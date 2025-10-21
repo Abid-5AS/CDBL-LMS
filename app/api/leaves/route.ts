@@ -125,16 +125,20 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  await dbConnect();
   const user = await getCurrentUser();
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ leaves: [] }, { status: 401 });
   }
 
-  await dbConnect();
-  const items = await Leave.find({ requestedById: user.id }).sort({ createdAt: -1 }).lean();
+  const { searchParams } = new URL(req.url);
+  const mine = searchParams.get("mine") === "1";
+  const query: any = mine ? { requestedById: user.id } : {};
 
-  const mapped = items.map((r: any) => {
+  const leaves = await Leave.find(query).sort({ createdAt: -1 }).lean();
+
+  const mapped = leaves.map((r: any) => {
     const approvals = Array.isArray(r.approvals)
       ? r.approvals.map((step: any) => serializeApproval(step)).filter(Boolean)
       : [];
@@ -154,5 +158,5 @@ export async function GET() {
     };
   });
 
-  return NextResponse.json({ items: mapped }, { status: 200 });
+  return NextResponse.json({ leaves: mapped }, { status: 200 });
 }
