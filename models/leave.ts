@@ -39,6 +39,11 @@ const LeaveSchema = new Schema(
     requestedById: { type: Types.ObjectId, ref: "User", required: true },
     approvals: { type: [ApprovalSchema], default: [] },
     currentStageIndex: { type: Number, default: 0 },
+    approverStage: {
+      type: String,
+      enum: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
+      default: "HR_ADMIN",
+    },
   },
   { timestamps: true }
 );

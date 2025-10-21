@@ -11,7 +11,7 @@ const LeaveRequestSchema = z.object({
   type: z.enum(["EL", "CL", "ML", "EWP", "EWO", "MAT", "PAT"]),
   start: z.string().datetime({ offset: true }),
   end: z.string().datetime({ offset: true }),
-  reason: z.string().min(1).max(1000),
+  reason: z.string().min(3).max(500),
   certificate: z.boolean().optional().default(false),
 });
 
@@ -25,6 +25,17 @@ function serializeApproval(step: any) {
     decidedAt: step.decidedAt ? new Date(step.decidedAt).toISOString() : null,
     comment: step.comment ?? null,
   };
+}
+
+async function hasOverlap(userId: string, start: Date, end: Date) {
+  const overlap = await Leave.findOne({
+    requestedById: userId,
+    start: { $lte: end },
+    end: { $gte: start },
+  })
+    .select({ _id: 1 })
+    .lean();
+  return Boolean(overlap);
 }
 
 export async function POST(req: Request) {
@@ -43,6 +54,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "End date cannot be before start date." }, { status: 400 });
     }
 
+    await dbConnect();
+
     const days = countRequestedDays(start, end);
 
     if (data.type === "CL" && days > 3) {
@@ -55,7 +68,10 @@ export async function POST(req: Request) {
       );
     }
 
-    await dbConnect();
+    const overlap = await hasOverlap(user.id, start, end);
+    if (overlap) {
+      return NextResponse.json({ error: "Overlapping leave exists for the selected dates." }, { status: 400 });
+    }
 
     const workflowRoles: string[] =
       typeof (Leave as any).workflowRoles === "function" ? (Leave as any).workflowRoles() : [];
@@ -77,6 +93,7 @@ export async function POST(req: Request) {
       requestedByEmail: user.email,
       approvals,
       currentStageIndex: 0,
+      approverStage: "DEPT_HEAD",
     });
 
     const serializedApprovals = Array.isArray(doc.approvals)
@@ -94,6 +111,7 @@ export async function POST(req: Request) {
         status: doc.status,
         approvals: serializedApprovals,
         currentStageIndex: doc.currentStageIndex,
+        approverStage: doc.approverStage ?? null,
         updatedAt: doc.updatedAt.toISOString(),
       },
       { status: 201 }
@@ -131,6 +149,7 @@ export async function GET() {
       status: r.status,
       approvals,
       currentStageIndex: r.currentStageIndex ?? 0,
+      approverStage: r.approverStage ?? null,
       updatedAt: new Date(r.updatedAt).toISOString(),
     };
   });
