@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,15 +20,21 @@ import {
 } from "@/components/ui/select";
 
 export default function ApplyLeavePage() {
+  const router = useRouter();
   const [type, setType] = useState<string>("");
   const [start, setStart] = useState<Date | undefined>();
   const [end, setEnd] = useState<Date | undefined>();
   const [reason, setReason] = useState<string>("");
   const [hasCertificate, setHasCertificate] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const requestedDays = useMemo(() => countRequestedDays(start, end), [start, end]);
+  const needsCertificate = type === "ML" && requestedDays > 3;
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     try {
+      if (submitting) return;
       if (!type) {
         toast.error("Please select a leave type.");
         return;
@@ -37,14 +44,25 @@ export default function ApplyLeavePage() {
         return;
       }
 
+      if (!reason.trim()) {
+        toast.error("Please provide a reason.");
+        return;
+      }
+
+      if (needsCertificate && !hasCertificate) {
+        toast.error("Medical leave over 3 days requires acknowledging the medical certificate.");
+        return;
+      }
+
       const payload = {
         type,
         start: start.toISOString(),
         end: end.toISOString(),
-        reason,
-        certificate: hasCertificate,
+        reason: reason.trim(),
+        certificate: needsCertificate ? true : hasCertificate,
       };
 
+      setSubmitting(true);
       const res = await fetch("/api/leaves", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -54,23 +72,19 @@ export default function ApplyLeavePage() {
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error("Policy check failed", { description: data.error ?? "Unable to submit." });
+        toast.error(data.error ?? "Failed to submit leave");
         return;
       }
 
-      toast("Leave request submitted ✅", {
-        description: `Requested ${data.requestedDays} day(s). Status: ${data.status}.`,
-      });
-
-      // TODO: In future, navigate to /leaves/my or reset form
-      // router.push("/leaves/my")
+      toast.success("Leave submitted for approval");
+      router.push("/dashboard");
     } catch (error) {
       console.error(error);
-      toast.error("Submission failed ❌", { description: "Please try again or contact HR." });
+      toast.error("Network error submitting leave");
+    } finally {
+      setSubmitting(false);
     }
   }
-
-  const requestedDays = countRequestedDays(start, end);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -91,7 +105,7 @@ export default function ApplyLeavePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label>Leave Type</Label>
-                  <Select onValueChange={setType}>
+                  <Select onValueChange={(value) => { setType(value); setHasCertificate(false); }}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select leave type" />
                     </SelectTrigger>
@@ -128,10 +142,16 @@ export default function ApplyLeavePage() {
 
               <div className="space-y-2">
                 <Label htmlFor="reason">Reason</Label>
-                <Textarea id="reason" rows={4} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Brief reason for leave…" />
+                <Textarea
+                  id="reason"
+                  rows={4}
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder="Brief reason for leave…"
+                />
               </div>
 
-              {type === "ML" ? (
+              {type === "ML" && (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <input
@@ -141,22 +161,24 @@ export default function ApplyLeavePage() {
                       onChange={(e) => setHasCertificate(e.target.checked)}
                     />
                     <label htmlFor="cert" className="text-sm">
-                      I will submit a medical certificate as required.
+                      I’ve attached a medical certificate.
                     </label>
                   </div>
-                  <p className="text-xs text-muted-foreground">Per policy, ML over 3 days requires a certificate.</p>
+                  <p className="text-xs text-muted-foreground">
+                    {requestedDays > 3
+                      ? "Required: Medical leave over 3 days must include a certificate."
+                      : "Optional: Attach supporting documents if available."}
+                  </p>
                 </div>
-              ) : null}
-
-              <div className="space-y-2">
-                <Label htmlFor="attachment">Attachment (optional)</Label>
-                <Input id="attachment" type="file" accept=".pdf,.jpg,.jpeg,.png" />
-                <p className="text-xs text-muted-foreground">Medical certificate or supporting proof, if applicable.</p>
-              </div>
+              )}
 
               <div className="flex items-center gap-3">
-                <Button type="submit" className="bg-[#2563EB] text-white">Submit Request</Button>
-                <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">Cancel</Link>
+                <Button type="submit" className="bg-[#2563EB] text-white" disabled={submitting}>
+                  {submitting ? "Submitting..." : "Submit Request"}
+                </Button>
+                <Link href="/dashboard" className="text-sm text-muted-foreground hover:underline">
+                  Cancel
+                </Link>
               </div>
             </form>
           </CardContent>
