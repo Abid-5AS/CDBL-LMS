@@ -4,6 +4,7 @@ import { countRequestedDays } from "@/lib/leave-days";
 import { dbConnect } from "@/lib/db";
 import { Leave } from "@/models/leave";
 import { getCurrentUser } from "@/lib/auth";
+import { canApprove } from "@/lib/rbac";
 
 export const runtime = "nodejs";
 
@@ -133,8 +134,20 @@ export async function GET(req: Request) {
   }
 
   const { searchParams } = new URL(req.url);
-  const mine = searchParams.get("mine") === "1";
-  const query: any = mine ? { requestedById: user.id } : {};
+  const stageParamRaw = searchParams.get("stage");
+
+  const query: Record<string, any> = {};
+  if (stageParamRaw) {
+    const stage = stageParamRaw.replace(/-/g, "_").toUpperCase();
+    const userStage = (user.role ?? "").replace(/-/g, "_").toUpperCase();
+    if (!canApprove(user.role as any) || stage !== userStage) {
+      return NextResponse.json({ leaves: [] }, { status: 200 });
+    }
+    query.approverStage = stage;
+    query.status = "PENDING";
+  } else {
+    query.requestedById = user.id;
+  }
 
   const leaves = await Leave.find(query).sort({ createdAt: -1 }).lean();
 
@@ -143,18 +156,31 @@ export async function GET(req: Request) {
       ? r.approvals.map((step: any) => serializeApproval(step)).filter(Boolean)
       : [];
 
+    const timeline = Array.isArray(r.timeline)
+      ? r.timeline.map((entry: any) => ({
+          by: entry?.by ? String(entry.by) : null,
+          role: entry?.role ?? null,
+          action: entry?.action ?? null,
+          at: entry?.at ? new Date(entry.at).toISOString() : null,
+          note: entry?.note ?? null,
+        }))
+      : [];
+
     return {
       id: String(r._id),
       type: r.type,
-      start: new Date(r.start).toISOString(),
-      end: new Date(r.end).toISOString(),
+      start: r.start ? new Date(r.start).toISOString() : null,
+      end: r.end ? new Date(r.end).toISOString() : null,
       requestedDays: r.requestedDays,
       reason: r.reason,
       status: r.status,
+      requestedByName: r.requestedByName ?? null,
+      requestedByEmail: r.requestedByEmail ?? null,
       approvals,
       currentStageIndex: r.currentStageIndex ?? 0,
       approverStage: r.approverStage ?? null,
-      updatedAt: new Date(r.updatedAt).toISOString(),
+      timeline,
+      updatedAt: r.updatedAt ? new Date(r.updatedAt).toISOString() : null,
     };
   });
 

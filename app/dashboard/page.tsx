@@ -10,12 +10,14 @@ import { CalendarCheck, Clock, Plus, Wallet, FileDown, Calendar } from "lucide-r
 import { getCurrentUser } from "@/lib/auth";
 import { canApprove } from "@/lib/rbac";
 import PendingApprovalsCard from "./components/pending-approvals-card";
+import { PendingApprovals } from "./components/pending-approvals";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
   const username = user?.name ?? "User";
   const role = user?.role ?? "employee";
   const approver = user ? canApprove(user.role as any) : false;
+  const approverStage = user ? user.role.replace(/-/g, "_").toUpperCase() : "";
   return (
     <div className="flex h-screen bg-[#F8FAFC]">
       <DashboardSidebar activeItem="dashboard" />
@@ -48,7 +50,11 @@ export default async function DashboardPage() {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2"><RequestsTable /></div>
-              <div className="space-y-6"><ActivityPanel /><PolicyReminders /></div>
+              <div className="space-y-6">
+                {approver && user ? <PendingApprovals role={approverStage} /> : null}
+                <ActivityPanel />
+                <PolicyReminders />
+              </div>
             </div>
           </div>
         </main>
