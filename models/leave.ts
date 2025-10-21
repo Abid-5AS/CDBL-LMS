@@ -33,7 +33,6 @@ const LeaveSchema = new Schema(
     requestedDays: { type: Number, required: true },
     reason: { type: String, required: true },
     certificate: { type: Boolean, default: false },
-    status: { type: String, enum: ["PENDING", "APPROVED", "REJECTED"], default: "PENDING" },
     requestedByName: { type: String, required: true },
     requestedByEmail: { type: String, required: true },
     requestedById: { type: Types.ObjectId, ref: "User", required: true },
@@ -41,9 +40,23 @@ const LeaveSchema = new Schema(
     currentStageIndex: { type: Number, default: 0 },
     approverStage: {
       type: String,
-      enum: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
-      default: "HR_ADMIN",
+      enum: ["DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO", "COMPLETED"],
+      default: "DEPT_HEAD",
     },
+    status: {
+      type: String,
+      enum: ["PENDING", "APPROVED", "REJECTED"],
+      default: "PENDING",
+    },
+    timeline: [
+      {
+        by: { type: Schema.Types.ObjectId, ref: "User" },
+        role: { type: String },
+        action: { type: String },
+        at: { type: Date, default: Date.now },
+        note: { type: String },
+      },
+    ],
   },
   { timestamps: true }
 );
