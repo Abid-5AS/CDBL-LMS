@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import StatusBadge from "./status-badge";
@@ -16,31 +16,12 @@ type LeaveRow = {
   updatedAt: string;
 };
 
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 export function RequestsTable() {
-  const [rows, setRows] = useState<LeaveRow[] | null>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-    fetch("/api/leaves")
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Failed to load leaves");
-        }
-        return res.json();
-      })
-      .then(({ items }) => {
-        if (!isMounted) return;
-        setRows(Array.isArray(items) ? items : []);
-      })
-      .catch(() => {
-        if (!isMounted) return;
-        setRows([]);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const { data, isLoading, error } = useSWR("/api/leaves?mine=1", fetcher, {
+    revalidateOnFocus: false,
+  });
 
   return (
     <Card>
@@ -60,20 +41,26 @@ export function RequestsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {rows === null ? (
+            {isLoading ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-8">
                   Loading…
                 </TableCell>
               </TableRow>
-            ) : rows.length === 0 ? (
+            ) : error ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center text-sm text-red-600 py-8">
+                  Failed to load
+                </TableCell>
+              </TableRow>
+            ) : !Array.isArray(data?.leaves) || data.leaves.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-8">
                   No leave requests yet. Apply your first leave!
                 </TableCell>
               </TableRow>
             ) : (
-              rows.map((row) => (
+              data.leaves.map((row: LeaveRow) => (
                 <TableRow key={row.id}>
                   <TableCell>{row.type}</TableCell>
                   <TableCell>
