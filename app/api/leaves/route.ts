@@ -138,13 +138,7 @@ export async function GET(req: Request) {
 
   const query: Record<string, any> = {};
   if (stageParamRaw) {
-    const stage = stageParamRaw.replace(/-/g, "_").toUpperCase();
-    const userStage = (user.role ?? "").replace(/-/g, "_").toUpperCase();
-    if (!canApprove(user.role as any) || stage !== userStage) {
-      return NextResponse.json({ leaves: [] }, { status: 200 });
-    }
-    query.approverStage = stage;
-    query.status = "PENDING";
+    query.approverStage = stageParamRaw.replace(/-/g, "_").toUpperCase();
   } else {
     query.requestedById = user.id;
   }
