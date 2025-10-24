@@ -1,182 +1,174 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { countRequestedDays } from "@/lib/leave-days";
-import { dbConnect } from "@/lib/db";
-import { Leave } from "@/models/leave";
+import { LeaveType } from "@prisma/client";
+import {
+  policy,
+  daysInclusive,
+  needsMedicalCertificate,
+  canBackdate,
+  withinBackdateLimit,
+  makeWarnings,
+} from "@/lib/policy";
+import { promises as fs } from "fs";
+import path from "path";
+import { randomUUID } from "crypto";
 import { getCurrentUser } from "@/lib/auth";
-import { canApprove } from "@/lib/rbac";
 
 export const runtime = "nodejs";
 
-const LeaveRequestSchema = z.object({
-  type: z.enum(["EL", "CL", "ML", "EWP", "EWO", "MAT", "PAT"]),
-  start: z.string().datetime({ offset: true }),
-  end: z.string().datetime({ offset: true }),
-  reason: z.string().min(3).max(500),
-  certificate: z.boolean().optional().default(false),
+const ApplySchema = z.object({
+  type: z.enum([
+    "EARNED",
+    "CASUAL",
+    "MEDICAL",
+    "EXTRAWITHPAY",
+    "EXTRAWITHOUTPAY",
+    "MATERNITY",
+    "PATERNITY",
+    "STUDY",
+    "SPECIAL_DISABILITY",
+    "QUARANTINE",
+  ]),
+  startDate: z.string(),
+  endDate: z.string(),
+  reason: z.string().min(3),
+  workingDays: z.number().int().positive().optional(),
+  needsCertificate: z.boolean().optional(),
 });
 
-function serializeApproval(step: any) {
-  if (!step) return null;
-  return {
-    role: step.role,
-    status: step.status,
-    decidedById: step.decidedById ?? null,
-    decidedByName: step.decidedByName ?? null,
-    decidedAt: step.decidedAt ? new Date(step.decidedAt).toISOString() : null,
-    comment: step.comment ?? null,
-  };
+export async function GET() {
+  const me = await getCurrentUser();
+  if (!me) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
+  const items = await prisma.leaveRequest.findMany({
+    where: { requesterId: me.id },
+    orderBy: { createdAt: "desc" },
+    include: { approvals: true },
+  });
+
+  return NextResponse.json({ items });
 }
 
-async function hasOverlap(userId: string, start: Date, end: Date) {
-  const overlap = await Leave.findOne({
-    requestedById: userId,
-    start: { $lte: end },
-    end: { $gte: start },
-  })
-    .select({ _id: 1 })
-    .lean();
-  return Boolean(overlap);
+function yearOf(d: Date) {
+  return d.getFullYear();
+}
+
+async function getAvailableDays(userId: number, type: LeaveType, year: number) {
+  const bal = await prisma.balance.findUnique({
+    where: { userId_type_year: { userId, type, year } },
+  });
+  if (!bal) return 0;
+  return (bal.opening ?? 0) + (bal.accrued ?? 0) - (bal.used ?? 0);
 }
 
 export async function POST(req: Request) {
-  try {
-    const raw = await req.json();
-    const data = LeaveRequestSchema.parse(raw);
+  const me = await getCurrentUser();
+  if (!me) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  const contentType = req.headers.get("content-type") ?? "";
+  let certificateFile: File | null = null;
+  let parsedInput: z.infer<typeof ApplySchema>;
 
-    const start = new Date(data.start);
-    const end = new Date(data.end);
-    if (start > end) {
-      return NextResponse.json({ error: "End date cannot be before start date." }, { status: 400 });
-    }
-
-    await dbConnect();
-
-    const days = countRequestedDays(start, end);
-
-    if (data.type === "CL" && days > 3) {
-      return NextResponse.json({ error: "Casual Leave limited to 3 consecutive days by policy." }, { status: 400 });
-    }
-    if (data.type === "ML" && days > 3 && !data.certificate) {
-      return NextResponse.json(
-        { error: "Medical Leave over 3 days requires a medical certificate per policy." },
-        { status: 400 },
-      );
-    }
-
-    const overlap = await hasOverlap(user.id, start, end);
-    if (overlap) {
-      return NextResponse.json({ error: "Overlapping leave exists for the selected dates." }, { status: 400 });
-    }
-
-    const workflowRoles: string[] =
-      typeof (Leave as any).workflowRoles === "function" ? (Leave as any).workflowRoles() : [];
-    const approvals = workflowRoles.map((role: string) => ({
-      role,
-      status: "PENDING" as const,
-    }));
-
-    const doc = await Leave.create({
-      type: data.type,
-      start,
-      end,
-      requestedDays: days,
-      reason: data.reason,
-      certificate: data.certificate ?? false,
-      status: "PENDING",
-      requestedByName: user.name,
-      requestedById: user.id,
-      requestedByEmail: user.email,
-      approvals,
-      currentStageIndex: 0,
-      approverStage: "DEPT_HEAD",
-    });
-
-    const serializedApprovals = Array.isArray(doc.approvals)
-      ? doc.approvals.map((step: any) => serializeApproval(step)).filter(Boolean)
-      : [];
-
-    return NextResponse.json(
-      {
-        id: String(doc._id),
-        type: doc.type,
-        start: doc.start.toISOString(),
-        end: doc.end.toISOString(),
-        requestedDays: doc.requestedDays,
-        reason: doc.reason,
-        status: doc.status,
-        approvals: serializedApprovals,
-        currentStageIndex: doc.currentStageIndex,
-        approverStage: doc.approverStage ?? null,
-        updatedAt: doc.updatedAt.toISOString(),
-      },
-      { status: 201 }
-    );
-  } catch (err: any) {
-    if (err?.issues) {
-      return NextResponse.json({ error: err.issues?.[0]?.message ?? "Invalid request." }, { status: 400 });
-    }
-    console.error(err);
-    return NextResponse.json({ error: "Unexpected error." }, { status: 500 });
-  }
-}
-
-export async function GET(req: Request) {
-  await dbConnect();
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ leaves: [] }, { status: 401 });
-  }
-
-  const { searchParams } = new URL(req.url);
-  const stageParamRaw = searchParams.get("stage");
-
-  const query: Record<string, any> = {};
-  if (stageParamRaw) {
-    query.approverStage = stageParamRaw.replace(/-/g, "_").toUpperCase();
-  } else {
-    query.requestedById = user.id;
-  }
-
-  const leaves = await Leave.find(query).sort({ createdAt: -1 }).lean();
-
-  const mapped = leaves.map((r: any) => {
-    const approvals = Array.isArray(r.approvals)
-      ? r.approvals.map((step: any) => serializeApproval(step)).filter(Boolean)
-      : [];
-
-    const timeline = Array.isArray(r.timeline)
-      ? r.timeline.map((entry: any) => ({
-          by: entry?.by ? String(entry.by) : null,
-          role: entry?.role ?? null,
-          action: entry?.action ?? null,
-          at: entry?.at ? new Date(entry.at).toISOString() : null,
-          note: entry?.note ?? null,
-        }))
-      : [];
-
-    return {
-      id: String(r._id),
-      type: r.type,
-      start: r.start ? new Date(r.start).toISOString() : null,
-      end: r.end ? new Date(r.end).toISOString() : null,
-      requestedDays: r.requestedDays,
-      reason: r.reason,
-      status: r.status,
-      requestedByName: r.requestedByName ?? null,
-      requestedByEmail: r.requestedByEmail ?? null,
-      approvals,
-      currentStageIndex: r.currentStageIndex ?? 0,
-      approverStage: r.approverStage ?? null,
-      timeline,
-      updatedAt: r.updatedAt ? new Date(r.updatedAt).toISOString() : null,
+  if (contentType.includes("multipart/form-data")) {
+    const formData = await req.formData();
+    const toBoolean = (value: FormDataEntryValue | null) => {
+      if (typeof value !== "string") return undefined;
+      return value === "true";
     };
+    const raw = {
+      type: String(formData.get("type") ?? ""),
+      startDate: String(formData.get("startDate") ?? ""),
+      endDate: String(formData.get("endDate") ?? ""),
+      reason: String(formData.get("reason") ?? ""),
+      workingDays: formData.get("workingDays")
+        ? Number(formData.get("workingDays"))
+        : undefined,
+      needsCertificate: toBoolean(formData.get("needsCertificate")),
+    };
+
+    certificateFile = formData.get("certificate") instanceof File ? (formData.get("certificate") as File) : null;
+    parsedInput = ApplySchema.parse(raw);
+  } else {
+    const json = await req.json();
+    parsedInput = ApplySchema.parse(json);
+  }
+
+  const start = new Date(parsedInput.startDate);
+  const end = new Date(parsedInput.endDate);
+  if (isNaN(start.getTime()) || isNaN(end.getTime()) || start > end) {
+    return NextResponse.json({ error: "invalid_dates" }, { status: 400 });
+  }
+
+  let certificateUrl: string | undefined;
+  if (certificateFile) {
+    const ext = (certificateFile.name.split(".").pop() ?? "").toLowerCase();
+    const allowed = ["pdf", "jpg", "jpeg", "png"];
+    if (!allowed.includes(ext)) {
+      return NextResponse.json({ error: "unsupported_file_type" }, { status: 400 });
+    }
+    if (certificateFile.size > 5 * 1024 * 1024) {
+      return NextResponse.json({ error: "file_too_large" }, { status: 400 });
+    }
+    const arrayBuffer = await certificateFile.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const safeName = certificateFile.name.replace(/[^\w.\-]/g, "_");
+    const finalName = `${randomUUID()}-${safeName}`;
+    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    await fs.mkdir(uploadDir, { recursive: true });
+    await fs.writeFile(path.join(uploadDir, finalName), buffer);
+    certificateUrl = `/uploads/${finalName}`;
+  }
+
+  const workingDays = daysInclusive(new Date(start), new Date(end));
+
+  const today = new Date();
+  const isBackdated = start < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const t = parsedInput.type as LeaveType;
+
+  if (isBackdated) {
+    if (!canBackdate(t)) {
+      return NextResponse.json({ error: "backdate_disallowed", type: t }, { status: 400 });
+    }
+    if (!withinBackdateLimit(t, new Date(today), new Date(start))) {
+      return NextResponse.json({ error: "backdate_window_exceeded", type: t }, { status: 400 });
+    }
+  }
+
+  const warnings = makeWarnings(parsedInput.type, new Date(today), new Date(start));
+
+  const mustCert = needsMedicalCertificate(parsedInput.type, workingDays);
+  const needsCertificate = parsedInput.needsCertificate ?? mustCert;
+  if (mustCert) {
+    (warnings as Record<string, boolean>).mlNeedsCertificate = true;
+  }
+
+  const year = yearOf(start);
+  const available = await getAvailableDays(me.id, t, year);
+  if (available < workingDays) {
+    return NextResponse.json(
+      { error: "insufficient_balance", available, requested: workingDays, type: t },
+      { status: 400 }
+    );
+  }
+
+  const created = await prisma.leaveRequest.create({
+    data: {
+      requesterId: me.id,
+      type: t,
+      startDate: start,
+      endDate: end,
+      workingDays,
+      reason: parsedInput.reason,
+      needsCertificate,
+      certificateUrl,
+      policyVersion: policy.version,
+      status: "SUBMITTED",
+      approvals: {
+        create: [{ step: 1, approverId: me.id, decision: "PENDING" }],
+      },
+    },
   });
 
-  return NextResponse.json({ leaves: mapped }, { status: 200 });
+  return NextResponse.json({ ok: true, id: created.id, warnings });
 }

@@ -1,31 +1,60 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { dbConnect } from "@/lib/db";
-import { User } from "@/models/user";
-import { signAuthJWT, AUTH_COOKIE } from "@/lib/auth-jwt";
+import { prisma } from "@/lib/prisma";
+import { AUTH_COOKIE, signAuthJWT } from "@/lib/auth-jwt";
 
 export async function POST(req: Request) {
   try {
-    const { userId } = await req.json();
-    if (!userId) return NextResponse.json({ error: "userId required" }, { status: 400 });
+    const body = await req.json().catch(() => ({}));
+    const emailInput = typeof body.email === "string" ? body.email.trim() : "";
 
-    await dbConnect();
-    const u = await User.findById(userId).lean();
-    if (!u) return NextResponse.json({ error: "User not found" }, { status: 404 });
+    if (!emailInput) {
+      return NextResponse.json({ error: "email_required" }, { status: 400 });
+    }
 
-    const token = await signAuthJWT({ uid: String(u._id), role: String(u.role) });
+    const user = await prisma.user.findFirst({
+      where: {
+        email: {
+          equals: emailInput,
+        },
+      },
+      select: { id: true, email: true, name: true, role: true },
+    });
 
+    if (!user) {
+      return NextResponse.json({ error: "unknown_user" }, { status: 401 });
+    }
+
+    const token = await signAuthJWT({ uid: String(user.id), role: user.role });
     const res = NextResponse.json({ ok: true });
+    res.cookies.set("auth_user_id", String(user.id), {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+    });
+    res.cookies.set("auth_user_email", user.email ?? "", {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+    });
+    res.cookies.set("auth_user_name", user.name ?? "", {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+    });
     res.cookies.set(AUTH_COOKIE, token, {
+      path: "/",
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 60 * 8,
     });
+    res.cookies.delete("auth_user");
+    res.cookies.delete("auth_user_email_legacy");
+
     return res;
-  } catch {
-    return NextResponse.json({ error: "Invalid login request" }, { status: 400 });
+  } catch (error) {
+    console.error("login error", error);
+    return NextResponse.json({ error: "internal_error" }, { status: 500 });
   }
 }

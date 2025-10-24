@@ -52,3 +52,17 @@ Data Retention
 --------------
 - **6.12f**  
   All final approvals retained; exportable PDF.
+
+### Where to implement (v1.1)
+- Validation:
+  - app/api/leaves/apply/route.ts  -> date rules, CL notice warning, ML certificate check.
+- Balances:
+  - lib/balance.ts                 -> EL 20/year, carry-forward; no year-end expiry; max bank 60.
+- UI:
+  - app/dashboard/components/requests-table.tsx -> full type labels.
+  - app/dashboard/components/dashboard-header.tsx -> show current date info.
+  - app/dashboard/components/request-detail.tsx  -> modal/drawer detail view.
+  - app/dashboard/components/cancel-button.tsx   -> cancel flow.
+- API:
+  - app/api/leaves/[id]/route.ts -> GET details.
+  - app/api/leaves/[id]/cancel/route.ts -> cancel.

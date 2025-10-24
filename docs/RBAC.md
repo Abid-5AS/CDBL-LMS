@@ -2,7 +2,7 @@
 
 EMPLOYEE
 - Create/edit own leave (DRAFT/PENDING), upload attachments.
-- View own balances/requests, cancel own pending/approved (pre-start).
+- View own balances/requests, cancel own PENDING requests.
 
 DEPT_HEAD
 - Approve/reject/return requests of department staff after HR step.
@@ -20,3 +20,6 @@ CEO
 
 SYS_ADMIN
 - Manage users/departments/roles; edit policy settings; force overrides; view audit logs.
+
+- Employee: can CREATE leave, VIEW own, CANCEL own (PENDING only).
+- Approver roles unchanged.

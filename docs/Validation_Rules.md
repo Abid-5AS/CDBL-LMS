@@ -1,20 +1,19 @@
-# Validation Rules (Centralized)
+# Validation Rules
 
-Shared pre-checks:
-- startDate/endDate present; startDate <= endDate; days = inclusive calendar days.
-- If type !== ML, enforce 5-working-day notice unless HR override.
-- Weekends/holidays count toward `days`.
-
-Per type:
-- CL: days <= 3; yearTotal(CL)+days <= 10; year scope only.
-- ML: yearTotal(ML)+days <= 14; if days > 3 -> require MEDICAL_CERT (+ PRESCRIPTION).
-- EL: currentBalance(EL) >= days.
-- QUAR: require QUARANTINE_CERT; days <= 21 (<=30 with HR_SENIOR override).
-- PAT: remainingOccasions >=1 and monthsSinceLast >= 36; days <= policy.paternity.days.
-
-Balance timing:
-- Deduct on final APPROVED; restore on CANCEL before start.
-- Auto-lapse CL at year-end; EL accrual monthly (cron/queue).
-
-Overrides:
-- Any hard rule may be overridden by HR_SENIOR/SYS_ADMIN with `overrideReason` logged.
+## Request Validation (v1.1)
+1) Balances
+   - Calculate available = opening + accrued - used.
+   - Reject if requestedDays > available for the selected type (after EL carry-forward cap).
+2) Backdate rules
+   - EARNED, MEDICAL: backdate allowed ≤ 30 days from apply date → start date.
+   - CASUAL: backdate disallowed; start date must be ≥ apply date.
+3) Notice
+   - CASUAL submitted < 5 days before start → accept but emit warning & flag (`clShortNotice`).
+4) Medical certificate
+   - MEDICAL requests with requestedDays > 3 must include `hasMedicalCertificate`; otherwise 400.
+5) Consecutive CL
+   - Reject CASUAL if requestedDays > 3 consecutive days.
+6) Weekends/holidays
+   - All spans count weekends/holidays via inclusive date calculation.
+7) Cancellation (unchanged)
+   - Employees may cancel only while status == PENDING; cancellation logs audit trail.

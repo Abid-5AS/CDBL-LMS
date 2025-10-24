@@ -4,24 +4,60 @@ import useSWR from "swr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import StatusBadge from "./status-badge";
+import { leaveTypeLabel } from "@/lib/ui";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 type LeaveRow = {
-  id: string;
-  type: "EL" | "CL" | "ML" | "EWP" | "EWO" | "MAT" | "PAT";
-  start: string;
-  end: string;
-  requestedDays: number;
-  reason: string;
-  status: "PENDING" | "APPROVED" | "REJECTED";
+  id: number;
+  type: string;
+  startDate: string;
+  endDate: string;
+  workingDays: number;
+  status: "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
   updatedAt: string;
 };
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const CANCELABLE_STATUSES = new Set<LeaveRow["status"]>(["SUBMITTED", "PENDING"]);
 
 export function RequestsTable() {
-  const { data, isLoading, error } = useSWR("/api/leaves?mine=1", fetcher, {
+  const { data, isLoading, error, mutate } = useSWR("/api/leaves?mine=1", fetcher, {
     revalidateOnFocus: false,
   });
+
+  const rows: LeaveRow[] = Array.isArray(data?.items) ? data.items : [];
+
+  const cancelRequest = async (id: number) => {
+    try {
+      const res = await fetch(`/api/leaves/${id}`, { method: "PATCH" });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        toast.error("Couldn't cancel request", {
+          description: body?.error ?? "Please try again.",
+        });
+        return;
+      }
+      toast.success("Request cancelled");
+      mutate();
+    } catch (err) {
+      console.error(err);
+      toast.error("Couldn't cancel request", {
+        description: "Network error. Please try again.",
+      });
+    }
+  };
 
   return (
     <Card>
@@ -44,7 +80,7 @@ export function RequestsTable() {
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-8">
-                  Loading…
+                  Loading...
                 </TableCell>
               </TableRow>
             ) : error ? (
@@ -53,26 +89,51 @@ export function RequestsTable() {
                   Failed to load
                 </TableCell>
               </TableRow>
-            ) : !Array.isArray(data?.leaves) || data.leaves.length === 0 ? (
+            ) : rows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-8">
                   No leave requests yet. Apply your first leave!
                 </TableCell>
               </TableRow>
             ) : (
-              data.leaves.map((row: LeaveRow) => (
+              rows.map((row) => (
                 <TableRow key={row.id}>
-                  <TableCell>{row.type}</TableCell>
+                  <TableCell>{leaveTypeLabel[row.type] ?? row.type}</TableCell>
                   <TableCell>
-                    {new Date(row.start).toLocaleDateString()} → {new Date(row.end).toLocaleDateString()}
+                    {new Date(row.startDate).toLocaleDateString()} →{" "}
+                    {new Date(row.endDate).toLocaleDateString()}
                   </TableCell>
-                  <TableCell>{row.requestedDays}</TableCell>
+                  <TableCell>{row.workingDays}</TableCell>
                   <TableCell>
                     <StatusBadge status={row.status} />
                   </TableCell>
                   <TableCell>{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
                   <TableCell>
-                    <button className="text-sm text-primary">View</button>
+                    {CANCELABLE_STATUSES.has(row.status) ? (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            Cancel
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Cancel this request?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will mark the request as cancelled. Approvers will no longer see it.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Keep</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => cancelRequest(row.id)}>
+                              Cancel Request
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
                   </TableCell>
                 </TableRow>
               ))

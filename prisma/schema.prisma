@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  EMPLOYEE
+  MANAGER
+  HR
+  CEO
+}
+
+enum LeaveType {
+  EARNED
+  CASUAL
+  MEDICAL
+  EXTRAWITHPAY
+  EXTRAWITHOUTPAY
+  MATERNITY
+  PATERNITY
+  STUDY
+  SPECIAL_DISABILITY
+  QUARANTINE
+}
+
+enum LeaveStatus {
+  DRAFT
+  SUBMITTED
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  empCode      String   @unique
+  name         String
+  email        String   @unique
+  role         Role     @default(EMPLOYEE)
+  department   String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  leaves       LeaveRequest[]
+  balances     Balance[]
+  approvals    Approval[]   @relation("ApprovalApprover")
+}
+
+model LeaveRequest {
+  id              Int           @id @default(autoincrement())
+  requesterId     Int
+  type            LeaveType
+  startDate       DateTime
+  endDate         DateTime
+  workingDays     Int
+  reason          String
+  needsCertificate Boolean      @default(false)
+  certificateUrl  String?       // future upload
+  status          LeaveStatus   @default(DRAFT)
+  policyVersion   String        // e.g. "v1.1"
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  requester       User          @relation(fields: [requesterId], references: [id])
+  approvals       Approval[]
+}
+
+model Approval {
+  id          Int          @id @default(autoincrement())
+  leaveId     Int
+  step        Int          // 1=Manager, 2=DeptHead/HR, 3=CEO (if needed)
+  approverId  Int
+  decision    String       // "APPROVED" | "REJECTED" | "PENDING"
+  comment     String?
+  decidedAt   DateTime?
+
+  leave       LeaveRequest @relation(fields: [leaveId], references: [id])
+  approver    User         @relation("ApprovalApprover", fields: [approverId], references: [id])
+}
+
+model Balance {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  type      LeaveType
+  year      Int
+  opening   Int      // carry-forward (for EL)
+  accrued   Int      // e.g., EL accrual 2 days / month
+  used      Int      @default(0)
+  closing   Int
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, type, year])
+}
+
+model Holiday {
+  id         Int      @id @default(autoincrement())
+  date       DateTime @unique
+  name       String
+  isOptional Boolean  @default(false)
+}

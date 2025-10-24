@@ -5,7 +5,7 @@ All responses: JSON with `{ success: boolean, data?: any, error?: { code, messag
 Auth:
 - For now: simple cookie `auth_token` (pending swap to NextAuth/iron-session).
 
-## POST /api/leaves
+## POST /api/leaves/apply
 Create a leave request.  
 Body:
 ```
@@ -20,15 +20,18 @@ Body:
   attachments?: { kind: "MEDICAL_CERT"|"PRESCRIPTION"|"QUARANTINE_CERT"|"OTHER", url:string, fileName:string }[]
 }
 ```
-Validations: See `/docs/Policy_Implementation_Map.md` (hard rules).  
-Returns: `{ success, data: { leave } }`
+Validations:
+- Backdate allowed: EL, ML; not allowed: CL.
+- CL notice < 5 days -> 200 + `{ warning: "CL should be submitted >= 5 days early" }` but still accepts if balance/rules OK.
+- ML > 3 days requires `hasMedicalCertificate: true`; otherwise 400.
+Returns: `{ success, data: { leave }, warning?: string }`
 
 ## GET /api/leaves?mine=1|0&type?=CL&status?=pending|approved|rejected&year?=2025
 List leaves (default: current user). HR/Admin can query org-wide with filters.  
 Returns: `{ success, data: { items, total } }`
 
 ## GET /api/leaves/:id
-Returns single leave with approvals trail.
+- Returns a single leave with full detail + timeline.
 
 ## POST /api/leaves/:id/approve
 Body: `{ note?: string }`  
@@ -47,8 +50,8 @@ Body: `{ note: string }`
 Role: current approver.
 
 ## POST /api/leaves/:id/cancel
-Employee cancels before start; Admin can force-cancel.  
-Returns: updated leave; if approved, restores balance.
+- Auth: employee who owns the leave; status must be PENDING.
+- Response: `{ success: true, leave: ... }`
 
 ## POST /api/return-to-duty
 Marks return for ML (and any tracked types).  

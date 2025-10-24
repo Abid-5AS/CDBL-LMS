@@ -21,3 +21,4 @@ Performance
 Ops
 - Year-end jobs: CL lapse, EL carry, summary emails.
 - Clock/timezone: Asia/Dhaka; all persisted as UTC ISO.
+- Policy versioning: every leave stores `policyVersion`. Future changes remain auditable and do not retroactively alter decisions.

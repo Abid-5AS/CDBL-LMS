@@ -80,3 +80,12 @@ Validation Rules (UI + API)
 	•	EL: elBalance >= days.
 	•	Quarantine: attachments must include QUARANTINE_CERT; days <= 21 (≤30 with HR_SENIOR override).
 	•	Submission lead time: if type !== ML and startDate < today + 5 working days ⇒ block (HR override flag available).
+
+### Leave Type Labels
+- "EL" -> "Earned Leave"
+- "CL" -> "Casual Leave"
+- "ML" -> "Medical Leave"
+- "MAT" -> "Maternity Leave"
+- "PAT" -> "Paternity Leave"
+- "EWP" -> "Extraordinary Leave (with pay)"
+- "EWO" -> "Extraordinary Leave (without pay)"

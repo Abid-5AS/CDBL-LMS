@@ -12,9 +12,10 @@ type Props = {
   onChange: (date?: Date) => void;
   placeholder?: string;
   id?: string;
+  disabled?: (date: Date) => boolean;
 };
 
-export default function DatePicker({ value, onChange, placeholder = "Pick a date", id }: Props) {
+export default function DatePicker({ value, onChange, placeholder = "Pick a date", id, disabled }: Props) {
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -37,6 +38,7 @@ export default function DatePicker({ value, onChange, placeholder = "Pick a date
             onChange(d || undefined);
             setOpen(false);
           }}
+          disabled={disabled}
           initialFocus
         />
       </PopoverContent>

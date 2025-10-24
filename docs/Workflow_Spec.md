@@ -25,3 +25,11 @@ Edge cases:
 
 Notifications (future):
 - Email/Teams internal notice to next approver on transitions.
+
+### Employee: Request Detail View
+- Show timeline: Created -> Dept Head -> HR Admin -> HR Head -> CEO (if required).
+- Fields: type (full name), dates, workingDays, reason, attachments, status, approvers, audit log.
+
+### Employee: Cancel Request
+- Preconditions: status == PENDING.
+- Action: POST /api/leaves/:id/cancel -> status = CANCELLED, audit entry, notification to approver queue to drop item.

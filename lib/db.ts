@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const uri = process.env.MONGODB_URI;
 if (!uri) {
-  throw new Error("MONGODB_URI is not set. Create .env.local with MONGODB_URI.");
+  throw new Error("MONGODB_URI is not set. Add it to your .env file.");
 }
 
 let cached = (global as any)._mongoose;

@@ -1,19 +1,28 @@
 import { cookies } from "next/headers";
-import { verifyAuthJWT, AUTH_COOKIE } from "@/lib/auth-jwt";
-import { dbConnect } from "@/lib/db";
-import { User } from "@/models/user";
+import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 
 export async function getCurrentUser() {
   const store = await cookies();
-  const token = store.get(AUTH_COOKIE)?.value;
-  if (!token) return null;
-  try {
-    const claims = await verifyAuthJWT(token);
-    await dbConnect();
-    const doc = await User.findById(claims.uid).lean();
-    if (!doc) return null;
-    return { id: String(doc._id), name: doc.name, email: doc.email, role: doc.role as string };
-  } catch {
+  const emailCookie = store.get("auth_user_email")?.value?.trim();
+  const idCookie = store.get("auth_user_id")?.value;
+  const idNumber = idCookie ? Number(idCookie) : undefined;
+
+  if (!emailCookie && (idNumber === undefined || Number.isNaN(idNumber))) {
     return null;
   }
+
+  const orClauses: Prisma.UserWhereInput[] = [];
+  if (emailCookie) {
+    orClauses.push({ email: { equals: emailCookie } });
+  }
+  if (idNumber !== undefined && !Number.isNaN(idNumber)) {
+    orClauses.push({ id: idNumber });
+  }
+
+  const user = orClauses.length
+    ? await prisma.user.findFirst({ where: { OR: orClauses } })
+    : null;
+
+  return user;
 }

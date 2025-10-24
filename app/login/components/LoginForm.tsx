@@ -53,7 +53,8 @@ export function LoginForm() {
       const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: selected.id }),
+        body: JSON.stringify({ email: selected.email }),
+        credentials: "same-origin",
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -62,8 +63,9 @@ export function LoginForm() {
       }
       await redirectAfterLogin();
       return;
-    } catch (err: any) {
-      if (err?.digest === "NEXT_REDIRECT") {
+    } catch (err) {
+      const anyErr = err as { digest?: string };
+      if (anyErr?.digest === "NEXT_REDIRECT") {
         throw err;
       }
       toast.error("Network error");

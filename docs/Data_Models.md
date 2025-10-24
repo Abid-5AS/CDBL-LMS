@@ -20,8 +20,23 @@
 - createdAt, updatedAt
 
 ## leaves  (model: Leave, schema: LeaveSchema)
-- See /docs/Form_Field_Map.md (full field list)
-- createdAt, updatedAt (timestamps)
+- id: string
+- employeeId: string
+- type: enum("EL","CL","ML","EWP","EWO","MAT","PAT")
+- startDate: date
+- endDate: date
+- requestedDays: int               # includes weekends/holidays
+- reason: string
+- status: enum("PENDING","APPROVED","REJECTED","CANCELLED")
+- policyVersion: string            # default "1.1"
+- flags:
+  - clNoticeShortfall?: boolean
+  - requiresMedicalCertificate?: boolean
+- attachments:
+  - medicalCertificateUrl?: string
+- audit: [ { at: datetime, by: string, action: string, note?: string } ]
+- updatedAt: datetime
+- createdAt: datetime
 
 ## policy_settings
 - _id: ObjectId

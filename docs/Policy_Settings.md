@@ -1,18 +1,8 @@
-Admin “Knobs & Tweaks”
-======================
+## Policy Settings (v1.1 overview)
 
-To allow policy changes without redeploys, expose these in an Admin → Policy Settings page (stored in a `policy_settings` collection):
+- EL: 20/year, carry-forward enabled, cap 60; backdate allowed up to 30 days with justification.
+- CL: no backdate; 5-day advance notice (warning only); max 3 consecutive days.
+- ML: backdate allowed up to 30 days; certificate required when > 3 days.
+- Weekends/holidays count toward leave span.
 
-```
-{
-  year: 2025,
-  weekendsCountAsLeave: true,
-  require5DayNoticeExceptML: true,
-  cl: { annualCap: 10, consecutiveCap: 3, lapsesEndOfYear: true },
-  ml: { annualCap: 14, certificateThresholdDays: 3 },
-  el: { monthlyAccrual: 2, maxCarry: 60 },
-  quarantine: { standardCap: 21, exceptionalCap: 30, requireCertificate: true },
-  paternity: { days: 6, maxOccasions: 2, minMonthsBetween: 36 },
-  approvalsFlow: ['HR_ADMIN','DEPT_HEAD','HR_SENIOR','CEO'] // per dept override possible
-}
-```
+> These controls are configurable in `lib/policy.ts` (policy version v1.1).
