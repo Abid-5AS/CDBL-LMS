@@ -30,7 +30,7 @@ export async function verifyJwt(token: string) {
 }
 
 export async function getCurrentUser() {
-  const store = cookies();
+  const store = await cookies();
   const token = store.get(JWT_COOKIE)?.value;
   const emailCookie = store.get("auth_user_email")?.value;
   const nameCookie = store.get("auth_user_name")?.value;

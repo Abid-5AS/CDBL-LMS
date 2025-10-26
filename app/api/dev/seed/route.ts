@@ -1,18 +1,50 @@
 export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
-import { dbConnect } from "@/lib/db";
-import { User } from "@/models/user";
+import { prisma } from "@/lib/prisma";
+import { Role } from "@prisma/client";
 
 export async function POST() {
-  await dbConnect();
   const seed = [
-    { name: "Employee One", email: "employee1@demo.local", role: "EMPLOYEE" },
-    { name: "Employee Two", email: "employee2@demo.local", role: "EMPLOYEE" },
-    { name: "HR Admin", email: "hr@demo.local", role: "HR_ADMIN" },
+    {
+      name: "Employee One",
+      email: "employee1@demo.local",
+      role: Role.EMPLOYEE,
+      empCode: "E001",
+      department: "Engineering",
+    },
+    {
+      name: "Employee Two",
+      email: "employee2@demo.local",
+      role: Role.EMPLOYEE,
+      empCode: "E002",
+      department: "Operations",
+    },
+    {
+      name: "HR Admin",
+      email: "hr@demo.local",
+      role: Role.HR_ADMIN,
+      empCode: "HR001",
+      department: "HR & Admin",
+    },
   ];
-  for (const u of seed) {
-    await User.updateOne({ email: u.email }, { $setOnInsert: u }, { upsert: true });
+
+  for (const user of seed) {
+    await prisma.user.upsert({
+      where: { email: user.email },
+      update: {
+        name: user.name,
+        role: user.role,
+        empCode: user.empCode,
+        department: user.department,
+      },
+      create: user,
+    });
   }
-  const all = await User.find().lean();
-  return NextResponse.json({ ok: true, count: all.length });
+
+  const count = await prisma.user.count({
+    where: { email: { in: seed.map((u) => u.email) } },
+  });
+
+  return NextResponse.json({ ok: true, count });
 }

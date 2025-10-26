@@ -1,6 +1,6 @@
 export const runtime = "nodejs";
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth";
 import { resolveLeave } from "../../resolve-leave";
@@ -10,24 +10,26 @@ const bodySchema = z.object({
   comment: z.string().optional(),
 });
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (user.role !== "HR_ADMIN") return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
-  const body = await req.json();
+  const body = await request.json();
   const parsed = bodySchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid payload" }, { status: 400 });
   }
 
-  const id = Number(params.id);
-  if (Number.isNaN(id)) {
+  const numericId = Number(id);
+  if (Number.isNaN(numericId)) {
     return NextResponse.json({ error: "invalid_id" }, { status: 400 });
   }
 
   const decision = parsed.data.action === "approve" ? "APPROVED" : "REJECTED";
-  const result = await resolveLeave(id, decision, user.id, parsed.data.comment);
+  const result = await resolveLeave(numericId, decision, user.id, parsed.data.comment);
 
   if (!result.ok) {
     if (result.error === "not_found") {

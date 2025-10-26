@@ -3,7 +3,7 @@ import { DashboardSidebar } from "@/app/dashboard/components/dashboard-sidebar";
 import { DashboardHeader } from "@/app/dashboard/components/dashboard-header";
 import { getCurrentUser } from "@/lib/auth";
 import { canApprove, type AppRole } from "@/lib/rbac";
-import { ApprovalsTable } from "./components/approvals-table";
+import { ApprovalsContent } from "./components/approvals-content";
 
 export default async function ApprovalsPage() {
   const user = await getCurrentUser();
@@ -22,12 +22,13 @@ export default async function ApprovalsPage() {
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-[1200px] mx-auto p-8 space-y-6">
             <header>
-              <h1 className="text-2xl font-semibold text-slate-900">Approvals</h1>
+              <h1 className="text-2xl font-semibold text-slate-900">Pending Leave Approvals</h1>
               <p className="text-sm text-slate-600">
-                Review pending leave requests assigned to your role and take action.
+                Review and process employee leave requests. Select a row to view the complete employee profile before
+                approving or rejecting.
               </p>
             </header>
-            <ApprovalsTable />
+            <ApprovalsContent />
           </div>
         </main>
       </div>

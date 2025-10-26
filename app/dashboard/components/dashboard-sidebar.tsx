@@ -1,15 +1,18 @@
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import {
+  BarChart3,
   Book,
   Calendar,
+  ClipboardCheck,
   ClipboardList,
   Gift,
   HelpCircle,
   Home,
-  ClipboardCheck,
+  Settings,
+  Users,
 } from "lucide-react";
-import { canApprove, type AppRole } from "@/lib/rbac";
+import type { AppRole } from "@/lib/rbac";
 import { getCurrentUser } from "@/lib/auth";
 
 type DashboardSidebarProps = {
@@ -24,12 +27,22 @@ type SidebarLink = {
   badge?: number;
 };
 
-const baseLinks: SidebarLink[] = [
+const employeeLinks: SidebarLink[] = [
   { key: "dashboard", label: "Dashboard", href: "/dashboard", icon: Home },
   { key: "apply-leave", label: "Apply Leave", href: "/leaves/apply", icon: Calendar },
   { key: "my-requests", label: "My Requests", href: "/leaves", icon: ClipboardList },
   { key: "balance-policy", label: "Balance & Policy", href: "/leaves/balance", icon: Book },
   { key: "holidays", label: "Holidays", href: "/holidays", icon: Gift },
+  { key: "help", label: "Help", href: "/help", icon: HelpCircle },
+];
+
+const hrAdminLinks: SidebarLink[] = [
+  { key: "dashboard", label: "Dashboard", href: "/dashboard", icon: Home },
+  { key: "approvals", label: "Approvals", href: "/approvals", icon: ClipboardCheck },
+  { key: "employees", label: "Employees", href: "/employees", icon: Users },
+  { key: "holidays", label: "Holidays", href: "/holidays", icon: Gift },
+  { key: "reports", label: "Reports", href: "/reports", icon: BarChart3 },
+  { key: "settings", label: "Settings", href: "/settings", icon: Settings },
   { key: "help", label: "Help", href: "/help", icon: HelpCircle },
 ];
 
@@ -48,19 +61,13 @@ async function getApprovalsCount() {
 
 export async function DashboardSidebar({ activeItem }: DashboardSidebarProps) {
   const user = await getCurrentUser();
-  const approver = user ? canApprove(user.role as AppRole) : false;
-  const approvalsCount = approver ? await getApprovalsCount() : 0;
+  const role = user?.role as AppRole | undefined;
+  const isHrAdmin = role === "HR_ADMIN";
+  const approvalsCount = isHrAdmin ? await getApprovalsCount() : 0;
 
-  const links: SidebarLink[] = [...baseLinks];
-  if (approver) {
-    links.splice(3, 0, {
-      key: "approvals",
-      label: "Approvals",
-      href: "/approvals",
-      icon: ClipboardCheck,
-      badge: approvalsCount,
-    });
-  }
+  const links: SidebarLink[] = (isHrAdmin ? hrAdminLinks : employeeLinks).map((link) =>
+    isHrAdmin && link.key === "approvals" ? { ...link, badge: approvalsCount } : link
+  );
 
   return (
     <aside className="w-64 bg-white border-r">

@@ -3,9 +3,14 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus, Prisma } from "@prisma/client";
 
-type LeaveWithApprovals = Awaited<ReturnType<typeof prisma.leaveRequest.findMany>>[number];
+type LeaveWithApprovals = Prisma.LeaveRequestGetPayload<{
+  include: {
+    requester: { select: { name: true; email: true } };
+    approvals: { include: { approver: { select: { name: true } } } };
+  };
+}>;
 
 type SerializedApproval = {
   role: string;

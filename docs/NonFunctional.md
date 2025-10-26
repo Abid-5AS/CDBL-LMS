@@ -11,7 +11,7 @@ Logging & Audit
 - Request ID per API; error logs include route + userId (no PII duplication).
 
 Backups & Data Retention
-- MongoDB nightly dumps (retain 30 days).
+- MySQL nightly dumps (retain 30 days).
 - File uploads stored on local server share with mirrored backup.
 
 Performance
