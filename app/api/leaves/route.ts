@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { unstable_noStore as noStore } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { LeaveType } from "@prisma/client";
@@ -14,8 +15,6 @@ import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
 import { getCurrentUser } from "@/lib/auth";
-
-export const runtime = "nodejs";
 
 const ApplySchema = z.object({
   type: z.enum([
@@ -38,6 +37,7 @@ const ApplySchema = z.object({
 });
 
 export async function GET() {
+  noStore();
   const me = await getCurrentUser();
   if (!me) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
@@ -63,6 +63,7 @@ async function getAvailableDays(userId: number, type: LeaveType, year: number) {
 }
 
 export async function POST(req: Request) {
+  noStore();
   const me = await getCurrentUser();
   if (!me) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 

@@ -1,14 +1,16 @@
-export const runtime = "nodejs";
-
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(req: Request) {
+export const cache = "no-store";
+
+export async function POST(request: NextRequest) {
+
   try {
-    const { searchParams } = new URL(req.url);
-    const q = (searchParams.get("q") ?? "").trim();
-    const limitParam = Number(searchParams.get("limit") ?? "20");
-    const take = Number.isNaN(limitParam) ? 20 : Math.min(Math.max(limitParam, 1), 50);
+    const payload = await request.json().catch(() => ({} as Record<string, unknown>));
+    const qRaw = typeof payload.q === "string" ? payload.q : "";
+    const q = qRaw.trim();
+    const limitRaw = typeof payload.limit === "number" || typeof payload.limit === "string" ? Number(payload.limit) : NaN;
+    const take = Number.isNaN(limitRaw) ? 20 : Math.min(Math.max(limitRaw, 1), 50);
 
     const filters = q
       ? {
@@ -35,7 +37,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ items: mapped });
   } catch (error) {
-    console.error("GET /api/auth/users failed", error);
+    console.error("POST /api/auth/users failed", error);
     return NextResponse.json({ error: "internal_error" }, { status: 500 });
   }
 }

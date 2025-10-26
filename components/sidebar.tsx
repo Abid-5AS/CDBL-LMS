@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ComponentType } from "react";
 import { BarChart3, CalendarDays, CalendarPlus, ClipboardCheck, FileText, LifeBuoy, Settings, ShieldCheck, Users, House } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
+import { LogoutButton } from "@/components/logout-button";
 
 type SidebarLink = {
   href: string;
@@ -77,7 +78,10 @@ export async function Sidebar({ pathname }: { pathname: string }) {
           );
         })}
       </nav>
-      <div className="mt-auto text-xs text-slate-400">Signed in as {user?.name ?? "Employee"}</div>
+      <div className="mt-auto space-y-2">
+        <div className="text-xs text-slate-400">Signed in as {user?.name ?? "Employee"}</div>
+        <LogoutButton className="justify-start px-0 text-sm text-slate-600 hover:text-slate-900" />
+      </div>
     </aside>
   );
 }

@@ -1,7 +1,28 @@
+import { Suspense } from "react";
+import { redirect } from "next/navigation";
+import { unstable_noStore as noStore } from "next/cache";
+import { getCurrentUser } from "@/lib/auth";
 import { LoginForm } from "./components/LoginForm";
 import { ImageWithFallback } from "./components/figma/ImageWithFallback";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginFallback />}>
+      <LoginGate />
+    </Suspense>
+  );
+}
+
+async function LoginGate() {
+  noStore();
+  const user = await getCurrentUser();
+  if (user) {
+    if (user.role === "HR_ADMIN") {
+      redirect("/approvals");
+    }
+    redirect("/dashboard");
+  }
+
   return (
     <div className="min-h-screen w-full bg-[#F8FAFC] flex">
       {/* Left Section - Branding */}
@@ -65,4 +86,8 @@ export default function LoginPage() {
       </div>
     </div>
   );
+}
+
+function LoginFallback() {
+  return <div className="min-h-screen w-full bg-[#F8FAFC]" />;
 }

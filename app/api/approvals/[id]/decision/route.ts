@@ -1,6 +1,5 @@
-export const runtime = "nodejs";
-
 import { NextRequest, NextResponse } from "next/server";
+import { unstable_noStore as noStore } from "next/cache";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth";
 import { resolveLeave } from "../../resolve-leave";
@@ -11,6 +10,7 @@ const bodySchema = z.object({
 });
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  noStore();
   const { id } = await params;
 
   const user = await getCurrentUser();

@@ -5,7 +5,7 @@ function needsAuth(pathname: string) {
   return pathname.startsWith("/dashboard") || pathname.startsWith("/leaves") || pathname.startsWith("/approvals");
 }
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const email = req.cookies.get("auth_user_email")?.value;
   const role = req.cookies.get("auth_user_role")?.value;

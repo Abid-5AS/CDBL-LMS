@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,40 +15,38 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ChevronsUpDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { redirectAfterLogin } from "../redirect-after-login";
 
 type LiteUser = { id: string; name: string; email: string; role: string };
 const FETCH_LIMIT = 10;
 
 export function LoginForm() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState<LiteUser[]>([]);
   const [selected, setSelected] = useState<LiteUser | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const search = useCallback(async (q: string) => {
-    setQuery(q);
-    if (!q.trim()) {
-      try {
-        const res = await fetch(`/api/auth/users?limit=${FETCH_LIMIT}`);
-        if (!res.ok) throw new Error("search failed");
-        const data = await res.json();
-        setUsers(data.items ?? []);
-      } catch {
-        setUsers([]);
-      }
-      return;
-    }
+  const search = useCallback(async (input: string) => {
+    setQuery(input);
     try {
-      const res = await fetch(`/api/auth/users?q=${encodeURIComponent(q)}&limit=${FETCH_LIMIT}`);
-      if (!res.ok) {
-        throw new Error("search failed");
-      }
+      const res = await fetch("/api/auth/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({
+          q: input.trim() || undefined,
+          limit: FETCH_LIMIT,
+        }),
+      });
+      if (!res.ok) throw new Error("search failed");
       const data = await res.json();
       setUsers(data.items ?? []);
     } catch {
-      toast.error("Unable to fetch users");
+      if (input.trim()) {
+        toast.error("Unable to fetch users");
+      }
+      setUsers([]);
     }
   }, []);
 
@@ -69,13 +68,12 @@ export function LoginForm() {
         toast.error(data.error ?? "Login failed");
         return;
       }
-      await redirectAfterLogin();
-      return;
+      const data = await res.json().catch(() => ({}));
+      const role = data?.user?.role;
+      const destination = role === "HR_ADMIN" ? "/approvals" : "/dashboard";
+      router.push(destination);
+      router.refresh();
     } catch (err) {
-      const anyErr = err as { digest?: string };
-      if (anyErr?.digest === "NEXT_REDIRECT") {
-        throw err;
-      }
       toast.error("Network error");
     } finally {
       setLoading(false);

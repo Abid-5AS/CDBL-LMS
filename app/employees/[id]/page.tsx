@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { getEmployeeDashboardData } from "@/lib/employee";
+import { unstable_noStore as noStore } from "next/cache";
 import AppShell from "@/components/app-shell";
+import { getEmployeeDashboardData } from "@/lib/employee";
 import { EmployeeDashboard } from "../components/EmployeeDashboard";
 
 type EmployeePageProps = {
@@ -8,7 +10,18 @@ type EmployeePageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function EmployeeDetailPage({ params, searchParams }: EmployeePageProps) {
+export default function EmployeeDetailPage(props: EmployeePageProps) {
+  return (
+    <AppShell title="Employee Details" pathname="/employees">
+      <Suspense fallback={<EmployeeDashboardFallback />}>
+        <EmployeeDashboardSection {...props} />
+      </Suspense>
+    </AppShell>
+  );
+}
+
+async function EmployeeDashboardSection({ params, searchParams }: EmployeePageProps) {
+  noStore();
   const { id } = await params;
   const query = await searchParams;
 
@@ -24,13 +37,20 @@ export default async function EmployeeDetailPage({ params, searchParams }: Emplo
 
   const pendingRequestQuery = query.request;
   const queryRequestId = typeof pendingRequestQuery === "string" ? Number(pendingRequestQuery) : NaN;
-  const pendingRequestId = Number.isNaN(queryRequestId)
-    ? data.pendingRequestId ?? undefined
-    : queryRequestId;
+  const pendingRequestId = Number.isNaN(queryRequestId) ? data.pendingRequestId ?? undefined : queryRequestId;
 
+  return <EmployeeDashboard data={data} pendingRequestId={pendingRequestId} />;
+}
+
+function EmployeeDashboardFallback() {
   return (
-    <AppShell title="Employee Details" pathname="/employees">
-      <EmployeeDashboard data={data} pendingRequestId={pendingRequestId} />
-    </AppShell>
+    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="h-4 w-32 rounded bg-slate-100" />
+      <div className="mt-4 space-y-3">
+        <div className="h-28 rounded-lg bg-slate-100" />
+        <div className="h-28 rounded-lg bg-slate-100" />
+        <div className="h-48 rounded-lg bg-slate-100" />
+      </div>
+    </div>
   );
 }

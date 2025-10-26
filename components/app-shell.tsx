@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { unstable_noStore as noStore } from "next/cache";
 import { Sidebar } from "@/components/sidebar";
 
 export function Topbar({ title }: { title: string }) {
@@ -19,9 +21,12 @@ export default async function AppShell({
   pathname?: string;
   children: React.ReactNode;
 }) {
+  noStore();
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <Sidebar pathname={pathname} />
+      <Suspense fallback={<SidebarFallback />}>
+        <Sidebar pathname={pathname} />
+      </Suspense>
       <div className="flex min-h-screen flex-1 flex-col">
         <Topbar title={title} />
         <main className="flex-1">
@@ -29,5 +34,19 @@ export default async function AppShell({
         </main>
       </div>
     </div>
+  );
+}
+
+function SidebarFallback() {
+  return (
+    <aside className="flex h-screen w-60 shrink-0 flex-col border-r border-slate-200 bg-white px-5 py-6">
+      <div className="h-6 w-24 rounded bg-slate-200" />
+      <div className="mt-6 space-y-2">
+        <div className="h-9 rounded bg-slate-100" />
+        <div className="h-9 rounded bg-slate-100" />
+        <div className="h-9 rounded bg-slate-100" />
+      </div>
+      <div className="mt-auto h-4 w-32 rounded bg-slate-100" />
+    </aside>
   );
 }
