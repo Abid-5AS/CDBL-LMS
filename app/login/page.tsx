@@ -17,8 +17,12 @@ async function LoginGate() {
   noStore();
   const user = await getCurrentUser();
   if (user) {
-    if (user.role === "HR_ADMIN") {
+    const role = user.role as string;
+    if (role === "HR_ADMIN") {
       redirect("/approvals");
+    }
+    if (role === "SUPER_ADMIN") {
+      redirect("/admin");
     }
     redirect("/dashboard");
   }

@@ -1,0 +1,17 @@
+-- AlterTable
+ALTER TABLE `User` MODIFY `role` ENUM('EMPLOYEE', 'HR_ADMIN', 'SUPER_ADMIN') NOT NULL DEFAULT 'EMPLOYEE';
+
+-- CreateTable
+CREATE TABLE `PolicyConfig` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `leaveType` ENUM('EARNED', 'CASUAL', 'MEDICAL', 'EXTRAWITHPAY', 'EXTRAWITHOUTPAY', 'MATERNITY', 'PATERNITY', 'STUDY', 'SPECIAL_DISABILITY', 'QUARANTINE') NOT NULL,
+    `maxDays` INTEGER NULL,
+    `minDays` INTEGER NULL,
+    `noticeDays` INTEGER NULL,
+    `carryLimit` INTEGER NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    UNIQUE INDEX `PolicyConfig_leaveType_key`(`leaveType`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

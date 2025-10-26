@@ -2,7 +2,12 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getJwtCookieName, verifyJwt } from "@/lib/auth-jwt";
 
 function needsAuth(pathname: string) {
-  return pathname.startsWith("/dashboard") || pathname.startsWith("/leaves") || pathname.startsWith("/approvals");
+  return (
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/leaves") ||
+    pathname.startsWith("/approvals") ||
+    pathname.startsWith("/admin")
+  );
 }
 
 export async function proxy(req: NextRequest) {
@@ -29,7 +34,13 @@ export async function proxy(req: NextRequest) {
     }
   }
 
-  if (pathname.startsWith("/approvals") && role !== "HR_ADMIN") {
+  if (pathname.startsWith("/approvals") && role !== "HR_ADMIN" && role !== "SUPER_ADMIN") {
+    const url = req.nextUrl.clone();
+    url.pathname = "/dashboard";
+    return NextResponse.redirect(url);
+  }
+
+  if (pathname.startsWith("/admin") && role !== "SUPER_ADMIN") {
     const url = req.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
@@ -39,5 +50,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/leaves/:path*", "/approvals/:path*"],
+  matcher: ["/dashboard/:path*", "/leaves/:path*", "/approvals/:path*", "/admin/:path*"],
 };

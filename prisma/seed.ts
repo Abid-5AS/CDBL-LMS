@@ -60,6 +60,39 @@ async function seedHoliday() {
   });
 }
 
+async function seedPolicies() {
+  const policies: Array<{
+    leaveType: LeaveType;
+    maxDays?: number;
+    minDays?: number;
+    noticeDays?: number;
+    carryLimit?: number;
+  }> = [
+    { leaveType: LeaveType.CASUAL, maxDays: 7, noticeDays: 5 },
+    { leaveType: LeaveType.MEDICAL, maxDays: 14, minDays: 1 },
+    { leaveType: LeaveType.EARNED, maxDays: 30, noticeDays: 15, carryLimit: 60 },
+  ];
+
+  const policyClient = (prisma as any).policyConfig as {
+    upsert: (args: unknown) => Promise<unknown>;
+  };
+
+  if (!policyClient) {
+    console.warn("PolicyConfig model missing; skipping policy seeding.");
+    return;
+  }
+
+  await Promise.all(
+    policies.map((policy) =>
+      policyClient.upsert({
+        where: { leaveType: policy.leaveType },
+        update: policy,
+        create: policy,
+      }),
+    ),
+  );
+}
+
 async function main() {
   await Promise.all([
     upsertUser({
@@ -83,9 +116,16 @@ async function main() {
       empCode: "HR001",
       department: "HR & Admin",
     }),
+    upsertUser({
+      name: "Super Admin",
+      email: "superadmin@demo.local",
+      role: "SUPER_ADMIN" as Role,
+      empCode: "SYS001",
+      department: "System Administration",
+    }),
   ]);
 
-  await seedHoliday();
+  await Promise.all([seedHoliday(), seedPolicies()]);
 
   console.log("Seeded demo users, balances, and holiday.");
 }

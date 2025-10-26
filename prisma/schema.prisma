@@ -10,6 +10,7 @@ datasource db {
 enum Role {
   EMPLOYEE
   HR_ADMIN
+  SUPER_ADMIN
 }
 
 enum LeaveType {
@@ -101,4 +102,15 @@ model Holiday {
   date       DateTime @unique
   name       String
   isOptional Boolean  @default(false)
+}
+
+model PolicyConfig {
+  id         Int       @id @default(autoincrement())
+  leaveType  LeaveType @unique
+  maxDays    Int?
+  minDays    Int?
+  noticeDays Int?
+  carryLimit Int?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
