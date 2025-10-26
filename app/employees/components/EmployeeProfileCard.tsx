@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatDate } from "@/lib/utils";
+import { SectionHeader } from "@/components/SectionHeader";
+import { cn, formatDate } from "@/lib/utils";
 
 type EmployeeProfileCardProps = {
   name: string;
@@ -20,15 +20,9 @@ const FIELDS = [
   { key: "employmentStatus", label: "Status" },
 ] as const;
 
-export function EmployeeProfileCard({
-  name,
-  email,
-  department,
-  designation,
-  manager,
-  joiningDate,
-  employmentStatus,
-}: EmployeeProfileCardProps) {
+export function EmployeeProfileCard(props: EmployeeProfileCardProps) {
+  const { name, email, department, designation, manager, joiningDate, employmentStatus } = props;
+
   const values: Record<string, string> = {
     email: email ?? "—",
     department: department ?? "—",
@@ -39,20 +33,23 @@ export function EmployeeProfileCard({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold text-slate-900">{name}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
-          {FIELDS.map((field) => (
-            <div key={field.key}>
-              <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{field.label}</dt>
-              <dd className="mt-1 text-sm text-slate-900">{values[field.key]}</dd>
-            </div>
-          ))}
-        </dl>
-      </CardContent>
-    </Card>
+    <div className="space-y-4">
+      <SectionHeader title="Employee Profile">
+        <span className="text-sm font-semibold text-blue-600">{name}</span>
+      </SectionHeader>
+      <dl className="grid gap-x-8 gap-y-4 lg:grid-cols-2">
+        {FIELDS.map((field) => (
+          <div key={field.key}>
+            <dt className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
+              {field.label}
+            </dt>
+            <dd className={cn("mt-1 text-sm text-slate-900", field.key === "email" && "font-medium")}
+            >
+              {values[field.key]}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
   );
 }

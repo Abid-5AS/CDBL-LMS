@@ -9,7 +9,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type LeaveStatsChartProps = {
   data: { month: string; leavesTaken: number }[];
@@ -17,11 +16,11 @@ type LeaveStatsChartProps = {
 
 export function LeaveStatsChart({ data }: LeaveStatsChartProps) {
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold text-slate-900">Monthly Leave Trend</CardTitle>
-      </CardHeader>
-      <CardContent className="h-64">
+    <div className="rounded-lg border border-slate-200 p-4 shadow-sm">
+      <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-600">
+        Monthly Leave Trend
+      </h3>
+      <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -31,7 +30,7 @@ export function LeaveStatsChart({ data }: LeaveStatsChartProps) {
             <Line type="monotone" dataKey="leavesTaken" stroke="#2563eb" strokeWidth={2} dot={{ r: 3 }} />
           </LineChart>
         </ResponsiveContainer>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

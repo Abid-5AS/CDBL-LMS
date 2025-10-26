@@ -1,6 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { SectionHeader } from "@/components/SectionHeader";
 import { formatDate } from "@/lib/utils";
 import type { LeaveHistoryEntry } from "@/lib/employee";
 
@@ -18,19 +18,17 @@ const STATUS_VARIANTS: Record<string, string> = {
 
 export function LeaveHistoryTable({ history }: LeaveHistoryTableProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold text-slate-900">Recent Leave History</CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
+    <div className="space-y-4">
+      <SectionHeader title="Recent Leave History" />
+      <div className="overflow-hidden rounded-xl border border-slate-200 shadow-sm">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-slate-50">
             <TableRow>
-              <TableHead>Type</TableHead>
-              <TableHead>Start</TableHead>
-              <TableHead>End</TableHead>
-              <TableHead>Days</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-500">Type</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-500">Start</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-500">End</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-500">Days</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-500">Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -42,7 +40,7 @@ export function LeaveHistoryTable({ history }: LeaveHistoryTableProps) {
               </TableRow>
             ) : (
               history.map((leave) => (
-                <TableRow key={leave.id}>
+                <TableRow key={leave.id} className="hover:bg-slate-50">
                   <TableCell className="text-sm font-medium text-slate-900">{leave.type}</TableCell>
                   <TableCell className="text-sm text-slate-600">{formatDate(leave.start)}</TableCell>
                   <TableCell className="text-sm text-slate-600">{formatDate(leave.end)}</TableCell>
@@ -57,7 +55,7 @@ export function LeaveHistoryTable({ history }: LeaveHistoryTableProps) {
             )}
           </TableBody>
         </Table>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

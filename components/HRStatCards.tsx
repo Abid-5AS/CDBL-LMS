@@ -1,14 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, Clock, Coins, UserCheck } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type HRStatCardsProps = {
   stats: {
-    totalLeavesThisYear: number;
-    avgApprovalTime: number;
-    pendingRequests: number;
     employeesOnLeave: number;
+    pendingRequests: number;
+    avgApprovalTime: number;
     encashmentPending: number;
+    totalLeavesThisYear: number;
   };
+  className?: string;
 };
 
 const CARDS: Array<{
@@ -45,34 +47,38 @@ const CARDS: Array<{
   },
 ] as const;
 
-export function HRStatCards({ stats }: HRStatCardsProps) {
+export function HRStatCards({ stats, className }: HRStatCardsProps) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className={cn("space-y-4", className)}>
       {CARDS.map((card) => {
         const Icon = card.icon;
         const value = stats[card.key] ?? 0;
         return (
-          <Card key={card.key}>
+          <Card key={card.key} className="border border-slate-200 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{card.label}</CardTitle>
-              <Icon className={`h-5 w-5 ${card.tone}`} />
+              <CardTitle className="text-sm font-medium text-slate-600 uppercase tracking-wide">
+                {card.label}
+              </CardTitle>
+              <Icon className={cn("h-5 w-5", card.tone)} />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-semibold text-slate-900">
+              <p className="text-2xl font-semibold text-slate-900">
                 {value}
                 {card.suffix ?? ""}
-              </div>
+              </p>
             </CardContent>
           </Card>
         );
       })}
-      <Card>
+      <Card className="border border-slate-200 shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Total Leave Days (YTD)</CardTitle>
+          <CardTitle className="text-sm font-medium text-slate-600 uppercase tracking-wide">
+            Total Leave Days (YTD)
+          </CardTitle>
           <Calendar className="h-5 w-5 text-slate-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-semibold text-slate-900">{stats.totalLeavesThisYear ?? 0}</div>
+          <p className="text-2xl font-semibold text-blue-600">{stats.totalLeavesThisYear ?? 0}</p>
         </CardContent>
       </Card>
     </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type LeaveDistributionChartProps = {
   data: { type: string; value: number }[];
@@ -13,11 +12,11 @@ export function LeaveDistributionChart({ data }: LeaveDistributionChartProps) {
   const total = data.reduce((acc, slice) => acc + slice.value, 0);
 
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold text-slate-900">Leave Type Distribution</CardTitle>
-      </CardHeader>
-      <CardContent className="h-64">
+    <div className="rounded-lg border border-slate-200 p-4 shadow-sm">
+      <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-600">
+        Leave Type Distribution
+      </h3>
+      <div className="h-64">
         {data.length === 0 ? (
           <p className="text-sm text-muted-foreground">No leave records to display.</p>
         ) : (
@@ -42,7 +41,7 @@ export function LeaveDistributionChart({ data }: LeaveDistributionChartProps) {
             </PieChart>
           </ResponsiveContainer>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

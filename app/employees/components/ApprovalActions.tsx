@@ -59,20 +59,29 @@ export function ApprovalActions({ pendingRequestId, employeeName }: ApprovalActi
 
   return (
     <>
-      <div className="flex flex-wrap items-center justify-end gap-3">
-        <Button variant="outline" onClick={() => router.back()} disabled={isPending || submitting}>
-          Back
-        </Button>
-        <Button
-          variant="destructive"
-          onClick={() => handleOpen("reject")}
-          disabled={!canAct || submitting || isPending}
-        >
-          Reject
-        </Button>
-        <Button onClick={() => handleOpen("approve")} disabled={!canAct || submitting || isPending}>
-          Approve
-        </Button>
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-slate-900">Actions</h3>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {canAct
+            ? "Review the current request and choose to approve or reject it."
+            : "No pending leave request requires your action right now."}
+        </p>
+        <div className="mt-4 flex flex-col gap-3">
+          <Button variant="outline" onClick={() => router.push("/approvals")} disabled={isPending || submitting}>
+            Back to Approvals
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => handleOpen("reject")}
+            disabled={!canAct || submitting || isPending}
+            className="w-full"
+          >
+            Reject Request
+          </Button>
+          <Button onClick={() => handleOpen("approve")} disabled={!canAct || submitting || isPending} className="w-full">
+            Approve Request
+          </Button>
+        </div>
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
