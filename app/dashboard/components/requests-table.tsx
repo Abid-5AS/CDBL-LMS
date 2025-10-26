@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import StatusBadge from "./status-badge";
 import { leaveTypeLabel } from "@/lib/ui";
 import { Button } from "@/components/ui/button";
+import { formatDate } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -100,14 +101,13 @@ export function RequestsTable() {
                 <TableRow key={row.id}>
                   <TableCell>{leaveTypeLabel[row.type] ?? row.type}</TableCell>
                   <TableCell>
-                    {new Date(row.startDate).toLocaleDateString()} →{" "}
-                    {new Date(row.endDate).toLocaleDateString()}
+                    {formatDate(row.startDate)} → {formatDate(row.endDate)}
                   </TableCell>
                   <TableCell>{row.workingDays}</TableCell>
                   <TableCell>
                     <StatusBadge status={row.status} />
                   </TableCell>
-                  <TableCell>{new Date(row.updatedAt).toLocaleDateString()}</TableCell>
+                  <TableCell>{formatDate(row.updatedAt)}</TableCell>
                   <TableCell>
                     {CANCELABLE_STATUSES.has(row.status) ? (
                       <AlertDialog>

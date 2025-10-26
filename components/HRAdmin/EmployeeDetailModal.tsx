@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatDate } from "@/lib/utils";
 import { HRApprovalItem } from "./types";
 
 type EmployeeDetailModalProps = {
@@ -28,15 +29,6 @@ const fallbackHistory = [
   { id: "H-998", type: "Earned Leave", days: 4, status: "approved" },
   { id: "H-990", type: "Casual Leave", days: 1, status: "approved" },
 ];
-
-function formatDate(value: string | null) {
-  if (!value) return "—";
-  try {
-    return new Date(value).toLocaleDateString();
-  } catch {
-    return value;
-  }
-}
 
 function statusTone(status: string | undefined) {
   switch (status?.toUpperCase()) {

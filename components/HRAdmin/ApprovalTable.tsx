@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { submitApprovalDecision } from "@/lib/api";
+import { formatDate } from "@/lib/utils";
 import { HRApprovalItem } from "./types";
 
 type ApprovalsResponse = { items: HRApprovalItem[] };
@@ -98,8 +99,8 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
           </TableHeader>
           <TableBody>
             {items.map((item) => {
-              const start = item.start ? new Date(item.start).toLocaleDateString() : "—";
-              const end = item.end ? new Date(item.end).toLocaleDateString() : "—";
+              const start = formatDate(item.start);
+              const end = formatDate(item.end);
               const stage = item.approvals?.[item.currentStageIndex]?.status ?? item.status;
               return (
                 <TableRow

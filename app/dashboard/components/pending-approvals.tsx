@@ -4,6 +4,7 @@ import useSWR from "swr";
 import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { formatDate } from "@/lib/utils";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -79,9 +80,7 @@ export function PendingApprovals({ role }: { role: string }) {
       <CardContent className="space-y-3">
         {rows.map((leave) => {
           const period =
-            leave.start && leave.end
-              ? `${new Date(leave.start).toLocaleDateString()} → ${new Date(leave.end).toLocaleDateString()}`
-              : null;
+            leave.start && leave.end ? `${formatDate(leave.start)} → ${formatDate(leave.end)}` : null;
           return (
             <div key={leave.id} className="flex flex-col gap-2 rounded border p-3 md:flex-row md:items-center md:justify-between">
               <div>
