@@ -14,7 +14,7 @@ type ApprovalsResponse = { items: HRApprovalItem[] };
 
 type ApprovalTableProps = {
   onSelect?: (item: HRApprovalItem) => void;
-  onDataChange?: (items: HRApprovalItem[], refresh: () => void) => void;
+  onDataChange?: (items: HRApprovalItem[]) => void;
 };
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -36,9 +36,9 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
   useEffect(() => {
     if (onDataChange) {
-      onDataChange(items, () => mutate());
+      onDataChange(items);
     }
-  }, [items, mutate, onDataChange]);
+  }, [items, onDataChange]);
 
   async function handleDecision(id: string, action: "approve" | "reject") {
     try {
