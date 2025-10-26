@@ -1,21 +1,13 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { dbConnect } from "@/lib/db";
-import { Leave } from "@/models/leave";
 import { getCurrentUser } from "@/lib/auth";
-
-const NEXT_STAGE: Record<string, string> = {
-  DEPT_HEAD: "HR_ADMIN",
-  HR_ADMIN: "HR_HEAD",
-  HR_HEAD: "CEO",
-  CEO: "COMPLETED",
-};
+import { resolveLeave } from "../resolve-leave";
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
-  await dbConnect();
   const me = await getCurrentUser();
   if (!me) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (me.role !== "HR_ADMIN") return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
   const payload = await req.json();
   const action = String(payload?.action ?? "").toUpperCase();
@@ -25,41 +17,21 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   }
 
-  const leave = await Leave.findById(params.id);
-  if (!leave) return NextResponse.json({ error: "Not found" }, { status: 404 });
-
-  if (leave.approverStage === "COMPLETED") {
-    return NextResponse.json({ error: "Workflow already completed" }, { status: 400 });
+  const id = Number(params.id);
+  if (Number.isNaN(id)) {
+    return NextResponse.json({ error: "invalid_id" }, { status: 400 });
   }
 
-  const roleKey = (me.role ?? "").toUpperCase();
-  if (leave.approverStage !== roleKey) {
-    return NextResponse.json({ error: "Not your stage" }, { status: 403 });
-  }
+  const decision = action === "APPROVED" ? "APPROVED" : "REJECTED";
+  const result = await resolveLeave(id, decision, me.id, note);
 
-  if (!Array.isArray(leave.timeline)) {
-    leave.timeline = [];
-  }
-
-  leave.timeline.push({
-    by: me.id,
-    role: me.role,
-    action,
-    at: new Date(),
-    note,
-  });
-
-  if (action === "APPROVED") {
-    const next = NEXT_STAGE[roleKey] ?? "COMPLETED";
-    leave.approverStage = next;
-    if (next === "COMPLETED") {
-      leave.status = "APPROVED";
+  if (!result.ok) {
+    if (result.error === "not_found") return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (result.error === "already_resolved") {
+      return NextResponse.json({ error: "Workflow already completed" }, { status: 400 });
     }
-  } else {
-    leave.status = "REJECTED";
-    leave.approverStage = "COMPLETED";
+    return NextResponse.json({ error: "unexpected_error" }, { status: 500 });
   }
 
-  await leave.save();
-  return NextResponse.json({ success: true, leave });
+  return NextResponse.json({ success: true, leave: result.leave });
 }

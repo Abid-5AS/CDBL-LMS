@@ -1,11 +1,11 @@
 -- CreateTable
 CREATE TABLE `User` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `empCode` VARCHAR(191) NOT NULL,
+    `empCode` VARCHAR(191) NULL,
     `name` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
-    `role` ENUM('EMPLOYEE', 'MANAGER', 'HR', 'CEO') NOT NULL DEFAULT 'EMPLOYEE',
-    `department` VARCHAR(191) NOT NULL,
+    `role` ENUM('EMPLOYEE', 'HR_ADMIN') NOT NULL DEFAULT 'EMPLOYEE',
+    `department` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 

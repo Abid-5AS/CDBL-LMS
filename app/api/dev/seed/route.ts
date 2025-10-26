@@ -6,11 +6,9 @@ import { User } from "@/models/user";
 export async function POST() {
   await dbConnect();
   const seed = [
-    { name: "Employee One", email: "emp1@cdbl.test", role: "employee" },
-    { name: "Dept Head", email: "depthead@cdbl.test", role: "dept_head" },
-    { name: "HR Admin", email: "hradmin@cdbl.test", role: "hr_admin" },
-    { name: "HR Head", email: "hrhead@cdbl.test", role: "hr_head" },
-    { name: "CEO", email: "ceo@cdbl.test", role: "ceo" },
+    { name: "Employee One", email: "employee1@demo.local", role: "EMPLOYEE" },
+    { name: "Employee Two", email: "employee2@demo.local", role: "EMPLOYEE" },
+    { name: "HR Admin", email: "hr@demo.local", role: "HR_ADMIN" },
   ];
   for (const u of seed) {
     await User.updateOne({ email: u.email }, { $setOnInsert: u }, { upsert: true });

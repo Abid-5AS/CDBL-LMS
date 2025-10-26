@@ -1,71 +1,61 @@
-# Data Models (MongoDB / Mongoose)
+# Data Models (Prisma / MySQL)
 
-## users
-- _id: ObjectId
-- employeeId: string (unique, required)
-- name: string
-- email: string (unique, required)
-- designation: string
-- departmentId: ObjectId (ref: departments)
-- roles: string[] (enum: EMPLOYEE, DEPT_HEAD, HR_ADMIN, HR_SENIOR, CEO, SYS_ADMIN)
-- status: string (active|inactive)
-- createdAt, updatedAt
+## User
+- `id`: Int (PK, autoincrement)
+- `name`: string
+- `email`: string (unique, required)
+- `empCode`: string? (unique, optional)
+- `department`: string?
+- `role`: enum (`EMPLOYEE` | `HR_ADMIN`)
+- `createdAt` / `updatedAt`
 
-## departments
-- _id: ObjectId
-- name: string (unique)
-- code: string (unique)
-- headUserId: ObjectId (ref: users)
-- approvalFlow?: string[]  // optional override, e.g. ["HR_ADMIN","DEPT_HEAD","HR_SENIOR","CEO"]
-- createdAt, updatedAt
+## LeaveRequest
+- `id`: Int (PK, autoincrement)
+- `requesterId`: FK → `User.id`
+- `type`: enum (`EARNED`, `CASUAL`, `MEDICAL`, `EXTRAWITHPAY`, `EXTRAWITHOUTPAY`, `MATERNITY`, `PATERNITY`, `STUDY`, `SPECIAL_DISABILITY`, `QUARANTINE`)
+- `startDate` / `endDate`: DateTime (inclusive range)
+- `workingDays`: Int (calendar days inclusive)
+- `reason`: string
+- `needsCertificate`: boolean (tracks ML > 3 days etc.)
+- `certificateUrl`: string?
+- `status`: enum (`DRAFT`, `SUBMITTED`, `PENDING`, `APPROVED`, `REJECTED`, `CANCELLED`)
+- `policyVersion`: string (e.g. `v1.1`)
+- `createdAt` / `updatedAt`
+- Relations:
+  - `requester`: User
+  - `approvals`: Approval[]
 
-## leaves  (model: Leave, schema: LeaveSchema)
-- id: string
-- employeeId: string
-- type: enum("EL","CL","ML","EWP","EWO","MAT","PAT")
-- startDate: date
-- endDate: date
-- requestedDays: int               # includes weekends/holidays
-- reason: string
-- status: enum("PENDING","APPROVED","REJECTED","CANCELLED")
-- policyVersion: string            # default "1.1"
-- flags:
-  - clNoticeShortfall?: boolean
-  - requiresMedicalCertificate?: boolean
-- attachments:
-  - medicalCertificateUrl?: string
-- audit: [ { at: datetime, by: string, action: string, note?: string } ]
-- updatedAt: datetime
-- createdAt: datetime
+## Approval
+- `id`: Int (PK, autoincrement)
+- `leaveId`: FK → `LeaveRequest.id`
+- `step`: Int (single HR stage = `1`)
+- `approverId`: FK → `User.id` (HR Admin who acted)
+- `decision`: string (`APPROVED` | `REJECTED`)
+- `comment`: string?
+- `decidedAt`: DateTime?
 
-## policy_settings
-- _id: ObjectId
-- year: number
-- weekendsCountAsLeave: boolean
-- require5DayNoticeExceptML: boolean
-- cl: { annualCap: number, consecutiveCap: number, lapsesEndOfYear: boolean }
-- ml: { annualCap: number, certificateThresholdDays: number }
-- el: { monthlyAccrual: number, maxCarry: number }
-- quarantine: { standardCap: number, exceptionalCap: number, requireCertificate: boolean }
-- paternity: { days: number, maxOccasions: number, minMonthsBetween: number }
-- approvalsFlow: string[] // default flow
-- createdBy: ObjectId (ref: users)
-- createdAt, updatedAt
+## Balance
+- `id`: Int (PK)
+- `userId`: FK → `User.id`
+- `type`: enum (`EARNED`, `CASUAL`, `MEDICAL`, ...)
+- `year`: Int
+- `opening`: Int (carry forward)
+- `accrued`: Int (current year entitlement)
+- `used`: Int (year-to-date consumption)
+- `closing`: Int (remaining balance after accrual/usage)
+- Unique composite: (`userId`, `type`, `year`)
 
-## audit_logs
-- _id: ObjectId
-- entity: string ("leave" | "user" | "policy" | ...)
-- entityId: ObjectId
-- action: string ("create"|"update"|"approve"|"reject"|"override"|"login"|"logout")
-- actorId: ObjectId (ref: users)
-- payload: object // diff or snapshot
-- createdAt
+## Holiday
+- `id`: Int (PK)
+- `date`: DateTime (unique)
+- `name`: string
+- `isOptional`: boolean (defaults false)
 
-## sessions (if you pick NextAuth/iron-session later)
-- per library format; store session token/userId/expiry/etc.
+### Derived Views / API Contracts
+- Employee dashboards query `LeaveRequest` filtered by cookie user.
+- HR dashboards list `LeaveRequest` where `status` in (`PENDING`,`SUBMITTED`), joined with `User`.
+- Approvals API writes to `Approval` table and updates `LeaveRequest.status`.
 
-Indexes (recommend):
-- users: { email:1 }, { employeeId:1 }, { departmentId:1 }
-- leaves: { 'employee.id':1, startDate:1 }, { status:1 }, { type:1 }, { createdAt:-1 }
-- audit_logs: { entity:1, entityId:1, createdAt:-1 }
-- policy_settings: { year:1 }
+### Seed Data
+- Three demo users (two `EMPLOYEE`, one `HR_ADMIN`) with 20/10/14 leave balances.
+- Holiday seed ensures “Victory Day” present for current year.

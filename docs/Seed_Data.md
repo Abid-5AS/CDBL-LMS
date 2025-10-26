@@ -1,15 +1,10 @@
 # Seed Data (Dev only)
 
 `policy_settings`: default for current year.  
-`departments`: `{ _id, name: "Application Dev & VAS", code: "AD-VAS", headUserId: <user> }`  
-`users`:
-- emp (EMPLOYEE) in AD-VAS
-- head (DEPT_HEAD) for AD-VAS
-- hr1 (HR_ADMIN)
-- hr2 (HR_SENIOR)
-- ceo (CEO)
-
-Passwords or login stubs as per your current mock login.
+`users` (Prisma seed):
+- Employee One (`employee1@demo.local`, EMPLOYEE, Engineering)
+- Employee Two (`employee2@demo.local`, EMPLOYEE, Operations)
+- HR Admin (`hr@demo.local`, HR_ADMIN, HR & Admin)
 
 - Default balances (example):
   - EL: 20 + prior carry (capped at 60)

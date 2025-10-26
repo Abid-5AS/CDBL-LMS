@@ -1,21 +1,37 @@
-import { NextResponse, NextRequest } from "next/server";
-import { AUTH_COOKIE, verifyAuthJWT } from "@/lib/auth-jwt";
+import { NextResponse, type NextRequest } from "next/server";
+import { getJwtCookieName, verifyJwt } from "@/lib/auth-jwt";
+
+function needsAuth(pathname: string) {
+  return pathname.startsWith("/dashboard") || pathname.startsWith("/leaves") || pathname.startsWith("/approvals");
+}
 
 export async function middleware(req: NextRequest) {
-  const token = req.cookies.get(AUTH_COOKIE)?.value;
-  const url = req.nextUrl.clone();
+  const { pathname } = req.nextUrl;
+  const email = req.cookies.get("auth_user_email")?.value;
+  const role = req.cookies.get("auth_user_role")?.value;
+  const jwt = req.cookies.get(getJwtCookieName())?.value;
 
-  if (!token) {
-    url.pathname = "/login";
-    url.searchParams.set("next", req.nextUrl.pathname);
-    return NextResponse.redirect(url);
+  if (needsAuth(pathname)) {
+    if (!email || !jwt) {
+      const url = req.nextUrl.clone();
+      url.pathname = "/login";
+      url.searchParams.set("next", pathname);
+      return NextResponse.redirect(url);
+    }
+
+    try {
+      await verifyJwt(jwt);
+    } catch {
+      const url = req.nextUrl.clone();
+      url.pathname = "/login";
+      url.searchParams.set("next", pathname);
+      return NextResponse.redirect(url);
+    }
   }
 
-  try {
-    await verifyAuthJWT(token);
-  } catch {
-    url.pathname = "/login";
-    url.searchParams.set("next", req.nextUrl.pathname);
+  if (pathname.startsWith("/approvals") && role !== "HR_ADMIN") {
+    const url = req.nextUrl.clone();
+    url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }
 
@@ -23,5 +39,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/leaves/:path*", "/api/leaves/:path*"],
+  matcher: ["/dashboard/:path*", "/leaves/:path*", "/approvals/:path*"],
 };

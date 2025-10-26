@@ -21,9 +21,9 @@ export function needsMedicalCertificate(type: LeaveKind | string, days: number) 
 }
 
 export function canBackdate(type: LeaveKind | string) {
-  const key = String(type) as LeaveKind | string;
-  // @ts-ignore
-  return !!policy.allowBackdate[key];
+  const key = String(type);
+  const map = policy.allowBackdate as Record<string, boolean>;
+  return !!map[key];
 }
 
 export function withinBackdateLimit(type: LeaveKind | string, applyDate: Date, start: Date) {

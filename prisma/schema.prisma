@@ -9,9 +9,7 @@ datasource db {
 
 enum Role {
   EMPLOYEE
-  MANAGER
-  HR
-  CEO
+  HR_ADMIN
 }
 
 enum LeaveType {
@@ -37,18 +35,18 @@ enum LeaveStatus {
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
-  empCode      String   @unique
-  name         String
-  email        String   @unique
-  role         Role     @default(EMPLOYEE)
-  department   String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String   @unique
+  empCode    String?  @unique
+  role       Role     @default(EMPLOYEE)
+  department String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  leaves       LeaveRequest[]
-  balances     Balance[]
-  approvals    Approval[]   @relation("ApprovalApprover")
+  leaves     LeaveRequest[]
+  balances   Balance[]
+  approvals  Approval[]   @relation("ApprovalApprover")
 }
 
 model LeaveRequest {

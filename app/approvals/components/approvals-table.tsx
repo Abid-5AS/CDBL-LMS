@@ -39,9 +39,10 @@ export function ApprovalsTable() {
       }
       const data = await res.json();
       setItems(data.items ?? []);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unexpected error";
       console.error(err);
-      toast.error("Unable to load approvals");
+      toast.error("Unable to load approvals", { description: message });
     } finally {
       setLoading(false);
     }

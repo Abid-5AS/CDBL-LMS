@@ -9,7 +9,7 @@ import {
   Home,
   ClipboardCheck,
 } from "lucide-react";
-import { canApprove } from "@/lib/rbac";
+import { canApprove, type AppRole } from "@/lib/rbac";
 import { getCurrentUser } from "@/lib/auth";
 
 type DashboardSidebarProps = {
@@ -48,7 +48,7 @@ async function getApprovalsCount() {
 
 export async function DashboardSidebar({ activeItem }: DashboardSidebarProps) {
   const user = await getCurrentUser();
-  const approver = user ? canApprove(user.role as any) : false;
+  const approver = user ? canApprove(user.role as AppRole) : false;
   const approvalsCount = approver ? await getApprovalsCount() : 0;
 
   const links: SidebarLink[] = [...baseLinks];

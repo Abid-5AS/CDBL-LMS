@@ -6,8 +6,8 @@ const UserSchema = new Schema(
     email: { type: String },
     role: {
       type: String,
-      enum: ["employee", "hr_admin", "dept_head", "hr_head", "ceo"],
-      default: "employee",
+      enum: ["EMPLOYEE", "HR_ADMIN"],
+      default: "EMPLOYEE",
     },
   },
   { timestamps: true }
@@ -17,7 +17,7 @@ export type IUser = {
   _id: string;
   name: string;
   email?: string;
-  role: "employee" | "hr_admin" | "dept_head" | "hr_head" | "ceo";
+  role: "EMPLOYEE" | "HR_ADMIN";
 };
 
 export const User = models.User || model("User", UserSchema);

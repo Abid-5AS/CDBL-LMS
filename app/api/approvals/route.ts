@@ -2,59 +2,111 @@ export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { dbConnect } from "@/lib/db";
-import { Leave } from "@/models/leave";
-import { canApprove, Role } from "@/lib/rbac";
+import { prisma } from "@/lib/prisma";
+import { LeaveStatus } from "@prisma/client";
 
-function serializeApproval(step: any) {
-  if (!step) return null;
-  return {
-    role: step.role,
-    status: step.status,
-    decidedById: step.decidedById ?? null,
-    decidedByName: step.decidedByName ?? null,
-    decidedAt: step.decidedAt ? new Date(step.decidedAt).toISOString() : null,
-    comment: step.comment ?? null,
-  };
+type LeaveWithApprovals = Awaited<ReturnType<typeof prisma.leaveRequest.findMany>>[number];
+
+type SerializedApproval = {
+  role: string;
+  status: string;
+  decidedById: string | null;
+  decidedByName: string | null;
+  decidedAt: string | null;
+  comment: string | null;
+};
+
+type SerializedLeave = {
+  id: string;
+  type: string;
+  start: string | null;
+  end: string | null;
+  requestedDays: number;
+  reason: string;
+  status: string;
+  approvals: SerializedApproval[];
+  currentStageIndex: number;
+  requestedById: string | null;
+  requestedByName: string | null;
+  requestedByEmail: string | null;
+  updatedAt: string | null;
+  createdAt: string | null;
+};
+
+async function requireHR(): Promise<Response | NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>> {
+  const me = await getCurrentUser();
+  if (!me || me.role !== "HR_ADMIN") {
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  }
+  return me;
 }
 
-function serializeLeave(doc: any) {
-  const approvals = Array.isArray(doc.approvals)
-    ? doc.approvals.map((step: any) => serializeApproval(step)).filter(Boolean)
-    : [];
+function normalizeApprovals(leave: LeaveWithApprovals): SerializedApproval[] {
+  if (Array.isArray(leave.approvals) && leave.approvals.length > 0) {
+    return leave.approvals.map((record) => ({
+      role: "HR_ADMIN",
+      status: record.decision,
+      decidedById: record.approverId ? String(record.approverId) : null,
+      decidedByName: record.approver?.name ?? null,
+      decidedAt: record.decidedAt ? new Date(record.decidedAt).toISOString() : null,
+      comment: record.comment ?? null,
+    }));
+  }
 
+  const pendingStatus =
+    leave.status === LeaveStatus.SUBMITTED ? "PENDING" : leave.status;
+
+  return [
+    {
+      role: "HR_ADMIN",
+      status: pendingStatus,
+      decidedById: null,
+      decidedByName: null,
+      decidedAt: null,
+      comment: null,
+    },
+  ];
+}
+
+function serializeLeave(leave: LeaveWithApprovals): SerializedLeave {
   return {
-    id: String(doc._id),
-    type: doc.type,
-    start: doc.start ? new Date(doc.start).toISOString() : null,
-    end: doc.end ? new Date(doc.end).toISOString() : null,
-    requestedDays: doc.requestedDays,
-    reason: doc.reason,
-    status: doc.status,
-    approvals,
-    currentStageIndex: doc.currentStageIndex ?? 0,
-    requestedById: doc.requestedById ? String(doc.requestedById) : null,
-    requestedByName: doc.requestedByName ?? null,
-    requestedByEmail: doc.requestedByEmail ?? null,
-    updatedAt: doc.updatedAt ? new Date(doc.updatedAt).toISOString() : null,
-    createdAt: doc.createdAt ? new Date(doc.createdAt).toISOString() : null,
+    id: String(leave.id),
+    type: leave.type,
+    start: leave.startDate ? leave.startDate.toISOString() : null,
+    end: leave.endDate ? leave.endDate.toISOString() : null,
+    requestedDays: leave.workingDays,
+    reason: leave.reason,
+    status: leave.status,
+    approvals: normalizeApprovals(leave),
+    currentStageIndex: 0,
+    requestedById: leave.requesterId ? String(leave.requesterId) : null,
+    requestedByName: leave.requester?.name ?? null,
+    requestedByEmail: leave.requester?.email ?? null,
+    updatedAt: leave.updatedAt ? leave.updatedAt.toISOString() : null,
+    createdAt: leave.createdAt ? leave.createdAt.toISOString() : null,
   };
 }
 
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (!canApprove(user.role as Role)) return NextResponse.json({ items: [] });
+  const me = await requireHR();
+  if (me instanceof Response) return me;
 
-  await dbConnect();
-
-  const items = await Leave.find({ status: "PENDING" }).lean();
-
-  const filtered = items.filter((leave: any) => {
-    const stageIndex = typeof leave.currentStageIndex === "number" ? leave.currentStageIndex : 0;
-    const step = Array.isArray(leave.approvals) ? leave.approvals[stageIndex] : null;
-    return step && step.role === user.role && step.status === "PENDING";
+  const items = await prisma.leaveRequest.findMany({
+    where: {
+      status: {
+        in: [LeaveStatus.SUBMITTED, LeaveStatus.PENDING],
+      },
+    },
+    include: {
+      requester: { select: { name: true, email: true } },
+      approvals: {
+        include: {
+          approver: { select: { name: true } },
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json({ items: filtered.map(serializeLeave) });
+  return NextResponse.json({ items: items.map(serializeLeave) });
 }

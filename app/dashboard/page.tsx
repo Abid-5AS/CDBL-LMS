@@ -8,7 +8,7 @@ import { PolicyReminders } from "./components/policy-reminders";
 import { Button } from "@/components/ui/button";
 import { Plus, Wallet, FileDown, Calendar } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
-import { canApprove } from "@/lib/rbac";
+import { canApprove, type AppRole } from "@/lib/rbac";
 import PendingApprovalsCard from "./components/pending-approvals-card";
 import { PendingApprovals } from "./components/pending-approvals";
 import { BalanceSummaryCards } from "./components/balance-summary-cards";
@@ -17,9 +17,9 @@ import { DashboardToday } from "./components/dashboard-today";
 export default async function DashboardPage() {
   const user = await getCurrentUser();
   const username = user?.name ?? "User";
-  const role = user?.role ?? "employee";
-  const approver = user ? canApprove(user.role as any) : false;
-  const approverStage = user ? user.role.replace(/-/g, "_").toUpperCase() : "";
+  const role = user?.role ?? "EMPLOYEE";
+  const approver = user ? canApprove(user.role as AppRole) : false;
+  const approverStage = user?.role ?? "";
   return (
     <div className="flex h-screen bg-[#F8FAFC]">
       <DashboardSidebar activeItem="dashboard" />
@@ -47,17 +47,23 @@ export default async function DashboardPage() {
               )}
             </div>
             <div className="flex items-center gap-4 mb-8">
-              <Button className="bg-[#2563EB] hover:bg-[#1E40AF] text-white">
-                <Plus size={18} className="mr-2" />
-                Apply Leave
+              <Button asChild className="bg-[#2563EB] hover:bg-[#1E40AF] text-white">
+                <Link href="/leaves/apply">
+                  <Plus size={18} className="mr-2" />
+                  Apply Leave
+                </Link>
               </Button>
-              <Button variant="outline" className="border-[#E2E8F0] text-[#475569]">
-                <Wallet size={18} className="mr-2" />
-                View My Balance
+              <Button asChild variant="outline" className="border-[#E2E8F0] text-[#475569]">
+                <Link href="/balance">
+                  <Wallet size={18} className="mr-2" />
+                  View My Balance
+                </Link>
               </Button>
-              <Button variant="outline" className="border-[#E2E8F0] text-[#475569]">
-                <FileDown size={18} className="mr-2" />
-                Download Policy (PDF)
+              <Button asChild variant="outline" className="border-[#E2E8F0] text-[#475569]">
+                <Link href="/policy.pdf">
+                  <FileDown size={18} className="mr-2" />
+                  Download Policy (PDF)
+                </Link>
               </Button>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

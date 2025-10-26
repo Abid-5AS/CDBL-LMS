@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-import { AUTH_COOKIE } from "@/lib/auth-jwt";
+import { getJwtCookieName } from "@/lib/auth-jwt";
+
 export async function POST() {
   const res = NextResponse.json({ ok: true });
-  res.cookies.delete("auth_user_id");
   res.cookies.delete("auth_user_email");
   res.cookies.delete("auth_user_name");
+  res.cookies.delete("auth_user_role");
   res.cookies.delete("auth_user");
-  res.cookies.delete(AUTH_COOKIE);
+  res.cookies.delete(getJwtCookieName());
   return res;
 }

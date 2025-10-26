@@ -163,10 +163,7 @@ export async function POST(req: Request) {
       needsCertificate,
       certificateUrl,
       policyVersion: policy.version,
-      status: "SUBMITTED",
-      approvals: {
-        create: [{ step: 1, approverId: me.id, decision: "PENDING" }],
-      },
+      status: "PENDING",
     },
   });
 

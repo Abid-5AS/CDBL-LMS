@@ -2,14 +2,14 @@ import { redirect } from "next/navigation";
 import { DashboardSidebar } from "@/app/dashboard/components/dashboard-sidebar";
 import { DashboardHeader } from "@/app/dashboard/components/dashboard-header";
 import { getCurrentUser } from "@/lib/auth";
-import { canApprove, Role } from "@/lib/rbac";
+import { canApprove, type AppRole } from "@/lib/rbac";
 import { ApprovalsTable } from "./components/approvals-table";
 
 export default async function ApprovalsPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const approver = canApprove(user.role as Role);
+  const approver = canApprove(user.role as AppRole);
   if (!approver) {
     redirect("/dashboard");
   }

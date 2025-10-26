@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { redirectAfterLogin } from "../redirect-after-login";
 
 type LiteUser = { id: string; name: string; email: string; role: string };
+const FETCH_LIMIT = 10;
 
 export function LoginForm() {
   const [open, setOpen] = useState(false);
@@ -25,14 +26,21 @@ export function LoginForm() {
   const [selected, setSelected] = useState<LiteUser | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function search(q: string) {
+  const search = useCallback(async (q: string) => {
     setQuery(q);
     if (!q.trim()) {
-      setUsers([]);
+      try {
+        const res = await fetch(`/api/auth/users?limit=${FETCH_LIMIT}`);
+        if (!res.ok) throw new Error("search failed");
+        const data = await res.json();
+        setUsers(data.items ?? []);
+      } catch {
+        setUsers([]);
+      }
       return;
     }
     try {
-      const res = await fetch(`/api/auth/users?q=${encodeURIComponent(q)}`);
+      const res = await fetch(`/api/auth/users?q=${encodeURIComponent(q)}&limit=${FETCH_LIMIT}`);
       if (!res.ok) {
         throw new Error("search failed");
       }
@@ -41,7 +49,7 @@ export function LoginForm() {
     } catch {
       toast.error("Unable to fetch users");
     }
-  }
+  }, []);
 
   async function onSubmit() {
     if (!selected) {
@@ -74,12 +82,16 @@ export function LoginForm() {
     }
   }
 
+  useEffect(() => {
+    void search("");
+  }, [search]);
+
   return (
     <div className="space-y-3">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
-            {selected ? `${selected.name} (${selected.role})` : "Search your name or email"}
+            {selected ? `${selected.name} (${selected.role.replace(/_/g, " ")})` : "Search your name or email"}
             <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -102,7 +114,7 @@ export function LoginForm() {
                     <div className="flex flex-col">
                       <span className="font-medium">{u.name}</span>
                       <span className="text-xs text-muted-foreground">
-                        {u.email} · {u.role}
+                        {u.email} · {u.role.replace(/_/g, " ")}
                       </span>
                     </div>
                   </CommandItem>

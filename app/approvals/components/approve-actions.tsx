@@ -30,8 +30,9 @@ export default function ApproveActions({ id }: { id: string }) {
         description: `Status: ${payload.status}`,
       });
       startTransition(() => router.refresh());
-    } catch (e: any) {
-      toast.error(`Could not ${action}`, { description: e?.message ?? "Unexpected error" });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unexpected error";
+      toast.error(`Could not ${action}`, { description: message });
     } finally {
       setPendingBtn(null);
     }

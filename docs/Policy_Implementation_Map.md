@@ -1,8 +1,8 @@
 Clause → System Behavior → Enforcement
 ======================================
 
-Model reference: `Leave` (Mongoose), collection `leaves`.  
-Roles: `employee`, `dept_head`, `hr_admin`, `hr_head`, `ceo`.
+Model reference: `LeaveRequest` (Prisma), table `LeaveRequest`.  
+Roles: `employee`, `hr_admin`.
 
 Submission & Timing
 -------------------
@@ -30,13 +30,13 @@ Type-Specific Rules
 - **Paternity: 6 days; max twice; 36-month gap (6.24)**  
   Hard enforce by counting prior approved paternity leaves.
 - **Quarantine: up to 21 (30 exceptional) + certificate (6.28)**  
-  Hard enforce certificate; >21 needs `hr_head` override up to 30.
+  Hard enforce certificate; >21 requires manual HR Admin override up to 30.
 
 Approval Flow
 -------------
 - **Form & policy (6.11b, form footer)**  
-  Route: `hr_admin` → `dept_head` → `hr_head` → `ceo`.  
-  System prevents skipping steps; delegations configurable per department.
+  Route: `hr_admin`.  
+  System prevents unassigned HRs from acting; delegation handled via HR Admin assignment.
 
 Return/Fitness
 --------------

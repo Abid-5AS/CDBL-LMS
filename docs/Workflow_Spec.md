@@ -8,9 +8,6 @@ States:
 Transitions (roles):
 1) EMPLOYEE: create DRAFT; submit -> PENDING
 2) HR_ADMIN: approve/reject/return
-3) DEPT_HEAD: approve/reject/return (receives only after HR_ADMIN approves)
-4) HR_SENIOR: approve/reject/return
-5) CEO: approve/reject
 
 Rules:
 - Steps must be sequential. Skipping is blocked unless SYS_ADMIN uses override.
@@ -27,7 +24,7 @@ Notifications (future):
 - Email/Teams internal notice to next approver on transitions.
 
 ### Employee: Request Detail View
-- Show timeline: Created -> Dept Head -> HR Admin -> HR Head -> CEO (if required).
+- Show timeline: Created -> HR Admin -> (Approved/Rejected).
 - Fields: type (full name), dates, workingDays, reason, attachments, status, approvers, audit log.
 
 ### Employee: Cancel Request

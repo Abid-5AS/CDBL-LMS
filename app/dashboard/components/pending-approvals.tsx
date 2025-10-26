@@ -17,20 +17,20 @@ type PendingLeave = {
 };
 
 export function PendingApprovals({ role }: { role: string }) {
-  const stage = (role ?? "").replace(/-/g, "_").toUpperCase();
-  const shouldFetch = Boolean(stage);
+  const normalizedRole = (role ?? "").toUpperCase();
+  const isHrAdmin = normalizedRole === "HR_ADMIN";
   const { data, isLoading, error, mutate } = useSWR(
-    shouldFetch ? `/api/leaves?stage=${stage}` : null,
+    isHrAdmin ? `/api/approvals` : null,
     fetcher,
     { revalidateOnFocus: false }
   );
 
   const act = async (id: string, action: "APPROVED" | "REJECTED") => {
     try {
-      const res = await fetch(`/api/approvals/${id}`, {
+      const res = await fetch(`/api/approvals/${id}/decision`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action }),
+        body: JSON.stringify({ action: action === "APPROVED" ? "approve" : "reject" }),
       });
       const payload = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -44,7 +44,7 @@ export function PendingApprovals({ role }: { role: string }) {
     }
   };
 
-  if (!shouldFetch) return null;
+  if (!isHrAdmin) return null;
 
   if (isLoading) {
     return (
@@ -68,7 +68,7 @@ export function PendingApprovals({ role }: { role: string }) {
     );
   }
 
-  const rows: PendingLeave[] = Array.isArray(data?.leaves) ? data.leaves : [];
+  const rows: PendingLeave[] = Array.isArray(data?.items) ? data.items : [];
   if (!rows.length) return null;
 
   return (

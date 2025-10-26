@@ -2,7 +2,7 @@ CDBL Leave Policy — System Summary
 ==================================
 
 Source: HR Policy & Procedures Manual (pages 32–41) and provided form.  
-System of record: MongoDB `leaves` collection via Mongoose `Leave` model / `LeaveSchema` (`models/leave.ts`).
+System of record: Prisma `LeaveRequest` table (MySQL).
 
 1) Working Hours, Attendance & Context
 --------------------------------------
@@ -41,14 +41,11 @@ System of record: MongoDB `leaves` collection via Mongoose `Leave` model / `Leav
 - ML > 3 days: medical certificate & prescription required (6.21b).
 - Copy of approved applications retained by HRD (6.12f).
 
-5) Approval Hierarchy (Standard)
---------------------------------
-1. HR Admin – process validation, due/available/balance check (form “Processed by”).
-2. Department Head – functional approval.
-3. Department of HR & Admin (senior HR) – verification.
-4. CEO/MD – final approval (per form; policy 6.11b “as per delegation”).
+5) Approval Hierarchy (System Implementation)
+---------------------------------------------
+- HR Admin – validates policy compliance, adjusts balances, approves/rejects requests.
 
-The system supports role-aware routing and allows per-department overrides.
+Policy documents reference additional escalation (Dept Head, HR Senior, CEO). These stages can be reintroduced later; the MVP focuses on HR Admin as the single approver to unblock rollout.
 
 6) System Enforcement Matrix (high level)
 -----------------------------------------

@@ -1,7 +1,7 @@
 import { Schema, model, models, Types } from "mongoose";
 
 export type ApprovalStep = {
-  role: "hr_admin" | "dept_head" | "hr_head" | "ceo";
+  role: "HR_ADMIN";
   status: "PENDING" | "APPROVED" | "REJECTED";
   decidedById?: string;
   decidedByName?: string;
@@ -11,7 +11,7 @@ export type ApprovalStep = {
 
 const ApprovalSchema = new Schema<ApprovalStep>(
   {
-    role: { type: String, enum: ["hr_admin", "dept_head", "hr_head", "ceo"], required: true },
+    role: { type: String, enum: ["HR_ADMIN"], required: true },
     status: { type: String, enum: ["PENDING", "APPROVED", "REJECTED"], default: "PENDING" },
     decidedById: { type: String },
     decidedByName: { type: String },
@@ -40,8 +40,8 @@ const LeaveSchema = new Schema(
     currentStageIndex: { type: Number, default: 0 },
     approverStage: {
       type: String,
-      enum: ["DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO", "COMPLETED"],
-      default: "DEPT_HEAD",
+      enum: ["HR_ADMIN", "COMPLETED"],
+      default: "HR_ADMIN",
     },
     status: {
       type: String,
@@ -64,7 +64,7 @@ const LeaveSchema = new Schema(
 LeaveSchema.index({ requestedById: 1, createdAt: -1 });
 
 LeaveSchema.statics.workflowRoles = function () {
-  return ["hr_admin", "dept_head", "hr_head", "ceo"];
+  return ["HR_ADMIN"];
 };
 
 export const Leave = models.Leave || model("Leave", LeaveSchema);

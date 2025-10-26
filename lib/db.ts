@@ -5,18 +5,37 @@ if (!uri) {
   throw new Error("MONGODB_URI is not set. Add it to your .env file.");
 }
 
-let cached = (global as any)._mongoose;
-if (!cached) cached = (global as any)._mongoose = { conn: null, promise: null };
+type MongooseConnectionCache = {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
+};
+
+declare global {
+  var _mongoose: MongooseConnectionCache | undefined;
+}
+
+const globalWithMongoose = global as typeof globalThis & {
+  _mongoose?: MongooseConnectionCache;
+};
+
+const cache = globalWithMongoose._mongoose ?? {
+  conn: null,
+  promise: null,
+};
+
+if (!globalWithMongoose._mongoose) {
+  globalWithMongoose._mongoose = cache;
+}
 
 export async function dbConnect() {
-  if (cached.conn) return cached.conn as typeof mongoose;
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(uri, {
+  if (cache.conn) return cache.conn;
+  if (!cache.promise) {
+    cache.promise = mongoose.connect(uri, {
       serverSelectionTimeoutMS: 5000,
       maxPoolSize: 10,
       // bufferCommands default is true; leave it on for API cold starts
     });
   }
-  cached.conn = await cached.promise;
-  return cached.conn as typeof mongoose;
+  cache.conn = await cache.promise;
+  return cache.conn;
 }

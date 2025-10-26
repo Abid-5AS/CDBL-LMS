@@ -2,53 +2,67 @@ export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { AUTH_COOKIE, signAuthJWT } from "@/lib/auth-jwt";
+import { signJwt, getJwtCookieName } from "@/lib/auth-jwt";
+
+const COOKIE_OPTIONS = {
+  path: "/",
+  sameSite: "lax" as const,
+};
 
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
     const emailInput = typeof body.email === "string" ? body.email.trim() : "";
+    const nameInput = typeof body.name === "string" ? body.name.trim() : "";
 
-    if (!emailInput) {
-      return NextResponse.json({ error: "email_required" }, { status: 400 });
+    if (!emailInput && !nameInput) {
+      return NextResponse.json({ error: "credentials_required" }, { status: 400 });
     }
 
+    const filters = [];
+    if (emailInput) filters.push({ email: { equals: emailInput } });
+    if (nameInput) filters.push({ name: { equals: nameInput } });
+
     const user = await prisma.user.findFirst({
-      where: {
-        email: {
-          equals: emailInput,
-        },
-      },
-      select: { id: true, email: true, name: true, role: true },
+      where: { OR: filters },
+      select: { id: true, name: true, email: true, role: true },
     });
 
     if (!user) {
       return NextResponse.json({ error: "unknown_user" }, { status: 401 });
     }
 
-    const token = await signAuthJWT({ uid: String(user.id), role: user.role });
-    const res = NextResponse.json({ ok: true });
-    res.cookies.set("auth_user_id", String(user.id), {
-      path: "/",
-      httpOnly: true,
-      sameSite: "lax",
+    const jwt = await signJwt({
+      sub: String(user.id),
+      email: user.email,
+      name: user.name,
+      role: user.role,
     });
+
+    const res = NextResponse.json({
+      ok: true,
+      user: { name: user.name, email: user.email, role: user.role },
+    });
+
     res.cookies.set("auth_user_email", user.email ?? "", {
-      path: "/",
-      httpOnly: true,
-      sameSite: "lax",
+      ...COOKIE_OPTIONS,
+      httpOnly: false,
     });
     res.cookies.set("auth_user_name", user.name ?? "", {
-      path: "/",
-      httpOnly: true,
-      sameSite: "lax",
+      ...COOKIE_OPTIONS,
+      httpOnly: false,
     });
-    res.cookies.set(AUTH_COOKIE, token, {
-      path: "/",
+    res.cookies.set("auth_user_role", user.role ?? "", {
+      ...COOKIE_OPTIONS,
+      httpOnly: false,
+    });
+    res.cookies.set(getJwtCookieName(), jwt, {
+      ...COOKIE_OPTIONS,
       httpOnly: true,
-      sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
     });
+
+    res.cookies.delete("auth_user_id");
     res.cookies.delete("auth_user");
     res.cookies.delete("auth_user_email_legacy");
 

@@ -7,6 +7,8 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const q = (searchParams.get("q") ?? "").trim();
+    const limitParam = Number(searchParams.get("limit") ?? "20");
+    const take = Number.isNaN(limitParam) ? 20 : Math.min(Math.max(limitParam, 1), 50);
 
     const filters = q
       ? {
@@ -20,7 +22,7 @@ export async function GET(req: Request) {
     const items = await prisma.user.findMany({
       where: filters,
       orderBy: { name: "asc" },
-      take: 20,
+      take,
       select: { id: true, name: true, email: true, role: true },
     });
 

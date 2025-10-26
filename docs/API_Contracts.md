@@ -3,7 +3,7 @@
 All responses: JSON with `{ success: boolean, data?: any, error?: { code, message } }`
 
 Auth:
-- For now: simple cookie `auth_token` (pending swap to NextAuth/iron-session).
+- Cookie bundle: `jwt` (HTTP-only) + `auth_user_email`/`auth_user_name`/`auth_user_role`.
 
 ## POST /api/leaves/apply
 Create a leave request.  
@@ -33,25 +33,19 @@ Returns: `{ success, data: { items, total } }`
 ## GET /api/leaves/:id
 - Returns a single leave with full detail + timeline.
 
-## POST /api/leaves/:id/approve
-Body: `{ note?: string }`  
-Role: next approver only (based on flow).  
-Effects: push `approvals[]`, advance to next step or mark final APPROVED and decrement balance.  
-Returns: updated leave.
-
-## POST /api/leaves/:id/reject
-Body: `{ note?: string }`  
-Role: current approver.  
-Returns: updated leave (status=REJECTED).
-
-## POST /api/leaves/:id/return
-Return to requester for changes.  
-Body: `{ note: string }`  
-Role: current approver.
-
 ## POST /api/leaves/:id/cancel
 - Auth: employee who owns the leave; status must be PENDING.
 - Response: `{ success: true, leave: ... }`
+
+## GET /api/approvals
+- Auth: HR Admin.
+- Returns pending leave requests awaiting HR action.
+
+## POST /api/approvals/:id/decision
+Body: `{ action: "approve"|"reject", comment?: string }`  
+Role: HR Admin.  
+Effects: Upserts an approval record and updates `LeaveRequest.status`.  
+Returns: `{ ok: true, status: "APPROVED"|"REJECTED" }`
 
 ## POST /api/return-to-duty
 Marks return for ML (and any tracked types).  
@@ -63,7 +57,7 @@ Returns: updated leave.
 Fetch active settings (year).
 
 ## POST /api/policy
-Update settings (SYS_ADMIN/HR_SENIOR).  
+Update settings (HR Admin / System Admin).  
 Body: shape of `/docs/Data_Models.md` `policy_settings`.
 
 Errors:

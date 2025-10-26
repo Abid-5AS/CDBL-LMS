@@ -8,12 +8,12 @@ Unit (Zod/validators):
 
 API (integration):
 - POST /api/leaves: happy paths for EL/CL/ML; negative cases for each rule.
-- Approval chain: HR_ADMIN -> DEPT_HEAD -> HR_SENIOR -> CEO.
+- Approval chain: HR_ADMIN reviews and resolves requests.
 - Cancel restores balance; reject keeps balance.
 - Return-to-duty for ML with and without fitness certificate.
 
 E2E (Playwright):
-- Employee submits CL (2 days) -> full approval -> visible in dashboard.
+- Employee submits CL (2 days) -> HR Admin approves -> visible in dashboard.
 - ML (5 days) without certificate -> blocked; with certificate -> allowed.
-- Quarantine with certificate -> HR_SENIOR override to 25 days.
+- Quarantine with certificate -> HR Admin override to 25 days.
 - Overstay scenario -> block new request until HR regularizes.

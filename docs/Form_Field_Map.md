@@ -50,7 +50,7 @@ LeaveSchema (suggested fields aligned to above)
   // Workflow
   status: { type: String, enum: ['draft','pending','approved','rejected','cancelled'], default: 'pending' },
   approvals: [{
-    role: { type: String, enum: ['HR_ADMIN','DEPT_HEAD','HR_SENIOR','CEO'] },
+    role: { type: String, enum: ['HR_ADMIN'] },
     userId: ObjectId, // ref users
     action: { type: String, enum: ['approved','rejected','returned'] },
     note: String,
@@ -78,7 +78,7 @@ Validation Rules (UI + API)
 	•	CL: days <= 3 AND sumYear(CL) + days <= 10.
 	•	ML: sumYear(ML) + days <= 14 AND if days > 3 ⇒ attachments must include MEDICAL_CERT (and prescription).
 	•	EL: elBalance >= days.
-	•	Quarantine: attachments must include QUARANTINE_CERT; days <= 21 (≤30 with HR_SENIOR override).
+	•	Quarantine: attachments must include QUARANTINE_CERT; days <= 21 (≤30 with HR Admin override).
 	•	Submission lead time: if type !== ML and startDate < today + 5 working days ⇒ block (HR override flag available).
 
 ### Leave Type Labels
