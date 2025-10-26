@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getEmployeeDashboardData } from "@/lib/employee";
+import AppShell from "@/components/app-shell";
 import { EmployeeDashboard } from "../components/EmployeeDashboard";
 
 type EmployeePageProps = {
@@ -27,5 +28,9 @@ export default async function EmployeeDetailPage({ params, searchParams }: Emplo
     ? data.pendingRequestId ?? undefined
     : queryRequestId;
 
-  return <EmployeeDashboard data={data} pendingRequestId={pendingRequestId} />;
+  return (
+    <AppShell title="Employee Details" pathname="/employees">
+      <EmployeeDashboard data={data} pendingRequestId={pendingRequestId} />
+    </AppShell>
+  );
 }

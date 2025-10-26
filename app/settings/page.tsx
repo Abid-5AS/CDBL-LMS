@@ -1,10 +1,10 @@
 import AppShell from "@/components/app-shell";
 
-export default function HelpPage() {
+export default function SettingsPage() {
   return (
-    <AppShell title="Help" pathname="/help">
+    <AppShell title="Settings" pathname="/settings">
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm text-sm text-slate-600">
-        Help center coming soon.
+        Settings panel coming soon.
       </div>
     </AppShell>
   );
