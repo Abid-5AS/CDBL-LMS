@@ -20,9 +20,10 @@ type ActionType = "approve" | "reject";
 type ApprovalActionsProps = {
   pendingRequestId?: number | null;
   employeeName: string;
+  status?: string;
 };
 
-export function ApprovalActions({ pendingRequestId, employeeName }: ApprovalActionsProps) {
+export function ApprovalActions({ pendingRequestId, employeeName, status }: ApprovalActionsProps) {
   const router = useRouter();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [action, setAction] = useState<ActionType>("approve");
@@ -59,28 +60,27 @@ export function ApprovalActions({ pendingRequestId, employeeName }: ApprovalActi
 
   return (
     <>
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-900">Actions</h3>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {canAct
-            ? "Review the current request and choose to approve or reject it."
-            : "No pending leave request requires your action right now."}
-        </p>
-        <div className="mt-4 flex flex-col gap-3">
-          <Button variant="outline" onClick={() => router.push("/approvals")} disabled={isPending || submitting}>
-            Back to Approvals
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={() => handleOpen("reject")}
-            disabled={!canAct || submitting || isPending}
-            className="w-full"
-          >
-            Reject Request
-          </Button>
-          <Button onClick={() => handleOpen("approve")} disabled={!canAct || submitting || isPending} className="w-full">
-            Approve Request
-          </Button>
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+        <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-4 px-4 py-3">
+          <div className="flex flex-col text-xs text-muted-foreground">
+            <span className="font-semibold uppercase tracking-wide text-slate-600">Status</span>
+            <span>{status ?? (canAct ? "Pending HR Review" : "No pending request")}</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button variant="outline" onClick={() => router.push("/approvals")} disabled={isPending || submitting}>
+              Back to Approvals
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => handleOpen("reject")}
+              disabled={!canAct || submitting || isPending}
+            >
+              Reject
+            </Button>
+            <Button onClick={() => handleOpen("approve")} disabled={!canAct || submitting || isPending}>
+              Approve
+            </Button>
+          </div>
         </div>
       </div>
 

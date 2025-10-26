@@ -1,6 +1,5 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { SectionHeader } from "@/components/SectionHeader";
 import { formatDate } from "@/lib/utils";
 import type { LeaveHistoryEntry } from "@/lib/employee";
 
@@ -18,9 +17,9 @@ const STATUS_VARIANTS: Record<string, string> = {
 
 export function LeaveHistoryTable({ history }: LeaveHistoryTableProps) {
   return (
-    <div className="space-y-4">
-      <SectionHeader title="Recent Leave History" />
-      <div className="overflow-hidden rounded-xl border border-slate-200 shadow-sm">
+    <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-600">Recent Leave History</h3>
+      <div className="max-h-[250px] overflow-y-auto rounded-lg border border-slate-100">
         <Table>
           <TableHeader className="bg-slate-50">
             <TableRow>
@@ -34,7 +33,7 @@ export function LeaveHistoryTable({ history }: LeaveHistoryTableProps) {
           <TableBody>
             {history.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="py-8 text-center text-sm text-muted-foreground">
+                <TableCell colSpan={5} className="py-6 text-center text-sm text-muted-foreground">
                   No leave records available.
                 </TableCell>
               </TableRow>

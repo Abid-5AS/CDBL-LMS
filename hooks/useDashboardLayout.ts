@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 const STORAGE_KEY = "employee-dashboard-layout";
-const DEFAULT_LAYOUT = ["LeaveHistory", "Profile", "Balance", "Charts"] as const;
+const DEFAULT_LAYOUT = ["Overview", "Analytics", "History"] as const;
 
 const isSectionId = (value: unknown): value is DashboardSectionId =>
   typeof value === "string" && (DEFAULT_LAYOUT as readonly string[]).includes(value);

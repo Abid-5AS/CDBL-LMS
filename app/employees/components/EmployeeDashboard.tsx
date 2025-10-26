@@ -15,10 +15,9 @@ import { HRStatCards } from "@/components/HRStatCards";
 import { ApprovalActions } from "./ApprovalActions";
 
 const SECTION_MAP = {
-  LeaveHistory: "LeaveHistory",
-  Profile: "Profile",
-  Balance: "Balance",
-  Charts: "Charts",
+  Overview: "Overview",
+  Analytics: "Analytics",
+  History: "History",
 } as const;
 
 type EmployeeDashboardProps = {
@@ -31,35 +30,51 @@ export function EmployeeDashboard({ data, pendingRequestId }: EmployeeDashboardP
   const [customizeMode, setCustomizeMode] = useState(false);
 
   const sections = useMemo<Record<DashboardSectionId, ReactNode>>(() => ({
-    [SECTION_MAP.LeaveHistory]: <LeaveHistoryTable history={data.history} />,
-    [SECTION_MAP.Profile]: (
-      <EmployeeProfileCard
-        name={data.name}
-        email={data.email}
-        department={data.department}
-        designation={data.designation}
-        manager={data.manager}
-        joiningDate={data.joiningDate}
-        employmentStatus={data.employmentStatus}
-      />
+    [SECTION_MAP.Overview]: (
+      <section className="space-y-4">
+        <SectionHeader title="Employee Overview" />
+        <div className="grid gap-4 xl:grid-cols-2">
+          <EmployeeProfileCard
+            name={data.name}
+            email={data.email}
+            department={data.department}
+            designation={data.designation}
+            manager={data.manager}
+            joiningDate={data.joiningDate}
+            employmentStatus={data.employmentStatus}
+          />
+          <LeaveBalanceCard balances={data.balances} />
+        </div>
+      </section>
     ),
-    [SECTION_MAP.Balance]: <LeaveBalanceCard balances={data.balances} />,
-    [SECTION_MAP.Charts]: <ChartsSection trend={data.monthlyTrend} distribution={data.distribution} />,
+    [SECTION_MAP.Analytics]: (
+      <section className="space-y-4">
+        <SectionHeader title="Balances & Analytics" />
+        <ChartsSection trend={data.monthlyTrend} distribution={data.distribution} />
+      </section>
+    ),
+    [SECTION_MAP.History]: (
+      <section className="space-y-4">
+        <SectionHeader title="Leave History" />
+        <LeaveHistoryTable history={data.history} />
+      </section>
+    ),
   }), [data]);
 
   const activeLayout = layout.length ? layout : [...defaultLayout];
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-12">
-      <div className="mx-auto w-full max-w-6xl px-8 py-8">
-        <div className="flex flex-col justify-between gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-center">
-          <div className="space-y-2">
+    <div className="min-h-screen bg-slate-50 pb-24">
+      <div className="mx-auto w-full max-w-[1400px] px-4 py-6">
+        <div className="flex flex-col justify-between gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-center">
+          <div className="space-y-1.5">
             <Link href="/approvals" className="text-sm font-medium text-blue-600 hover:underline">
               &larr; Back to Approvals
             </Link>
-            <SectionHeader title={data.name} className="mb-0">
-              <span className="text-sm text-muted-foreground">{data.email}</span>
-            </SectionHeader>
+            <div>
+              <h1 className="text-2xl font-semibold text-slate-900">{data.name}</h1>
+              <p className="text-sm text-muted-foreground">{data.email}</p>
+            </div>
             <p className="text-sm text-muted-foreground">
               {data.department ? `${data.department}` : "Department not specified"}
             </p>
@@ -90,8 +105,8 @@ export function EmployeeDashboard({ data, pendingRequestId }: EmployeeDashboardP
           </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-3 gap-6">
-          <div className="col-span-2 space-y-6">
+        <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <div className="space-y-4">
             <DashboardContainer
               layout={activeLayout}
               customizeMode={customizeMode}
@@ -99,14 +114,18 @@ export function EmployeeDashboard({ data, pendingRequestId }: EmployeeDashboardP
               sections={sections}
             />
           </div>
-          <aside className="col-span-1 space-y-4">
+          <aside className="space-y-4">
             <div className="sticky top-4 space-y-4">
               <HRStatCards stats={data.stats} />
-              <ApprovalActions pendingRequestId={pendingRequestId} employeeName={data.name} />
             </div>
           </aside>
         </div>
       </div>
+      <ApprovalActions
+        pendingRequestId={pendingRequestId}
+        employeeName={data.name}
+        status={pendingRequestId ? "Pending HR Review" : "No pending request"}
+      />
     </div>
   );
 }

@@ -16,7 +16,7 @@ export function LeaveDistributionChart({ data }: LeaveDistributionChartProps) {
       <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-600">
         Leave Type Distribution
       </h3>
-      <div className="h-64">
+      <div className="h-[180px]">
         {data.length === 0 ? (
           <p className="text-sm text-muted-foreground">No leave records to display.</p>
         ) : (

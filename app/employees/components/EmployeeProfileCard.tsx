@@ -1,4 +1,3 @@
-import { SectionHeader } from "@/components/SectionHeader";
 import { cn, formatDate } from "@/lib/utils";
 
 type EmployeeProfileCardProps = {
@@ -33,11 +32,12 @@ export function EmployeeProfileCard(props: EmployeeProfileCardProps) {
   };
 
   return (
-    <div className="space-y-4">
-      <SectionHeader title="Employee Profile">
-        <span className="text-sm font-semibold text-blue-600">{name}</span>
-      </SectionHeader>
-      <dl className="grid gap-x-8 gap-y-4 lg:grid-cols-2">
+    <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-600">Profile</h3>
+        <span className="text-xs font-medium text-blue-600">{name}</span>
+      </div>
+      <dl className="grid gap-x-6 gap-y-3 lg:grid-cols-2">
         {FIELDS.map((field) => (
           <div key={field.key}>
             <dt className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">

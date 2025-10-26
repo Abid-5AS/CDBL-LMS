@@ -49,17 +49,16 @@ function DashboardSection({ id, customizeMode, children }: DashboardSectionProps
       ref={setNodeRef}
       style={style}
       className={cn(
-        "rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 ease-in-out",
-        "hover:shadow-md",
-        customizeMode && "border-dashed border-2 border-blue-300",
+        "transition-all duration-300 ease-in-out",
+        customizeMode ? "rounded-xl border-2 border-dashed border-blue-300 bg-blue-50/30 p-2" : "",
         isDragging && "opacity-80",
       )}
     >
-      <div className={cn("relative", customizeMode && "cursor-grab")}>
+      <div className={cn("relative", customizeMode && "cursor-grab")}> 
         {customizeMode && (
           <button
             type="button"
-            className="absolute right-0 top-0 -mt-3 -mr-2 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:text-slate-600"
+            className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:text-slate-600"
             {...attributes}
             {...listeners}
             aria-label="Drag section"
@@ -67,7 +66,7 @@ function DashboardSection({ id, customizeMode, children }: DashboardSectionProps
             <GripVertical className="h-4 w-4" />
           </button>
         )}
-        {children}
+        <div className={cn(customizeMode ? "pointer-events-none" : "")}>{children}</div>
       </div>
     </div>
   );
