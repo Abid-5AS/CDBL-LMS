@@ -41,10 +41,10 @@ export default function DashboardPage() {
 
 function DashboardFallback() {
   return (
-    <div className="space-y-8 max-w-7xl mx-auto p-6">
+    <div className="space-y-6">
       <div className="h-36 rounded-xl border border-slate-200 bg-white p-6 shadow-sm" />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, index) => (
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, index) => (
           <div key={index} className="h-28 rounded-xl border border-slate-200 bg-white shadow-sm" />
         ))}
       </div>

@@ -3,10 +3,13 @@
 import useSWR from "swr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ClipboardCheck, Plus } from "lucide-react";
 import StatusBadge from "./status-badge";
 import { leaveTypeLabel } from "@/lib/ui";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
+import Link from "next/link";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -92,8 +95,16 @@ export function RequestsTable() {
               </TableRow>
             ) : rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-8">
-                  No leave requests yet. Apply your first leave!
+                <TableCell colSpan={6} className="p-0">
+                  <EmptyState
+                    icon={ClipboardCheck}
+                    title="No leave requests yet"
+                    description="Start by applying for your first leave request."
+                    action={{
+                      label: "Apply Leave",
+                      onClick: () => window.location.href = "/leaves/apply",
+                    }}
+                  />
                 </TableCell>
               </TableRow>
             ) : (

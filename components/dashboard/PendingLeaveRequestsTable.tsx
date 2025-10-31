@@ -3,6 +3,8 @@ import { LeaveStatus } from "@prisma/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ClipboardCheck } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
 import Link from "next/link";
@@ -36,8 +38,12 @@ export async function PendingLeaveRequestsTable() {
         <CardHeader>
           <CardTitle>Pending Requests</CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground text-center py-8">No pending leave requests</p>
+        <CardContent className="p-0">
+          <EmptyState
+            icon={ClipboardCheck}
+            title="No pending requests"
+            description="All leave requests have been processed. Check back later for new submissions."
+          />
         </CardContent>
       </Card>
     );

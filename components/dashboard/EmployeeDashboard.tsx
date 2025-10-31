@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { Plus, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { BalanceSummaryCards } from "@/app/dashboard/components/balance-summary-cards";
 import { RequestsTable } from "@/app/dashboard/components/requests-table";
 import { UpcomingHolidays } from "./UpcomingHolidays";
@@ -13,7 +14,7 @@ type EmployeeDashboardProps = {
 
 export function EmployeeDashboard({ username }: EmployeeDashboardProps) {
   return (
-    <div className="space-y-8 max-w-7xl mx-auto p-6">
+    <div className="space-y-6">
       {/* Header */}
       <section className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-6 shadow-sm md:flex-row md:items-center md:justify-between">
         <div>
@@ -29,7 +30,7 @@ export function EmployeeDashboard({ username }: EmployeeDashboardProps) {
       </section>
 
       {/* Balance Cards */}
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <Suspense fallback={<BalanceCardSkeleton />}>
           <BalanceSummaryCards />
         </Suspense>
@@ -46,7 +47,7 @@ export function EmployeeDashboard({ username }: EmployeeDashboardProps) {
             <Link href="/leaves">View all</Link>
           </Button>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <Suspense fallback={<TableSkeleton />}>
             <RequestsTable />
           </Suspense>
@@ -62,11 +63,11 @@ function BalanceCardSkeleton() {
       {Array.from({ length: 3 }).map((_, i) => (
         <Card key={i} className="h-auto min-h-[120px]">
           <CardHeader>
-            <div className="h-4 w-32 bg-slate-200 rounded animate-pulse" />
+            <Skeleton className="h-4 w-32" />
           </CardHeader>
           <CardContent>
-            <div className="h-8 w-24 bg-slate-200 rounded animate-pulse mb-2" />
-            <div className="h-3 w-48 bg-slate-200 rounded animate-pulse" />
+            <Skeleton className="h-8 w-24 mb-2" />
+            <Skeleton className="h-3 w-48" />
           </CardContent>
         </Card>
       ))}
@@ -78,12 +79,12 @@ function HolidayCardSkeleton() {
   return (
     <Card className="h-auto min-h-[120px]">
       <CardHeader>
-        <div className="h-4 w-32 bg-slate-200 rounded animate-pulse" />
+        <Skeleton className="h-4 w-32" />
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-4 w-full bg-slate-200 rounded animate-pulse" />
+            <Skeleton key={i} className="h-4 w-full" />
           ))}
         </div>
       </CardContent>
@@ -95,7 +96,7 @@ function TableSkeleton() {
   return (
     <div className="space-y-3">
       {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} className="h-12 w-full bg-slate-200 rounded animate-pulse" />
+        <Skeleton key={i} className="h-12 w-full" />
       ))}
     </div>
   );

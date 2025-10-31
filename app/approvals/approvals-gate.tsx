@@ -14,12 +14,12 @@ export default async function ApprovalsGate() {
 
   return (
     <div className="space-y-6">
-      <header className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-semibold text-slate-900">Pending Leave Approvals</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-1 text-sm text-muted-foreground">
           Review and process employee leave requests. Select a row to view full details before approving or rejecting.
         </p>
-      </header>
+      </section>
       <ApprovalsContent />
     </div>
   );

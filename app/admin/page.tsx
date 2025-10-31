@@ -68,5 +68,17 @@ async function AdminConsoleGate() {
 }
 
 function AdminFallback() {
-  return <div className="h-48 w-full rounded-xl border border-slate-200 bg-white shadow-sm" />;
+  return (
+    <div className="space-y-6">
+      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="h-8 w-64 bg-slate-200 rounded animate-pulse" />
+        <div className="mt-2 h-4 w-96 bg-slate-100 rounded animate-pulse" />
+      </section>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="h-32 rounded-xl border border-slate-200 bg-white shadow-sm animate-pulse" />
+        ))}
+      </div>
+    </div>
+  );
 }
