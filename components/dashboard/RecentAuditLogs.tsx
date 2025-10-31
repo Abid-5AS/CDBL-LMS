@@ -1,5 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Activity } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 
@@ -15,10 +17,18 @@ export async function RecentAuditLogs() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
+          <div className="flex items-center gap-2">
+            <Activity className="h-5 w-5 text-slate-400" />
+            <CardTitle>Recent Activity</CardTitle>
+          </div>
+          <CardDescription>System audit logs and activity history</CardDescription>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground text-center py-8">No audit logs yet</p>
+        <CardContent className="p-0">
+          <EmptyState
+            icon={Activity}
+            title="No activity yet"
+            description="Audit logs will appear here as system actions are performed."
+          />
         </CardContent>
       </Card>
     );
@@ -27,7 +37,11 @@ export async function RecentAuditLogs() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent Activity</CardTitle>
+        <div className="flex items-center gap-2">
+          <Activity className="h-5 w-5 text-blue-600" />
+          <CardTitle>Recent Activity</CardTitle>
+        </div>
+        <CardDescription>Last {logs.length} system actions</CardDescription>
       </CardHeader>
       <CardContent className="p-0">
         <Table>
@@ -43,16 +57,20 @@ export async function RecentAuditLogs() {
           <TableBody>
             {logs.map((log) => (
               <TableRow key={log.id}>
-                <TableCell className="text-sm">
+                <TableCell className="text-sm font-medium">
                   {formatDate(log.createdAt.toISOString())}
                 </TableCell>
                 <TableCell className="text-sm">{log.actorEmail}</TableCell>
-                <TableCell className="text-sm font-medium">{log.action}</TableCell>
+                <TableCell>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-100 text-blue-700">
+                    {log.action}
+                  </span>
+                </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
                   {log.targetEmail || "—"}
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground max-w-xs truncate">
-                  {log.details ? JSON.stringify(log.details) : "—"}
+                  {log.details ? JSON.stringify(log.details).substring(0, 50) + "..." : "—"}
                 </TableCell>
               </TableRow>
             ))}
