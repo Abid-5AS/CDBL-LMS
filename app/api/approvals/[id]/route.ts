@@ -14,7 +14,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const action = String(payload?.action ?? "").toUpperCase();
   const note = typeof payload?.note === "string" ? payload.note : undefined;
 
-  if (!["APPROVED", "REJECTED"].includes(action)) {
+  if (!["APPROVE", "REJECT"].includes(action)) {
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   }
 
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ error: "invalid_id" }, { status: 400 });
   }
 
-  const decision = action === "APPROVED" ? "APPROVED" : "REJECTED";
+  const decision = action === "APPROVE" ? "APPROVED" : "REJECTED";
   const result = await resolveLeave(numericId, decision, me.id, note);
 
   if (!result.ok) {
