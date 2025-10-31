@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { submitApprovalDecision } from "@/lib/api";
 import { formatDate } from "@/lib/utils";
 import { HRApprovalItem } from "./types";
+import { FilterBar } from "@/components/filters/FilterBar";
+import { leaveTypeLabel } from "@/lib/ui";
 
 type ApprovalsResponse = { items: HRApprovalItem[] };
 
@@ -26,13 +28,67 @@ function statusStyle(status: string) {
   return "hover:bg-slate-50";
 }
 
+const STATUS_OPTIONS = [
+  { value: "PENDING", label: "Pending" },
+  { value: "SUBMITTED", label: "Submitted" },
+];
+
+const TYPE_OPTIONS = [
+  { value: "EARNED", label: "Earned Leave" },
+  { value: "CASUAL", label: "Casual Leave" },
+  { value: "MEDICAL", label: "Medical Leave" },
+  { value: "EXTRAWITHPAY", label: "Extra with Pay" },
+  { value: "EXTRAWITHOUTPAY", label: "Extra without Pay" },
+];
+
 export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+
   const { data, error, isLoading, mutate } = useSWR<ApprovalsResponse>("/api/approvals", fetcher, {
     revalidateOnFocus: true,
   });
 
-  const items = useMemo(() => (Array.isArray(data?.items) ? data!.items : []), [data]);
+  const allItems = useMemo(() => (Array.isArray(data?.items) ? data!.items : []), [data]);
+
+  const items = useMemo(() => {
+    let filtered = allItems;
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (item) =>
+          item.requestedByName?.toLowerCase().includes(query) ||
+          item.requestedByEmail?.toLowerCase().includes(query) ||
+          item.type.toLowerCase().includes(query) ||
+          (leaveTypeLabel[item.type]?.toLowerCase().includes(query) ?? false) ||
+          item.reason?.toLowerCase().includes(query) ||
+          formatDate(item.start).toLowerCase().includes(query) ||
+          formatDate(item.end).toLowerCase().includes(query)
+      );
+    }
+
+    // Status filter
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((item) => item.status === statusFilter);
+    }
+
+    // Type filter
+    if (typeFilter !== "all") {
+      filtered = filtered.filter((item) => item.type === typeFilter);
+    }
+
+    return filtered;
+  }, [allItems, searchQuery, statusFilter, typeFilter]);
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setStatusFilter("all");
+    setTypeFilter("all");
+  };
 
   useEffect(() => {
     if (onDataChange) {
@@ -83,9 +139,34 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   }
 
   return (
-    <Card className="overflow-hidden border">
-      <CardContent className="p-0">
-        <Table>
+    <div className="space-y-4">
+      <FilterBar
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search by employee, type, reason, or date..."
+        statusFilter={{
+          value: statusFilter,
+          onChange: setStatusFilter,
+          options: STATUS_OPTIONS,
+        }}
+        typeFilter={{
+          value: typeFilter,
+          onChange: setTypeFilter,
+          options: TYPE_OPTIONS,
+        }}
+        onClear={clearFilters}
+      />
+
+      {items.length === 0 && allItems.length > 0 ? (
+        <Card>
+          <CardContent className="py-12 text-center text-sm text-muted-foreground">
+            No requests match your filters. Try adjusting your search criteria.
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="overflow-hidden border">
+          <CardContent className="p-0">
+            <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Employee</TableHead>
@@ -112,7 +193,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                     <div className="font-medium text-slate-900">{item.requestedByName ?? "Unknown"}</div>
                     <div className="text-xs text-muted-foreground">{item.requestedByEmail ?? "—"}</div>
                   </TableCell>
-                  <TableCell className="text-sm text-slate-600">{item.type}</TableCell>
+                  <TableCell className="text-sm text-slate-600">{leaveTypeLabel[item.type] ?? item.type}</TableCell>
                   <TableCell className="text-sm text-slate-600">
                     <div>{start}</div>
                     {start !== end && <div className="text-xs text-muted-foreground">to {end}</div>}
@@ -155,5 +236,12 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         </Table>
       </CardContent>
     </Card>
+      )}
+      {items.length !== allItems.length && allItems.length > 0 && (
+        <p className="text-sm text-muted-foreground text-center">
+          Showing {items.length} of {allItems.length} requests
+        </p>
+      )}
+    </div>
   );
 }

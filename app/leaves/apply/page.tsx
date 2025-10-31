@@ -1,15 +1,34 @@
 import { Suspense } from "react";
-import AppShell from "@/components/app-shell";
+import { redirect } from "next/navigation";
+import { UnifiedLayout } from "@/components/unified/UnifiedLayout";
+import { getCurrentUser } from "@/lib/auth";
+import { getUserRole } from "@/lib/session";
 import { ApplyLeaveForm } from "./_components/apply-leave-form";
 
-export default function ApplyLeavePage() {
+async function ApplyLeavePageWrapper() {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/login");
+  }
+
+  const role = await getUserRole();
+  const userData = { name: user.name, email: user.email };
+
+  if (role !== "EMPLOYEE") {
+    redirect("/dashboard");
+  }
+
   return (
-    <AppShell title="Apply Leave" pathname="/leaves/apply">
+    <UnifiedLayout currentPage="Apply" role="EMPLOYEE" user={userData}>
       <Suspense fallback={<ApplyLeaveFallback />}>
         <ApplyLeaveForm />
       </Suspense>
-    </AppShell>
+    </UnifiedLayout>
   );
+}
+
+export default function ApplyLeavePage() {
+  return <ApplyLeavePageWrapper />;
 }
 
 function ApplyLeaveFallback() {

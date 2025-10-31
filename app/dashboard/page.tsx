@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import AppShell from "@/components/app-shell";
 import { getUserRole } from "@/lib/session";
 import { getCurrentUser } from "@/lib/auth";
-import { EmployeeDashboard } from "@/components/dashboard/EmployeeDashboard";
+import { EmployeeDashboardUnified } from "@/components/dashboard/EmployeeDashboardUnified";
 import { HRDashboard } from "@/components/dashboard/HRDashboard";
 import { SuperAdminDashboard } from "@/components/dashboard/SuperAdminDashboard";
 
@@ -16,27 +16,31 @@ async function DashboardContent() {
   const role = await getUserRole();
   const username = user.name ?? "User";
 
+  // Super Admin keeps sidebar layout
+  if (role === "SUPER_ADMIN") {
+    return (
+      <AppShell title="Dashboard" pathname="/dashboard">
+        <Suspense fallback={<DashboardFallback />}>
+          <SuperAdminDashboard username={username} />
+        </Suspense>
+      </AppShell>
+    );
+  }
+
+  // Unified layout for Employee and HR Admin (handled by LayoutWrapper)
   return (
-    <>
+    <Suspense fallback={<DashboardFallback />}>
       {role === "HR_ADMIN" ? (
         <HRDashboard username={username} />
-      ) : role === "SUPER_ADMIN" ? (
-        <SuperAdminDashboard username={username} />
       ) : (
-        <EmployeeDashboard username={username} />
+        <EmployeeDashboardUnified username={username} />
       )}
-    </>
+    </Suspense>
   );
 }
 
 export default function DashboardPage() {
-  return (
-    <AppShell title="Dashboard" pathname="/dashboard">
-      <Suspense fallback={<DashboardFallback />}>
-        <DashboardContent />
-      </Suspense>
-    </AppShell>
-  );
+  return <DashboardContent />;
 }
 
 function DashboardFallback() {

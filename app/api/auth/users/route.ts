@@ -1,7 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
+import { canViewAllRequests } from "@/lib/rbac";
 
 export const cache = "no-store";
+
+export async function GET() {
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  // Only HR Admin and Super Admin can view all employees
+  if (!canViewAllRequests(user.role as "EMPLOYEE" | "HR_ADMIN" | "SUPER_ADMIN")) {
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  }
+
+  const users = await prisma.user.findMany({
+    orderBy: { name: "asc" },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      empCode: true,
+      department: true,
+      role: true,
+    },
+  });
+
+  return NextResponse.json({ users });
+}
 
 export async function POST(request: NextRequest) {
 

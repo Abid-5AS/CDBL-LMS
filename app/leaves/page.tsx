@@ -1,20 +1,42 @@
-import AppShell from "@/components/app-shell";
-import { RequestsTable } from "@/app/dashboard/components/requests-table";
+import { Suspense } from "react";
+import { redirect } from "next/navigation";
+import { UnifiedLayout } from "@/components/unified/UnifiedLayout";
+import { getCurrentUser } from "@/lib/auth";
+import { getUserRole } from "@/lib/session";
+import { MyLeavesPageContent } from "./MyLeavesPageContent";
+
+async function MyLeavesPageWrapper() {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/login");
+  }
+
+  const role = await getUserRole();
+  const userData = { name: user.name, email: user.email };
+
+  // Only employees use unified layout for this page
+  if (role !== "EMPLOYEE") {
+    redirect("/dashboard");
+  }
+
+  return (
+    <UnifiedLayout currentPage="Requests" role="EMPLOYEE" user={userData}>
+      <Suspense fallback={<MyLeavesFallback />}>
+        <MyLeavesPageContent />
+      </Suspense>
+    </UnifiedLayout>
+  );
+}
 
 export default function MyLeavesPage() {
+  return <MyLeavesPageWrapper />;
+}
+
+function MyLeavesFallback() {
   return (
-    <AppShell title="My Requests" pathname="/leaves">
-      <div className="space-y-6">
-        <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
-          <h1 className="text-2xl font-semibold text-slate-900">My Leave Requests</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Track the status of your submitted leave applications. Pending requests can be withdrawn before approval.
-          </p>
-        </section>
-        <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm overflow-x-auto">
-          <RequestsTable />
-        </div>
-      </div>
-    </AppShell>
+    <div className="space-y-6">
+      <div className="h-32 rounded-2xl border border-gray-200 bg-white p-6" />
+      <div className="h-96 rounded-2xl border border-gray-200 bg-white p-6" />
+    </div>
   );
 }

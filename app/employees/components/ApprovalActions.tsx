@@ -20,10 +20,14 @@ type ActionType = "approve" | "reject";
 type ApprovalActionsProps = {
   pendingRequestId?: number | null;
   employeeName: string;
+  employeeRole: string;
   status?: string;
 };
 
-export function ApprovalActions({ pendingRequestId, employeeName, status }: ApprovalActionsProps) {
+export function ApprovalActions({ pendingRequestId, employeeName, employeeRole, status }: ApprovalActionsProps) {
+  // Only show approve/reject buttons for EMPLOYEE role
+  const isEmployee = employeeRole === "EMPLOYEE";
+  const canAct = Boolean(pendingRequestId) && isEmployee;
   const router = useRouter();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [action, setAction] = useState<ActionType>("approve");
@@ -31,7 +35,10 @@ export function ApprovalActions({ pendingRequestId, employeeName, status }: Appr
   const [isPending, startTransition] = useTransition();
   const [submitting, setSubmitting] = useState(false);
 
-  const canAct = Boolean(pendingRequestId);
+  // Don't show approval actions at all if not an employee
+  if (!isEmployee) {
+    return null;
+  }
 
   const handleOpen = useCallback((nextAction: ActionType) => {
     setAction(nextAction);

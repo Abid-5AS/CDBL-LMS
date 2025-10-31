@@ -1,4 +1,5 @@
 import * as React from "react";
+import Link from "next/link";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -9,8 +10,10 @@ type EmptyStateProps = {
   description?: string;
   action?: {
     label: string;
-    onClick: () => void;
+    onClick?: () => void;
+    href?: string;
   };
+  helpText?: string;
   className?: string;
 };
 
@@ -19,6 +22,7 @@ export function EmptyState({
   title,
   description,
   action,
+  helpText,
   className,
 }: EmptyStateProps) {
   return (
@@ -31,18 +35,33 @@ export function EmptyState({
       aria-live="polite"
     >
       {Icon && (
-        <div className="flex items-center justify-center h-16 w-16 rounded-full bg-slate-100 mb-4" aria-hidden="true">
-          <Icon className="h-8 w-8 text-slate-400" />
+        <div className="flex items-center justify-center h-16 w-16 rounded-full bg-indigo-100 mb-4" aria-hidden="true">
+          <Icon className="h-8 w-8 text-indigo-600" />
         </div>
       )}
-      <h3 className="text-lg font-semibold text-slate-900 mb-1">{title}</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-1">{title}</h3>
       {description && (
-        <p className="text-sm text-muted-foreground max-w-md mb-4">{description}</p>
+        <p className="text-sm text-gray-600 max-w-md mb-4">{description}</p>
       )}
       {action && (
-        <Button onClick={action.onClick} variant="outline" size="sm" aria-label={action.label}>
-          {action.label}
-        </Button>
+        <div className="flex flex-col gap-2 items-center">
+          {action.href ? (
+            <Button asChild variant="outline" size="sm" className="rounded-full">
+              <Link href={action.href} aria-label={action.label}>
+                {action.label}
+              </Link>
+            </Button>
+          ) : action.onClick ? (
+            <Button onClick={action.onClick} variant="outline" size="sm" aria-label={action.label} className="rounded-full">
+              {action.label}
+            </Button>
+          ) : null}
+          {helpText && (
+            <Link href="/help" className="text-xs text-indigo-600 hover:text-indigo-700 hover:underline">
+              {helpText}
+            </Link>
+          )}
+        </div>
       )}
     </div>
   );

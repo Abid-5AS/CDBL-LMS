@@ -124,6 +124,7 @@ export function EmployeeDashboard({ data, pendingRequestId }: EmployeeDashboardP
       <ApprovalActions
         pendingRequestId={pendingRequestId}
         employeeName={data.name}
+        employeeRole={data.role}
         status={pendingRequestId ? "Pending HR Review" : "No pending request"}
       />
     </div>

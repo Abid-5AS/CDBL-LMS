@@ -1,0 +1,203 @@
+"use client";
+
+import { useState, useMemo } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ClipboardCheck } from "lucide-react";
+import StatusBadge from "@/app/dashboard/components/status-badge";
+import { leaveTypeLabel } from "@/lib/ui";
+import { Button } from "@/components/ui/button";
+import { formatDate } from "@/lib/utils";
+import { FilterChips } from "@/components/leaves/FilterChips";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import useSWR from "swr";
+import { useUIStore } from "@/lib/ui-state";
+
+type LeaveRow = {
+  id: number;
+  type: string;
+  startDate: string;
+  endDate: string;
+  workingDays: number;
+  status: "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
+  updatedAt: string;
+  reason?: string;
+};
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const CANCELABLE_STATUSES = new Set<LeaveRow["status"]>(["SUBMITTED", "PENDING"]);
+
+const FILTER_OPTIONS = [
+  { value: "all", label: "All" },
+  { value: "pending", label: "Pending" },
+  { value: "approved", label: "Approved" },
+  { value: "rejected", label: "Rejected" },
+  { value: "cancelled", label: "Cancelled" },
+];
+
+export function MyLeavesPageContent() {
+  const [selectedFilter, setSelectedFilter] = useState("all");
+  const { openDrawer } = useUIStore();
+  
+  const { data, isLoading, error, mutate } = useSWR("/api/leaves?mine=1", fetcher, {
+    revalidateOnFocus: false,
+  });
+
+  const allRows: LeaveRow[] = Array.isArray(data?.items) ? data.items : [];
+
+  const filteredRows = useMemo(() => {
+    if (selectedFilter === "all") return allRows;
+    return allRows.filter(row => {
+      const status = row.status.toLowerCase();
+      return status === selectedFilter || 
+             (selectedFilter === "pending" && (status === "submitted" || status === "pending"));
+    });
+  }, [allRows, selectedFilter]);
+
+  const cancelRequest = async (id: number) => {
+    try {
+      const res = await fetch(`/api/leaves/${id}`, { method: "PATCH" });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        toast.error("Couldn't cancel request", {
+          description: body?.error ?? "Please try again.",
+        });
+        return;
+      }
+      toast.success("Request cancelled");
+      mutate();
+    } catch (err) {
+      console.error(err);
+      toast.error("Couldn't cancel request", {
+        description: "Network error. Please try again.",
+      });
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <section className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-sm p-6 shadow-sm">
+        <h1 className="text-2xl font-semibold text-gray-900 mb-2">My Leave Requests</h1>
+        <p className="text-sm text-gray-600">
+          Track the status of your submitted leave applications. Pending requests can be withdrawn before approval.
+        </p>
+      </section>
+
+      {/* Filters */}
+      <Card className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100">
+        <CardContent className="p-4">
+          <FilterChips options={FILTER_OPTIONS} selectedValue={selectedFilter} onChange={setSelectedFilter} />
+        </CardContent>
+      </Card>
+
+      {/* Table */}
+      <Card className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <CardHeader className="border-b border-gray-200 bg-gray-50/50 backdrop-blur-sm">
+          <CardTitle>Requests</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader className="sticky top-0 z-10 bg-white border-b border-gray-200">
+                <TableRow className="hover:bg-transparent">
+                  <TableHead>Type</TableHead>
+                  <TableHead className="hidden sm:table-cell">Dates</TableHead>
+                  <TableHead className="hidden md:table-cell">Working Days</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="hidden lg:table-cell">Last Updated</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-sm text-gray-600 py-8">
+                    Loading...
+                  </TableCell>
+                </TableRow>
+              ) : error ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-sm text-red-600 py-8" role="alert">
+                    Failed to load
+                  </TableCell>
+                </TableRow>
+              ) : filteredRows.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="p-0">
+                    <EmptyState
+                      icon={ClipboardCheck}
+                      title="No leave requests"
+                      description={selectedFilter === "all" 
+                        ? "Start by applying for your first leave request."
+                        : `No ${selectedFilter} requests found.`}
+                    />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredRows.map((row) => (
+                  <TableRow 
+                    key={row.id} 
+                    className="hover:bg-indigo-50/50 cursor-pointer transition-colors"
+                    onClick={() => openDrawer(row.id)}
+                  >
+                    <TableCell className="font-medium">{leaveTypeLabel[row.type] ?? row.type}</TableCell>
+                    <TableCell className="hidden sm:table-cell text-gray-600">
+                      {formatDate(row.startDate)} → {formatDate(row.endDate)}
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell text-gray-600">{row.workingDays}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={row.status} />
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell text-gray-600">{formatDate(row.updatedAt)}</TableCell>
+                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                      {CANCELABLE_STATUSES.has(row.status) ? (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              Cancel
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Cancel this request?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will mark the request as cancelled. Approvers will no longer see it.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Keep</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => cancelRequest(row.id)}>
+                                Cancel Request
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      ) : (
+                        <span className="text-xs text-gray-500">—</span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+

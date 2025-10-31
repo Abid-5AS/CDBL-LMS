@@ -3,6 +3,7 @@ import { Sidebar } from "@/components/sidebar";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { getCurrentUser } from "@/lib/auth";
 import { User, Bell } from "lucide-react";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 
 type BreadcrumbItem = {
   label: string;
@@ -28,15 +29,7 @@ async function TopbarContent({
           <h1 className="text-lg font-semibold text-slate-900 truncate">{title}</h1>
         </div>
         <div className="flex items-center gap-2 sm:gap-3 ml-2 sm:ml-4">
-          <button
-            type="button"
-            className="relative p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-            aria-label="Notifications"
-            aria-haspopup="true"
-          >
-            <Bell className="h-5 w-5" aria-hidden="true" />
-            <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full" aria-label="New notifications" />
-          </button>
+          <NotificationDropdown />
           <div 
             className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-slate-50 border border-slate-200"
             role="region"
@@ -86,20 +79,31 @@ export default async function AppShell({
   pathname = "/",
   children,
   breadcrumbs,
+  role,
+  user,
 }: {
   title: string;
   pathname?: string;
   children: React.ReactNode;
   breadcrumbs?: BreadcrumbItem[];
+  role?: "EMPLOYEE" | "HR_ADMIN" | "SUPER_ADMIN";
+  user?: { name: string; email: string };
 }) {
+  // If unified layout props provided, render without sidebar
+  if (role && user && (role === "EMPLOYEE" || role === "HR_ADMIN")) {
+    // Unified layout will be rendered by the page component
+    return <>{children}</>;
+  }
+
+  // Super Admin or legacy layout: use sidebar
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="fixed inset-0 flex bg-slate-50">
       <Suspense fallback={<SidebarFallback />}>
         <Sidebar pathname={pathname} />
       </Suspense>
-      <div className="flex min-h-screen flex-1 flex-col min-w-0">
+      <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
         <Topbar title={title} breadcrumbs={breadcrumbs} />
-        <main className="flex-1" role="main" aria-label="Main content">
+        <main className="flex-1 overflow-y-auto" role="main" aria-label="Main content">
           <div className="mx-auto w-full max-w-[1400px] px-4 py-6">{children}</div>
         </main>
       </div>

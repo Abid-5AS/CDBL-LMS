@@ -1,25 +1,38 @@
+"use client";
+
+import { useMemo } from "react";
 import Link from "next/link";
 import { Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { prisma } from "@/lib/prisma";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate } from "@/lib/utils";
+import useSWR from "swr";
 
-export async function UpcomingHolidays() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-  const holidays = await prisma.holiday.findMany({
-    where: {
-      date: {
-        gte: today,
-      },
-    },
-    orderBy: {
-      date: "asc",
-    },
-    take: 5,
+export function UpcomingHolidays() {
+  const { data, error, isLoading } = useSWR("/api/holidays?upcoming=true", fetcher, {
+    revalidateOnFocus: false,
   });
+
+  const holidays = useMemo(() => {
+    if (!data?.items) return [];
+    return data.items.slice(0, 5);
+  }, [data]);
+
+  if (isLoading) {
+    return (
+      <Card className="h-auto min-h-[140px]">
+        <CardHeader className="pb-3">
+          <Skeleton className="h-6 w-40" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-16 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (holidays.length === 0) {
     return (
@@ -48,7 +61,7 @@ export async function UpcomingHolidays() {
   }
 
   const nextHoliday = holidays[0];
-  const dateStr = formatDate(nextHoliday.date.toISOString());
+  const dateStr = formatDate(nextHoliday.date);
   const nextDate = new Date(nextHoliday.date);
   const todayDate = new Date();
   todayDate.setHours(0, 0, 0, 0);

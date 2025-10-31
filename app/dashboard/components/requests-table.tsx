@@ -109,17 +109,17 @@ export function RequestsTable() {
               </TableRow>
             ) : (
               rows.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell>{leaveTypeLabel[row.type] ?? row.type}</TableCell>
-                  <TableCell className="hidden sm:table-cell">
+                <TableRow key={row.id} className="hover:bg-slate-50">
+                  <TableCell className="font-medium">{leaveTypeLabel[row.type] ?? row.type}</TableCell>
+                  <TableCell className="hidden sm:table-cell text-slate-600">
                     <span className="sr-only">Dates: </span>
                     {formatDate(row.startDate)} → {formatDate(row.endDate)}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">{row.workingDays}</TableCell>
+                  <TableCell className="hidden md:table-cell text-slate-600">{row.workingDays}</TableCell>
                   <TableCell>
                     <StatusBadge status={row.status} />
                   </TableCell>
-                  <TableCell className="hidden lg:table-cell">{formatDate(row.updatedAt)}</TableCell>
+                  <TableCell className="hidden lg:table-cell text-slate-600">{formatDate(row.updatedAt)}</TableCell>
                   <TableCell className="text-right">
                     {CANCELABLE_STATUSES.has(row.status) ? (
                       <AlertDialog>

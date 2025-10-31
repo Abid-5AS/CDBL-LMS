@@ -1,7 +1,35 @@
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
 import { connection } from "next/server";
-import AppShell from "@/components/app-shell";
+import { UnifiedLayout } from "@/components/unified/UnifiedLayout";
+import { getCurrentUser } from "@/lib/auth";
+import { getUserRole } from "@/lib/session";
 import { HolidaysList } from "./components/HolidaysList";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
+
+async function HolidaysPageWrapper() {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/login");
+  }
+
+  const role = await getUserRole();
+  const userData = { name: user.name, email: user.email };
+
+  // Both Employee and HR Admin use unified layout
+  if (role !== "EMPLOYEE" && role !== "HR_ADMIN") {
+    redirect("/dashboard");
+  }
+
+  return (
+    <UnifiedLayout currentPage="Holidays" role={role as "EMPLOYEE" | "HR_ADMIN"} user={userData}>
+      <Suspense fallback={<HolidaysPageFallback />}>
+        <HolidaysContent />
+      </Suspense>
+    </UnifiedLayout>
+  );
+}
 
 async function HolidaysContent() {
   await connection();
@@ -9,11 +37,16 @@ async function HolidaysContent() {
   
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold text-slate-900">Company Holidays</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          View upcoming holidays and calendar for {currentYear}
-        </p>
+      <section className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-sm p-6 shadow-sm">
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900">Company Holidays</h1>
+            <p className="mt-1 text-sm text-gray-600">
+              View upcoming holidays and calendar for {currentYear}
+            </p>
+          </div>
+          <PDFExportButton />
+        </div>
       </section>
       <Suspense fallback={<HolidaysListSkeleton />}>
         <HolidaysList />
@@ -22,14 +55,28 @@ async function HolidaysContent() {
   );
 }
 
-export default function HolidaysPage() {
+function PDFExportButton() {
+  const handleExport = () => {
+    // TODO: Implement actual PDF export
+    window.print();
+  };
+
   return (
-    <AppShell title="Holidays" pathname="/holidays">
-      <Suspense fallback={<HolidaysPageFallback />}>
-        <HolidaysContent />
-      </Suspense>
-    </AppShell>
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={handleExport}
+      className="rounded-full"
+      aria-label="Export holidays calendar as PDF"
+    >
+      <Download className="h-4 w-4 mr-2" />
+      Export PDF
+    </Button>
   );
+}
+
+export default function HolidaysPage() {
+  return <HolidaysPageWrapper />;
 }
 
 function HolidaysPageFallback() {

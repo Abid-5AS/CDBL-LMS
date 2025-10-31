@@ -40,6 +40,7 @@ export type EmployeeDashboardData = {
   id: number;
   name: string;
   email: string;
+  role: string;
   department?: string | null;
   designation?: string | null;
   manager?: string | null;
@@ -179,6 +180,7 @@ export async function getEmployeeDashboardData(employeeId: number): Promise<Empl
     id: user.id,
     name: user.name,
     email: user.email,
+    role: user.role,
     department: user.department,
     designation: null,
     manager: null,

@@ -44,9 +44,20 @@ function resolveLinks(role: string | null | undefined) {
   return EMPLOYEE_LINKS;
 }
 
-function isActive(href: string, pathname: string) {
+function isActive(href: string, pathname: string, allLinks: SidebarLink[]) {
+  // Exact match
   if (pathname === href) return true;
+  
+  // Don't highlight parent routes if a child route is active
+  // Check if any link in the sidebar is an exact match first
+  const hasExactMatch = allLinks.some(link => pathname === link.href);
+  if (hasExactMatch && pathname !== href) {
+    return false;
+  }
+  
+  // Prefix match for parent routes (only if no exact match exists)
   if (href !== "/" && pathname.startsWith(`${href}/`)) return true;
+  
   return false;
 }
 
@@ -73,7 +84,7 @@ export async function Sidebar({ pathname }: { pathname: string }) {
       <nav className="flex flex-1 flex-col gap-1 px-3 py-4 overflow-y-auto">
         {links.map((link) => {
           const Icon = link.icon;
-          const active = isActive(link.href, pathname);
+          const active = isActive(link.href, pathname, links);
           return (
             <Link
               key={link.href}

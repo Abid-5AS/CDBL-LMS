@@ -50,14 +50,54 @@ async function upsertUser(user: {
 }
 
 async function seedHoliday() {
-  await prisma.holiday.upsert({
-    where: { date: new Date(`${YEAR}-12-16T00:00:00.000Z`) },
-    update: {},
-    create: {
-      date: new Date(`${YEAR}-12-16T00:00:00.000Z`),
-      name: "Victory Day",
-    },
-  });
+  // All holidays for 2025 from CDBL's official list
+  const holidays = [
+    { date: `${YEAR}-02-15T00:00:00.000Z`, name: "Shab-e-Barat", isOptional: true },
+    { date: `${YEAR}-02-21T00:00:00.000Z`, name: "Shaheed Day and International Mother Language Day" },
+    { date: `${YEAR}-03-26T00:00:00.000Z`, name: "Independence & National day" },
+    { date: `${YEAR}-03-28T00:00:00.000Z`, name: "Shab-e-Qadar", isOptional: true },
+    // Eid-ul-Fitr spans multiple days
+    { date: `${YEAR}-03-29T00:00:00.000Z`, name: "Eid-ul-Fitr" },
+    { date: `${YEAR}-03-30T00:00:00.000Z`, name: "Eid-ul-Fitr" },
+    { date: `${YEAR}-03-31T00:00:00.000Z`, name: "Eid-ul-Fitr" },
+    { date: `${YEAR}-04-01T00:00:00.000Z`, name: "Eid-ul-Fitr" },
+    { date: `${YEAR}-04-02T00:00:00.000Z`, name: "Eid-ul-Fitr" },
+    { date: `${YEAR}-04-14T00:00:00.000Z`, name: "Bengali New Year's day" },
+    { date: `${YEAR}-05-01T00:00:00.000Z`, name: "May Day" },
+    { date: `${YEAR}-05-11T00:00:00.000Z`, name: "Budha Purnima", isOptional: true },
+    // Eid-ul-Azha spans multiple days
+    { date: `${YEAR}-06-05T00:00:00.000Z`, name: "Eid-ul-Azha" },
+    { date: `${YEAR}-06-06T00:00:00.000Z`, name: "Eid-ul-Azha" },
+    { date: `${YEAR}-06-07T00:00:00.000Z`, name: "Eid-ul-Azha" },
+    { date: `${YEAR}-06-08T00:00:00.000Z`, name: "Eid-ul-Azha" },
+    { date: `${YEAR}-06-09T00:00:00.000Z`, name: "Eid-ul-Azha" },
+    { date: `${YEAR}-06-10T00:00:00.000Z`, name: "Eid-ul-Azha" },
+    { date: `${YEAR}-07-01T00:00:00.000Z`, name: "Trading Holiday (Bank Holiday)" },
+    { date: `${YEAR}-07-06T00:00:00.000Z`, name: "Muharram (Ashura)", isOptional: true },
+    { date: `${YEAR}-08-16T00:00:00.000Z`, name: "Janmashtami", isOptional: true },
+    { date: `${YEAR}-09-05T00:00:00.000Z`, name: "Eid-E-Milad-un-Nabi" },
+    // Durgapuja spans multiple days
+    { date: `${YEAR}-10-01T00:00:00.000Z`, name: "Durgapuja" },
+    { date: `${YEAR}-10-02T00:00:00.000Z`, name: "Durgapuja" },
+    { date: `${YEAR}-12-16T00:00:00.000Z`, name: "Victory Day" },
+    { date: `${YEAR}-12-25T00:00:00.000Z`, name: "Christmas Day" },
+    { date: `${YEAR}-12-31T00:00:00.000Z`, name: "Trading Holiday (Bank Holiday)" },
+  ];
+
+  for (const holiday of holidays) {
+    await prisma.holiday.upsert({
+      where: { date: new Date(holiday.date) },
+      update: {
+        name: holiday.name,
+        isOptional: holiday.isOptional ?? false,
+      },
+      create: {
+        date: new Date(holiday.date),
+        name: holiday.name,
+        isOptional: holiday.isOptional ?? false,
+      },
+    });
+  }
 }
 
 async function seedPolicies() {
