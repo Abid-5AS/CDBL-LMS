@@ -55,16 +55,16 @@ export async function PendingLeaveRequestsTable() {
         <CardTitle>Pending Requests</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <Table>
+        <Table aria-label="Pending leave requests table">
           <TableHeader>
             <TableRow>
               <TableHead>Employee</TableHead>
               <TableHead>Type</TableHead>
-              <TableHead>Dates</TableHead>
-              <TableHead>Days</TableHead>
-              <TableHead>Reason</TableHead>
+              <TableHead className="hidden sm:table-cell">Dates</TableHead>
+              <TableHead className="hidden md:table-cell">Days</TableHead>
+              <TableHead className="hidden lg:table-cell">Reason</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -80,16 +80,23 @@ export async function PendingLeaveRequestsTable() {
                   <div className="text-xs text-muted-foreground">{leave.requester.email}</div>
                 </TableCell>
                 <TableCell>{leaveTypeLabel[leave.type] ?? leave.type}</TableCell>
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">
+                  <span className="sr-only">Dates: </span>
                   {formatDate(leave.startDate.toISOString())} → {formatDate(leave.endDate.toISOString())}
                 </TableCell>
-                <TableCell>{leave.workingDays}</TableCell>
-                <TableCell className="max-w-xs truncate">{leave.reason}</TableCell>
+                <TableCell className="hidden md:table-cell">
+                  <span className="sr-only">Working days: </span>
+                  {leave.workingDays}
+                </TableCell>
+                <TableCell className="hidden lg:table-cell max-w-xs truncate">
+                  <span className="sr-only">Reason: </span>
+                  {leave.reason}
+                </TableCell>
                 <TableCell>
                   <StatusBadge status={leave.status} />
                 </TableCell>
-                <TableCell>
-                  <Button asChild size="sm" variant="outline">
+                <TableCell className="text-right">
+                  <Button asChild size="sm" variant="outline" aria-label={`Review leave request from ${leave.requester.name}`}>
                     <Link href={`/approvals?leave=${leave.id}`}>Review</Link>
                   </Button>
                 </TableCell>

@@ -385,15 +385,15 @@ export function AdminHolidaysManagement() {
 
   return (
     <>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <h2 className="text-2xl font-semibold text-slate-900">Holidays Management</h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              Manage company holidays and optional days off for {new Date().getFullYear()}
-            </p>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between flex-col sm:flex-row gap-4">
+                <div>
+                  <h2 className="text-2xl font-semibold text-slate-900">Holidays Management</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Manage company holidays and optional days off for {new Date().getFullYear()}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
             <Button variant="outline" size="sm" onClick={downloadTemplate}>
               <Download className="mr-2 h-4 w-4" />
               Download Template
@@ -607,49 +607,68 @@ export function AdminHolidaysManagement() {
                 </Button>
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[40%]">Holiday Name</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Day</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {holidays.map((holiday) => {
-                    const date = new Date(holiday.date);
-                    const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
-                    const isPast = date < new Date();
-                    
-                    return (
-                      <TableRow key={holiday.id} className={isPast ? 'opacity-60' : ''}>
-                        <TableCell className="font-medium">{holiday.name}</TableCell>
-                        <TableCell>{formatDate(holiday.date)}</TableCell>
-                        <TableCell>
-                          <span className="text-sm text-muted-foreground">{dayName}</span>
-                        </TableCell>
-                        <TableCell>
-                          {holiday.isOptional ? (
-                            <Badge variant="secondary" className="text-xs">
-                              Optional
-                            </Badge>
-                          ) : (
-                            <Badge variant="default" className="text-xs bg-green-600">
-                              Mandatory
-                            </Badge>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center gap-1 justify-end">
+              <div className="overflow-x-auto">
+                <Table aria-label="Holidays calendar table">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="min-w-[200px]">Holiday Name</TableHead>
+                      <TableHead className="hidden sm:table-cell">Date</TableHead>
+                      <TableHead className="hidden md:table-cell">Day</TableHead>
+                      <TableHead className="hidden lg:table-cell">Type</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {holidays.map((holiday) => {
+                      const date = new Date(holiday.date);
+                      const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+                      const isPast = date < new Date();
+                      
+                      return (
+                        <TableRow key={holiday.id} className={isPast ? 'opacity-60' : ''}>
+                          <TableCell className="font-medium">
+                            <div className="flex flex-col gap-1">
+                              <span>{holiday.name}</span>
+                              <span className="text-xs text-muted-foreground sm:hidden">
+                                {formatDate(holiday.date)} • {dayName}
+                              </span>
+                              <span className="text-xs sm:hidden">
+                                {holiday.isOptional ? (
+                                  <Badge variant="secondary" className="text-xs">
+                                    Optional
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="default" className="text-xs bg-green-600">
+                                    Mandatory
+                                  </Badge>
+                                )}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="hidden sm:table-cell">{formatDate(holiday.date)}</TableCell>
+                          <TableCell className="hidden md:table-cell">
+                            <span className="text-sm text-muted-foreground">{dayName}</span>
+                          </TableCell>
+                          <TableCell className="hidden lg:table-cell">
+                            {holiday.isOptional ? (
+                              <Badge variant="secondary" className="text-xs">
+                                Optional
+                              </Badge>
+                            ) : (
+                              <Badge variant="default" className="text-xs bg-green-600">
+                                Mandatory
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center gap-1 justify-end">
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => handleOpenDialog(holiday)}
-                              title="Edit holiday"
+                              aria-label={`Edit ${holiday.name}`}
                             >
-                              <Edit className="h-4 w-4" />
+                              <Edit className="h-4 w-4" aria-hidden="true" />
                             </Button>
                             <Button
                               variant="ghost"
@@ -658,17 +677,18 @@ export function AdminHolidaysManagement() {
                                 setDeletingHolidayId(holiday.id);
                                 setDeleteDialogOpen(true);
                               }}
-                              title="Delete holiday"
+                              aria-label={`Delete ${holiday.name}`}
                             >
-                              <Trash2 className="h-4 w-4 text-red-600" />
+                              <Trash2 className="h-4 w-4 text-red-600" aria-hidden="true" />
                             </Button>
                           </div>
                         </TableCell>
                       </TableRow>
                     );
                   })}
-                </TableBody>
-              </Table>
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </CardContent>
         </Card>

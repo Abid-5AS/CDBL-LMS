@@ -69,27 +69,27 @@ export function RequestsTable() {
         <CardTitle>My Requests</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <Table>
+        <Table aria-label="My leave requests table">
           <TableHeader>
             <TableRow>
               <TableHead>Type</TableHead>
-              <TableHead>Dates</TableHead>
-              <TableHead>Working Days</TableHead>
+              <TableHead className="hidden sm:table-cell">Dates</TableHead>
+              <TableHead className="hidden md:table-cell">Working Days</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Last Updated</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="hidden lg:table-cell">Last Updated</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-8">
+                <TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-8" aria-live="polite">
                   Loading...
                 </TableCell>
               </TableRow>
             ) : error ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-sm text-red-600 py-8">
+                <TableCell colSpan={6} className="text-center text-sm text-red-600 py-8" role="alert">
                   Failed to load
                 </TableCell>
               </TableRow>
@@ -111,19 +111,20 @@ export function RequestsTable() {
               rows.map((row) => (
                 <TableRow key={row.id}>
                   <TableCell>{leaveTypeLabel[row.type] ?? row.type}</TableCell>
-                  <TableCell>
+                  <TableCell className="hidden sm:table-cell">
+                    <span className="sr-only">Dates: </span>
                     {formatDate(row.startDate)} → {formatDate(row.endDate)}
                   </TableCell>
-                  <TableCell>{row.workingDays}</TableCell>
+                  <TableCell className="hidden md:table-cell">{row.workingDays}</TableCell>
                   <TableCell>
                     <StatusBadge status={row.status} />
                   </TableCell>
-                  <TableCell>{formatDate(row.updatedAt)}</TableCell>
-                  <TableCell>
+                  <TableCell className="hidden lg:table-cell">{formatDate(row.updatedAt)}</TableCell>
+                  <TableCell className="text-right">
                     {CANCELABLE_STATUSES.has(row.status) ? (
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="outline" size="sm">
+                          <Button variant="outline" size="sm" aria-label={`Cancel leave request from ${formatDate(row.startDate)} to ${formatDate(row.endDate)}`}>
                             Cancel
                           </Button>
                         </AlertDialogTrigger>

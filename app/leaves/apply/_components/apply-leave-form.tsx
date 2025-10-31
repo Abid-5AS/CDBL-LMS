@@ -243,7 +243,7 @@ export function ApplyLeaveForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+    <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]" noValidate aria-label="Leave application form">
       <div className="space-y-6">
         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-xl font-semibold text-slate-900">New Leave Application</h2>
@@ -264,7 +264,13 @@ export function ApplyLeaveForm() {
                 clearErrors();
               }}
             >
-              <SelectTrigger className={cn("h-10", errors.type && "border-red-500")}>
+              <SelectTrigger 
+                className={cn("h-10", errors.type && "border-red-500")}
+                aria-label="Leave type"
+                aria-required="true"
+                aria-invalid={!!errors.type}
+                aria-describedby={errors.type ? "type-error" : undefined}
+              >
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent>
@@ -276,8 +282,8 @@ export function ApplyLeaveForm() {
               </SelectContent>
             </Select>
             {errors.type && (
-              <p className="text-sm text-red-600 flex items-center gap-1">
-                <AlertCircle className="h-3 w-3" />
+              <p id="type-error" className="text-sm text-red-600 flex items-center gap-1" role="alert">
+                <AlertCircle className="h-3 w-3" aria-hidden="true" />
                 {errors.type}
               </p>
             )}
@@ -296,10 +302,14 @@ export function ApplyLeaveForm() {
                 }} 
                 disabled={disableDate} 
                 className={cn("w-full", errors.start && "border-red-500")}
+                aria-label="Start date"
+                aria-required="true"
+                aria-invalid={!!errors.start}
+                aria-describedby={errors.start ? "start-error" : undefined}
               />
               {errors.start && (
-                <p className="text-sm text-red-600 flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
+                <p id="start-error" className="text-sm text-red-600 flex items-center gap-1" role="alert">
+                  <AlertCircle className="h-3 w-3" aria-hidden="true" />
                   {errors.start}
                 </p>
               )}
@@ -316,10 +326,14 @@ export function ApplyLeaveForm() {
                 }} 
                 disabled={disableDate} 
                 className={cn("w-full", errors.end && "border-red-500")}
+                aria-label="End date"
+                aria-required="true"
+                aria-invalid={!!errors.end}
+                aria-describedby={errors.end ? "end-error" : undefined}
               />
               {errors.end && (
-                <p className="text-sm text-red-600 flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
+                <p id="end-error" className="text-sm text-red-600 flex items-center gap-1" role="alert">
+                  <AlertCircle className="h-3 w-3" aria-hidden="true" />
                   {errors.end}
                 </p>
               )}
@@ -341,15 +355,19 @@ export function ApplyLeaveForm() {
                 "min-h-[120px]",
                 errors.reason && "border-red-500 focus-visible:ring-red-500"
               )}
+              aria-label="Reason for leave"
+              aria-required="true"
+              aria-invalid={!!errors.reason}
+              aria-describedby={errors.reason ? "reason-error" : "reason-help"}
             />
             <div className="flex items-center justify-between">
               {errors.reason ? (
-                <p className="text-sm text-red-600 flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
+                <p id="reason-error" className="text-sm text-red-600 flex items-center gap-1" role="alert">
+                  <AlertCircle className="h-3 w-3" aria-hidden="true" />
                   {errors.reason}
                 </p>
               ) : (
-                <p className="text-xs text-muted-foreground">
+                <p id="reason-help" className="text-xs text-muted-foreground">
                   {reason.trim().length} / 10 characters minimum
                 </p>
               )}
@@ -369,10 +387,14 @@ export function ApplyLeaveForm() {
                   accept=".pdf,image/*" 
                   onChange={handleFileChange}
                   className={cn(errors.file && "border-red-500")}
+                  aria-label="Medical certificate file"
+                  aria-required="true"
+                  aria-invalid={!!errors.file}
+                  aria-describedby={errors.file ? "file-error" : undefined}
                 />
               ) : (
-                <div className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-slate-50">
-                  <FileText className="h-5 w-5 text-blue-600" />
+                <div className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-slate-50" role="status" aria-live="polite">
+                  <FileText className="h-5 w-5 text-blue-600" aria-hidden="true" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-slate-900 truncate">{file.name}</p>
                     <p className="text-xs text-muted-foreground">
@@ -388,14 +410,15 @@ export function ApplyLeaveForm() {
                       setErrors((prev) => ({ ...prev, file: undefined }));
                     }}
                     className="h-8 w-8 p-0"
+                    aria-label="Remove file"
                   >
-                    <X className="h-4 w-4" />
+                    <X className="h-4 w-4" aria-hidden="true" />
                   </Button>
                 </div>
               )}
               {errors.file && (
-                <p className="text-sm text-red-600 flex items-center gap-1">
-                  <AlertCircle className="h-3 w-3" />
+                <p id="file-error" className="text-sm text-red-600 flex items-center gap-1" role="alert">
+                  <AlertCircle className="h-3 w-3" aria-hidden="true" />
                   {errors.file}
                 </p>
               )}

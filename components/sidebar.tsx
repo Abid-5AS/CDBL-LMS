@@ -55,7 +55,7 @@ export async function Sidebar({ pathname }: { pathname: string }) {
   const links = resolveLinks(user?.role);
 
   return (
-    <aside className="flex h-screen w-60 shrink-0 flex-col border-r border-slate-200 bg-white shadow-sm">
+    <aside className="hidden lg:flex h-screen w-60 shrink-0 flex-col border-r border-slate-200 bg-white shadow-sm" aria-label="Main navigation">
       {/* Logo/Brand */}
       <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-200">
         <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-600">
@@ -78,14 +78,16 @@ export async function Sidebar({ pathname }: { pathname: string }) {
             <Link
               key={link.href}
               href={link.href}
+              aria-label={link.label}
+              aria-current={active ? "page" : undefined}
               className={clsx(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
                 active
                   ? "bg-blue-50 text-blue-700 shadow-sm border border-blue-100"
                   : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
               )}
             >
-              <Icon className={clsx("h-4 w-4 flex-shrink-0", active && "text-blue-600")} />
+              <Icon className={clsx("h-4 w-4 flex-shrink-0", active && "text-blue-600")} aria-hidden="true" />
               <span>{link.label}</span>
             </Link>
           );

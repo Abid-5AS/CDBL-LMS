@@ -27,9 +27,11 @@ export function EmptyState({
         "flex flex-col items-center justify-center py-12 px-4 text-center",
         className
       )}
+      role="status"
+      aria-live="polite"
     >
       {Icon && (
-        <div className="flex items-center justify-center h-16 w-16 rounded-full bg-slate-100 mb-4">
+        <div className="flex items-center justify-center h-16 w-16 rounded-full bg-slate-100 mb-4" aria-hidden="true">
           <Icon className="h-8 w-8 text-slate-400" />
         </div>
       )}
@@ -38,7 +40,7 @@ export function EmptyState({
         <p className="text-sm text-muted-foreground max-w-md mb-4">{description}</p>
       )}
       {action && (
-        <Button onClick={action.onClick} variant="outline" size="sm">
+        <Button onClick={action.onClick} variant="outline" size="sm" aria-label={action.label}>
           {action.label}
         </Button>
       )}
