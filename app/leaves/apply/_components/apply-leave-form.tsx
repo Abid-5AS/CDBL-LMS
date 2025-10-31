@@ -10,8 +10,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import DatePicker from "@/components/date-picker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertCircle, X, FileText, CheckCircle2 } from "lucide-react";
 import { countRequestedDays } from "@/lib/leave-days";
 import { formatDate } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_FILE_REGEX = /(\.pdf|\.png|\.jpe?g)$/i;
@@ -45,6 +47,15 @@ function startOfDay(date: Date) {
   return d;
 }
 
+type FormErrors = {
+  type?: string;
+  start?: string;
+  end?: string;
+  reason?: string;
+  file?: string;
+  general?: string;
+};
+
 export function ApplyLeaveForm() {
   const router = useRouter();
   const [type, setType] = useState<LeaveType>("CASUAL");
@@ -53,6 +64,7 @@ export function ApplyLeaveForm() {
   const [reason, setReason] = useState("Meeting family obligations");
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const {
@@ -110,38 +122,79 @@ export function ApplyLeaveForm() {
     const selected = event.target.files?.[0];
     if (!selected) {
       setFile(null);
+      setErrors((prev) => ({ ...prev, file: undefined }));
       return;
     }
+    let fileError: string | undefined;
     if (!ACCEPTED_FILE_REGEX.test(selected.name)) {
-      toast.error("Unsupported file type. Use PDF, JPG, or PNG.");
+      fileError = "Unsupported file type. Use PDF, JPG, or PNG.";
+    } else if (selected.size > MAX_FILE_SIZE) {
+      fileError = "File too large (max 5 MB).";
+    }
+    
+    if (fileError) {
+      setErrors((prev) => ({ ...prev, file: fileError }));
       event.target.value = "";
+      toast.error(fileError);
       return;
     }
-    if (selected.size > MAX_FILE_SIZE) {
-      toast.error("File too large (max 5 MB).");
-      event.target.value = "";
-      return;
-    }
+    
     setFile(selected);
+    setErrors((prev) => ({ ...prev, file: undefined }));
+  };
+
+  const clearErrors = () => {
+    setErrors({});
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+    
+    if (!start) {
+      newErrors.start = "Start date is required";
+    }
+    
+    if (!end) {
+      newErrors.end = "End date is required";
+    }
+    
+    if (start && end) {
+      if (start > end) {
+        newErrors.end = "End date must be on or after start date";
+      } else if (requestedDays <= 0) {
+        newErrors.end = "Invalid date range";
+      }
+    }
+    
+    if (!reason.trim()) {
+      newErrors.reason = "Reason is required";
+    } else if (reason.trim().length < 10) {
+      newErrors.reason = "Reason must be at least 10 characters";
+    }
+    
+    if (hasBalanceData && remainingBalance < 0) {
+      newErrors.general = "Insufficient balance for this leave type";
+    }
+    
+    if (requiresCertificate && !file) {
+      newErrors.file = "Medical certificate is required for sick leave over 3 days";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (submitting) return;
+    
+    if (!validateForm()) {
+      toast.error("Please fix the errors in the form");
+      return;
+    }
+
+    // Type guards: validateForm ensures these are defined, but TypeScript needs explicit checks
     if (!start || !end) {
-      toast.error("Select both start and end dates.");
-      return;
-    }
-    if (!reason.trim()) {
-      toast.error("Please provide a reason for your leave.");
-      return;
-    }
-    if (requestedDays <= 0) {
-      toast.error("End date must be on or after start date.");
-      return;
-    }
-    if (hasBalanceData && remainingBalance < 0) {
-      toast.error("Insufficient balance for this leave type.");
       return;
     }
 
@@ -201,9 +254,17 @@ export function ApplyLeaveForm() {
 
         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
           <div className="space-y-2">
-            <Label className="text-sm text-slate-600">Leave Type</Label>
-            <Select value={type} onValueChange={(value) => handleTypeChange(value as LeaveType)}>
-              <SelectTrigger className="h-10">
+            <Label className="text-sm font-medium text-slate-900">
+              Leave Type <span className="text-red-500">*</span>
+            </Label>
+            <Select 
+              value={type} 
+              onValueChange={(value) => {
+                handleTypeChange(value as LeaveType);
+                clearErrors();
+              }}
+            >
+              <SelectTrigger className={cn("h-10", errors.type && "border-red-500")}>
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent>
@@ -214,35 +275,142 @@ export function ApplyLeaveForm() {
                 ))}
               </SelectContent>
             </Select>
+            {errors.type && (
+              <p className="text-sm text-red-600 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {errors.type}
+              </p>
+            )}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label className="text-sm text-slate-600">Start Date</Label>
-              <DatePicker value={start} onChange={setStart} disabled={disableDate} className="w-full" />
+              <Label className="text-sm font-medium text-slate-900">
+                Start Date <span className="text-red-500">*</span>
+              </Label>
+              <DatePicker 
+                value={start} 
+                onChange={(date) => {
+                  setStart(date);
+                  setErrors((prev) => ({ ...prev, start: undefined }));
+                }} 
+                disabled={disableDate} 
+                className={cn("w-full", errors.start && "border-red-500")}
+              />
+              {errors.start && (
+                <p className="text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {errors.start}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
-              <Label className="text-sm text-slate-600">End Date</Label>
-              <DatePicker value={end} onChange={setEnd} disabled={disableDate} className="w-full" />
+              <Label className="text-sm font-medium text-slate-900">
+                End Date <span className="text-red-500">*</span>
+              </Label>
+              <DatePicker 
+                value={end} 
+                onChange={(date) => {
+                  setEnd(date);
+                  setErrors((prev) => ({ ...prev, end: undefined }));
+                }} 
+                disabled={disableDate} 
+                className={cn("w-full", errors.end && "border-red-500")}
+              />
+              {errors.end && (
+                <p className="text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {errors.end}
+                </p>
+              )}
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-sm text-slate-600">Reason</Label>
+            <Label className="text-sm font-medium text-slate-900">
+              Reason <span className="text-red-500">*</span>
+            </Label>
             <Textarea
               value={reason}
-              onChange={(event) => setReason(event.target.value)}
+              onChange={(event) => {
+                setReason(event.target.value);
+                setErrors((prev) => ({ ...prev, reason: undefined }));
+              }}
               placeholder="Family event, personal errand, medical follow-up..."
-              className="min-h-[120px]"
+              className={cn(
+                "min-h-[120px]",
+                errors.reason && "border-red-500 focus-visible:ring-red-500"
+              )}
             />
+            <div className="flex items-center justify-between">
+              {errors.reason ? (
+                <p className="text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {errors.reason}
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  {reason.trim().length} / 10 characters minimum
+                </p>
+              )}
+            </div>
           </div>
 
           {requiresCertificate ? (
             <div className="space-y-2">
-              <Label className="text-sm text-slate-600">Medical Certificate (PDF/JPG/PNG)</Label>
-              <Input ref={fileInputRef} type="file" accept=".pdf,image/*" onChange={handleFileChange} />
+              <Label className="text-sm font-medium text-slate-900">
+                Medical Certificate <span className="text-red-500">*</span>
+                <span className="text-xs font-normal text-muted-foreground ml-1">(PDF, JPG, PNG, max 5MB)</span>
+              </Label>
+              {!file ? (
+                <Input 
+                  ref={fileInputRef} 
+                  type="file" 
+                  accept=".pdf,image/*" 
+                  onChange={handleFileChange}
+                  className={cn(errors.file && "border-red-500")}
+                />
+              ) : (
+                <div className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-slate-50">
+                  <FileText className="h-5 w-5 text-blue-600" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-900 truncate">{file.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {(file.size / 1024).toFixed(1)} KB
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      resetFile();
+                      setErrors((prev) => ({ ...prev, file: undefined }));
+                    }}
+                    className="h-8 w-8 p-0"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              {errors.file && (
+                <p className="text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {errors.file}
+                </p>
+              )}
             </div>
           ) : null}
+
+          {errors.general && (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-3 flex items-start gap-2">
+              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-red-900">Validation Error</p>
+                <p className="text-sm text-red-700 mt-0.5">{errors.general}</p>
+              </div>
+            </div>
+          )}
 
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => router.back()} disabled={submitting}>
