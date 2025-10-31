@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { unstable_noStore as noStore } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@prisma/client";
 
+export const cache = "no-store";
+
 export async function POST() {
-  noStore();
   const seed = [
     {
       name: "Employee One",

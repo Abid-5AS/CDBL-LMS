@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { unstable_noStore as noStore } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { LeaveStatus, Prisma } from "@prisma/client";
+
+export const cache = "no-store";
 
 type LeaveWithApprovals = Prisma.LeaveRequestGetPayload<{
   include: {
@@ -92,7 +93,6 @@ function serializeLeave(leave: LeaveWithApprovals): SerializedLeave {
 }
 
 export async function GET() {
-  noStore();
   const me = await requireHR();
   if (me instanceof Response) return me;
 

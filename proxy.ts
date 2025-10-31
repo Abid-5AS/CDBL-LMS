@@ -6,7 +6,13 @@ function needsAuth(pathname: string) {
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/leaves") ||
     pathname.startsWith("/approvals") ||
-    pathname.startsWith("/admin")
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/holidays") ||
+    pathname.startsWith("/employees") ||
+    pathname.startsWith("/balance") ||
+    pathname.startsWith("/policies") ||
+    pathname.startsWith("/reports") ||
+    pathname.startsWith("/settings")
   );
 }
 
@@ -40,15 +46,39 @@ export async function proxy(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (pathname.startsWith("/admin") && role !== "SUPER_ADMIN") {
-    const url = req.nextUrl.clone();
-    url.pathname = "/dashboard";
-    return NextResponse.redirect(url);
+  // Admin routes - most require SUPER_ADMIN, but holidays can be accessed by HR_ADMIN too
+  if (pathname.startsWith("/admin")) {
+    if (pathname.startsWith("/admin/holidays")) {
+      // Holidays management: HR_ADMIN or SUPER_ADMIN
+      if (role !== "SUPER_ADMIN" && role !== "HR_ADMIN") {
+        const url = req.nextUrl.clone();
+        url.pathname = "/dashboard";
+        return NextResponse.redirect(url);
+      }
+    } else {
+      // Other admin routes: SUPER_ADMIN only
+      if (role !== "SUPER_ADMIN") {
+        const url = req.nextUrl.clone();
+        url.pathname = "/dashboard";
+        return NextResponse.redirect(url);
+      }
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/leaves/:path*", "/approvals/:path*", "/admin/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/leaves/:path*",
+    "/approvals/:path*",
+    "/admin/:path*",
+    "/holidays/:path*",
+    "/employees/:path*",
+    "/balance/:path*",
+    "/policies/:path*",
+    "/reports/:path*",
+    "/settings/:path*",
+  ],
 };

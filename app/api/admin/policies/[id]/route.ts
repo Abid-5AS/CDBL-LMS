@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { unstable_noStore as noStore } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+
+export const cache = "no-store";
 
 const UpdateSchema = z
   .object({
@@ -17,7 +18,6 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  noStore();
 
   const user = await getCurrentUser();
   if (!user || (user.role as string) !== "SUPER_ADMIN") {
@@ -55,11 +55,28 @@ export async function PATCH(
     },
   });
 
+  const log = await prisma.auditLog.create({
+    data: {
+      actorEmail: user.email ?? "unknown@cdbl",
+      action: "POLICY_UPDATED",
+      targetEmail: null,
+      details: {
+        policyId: policy.id,
+        leaveType: policy.leaveType,
+        changes: payload,
+      },
+    },
+  });
+
   return NextResponse.json({
     item: {
       ...policy,
       createdAt: policy.createdAt.toISOString(),
       updatedAt: policy.updatedAt.toISOString(),
+    },
+    log: {
+      ...log,
+      createdAt: log.createdAt.toISOString(),
     },
   });
 }

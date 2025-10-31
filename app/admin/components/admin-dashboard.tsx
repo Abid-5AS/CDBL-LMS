@@ -6,9 +6,19 @@ import { UserManagement, type AdminUserRecord } from "./user-management";
 import { PolicyPanel, type PolicyRecord } from "./policy-panel";
 import { LogsPanel } from "./logs-panel";
 
+export type AuditLogRecord = {
+  id: number;
+  actorEmail: string;
+  action: string;
+  targetEmail: string | null;
+  details: unknown | null;
+  createdAt: string;
+};
+
 type AdminDashboardProps = {
   initialUsers: AdminUserRecord[];
   initialPolicies: PolicyRecord[];
+  initialLogs: AuditLogRecord[];
 };
 
 type TabId = "users" | "policies" | "logs";
@@ -19,10 +29,11 @@ const TABS: Array<{ id: TabId; label: string; description: string }> = [
   { id: "logs", label: "Audit Log", description: "Review recent administrative actions." },
 ];
 
-export default function AdminDashboard({ initialUsers, initialPolicies }: AdminDashboardProps) {
+export default function AdminDashboard({ initialUsers, initialPolicies, initialLogs }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabId>("users");
   const [users, setUsers] = useState(initialUsers);
   const [policies, setPolicies] = useState(initialPolicies);
+  const [logs, setLogs] = useState(initialLogs);
   const [busyUserId, setBusyUserId] = useState<number | null>(null);
   const [busyPolicyId, setBusyPolicyId] = useState<number | null>(null);
 
@@ -34,6 +45,10 @@ export default function AdminDashboard({ initialUsers, initialPolicies }: AdminD
     }),
     [users, policies],
   );
+
+  const appendLog = (entry: AuditLogRecord) => {
+    setLogs((prev) => [entry, ...prev].slice(0, 100));
+  };
 
   const handleUserRoleChange = async (id: number, nextRole: AdminUserRecord["role"]) => {
     setBusyUserId(id);
@@ -52,6 +67,9 @@ export default function AdminDashboard({ initialUsers, initialPolicies }: AdminD
       const updated = payload?.item as AdminUserRecord | undefined;
       if (updated) {
         setUsers((prev) => prev.map((user) => (user.id === id ? { ...user, ...updated } : user)));
+      }
+      if (payload?.log) {
+        appendLog(payload.log as AuditLogRecord);
       }
     } finally {
       setBusyUserId(null);
@@ -79,9 +97,17 @@ export default function AdminDashboard({ initialUsers, initialPolicies }: AdminD
       if (updated) {
         setPolicies((prev) => prev.map((policy) => (policy.id === id ? updated : policy)));
       }
+      if (payload?.log) {
+        appendLog(payload.log as AuditLogRecord);
+      }
     } finally {
       setBusyPolicyId(null);
     }
+  };
+
+  const handleUserCreated = (user: AdminUserRecord, log?: AuditLogRecord) => {
+    setUsers((prev) => [{ ...user }, ...prev]);
+    if (log) appendLog(log);
   };
 
   return (
@@ -119,12 +145,17 @@ export default function AdminDashboard({ initialUsers, initialPolicies }: AdminD
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <p className="mb-6 text-sm text-muted-foreground">{TABS.find((tab) => tab.id === activeTab)?.description}</p>
         {activeTab === "users" ? (
-          <UserManagement users={users} onRoleChange={handleUserRoleChange} busyUserId={busyUserId} />
+          <UserManagement
+            users={users}
+            onRoleChange={handleUserRoleChange}
+            onCreate={handleUserCreated}
+            busyUserId={busyUserId}
+          />
         ) : null}
         {activeTab === "policies" ? (
           <PolicyPanel policies={policies} onUpdatePolicy={handlePolicyUpdate} busyPolicyId={busyPolicyId} />
         ) : null}
-        {activeTab === "logs" ? <LogsPanel /> : null}
+        {activeTab === "logs" ? <LogsPanel logs={logs} /> : null}
       </section>
     </div>
   );

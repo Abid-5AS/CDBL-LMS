@@ -1,8 +1,13 @@
 import { Badge } from "@/components/ui/badge";
+import { LeaveStatus } from "@prisma/client";
 
-type Status = "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
+type Status = LeaveStatus;
 
 const STATUS_STYLES: Record<Status, { label: string; className: string }> = {
+  DRAFT: {
+    label: "Draft",
+    className: "bg-slate-100 text-slate-600 hover:bg-slate-100",
+  },
   SUBMITTED: {
     label: "Submitted",
     className: "bg-blue-100 text-blue-900 hover:bg-blue-100",

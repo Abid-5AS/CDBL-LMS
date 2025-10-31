@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CreateUserDialog } from "./create-user-dialog";
+import type { AuditLogRecord } from "./admin-dashboard";
 
 export type AdminUserRecord = {
   id: number;
@@ -20,10 +22,11 @@ const ROLE_OPTIONS: Array<AdminUserRecord["role"]> = ["EMPLOYEE", "HR_ADMIN", "S
 type UserManagementProps = {
   users: AdminUserRecord[];
   onRoleChange: (id: number, nextRole: AdminUserRecord["role"]) => Promise<void>;
+  onCreate: (user: AdminUserRecord, log?: AuditLogRecord) => void;
   busyUserId: number | null;
 };
 
-export function UserManagement({ users, onRoleChange, busyUserId }: UserManagementProps) {
+export function UserManagement({ users, onRoleChange, onCreate, busyUserId }: UserManagementProps) {
   const [query, setQuery] = useState("");
 
   const filtered = useMemo(() => {
@@ -45,12 +48,15 @@ export function UserManagement({ users, onRoleChange, busyUserId }: UserManageme
           <h2 className="text-xl font-semibold text-slate-900">User Management</h2>
           <p className="text-sm text-muted-foreground">Assign roles and manage departments for each account.</p>
         </div>
-        <div className="w-full sm:w-64">
-          <Input
-            placeholder="Search name, email, or code..."
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          <div className="sm:w-64">
+            <Input
+              placeholder="Search name, email, or code..."
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+            />
+          </div>
+          <CreateUserDialog onCreated={onCreate} />
         </div>
       </div>
 

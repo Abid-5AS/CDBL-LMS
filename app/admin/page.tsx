@@ -26,7 +26,7 @@ async function AdminConsoleGate() {
     throw new Error("Policy configuration model is missing. Run database migrations.");
   }
 
-  const [users, policies] = await Promise.all([
+  const [users, policies, logs] = await Promise.all([
     prisma.user.findMany({
       orderBy: { createdAt: "desc" },
       select: {
@@ -42,6 +42,10 @@ async function AdminConsoleGate() {
     policyClient.findMany({
       orderBy: { leaveType: "asc" },
     }),
+    prisma.auditLog.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 100,
+    }),
   ]);
 
   const initialUsers = users.map((record) => ({
@@ -55,7 +59,12 @@ async function AdminConsoleGate() {
     updatedAt: policy.updatedAt.toISOString(),
   }));
 
-  return <AdminDashboard initialUsers={initialUsers} initialPolicies={initialPolicies} />;
+  const initialLogs = logs.map((log) => ({
+    ...log,
+    createdAt: log.createdAt.toISOString(),
+  }));
+
+  return <AdminDashboard initialUsers={initialUsers} initialPolicies={initialPolicies} initialLogs={initialLogs} />;
 }
 
 function AdminFallback() {

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getEmployeeDashboardData } from "@/lib/employee";
 
+export const cache = "no-store";
+
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const employeeId = Number(id);

@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { unstable_noStore as noStore } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+
+export const cache = "no-store";
 
 const UpdateSchema = z.object({
   role: z.enum(["EMPLOYEE", "HR_ADMIN", "SUPER_ADMIN"]).optional(),
@@ -13,7 +14,6 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  noStore();
 
   const current = await getCurrentUser();
   if (!current || (current.role as string) !== "SUPER_ADMIN") {
@@ -37,6 +37,21 @@ export async function PATCH(
     return NextResponse.json({ error: "no_changes" }, { status: 400 });
   }
 
+  const target = await prisma.user.findUnique({
+    where: { id: numericId },
+    select: { id: true, email: true, role: true, department: true, name: true },
+  });
+  if (!target) {
+    return NextResponse.json({ error: "not_found" }, { status: 404 });
+  }
+
+  if (payload.role && payload.role !== "SUPER_ADMIN" && target.role === "SUPER_ADMIN") {
+    const remaining = await prisma.user.count({ where: { role: "SUPER_ADMIN" as any, NOT: { id: numericId } } });
+    if (remaining === 0) {
+      return NextResponse.json({ error: "last_super_admin" }, { status: 400 });
+    }
+  }
+
   const updated = await prisma.user.update({
     where: { id: numericId },
     data: {
@@ -54,10 +69,28 @@ export async function PATCH(
     },
   });
 
+  const log = await prisma.auditLog.create({
+    data: {
+      actorEmail: current.email ?? "unknown@cdbl",
+      action: "USER_UPDATED",
+      targetEmail: updated.email,
+      details: {
+        previousRole: target.role,
+        newRole: updated.role,
+        previousDepartment: target.department,
+        newDepartment: updated.department,
+      },
+    },
+  });
+
   return NextResponse.json({
     item: {
       ...updated,
       createdAt: updated.createdAt.toISOString(),
+    },
+    log: {
+      ...log,
+      createdAt: log.createdAt.toISOString(),
     },
   });
 }

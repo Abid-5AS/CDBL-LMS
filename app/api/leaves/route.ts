@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { unstable_noStore as noStore } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+
+export const cache = "no-store";
 import { LeaveType } from "@prisma/client";
 import {
   policy,
@@ -37,7 +38,6 @@ const ApplySchema = z.object({
 });
 
 export async function GET() {
-  noStore();
   const me = await getCurrentUser();
   if (!me) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
@@ -63,7 +63,6 @@ async function getAvailableDays(userId: number, type: LeaveType, year: number) {
 }
 
 export async function POST(req: Request) {
-  noStore();
   const me = await getCurrentUser();
   if (!me) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 

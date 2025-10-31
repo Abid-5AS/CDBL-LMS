@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { unstable_noStore as noStore } from "next/cache";
 import { Sidebar } from "@/components/sidebar";
 
 export function Topbar({ title }: { title: string }) {
@@ -21,7 +20,6 @@ export default async function AppShell({
   pathname?: string;
   children: React.ReactNode;
 }) {
-  noStore();
   return (
     <div className="flex min-h-screen bg-slate-50">
       <Suspense fallback={<SidebarFallback />}>

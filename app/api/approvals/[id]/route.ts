@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { unstable_noStore as noStore } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { resolveLeave } from "../resolve-leave";
 
+export const cache = "no-store";
+
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  noStore();
   const { id } = await params;
   const me = await getCurrentUser();
   if (!me) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

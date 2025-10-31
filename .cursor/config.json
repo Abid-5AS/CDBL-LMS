@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "next-devtools": {
+      "command": "npx",
+      "args": ["-y", "next-devtools-mcp@latest"]
+    },
+    "codex": {
+      "command": "npx",
+      "args": ["-y", "codex", "mcp-server"]
+    }
+  },
+  "defaultBranch": "main",
+  "autoRunTasks": true,
+  "promptStyle": "concise",
+  "autoSave": true
+}
+

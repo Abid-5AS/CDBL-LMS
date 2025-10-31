@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { unstable_noStore as noStore } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { signJwt, getJwtCookieName } from "@/lib/auth-jwt";
+
+export const cache = "no-store";
 
 const COOKIE_OPTIONS = {
   path: "/",
@@ -9,7 +10,6 @@ const COOKIE_OPTIONS = {
 };
 
 export async function POST(req: Request) {
-  noStore();
   try {
     const body = await req.json().catch(() => ({}));
     const emailInput = typeof body.email === "string" ? body.email.trim() : "";
