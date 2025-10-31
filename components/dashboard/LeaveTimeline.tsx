@@ -30,35 +30,35 @@ const getApprovalStages = (requestId: number): ApprovalStage[] => {
   ];
 };
 
+const getStageIcon = (status: string) => {
+  switch (status) {
+    case "completed":
+      return CheckCircle2;
+    case "active":
+      return Clock;
+    case "rejected":
+      return XCircle;
+    default:
+      return Circle;
+  }
+};
+
+const getStageColor = (status: string) => {
+  switch (status) {
+    case "completed":
+      return "text-green-600 bg-green-100";
+    case "active":
+      return "text-indigo-600 bg-indigo-100 animate-pulse";
+    case "rejected":
+      return "text-red-600 bg-red-100";
+    default:
+      return "text-gray-400 bg-gray-100";
+  }
+};
+
 export function LeaveTimeline({ requestId, variant = "compact" }: LeaveTimelineProps) {
   const stages = getApprovalStages(requestId);
   
-  const getStageIcon = (status: string) => {
-    switch (status) {
-      case "completed":
-        return CheckCircle2;
-      case "active":
-        return Clock;
-      case "rejected":
-        return XCircle;
-      default:
-        return Circle;
-    }
-  };
-
-  const getStageColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "text-green-600 bg-green-100";
-      case "active":
-        return "text-indigo-600 bg-indigo-100 animate-pulse";
-      case "rejected":
-        return "text-red-600 bg-red-100";
-      default:
-        return "text-gray-400 bg-gray-100";
-    }
-  };
-
   return (
     <div className="flex items-center gap-2 overflow-x-auto pb-2">
       {stages.map((stage, index) => {
@@ -131,4 +131,5 @@ function StageItem({
       )}
     </div>
   );
+}
 
