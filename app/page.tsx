@@ -12,7 +12,7 @@ export default async function Home() {
     if (role === "HR_ADMIN") {
       redirect("/approvals");
     }
-    if (role === "SUPER_ADMIN") {
+    if (role === "CEO") {
       redirect("/admin");
     }
     redirect("/dashboard");

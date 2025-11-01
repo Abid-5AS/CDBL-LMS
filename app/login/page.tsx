@@ -18,13 +18,15 @@ async function LoginGate() {
   const user = await getCurrentUser();
   if (user) {
     const role = user.role as string;
-    if (role === "HR_ADMIN") {
-      redirect("/approvals");
-    }
-    if (role === "SUPER_ADMIN") {
-      redirect("/admin");
-    }
-    redirect("/dashboard");
+    const redirectMap: Record<string, string> = {
+      EMPLOYEE: "/dashboard",
+      DEPT_HEAD: "/manager/dashboard",
+      HR_ADMIN: "/admin",
+      HR_HEAD: "/hr-head/dashboard",
+      CEO: "/ceo/dashboard",
+    };
+    const destination = redirectMap[role] || "/dashboard";
+    redirect(destination);
   }
 
   return (

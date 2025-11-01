@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Plus, Users, FileText, Calendar } from "lucide-react";
+import { Plus, Users, FileText, Calendar, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -29,6 +29,12 @@ export function HRQuickActions() {
           <Link href="/employees" className="flex items-center">
             <Users className="mr-2 h-4 w-4" />
             Manage Employees
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/admin/audit" className="flex items-center">
+            <Activity className="mr-2 h-4 w-4" />
+            Audit Logs
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>

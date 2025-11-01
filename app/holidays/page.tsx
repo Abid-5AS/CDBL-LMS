@@ -1,12 +1,10 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
-import { UnifiedLayout } from "@/components/unified/UnifiedLayout";
 import { getCurrentUser } from "@/lib/auth";
 import { getUserRole } from "@/lib/session";
 import { HolidaysList } from "./components/HolidaysList";
-import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { PDFExportButton } from "./components/PDFExportButton";
 
 async function HolidaysPageWrapper() {
   const user = await getCurrentUser();
@@ -23,11 +21,9 @@ async function HolidaysPageWrapper() {
   }
 
   return (
-    <UnifiedLayout currentPage="Holidays" role={role as "EMPLOYEE" | "HR_ADMIN"} user={userData}>
-      <Suspense fallback={<HolidaysPageFallback />}>
-        <HolidaysContent />
-      </Suspense>
-    </UnifiedLayout>
+    <Suspense fallback={<HolidaysPageFallback />}>
+      <HolidaysContent />
+    </Suspense>
   );
 }
 
@@ -55,28 +51,12 @@ async function HolidaysContent() {
   );
 }
 
-function PDFExportButton() {
-  const handleExport = () => {
-    // TODO: Implement actual PDF export
-    window.print();
-  };
-
-  return (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={handleExport}
-      className="rounded-full"
-      aria-label="Export holidays calendar as PDF"
-    >
-      <Download className="h-4 w-4 mr-2" />
-      Export PDF
-    </Button>
-  );
-}
-
 export default function HolidaysPage() {
-  return <HolidaysPageWrapper />;
+  return (
+    <Suspense fallback={<HolidaysPageFallback />}>
+      <HolidaysPageWrapper />
+    </Suspense>
+  );
 }
 
 function HolidaysPageFallback() {

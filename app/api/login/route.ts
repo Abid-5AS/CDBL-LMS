@@ -1,37 +1,60 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { signJwt, getJwtCookieName } from "@/lib/auth-jwt";
+import bcrypt from "bcryptjs";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 export const cache = "no-store";
 
 const COOKIE_OPTIONS = {
   path: "/",
   sameSite: "lax" as const,
+  maxAge: 86400, // 1 day
 };
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json().catch(() => ({}));
-    const emailInput = typeof body.email === "string" ? body.email.trim() : "";
-    const nameInput = typeof body.name === "string" ? body.name.trim() : "";
-
-    if (!emailInput && !nameInput) {
-      return NextResponse.json({ error: "credentials_required" }, { status: 400 });
+    // Rate limiting check
+    const ip = req.headers.get("x-forwarded-for") || "local";
+    if (!(await checkRateLimit(ip))) {
+      return NextResponse.json(
+        { error: "Too many login attempts. Please try again later." },
+        { status: 429 }
+      );
     }
 
-    const filters = [];
-    if (emailInput) filters.push({ email: { equals: emailInput } });
-    if (nameInput) filters.push({ name: { equals: nameInput } });
+    const body = await req.json();
+    const { email, password } = body;
 
-    const user = await prisma.user.findFirst({
-      where: { OR: filters },
-      select: { id: true, name: true, email: true, role: true },
+    if (!email || !password) {
+      return NextResponse.json({ error: "Missing email or password" }, { status: 400 });
+    }
+
+    // Find user by email
+    const user = await prisma.user.findUnique({
+      where: { email: email.trim() },
     });
 
     if (!user) {
-      return NextResponse.json({ error: "unknown_user" }, { status: 401 });
+      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
+    // Check if user has a password set
+    if (!user.password) {
+      return NextResponse.json(
+        { error: "Account not properly configured. Please contact HR." },
+        { status: 401 }
+      );
+    }
+
+    // Verify password
+    const valid = await bcrypt.compare(password, user.password);
+
+    if (!valid) {
+      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+    }
+
+    // Create JWT
     const jwt = await signJwt({
       sub: String(user.id),
       email: user.email,
@@ -39,36 +62,40 @@ export async function POST(req: Request) {
       role: user.role,
     });
 
+    // Log successful login to audit trail
+    try {
+      await prisma.auditLog.create({
+        data: {
+          actorEmail: user.email,
+          action: "LOGIN",
+          targetEmail: user.email,
+          details: {
+            ip: ip,
+            role: user.role,
+          },
+        },
+      });
+    } catch (auditError) {
+      // Don't fail login if audit logging fails
+      console.error("Failed to log audit trail:", auditError);
+    }
+
+    // Return success response with user data (without password)
     const res = NextResponse.json({
       ok: true,
-      user: { name: user.name, email: user.email, role: user.role },
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
     });
 
-    res.cookies.set("auth_user_email", user.email ?? "", {
-      ...COOKIE_OPTIONS,
-      httpOnly: false,
-    });
-    res.cookies.set("auth_user_name", user.name ?? "", {
-      ...COOKIE_OPTIONS,
-      httpOnly: false,
-    });
-    res.cookies.set("auth_user_role", user.role ?? "", {
-      ...COOKIE_OPTIONS,
-      httpOnly: false,
-    });
+    // Set session token cookie
     res.cookies.set(getJwtCookieName(), jwt, {
       ...COOKIE_OPTIONS,
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
     });
 
-    res.cookies.delete("auth_user_id");
-    res.cookies.delete("auth_user");
-    res.cookies.delete("auth_user_email_legacy");
-
     return res;
   } catch (error) {
     console.error("login error", error);
-    return NextResponse.json({ error: "internal_error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

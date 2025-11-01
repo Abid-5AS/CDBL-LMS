@@ -1,22 +1,19 @@
-import AppShell from "@/components/app-shell";
 import { Suspense } from "react";
 import { ReportsContent } from "./components/ReportsContent";
 
 export default function ReportsPage() {
   return (
-    <AppShell title="Reports" pathname="/reports">
-      <div className="space-y-6">
-        <section className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
-          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Reports & Analytics</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Access analytics, insights, and detailed reports on leave management
-          </p>
-        </section>
-        <Suspense fallback={<ReportsFallback />}>
-          <ReportsContent />
-        </Suspense>
-      </div>
-    </AppShell>
+    <div className="space-y-6">
+      <section className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Reports & Analytics</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Access analytics, insights, and detailed reports on leave management
+        </p>
+      </section>
+      <Suspense fallback={<ReportsFallback />}>
+        <ReportsContent />
+      </Suspense>
+    </div>
   );
 }
 

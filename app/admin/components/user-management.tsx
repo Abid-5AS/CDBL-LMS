@@ -12,12 +12,12 @@ export type AdminUserRecord = {
   name: string;
   email: string;
   empCode: string | null;
-  role: "EMPLOYEE" | "HR_ADMIN" | "SUPER_ADMIN";
+  role: "EMPLOYEE" | "DEPT_HEAD" | "HR_ADMIN" | "HR_HEAD" | "CEO";
   department: string | null;
   createdAt: string;
 };
 
-const ROLE_OPTIONS: Array<AdminUserRecord["role"]> = ["EMPLOYEE", "HR_ADMIN", "SUPER_ADMIN"];
+const ROLE_OPTIONS: Array<AdminUserRecord["role"]> = ["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"];
 
 type UserManagementProps = {
   users: AdminUserRecord[];

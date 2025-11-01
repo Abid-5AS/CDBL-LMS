@@ -6,8 +6,13 @@ export const cache = "no-store";
 
 export async function GET() {
   const user = await getCurrentUser();
-  if (!user || (user.role as string) !== "SUPER_ADMIN") {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  
+  const allowedRoles = ["HR_ADMIN", "HR_HEAD", "CEO"];
+  if (!allowedRoles.includes(user.role as string)) {
+    return NextResponse.json({ error: "Access denied" }, { status: 403 });
   }
 
   const logs = await prisma.auditLog.findMany({

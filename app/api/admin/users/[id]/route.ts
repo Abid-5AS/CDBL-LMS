@@ -6,7 +6,7 @@ import { getCurrentUser } from "@/lib/auth";
 export const cache = "no-store";
 
 const UpdateSchema = z.object({
-  role: z.enum(["EMPLOYEE", "HR_ADMIN", "SUPER_ADMIN"]).optional(),
+  role: z.enum(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"]).optional(),
   department: z.string().min(1).optional(),
 });
 
@@ -16,7 +16,7 @@ export async function PATCH(
 ) {
 
   const current = await getCurrentUser();
-  if (!current || (current.role as string) !== "SUPER_ADMIN") {
+  if (!current || (current.role as string) !== "CEO") {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
@@ -45,8 +45,8 @@ export async function PATCH(
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
-  if (payload.role && payload.role !== "SUPER_ADMIN" && target.role === "SUPER_ADMIN") {
-    const remaining = await prisma.user.count({ where: { role: "SUPER_ADMIN" as any, NOT: { id: numericId } } });
+  if (payload.role && payload.role !== "CEO" && target.role === "CEO") {
+    const remaining = await prisma.user.count({ where: { role: "CEO" as any, NOT: { id: numericId } } });
     if (remaining === 0) {
       return NextResponse.json({ error: "last_super_admin" }, { status: 400 });
     }

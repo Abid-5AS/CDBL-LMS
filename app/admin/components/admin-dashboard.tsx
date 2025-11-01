@@ -41,7 +41,7 @@ export default function AdminDashboard({ initialUsers, initialPolicies, initialL
     () => ({
       totalUsers: users.length,
       totalPolicies: policies.length,
-      superAdmins: users.filter((user) => user.role === "SUPER_ADMIN").length,
+      superAdmins: users.filter((user) => user.role === "CEO").length,
     }),
     [users, policies],
   );

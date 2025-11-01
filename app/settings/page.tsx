@@ -1,23 +1,20 @@
-import AppShell from "@/components/app-shell";
 import { Suspense } from "react";
 import { SettingsContent } from "./components/SettingsContent";
 import { getCurrentUser } from "@/lib/auth";
 
 export default async function SettingsPage() {
   return (
-    <AppShell title="Settings" pathname="/settings">
-      <div className="space-y-6">
-        <section className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
-          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Settings</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Manage your account preferences and notification settings
-          </p>
-        </section>
-        <Suspense fallback={<SettingsFallback />}>
-          <SettingsGate />
-        </Suspense>
-      </div>
-    </AppShell>
+    <div className="space-y-6">
+      <section className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Settings</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Manage your account preferences and notification settings
+        </p>
+      </section>
+      <Suspense fallback={<SettingsFallback />}>
+        <SettingsGate />
+      </Suspense>
+    </div>
   );
 }
 

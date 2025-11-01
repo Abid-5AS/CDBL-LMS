@@ -1,7 +1,14 @@
+/**
+ * @deprecated Legacy sidebar navigation component
+ * This component provided role-based sidebar links
+ * Use FloatingDock component with lib/navigation.ts config instead
+ * This is preserved only for reference - do not use in new code
+ */
+
 import clsx from "clsx";
 import Link from "next/link";
 import type { ComponentType } from "react";
-import { BarChart3, CalendarDays, CalendarPlus, ClipboardCheck, FileText, LifeBuoy, Settings, ShieldCheck, Users, House } from "lucide-react";
+import { BarChart3, CalendarDays, CalendarPlus, ClipboardCheck, FileText, LifeBuoy, Settings, ShieldCheck, Users, House, UserCheck } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { LogoutButton } from "@/components/logout-button";
 
@@ -20,6 +27,15 @@ const EMPLOYEE_LINKS: SidebarLink[] = [
   { href: "/help", label: "Help", icon: LifeBuoy },
 ];
 
+const DEPT_HEAD_LINKS: SidebarLink[] = [
+  { href: "/manager/dashboard", label: "Dashboard", icon: House },
+  { href: "/approvals", label: "Approvals", icon: UserCheck },
+  { href: "/employees", label: "Team", icon: Users },
+  { href: "/holidays", label: "Holidays", icon: CalendarDays },
+  { href: "/policies", label: "Policies", icon: FileText },
+  { href: "/help", label: "Help", icon: LifeBuoy },
+];
+
 const HR_ADMIN_LINKS: SidebarLink[] = [
   { href: "/dashboard", label: "Dashboard", icon: House },
   { href: "/approvals", label: "Approvals", icon: ClipboardCheck },
@@ -30,18 +46,45 @@ const HR_ADMIN_LINKS: SidebarLink[] = [
   { href: "/help", label: "Help", icon: LifeBuoy },
 ];
 
-const SUPER_ADMIN_LINKS: SidebarLink[] = [
-  { href: "/dashboard", label: "Dashboard", icon: House },
-  { href: "/admin", label: "Admin Console", icon: ShieldCheck },
+const HR_HEAD_LINKS: SidebarLink[] = [
+  { href: "/hr-head/dashboard", label: "Dashboard", icon: House },
+  { href: "/approvals", label: "Approvals", icon: ClipboardCheck },
+  { href: "/employees", label: "Employees", icon: Users },
+  { href: "/reports", label: "Analytics", icon: BarChart3 },
+  { href: "/admin", label: "Admin", icon: ShieldCheck },
   { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/help", label: "Help", icon: LifeBuoy },
+];
+
+const CEO_LINKS: SidebarLink[] = [
+  { href: "/ceo/dashboard", label: "Dashboard", icon: House },
+  { href: "/approvals", label: "Executive Approvals", icon: ClipboardCheck },
   { href: "/reports", label: "Reports", icon: BarChart3 },
+  { href: "/admin", label: "Admin Console", icon: ShieldCheck },
   { href: "/help", label: "Help", icon: LifeBuoy },
 ];
 
 function resolveLinks(role: string | null | undefined) {
+  if (role === "DEPT_HEAD") return DEPT_HEAD_LINKS;
   if (role === "HR_ADMIN") return HR_ADMIN_LINKS;
-  if (role === "SUPER_ADMIN") return SUPER_ADMIN_LINKS;
+  if (role === "HR_HEAD") return HR_HEAD_LINKS;
+  if (role === "CEO") return CEO_LINKS;
   return EMPLOYEE_LINKS;
+}
+
+function getRoleLabel(role: string | null | undefined): string {
+  switch (role) {
+    case "HR_ADMIN":
+      return "HR Admin";
+    case "HR_HEAD":
+      return "HR Head";
+    case "DEPT_HEAD":
+      return "Manager";
+    case "CEO":
+      return "CEO";
+    default:
+      return "Employee";
+  }
 }
 
 function isActive(href: string, pathname: string, allLinks: SidebarLink[]) {
@@ -118,7 +161,7 @@ export async function Sidebar({ pathname }: { pathname: string }) {
               {user?.name ?? "Employee"}
             </div>
             <div className="text-xs text-slate-500 truncate">
-              {user?.role === "HR_ADMIN" ? "HR Admin" : user?.role === "SUPER_ADMIN" ? "Super Admin" : "Employee"}
+              {getRoleLabel(user?.role)}
             </div>
           </div>
         </div>

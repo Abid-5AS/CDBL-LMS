@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { UnifiedLayout } from "@/components/unified/UnifiedLayout";
 import { getCurrentUser } from "@/lib/auth";
 import { getUserRole } from "@/lib/session";
 import { MyLeavesPageContent } from "./MyLeavesPageContent";
@@ -20,16 +19,18 @@ async function MyLeavesPageWrapper() {
   }
 
   return (
-    <UnifiedLayout currentPage="Requests" role="EMPLOYEE" user={userData}>
-      <Suspense fallback={<MyLeavesFallback />}>
-        <MyLeavesPageContent />
-      </Suspense>
-    </UnifiedLayout>
+    <Suspense fallback={<MyLeavesFallback />}>
+      <MyLeavesPageContent />
+    </Suspense>
   );
 }
 
 export default function MyLeavesPage() {
-  return <MyLeavesPageWrapper />;
+  return (
+    <Suspense fallback={<MyLeavesFallback />}>
+      <MyLeavesPageWrapper />
+    </Suspense>
+  );
 }
 
 function MyLeavesFallback() {

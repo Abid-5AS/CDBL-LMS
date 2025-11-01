@@ -1,29 +1,26 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import AppShell from "@/components/app-shell";
 import { getCurrentUser } from "@/lib/auth";
 import { AdminHolidaysManagement } from "./components/AdminHolidaysManagement";
 
 async function AdminHolidaysContent() {
   const user = await getCurrentUser();
-  if (!user || (user.role !== "HR_ADMIN" && user.role !== "SUPER_ADMIN")) {
+  if (!user || !["HR_ADMIN", "HR_HEAD", "CEO"].includes(user.role as string)) {
     redirect("/dashboard");
   }
 
   return (
-        <div className="w-full">
-          <AdminHolidaysManagement />
-        </div>
+    <div className="w-full">
+      <AdminHolidaysManagement />
+    </div>
   );
 }
 
 export default function AdminHolidaysPage() {
   return (
-    <AppShell title="Manage Holidays" pathname="/admin/holidays">
-      <Suspense fallback={<AdminHolidaysSkeleton />}>
-        <AdminHolidaysContent />
-      </Suspense>
-    </AppShell>
+    <Suspense fallback={<AdminHolidaysSkeleton />}>
+      <AdminHolidaysContent />
+    </Suspense>
   );
 }
 

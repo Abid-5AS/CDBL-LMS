@@ -1,23 +1,21 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import AppShell from "@/components/app-shell";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import AdminDashboard from "./components/admin-dashboard";
 
 export default function AdminConsolePage() {
   return (
-    <AppShell title="Admin Console" pathname="/admin">
-      <Suspense fallback={<AdminFallback />}>
-        <AdminConsoleGate />
-      </Suspense>
-    </AppShell>
+    <Suspense fallback={<AdminFallback />}>
+      <AdminConsoleGate />
+    </Suspense>
   );
 }
 
 async function AdminConsoleGate() {
   const user = await getCurrentUser();
-  if (!user || (user.role as string) !== "SUPER_ADMIN") {
+  const allowedRoles = ["HR_ADMIN", "HR_HEAD", "CEO"];
+  if (!user || !allowedRoles.includes(user.role as string)) {
     redirect("/dashboard");
   }
 

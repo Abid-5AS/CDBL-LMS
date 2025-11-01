@@ -14,7 +14,7 @@ export async function SystemOverviewCards() {
       where: { role: Role.EMPLOYEE },
     }),
     prisma.user.count({
-      where: { role: { in: [Role.HR_ADMIN, Role.SUPER_ADMIN] } },
+      where: { role: { in: [Role.HR_ADMIN, Role.HR_HEAD, Role.CEO] } },
     }),
     prisma.leaveRequest.count({
       where: {

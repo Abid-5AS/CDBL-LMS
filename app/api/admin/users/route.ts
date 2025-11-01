@@ -6,7 +6,7 @@ export const cache = "no-store";
 
 export async function GET() {
   const user = await getCurrentUser();
-  if (!user || (user.role as string) !== "SUPER_ADMIN") {
+  if (!user || (user.role as string) !== "CEO") {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 

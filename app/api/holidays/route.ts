@@ -46,7 +46,7 @@ export async function GET(req: Request) {
 // POST - Create holiday (admin only)
 export async function POST(req: Request) {
   const user = await getCurrentUser();
-  if (!user || (user.role !== "HR_ADMIN" && user.role !== "SUPER_ADMIN")) {
+  if (!user || (user.role !== "HR_ADMIN" && user.role !== "HR_HEAD" && user.role !== "CEO")) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 

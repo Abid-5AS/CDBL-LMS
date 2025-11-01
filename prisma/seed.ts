@@ -1,5 +1,6 @@
 import { prisma } from "../lib/prisma";
 import { LeaveType, Role } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const YEAR = new Date().getFullYear();
 
@@ -33,7 +34,10 @@ async function upsertUser(user: {
   role: Role;
   empCode?: string;
   department?: string;
+  password?: string;
 }) {
+  const password = user.password || await bcrypt.hash("demo123", 10);
+  
   const created = await prisma.user.upsert({
     where: { email: user.email },
     update: {
@@ -41,8 +45,16 @@ async function upsertUser(user: {
       role: user.role,
       empCode: user.empCode,
       department: user.department,
+      password,
     },
-    create: user,
+    create: {
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      empCode: user.empCode,
+      department: user.department,
+      password,
+    },
   });
 
   await upsertBalances(created.id);
@@ -150,24 +162,39 @@ async function main() {
       department: "Operations",
     }),
     upsertUser({
+      name: "Dept Head",
+      email: "manager@demo.local",
+      role: Role.DEPT_HEAD,
+      empCode: "M001",
+      department: "Engineering",
+    }),
+    upsertUser({
       name: "HR Admin",
-      email: "hr@demo.local",
+      email: "hradmin@demo.local",
       role: Role.HR_ADMIN,
       empCode: "HR001",
       department: "HR & Admin",
     }),
     upsertUser({
-      name: "Super Admin",
-      email: "superadmin@demo.local",
-      role: "SUPER_ADMIN" as Role,
-      empCode: "SYS001",
-      department: "System Administration",
+      name: "HR Head",
+      email: "hrhead@demo.local",
+      role: Role.HR_HEAD,
+      empCode: "HRH001",
+      department: "HR & Admin",
+    }),
+    upsertUser({
+      name: "CEO",
+      email: "ceo@demo.local",
+      role: Role.CEO,
+      empCode: "C001",
+      department: "Executive",
     }),
   ]);
 
   await Promise.all([seedHoliday(), seedPolicies()]);
 
   console.log("Seeded demo users, balances, and holiday.");
+  console.log("All passwords: demo123");
 }
 
 if (require.main === module) {

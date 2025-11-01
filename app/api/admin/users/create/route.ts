@@ -10,13 +10,13 @@ const CreateUserSchema = z.object({
   email: z.string().email(),
   empCode: z.string().min(2),
   department: z.string().min(2).optional(),
-  role: z.enum(["EMPLOYEE", "HR_ADMIN", "SUPER_ADMIN"]),
+  role: z.enum(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"]),
 });
 
 export async function POST(req: Request) {
 
   const actor = await getCurrentUser();
-  if (!actor || (actor.role as string) !== "SUPER_ADMIN") {
+  if (!actor || (actor.role as string) !== "CEO") {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 

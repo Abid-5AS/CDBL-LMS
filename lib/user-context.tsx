@@ -6,7 +6,7 @@ type User = {
   id: number;
   name: string;
   email: string;
-  role: string; // "EMPLOYEE" | "HR_ADMIN" | "SUPER_ADMIN"
+  role: string; // "EMPLOYEE" | "DEPT_HEAD" | "HR_ADMIN" | "HR_HEAD" | "CEO"
   empCode?: string | null;
   department?: string | null;
   createdAt?: Date;

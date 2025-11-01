@@ -17,7 +17,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const user = await getCurrentUser();
-  if (!user || (user.role !== "HR_ADMIN" && user.role !== "SUPER_ADMIN")) {
+  if (!user || (user.role !== "HR_ADMIN" && user.role !== "HR_HEAD" && user.role !== "CEO")) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
@@ -80,7 +80,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const user = await getCurrentUser();
-  if (!user || (user.role !== "HR_ADMIN" && user.role !== "SUPER_ADMIN")) {
+  if (!user || (user.role !== "HR_ADMIN" && user.role !== "HR_HEAD" && user.role !== "CEO")) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 

@@ -1,131 +1,102 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ChevronsUpDown, Check } from "lucide-react";
-import { cn } from "@/lib/utils";
-
-type LiteUser = { id: string; name: string; email: string; role: string };
-const FETCH_LIMIT = 10;
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export function LoginForm() {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
-  const [users, setUsers] = useState<LiteUser[]>([]);
-  const [selected, setSelected] = useState<LiteUser | null>(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const search = useCallback(async (input: string) => {
-    setQuery(input);
-    try {
-      const res = await fetch("/api/auth/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "same-origin",
-        body: JSON.stringify({
-          q: input.trim() || undefined,
-          limit: FETCH_LIMIT,
-        }),
-      });
-      if (!res.ok) throw new Error("search failed");
-      const data = await res.json();
-      setUsers(data.items ?? []);
-    } catch {
-      if (input.trim()) {
-        toast.error("Unable to fetch users");
-      }
-      setUsers([]);
-    }
-  }, []);
-
-  async function onSubmit() {
-    if (!selected) {
-      toast("Please select your account");
-      return;
-    }
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault();
     setLoading(true);
+
     try {
       const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: selected.email }),
+        body: JSON.stringify({ email, password }),
         credentials: "same-origin",
       });
+
+      const data = await res.json().catch(() => ({}));
+
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        toast.error(data.error ?? "Login failed");
+        toast.error(data.error || "Login failed");
+        setLoading(false);
         return;
       }
-      const data = await res.json().catch(() => ({}));
+
+      toast.success("Login successful!");
+      
+      // Role-based redirect
       const role = data?.user?.role;
-      const destination = role === "HR_ADMIN" ? "/approvals" : "/dashboard";
-      router.push(destination);
-      router.refresh();
+      const redirectMap: Record<string, string> = {
+        EMPLOYEE: "/dashboard",
+        DEPT_HEAD: "/manager/dashboard",
+        HR_ADMIN: "/admin",
+        HR_HEAD: "/hr-head/dashboard",
+        CEO: "/ceo/dashboard",
+      };
+      
+      const destination = redirectMap[role] || "/dashboard";
+      router.replace(destination);
     } catch (err) {
-      toast.error("Network error");
-    } finally {
+      toast.error("Network error. Please try again.");
       setLoading(false);
     }
   }
 
-  useEffect(() => {
-    void search("");
-  }, [search]);
-
   return (
-    <div className="space-y-3">
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
-            {selected ? `${selected.name} (${selected.role.replace(/_/g, " ")})` : "Search your name or email"}
-            <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[420px] p-0">
-          <Command shouldFilter={false}>
-            <CommandInput placeholder="Type name or email..." value={query} onValueChange={(v) => search(v)} />
-            <CommandList>
-              <CommandEmpty>No users found</CommandEmpty>
-              <CommandGroup heading="Users">
-                {users.map((u) => (
-                  <CommandItem
-                    key={u.id}
-                    value={u.id}
-                    onSelect={() => {
-                      setSelected(u);
-                      setOpen(false);
-                    }}
-                  >
-                    <Check className={cn("mr-2 h-4 w-4", selected?.id === u.id ? "opacity-100" : "opacity-0")} />
-                    <div className="flex flex-col">
-                      <span className="font-medium">{u.name}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {u.email} · {u.role.replace(/_/g, " ")}
-                      </span>
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+    <div className="w-full max-w-md space-y-6">
+      <div className="space-y-2">
+        <h2 className="text-3xl font-semibold text-slate-900">Welcome Back</h2>
+        <p className="text-slate-600">Sign in to your CDBL account</p>
+      </div>
 
-      <Button className="w-full" onClick={onSubmit} disabled={!selected || loading}>
-        {loading ? "Signing in..." : "Login"}
-      </Button>
+      <form onSubmit={onSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="your.name@cdbl.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            disabled={loading}
+            className="w-full"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="password">Password</Label>
+          <Input
+            id="password"
+            type="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            disabled={loading}
+            className="w-full"
+          />
+        </div>
+
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? "Signing in..." : "Sign In"}
+        </Button>
+      </form>
+
+      <div className="text-center text-sm text-slate-500">
+        <p>Internal system for CDBL employees only</p>
+      </div>
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import { Suspense } from "react";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { unstable_noStore as noStore } from "next/cache";
-import AppShell from "@/components/app-shell";
+import { getCurrentUser } from "@/lib/auth";
+import { canViewAllRequests, canViewEmployee, type AppRole } from "@/lib/rbac";
 import { getEmployeeDashboardData } from "@/lib/employee";
 import { EmployeeDashboard } from "../components/EmployeeDashboard";
 
@@ -12,16 +13,20 @@ type EmployeePageProps = {
 
 export default function EmployeeDetailPage(props: EmployeePageProps) {
   return (
-    <AppShell title="Employee Details" pathname="/employees">
-      <Suspense fallback={<EmployeeDashboardFallback />}>
-        <EmployeeDashboardSection {...props} />
-      </Suspense>
-    </AppShell>
+    <Suspense fallback={<EmployeeDashboardFallback />}>
+      <EmployeeDashboardSection {...props} />
+    </Suspense>
   );
 }
 
 async function EmployeeDashboardSection({ params, searchParams }: EmployeePageProps) {
   noStore();
+  const user = await getCurrentUser();
+  
+  if (!user || !canViewAllRequests(user.role as AppRole)) {
+    redirect("/dashboard");
+  }
+
   const { id } = await params;
   const query = await searchParams;
 
@@ -35,11 +40,19 @@ async function EmployeeDashboardSection({ params, searchParams }: EmployeePagePr
     notFound();
   }
 
+  // Check if user can view this specific employee
+  if (!canViewEmployee(user.role as AppRole, data.role as AppRole)) {
+    notFound();
+  }
+
   const pendingRequestQuery = query.request;
   const queryRequestId = typeof pendingRequestQuery === "string" ? Number(pendingRequestQuery) : NaN;
   const pendingRequestId = Number.isNaN(queryRequestId) ? data.pendingRequestId ?? undefined : queryRequestId;
 
-  return <EmployeeDashboard data={data} pendingRequestId={pendingRequestId} />;
+  // Determine viewing context
+  const isHRView = ["HR_ADMIN", "HR_HEAD", "CEO"].includes(user.role);
+
+  return <EmployeeDashboard data={data} pendingRequestId={pendingRequestId} viewerRole={user.role as AppRole} isHRView={isHRView} />;
 }
 
 function EmployeeDashboardFallback() {

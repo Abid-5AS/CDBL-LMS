@@ -65,7 +65,7 @@ export function SettingsContent({ user }: SettingsContentProps) {
                 Role
               </Label>
               <p className="text-sm font-medium capitalize">
-                {user.role === "HR_ADMIN" ? "HR Admin" : user.role === "SUPER_ADMIN" ? "Super Admin" : "Employee"}
+                {user.role === "HR_ADMIN" ? "HR Admin" : user.role === "HR_HEAD" ? "HR Head" : user.role === "DEPT_HEAD" ? "Manager" : user.role === "CEO" ? "CEO" : "Employee"}
               </p>
             </div>
             {user.department && (

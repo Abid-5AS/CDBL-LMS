@@ -4,12 +4,14 @@ import { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Users, User } from "lucide-react";
+import { Users, User, Pencil } from "lucide-react";
 import { FilterBar } from "@/components/filters/FilterBar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import useSWR from "swr";
 import { Badge } from "@/components/ui/badge";
+import { canEditEmployee, type AppRole } from "@/lib/rbac";
+import { useUser } from "@/lib/user-context";
 
 type EmployeeRecord = {
   id: number;
@@ -17,7 +19,7 @@ type EmployeeRecord = {
   email: string;
   empCode: string | null;
   department: string | null;
-  role: "EMPLOYEE" | "HR_ADMIN" | "SUPER_ADMIN";
+  role: "EMPLOYEE" | "DEPT_HEAD" | "HR_ADMIN" | "HR_HEAD" | "CEO";
 };
 
 const fetcher = async (url: string) => {
@@ -30,14 +32,17 @@ const fetcher = async (url: string) => {
 
 const ROLE_OPTIONS = [
   { value: "EMPLOYEE", label: "Employee" },
+  { value: "DEPT_HEAD", label: "Department Head" },
   { value: "HR_ADMIN", label: "HR Admin" },
-  { value: "SUPER_ADMIN", label: "Super Admin" },
+  { value: "HR_HEAD", label: "HR Head" },
+  { value: "CEO", label: "CEO" },
 ];
 
 export function EmployeeList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [roleFilter, setRoleFilter] = useState("all");
+  const user = useUser();
 
   const { data, isLoading, error } = useSWR<{ users: EmployeeRecord[] }>("/api/auth/users", fetcher, {
     revalidateOnFocus: false,
@@ -92,10 +97,14 @@ export function EmployeeList() {
 
   const roleLabel = (role: EmployeeRecord["role"]) => {
     switch (role) {
+      case "DEPT_HEAD":
+        return "Manager";
       case "HR_ADMIN":
         return "HR Admin";
-      case "SUPER_ADMIN":
-        return "Super Admin";
+      case "HR_HEAD":
+        return "HR Head";
+      case "CEO":
+        return "CEO";
       default:
         return "Employee";
     }
@@ -185,10 +194,12 @@ export function EmployeeList() {
                       <Badge
                         variant="outline"
                         className={
-                          employee.role === "SUPER_ADMIN"
+                          employee.role === "CEO"
                             ? "bg-purple-50 text-purple-700 border-purple-200"
-                            : employee.role === "HR_ADMIN"
+                            : employee.role === "HR_HEAD" || employee.role === "HR_ADMIN"
                             ? "bg-blue-50 text-blue-700 border-blue-200"
+                            : employee.role === "DEPT_HEAD"
+                            ? "bg-green-50 text-green-700 border-green-200"
                             : "bg-slate-50 text-slate-700 border-slate-200"
                         }
                       >
@@ -196,9 +207,18 @@ export function EmployeeList() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button asChild variant="ghost" size="sm">
-                        <Link href={`/employees/${employee.id}`}>View</Link>
-                      </Button>
+                      <div className="flex justify-end gap-2">
+                        <Button asChild variant="ghost" size="sm">
+                          <Link href={`/employees/${employee.id}`}>View</Link>
+                        </Button>
+                        {user && canEditEmployee(user.role as AppRole, employee.role) && (
+                          <Button asChild variant="ghost" size="sm">
+                            <Link href={`/employees/${employee.id}?edit=true`}>
+                              <Pencil className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

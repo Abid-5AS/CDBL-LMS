@@ -1,14 +1,11 @@
 import { Suspense } from "react";
-import AppShell from "@/components/app-shell";
 import ApprovalsGate from "./approvals-gate";
 
 export default function ApprovalsPage() {
   return (
-    <AppShell title="Approvals" pathname="/approvals">
-      <Suspense fallback={<ApprovalsFallback />}>
-        <ApprovalsGate />
-      </Suspense>
-    </AppShell>
+    <Suspense fallback={<ApprovalsFallback />}>
+      <ApprovalsGate />
+    </Suspense>
   );
 }
 

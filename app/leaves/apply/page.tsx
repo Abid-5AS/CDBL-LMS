@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { UnifiedLayout } from "@/components/unified/UnifiedLayout";
 import { getCurrentUser } from "@/lib/auth";
 import { getUserRole } from "@/lib/session";
 import { ApplyLeaveForm } from "./_components/apply-leave-form";
@@ -19,16 +18,18 @@ async function ApplyLeavePageWrapper() {
   }
 
   return (
-    <UnifiedLayout currentPage="Apply" role="EMPLOYEE" user={userData}>
-      <Suspense fallback={<ApplyLeaveFallback />}>
-        <ApplyLeaveForm />
-      </Suspense>
-    </UnifiedLayout>
+    <Suspense fallback={<ApplyLeaveFallback />}>
+      <ApplyLeaveForm />
+    </Suspense>
   );
 }
 
 export default function ApplyLeavePage() {
-  return <ApplyLeavePageWrapper />;
+  return (
+    <Suspense fallback={<ApplyLeaveFallback />}>
+      <ApplyLeavePageWrapper />
+    </Suspense>
+  );
 }
 
 function ApplyLeaveFallback() {

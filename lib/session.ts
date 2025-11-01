@@ -13,7 +13,7 @@ export async function getUserRole(): Promise<AppRole | null> {
   // Prefer DB role, fallback to cookie
   const role = (user.role as string) || roleCookie;
   
-  if (role === "HR_ADMIN" || role === "SUPER_ADMIN" || role === "EMPLOYEE") {
+  if (role === "HR_ADMIN" || role === "HR_HEAD" || role === "DEPT_HEAD" || role === "CEO" || role === "EMPLOYEE") {
     return role as AppRole;
   }
   

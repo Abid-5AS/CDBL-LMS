@@ -9,8 +9,10 @@ datasource db {
 
 enum Role {
   EMPLOYEE
+  DEPT_HEAD
   HR_ADMIN
-  SUPER_ADMIN
+  HR_HEAD
+  CEO
 }
 
 enum LeaveType {
@@ -39,6 +41,7 @@ model User {
   id         Int      @id @default(autoincrement())
   name       String
   email      String   @unique
+  password   String?
   empCode    String?  @unique
   role       Role     @default(EMPLOYEE)
   department String?

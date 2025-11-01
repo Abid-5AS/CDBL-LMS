@@ -1,5 +1,12 @@
+/**
+ * @deprecated Legacy sidebar layout component
+ * This component provided a sidebar + topbar navigation pattern
+ * Use LayoutWrapper (TopNavBar + FloatingDock) for all new pages
+ * This is preserved only for reference - do not use in new code
+ */
+
 import { Suspense } from "react";
-import { Sidebar } from "@/components/sidebar";
+import { Sidebar } from "@/components/legacy/sidebar-deprecated";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { getCurrentUser } from "@/lib/auth";
 import { User, Bell } from "lucide-react";
@@ -86,7 +93,7 @@ export default async function AppShell({
   pathname?: string;
   children: React.ReactNode;
   breadcrumbs?: BreadcrumbItem[];
-  role?: "EMPLOYEE" | "HR_ADMIN" | "SUPER_ADMIN";
+  role?: "EMPLOYEE" | "DEPT_HEAD" | "HR_ADMIN" | "HR_HEAD" | "CEO";
   user?: { name: string; email: string };
 }) {
   // If unified layout props provided, render without sidebar

@@ -4,7 +4,7 @@ import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 import type { Prisma } from "@prisma/client";
 
 const SECRET = process.env.JWT_SECRET || process.env.AUTH_SECRET || "dev-secret";
-const JWT_COOKIE = "jwt";
+const JWT_COOKIE = "session_token";
 
 const encoder = new TextEncoder();
 const SECRET_KEY = encoder.encode(SECRET);
@@ -13,7 +13,7 @@ type JwtClaims = {
   sub: string;
   email?: string;
   name?: string;
-  role?: string;
+  role?: "EMPLOYEE" | "DEPT_HEAD" | "HR_ADMIN" | "HR_HEAD" | "CEO";
 };
 
 export async function signJwt(claims: JwtClaims, maxAgeSeconds = 60 * 60 * 8) {

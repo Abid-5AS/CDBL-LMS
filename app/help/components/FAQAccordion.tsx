@@ -10,7 +10,7 @@ import {
 const FAQS = [
   {
     question: "How do I apply for leave?",
-    answer: "Navigate to 'Apply Leave' from the sidebar or dashboard. Fill in the leave type, dates, and reason. Submit the request and wait for HR approval.",
+    answer: "Navigate to 'Apply Leave' from the dock navigation or dashboard. Fill in the leave type, dates, and reason. Submit the request and wait for HR approval.",
   },
   {
     question: "What is the difference between Casual, Earned, and Medical leave?",

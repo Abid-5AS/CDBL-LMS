@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import AppShell from "@/components/app-shell";
 import { Calendar, Clock, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { connection } from "next/server";
@@ -7,7 +6,7 @@ import { connection } from "next/server";
 async function BalanceContent() {
   await connection();
   const currentYear = new Date().getFullYear();
-  
+
   return (
     <div className="space-y-6">
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -63,11 +62,9 @@ async function BalanceContent() {
 
 export default function BalancePage() {
   return (
-    <AppShell title="Leave Balance" pathname="/balance">
-      <Suspense fallback={<BalanceFallback />}>
-        <BalanceContent />
-      </Suspense>
-    </AppShell>
+    <Suspense fallback={<BalanceFallback />}>
+      <BalanceContent />
+    </Suspense>
   );
 }
 

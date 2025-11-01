@@ -24,7 +24,7 @@ const FormSchema = z.object({
   email: z.string().email("Valid email required"),
   empCode: z.string().min(2, "Employee code required"),
   department: z.string().optional(),
-  role: z.enum(["EMPLOYEE", "HR_ADMIN", "SUPER_ADMIN"] as const),
+  role: z.enum(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"] as const),
 });
 
 type CreateUserDialogProps = {
@@ -38,7 +38,7 @@ export function CreateUserDialog({ onCreated }: CreateUserDialogProps) {
     email: "",
     empCode: "",
     department: "",
-    role: "EMPLOYEE" as "EMPLOYEE" | "HR_ADMIN" | "SUPER_ADMIN",
+    role: "EMPLOYEE" as "EMPLOYEE" | "DEPT_HEAD" | "HR_ADMIN" | "HR_HEAD" | "CEO",
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -153,8 +153,10 @@ export function CreateUserDialog({ onCreated }: CreateUserDialogProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="EMPLOYEE">Employee</SelectItem>
+                <SelectItem value="DEPT_HEAD">Department Head</SelectItem>
                 <SelectItem value="HR_ADMIN">HR Admin</SelectItem>
-                <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
+                <SelectItem value="HR_HEAD">HR Head</SelectItem>
+                <SelectItem value="CEO">CEO</SelectItem>
               </SelectContent>
             </Select>
           </div>
