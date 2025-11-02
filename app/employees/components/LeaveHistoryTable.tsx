@@ -17,17 +17,17 @@ const STATUS_VARIANTS: Record<string, string> = {
 
 export function LeaveHistoryTable({ history }: LeaveHistoryTableProps) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-600">Recent Leave History</h3>
-      <div className="max-h-[250px] overflow-y-auto rounded-lg border border-slate-100">
+    <div className="rounded-lg border border-slate-200/50 dark:border-slate-800/50 glass-base p-4 shadow-sm">
+      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Recent Leave History</h3>
+      <div className="max-h-[250px] overflow-y-auto rounded-lg border border-slate-100 dark:border-slate-700">
         <Table>
-          <TableHeader className="bg-slate-50">
+          <TableHeader className="bg-slate-50 dark:bg-slate-800/50">
             <TableRow>
-              <TableHead className="text-xs font-semibold uppercase text-slate-500">Type</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-500">Start</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-500">End</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-500">Days</TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-500">Status</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Type</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Start</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">End</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Days</TableHead>
+              <TableHead className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -39,11 +39,11 @@ export function LeaveHistoryTable({ history }: LeaveHistoryTableProps) {
               </TableRow>
             ) : (
               history.map((leave) => (
-                <TableRow key={leave.id} className="hover:bg-slate-50">
-                  <TableCell className="text-sm font-medium text-slate-900">{leave.type}</TableCell>
-                  <TableCell className="text-sm text-slate-600">{formatDate(leave.start)}</TableCell>
-                  <TableCell className="text-sm text-slate-600">{formatDate(leave.end)}</TableCell>
-                  <TableCell className="text-sm text-slate-600">{leave.days}</TableCell>
+                <TableRow key={leave.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  <TableCell className="text-sm font-medium text-slate-900 dark:text-slate-100">{leave.type}</TableCell>
+                  <TableCell className="text-sm text-slate-600 dark:text-slate-300">{formatDate(leave.start)}</TableCell>
+                  <TableCell className="text-sm text-slate-600 dark:text-slate-300">{formatDate(leave.end)}</TableCell>
+                  <TableCell className="text-sm text-slate-600 dark:text-slate-300">{leave.days}</TableCell>
                   <TableCell>
                     <Badge className={STATUS_VARIANTS[leave.status] ?? "bg-slate-100 text-slate-700"}>
                       {leave.status.toLowerCase()}

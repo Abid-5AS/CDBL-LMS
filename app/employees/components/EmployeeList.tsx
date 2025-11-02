@@ -12,6 +12,7 @@ import useSWR from "swr";
 import { Badge } from "@/components/ui/badge";
 import { canEditEmployee, type AppRole } from "@/lib/rbac";
 import { useUser } from "@/lib/user-context";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 type EmployeeRecord = {
   id: number;
@@ -181,8 +182,8 @@ export function EmployeeList() {
               </TableHeader>
               <TableBody>
                 {filteredEmployees.map((employee) => (
-                  <TableRow key={employee.id} className="hover:bg-slate-50">
-                    <TableCell className="font-medium">{employee.name}</TableCell>
+                  <TableRow key={employee.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                    <TableCell className="font-medium text-slate-900 dark:text-slate-100">{employee.name}</TableCell>
                     <TableCell className="hidden sm:table-cell text-muted-foreground">{employee.email}</TableCell>
                     <TableCell className="hidden md:table-cell text-muted-foreground">
                       {employee.empCode || "—"}
@@ -196,8 +197,10 @@ export function EmployeeList() {
                         className={
                           employee.role === "CEO"
                             ? "bg-purple-50 text-purple-700 border-purple-200"
-                            : employee.role === "HR_HEAD" || employee.role === "HR_ADMIN"
+                            : employee.role === "HR_HEAD"
                             ? "bg-blue-50 text-blue-700 border-blue-200"
+                            : employee.role === "HR_ADMIN"
+                            ? "bg-cyan-50 text-cyan-700 border-cyan-200"
                             : employee.role === "DEPT_HEAD"
                             ? "bg-green-50 text-green-700 border-green-200"
                             : "bg-slate-50 text-slate-700 border-slate-200"
@@ -208,15 +211,29 @@ export function EmployeeList() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button asChild variant="ghost" size="sm">
-                          <Link href={`/employees/${employee.id}`}>View</Link>
-                        </Button>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button asChild variant="ghost" size="sm">
+                                <Link href={`/employees/${employee.id}`}>View</Link>
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>View employee profile</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                         {user && canEditEmployee(user.role as AppRole, employee.role) && (
-                          <Button asChild variant="ghost" size="sm">
-                            <Link href={`/employees/${employee.id}?edit=true`}>
-                              <Pencil className="h-4 w-4" />
-                            </Link>
-                          </Button>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button asChild variant="ghost" size="sm">
+                                  <Link href={`/employees/${employee.id}?edit=true`}>
+                                    <Pencil className="h-4 w-4" />
+                                  </Link>
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Update employee</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         )}
                       </div>
                     </TableCell>

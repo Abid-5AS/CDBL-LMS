@@ -17,8 +17,8 @@ const COLORS = {
 
 export function LeaveBalanceCard({ balances }: LeaveBalanceCardProps) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-      <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-600">Leave Balances</h3>
+    <div className="rounded-lg border border-slate-200/50 dark:border-slate-800/50 glass-base p-4 shadow-sm">
+      <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Leave Balances</h3>
       <div className="mt-4 space-y-3">
         {balances.length === 0 ? (
           <p className="text-sm text-muted-foreground">No balance information available.</p>
