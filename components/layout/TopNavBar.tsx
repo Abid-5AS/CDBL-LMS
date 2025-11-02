@@ -7,20 +7,12 @@ import { useState, useEffect } from "react";
 import ControlCenter from "./ControlCenter";
 import { ThemeToggle } from "@/components/theme-toggle";
 import clsx from "clsx";
-import { supportsWebGL } from "@/lib/webgl-support";
-import LiquidGlassWrapper from "@/components/ui/LiquidGlassWrapper";
 
 export default function TopNavBar() {
   const user = useUser();
   const pathname = usePathname();
   const [controlCenterOpen, setControlCenterOpen] = useState(false);
   const [hasAlerts, setHasAlerts] = useState(false);
-  const [hasWebGL, setHasWebGL] = useState(false);
-
-  // WebGL detection
-  useEffect(() => {
-    setHasWebGL(supportsWebGL());
-  }, []);
 
   // Live notification indicator (can be enhanced with SSE later)
   useEffect(() => {
@@ -65,8 +57,11 @@ export default function TopNavBar() {
 
   if (!user) return null;
 
-  const navbarContent = (
-    <>
+  return (
+    <header
+      className="fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between glass-light px-6"
+      role="banner"
+    >
       {/* Page Title */}
       <h1 className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">{title}</h1>
 
@@ -104,21 +99,6 @@ export default function TopNavBar() {
           </div>
         )}
       </div>
-    </>
-  );
-
-  return (
-    <header
-      className="fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between px-6"
-      role="banner"
-    >
-      {hasWebGL ? (
-        <LiquidGlassWrapper cornerRadius={12} elasticity={0.2} intensity={48} className="absolute inset-0 flex items-center justify-between px-6" padding="0">
-          {navbarContent}
-        </LiquidGlassWrapper>
-      ) : (
-        <div className="flex h-14 w-full items-center justify-between glass-light px-6">{navbarContent}</div>
-      )}
     </header>
   );
 }

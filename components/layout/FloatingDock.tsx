@@ -6,20 +6,12 @@ import { motion } from "framer-motion";
 import clsx from "clsx";
 import { LogOut } from "lucide-react";
 import { getNavItemsForRole, type UserRole } from "@/lib/navigation";
-import { useState, useEffect } from "react";
-import { supportsWebGL } from "@/lib/webgl-support";
-import LiquidGlassWrapper from "@/components/ui/LiquidGlassWrapper";
 
 export default function FloatingDock() {
   const user = useUser();
   const pathname = usePathname();
   const router = useRouter();
   const status = useUserStatus();
-  const [hasWebGL, setHasWebGL] = useState(false);
-
-  useEffect(() => {
-    setHasWebGL(supportsWebGL());
-  }, []);
 
   const handleLogout = async () => {
     await fetch("/api/logout", { method: "POST" });
@@ -32,8 +24,16 @@ export default function FloatingDock() {
   // Get role-specific navigation items
   const navItems = getNavItemsForRole(user.role as UserRole);
 
-  const dockContent = (
-    <>
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: "spring", stiffness: 200, damping: 20 }}
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-full px-5 py-3 glass-base"
+      role="navigation"
+      aria-label="Main navigation"
+    >
       {navItems.map((item) => {
         const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
         return (
@@ -74,33 +74,6 @@ export default function FloatingDock() {
           Logout
         </span>
       </button>
-    </>
-  );
-
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 200, damping: 20 }}
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
-      role="navigation"
-      aria-label="Main navigation"
-    >
-      {hasWebGL ? (
-        <LiquidGlassWrapper
-          intensity={64}
-          elasticity={0.25}
-          cornerRadius={9999}
-          mode="shader"
-          className="flex items-center gap-2"
-          padding="1.25rem 1.5rem"
-        >
-          {dockContent}
-        </LiquidGlassWrapper>
-      ) : (
-        <div className="flex items-center gap-2 rounded-full px-5 py-3 glass-base">{dockContent}</div>
-      )}
     </motion.div>
   );
 }
