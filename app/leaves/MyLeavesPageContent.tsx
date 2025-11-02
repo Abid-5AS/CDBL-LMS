@@ -89,48 +89,48 @@ export function MyLeavesPageContent() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <section className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-sm p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-2">My Leave Requests</h1>
-        <p className="text-sm text-gray-600">
+      <section className="rounded-2xl border border-slate-200/50 dark:border-slate-800/50 glass-base p-6 shadow-sm">
+        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-2">My Leave Requests</h1>
+        <p className="text-sm text-slate-600 dark:text-slate-300">
           Track the status of your submitted leave applications. Pending requests can be withdrawn before approval.
         </p>
       </section>
 
       {/* Filters */}
-      <Card className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100">
+      <Card>
         <CardContent className="p-4">
           <FilterChips options={FILTER_OPTIONS} selectedValue={selectedFilter} onChange={setSelectedFilter} />
         </CardContent>
       </Card>
 
       {/* Table */}
-      <Card className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <CardHeader className="border-b border-gray-200 bg-gray-50/50 backdrop-blur-sm">
+      <Card className="overflow-hidden">
+        <CardHeader className="border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/20 backdrop-blur-sm">
           <CardTitle>Requests</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader className="sticky top-0 z-10 bg-white border-b border-gray-200">
+              <TableHeader className="sticky top-0 z-10 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700">
                 <TableRow className="hover:bg-transparent">
-                  <TableHead>Type</TableHead>
-                  <TableHead className="hidden sm:table-cell">Dates</TableHead>
-                  <TableHead className="hidden md:table-cell">Working Days</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="hidden lg:table-cell">Last Updated</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-slate-700 dark:text-slate-200">Type</TableHead>
+                  <TableHead className="hidden sm:table-cell text-slate-700 dark:text-slate-200">Dates</TableHead>
+                  <TableHead className="hidden md:table-cell text-slate-700 dark:text-slate-200">Working Days</TableHead>
+                  <TableHead className="text-slate-700 dark:text-slate-200">Status</TableHead>
+                  <TableHead className="hidden lg:table-cell text-slate-700 dark:text-slate-200">Last Updated</TableHead>
+                  <TableHead className="text-right text-slate-700 dark:text-slate-200">Actions</TableHead>
                 </TableRow>
               </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-sm text-gray-600 py-8">
+                  <TableCell colSpan={6} className="text-center text-sm text-gray-600 dark:text-slate-300 py-8">
                     Loading...
                   </TableCell>
                 </TableRow>
               ) : error ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-sm text-red-600 py-8" role="alert">
+                  <TableCell colSpan={6} className="text-center text-sm text-red-600 dark:text-red-400 py-8" role="alert">
                     Failed to load
                   </TableCell>
                 </TableRow>
@@ -150,18 +150,18 @@ export function MyLeavesPageContent() {
                 filteredRows.map((row) => (
                   <TableRow 
                     key={row.id} 
-                    className="hover:bg-indigo-50/50 cursor-pointer transition-colors"
+                    className="hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 cursor-pointer transition-colors"
                     onClick={() => openDrawer(row.id)}
                   >
-                    <TableCell className="font-medium">{leaveTypeLabel[row.type] ?? row.type}</TableCell>
-                    <TableCell className="hidden sm:table-cell text-gray-600">
+                    <TableCell className="font-medium text-slate-900 dark:text-slate-100">{leaveTypeLabel[row.type] ?? row.type}</TableCell>
+                    <TableCell className="hidden sm:table-cell text-gray-600 dark:text-slate-300">
                       {formatDate(row.startDate)} → {formatDate(row.endDate)}
                     </TableCell>
-                    <TableCell className="hidden md:table-cell text-gray-600">{row.workingDays}</TableCell>
+                    <TableCell className="hidden md:table-cell text-gray-600 dark:text-slate-300">{row.workingDays}</TableCell>
                     <TableCell>
                       <StatusBadge status={row.status} />
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell text-gray-600">{formatDate(row.updatedAt)}</TableCell>
+                    <TableCell className="hidden lg:table-cell text-gray-600 dark:text-slate-300">{formatDate(row.updatedAt)}</TableCell>
                     <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                       {CANCELABLE_STATUSES.has(row.status) ? (
                         <AlertDialog>
@@ -186,7 +186,7 @@ export function MyLeavesPageContent() {
                           </AlertDialogContent>
                         </AlertDialog>
                       ) : (
-                        <span className="text-xs text-gray-500">—</span>
+                        <span className="text-xs text-gray-500 dark:text-slate-400">—</span>
                       )}
                     </TableCell>
                   </TableRow>
