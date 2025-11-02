@@ -56,15 +56,16 @@ export function PendingLeaveRequestsTable() {
   const allLeaves: LeaveRequest[] = Array.isArray(data?.items) ? data.items : [];
 
   const filteredLeaves = useMemo(() => {
-    let filtered = allLeaves.slice(0, 10); // Limit to 10 for dashboard
+    // Filter out leaves without requester data
+    let filtered = allLeaves.filter((leave) => leave.requester).slice(0, 10); // Limit to 10 for dashboard
 
     // Search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
         (leave) =>
-          leave.requester.name.toLowerCase().includes(query) ||
-          leave.requester.email.toLowerCase().includes(query) ||
+          leave.requester?.name?.toLowerCase().includes(query) ||
+          leave.requester?.email?.toLowerCase().includes(query) ||
           leave.type.toLowerCase().includes(query) ||
           (leaveTypeLabel[leave.type]?.toLowerCase().includes(query) ?? false) ||
           leave.reason?.toLowerCase().includes(query)
@@ -201,40 +202,43 @@ export function PendingLeaveRequestsTable() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredLeaves.map((leave) => (
-              <TableRow key={leave.id}>
-                <TableCell>
-                  <Link
-                    href={`/employees/${leave.requester.id}`}
-                    className="text-blue-600 hover:underline font-medium"
-                  >
-                    {leave.requester.name}
-                  </Link>
-                  <div className="text-xs text-muted-foreground">{leave.requester.email}</div>
-                </TableCell>
-                <TableCell className="font-medium">{leaveTypeLabel[leave.type] ?? leave.type}</TableCell>
-                <TableCell className="hidden sm:table-cell text-slate-600">
-                  <span className="sr-only">Dates: </span>
-                  {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
-                </TableCell>
-                <TableCell className="hidden md:table-cell text-slate-600">
-                  <span className="sr-only">Working days: </span>
-                  {leave.workingDays}
-                </TableCell>
-                <TableCell className="hidden lg:table-cell max-w-xs truncate text-slate-600">
-                  <span className="sr-only">Reason: </span>
-                  {leave.reason}
-                </TableCell>
-                <TableCell>
-                  <StatusBadge status={leave.status} />
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button asChild size="sm" variant="outline" aria-label={`Review leave request from ${leave.requester.name}`}>
-                    <Link href={`/approvals?leave=${leave.id}`}>Review</Link>
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+                {filteredLeaves.map((leave) => {
+                  if (!leave.requester) return null;
+                  return (
+                    <TableRow key={leave.id}>
+                      <TableCell>
+                        <Link
+                          href={`/employees/${leave.requester.id}`}
+                          className="text-blue-600 hover:underline font-medium"
+                        >
+                          {leave.requester.name}
+                        </Link>
+                        <div className="text-xs text-muted-foreground">{leave.requester.email}</div>
+                      </TableCell>
+                      <TableCell className="font-medium">{leaveTypeLabel[leave.type] ?? leave.type}</TableCell>
+                      <TableCell className="hidden sm:table-cell text-slate-600">
+                        <span className="sr-only">Dates: </span>
+                        {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell text-slate-600">
+                        <span className="sr-only">Working days: </span>
+                        {leave.workingDays}
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell max-w-xs truncate text-slate-600">
+                        <span className="sr-only">Reason: </span>
+                        {leave.reason}
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge status={leave.status} />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button asChild size="sm" variant="outline" aria-label={`Review leave request from ${leave.requester.name}`}>
+                          <Link href={`/approvals?leave=${leave.id}`}>Review</Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </CardContent>

@@ -5,6 +5,7 @@ import { useUser } from "@/lib/user-context";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import ControlCenter from "./ControlCenter";
+import { ThemeToggle } from "@/components/theme-toggle";
 import clsx from "clsx";
 
 export default function TopNavBar() {
@@ -64,8 +65,9 @@ export default function TopNavBar() {
       {/* Page Title */}
       <h1 className="text-sm font-semibold text-indigo-600">{title}</h1>
 
-      {/* Right Section: User Info + Avatar */}
+      {/* Right Section: Theme Toggle + User Info + Avatar */}
       <div className="flex items-center gap-3 relative">
+        <ThemeToggle />
         <span className="hidden sm:block text-sm text-gray-600">{user.name}</span>
 
         {/* Avatar Button */}

@@ -3,7 +3,7 @@
 import useSWR from "swr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, CheckCircle2, AlertCircle, XCircle } from "lucide-react";
+import { Clock, CheckCircle2, AlertCircle, XCircle, Calendar } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -97,12 +97,15 @@ export function ActiveRequestsTimeline() {
                     {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
                   </div>
                   {daysUntil !== null && (
-                    <div className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full inline-block">
-                      {daysUntil === 0 
-                        ? "📅 Starting today" 
-                        : daysUntil === 1 
-                        ? "📅 Starts tomorrow" 
-                        : `📅 Starts in ${daysUntil} days`}
+                    <div className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-600 bg-blue-100 px-2.5 py-1 rounded-full">
+                      <Calendar className="h-3 w-3 flex-shrink-0 mt-0.5" strokeWidth={2} />
+                      <span>
+                        {daysUntil === 0 
+                          ? "Starting today" 
+                          : daysUntil === 1 
+                          ? "Starts tomorrow" 
+                          : `Starts in ${daysUntil} days`}
+                      </span>
                     </div>
                   )}
                 </div>
