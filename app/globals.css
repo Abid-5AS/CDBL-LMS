@@ -422,4 +422,74 @@
       transform: translateY(0);
     }
   }
+
+  /* Weekend days (Friday & Saturday in Bangladesh) */
+  .weekend-day {
+    position: relative;
+    color: rgb(148 163 184 / 0.7);
+    background-color: rgb(148 163 184 / 0.05);
+  }
+
+  .weekend-day::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 2px,
+      rgb(148 163 184 / 0.1) 2px,
+      rgb(148 163 184 / 0.1) 4px
+    );
+    pointer-events: none;
+  }
+
+  .dark .weekend-day {
+    color: rgb(148 163 184 / 0.5);
+    background-color: rgb(71 85 105 / 0.1);
+  }
+
+  /* Company holidays */
+  .holiday-day {
+    position: relative;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    color: rgb(99 102 241);
+    font-weight: 600;
+  }
+
+  .holiday-day::before {
+    content: '•';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    color: rgb(99, 102, 241);
+    font-size: 10px;
+  }
+
+  .dark .holiday-day {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+    border-color: rgba(99, 102, 241, 0.4);
+    color: rgb(165 180 252);
+  }
+
+  /* Range selection highlighting */
+  .rdp-day_selected.rdp-day_range_start,
+  .rdp-day_selected.rdp-day_range_end {
+    background-color: rgb(99, 102, 241);
+    color: white;
+    font-weight: 700;
+  }
+
+  .rdp-day_selected.rdp-day_range_middle {
+    background-color: rgba(99, 102, 241, 0.12);
+    border-top: 1px solid rgba(99, 102, 241, 0.3);
+    border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+    color: rgb(99 102 241);
+  }
+
+  .dark .rdp-day_selected.rdp-day_range_middle {
+    background-color: rgba(99, 102, 241, 0.2);
+    color: rgb(165 180 252);
+  }
 }

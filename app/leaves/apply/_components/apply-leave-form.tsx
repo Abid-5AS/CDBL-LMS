@@ -7,10 +7,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import DatePicker from "@/components/date-picker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertCircle, FileText, Clock, Info } from "lucide-react";
-import { countRequestedDays } from "@/lib/leave-days";
 import { formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { policy } from "@/lib/policy";
@@ -18,6 +16,9 @@ import Link from "next/link";
 import { LeaveConfirmationModal } from "./leave-confirmation-modal";
 import { FileUploadSection } from "./file-upload-section";
 import { useDraftAutosave } from "./use-draft-autosave";
+import { DateRangePicker } from "./date-range-picker";
+import { useHolidays } from "./use-holidays";
+import { totalDaysInclusive, rangeContainsNonWorking, isWeekendOrHoliday, fmtDDMMYYYY } from "@/lib/date-utils";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -60,8 +61,10 @@ type FormErrors = {
 export function ApplyLeaveForm() {
   const router = useRouter();
   const [type, setType] = useState<LeaveType>("CASUAL");
-  const [start, setStart] = useState<Date | undefined>();
-  const [end, setEnd] = useState<Date | undefined>();
+  const [dateRange, setDateRange] = useState<{ start: Date | undefined; end: Date | undefined }>({
+    start: undefined,
+    end: undefined,
+  });
   const [reason, setReason] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -76,11 +79,14 @@ export function ApplyLeaveForm() {
     isLoading: balancesLoading,
   } = useSWR<BalanceResponse>("/api/balance/mine", fetcher);
 
+  // Fetch holidays
+  const { holidays } = useHolidays();
+
   // Draft auto-save
   const { lastSaved, hasDraft, loadDraft, clearDraft } = useDraftAutosave({
     type,
-    startDate: start,
-    endDate: end,
+    startDate: dateRange.start,
+    endDate: dateRange.end,
     reason,
     fileName: file?.name || null,
   });
@@ -97,8 +103,10 @@ export function ApplyLeaveForm() {
           label: "Restore",
           onClick: () => {
             setType(draft.type);
-            setStart(draft.startDate ? new Date(draft.startDate) : undefined);
-            setEnd(draft.endDate ? new Date(draft.endDate) : undefined);
+            setDateRange({
+              start: draft.startDate ? new Date(draft.startDate) : undefined,
+              end: draft.endDate ? new Date(draft.endDate) : undefined,
+            });
             setReason(draft.reason);
             toast.success("Draft restored successfully");
           },
@@ -108,7 +116,10 @@ export function ApplyLeaveForm() {
     setDraftLoaded(true);
   }, [loadDraft, draftLoaded]);
 
-  const requestedDays = useMemo(() => countRequestedDays(start, end), [start, end]);
+  const requestedDays = useMemo(() => {
+    if (!dateRange.start || !dateRange.end) return 0;
+    return totalDaysInclusive(dateRange.start, dateRange.end);
+  }, [dateRange]);
   const requiresCertificate = type === "MEDICAL" && requestedDays > 3;
 
   const minSelectableDate = useMemo(() => {
@@ -120,19 +131,40 @@ export function ApplyLeaveForm() {
     return startOfDay(new Date());
   }, [type]);
 
-  const disableDate = (date: Date) => startOfDay(date) < minSelectableDate;
-
   const hasBalanceData = Boolean(balances) && !balancesError;
   const balanceForType = hasBalanceData ? balances?.[type] ?? 0 : 0;
   const remainingBalance = balanceForType - (requestedDays || 0);
+
+  // Range validation with CDBL policy
+  const rangeValidation = useMemo(() => {
+    if (!dateRange.start || !dateRange.end) return null;
+
+    if (isWeekendOrHoliday(dateRange.start, holidays)) {
+      return { valid: false, message: "Start date cannot be on Friday, Saturday, or a company holiday" };
+    }
+
+    if (isWeekendOrHoliday(dateRange.end, holidays)) {
+      return { valid: false, message: "End date cannot be on Friday, Saturday, or a company holiday" };
+    }
+
+    const containsNonWorking = rangeContainsNonWorking(dateRange.start, dateRange.end, holidays);
+
+    return {
+      valid: true,
+      containsNonWorking,
+      message: containsNonWorking
+        ? "Note: This range includes weekends/holidays which count toward your balance"
+        : null,
+    };
+  }, [dateRange, holidays]);
 
   // Real-time validation warnings
   const warnings: string[] = [];
   if (type === "CASUAL" && requestedDays > policy.clMaxConsecutiveDays) {
     warnings.push(`Casual Leave cannot exceed ${policy.clMaxConsecutiveDays} consecutive days.`);
   }
-  if (type === "EARNED" && start) {
-    const daysUntil = Math.floor((start.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+  if (type === "EARNED" && dateRange.start) {
+    const daysUntil = Math.floor((dateRange.start.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
     if (daysUntil < policy.elMinNoticeDays && daysUntil >= 0) {
       warnings.push(`Earned Leave requires ${policy.elMinNoticeDays} days' advance notice.`);
     }
@@ -160,20 +192,25 @@ export function ApplyLeaveForm() {
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
-    if (!start) {
+    if (!dateRange.start) {
       newErrors.start = "Start date is required";
     }
 
-    if (!end) {
+    if (!dateRange.end) {
       newErrors.end = "End date is required";
     }
 
-    if (start && end) {
-      if (start > end) {
+    if (dateRange.start && dateRange.end) {
+      if (dateRange.start > dateRange.end) {
         newErrors.end = "End date must be on or after start date";
       } else if (requestedDays <= 0) {
         newErrors.end = "Invalid date range";
       }
+    }
+
+    // CDBL policy validation
+    if (rangeValidation && !rangeValidation.valid) {
+      newErrors.general = rangeValidation.message || "Invalid date range";
     }
 
     if (!reason.trim()) {
@@ -207,14 +244,14 @@ export function ApplyLeaveForm() {
   };
 
   const handleConfirmSubmit = async () => {
-    if (!start || !end) return;
+    if (!dateRange.start || !dateRange.end) return;
 
     try {
       setSubmitting(true);
       const payload = {
         type,
-        startDate: start.toISOString(),
-        endDate: end.toISOString(),
+        startDate: dateRange.start.toISOString(),
+        endDate: dateRange.end.toISOString(),
         reason: reason.trim(),
         needsCertificate: requiresCertificate,
       };
@@ -317,55 +354,60 @@ export function ApplyLeaveForm() {
                 )}
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-900 dark:text-slate-50">
-                    Start Date <span className="text-red-500">*</span>
-                  </Label>
-                  <DatePicker
-                    value={start}
-                    onChange={(date) => {
-                      setStart(date);
-                      setErrors((prev) => ({ ...prev, start: undefined }));
-                    }}
-                    disabled={disableDate}
-                    className={cn("w-full", errors.start && "border-red-500")}
-                    aria-label="Start date"
-                    aria-required="true"
-                    aria-invalid={!!errors.start}
-                    aria-describedby={errors.start ? "start-error" : undefined}
-                  />
-                  {errors.start && (
-                    <p id="start-error" className="text-sm text-red-600 flex items-center gap-1" role="alert">
-                      <AlertCircle className="h-3 w-3" aria-hidden="true" />
-                      {errors.start}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-slate-900 dark:text-slate-50">
+                  Leave Dates <span className="text-red-500">*</span>
+                </Label>
+
+                <DateRangePicker
+                  value={dateRange}
+                  onChange={setDateRange}
+                  holidays={holidays}
+                  disabled={submitting}
+                  minDate={minSelectableDate}
+                />
+
+                {/* Duration feedback */}
+                {dateRange.start && dateRange.end && (
+                  <div className="mt-2 text-sm flex items-center gap-2" aria-live="polite">
+                    <span className="text-slate-600 dark:text-slate-400">Selected:</span>
+                    <span className="font-semibold text-slate-900 dark:text-slate-100">
+                      {requestedDays} day{requestedDays !== 1 ? 's' : ''}
+                    </span>
+                    <span className="text-slate-500 dark:text-slate-400">
+                      ({fmtDDMMYYYY(dateRange.start)} → {fmtDDMMYYYY(dateRange.end)})
+                    </span>
+                  </div>
+                )}
+
+                {/* Validation feedback */}
+                {rangeValidation && !rangeValidation.valid && (
+                  <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1 mt-2" role="alert">
+                    <AlertCircle className="h-3 w-3" aria-hidden="true" />
+                    {rangeValidation.message}
+                  </p>
+                )}
+
+                {rangeValidation?.containsNonWorking && rangeValidation.valid && (
+                  <div className="mt-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-3 py-2">
+                    <p className="text-xs text-amber-700 dark:text-amber-300 flex items-center gap-1">
+                      <Info className="h-3 w-3" />
+                      {rangeValidation.message}
                     </p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-900 dark:text-slate-50">
-                    End Date <span className="text-red-500">*</span>
-                  </Label>
-                  <DatePicker
-                    value={end}
-                    onChange={(date) => {
-                      setEnd(date);
-                      setErrors((prev) => ({ ...prev, end: undefined }));
-                    }}
-                    disabled={disableDate}
-                    className={cn("w-full", errors.end && "border-red-500")}
-                    aria-label="End date"
-                    aria-required="true"
-                    aria-invalid={!!errors.end}
-                    aria-describedby={errors.end ? "end-error" : undefined}
-                  />
-                  {errors.end && (
-                    <p id="end-error" className="text-sm text-red-600 flex items-center gap-1" role="alert">
-                      <AlertCircle className="h-3 w-3" aria-hidden="true" />
-                      {errors.end}
-                    </p>
-                  )}
-                </div>
+                  </div>
+                )}
+
+                {/* Help text */}
+                <p className="text-xs text-muted-foreground mt-2">
+                  All days in the range count toward balance. Start/End cannot be Fri/Sat or holidays.
+                </p>
+
+                {(errors.start || errors.end) && (
+                  <p className="text-sm text-red-600 flex items-center gap-1" role="alert">
+                    <AlertCircle className="h-3 w-3" aria-hidden="true" />
+                    {errors.start || errors.end}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -549,8 +591,8 @@ export function ApplyLeaveForm() {
         onConfirm={handleConfirmSubmit}
         submitting={submitting}
         type={type}
-        startDate={start!}
-        endDate={end!}
+        startDate={dateRange.start!}
+        endDate={dateRange.end!}
         duration={requestedDays}
         reason={reason}
         fileName={file?.name || null}
