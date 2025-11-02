@@ -71,11 +71,11 @@ async function LoginGate() {
 
       {/* Right Section - Login Form */}
       <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-md glass-strong rounded-2xl p-8 shadow-xl">
           <LoginForm />
-          <div className="mt-8 text-center">
-            <p className="text-[#64748B] text-xs">© 2025 Central Depository Bangladesh Limited. All rights reserved.</p>
-          </div>
+        </div>
+        <div className="mt-8 text-center absolute bottom-8 left-1/2 -translate-x-1/2">
+          <p className="text-[#64748B] text-xs">© 2025 Central Depository Bangladesh Limited. All rights reserved.</p>
         </div>
       </div>
 

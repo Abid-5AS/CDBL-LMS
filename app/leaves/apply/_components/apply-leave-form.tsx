@@ -245,14 +245,14 @@ export function ApplyLeaveForm() {
   return (
     <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]" noValidate aria-label="Leave application form">
       <div className="space-y-6">
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-slate-900">New Leave Application</h2>
+        <div className="glass-base rounded-xl p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">New Leave Application</h2>
           <p className="text-sm text-muted-foreground">
             Select leave type, duration, and add a short reason. Attach supporting documents when necessary.
           </p>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+        <div className="glass-base rounded-xl p-6 shadow-sm space-y-5">
           <div className="space-y-2">
             <Label className="text-sm font-medium text-slate-900">
               Leave Type <span className="text-red-500">*</span>
@@ -440,15 +440,15 @@ export function ApplyLeaveForm() {
               Cancel
             </Button>
             <Button type="submit" disabled={submitting}>
-              {submitting ? "Submitting..." : "Submit Application"}
+              {submitting ? "Applying..." : "Apply Leave"}
             </Button>
           </div>
         </div>
       </div>
 
       <aside className="space-y-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-slate-900">Leave Summary</h3>
+        <div className="glass-base rounded-xl p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Leave Summary</h3>
           <ul className="mt-4 space-y-2 text-sm text-slate-700">
             {summaryItems.map((item) => (
               <li key={item.label} className="flex items-center justify-between gap-3">
@@ -475,8 +475,8 @@ export function ApplyLeaveForm() {
           ) : null}
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm text-sm text-slate-600">
-          <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Balances</h4>
+        <div className="glass-base rounded-xl p-6 shadow-sm text-sm text-slate-600 dark:text-slate-300">
+          <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Balances</h4>
           <p className="mt-2">Current year balances</p>
           {balancesLoading ? (
             <div className="mt-3 space-y-2">
