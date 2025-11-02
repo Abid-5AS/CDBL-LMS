@@ -130,7 +130,7 @@
 /* Modern glass effect utilities with OKLCH tokens and dual shadows */
 /* Placed outside @layer to prevent Tailwind v4 from stripping backdrop-filter */
 .glass-base {
-  --glass-blur: 40px;
+  --glass-blur: 28px;
   backdrop-filter: blur(var(--glass-blur)) saturate(180%);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
   background-color: rgb(255 255 255 / 0.55);
@@ -168,6 +168,96 @@
   }
 }
 
+/* Glass navigation utility for TopNavBar */
+.glass-nav {
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  background-color: rgba(25, 25, 28, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  transition: all 0.3s ease;
+}
+
+.glass-nav.scrolled {
+  background-color: rgba(20, 20, 23, 0.70);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+.dark .glass-nav {
+  background-color: rgba(25, 25, 28, 0.55);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark .glass-nav.scrolled {
+  background-color: rgba(20, 20, 23, 0.70);
+}
+
+/* Glass medium utility for modular segments */
+.glass-medium {
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background-color: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease;
+}
+
+.dark .glass-medium {
+  background-color: rgba(25, 25, 28, 0.6);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.glass-medium:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+.dark .glass-medium:hover {
+  background-color: rgba(30, 30, 35, 0.7);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Glass modal overlay styling */
+.glass-modal-overlay {
+  background-color: rgba(15, 15, 20, 0.35);
+}
+
+.dark .glass-modal-overlay {
+  background-color: rgba(15, 15, 20, 0.45);
+}
+
+/* Glass modal styling */
+.glass-modal {
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  background-color: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+}
+
+.dark .glass-modal {
+  background-color: rgba(25, 25, 28, 0.55);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
+}
+
+/* Top glass nav styling */
+.top-glass-nav {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.dark .top-glass-nav {
+  background-color: rgba(25, 25, 28, 0.55);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
 .text-glass {
   color: oklch(25% 0.05 260);
 }
@@ -203,7 +293,24 @@
 }
 
 .dark .text-glass {
-  color: oklch(85% 0.02 260);
+  color: oklch(90% 0.04 250);
+}
+
+/* OKLCH text colors for glass navigation */
+.glass-nav-text {
+  color: oklch(30% 0.03 250);
+}
+
+.dark .glass-nav-text {
+  color: oklch(85% 0.04 250);
+}
+
+.glass-nav-text-hover {
+  color: oklch(20% 0.03 250);
+}
+
+.dark .glass-nav-text-hover {
+  color: oklch(95% 0.04 250);
 }
 
 .dark .glass-content {
@@ -260,6 +367,59 @@
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* File upload drag-over transition */
+  .file-upload-drag-over {
+    transition: all 0.2s ease-in-out;
+  }
+
+  /* Balance color indicators */
+  .balance-healthy {
+    color: rgb(34 197 94);
+  }
+  
+  .balance-low {
+    color: rgb(251 191 36);
+  }
+  
+  .balance-insufficient {
+    color: rgb(239 68 68);
+  }
+
+  .dark .balance-healthy {
+    color: rgb(74 222 128);
+  }
+  
+  .dark .balance-low {
+    color: rgb(250 204 21);
+  }
+  
+  .dark .balance-insufficient {
+    color: rgb(248 113 113);
+  }
+
+  /* Glass input focus states */
+  .glass-input:focus {
+    outline: 2px solid rgba(99, 102, 241, 0.5);
+    outline-offset: 2px;
+    border-color: rgba(99, 102, 241, 0.5);
+  }
+
+  /* Smooth validation message transitions */
+  .validation-message {
+    animation: slideIn 0.2s ease-out;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 }
