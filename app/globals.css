@@ -127,74 +127,107 @@
   }
 }
 
-@layer utilities {
-  /* Glass effect utilities with CSS custom properties for dynamic tuning */
+/* Modern glass effect utilities with OKLCH tokens and dual shadows */
+.glass-base {
+  --glass-blur: 40px;
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  background-color: rgb(255 255 255 / 0.55);
+  border: 1px solid rgb(255 255 255 / 0.25);
+  box-shadow: 0 2px 12px rgb(0 0 0 / 0.1);
+}
+
+@supports not (backdrop-filter: blur()) {
   .glass-base {
-    --glass-blur: 40px;
-    --glass-opacity: 0.05;
-    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-    background-color: rgb(255 255 255 / var(--glass-opacity));
-    border: 1px solid rgb(255 255 255 / 0.1);
-    
-    @supports not (backdrop-filter: blur()) {
-      background-color: rgb(255 255 255 / 0.9);
-    }
+    background-color: rgb(255 255 255 / 0.9);
   }
-  
-  @media (prefers-reduced-motion: reduce) {
-    .glass-base {
-      --glass-blur: 20px;
-    }
-  }
-  
-  .dark .glass-base {
-    --glass-opacity: 0.3;
-    background-color: rgb(0 0 0 / var(--glass-opacity));
-    border-color: rgb(255 255 255 / 0.05);
-  }
-  
-  .glass-light {
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-base {
     --glass-blur: 20px;
-    --glass-opacity: 0.03;
-    backdrop-filter: blur(var(--glass-blur)) saturate(160%);
-    background-color: rgb(255 255 255 / var(--glass-opacity));
-    border: 1px solid rgb(255 255 255 / 0.08);
-    
-    @supports not (backdrop-filter: blur()) {
-      background-color: rgb(255 255 255 / 0.85);
-    }
   }
-  
-  .dark .glass-light {
-    --glass-opacity: 0.2;
-    background-color: rgb(0 0 0 / var(--glass-opacity));
-    border-color: rgb(255 255 255 / 0.03);
+}
+
+.glass-light {
+  --glass-blur: 20px;
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  background-color: rgb(255 255 255 / 0.45);
+  border: 1px solid rgb(255 255 255 / 0.2);
+  box-shadow: 0 1px 8px rgb(0 0 0 / 0.08);
+}
+
+@supports not (backdrop-filter: blur()) {
+  .glass-light {
+    background-color: rgb(255 255 255 / 0.85);
   }
-  
+}
+
+.glass-strong {
+  --glass-blur: 60px;
+  backdrop-filter: blur(var(--glass-blur)) saturate(200%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(200%);
+  background-color: rgb(255 255 255 / 0.65);
+  border: 1px solid rgb(255 255 255 / 0.3);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.15);
+}
+
+@supports not (backdrop-filter: blur()) {
   .glass-strong {
-    --glass-blur: 60px;
-    --glass-opacity: 0.08;
-    backdrop-filter: blur(var(--glass-blur)) saturate(200%);
-    background-color: rgb(255 255 255 / var(--glass-opacity));
-    border: 1px solid rgb(255 255 255 / 0.15);
-    
-    @supports not (backdrop-filter: blur()) {
-      background-color: rgb(255 255 255 / 0.95);
-    }
+    background-color: rgb(255 255 255 / 0.95);
   }
-  
-  @media (prefers-reduced-motion: reduce) {
-    .glass-strong {
-      --glass-blur: 30px;
-    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-strong {
+    --glass-blur: 30px;
   }
-  
-  .dark .glass-strong {
-    --glass-opacity: 0.4;
-    background-color: rgb(0 0 0 / var(--glass-opacity));
-    border-color: rgb(255 255 255 / 0.08);
-  }
-  
+}
+
+.text-glass {
+  color: oklch(25% 0.05 260);
+}
+
+.glass-content {
+  background: linear-gradient(to bottom right, rgb(255 255 255 / 0.04), rgb(0 0 0 / 0.1));
+  border-radius: inherit;
+}
+
+/* Dark mode glass overrides with proper dual shadows */
+.dark .glass-base {
+  background-color: rgb(22 24 28 / 0.65);
+  border-color: rgb(255 255 255 / 0.05);
+  box-shadow:
+    inset 0 0 0.5px rgb(255 255 255 / 0.1),
+    0 4px 32px rgb(0 0 0 / 0.45);
+}
+
+.dark .glass-light {
+  background-color: rgb(22 24 28 / 0.5);
+  border-color: rgb(255 255 255 / 0.03);
+  box-shadow:
+    inset 0 0 0.5px rgb(255 255 255 / 0.08),
+    0 2px 16px rgb(0 0 0 / 0.35);
+}
+
+.dark .glass-strong {
+  background-color: rgb(22 24 28 / 0.75);
+  border-color: rgb(255 255 255 / 0.08);
+  box-shadow:
+    inset 0 0 1px rgb(255 255 255 / 0.12),
+    0 8px 48px rgb(0 0 0 / 0.6);
+}
+
+.dark .text-glass {
+  color: oklch(85% 0.02 260);
+}
+
+.dark .glass-content {
+  background: linear-gradient(to bottom right, rgb(255 255 255 / 0.02), rgb(0 0 0 / 0.2));
+}
+
+@layer utilities {
   /* Soft scrollbar styling */
   .soft-scrollbar::-webkit-scrollbar {
     width: 8px;
