@@ -44,3 +44,40 @@ export const fmtDDMMYYYY = (d: Date) =>
     year: "numeric" 
   });
 
+// Find next working day (skips weekends and holidays)
+export const nextWorkingDay = (d: Date, holidays: Holiday[]): Date => {
+  let next = addDays(d, 1);
+  const maxAttempts = 60; // Safety limit
+  let attempts = 0;
+  
+  while (isWeekendOrHoliday(next, holidays) && attempts < maxAttempts) {
+    next = addDays(next, 1);
+    attempts++;
+  }
+  
+  return next;
+};
+
+// Count breakdown: total, weekends, holidays
+export const countDaysBreakdown = (start: Date, end: Date, holidays: Holiday[]) => {
+  const days = totalDaysInclusive(start, end);
+  let weekendCount = 0;
+  let holidayCount = 0;
+  
+  for (let i = 0; i < days; i++) {
+    const d = addDays(start, i);
+    if (isWeekendBD(d)) {
+      weekendCount++;
+    } else if (isHoliday(d, holidays)) {
+      holidayCount++;
+    }
+  }
+  
+  return {
+    total: days,
+    weekends: weekendCount,
+    holidays: holidayCount,
+    working: days - weekendCount - holidayCount,
+  };
+};
+

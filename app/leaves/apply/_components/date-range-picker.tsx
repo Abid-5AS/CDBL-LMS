@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { isWeekendOrHoliday, fmtDDMMYYYY, totalDaysInclusive } from "@/lib/date-utils";
+import { isWeekendOrHoliday, fmtDDMMYYYY, totalDaysInclusive, nextWorkingDay, countDaysBreakdown } from "@/lib/date-utils";
 import type { Holiday } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import type { DateRange } from "react-day-picker";
@@ -75,7 +75,7 @@ export function DateRangePicker({
     onChange({ start: undefined, end: undefined });
   };
 
-  const handleQuickSelect = (type: "today" | "tomorrow" | "nextWeek") => {
+  const handleQuickSelect = (type: "nextWorkingDay" | "nextWeek") => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
@@ -83,28 +83,24 @@ export function DateRangePicker({
     let end: Date;
     
     switch (type) {
-      case "today":
-        start = today;
-        end = today;
-        break;
-      case "tomorrow":
-        start = addDays(today, 1);
+      case "nextWorkingDay":
+        // Find next working day from today
+        start = nextWorkingDay(today, holidays);
         end = start;
         break;
       case "nextWeek":
-        start = addDays(today, 7);
+        // Next week: Find next Monday that's a working day (skip holidays)
+        const daysUntilNextMonday = (8 - today.getDay()) % 7 || 7;
+        let potentialMonday = addDays(today, daysUntilNextMonday);
+        
+        // If potential Monday is on a holiday, find the next working day
+        while (isWeekendOrHoliday(potentialMonday, holidays)) {
+          potentialMonday = addDays(potentialMonday, 1);
+        }
+        
+        start = potentialMonday;
         end = addDays(start, 2); // 3 days total
         break;
-    }
-    
-    // Check if any of these fall on weekends/holidays
-    if (isWeekendOrHoliday(start, holidays)) {
-      toast.error("Selected start date falls on Friday, Saturday, or a company holiday");
-      return;
-    }
-    if (isWeekendOrHoliday(end, holidays)) {
-      toast.error("Selected end date falls on Friday, Saturday, or a company holiday");
-      return;
     }
     
     onChange({ start, end });
@@ -113,6 +109,9 @@ export function DateRangePicker({
   const previewStart = hoverPreview?.start || value.start;
   const previewEnd = hoverPreview?.end || value.end;
   const previewDays = previewStart && previewEnd ? totalDaysInclusive(previewStart, previewEnd) : 0;
+
+  // Calculate breakdown for current selection
+  const breakdown = value.start && value.end ? countDaysBreakdown(value.start, value.end, holidays) : null;
 
   return (
     <div className="space-y-2">
@@ -155,27 +154,18 @@ export function DateRangePicker({
         
         <PopoverContent className="w-auto p-0" align="start">
           <div className="p-4 space-y-4">
-            {/* Quick Select Buttons */}
+            {/* Quick Select Buttons - Updated for "Next Working Day" and "Next Week" */}
             {showQuickSelect && (
               <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700 pb-3">
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleQuickSelect("today")}
+                  onClick={() => handleQuickSelect("nextWorkingDay")}
                   className="text-xs"
                 >
                   <Sparkles className="h-3 w-3 mr-1" />
-                  Today
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleQuickSelect("tomorrow")}
-                  className="text-xs"
-                >
-                  Tomorrow
+                  Next Working Day
                 </Button>
                 <Button
                   type="button"
@@ -223,6 +213,38 @@ export function DateRangePicker({
               onDayMouseLeave={() => setHoverPreview(null)}
               initialFocus
             />
+
+            {/* Breakdown Summary */}
+            {breakdown && (
+              <div className="text-xs text-slate-600 dark:text-slate-400 px-1 pt-2 border-t border-slate-200 dark:border-slate-700">
+                <div className="font-medium mb-1">
+                  {breakdown.total} total day{breakdown.total !== 1 ? 's' : ''}
+                </div>
+                {(breakdown.weekends > 0 || breakdown.holidays > 0) && (
+                  <div className="text-slate-500">
+                    {breakdown.weekends > 0 && (
+                      <span>{breakdown.weekends} weekend{breakdown.weekends !== 1 ? 's' : ''}</span>
+                    )}
+                    {breakdown.weekends > 0 && breakdown.holidays > 0 && ', '}
+                    {breakdown.holidays > 0 && (
+                      <span>{breakdown.holidays} holiday{breakdown.holidays !== 1 ? 's' : ''}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Legend */}
+            <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-700">
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded border border-indigo-300 bg-indigo-50" />
+                <span>Holiday</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded border border-slate-300" />
+                <span>Weekend</span>
+              </div>
+            </div>
           </div>
         </PopoverContent>
       </Popover>
