@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { CalendarPlus, Eye, TrendingUp } from "lucide-react";
+import { CalendarPlus, Eye, TrendingUp, Calendar } from "lucide-react";
 import useSWR from "swr";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -72,12 +72,15 @@ export function HeroStrip({ name }: HeroStripProps) {
   }, [leavesData, holidaysData, name]);
 
   return (
-    <div className="flex items-center justify-between gap-4 bg-white/70 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-gray-200">
+    <div className="flex items-center justify-between gap-4 glass-base rounded-2xl p-4 shadow-sm">
       <div className="flex-1 min-w-0">
-        <p className="text-base font-medium text-gray-900">{message}</p>
+        <p className="text-base font-medium text-gray-900 dark:text-gray-100">{message}</p>
         {nextHoliday && (
-          <p className="text-xs text-gray-600 mt-1">
-            📅 Next holiday: {nextHoliday.name} on {new Date(nextHoliday.date).toLocaleDateString()}
+          <p className="flex items-start gap-1.5 text-xs text-gray-600 dark:text-gray-300 mt-1.5">
+            <Calendar className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" strokeWidth={2} />
+            <span className="leading-relaxed">
+              Next holiday: <span className="font-medium text-gray-700 dark:text-gray-200">{nextHoliday.name}</span> on {new Date(nextHoliday.date).toLocaleDateString()}
+            </span>
           </p>
         )}
       </div>

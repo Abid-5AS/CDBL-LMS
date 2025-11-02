@@ -41,6 +41,12 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  
+  /* Glass theme color tokens */
+  --color-bg-dark: #0f1115;
+  --color-surface-dark: rgba(30, 30, 30, 0.65);
+  --color-text-dark: #e5e7eb;
+  --color-accent-dark: #7b9eff;
 }
 
 :root {
@@ -122,9 +128,71 @@
 }
 
 @layer utilities {
-  /* Glass effect for macOS-style blur */
-  .glass {
-    @apply bg-white/60 backdrop-blur-md border border-gray-200/40;
+  /* Glass effect utilities with CSS custom properties for dynamic tuning */
+  .glass-base {
+    --glass-blur: 40px;
+    --glass-opacity: 0.05;
+    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    background-color: rgb(255 255 255 / var(--glass-opacity));
+    border: 1px solid rgb(255 255 255 / 0.1);
+    
+    @supports not (backdrop-filter: blur()) {
+      background-color: rgb(255 255 255 / 0.9);
+    }
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .glass-base {
+      --glass-blur: 20px;
+    }
+  }
+  
+  .dark .glass-base {
+    --glass-opacity: 0.3;
+    background-color: rgb(0 0 0 / var(--glass-opacity));
+    border-color: rgb(255 255 255 / 0.05);
+  }
+  
+  .glass-light {
+    --glass-blur: 20px;
+    --glass-opacity: 0.03;
+    backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+    background-color: rgb(255 255 255 / var(--glass-opacity));
+    border: 1px solid rgb(255 255 255 / 0.08);
+    
+    @supports not (backdrop-filter: blur()) {
+      background-color: rgb(255 255 255 / 0.85);
+    }
+  }
+  
+  .dark .glass-light {
+    --glass-opacity: 0.2;
+    background-color: rgb(0 0 0 / var(--glass-opacity));
+    border-color: rgb(255 255 255 / 0.03);
+  }
+  
+  .glass-strong {
+    --glass-blur: 60px;
+    --glass-opacity: 0.08;
+    backdrop-filter: blur(var(--glass-blur)) saturate(200%);
+    background-color: rgb(255 255 255 / var(--glass-opacity));
+    border: 1px solid rgb(255 255 255 / 0.15);
+    
+    @supports not (backdrop-filter: blur()) {
+      background-color: rgb(255 255 255 / 0.95);
+    }
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .glass-strong {
+      --glass-blur: 30px;
+    }
+  }
+  
+  .dark .glass-strong {
+    --glass-opacity: 0.4;
+    background-color: rgb(0 0 0 / var(--glass-opacity));
+    border-color: rgb(255 255 255 / 0.08);
   }
   
   /* Soft scrollbar styling */
@@ -142,6 +210,14 @@
   
   .soft-scrollbar::-webkit-scrollbar-thumb:hover {
     @apply bg-gray-400/70;
+  }
+  
+  .dark .soft-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-600/60;
+  }
+  
+  .dark .soft-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500/70;
   }
   
   /* Hide scrollbar for Chrome, Safari and Opera */

@@ -38,14 +38,14 @@ export function EmployeeDashboardUnified({ username }: EmployeeDashboardUnifiedP
           </Suspense>
 
           {/* Quick Actions */}
-          <Card className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100">
+          <Card>
             <CardContent className="p-6">
               <QuickActionsCard />
             </CardContent>
           </Card>
 
           {/* Recent Requests Table */}
-          <Card className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100">
+          <Card>
             <CardHeader>
               <CardTitle className="text-lg font-semibold">Recent Requests</CardTitle>
             </CardHeader>
@@ -59,7 +59,7 @@ export function EmployeeDashboardUnified({ username }: EmployeeDashboardUnifiedP
 
         {/* Right Column (1/3): Balances & Next Holiday */}
         <div className="space-y-6">
-          <Card className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100">
+          <Card>
             <CardHeader>
               <CardTitle className="text-base font-semibold">Leave Balances</CardTitle>
             </CardHeader>
