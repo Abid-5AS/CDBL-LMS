@@ -142,7 +142,7 @@ export default function AdminDashboard({ initialUsers, initialPolicies, initialL
         })}
       </nav>
 
-      <section className="rounded-xl border border-slate-200/50 dark:border-slate-800/50 glass-base p-6 shadow-sm">
+      <section className="rounded-xl border border-slate-200/50 dark:border-slate-800/50 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 p-6 shadow-sm">
         <p className="mb-6 text-sm text-muted-foreground">{TABS.find((tab) => tab.id === activeTab)?.description}</p>
         {activeTab === "users" ? (
           <UserManagement

@@ -12,13 +12,15 @@ interface GlassCardProps extends HTMLMotionProps<"div"> {
 
 const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
   ({ variant = "medium", shine, interactive, className, children, ...props }, ref) => {
-    // Map variant to glass utility class
-    const glassClass =
-      variant === "light" ? "glass-light" : variant === "strong" ? "glass-strong" : "glass-base";
+    // Map variant to backdrop blur and background opacity
+    const blurClass = variant === "light" ? "backdrop-blur-md" : variant === "strong" ? "backdrop-blur-2xl" : "backdrop-blur-xl";
+    const bgClass = variant === "light" ? "bg-white/60 dark:bg-slate-900/60" : variant === "strong" ? "bg-white/80 dark:bg-slate-900/80" : "bg-white/70 dark:bg-slate-900/70";
 
     const baseStyles = cn(
       "rounded-lg transition-all duration-300",
-      glassClass,
+      blurClass,
+      bgClass,
+      "border border-white/30 dark:border-white/10",
       interactive && "hover:scale-[1.02] cursor-pointer",
       shine && "relative overflow-hidden",
       className

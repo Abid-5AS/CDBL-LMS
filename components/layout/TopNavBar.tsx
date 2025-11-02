@@ -59,47 +59,67 @@ export default function TopNavBar() {
 
   return (
     <header
-      className="fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between glass-light px-6"
+      className="fixed inset-x-0 top-0 z-50 flex h-16 items-center justify-between backdrop-blur-2xl bg-white/80 dark:bg-slate-900/80 border-b border-white/30 dark:border-white/10 shadow-sm"
       role="banner"
     >
-      {/* Page Title */}
-      <h1 className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">{title}</h1>
-
-      {/* Right Section: Theme Toggle + User Info + Avatar */}
-      <div className="flex items-center gap-3 relative">
-        <ThemeToggle />
-        <span className="hidden sm:block text-sm text-gray-600 dark:text-gray-300">{user.name}</span>
-
-        {/* Avatar Button */}
-        <button
-          onClick={() => setControlCenterOpen(!controlCenterOpen)}
-          aria-label="Open Control Center"
-          aria-expanded={controlCenterOpen}
-          aria-haspopup="true"
-          className={clsx(
-            "relative h-8 w-8 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700 hover:ring-2 hover:ring-indigo-300 dark:hover:ring-indigo-600 transition-all",
-            controlCenterOpen && "ring-2 ring-indigo-500"
-          )}
-        >
-          <div className="h-full w-full bg-indigo-600 flex items-center justify-center text-white font-semibold text-xs">
-            {user.name?.[0]?.toUpperCase() ?? "U"}
+      <div className="flex items-center gap-6 w-full px-6">
+        {/* Page Title with breadcrumb style */}
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="hidden md:flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+            <span>CDBL</span>
+            <span>/</span>
           </div>
-          {hasAlerts && (
-            <span
-              className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-900"
-              aria-label="You have new notifications"
-            />
-          )}
-        </button>
+          <h1 className="text-base font-bold text-slate-900 dark:text-white truncate">
+            {title}
+          </h1>
+        </div>
 
-        {/* Control Center Popover */}
-        {controlCenterOpen && (
-          <div className="relative">
-            <ControlCenter onClose={() => setControlCenterOpen(false)} />
+        {/* Right Section: Theme Toggle + User Info + Avatar */}
+        <div className="flex items-center gap-4 ml-auto">
+          <ThemeToggle />
+
+          {/* User Info with better styling */}
+          <div className="hidden md:flex flex-col items-end">
+            <span className="text-sm font-medium text-slate-900 dark:text-white">
+              {user.name}
+            </span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 capitalize">
+              {user.role.toLowerCase()}
+            </span>
           </div>
-        )}
+
+          {/* Avatar Button with enhanced styling */}
+          <button
+            onClick={() => setControlCenterOpen(!controlCenterOpen)}
+            aria-label="Open Control Center"
+            aria-expanded={controlCenterOpen}
+            aria-haspopup="true"
+            className={clsx(
+              "relative h-10 w-10 rounded-full overflow-hidden border-2 transition-all hover:scale-105 active:scale-95",
+              controlCenterOpen
+                ? "border-indigo-500 dark:border-indigo-400 shadow-lg shadow-indigo-500/50"
+                : "border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-600"
+            )}
+          >
+            <div className="h-full w-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-inner">
+              {user.name?.[0]?.toUpperCase() ?? "U"}
+            </div>
+            {hasAlerts && (
+              <span
+                className="absolute top-0 right-0 h-3 w-3 rounded-full bg-red-500 border-2 border-white dark:border-slate-900 animate-pulse"
+                aria-label="You have new notifications"
+              />
+            )}
+          </button>
+
+          {/* Control Center Popover */}
+          {controlCenterOpen && (
+            <div className="relative">
+              <ControlCenter onClose={() => setControlCenterOpen(false)} />
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
 }
-

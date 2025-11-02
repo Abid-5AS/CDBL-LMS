@@ -30,12 +30,13 @@ export default function FloatingDock() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 200, damping: 20 }}
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-full px-5 py-3 glass-base"
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-full px-5 py-3 backdrop-blur-2xl bg-white/60 dark:bg-slate-900/60 border border-white/20 dark:border-white/10 shadow-xl"
       role="navigation"
       aria-label="Main navigation"
     >
       {navItems.map((item) => {
-        const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+        const isActive =
+          pathname === item.href || pathname.startsWith(item.href + "/");
         return (
           <button
             key={item.href}
@@ -55,7 +56,7 @@ export default function FloatingDock() {
                 {item.badge > 9 ? "9+" : item.badge}
               </span>
             )}
-            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs font-medium text-white dark:text-gray-100 bg-gray-900 dark:bg-gray-800 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none glass-light">
+            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 text-xs font-semibold text-slate-900 dark:text-white rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all pointer-events-none backdrop-blur-xl bg-white/95 dark:bg-slate-800/95 border border-slate-200 dark:border-slate-700 shadow-lg z-50">
               {item.label}
             </span>
           </button>
@@ -70,11 +71,10 @@ export default function FloatingDock() {
         className="p-2.5 rounded-full text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/20 transition-all duration-200 relative group"
       >
         <LogOut size={20} />
-        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs font-medium text-white dark:text-gray-100 bg-gray-900 dark:bg-gray-800 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none glass-light">
+        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 text-xs font-semibold text-slate-900 dark:text-white rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all pointer-events-none backdrop-blur-xl bg-white/95 dark:bg-slate-800/95 border border-slate-200 dark:border-slate-700 shadow-lg z-50">
           Logout
         </span>
       </button>
     </motion.div>
   );
 }
-

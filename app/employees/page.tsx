@@ -18,7 +18,7 @@ async function EmployeesPageContent() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-slate-200/50 dark:border-slate-800/50 glass-base p-6 shadow-sm">
+      <section className="rounded-xl border border-slate-200/50 dark:border-slate-800/50 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 p-6 shadow-sm">
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Employee Directory</h1>

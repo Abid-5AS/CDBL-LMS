@@ -27,7 +27,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50" suppressHydrationWarning>
       <TopNavBar />
-      <main className="flex-1 overflow-y-auto pt-14 pb-20" role="main" aria-label="Main content">
+      <main className="flex-1 overflow-y-auto pt-16 pb-20" role="main" aria-label="Main content">
         <div className="mx-auto w-full max-w-7xl px-6 py-6">{children}</div>
       </main>
       <FloatingDock />

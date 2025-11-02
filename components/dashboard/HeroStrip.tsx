@@ -72,7 +72,7 @@ export function HeroStrip({ name }: HeroStripProps) {
   }, [leavesData, holidaysData, name]);
 
   return (
-    <div className="flex items-center justify-between gap-4 glass-base rounded-2xl p-4 shadow-sm">
+    <div className="flex items-center justify-between gap-4 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/30 dark:border-white/10 rounded-2xl p-4 shadow-sm">
       <div className="flex-1 min-w-0">
         <p className="text-base font-medium text-gray-900 dark:text-gray-100">{message}</p>
         {nextHoliday && (

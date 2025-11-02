@@ -106,7 +106,7 @@ export default function ControlCenter({ onClose }: { onClose: () => void }) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: -8 }}
         transition={{ type: "spring", stiffness: 240, damping: 24 }}
-        className="fixed right-6 top-[64px] w-72 rounded-2xl z-50 overflow-hidden glass-strong shadow-xl dark:shadow-2xl"
+        className="fixed right-6 top-[64px] w-72 rounded-2xl z-50 overflow-hidden backdrop-blur-2xl bg-white/80 dark:bg-slate-900/80 border border-white/30 dark:border-white/10 shadow-xl dark:shadow-2xl"
         data-control-center
         role="dialog"
         aria-modal="true"

@@ -128,6 +128,7 @@
 }
 
 /* Modern glass effect utilities with OKLCH tokens and dual shadows */
+/* Placed outside @layer to prevent Tailwind v4 from stripping backdrop-filter */
 .glass-base {
   --glass-blur: 40px;
   backdrop-filter: blur(var(--glass-blur)) saturate(180%);
@@ -135,12 +136,6 @@
   background-color: rgb(255 255 255 / 0.55);
   border: 1px solid rgb(255 255 255 / 0.25);
   box-shadow: 0 2px 12px rgb(0 0 0 / 0.1);
-}
-
-@supports not (backdrop-filter: blur()) {
-  .glass-base {
-    background-color: rgb(255 255 255 / 0.9);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -158,12 +153,6 @@
   box-shadow: 0 1px 8px rgb(0 0 0 / 0.08);
 }
 
-@supports not (backdrop-filter: blur()) {
-  .glass-light {
-    background-color: rgb(255 255 255 / 0.85);
-  }
-}
-
 .glass-strong {
   --glass-blur: 60px;
   backdrop-filter: blur(var(--glass-blur)) saturate(200%);
@@ -171,12 +160,6 @@
   background-color: rgb(255 255 255 / 0.65);
   border: 1px solid rgb(255 255 255 / 0.3);
   box-shadow: 0 4px 16px rgb(0 0 0 / 0.15);
-}
-
-@supports not (backdrop-filter: blur()) {
-  .glass-strong {
-    background-color: rgb(255 255 255 / 0.95);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

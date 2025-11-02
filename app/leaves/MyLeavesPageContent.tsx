@@ -89,7 +89,7 @@ export function MyLeavesPageContent() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <section className="rounded-2xl border border-slate-200/50 dark:border-slate-800/50 glass-base p-6 shadow-sm">
+      <section className="rounded-2xl border border-slate-200/50 dark:border-slate-800/50 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 p-6 shadow-sm">
         <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-2">My Leave Requests</h1>
         <p className="text-sm text-slate-600 dark:text-slate-300">
           Track the status of your submitted leave applications. Pending requests can be withdrawn before approval.

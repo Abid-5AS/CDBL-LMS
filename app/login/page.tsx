@@ -71,7 +71,7 @@ async function LoginGate() {
 
       {/* Right Section - Login Form */}
       <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-md glass-strong rounded-2xl p-8 shadow-xl">
+        <div className="w-full max-w-md backdrop-blur-2xl bg-white/80 dark:bg-slate-900/80 border border-white/30 dark:border-white/10 rounded-2xl p-8 shadow-xl">
           <LoginForm />
         </div>
         <div className="mt-8 text-center absolute bottom-8 left-1/2 -translate-x-1/2">
