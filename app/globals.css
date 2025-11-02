@@ -242,19 +242,19 @@
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
 }
 
-/* Top glass nav styling */
+/* Top glass nav styling - improved light/dark balance */
 .top-glass-nav {
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   background-color: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 
 .dark .top-glass-nav {
-  background-color: rgba(25, 25, 28, 0.55);
-  border-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(38, 38, 42, 0.6);
+  border-color: rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
