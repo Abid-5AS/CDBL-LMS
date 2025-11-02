@@ -59,16 +59,16 @@ export default function TopNavBar() {
 
   return (
     <header
-      className="fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between bg-white/60 backdrop-blur-md shadow-sm px-6"
+      className="fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between glass-light px-6"
       role="banner"
     >
       {/* Page Title */}
-      <h1 className="text-sm font-semibold text-indigo-600">{title}</h1>
+      <h1 className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">{title}</h1>
 
       {/* Right Section: Theme Toggle + User Info + Avatar */}
       <div className="flex items-center gap-3 relative">
         <ThemeToggle />
-        <span className="hidden sm:block text-sm text-gray-600">{user.name}</span>
+        <span className="hidden sm:block text-sm text-gray-600 dark:text-gray-300">{user.name}</span>
 
         {/* Avatar Button */}
         <button
@@ -77,7 +77,7 @@ export default function TopNavBar() {
           aria-expanded={controlCenterOpen}
           aria-haspopup="true"
           className={clsx(
-            "relative h-8 w-8 rounded-full overflow-hidden border border-gray-200 hover:ring-2 hover:ring-indigo-300 transition-all",
+            "relative h-8 w-8 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700 hover:ring-2 hover:ring-indigo-300 dark:hover:ring-indigo-600 transition-all",
             controlCenterOpen && "ring-2 ring-indigo-500"
           )}
         >
@@ -86,7 +86,7 @@ export default function TopNavBar() {
           </div>
           {hasAlerts && (
             <span
-              className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"
+              className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-900"
               aria-label="You have new notifications"
             />
           )}
