@@ -50,7 +50,7 @@ function DashboardSection({ id, customizeMode, children }: DashboardSectionProps
       style={style}
       className={cn(
         "transition-all duration-300 ease-in-out",
-        customizeMode ? "rounded-xl border-2 border-dashed border-blue-300 bg-blue-50/30 p-2" : "",
+        customizeMode ? "rounded-xl border-2 border-dashed border-blue-300 dark:border-blue-600 bg-blue-50/30 dark:bg-blue-900/20 p-2" : "",
         isDragging && "opacity-80",
       )}
     >

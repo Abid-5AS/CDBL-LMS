@@ -106,39 +106,14 @@ export default function ControlCenter({ onClose }: { onClose: () => void }) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: -8 }}
         transition={{ type: "spring", stiffness: 240, damping: 24 }}
-        className="fixed right-6 top-[64px] w-72 rounded-2xl z-50 overflow-hidden backdrop-blur-2xl bg-white/80 dark:bg-slate-900/80 border border-white/30 dark:border-white/10 shadow-xl dark:shadow-2xl"
+        className="fixed right-6 top-[64px] w-72 rounded-2xl z-50 overflow-hidden glass-base border border-white/30 dark:border-white/10"
         data-control-center
         role="dialog"
         aria-modal="true"
         aria-label="Control Center"
       >
-        {/* Dark overlay for better text readability */}
-        <div 
-          className="absolute inset-0 rounded-2xl pointer-events-none"
-          style={{
-            background: "linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.3) 100%)",
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-          }}
-        />
-        
-        {/* Glass shine overlay */}
-        <div 
-          className="absolute inset-0 rounded-2xl pointer-events-none z-0"
-          style={{
-            background: "linear-gradient(to bottom, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 100%)",
-          }}
-        />
-        
-        {/* Content wrapper with blur effect */}
-        <div 
-          className="relative z-10 p-4 backdrop-blur-sm" 
-          style={{ 
-            textShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
-            backdropFilter: "blur(8px)",
-            WebkitBackdropFilter: "blur(8px)",
-          }}
-        >
+        {/* Content wrapper */}
+        <div className="relative z-10 p-4">
           {/* User Info */}
           <div className="flex items-center gap-3 border-b border-gray-200/40 dark:border-gray-700/40 pb-3 mb-3">
             <div className="h-10 w-10 rounded-full bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center text-white font-semibold text-sm shadow-md">

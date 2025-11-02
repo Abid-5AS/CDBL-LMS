@@ -11,59 +11,65 @@ import { generateBreadcrumbs } from "@/lib/breadcrumbs";
 import {
   Search,
   ChevronRight,
-  ChevronDown,
-  ChevronUp,
   Plus,
   UserPlus,
   CalendarPlus,
-  ClipboardCheck,
-  BarChart2,
+  FileText,
+  MoreVertical,
 } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
 import { GlassButton } from "@/components/ui/glass-button";
-import { LiveClock } from "./LiveClock";
 import { Button } from "@/components/ui/button";
-
-// Get quick action button based on role
-const getQuickAction = (role: string) => {
-  switch (role) {
-    case "EMPLOYEE":
-      return {
-        href: "/leaves/apply",
-        label: "Apply Leave",
-        icon: CalendarPlus,
-      };
-    case "HR_ADMIN":
-    case "HR_HEAD":
-      return {
-        href: "/admin/users",
-        label: "Add User",
-        icon: UserPlus,
-      };
-    case "DEPT_HEAD":
-      return {
-        href: "/approvals",
-        label: "Approve",
-        icon: ClipboardCheck,
-      };
-    case "CEO":
-      return {
-        href: "/reports",
-        label: "Reports",
-        icon: BarChart2,
-      };
-    default:
-      return null;
-  }
-};
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuShortcut,
+} from "@/components/ui/dropdown-menu";
 
 // Get greeting based on time
-function getGreeting(): string {
+function getGreeting(firstName?: string): string {
   const hour = new Date().getHours();
-  if (hour < 12) return "Good Morning";
-  if (hour < 17) return "Good Afternoon";
-  return "Good Evening";
+  let greeting = "";
+  if (hour < 12) greeting = "Good Morning";
+  else if (hour < 17) greeting = "Good Afternoon";
+  else greeting = "Good Evening";
+
+  return firstName ? `${greeting}, ${firstName}` : greeting;
+}
+
+// Lightweight clock hook
+function useClock() {
+  const [time, setTime] = useState("");
+  const [date, setDate] = useState("");
+
+  useEffect(() => {
+    const update = () => {
+      const now = new Date();
+      setTime(
+        now.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      );
+      setDate(
+        now.toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        })
+      );
+    };
+    update();
+    const id = setInterval(update, 60000); // Update every minute
+    return () => clearInterval(id);
+  }, []);
+
+  return { time, date };
 }
 
 export default function TopNavBar() {
@@ -74,18 +80,9 @@ export default function TopNavBar() {
   const [hasAlerts, setHasAlerts] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(true);
-  const [greeting] = useState(getGreeting());
-
-  // Responsive: expanded by default on desktop (≥1024px), collapsed on mobile
-  useEffect(() => {
-    const checkViewport = () => {
-      setIsExpanded(window.innerWidth >= 1024);
-    };
-    checkViewport();
-    window.addEventListener("resize", checkViewport);
-    return () => window.removeEventListener("resize", checkViewport);
-  }, []);
+  const { time, date } = useClock();
+  const firstName = user?.name?.split(" ")[0] || "";
+  const greeting = useMemo(() => getGreeting(firstName), [firstName]);
 
   // Scroll detection
   useEffect(() => {
@@ -100,24 +97,57 @@ export default function TopNavBar() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ctrl+K or Cmd+K: Search
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
         setSearchOpen(true);
       }
-      
+
       // Ctrl+, or Cmd+,: Control Center
-      if ((e.ctrlKey || e.metaKey) && e.key === ',') {
+      if ((e.ctrlKey || e.metaKey) && e.key === ",") {
         e.preventDefault();
         setControlCenterOpen(!controlCenterOpen);
       }
-      
+
       // Ctrl+L or Cmd+L: Apply Leave (for employees)
-      if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
-        const action = getQuickAction(user?.role || "EMPLOYEE");
-        if (action?.href === "/leaves/apply") {
+      if ((e.ctrlKey || e.metaKey) && e.key === "l") {
+        if (user?.role === "EMPLOYEE") {
           e.preventDefault();
-          router.push(action.href);
+          router.push("/leaves/apply");
         }
+      }
+
+      // g + key: Quick navigation (only when not in input/textarea)
+      if (
+        e.key === "g" &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey &&
+        !e.shiftKey
+      ) {
+        const target = e.target as HTMLElement;
+        if (
+          target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable
+        ) {
+          return;
+        }
+
+        const handleNextKey = (nextEvent: KeyboardEvent) => {
+          nextEvent.preventDefault();
+          if (nextEvent.key === "d") {
+            router.push("/dashboard");
+          } else if (nextEvent.key === "r") {
+            router.push("/leaves");
+          } else if (nextEvent.key === "a") {
+            router.push("/approvals");
+          }
+          window.removeEventListener("keydown", handleNextKey);
+        };
+        window.addEventListener("keydown", handleNextKey, { once: true });
+        setTimeout(() => {
+          window.removeEventListener("keydown", handleNextKey);
+        }, 1000);
       }
     };
 
@@ -145,10 +175,66 @@ export default function TopNavBar() {
   }, []);
 
   const breadcrumbs = useMemo(() => generateBreadcrumbs(pathname), [pathname]);
-  const quickAction = useMemo(
-    () => getQuickAction(user?.role || "EMPLOYEE"),
-    [user?.role]
-  );
+
+  // Get "+ New" menu items based on role
+  type MenuItem = {
+    label: string;
+    href: string;
+    icon: typeof CalendarPlus;
+    shortcut?: string;
+  };
+
+  const getNewMenuItems = (): MenuItem[] => {
+    if (!user) return [];
+    switch (user.role) {
+      case "EMPLOYEE":
+        return [
+          {
+            label: "Apply Leave",
+            href: "/leaves/apply",
+            icon: CalendarPlus,
+            shortcut: "⌘L",
+          },
+        ];
+      case "HR_ADMIN":
+      case "HR_HEAD":
+        return [
+          {
+            label: "Add Employee",
+            href: "/admin/users/create",
+            icon: UserPlus,
+          },
+          {
+            label: "Create Adjustment",
+            href: "/admin/adjustments/create",
+            icon: FileText,
+          },
+        ];
+      case "DEPT_HEAD":
+        return [
+          {
+            label: "Apply Leave",
+            href: "/leaves/apply",
+            icon: CalendarPlus,
+          },
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const newMenuItems = getNewMenuItems();
+
+  // Check if mobile (for responsive utilities menu)
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   if (!user) return null;
 
@@ -156,142 +242,219 @@ export default function TopNavBar() {
     <>
       <nav
         className={clsx(
-          "fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-7xl w-[95%] rounded-2xl px-4 sm:px-6 py-3",
-          "backdrop-blur-lg bg-white/60 dark:bg-neutral-900/60 border border-white/20 dark:border-white/10",
-          "shadow-md transition-all duration-300",
-          scrolled && "shadow-lg bg-white/70 dark:bg-neutral-900/70",
-          "flex items-center justify-between gap-4"
+          "fixed top-0 left-0 right-0 z-50 h-14 border-b border-white/10 dark:border-white/10",
+          "backdrop-blur-xl bg-white/30 dark:bg-[rgba(19,24,34,0.6)]",
+          "supports-backdrop-filter:bg-transparent",
+          "shadow-sm transition-shadow duration-300",
+          scrolled && "shadow-md"
         )}
-        role="banner"
+        role="navigation"
+        aria-label="Global navigation"
       >
-        {/* Left Section: Breadcrumbs */}
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <nav
-            className="flex items-center gap-1.5 text-sm text-slate-700 dark:text-slate-300 shrink-0"
-            aria-label="Breadcrumb"
-          >
-            {breadcrumbs.map((crumb, index) => (
-              <div
-                key={`${crumb.href}-${index}`}
-                className="flex items-center gap-1.5"
-              >
-                {index > 0 && (
-                  <ChevronRight className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
-                )}
-                <Link
-                  href={crumb.href}
-                  className={clsx(
-                    "transition-colors truncate hover:text-indigo-600 dark:hover:text-indigo-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 rounded",
-                    index === breadcrumbs.length - 1
-                      ? "font-semibold text-slate-900 dark:text-slate-100"
-                      : "hover:underline"
-                  )}
-                >
-                  {crumb.label}
-                </Link>
-              </div>
-            ))}
-          </nav>
-
-          {/* Quick Action Button */}
-          {quickAction && isExpanded && (
-            <Button
-              asChild
-              size="sm"
-              className="hidden md:flex items-center gap-1.5 h-8 px-4 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all hover:scale-105 active:scale-95"
+        <div className="mx-auto max-w-7xl h-full px-4 grid grid-cols-[auto_1fr_auto] items-center gap-4">
+          {/* Left Section: Breadcrumbs + New */}
+          <div className="flex items-center gap-2 min-w-0">
+            <nav
+              className="flex items-center gap-1.5 text-sm text-slate-700 dark:text-slate-300 shrink-0 min-w-0"
+              aria-label="Breadcrumb"
             >
-              <Link href={quickAction.href}>
-                <quickAction.icon className="h-4 w-4" />
-                {quickAction.label}
-              </Link>
-            </Button>
-          )}
-        </div>
+              {breadcrumbs.map((crumb, index) => (
+                <div
+                  key={`${crumb.href}-${index}`}
+                  className="flex items-center gap-1.5 shrink-0"
+                >
+                  {index > 0 && (
+                    <ChevronRight className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
+                  )}
+                  <Link
+                    href={crumb.href}
+                    className={clsx(
+                      "transition-colors truncate hover:text-indigo-600 dark:hover:text-indigo-400",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 rounded",
+                      index === breadcrumbs.length - 1
+                        ? "font-semibold text-slate-900 dark:text-slate-100"
+                        : "hover:underline"
+                    )}
+                  >
+                    {crumb.label}
+                  </Link>
+                </div>
+              ))}
+              {/* Filter chip for list pages */}
+              {(pathname.startsWith("/leaves") ||
+                pathname.startsWith("/approvals")) && (
+                <>
+                  <ChevronRight className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
+                  <button
+                    onClick={() => {
+                      router.push(pathname.split("?")[0]);
+                    }}
+                    className="px-2 py-0.5 text-xs font-medium rounded-md bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 shrink-0"
+                    aria-label="Remove filter"
+                  >
+                    {pathname.includes("status=pending")
+                      ? "Pending"
+                      : pathname.includes("status=approved")
+                      ? "Approved"
+                      : "All"}
+                    <span className="ml-1 text-indigo-500">×</span>
+                  </button>
+                </>
+              )}
+            </nav>
 
-        {/* Right Section: Tools & Profile */}
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Expand/Collapse Button (visible on <1024px) */}
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="lg:hidden glass-light p-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-white/80 dark:hover:bg-white/5 transition-all"
-            aria-label={
-              isExpanded ? "Collapse navigation" : "Expand navigation"
-            }
-            aria-expanded={isExpanded}
-          >
-            {isExpanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
+            {/* + New Menu */}
+            {newMenuItems.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="sm"
+                    className="h-8 px-3 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all hover:scale-105 active:scale-95 shrink-0"
+                    aria-label="New"
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span className="hidden sm:inline ml-1">New</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56">
+                  <DropdownMenuLabel>New</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {newMenuItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <DropdownMenuItem key={item.href} asChild>
+                        <Link
+                          href={item.href}
+                          className="flex items-center gap-2"
+                        >
+                          <Icon className="h-4 w-4" />
+                          <span>{item.label}</span>
+                          {item.shortcut && (
+                            <DropdownMenuShortcut>
+                              {item.shortcut}
+                            </DropdownMenuShortcut>
+                          )}
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
-          </button>
-
-          {/* Search */}
-          <GlassButton
-            variant="ghost"
-            size="icon"
-            onClick={() => setSearchOpen(true)}
-            aria-label="Search"
-            aria-keyshortcuts="Meta+K Ctrl+K"
-            className="glass-light hover:bg-white/80 dark:hover:bg-white/5 transition-all hover:scale-105"
-            title="Search (⌘K / Ctrl+K)"
-          >
-            <Search className="h-4 w-4" />
-          </GlassButton>
-
-          {/* Theme Toggle */}
-          <div className="glass-light rounded-lg p-1">
-            <ThemeToggle />
           </div>
 
-          {/* Notifications */}
-          <div className="glass-light rounded-lg">
-            <NotificationDropdown />
-          </div>
-
-          {/* Greeting & Clock */}
-          {isExpanded && (
-            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 glass-light rounded-lg text-xs text-slate-700 dark:text-slate-300">
-              <span className="font-medium">{greeting},</span>
-              <span className="text-slate-600 dark:text-slate-400 truncate max-w-[100px]">
-                {user.name.split(' ')[0]}
-              </span>
-            </div>
-          )}
-
-          {/* Live Clock */}
-          <LiveClock />
-
-          {/* User Avatar */}
-          <button
-            onClick={() => setControlCenterOpen(!controlCenterOpen)}
-            aria-label="Profile & Settings"
-            aria-keyshortcuts="Meta+, Ctrl+,"
-            aria-expanded={controlCenterOpen}
-            aria-haspopup="true"
+          {/* Center Section: Greeting, Time, Date */}
+          <div
             className={clsx(
-              "glass-light relative h-9 w-9 rounded-full overflow-hidden border-2 transition-all hover:scale-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2",
-              controlCenterOpen
-                ? "border-indigo-500 dark:border-indigo-400 shadow-lg shadow-indigo-500/50"
-                : "border-white/20 dark:border-white/10 hover:border-indigo-300 dark:hover:border-indigo-700"
+              "hidden md:flex flex-col items-center text-xs text-muted-foreground select-none",
+              "transition-opacity hover:opacity-80 cursor-pointer",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 rounded px-2 py-1"
             )}
+            onClick={() => setControlCenterOpen(!controlCenterOpen)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setControlCenterOpen(!controlCenterOpen);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label="Control Center (Ctrl+,)"
+            title="Control Center (Ctrl+,)"
           >
-            <div className="h-full w-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-inner">
-              {user.name?.[0]?.toUpperCase() ?? "U"}
-            </div>
-            {hasAlerts && (
-              <span
-                className="absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-white dark:border-slate-900 animate-pulse"
-                aria-label="You have new notifications"
-              />
+            <span className="font-medium">{greeting}</span>
+            <span className="text-[10px] opacity-75">
+              {time} | {date}
+            </span>
+          </div>
+
+          {/* Right Section: Utilities */}
+          <div className="flex items-center gap-2 shrink-0">
+            {isMobile ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <GlassButton
+                    variant="ghost"
+                    size="icon"
+                    className="glass-light hover:bg-white/80 dark:hover:bg-white/5 transition-all focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1"
+                    aria-label="More options"
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </GlassButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onSelect={() => setSearchOpen(true)}>
+                    <Search className="h-4 w-4 mr-2" />
+                    Search
+                    <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <div className="px-2 py-1.5 flex items-center justify-between">
+                    <span className="text-sm">Theme</span>
+                    <ThemeToggle />
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                {/* Search */}
+                <GlassButton
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSearchOpen(true)}
+                  aria-label="Search"
+                  aria-keyshortcuts="Meta+K Ctrl+K"
+                  className="glass-light hover:bg-white/80 dark:hover:bg-white/5 transition-all hover:scale-105 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1"
+                  title="Search (⌘K / Ctrl+K)"
+                >
+                  <Search className="h-4 w-4" />
+                </GlassButton>
+
+                {/* Theme Toggle */}
+                <div className="glass-light rounded-lg p-1">
+                  <ThemeToggle />
+                </div>
+
+                {/* Notifications */}
+                <div className="glass-light rounded-lg">
+                  <NotificationDropdown />
+                </div>
+              </>
             )}
-          </button>
+
+            {/* Profile Avatar */}
+            <button
+              onClick={() => setControlCenterOpen(!controlCenterOpen)}
+              aria-label="Profile & Settings"
+              aria-keyshortcuts="Meta+, Ctrl+,"
+              aria-expanded={controlCenterOpen}
+              aria-haspopup="true"
+              className={clsx(
+                "glass-light relative h-9 w-9 rounded-full overflow-hidden border-2 transition-all",
+                "hover:scale-110 active:scale-95",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1",
+                controlCenterOpen
+                  ? "border-indigo-500 dark:border-indigo-400 shadow-lg shadow-indigo-500/50"
+                  : "border-white/20 dark:border-white/10 hover:border-indigo-300 dark:hover:border-indigo-700"
+              )}
+            >
+              <div className="h-full w-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-inner">
+                {user.name?.[0]?.toUpperCase() ?? "U"}
+              </div>
+              {hasAlerts && (
+                <span
+                  className="absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-white dark:border-slate-900 animate-pulse"
+                  aria-label="You have new notifications"
+                />
+              )}
+            </button>
+          </div>
         </div>
       </nav>
 
       {/* Control Center Popover */}
       {controlCenterOpen && (
-        <div className="fixed top-20 right-4 z-50">
+        <div className="fixed top-16 right-4 z-50">
           <ControlCenter onClose={() => setControlCenterOpen(false)} />
         </div>
       )}

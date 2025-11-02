@@ -15,7 +15,13 @@
 
 # next.js
 /.next/
+/.next-dev/
 /out/
+# Next.js build artifacts and cache files
+**/_*.js
+**/_*.js.map
+**/_*.ts
+**/_*.ts.map
 
 # production
 /build
@@ -42,3 +48,8 @@ next-env.d.ts
 
 # custom
 /lib/generated/prisma
+
+# build artifacts and temporary files
+**/chunks/**
+**/*.map
+*.map

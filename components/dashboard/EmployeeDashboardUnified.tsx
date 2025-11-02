@@ -1,14 +1,10 @@
 "use client";
 
 import { Suspense } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LeaveStatusBanner } from "./LeaveStatusBanner";
-import { LeaveTimeline } from "./LeaveTimeline";
-import { ActiveRequestsTimeline } from "./ActiveRequestsTimeline";
-import { QuickActionsCard } from "./QuickActionsCard";
-import { BalanceMetersGroup } from "./BalanceMetersGroup";
-import { NextHoliday } from "./NextHoliday";
+import { LeaveSummaryCard } from "./LeaveSummaryCard";
 import { RequestsTable } from "@/app/dashboard/components/requests-table";
 import { HeroStrip } from "./HeroStrip";
 
@@ -31,47 +27,18 @@ export function EmployeeDashboardUnified({ username }: EmployeeDashboardUnifiedP
 
       {/* Main Content Grid */}
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Left Column (2/3): Active Requests */}
+        {/* Left Column (2/3): Leave Requests */}
         <div className="lg:col-span-2 space-y-6">
-          <Suspense fallback={<ActiveRequestsSkeleton />}>
-            <ActiveRequestsTimeline />
+          {/* My Leave Requests Table (recent 3 only) */}
+          <Suspense fallback={<TableSkeleton />}>
+            <RequestsTable limit={3} showFilter={false} />
           </Suspense>
-
-          {/* Quick Actions */}
-          <Card>
-            <CardContent className="p-6">
-              <QuickActionsCard />
-            </CardContent>
-          </Card>
-
-          {/* Recent Requests Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">Recent Requests</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Suspense fallback={<TableSkeleton />}>
-                <RequestsTable />
-              </Suspense>
-            </CardContent>
-          </Card>
         </div>
 
-        {/* Right Column (1/3): Balances & Next Holiday */}
+        {/* Right Column (1/3): Leave Summary */}
         <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base font-semibold">Leave Balances</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Suspense fallback={<BalanceSkeleton />}>
-                <BalanceMetersGroup />
-              </Suspense>
-            </CardContent>
-          </Card>
-
-          <Suspense fallback={<NextHolidaySkeleton />}>
-            <NextHoliday />
+          <Suspense fallback={<SummarySkeleton />}>
+            <LeaveSummaryCard />
           </Suspense>
         </div>
       </div>
@@ -95,34 +62,17 @@ function BannerSkeleton() {
   );
 }
 
-function ActiveRequestsSkeleton() {
+function SummarySkeleton() {
   return (
     <Card>
-      <CardHeader>
-        <Skeleton className="h-6 w-40" />
-      </CardHeader>
-      <CardContent>
-        <Skeleton className="h-32 w-full" />
-      </CardContent>
-    </Card>
-  );
-}
-
-function BalanceSkeleton() {
-  return (
-    <div className="space-y-4">
-      {[1, 2, 3].map((i) => (
-        <Skeleton key={i} className="h-20 w-full" />
-      ))}
-    </div>
-  );
-}
-
-function NextHolidaySkeleton() {
-  return (
-    <Card className="bg-slate-50 border-slate-200">
-      <CardContent className="p-4">
-        <Skeleton className="h-16 w-full" />
+      <CardContent className="p-6 space-y-4">
+        <Skeleton className="h-6 w-32" />
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-2 w-full" />
+          </div>
+        ))}
       </CardContent>
     </Card>
   );

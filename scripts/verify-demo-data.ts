@@ -140,7 +140,7 @@ async function checkForeignKeys() {
 
 async function checkApprovalChains() {
   const leaves = await prisma.leaveRequest.findMany({
-    include: { approvals: { orderBy: { step: "asc" } } },
+    include: { approvals: { orderBy: { step: "asc" }, include: { approver: true } } },
   });
 
   let invalidChains = 0;
@@ -358,4 +358,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-

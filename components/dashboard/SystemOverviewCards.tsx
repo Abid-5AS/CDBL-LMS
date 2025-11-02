@@ -73,16 +73,16 @@ export async function SystemOverviewCards() {
           <Card key={card.title} className="h-auto min-h-[140px] hover:shadow-md transition-shadow">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-xs font-semibold uppercase tracking-wide text-slate-600">
+                <CardTitle className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-[var(--text-secondary)]">
                   {card.title}
                 </CardTitle>
-                <div className={`${card.bgColor} ${card.color} p-2 rounded-lg`}>
+                <div className={`${card.bgColor} dark:bg-opacity-20 ${card.color} dark:opacity-90 p-2 rounded-lg`}>
                   <Icon className="h-4 w-4" />
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-slate-900 mb-1">{card.value}</p>
+              <p className="text-3xl font-bold text-slate-900 dark:text-[var(--text-primary)] mb-1">{card.value}</p>
               <p className="text-xs text-muted-foreground">{card.description}</p>
             </CardContent>
           </Card>

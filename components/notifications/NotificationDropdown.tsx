@@ -46,7 +46,7 @@ export function NotificationDropdown() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative h-9 w-9 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+          className="relative h-9 w-9 text-slate-600 dark:text-[var(--text-secondary)] hover:text-slate-900 dark:hover:text-[var(--text-primary)] hover:bg-slate-100 dark:hover:bg-[rgba(255,255,255,0.05)] rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           aria-label="Notifications"
         >
           <Bell className="h-5 w-5" />

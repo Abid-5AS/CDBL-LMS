@@ -46,7 +46,20 @@ export async function GET() {
   const items = await prisma.leaveRequest.findMany({
     where: { requesterId: me.id },
     orderBy: { createdAt: "desc" },
-    include: { approvals: true },
+    include: {
+      approvals: {
+        include: {
+          approver: {
+            select: {
+              name: true,
+            },
+          },
+        },
+        orderBy: {
+          step: "asc",
+        },
+      },
+    },
   });
 
   return NextResponse.json({ items });

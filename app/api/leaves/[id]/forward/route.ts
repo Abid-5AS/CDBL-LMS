@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { canForwardTo, getStepForRole, getNextRoleInChain, getStatusAfterAction, type ApprovalAction } from "@/lib/workflow";
-import { canPerformAction, type AppRole } from "@/lib/rbac";
+import { canPerformAction } from "@/lib/workflow";
+import type { AppRole } from "@/lib/rbac";
 import { LeaveStatus } from "@prisma/client";
 
 export const cache = "no-store";
@@ -112,4 +113,3 @@ export async function POST(
     forwardedTo: nextRole,
   });
 }
-

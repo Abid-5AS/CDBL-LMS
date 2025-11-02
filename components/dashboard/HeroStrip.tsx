@@ -2,9 +2,9 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { CalendarPlus, Eye, TrendingUp, Calendar } from "lucide-react";
 import useSWR from "swr";
+import { formatDate } from "@/lib/utils";
+import { getIcon, iconSizes } from "@/lib/icons";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -12,7 +12,12 @@ type HeroStripProps = {
   name: string;
 };
 
+const CalendarIcon = getIcon("CalendarDays");
+const AlertIcon = getIcon("AlertCircle");
+const ApplyIcon = getIcon("CalendarPlus");
+
 export function HeroStrip({ name }: HeroStripProps) {
+
   const { data: leavesData } = useSWR("/api/leaves?mine=1", fetcher, {
     revalidateOnFocus: false,
   });
@@ -50,7 +55,7 @@ export function HeroStrip({ name }: HeroStripProps) {
     let msg = "";
     if (approvedUpcoming) {
       const startDate = new Date(approvedUpcoming.startDate);
-      msg = `Your ${approvedUpcoming.type.toLowerCase()} leave starts on ${startDate.toLocaleDateString()}.`;
+      msg = `Your ${approvedUpcoming.type.toLowerCase()} leave starts on ${formatDate(startDate)}.`;
     } else if (pending.length > 0) {
       msg = `You have ${pending.length} request(s) awaiting approval.`;
     } else {
@@ -62,7 +67,7 @@ export function HeroStrip({ name }: HeroStripProps) {
       pendingCount: pending.length,
       approvedUpcoming: approvedUpcoming ? {
         type: approvedUpcoming.type,
-        dates: `${new Date(approvedUpcoming.startDate).toLocaleDateString()} → ${new Date(approvedUpcoming.endDate).toLocaleDateString()}`,
+        dates: `${formatDate(approvedUpcoming.startDate)} → ${formatDate(approvedUpcoming.endDate)}`,
       } : null,
       nextHoliday: nextHoliday ? {
         name: nextHoliday.name,
@@ -72,43 +77,37 @@ export function HeroStrip({ name }: HeroStripProps) {
   }, [leavesData, holidaysData, name]);
 
   return (
-    <div className="flex items-center justify-between gap-4 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/30 dark:border-white/10 rounded-2xl p-4 shadow-sm">
-      <div className="flex-1 min-w-0">
-        <p className="text-base font-medium text-gray-900 dark:text-gray-100">{message}</p>
-        {nextHoliday && (
-          <p className="flex items-start gap-1.5 text-xs text-gray-600 dark:text-gray-300 mt-1.5">
-            <Calendar className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" strokeWidth={2} />
-            <span className="leading-relaxed">
-              Next holiday: <span className="font-medium text-gray-700 dark:text-gray-200">{nextHoliday.name}</span> on {new Date(nextHoliday.date).toLocaleDateString()}
-            </span>
-          </p>
-        )}
-      </div>
-      <div className="flex items-center gap-2 shrink-0">
-        <Button
-          asChild
-          variant="outline"
-          size="sm"
-          className="rounded-full px-4 py-2 font-medium"
-        >
-          <Link href="/leaves/apply">
-            <CalendarPlus className="h-4 w-4 mr-2" />
-            Apply Leave
-          </Link>
-        </Button>
-        <Button
-          asChild
-          variant="outline"
-          size="sm"
-          className="rounded-full px-4 py-2 font-medium"
-        >
-          <Link href="/leaves">
-            <Eye className="h-4 w-4 mr-2" />
-            Track Status
-          </Link>
-        </Button>
+    <div className="glass-base border border-white/30 dark:border-white/10 rounded-2xl p-4 transition-transform duration-300 will-change-transform">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          {pendingCount > 0 ? (
+            <Link 
+              href="/leaves?status=pending"
+              className="text-base font-medium text-gray-900 dark:text-gray-100 mb-2 flex items-start gap-2 underline-offset-4 hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors"
+            >
+              <AlertIcon className="mt-0.5 size-4 text-amber-500 dark:text-amber-300 flex-shrink-0" strokeWidth={2} />
+              <span className="line-clamp-2">{message}</span>
+            </Link>
+          ) : (
+            <p className="text-base font-medium text-gray-900 dark:text-gray-100 mb-2 flex items-start gap-2">
+              <ApplyIcon className="mt-0.5 size-4 text-emerald-500 dark:text-emerald-300 flex-shrink-0" strokeWidth={2} />
+              <span className="line-clamp-2">{message}</span>
+            </p>
+          )}
+          {nextHoliday && (
+            <p className="flex items-start gap-1.5 text-xs text-gray-600 dark:text-gray-300">
+              <CalendarIcon
+                className="flex-shrink-0 text-sky-600 dark:text-sky-300"
+                size={iconSizes.sm}
+                strokeWidth={2.4}
+              />
+              <span className="leading-relaxed">
+                Next holiday: <span className="font-medium text-gray-700 dark:text-gray-200">{nextHoliday.name}</span> on {formatDate(nextHoliday.date)}
+              </span>
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
 }
-

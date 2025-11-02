@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, Circle, Clock, XCircle } from "lucide-react";
+import { CheckCircle2, Circle, Clock, XCircle, Eye, MessageSquare } from "lucide-react";
 import clsx from "clsx";
+import { formatDate } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 type ApprovalStage = {
   name: string;
@@ -73,6 +76,7 @@ export function LeaveTimeline({ requestId, variant = "compact" }: LeaveTimelineP
             isActive={isActive}
             variant={variant}
             isLast={index === stages.length - 1}
+            requestId={requestId}
           />
         );
       })}
@@ -85,15 +89,18 @@ function StageItem({
   Icon, 
   isActive, 
   variant, 
-  isLast 
+  isLast,
+  requestId
 }: { 
   stage: ApprovalStage;
   Icon: typeof CheckCircle2;
   isActive: boolean;
   variant: "compact" | "detailed";
   isLast: boolean;
+  requestId: number;
 }) {
   const [showTooltip, setShowTooltip] = useState(false);
+  const router = useRouter();
   
   return (
     <div className="flex items-center gap-2 shrink-0">
@@ -112,6 +119,37 @@ function StageItem({
         )}
         <span>{stage.name}</span>
       </div>
+
+      {/* View and Nudge buttons for active stage */}
+      {isActive && variant === "compact" && (
+        <div className="flex items-center gap-1 ml-2">
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 px-2 text-xs"
+            onClick={() => {
+              router.push(`/leaves?request=${requestId}`);
+            }}
+            aria-label="View request"
+          >
+            <Eye className="h-3.5 w-3.5 mr-1" />
+            View
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 px-2 text-xs"
+            onClick={() => {
+              // TODO: Implement nudge functionality
+              console.log("Nudge approver for request", requestId);
+            }}
+            aria-label="Nudge approver"
+          >
+            <MessageSquare className="h-3.5 w-3.5 mr-1" />
+            Nudge
+          </Button>
+        </div>
+      )}
       
       {/* Tooltip for approver info */}
       {showTooltip && stage.approver && variant === "compact" && (
@@ -120,7 +158,7 @@ function StageItem({
           <div className="text-gray-300">{stage.approver}</div>
           {stage.completedAt && (
             <div className="text-gray-400 mt-1">
-              {new Date(stage.completedAt).toLocaleDateString()}
+              {formatDate(stage.completedAt)}
             </div>
           )}
         </div>

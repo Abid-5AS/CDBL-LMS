@@ -4,7 +4,8 @@ import { motion, HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { forwardRef } from "react";
 
-interface GlassCardProps extends HTMLMotionProps<"div"> {
+interface GlassCardProps extends Omit<HTMLMotionProps<"div">, "children"> {
+  children?: React.ReactNode;
   variant?: "light" | "medium" | "strong";
   shine?: boolean;
   interactive?: boolean;
@@ -14,7 +15,7 @@ const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
   ({ variant = "medium", shine, interactive, className, children, ...props }, ref) => {
     // Map variant to backdrop blur and background opacity
     const blurClass = variant === "light" ? "backdrop-blur-md" : variant === "strong" ? "backdrop-blur-2xl" : "backdrop-blur-xl";
-    const bgClass = variant === "light" ? "bg-white/60 dark:bg-slate-900/60" : variant === "strong" ? "bg-white/80 dark:bg-slate-900/80" : "bg-white/70 dark:bg-slate-900/70";
+    const bgClass = variant === "light" ? "bg-white/60 dark:bg-[var(--bg-glass)]" : variant === "strong" ? "bg-white/80 dark:bg-[var(--bg-glass)]" : "bg-white/70 dark:bg-[var(--bg-glass)]";
 
     const baseStyles = cn(
       "rounded-lg transition-all duration-300",
@@ -67,4 +68,3 @@ const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
 GlassCard.displayName = "GlassCard";
 
 export { GlassCard };
-

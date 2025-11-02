@@ -12,6 +12,8 @@ import { HRHeadView } from "@/components/roles/HRHeadView";
 import { ExecutiveView } from "@/components/roles/ExecutiveView";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 type EmployeePageProps = {
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;

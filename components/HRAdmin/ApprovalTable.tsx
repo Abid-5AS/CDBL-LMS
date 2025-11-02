@@ -11,6 +11,9 @@ import { formatDate } from "@/lib/utils";
 import { HRApprovalItem } from "./types";
 import { FilterBar } from "@/components/filters/FilterBar";
 import { leaveTypeLabel } from "@/lib/ui";
+import { useSelectionContext } from "@/lib/selection-context";
+import { Checkbox } from "@/components/ui/checkbox";
+import clsx from "clsx";
 
 type ApprovalsResponse = { items: HRApprovalItem[] };
 
@@ -46,6 +49,13 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const { setSelectionCount } = useSelectionContext();
+
+  // Update selection count when selectedIds changes
+  useEffect(() => {
+    setSelectionCount(selectedIds.size);
+  }, [selectedIds, setSelectionCount]);
 
   const { data, error, isLoading, mutate } = useSWR<ApprovalsResponse>("/api/approvals", fetcher, {
     revalidateOnFocus: true,
@@ -101,6 +111,12 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
       setProcessingId(id + action);
       await submitApprovalDecision(id, action);
       toast.success(`Request ${action === "approve" ? "approved" : "rejected"}`);
+      // Remove from selection if selected
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
       await mutate();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to update request";
@@ -109,6 +125,29 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
       setProcessingId(null);
     }
   }
+
+  const handleSelectRow = (itemId: string, checked: boolean) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (checked) {
+        next.add(itemId);
+      } else {
+        next.delete(itemId);
+      }
+      return next;
+    });
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(new Set(items.map((item) => item.id)));
+    } else {
+      setSelectedIds(new Set());
+    }
+  };
+
+  const allSelected = items.length > 0 && selectedIds.size === items.length;
+  const someSelected = selectedIds.size > 0 && selectedIds.size < items.length;
 
   if (isLoading) {
     return (
@@ -169,6 +208,14 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
             <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-12">
+                <Checkbox
+                  checked={allSelected}
+                  onCheckedChange={(checked) => handleSelectAll(checked === true)}
+                  aria-label="Select all rows"
+                  className={someSelected ? "data-[state=checked]:bg-indigo-600" : ""}
+                />
+              </TableHead>
               <TableHead>Employee</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Dates</TableHead>
@@ -186,9 +233,26 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
               return (
                 <TableRow
                   key={item.id}
-                  className={`cursor-pointer transition ${statusStyle(item.status)}`}
-                  onClick={() => onSelect?.(item)}
+                  className={clsx(
+                    "cursor-pointer transition",
+                    statusStyle(item.status),
+                    selectedIds.has(item.id) && "bg-indigo-50 dark:bg-indigo-900/20"
+                  )}
+                  onClick={(e) => {
+                    // Don't trigger onSelect if clicking on checkbox
+                    if (!(e.target as HTMLElement).closest('input[type="checkbox"]')) {
+                      onSelect?.(item);
+                    }
+                  }}
                 >
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedIds.has(item.id)}
+                      onCheckedChange={(checked) => handleSelectRow(item.id, checked === true)}
+                      onClick={(e) => e.stopPropagation()}
+                      aria-label={`Select row ${item.id}`}
+                    />
+                  </TableCell>
                   <TableCell>
                     <div className="font-medium text-slate-900">{item.requestedByName ?? "Unknown"}</div>
                     <div className="text-xs text-muted-foreground">{item.requestedByEmail ?? "—"}</div>

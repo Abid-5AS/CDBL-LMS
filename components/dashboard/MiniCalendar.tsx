@@ -5,6 +5,7 @@ import { Calendar } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import useSWR from "swr";
 import { Badge } from "@/components/ui/badge";
+import { formatDate } from "@/lib/utils";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -92,7 +93,7 @@ export function MiniCalendar() {
         <div className="mb-4 p-3 rounded-lg bg-blue-50 border border-blue-200">
           <div className="text-xs font-medium text-blue-600 uppercase tracking-wide mb-1">Today</div>
           <div className="text-lg font-bold text-blue-900">
-            {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+            {new Date().toLocaleDateString("en-GB", { weekday: "long" })} {formatDate(new Date())}
           </div>
         </div>
 

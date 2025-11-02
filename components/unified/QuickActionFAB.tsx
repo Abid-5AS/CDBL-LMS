@@ -95,7 +95,7 @@ export function QuickActionFAB() {
                 key={action.href}
                 href={action.href}
                 className={clsx(
-                  "flex items-center gap-3 px-4 py-3 bg-white rounded-full shadow-lg border border-gray-200",
+                  "flex items-center gap-3 px-4 py-3 glass-base rounded-full border border-white/30 dark:border-white/10",
                   "hover:scale-105 transition-all duration-200",
                   "focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2",
                   "opacity-0 animate-in fade-in slide-in-from-bottom-2"
@@ -107,10 +107,10 @@ export function QuickActionFAB() {
                 onClick={() => setIsOpen(false)}
                 aria-label={`${action.label}${action.badge ? ` (${action.badge} pending)` : ""}`}
               >
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100">
-                  <Icon className="h-5 w-5 text-indigo-600" />
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/40">
+                  <Icon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                 </div>
-                <span className="text-sm font-medium text-gray-900 whitespace-nowrap">{action.label}</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-[var(--text-primary)] whitespace-nowrap">{action.label}</span>
                 {action.badge && (
                   <span className="flex items-center justify-center w-6 h-6 rounded-full bg-red-500 text-white text-xs font-semibold">
                     {action.badge}
