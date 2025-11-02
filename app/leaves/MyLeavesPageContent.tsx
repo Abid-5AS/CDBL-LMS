@@ -21,9 +21,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { LeaveDetailsModal } from "@/components/dashboard/LeaveDetailsModal";
 import { toast } from "sonner";
 import useSWR from "swr";
-import { useUIStore } from "@/lib/ui-state";
 
 type LeaveRow = {
   id: number;
@@ -49,7 +49,8 @@ const FILTER_OPTIONS = [
 
 export function MyLeavesPageContent() {
   const [selectedFilter, setSelectedFilter] = useState("all");
-  const { openDrawer } = useUIStore();
+  const [selectedLeave, setSelectedLeave] = useState<LeaveRow | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
   
   const { data, isLoading, error, mutate } = useSWR("/api/leaves?mine=1", fetcher, {
     revalidateOnFocus: false,
@@ -151,7 +152,10 @@ export function MyLeavesPageContent() {
                   <TableRow 
                     key={row.id} 
                     className="hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 cursor-pointer transition-colors"
-                    onClick={() => openDrawer(row.id)}
+                    onClick={() => {
+                      setSelectedLeave(row);
+                      setModalOpen(true);
+                    }}
                   >
                     <TableCell className="font-medium text-slate-900 dark:text-slate-100">{leaveTypeLabel[row.type] ?? row.type}</TableCell>
                     <TableCell className="hidden sm:table-cell text-gray-600 dark:text-slate-300">
@@ -166,7 +170,7 @@ export function MyLeavesPageContent() {
                       {CANCELABLE_STATUSES.has(row.status) ? (
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="outline" size="sm">
+                            <Button variant="outline" size="sm" className="border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:border-slate-500">
                               Cancel
                             </Button>
                           </AlertDialogTrigger>
@@ -197,6 +201,13 @@ export function MyLeavesPageContent() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Leave Details Modal */}
+      <LeaveDetailsModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        leave={selectedLeave}
+      />
     </div>
   );
 }

@@ -2,20 +2,14 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useUser, useUserStatus } from "@/lib/user-context";
+import { useSelectionCount } from "@/lib/selection-context";
+import {
+  getActionsForContext,
+  inferPageContext,
+  type PageContext,
+} from "@/lib/page-context";
 import { motion } from "framer-motion";
 import clsx from "clsx";
-import {
-  LogOut,
-  PlaneTakeoff,
-  ClipboardList,
-  CalendarDays,
-  UserRound,
-  ClipboardCheck,
-  Users,
-  BarChart2,
-  Settings,
-  FileText,
-} from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -23,92 +17,34 @@ import {
   TooltipProvider,
 } from "@/components/ui/tooltip";
 
-type DockItem = {
-  label: string;
-  href: string;
-  icon: typeof PlaneTakeoff;
+type FloatingDockProps = {
+  pageContext?: PageContext;
 };
 
-// Context-aware dock items based on role
-const getDockItems = (role: string): DockItem[] => {
-  switch (role) {
-    case "EMPLOYEE":
-      return [
-        {
-          label: "Apply Leave",
-          href: "/leaves/apply",
-          icon: PlaneTakeoff,
-        },
-        {
-          label: "Leave Requests",
-          href: "/leaves",
-          icon: ClipboardList,
-        },
-      ];
-    case "HR_ADMIN":
-    case "HR_HEAD":
-      return [
-        {
-          label: "Approvals",
-          href: "/approvals",
-          icon: ClipboardCheck,
-        },
-        { label: "Employees", href: "/employees", icon: Users },
-        { label: "Audit Logs", href: "/admin/audit", icon: FileText },
-      ];
-    case "DEPT_HEAD":
-      return [
-        {
-          label: "Team Requests",
-          href: "/approvals",
-          icon: ClipboardCheck,
-        },
-        {
-          label: "Team Calendar",
-          href: "/holidays",
-          icon: CalendarDays,
-        },
-      ];
-    case "CEO":
-      return [
-        {
-          label: "Insights",
-          href: "/dashboard",
-          icon: BarChart2,
-        },
-        { label: "Reports", href: "/reports", icon: FileText },
-      ];
-    default:
-      return [
-        {
-          label: "Apply Leave",
-          href: "/leaves/apply",
-          icon: PlaneTakeoff,
-        },
-        {
-          label: "Leave Requests",
-          href: "/leaves",
-          icon: ClipboardList,
-        },
-      ];
-  }
-};
-
-export default function FloatingDock() {
+export default function FloatingDock({ pageContext }: FloatingDockProps) {
   const user = useUser();
   const pathname = usePathname();
   const router = useRouter();
   const status = useUserStatus();
-
-  const handleLogout = async () => {
-    await fetch("/api/logout", { method: "POST" });
-    window.location.assign("/login");
-  };
+  const selectionCount = useSelectionCount();
 
   if (status !== "ready") return null;
   if (!user) return null;
 
-  const dockItems = getDockItems(user.role);
+  // Infer page context from pathname if not provided
+  const resolvedPageContext = pageContext || inferPageContext(pathname);
+
+  // Get actions for current context, role, and selection state
+  const actions = getActionsForContext(
+    user.role as any,
+    resolvedPageContext,
+    selectionCount
+  );
+
+  // If no actions, don't render (or show minimal dock)
+  if (actions.length === 0) {
+    return null;
+  }
 
   return (
     <motion.div
@@ -116,30 +52,34 @@ export default function FloatingDock() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 200, damping: 20 }}
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-2xl px-4 sm:px-5 py-2.5 sm:py-3 glass-base shadow-xl hover:shadow-2xl transition-all duration-300"
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-2xl px-2 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3 glass-base transition-all duration-300"
       role="navigation"
-      aria-label="Quick actions"
-      style={{
-        backdropFilter: "blur(32px) saturate(180%)",
-        WebkitBackdropFilter: "blur(32px) saturate(180%)",
-        boxShadow: "0 12px 40px rgba(0, 0, 0, 0.4)",
-      }}
+      aria-label="Page actions"
     >
       <TooltipProvider>
-        {dockItems.map((item) => {
-          const isActive =
-            pathname === item.href || pathname.startsWith(item.href + "/");
-          const Icon = item.icon;
+        {actions.map((action) => {
+          const Icon = action.icon;
+          const isActive = action.href
+            ? pathname === action.href || pathname.startsWith(action.href + "/")
+            : false;
+
+          const handleClick = () => {
+            if (action.onClick) {
+              action.onClick();
+            } else if (action.href) {
+              router.push(action.href);
+            }
+          };
 
           return (
-            <Tooltip key={item.href}>
+            <Tooltip key={action.label}>
               <TooltipTrigger asChild>
                 <button
-                  onClick={() => router.push(item.href)}
-                  aria-label={item.label}
+                  onClick={handleClick}
+                  aria-label={action.label}
                   aria-current={isActive ? "page" : undefined}
                   className={clsx(
-                    "p-2.5 rounded-full transition-all duration-200 relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2",
+                    "flex items-center gap-2 p-2.5 rounded-full transition-all duration-200 relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2",
                     "hover:scale-[1.05] active:scale-[0.95]",
                     isActive
                       ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/40 shadow-lg ring-2 ring-indigo-500/20 dark:ring-indigo-400/30"
@@ -154,57 +94,34 @@ export default function FloatingDock() {
                   }
                 >
                   <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                  <span className="hidden md:inline text-xs font-medium whitespace-nowrap">
+                    {action.label}
+                  </span>
+                  {action.badge !== undefined && action.badge > 0 && (
+                    <span
+                      className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 dark:bg-indigo-500 text-white text-[10px] font-bold shadow-lg"
+                      aria-label={`${action.badge} items selected`}
+                    >
+                      {action.badge > 99 ? "99+" : action.badge}
+                    </span>
+                  )}
                 </button>
               </TooltipTrigger>
               <TooltipContent
                 side="top"
                 sideOffset={8}
-                className="glass-medium backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 shadow-lg"
-                style={{
-                  backgroundColor: "rgba(15, 15, 20, 0.9)",
-                  color: "oklch(95% 0.03 250)",
-                  padding: "6px 12px",
-                  borderRadius: "8px",
-                  boxShadow:
-                    "0 0 12px rgba(255, 255, 255, 0.05), 0 8px 16px rgba(0, 0, 0, 0.3)",
-                }}
               >
-                <p className="text-xs font-semibold">{item.label}</p>
+                <p className="text-xs font-semibold">{action.label}</p>
+                {selectionCount > 0 && (
+                  <p className="text-[10px] text-slate-400 dark:text-slate-300 mt-0.5">
+                    {selectionCount} row{selectionCount !== 1 ? "s" : ""}{" "}
+                    selected
+                  </p>
+                )}
               </TooltipContent>
             </Tooltip>
           );
         })}
-      </TooltipProvider>
-
-      <div className="h-8 w-px bg-gray-300/50 dark:bg-gray-600/50 mx-1" />
-
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              onClick={handleLogout}
-              aria-label="Logout"
-              className="p-2.5 rounded-full text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50/30 dark:hover:bg-red-500/20 transition-all duration-200 relative group hover:scale-[1.05] active:scale-[0.95] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
-            >
-              <LogOut size={20} strokeWidth={2} />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent
-            side="top"
-            sideOffset={8}
-            className="glass-medium backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 shadow-lg"
-            style={{
-              backgroundColor: "rgba(15, 15, 20, 0.9)",
-              color: "oklch(95% 0.03 250)",
-              padding: "6px 12px",
-              borderRadius: "8px",
-              boxShadow:
-                "0 0 12px rgba(255, 255, 255, 0.05), 0 8px 16px rgba(0, 0, 0, 0.3)",
-            }}
-          >
-            <p className="text-xs font-semibold">Logout</p>
-          </TooltipContent>
-        </Tooltip>
       </TooltipProvider>
     </motion.div>
   );

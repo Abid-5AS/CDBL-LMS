@@ -19,9 +19,9 @@ export default async function PendingApprovalsCard() {
   const count = await getCount();
 
   return (
-    <Card className="px-6 py-4 bg-white">
+    <Card className="px-6 py-4">
       <div className="text-sm text-muted-foreground">Pending Approvals</div>
-      <div className="mt-2 text-3xl font-semibold text-slate-900">{count}</div>
+      <div className="mt-2 text-3xl font-semibold text-foreground">{count}</div>
       <div className="mt-1 text-xs text-muted-foreground">Items requiring your review</div>
     </Card>
   );

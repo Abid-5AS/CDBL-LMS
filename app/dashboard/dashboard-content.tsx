@@ -19,10 +19,10 @@ export default async function DashboardContent() {
 
   return (
     <div className="space-y-8">
-      <section className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-6 shadow-sm md:flex-row md:items-center md:justify-between">
+      <section className="flex flex-col gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-card p-6 shadow-sm md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-sm text-muted-foreground">Welcome back, {username}</p>
-          <h2 className="text-2xl font-semibold text-slate-900">Your leave snapshot</h2>
+          <h2 className="text-2xl font-semibold text-foreground">Your leave snapshot</h2>
           <DashboardToday />
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -51,9 +51,9 @@ export default async function DashboardContent() {
         {approver ? (
           <PendingApprovalsCard />
         ) : (
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-600">Upcoming Holiday</h3>
-            <p className="mt-2 text-lg font-semibold text-slate-900">Victory Day</p>
+          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-card p-6 shadow-sm">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Upcoming Holiday</h3>
+            <p className="mt-2 text-lg font-semibold text-foreground">Victory Day</p>
             <p className="text-sm text-muted-foreground">16 December • Click to view all holidays</p>
             <Button asChild variant="link" className="px-0 text-blue-600">
               <Link href="/holidays">
@@ -68,25 +68,25 @@ export default async function DashboardContent() {
       <section className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-slate-900">Recent Requests</h3>
+            <h3 className="text-lg font-semibold text-foreground">Recent Requests</h3>
             <Button asChild variant="ghost" className="text-blue-600">
               <Link href="/leaves">View all</Link>
             </Button>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-card p-4 shadow-sm">
             <RequestsTable />
           </div>
         </div>
         <div className="space-y-4">
           {approver && user ? (
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-card p-4 shadow-sm">
               <PendingApprovals role={approverStage} />
             </div>
           ) : null}
-          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-card p-4 shadow-sm">
             <ActivityPanel />
           </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-card p-4 shadow-sm">
             <PolicyReminders />
           </div>
         </div>
