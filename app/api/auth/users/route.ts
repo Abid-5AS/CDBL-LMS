@@ -21,12 +21,20 @@ export async function GET() {
   // Get visible roles for this user
   const visibleRoles = getVisibleRoles(userRole);
 
-  const users = await prisma.user.findMany({
-    where: {
-      role: {
-        in: visibleRoles,
-      },
+  // Build where clause with role and department filtering
+  const where: any = {
+    role: {
+      in: visibleRoles,
     },
+  };
+
+  // DEPT_HEAD can only see employees in their own department
+  if (userRole === "DEPT_HEAD" && user.department) {
+    where.department = user.department;
+  }
+
+  const users = await prisma.user.findMany({
+    where,
     orderBy: { name: "asc" },
     select: {
       id: true,

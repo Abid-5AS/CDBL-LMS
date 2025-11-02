@@ -1,12 +1,14 @@
 export const policy = {
   version: "v1.1",
-  accrual: { EL_PER_YEAR: 20, CL_PER_YEAR: 10, ML_PER_YEAR: 14 },
+  accrual: { EL_PER_YEAR: 20, CL_PER_YEAR: 10, ML_PER_YEAR: 14 }, // CL: 10 days/year per policy
   carryForward: { EL: true, EARNED: true },
   carryForwardCap: { EL: 60, EARNED: 60 }, // cap total carry at 60
   allowBackdate: { EL: true, CL: false, ML: true, EARNED: true, CASUAL: false, MEDICAL: true },
   maxBackdateDays: { EL: 30, ML: 30, EARNED: 30, MEDICAL: 30 },
-  clMinNoticeDays: 5, // warning only
-  clMaxConsecutiveDays: 3,
+  clMinNoticeDays: 5, // warning only for CL (soft rule)
+  elMinNoticeDays: 15, // hard requirement for EARNED leave
+  clMaxConsecutiveDays: 3, // Policy: max 3 days per spell
+  elAccrualPerMonth: 2, // EL accrues 2 days/month
 };
 
 export type LeaveKind = "EARNED" | "CASUAL" | "MEDICAL";
@@ -35,15 +37,31 @@ export function withinBackdateLimit(type: LeaveKind | string, applyDate: Date, s
   return diffDays <= max;
 }
 
-export type PolicyWarnings = { clShortNotice?: boolean; mlNeedsCertificate?: boolean };
+export type PolicyWarnings = { 
+  clShortNotice?: boolean; 
+  mlNeedsCertificate?: boolean;
+  elInsufficientNotice?: boolean;
+};
 
 export function clNoticeWarning(applyDate: Date, start: Date) {
   const diff = Math.floor((start.setHours(0, 0, 0, 0) - applyDate.setHours(0, 0, 0, 0)) / 86400000);
   return diff < policy.clMinNoticeDays;
 }
 
+export function elNoticeWarning(applyDate: Date, start: Date) {
+  const diff = Math.floor((start.setHours(0, 0, 0, 0) - applyDate.setHours(0, 0, 0, 0)) / 86400000);
+  return diff < policy.elMinNoticeDays;
+}
+
 export function makeWarnings(type: LeaveKind | string, applyDate: Date, start: Date): PolicyWarnings {
-  return String(type) === "CASUAL" && clNoticeWarning(applyDate, start) ? { clShortNotice: true } : {};
+  const warnings: PolicyWarnings = {};
+  if (String(type) === "CASUAL" && clNoticeWarning(applyDate, start)) {
+    warnings.clShortNotice = true;
+  }
+  if ((String(type) === "EARNED" || String(type) === "EL") && elNoticeWarning(applyDate, start)) {
+    warnings.elInsufficientNotice = true;
+  }
+  return warnings;
 }
 
 export const labels: Record<string, string> = {

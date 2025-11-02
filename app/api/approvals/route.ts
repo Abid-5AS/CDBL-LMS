@@ -26,6 +26,9 @@ type SerializedLeave = {
   type: string;
   start: string | null;
   end: string | null;
+  startDate?: string;
+  endDate?: string;
+  workingDays?: number;
   requestedDays: number;
   reason: string;
   status: string;
@@ -34,6 +37,11 @@ type SerializedLeave = {
   requestedById: string | null;
   requestedByName: string | null;
   requestedByEmail: string | null;
+  requester?: {
+    id: number;
+    name: string;
+    email: string;
+  };
   updatedAt: string | null;
   createdAt: string | null;
 };
@@ -79,6 +87,9 @@ function serializeLeave(leave: LeaveWithApprovals): SerializedLeave {
     type: leave.type,
     start: leave.startDate ? leave.startDate.toISOString() : null,
     end: leave.endDate ? leave.endDate.toISOString() : null,
+    startDate: leave.startDate ? leave.startDate.toISOString() : undefined,
+    endDate: leave.endDate ? leave.endDate.toISOString() : undefined,
+    workingDays: leave.workingDays,
     requestedDays: leave.workingDays,
     reason: leave.reason,
     status: leave.status,
@@ -87,6 +98,13 @@ function serializeLeave(leave: LeaveWithApprovals): SerializedLeave {
     requestedById: leave.requesterId ? String(leave.requesterId) : null,
     requestedByName: leave.requester?.name ?? null,
     requestedByEmail: leave.requester?.email ?? null,
+    requester: leave.requesterId && leave.requester
+      ? {
+          id: leave.requesterId,
+          name: leave.requester.name,
+          email: leave.requester.email,
+        }
+      : undefined,
     updatedAt: leave.updatedAt ? leave.updatedAt.toISOString() : null,
     createdAt: leave.createdAt ? leave.createdAt.toISOString() : null,
   };
@@ -103,7 +121,7 @@ export async function GET() {
       },
     },
     include: {
-      requester: { select: { name: true, email: true } },
+      requester: { select: { id: true, name: true, email: true } },
       approvals: {
         include: {
           approver: { select: { name: true } },

@@ -5,9 +5,9 @@
  * This is preserved only for reference - do not use in new code
  */
 
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 import { Sidebar } from "@/components/legacy/sidebar-deprecated";
-import { Breadcrumb } from "@/components/ui/breadcrumb";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { getCurrentUser } from "@/lib/auth";
 import { User, Bell } from "lucide-react";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
@@ -31,7 +31,22 @@ async function TopbarContent({
       <div className="mx-auto flex h-full w-full max-w-[1400px] items-center justify-between px-4 py-3">
         <div className="flex flex-col gap-1 min-w-0 flex-1">
           {breadcrumbs && breadcrumbs.length > 0 && (
-            <Breadcrumb items={breadcrumbs} />
+            <Breadcrumb>
+              <BreadcrumbList>
+                {breadcrumbs.map((item, index) => (
+                  <React.Fragment key={index}>
+                    <BreadcrumbItem>
+                      {item.href ? (
+                        <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
+                      ) : (
+                        <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                      )}
+                    </BreadcrumbItem>
+                    {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
+                  </React.Fragment>
+                ))}
+              </BreadcrumbList>
+            </Breadcrumb>
           )}
           <h1 className="text-lg font-semibold text-slate-900 truncate">{title}</h1>
         </div>

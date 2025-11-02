@@ -38,6 +38,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     if (result.error === "already_resolved") {
       return NextResponse.json({ error: "Leave already resolved" }, { status: 400 });
     }
+    if (result.error === "self_approval_disallowed") {
+      return NextResponse.json({ error: "Cannot approve your own leave request" }, { status: 403 });
+    }
     return NextResponse.json({ error: "unexpected_error" }, { status: 500 });
   }
 

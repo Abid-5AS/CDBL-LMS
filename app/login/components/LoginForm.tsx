@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getHomePageForRole } from "@/lib/navigation";
 
 export function LoginForm() {
   const router = useRouter();
@@ -35,18 +36,16 @@ export function LoginForm() {
 
       toast.success("Login successful!");
       
-      // Role-based redirect
+      // Role-based redirect using hard navigation for server re-hydration
       const role = data?.user?.role;
-      const redirectMap: Record<string, string> = {
-        EMPLOYEE: "/dashboard",
-        DEPT_HEAD: "/manager/dashboard",
-        HR_ADMIN: "/admin",
-        HR_HEAD: "/hr-head/dashboard",
-        CEO: "/ceo/dashboard",
-      };
-      
-      const destination = redirectMap[role] || "/dashboard";
-      router.replace(destination);
+      if (typeof window !== "undefined") {
+        const destination = getHomePageForRole(role as any) || "/dashboard";
+        window.location.assign(destination);
+      } else {
+        // Fallback for SSR (shouldn't happen, but safe guard)
+        const destination = "/dashboard";
+        router.replace(destination);
+      }
     } catch (err) {
       toast.error("Network error. Please try again.");
       setLoading(false);

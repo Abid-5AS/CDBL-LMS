@@ -51,13 +51,28 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
 
   const body = await request.json();
-  const { name, email, department, role, empCode } = body;
+  const { name, email, department, role, empCode, changedFields } = body;
 
   // If role is being changed, check if user can assign that role
   if (role && role !== targetEmployee.role) {
     if (!canAssignRole(user.role as AppRole, role as AppRole)) {
       return NextResponse.json({ error: "Cannot assign this role" }, { status: 403 });
     }
+  }
+
+  // Track original values for audit
+  const originalValues = {
+    name: targetEmployee.role, // We need to fetch full user for proper tracking
+  };
+
+  // Get original employee data for audit
+  const originalEmployee = await prisma.user.findUnique({
+    where: { id: employeeId },
+    select: { name: true, email: true, department: true, role: true, empCode: true },
+  });
+
+  if (!originalEmployee) {
+    return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
   // Update the employee
@@ -72,16 +87,23 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     },
   });
 
-  // Log audit trail
+  // Calculate changed fields for audit
+  const changedFieldsDetails: Record<string, { from: any; to: any }> = {};
+  if (name && name !== originalEmployee.name) changedFieldsDetails.name = { from: originalEmployee.name, to: name };
+  if (email && email !== originalEmployee.email) changedFieldsDetails.email = { from: originalEmployee.email, to: email };
+  if (department !== undefined && department !== originalEmployee.department) changedFieldsDetails.department = { from: originalEmployee.department, to: department };
+  if (role && role !== originalEmployee.role) changedFieldsDetails.role = { from: originalEmployee.role, to: role };
+  if (empCode !== undefined && empCode !== originalEmployee.empCode) changedFieldsDetails.empCode = { from: originalEmployee.empCode, to: empCode };
+
+  // Log audit trail with EMPLOYEE_EDIT action and changedFields
   await prisma.auditLog.create({
     data: {
       actorEmail: user.email,
-      action: "UPDATE_EMPLOYEE",
+      action: "EMPLOYEE_EDIT",
       targetEmail: updated.email,
       details: {
-        changes: body,
-        previousRole: targetEmployee.role,
-        newRole: role || targetEmployee.role,
+        changedFields: changedFieldsDetails,
+        employeeId: employeeId,
       },
     },
   });

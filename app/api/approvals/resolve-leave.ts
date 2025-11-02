@@ -13,6 +13,11 @@ export async function resolveLeave(leaveId: number, decision: Decision, approver
     return { ok: false, error: "not_found" } as const;
   }
 
+  // Prevent self-approval
+  if (target.requesterId === approverId) {
+    return { ok: false, error: "self_approval_disallowed" } as const;
+  }
+
   if (target.status !== LeaveStatus.SUBMITTED && target.status !== LeaveStatus.PENDING) {
     return { ok: false, error: "already_resolved", status: target.status } as const;
   }

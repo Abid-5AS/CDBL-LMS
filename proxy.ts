@@ -52,6 +52,14 @@ export async function proxy(req: NextRequest) {
     if (pathname.startsWith("/manager") && !["DEPT_HEAD", "CEO"].includes(role))
       return NextResponse.redirect(new URL(rolePathMap[role]?.[0] || "/dashboard", req.url));
 
+    // Employees page: HR_ADMIN, HR_HEAD, CEO, DEPT_HEAD only
+    if (pathname.startsWith("/employees") && !["HR_ADMIN", "HR_HEAD", "CEO", "DEPT_HEAD"].includes(role))
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+
+    // Approvals page: DEPT_HEAD, HR_ADMIN, HR_HEAD, CEO only
+    if (pathname.startsWith("/approvals") && !["DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"].includes(role))
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+
     // ✅ Security + caching headers
     const res = NextResponse.next();
     res.headers.set("X-Frame-Options", "DENY");

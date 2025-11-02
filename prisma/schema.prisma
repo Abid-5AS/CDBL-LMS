@@ -72,17 +72,27 @@ model LeaveRequest {
   approvals       Approval[]
 }
 
+enum ApprovalDecision {
+  APPROVED
+  REJECTED
+  FORWARDED
+  PENDING
+}
+
 model Approval {
-  id          Int          @id @default(autoincrement())
+  id          Int              @id @default(autoincrement())
   leaveId     Int
-  step        Int          // 1=Manager, 2=DeptHead/HR, 3=CEO (if needed)
+  step        Int              // Step in approval chain: 1=HR_ADMIN, 2=DEPT_HEAD, 3=HR_HEAD, 4=CEO
   approverId  Int
-  decision    String       // "APPROVED" | "REJECTED" | "PENDING"
+  decision    ApprovalDecision @default(PENDING)
+  toRole      String?          // Role forwarded to (if decision is FORWARDED)
   comment     String?
   decidedAt   DateTime?
 
-  leave       LeaveRequest @relation(fields: [leaveId], references: [id])
-  approver    User         @relation("ApprovalApprover", fields: [approverId], references: [id])
+  leave       LeaveRequest     @relation(fields: [leaveId], references: [id])
+  approver    User             @relation("ApprovalApprover", fields: [approverId], references: [id])
+
+  @@index([leaveId])
 }
 
 model Balance {
@@ -127,4 +137,13 @@ model AuditLog {
   createdAt   DateTime @default(now())
 
   @@index([createdAt])
+}
+
+model OrgSettings {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique
+  value       Json
+  description String?
+  updatedAt   DateTime @updatedAt
+  updatedBy   Int?     // User ID
 }

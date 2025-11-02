@@ -101,3 +101,11 @@ export function canAssignRole(viewerRole: AppRole, targetRole: AppRole): boolean
   // Others cannot assign roles
   return false;
 }
+
+/**
+ * Check if a role can create new employees
+ * @param role - The role of the person trying to create
+ */
+export function canCreateEmployee(role: AppRole): boolean {
+  return role === "HR_ADMIN" || role === "HR_HEAD" || role === "CEO";
+}

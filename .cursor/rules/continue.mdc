@@ -1,0 +1,5 @@
+---
+alwaysApply: true
+---
+
+continue working until i tell you to stop explicitly, and if something goes wrong, we can always roll back to previous commits if needed
