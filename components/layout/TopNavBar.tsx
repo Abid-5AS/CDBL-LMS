@@ -8,48 +8,22 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { SearchModal } from "./SearchModal";
 import { generateBreadcrumbs } from "@/lib/breadcrumbs";
-import { Search, ChevronRight, ChevronDown, ChevronUp, Plus, UserPlus, CalendarPlus } from "lucide-react";
+import {
+  Search,
+  ChevronRight,
+  ChevronDown,
+  ChevronUp,
+  Plus,
+  UserPlus,
+  CalendarPlus,
+  ClipboardCheck,
+  BarChart2,
+} from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
 import { GlassButton } from "@/components/ui/glass-button";
 import { LiveClock } from "./LiveClock";
 import { Button } from "@/components/ui/button";
-
-// Navigation links based on role
-const getNavLinks = (role: string) => {
-  switch (role) {
-    case "EMPLOYEE":
-      return [
-        { href: "/leaves", label: "My Leaves" },
-        { href: "/policies", label: "Policies" },
-        { href: "/holidays", label: "Holidays" },
-      ];
-    case "HR_ADMIN":
-    case "HR_HEAD":
-      return [
-        { href: "/approvals", label: "Approvals" },
-        { href: "/employees", label: "Employees" },
-        { href: "/admin/audit", label: "Audit" },
-      ];
-    case "DEPT_HEAD":
-      return [
-        { href: "/approvals", label: "Team Requests" },
-        { href: "/policies", label: "Policies" },
-      ];
-    case "CEO":
-      return [
-        { href: "/approvals", label: "Approvals" },
-        { href: "/employees", label: "Employees" },
-        { href: "/reports", label: "Reports" },
-      ];
-    default:
-      return [
-        { href: "/leaves", label: "My Leaves" },
-        { href: "/policies", label: "Policies" },
-        { href: "/holidays", label: "Holidays" },
-      ];
-  }
-};
 
 // Get quick action button based on role
 const getQuickAction = (role: string) => {
@@ -66,6 +40,18 @@ const getQuickAction = (role: string) => {
         href: "/admin/users",
         label: "Add User",
         icon: UserPlus,
+      };
+    case "DEPT_HEAD":
+      return {
+        href: "/approvals",
+        label: "Approve",
+        icon: ClipboardCheck,
+      };
+    case "CEO":
+      return {
+        href: "/reports",
+        label: "Reports",
+        icon: BarChart2,
       };
     default:
       return null;
@@ -110,6 +96,35 @@ export default function TopNavBar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+K or Cmd+K: Search
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+      
+      // Ctrl+, or Cmd+,: Control Center
+      if ((e.ctrlKey || e.metaKey) && e.key === ',') {
+        e.preventDefault();
+        setControlCenterOpen(!controlCenterOpen);
+      }
+      
+      // Ctrl+L or Cmd+L: Apply Leave (for employees)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
+        const action = getQuickAction(user?.role || "EMPLOYEE");
+        if (action?.href === "/leaves/apply") {
+          e.preventDefault();
+          router.push(action.href);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [controlCenterOpen, router, user?.role]);
+
   // Live notification indicator
   useEffect(() => {
     const checkNotifications = async () => {
@@ -130,10 +145,6 @@ export default function TopNavBar() {
   }, []);
 
   const breadcrumbs = useMemo(() => generateBreadcrumbs(pathname), [pathname]);
-  const navLinks = useMemo(
-    () => getNavLinks(user?.role || "EMPLOYEE"),
-    [user?.role]
-  );
   const quickAction = useMemo(
     () => getQuickAction(user?.role || "EMPLOYEE"),
     [user?.role]
@@ -146,9 +157,9 @@ export default function TopNavBar() {
       <nav
         className={clsx(
           "fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-7xl w-[95%] rounded-2xl px-4 sm:px-6 py-3",
-          "backdrop-blur-xl bg-white/70 dark:bg-neutral-900/60 border border-white/20 dark:border-white/10",
-          "shadow-lg transition-all duration-300",
-          scrolled && "shadow-xl bg-white/80 dark:bg-neutral-900/70",
+          "backdrop-blur-lg bg-white/60 dark:bg-neutral-900/60 border border-white/20 dark:border-white/10",
+          "shadow-md transition-all duration-300",
+          scrolled && "shadow-lg bg-white/70 dark:bg-neutral-900/70",
           "flex items-center justify-between gap-4"
         )}
         role="banner"
@@ -156,18 +167,21 @@ export default function TopNavBar() {
         {/* Left Section: Breadcrumbs */}
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <nav
-            className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400 shrink-0"
+            className="flex items-center gap-1.5 text-sm text-slate-700 dark:text-slate-300 shrink-0"
             aria-label="Breadcrumb"
           >
             {breadcrumbs.map((crumb, index) => (
-              <div key={`${crumb.href}-${index}`} className="flex items-center gap-1.5">
+              <div
+                key={`${crumb.href}-${index}`}
+                className="flex items-center gap-1.5"
+              >
                 {index > 0 && (
-                  <ChevronRight className="h-3 w-3 text-slate-400 dark:text-slate-500" />
+                  <ChevronRight className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
                 )}
                 <Link
                   href={crumb.href}
                   className={clsx(
-                    "transition-colors truncate hover:text-slate-900 dark:hover:text-slate-100",
+                    "transition-colors truncate hover:text-indigo-600 dark:hover:text-indigo-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 rounded",
                     index === breadcrumbs.length - 1
                       ? "font-semibold text-slate-900 dark:text-slate-100"
                       : "hover:underline"
@@ -184,45 +198,15 @@ export default function TopNavBar() {
             <Button
               asChild
               size="sm"
-              className="hidden md:flex items-center gap-1.5 h-7 px-3 text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm transition-all hover:scale-105 active:scale-95"
+              className="hidden md:flex items-center gap-1.5 h-8 px-4 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all hover:scale-105 active:scale-95"
             >
               <Link href={quickAction.href}>
-                <quickAction.icon className="h-3.5 w-3.5" />
+                <quickAction.icon className="h-4 w-4" />
                 {quickAction.label}
               </Link>
             </Button>
           )}
         </div>
-
-        {/* Center Section: Navigation Links */}
-        {isExpanded && (
-          <nav
-            className="hidden lg:flex items-center gap-1.5 flex-wrap"
-            aria-label="Main navigation"
-          >
-            {navLinks.map((link) => {
-              const isActive =
-                pathname === link.href ||
-                (link.href !== "/dashboard" && pathname.startsWith(link.href));
-              return (
-                <Link key={link.href} href={link.href}>
-                  <GlassButton
-                    variant={isActive ? "active" : "default"}
-                    size="sm"
-                    className={clsx(
-                      "transition-all duration-150 hover:scale-105 active:scale-95",
-                      isActive &&
-                        "bg-indigo-100 dark:bg-indigo-900/40 border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 shadow-sm"
-                    )}
-                    aria-current={isActive ? "page" : undefined}
-                  >
-                    {link.label}
-                  </GlassButton>
-                </Link>
-              );
-            })}
-          </nav>
-        )}
 
         {/* Right Section: Tools & Profile */}
         <div className="flex items-center gap-2 shrink-0">
@@ -230,7 +214,9 @@ export default function TopNavBar() {
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="lg:hidden glass-light p-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-white/80 dark:hover:bg-white/5 transition-all"
-            aria-label={isExpanded ? "Collapse navigation" : "Expand navigation"}
+            aria-label={
+              isExpanded ? "Collapse navigation" : "Expand navigation"
+            }
             aria-expanded={isExpanded}
           >
             {isExpanded ? (
@@ -246,8 +232,9 @@ export default function TopNavBar() {
             size="icon"
             onClick={() => setSearchOpen(true)}
             aria-label="Search"
+            aria-keyshortcuts="Meta+K Ctrl+K"
             className="glass-light hover:bg-white/80 dark:hover:bg-white/5 transition-all hover:scale-105"
-            title="Search (Ctrl+K)"
+            title="Search (⌘K / Ctrl+K)"
           >
             <Search className="h-4 w-4" />
           </GlassButton>
@@ -264,10 +251,10 @@ export default function TopNavBar() {
 
           {/* Greeting & Clock */}
           {isExpanded && (
-            <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 glass-light rounded-lg text-xs text-slate-700 dark:text-slate-300">
+            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 glass-light rounded-lg text-xs text-slate-700 dark:text-slate-300">
               <span className="font-medium">{greeting},</span>
-              <span className="text-slate-600 dark:text-slate-400 truncate max-w-[120px]">
-                {user.name}
+              <span className="text-slate-600 dark:text-slate-400 truncate max-w-[100px]">
+                {user.name.split(' ')[0]}
               </span>
             </div>
           )}
@@ -278,11 +265,12 @@ export default function TopNavBar() {
           {/* User Avatar */}
           <button
             onClick={() => setControlCenterOpen(!controlCenterOpen)}
-            aria-label="Open Control Center"
+            aria-label="Profile & Settings"
+            aria-keyshortcuts="Meta+, Ctrl+,"
             aria-expanded={controlCenterOpen}
             aria-haspopup="true"
             className={clsx(
-              "glass-light relative h-9 w-9 rounded-full overflow-hidden border-2 transition-all hover:scale-110 active:scale-95",
+              "glass-light relative h-9 w-9 rounded-full overflow-hidden border-2 transition-all hover:scale-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2",
               controlCenterOpen
                 ? "border-indigo-500 dark:border-indigo-400 shadow-lg shadow-indigo-500/50"
                 : "border-white/20 dark:border-white/10 hover:border-indigo-300 dark:hover:border-indigo-700"
