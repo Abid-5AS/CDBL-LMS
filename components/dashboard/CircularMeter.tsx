@@ -69,19 +69,19 @@ export function CircularMeter({ label, used, total, color }: CircularMeterProps)
         {/* Center text */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
-            <div className="text-lg font-bold text-gray-900 transition-all duration-500">{remaining}</div>
-            <div className="text-xs text-gray-500">{used}/{total}</div>
+            <div className="text-lg font-bold text-foreground transition-all duration-500">{remaining}</div>
+            <div className="text-xs text-muted-foreground">{used}/{total}</div>
           </div>
         </div>
       </div>
 
       {/* Labels */}
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-medium text-gray-900 mb-1">{label}</div>
-        <div className="text-xs text-gray-600">
+        <div className="text-sm font-medium text-foreground mb-1">{label}</div>
+        <div className="text-xs text-muted-foreground">
           {used} / {total} days used
         </div>
-        <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+        <div className="mt-2 w-full bg-muted rounded-full h-1.5 overflow-hidden">
           <div
             className={clsx("h-full transition-all duration-500 ease-out", color)}
             style={{ width: `${percentage}%` }}

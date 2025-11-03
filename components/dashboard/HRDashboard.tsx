@@ -18,7 +18,7 @@ export function HRDashboard({ username }: HRDashboardProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <section className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm md:flex-row md:items-center md:justify-between" aria-label="HR Admin Dashboard Header">
+      <section className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:p-6 shadow-sm md:flex-row md:items-center md:justify-between" aria-label="HR Admin Dashboard Header">
         <div>
           <h2 className="text-2xl font-semibold text-slate-900">HR Admin Dashboard</h2>
           <p className="text-sm text-muted-foreground mt-1">Welcome back, {username}</p>
@@ -36,7 +36,7 @@ export function HRDashboard({ username }: HRDashboardProps) {
             <Link href="/approvals">View all</Link>
           </Button>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
           <Suspense fallback={<TableSkeleton />}>
             <PendingLeaveRequestsTable />
           </Suspense>

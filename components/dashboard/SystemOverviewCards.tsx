@@ -104,7 +104,7 @@ export async function SystemOverviewCards() {
                 <CardTitle className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-[var(--text-secondary)]">
                   {card.title}
                 </CardTitle>
-                <div className={`${card.bgColor} dark:bg-opacity-20 ${card.color} dark:opacity-90 p-2 rounded-lg`}>
+                <div className={`${card.bgColor} dark:bg-muted/30 ${card.color} dark:text-foreground p-2 rounded-lg border border-border/50`}>
                   <Icon className="h-4 w-4" />
                 </div>
               </div>

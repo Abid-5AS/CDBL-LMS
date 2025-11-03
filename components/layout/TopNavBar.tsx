@@ -284,7 +284,7 @@ export default function TopNavBar() {
               {(pathname.startsWith("/leaves") ||
                 pathname.startsWith("/approvals")) && (
                 <>
-                  <ChevronRight className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
+                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                   <button
                     onClick={() => {
                       router.push(pathname.split("?")[0]);
