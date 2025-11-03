@@ -1,18 +1,19 @@
 
 # 🏛️ CDBL Leave Management – Policy & Logic Reference
 
-> **Change Log & Engineering Tasks (applied today)**
-> 1) **Weekend/Holiday consistency:** Synced with `Asia/Dhaka` timezone normalization from file 08.
-> 2) **CL edge-case enforcement:** Ensure `touchesHolidayOrWeekendOnSides()` uses Dhaka-normalized dates and checks both edges.
-> 3) **Backdate guardrails:** CL and Quarantine: no backdating; EL/ML: max 30 days.
-> 4) **Holiday dataset:** Fetch from `holidays` table; cached in memory with hourly refresh.
-> 5) **Admin panel:** Add bulk import (CSV) and auto‑refresh on add/update/delete.
-> 6) **UI enhancements:** Warning banner in Apply form if date range touches holidays/weekends.
-> 7) **Engineering tasks:**
->    - Implement `normalizeToDhakaMidnight()` in all holiday/weekend checks.
->    - Refactor `touchesHolidayOrWeekendOnSides()` to return detailed flags (`startHoliday`, `endHoliday`).
->    - Add server‑side validation mirror of frontend date restrictions.
->    - Add automated integration test covering all combinations of Fri/Sat and holidays.
+> **Change Log & Engineering Tasks**
+> 
+> **Phase 2 (Policy v2.0 - Date, Time & Holiday Handling):**
+> 1) **Timezone enforcement:** Implemented `normalizeToDhakaMidnight()` using date-fns-tz for Asia/Dhaka normalization.
+> 2) **Working days enhanced:** `countWorkingDays()` now fetches holidays from database and excludes them.
+> 3) **CL side-touch rule:** Updated validation to use Dhaka-normalized dates in `touchesHolidayOrWeekendOnSides()`.
+> 4) **EL notice calculation:** Changed from calendar days to working days (excludes weekends and holidays).
+> 5) **Date comparisons:** All date operations in API routes now use `normalizeToDhakaMidnight()` for consistency.
+> 
+> **Previous Tasks:**
+> 6) **Holiday dataset:** Fetch from `holidays` table; cached in memory with hourly refresh.
+> 7) **Admin panel:** Add bulk import (CSV) and auto‑refresh on add/update/delete.
+> 8) **UI enhancements:** Warning banner in Apply form if date range touches holidays/weekends.
 
 ## Part 3: Holiday & Weekend Handling
 

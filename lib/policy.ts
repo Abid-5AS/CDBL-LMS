@@ -1,3 +1,5 @@
+import { normalizeToDhakaMidnight } from "./date-utils";
+
 export const policy = {
   version: "v2.0",
   accrual: { EL_PER_YEAR: 24, CL_PER_YEAR: 10, ML_PER_YEAR: 14 }, // EL: 24 days/year (2 × 12) per Policy 6.19
@@ -31,9 +33,11 @@ export function canBackdate(type: LeaveKind | string) {
 export function withinBackdateLimit(type: LeaveKind | string, applyDate: Date, start: Date) {
   const key = String(type) as "EARNED" | "MEDICAL" | "CASUAL";
   // CL backdate is disallowed anyway
-  if (key === "CASUAL") return start >= applyDate;
+  const normalizedApply = normalizeToDhakaMidnight(applyDate);
+  const normalizedStart = normalizeToDhakaMidnight(start);
+  if (key === "CASUAL") return normalizedStart >= normalizedApply;
   const max = key === "EARNED" ? policy.maxBackdateDays.EL : policy.maxBackdateDays.ML;
-  const diffDays = Math.floor((applyDate.setHours(0, 0, 0, 0) - start.setHours(0, 0, 0, 0)) / 86400000);
+  const diffDays = Math.floor((normalizedApply.getTime() - normalizedStart.getTime()) / 86400000);
   return diffDays <= max;
 }
 

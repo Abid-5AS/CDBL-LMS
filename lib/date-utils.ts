@@ -1,6 +1,9 @@
 import { addDays, differenceInCalendarDays } from "date-fns";
+import { utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
 
 export type Holiday = { date: string; name: string }; // ISO format yyyy-mm-dd
+
+const DHAKA_TZ = "Asia/Dhaka"; // Bangladesh timezone
 
 // Bangladesh weekends: Friday (5) and Saturday (6)
 export const isWeekendBD = (d: Date) => {
@@ -8,13 +11,35 @@ export const isWeekendBD = (d: Date) => {
   return dow === 5 || dow === 6;
 };
 
-// Normalize to midnight UTC
+// Normalize to midnight UTC (deprecated - use normalizeToDhakaMidnight)
 export const normalize = (d: Date) => 
   new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
+/**
+ * Normalize date to Asia/Dhaka midnight
+ * Converts any date to its equivalent midnight in Dhaka timezone
+ * @param d - Date to normalize
+ * @returns Date normalized to Dhaka midnight (UTC representation)
+ */
+export const normalizeToDhakaMidnight = (d: Date): Date => {
+  // Convert to Dhaka timezone
+  const zoned = utcToZonedTime(d, DHAKA_TZ);
+  // Get year, month, date in Dhaka timezone
+  const year = zoned.getFullYear();
+  const month = zoned.getMonth();
+  const date = zoned.getDate();
+  // Create a new Date at midnight in Dhaka, then convert back to UTC
+  const dhakaMidnight = zonedTimeToUtc(
+    new Date(year, month, date, 0, 0, 0, 0),
+    DHAKA_TZ
+  );
+  return dhakaMidnight;
+};
+
 // Check if date is a company holiday
 export const isHoliday = (d: Date, holidays: Holiday[]) => {
-  const nd = normalize(d).toISOString().slice(0, 10);
+  // Normalize to Dhaka midnight for consistent comparison
+  const nd = normalizeToDhakaMidnight(d).toISOString().slice(0, 10);
   return holidays.some(h => h.date === nd);
 };
 

@@ -2,7 +2,7 @@ import { prisma } from "../lib/prisma";
 import { LeaveType, Role, LeaveStatus } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { initDefaultOrgSettings } from "../lib/org-settings";
-import { countWorkingDays } from "../lib/working-days";
+import { countWorkingDaysSync } from "../lib/working-days";
 
 const YEAR = new Date().getFullYear();
 
@@ -242,8 +242,8 @@ async function seedLeaveRequests() {
   const currentYear = now.getFullYear();
   const approvers = [hrAdmin, deptHead, hrHead, ceo];
 
-  // Helper to calculate working days
-  const calcWorkingDays = (start: Date, end: Date) => countWorkingDays(start, end);
+  // Helper to calculate working days (using sync version since we're in a seed script)
+  const calcWorkingDays = (start: Date, end: Date) => countWorkingDaysSync(start, end);
 
   // Helper to create approval and audit log
   async function createApprovalAndAudit(

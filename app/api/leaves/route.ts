@@ -18,6 +18,7 @@ import { randomUUID } from "crypto";
 import { getCurrentUser } from "@/lib/auth";
 import { getBackdateSettings, type BackdateSetting } from "@/lib/org-settings";
 import { countWorkingDays } from "@/lib/working-days";
+import { normalizeToDhakaMidnight } from "@/lib/date-utils";
 
 const ApplySchema = z.object({
   type: z.enum([
@@ -79,27 +80,30 @@ async function getAvailableDays(userId: number, type: LeaveType, year: number) {
 
 /**
  * Check if a date touches a holiday or weekend
+ * Uses Dhaka timezone normalization for consistent comparison
  */
 async function touchesHolidayOrWeekend(date: Date): Promise<boolean> {
-  const day = date.getDay();
+  const normalized = normalizeToDhakaMidnight(date);
+  const day = normalized.getDay();
   // Weekends: Friday (5) or Saturday (6)
   if (day === 5 || day === 6) return true;
   
-  // Check if date is a holiday
-  const dateOnly = new Date(date);
-  dateOnly.setHours(0, 0, 0, 0);
+  // Check if date is a holiday (normalized to Dhaka midnight)
   const holiday = await prisma.holiday.findUnique({
-    where: { date: dateOnly },
+    where: { date: normalized },
   });
   return !!holiday;
 }
 
 /**
  * Check if date range touches holidays/weekends on either side
+ * Uses Dhaka timezone normalization for consistent comparison
  */
 async function touchesHolidayOrWeekendOnSides(start: Date, end: Date): Promise<boolean> {
-  const startTouches = await touchesHolidayOrWeekend(start);
-  const endTouches = await touchesHolidayOrWeekend(end);
+  const normalizedStart = normalizeToDhakaMidnight(start);
+  const normalizedEnd = normalizeToDhakaMidnight(end);
+  const startTouches = await touchesHolidayOrWeekend(normalizedStart);
+  const endTouches = await touchesHolidayOrWeekend(normalizedEnd);
   return startTouches || endTouches;
 }
 
@@ -163,19 +167,19 @@ export async function POST(req: Request) {
 
   const workingDays = daysInclusive(new Date(start), new Date(end));
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const startDateOnly = new Date(start);
-  startDateOnly.setHours(0, 0, 0, 0);
+  // Normalize all dates to Dhaka midnight for consistent comparison
+  const today = normalizeToDhakaMidnight(new Date());
+  const startDateOnly = normalizeToDhakaMidnight(new Date(start));
+  const endDateOnly = normalizeToDhakaMidnight(new Date(end));
   const isBackdated = startDateOnly < today;
   const t = parsedInput.type as LeaveType;
 
-  // Enforce EL advance notice requirement (15 days)
+  // Enforce EL advance notice requirement (5 working days per Policy 6.11)
   if (t === "EARNED") {
-    const daysUntilStart = Math.floor((startDateOnly.getTime() - today.getTime()) / 86400000);
-    if (daysUntilStart < policy.elMinNoticeDays) {
+    const workingDaysNotice = await countWorkingDays(today, startDateOnly);
+    if (workingDaysNotice < policy.elMinNoticeDays) {
       return NextResponse.json(
-        { error: "el_insufficient_notice", required: policy.elMinNoticeDays, provided: daysUntilStart },
+        { error: "el_insufficient_notice", required: policy.elMinNoticeDays, provided: workingDaysNotice },
         { status: 400 }
       );
     }
@@ -229,14 +233,14 @@ export async function POST(req: Request) {
     }
     
     // Still validate within backdate limit
-    if (!withinBackdateLimit(t, new Date(today), new Date(start))) {
+    if (!withinBackdateLimit(t, today, startDateOnly)) {
       return NextResponse.json({ error: "backdate_window_exceeded", type: t }, { status: 400 });
     }
   }
 
   // CL: Cannot be adjacent to holidays/weekends (hard block)
   if (t === "CASUAL") {
-    const touchesHoliday = await touchesHolidayOrWeekendOnSides(start, end);
+    const touchesHoliday = await touchesHolidayOrWeekendOnSides(startDateOnly, endDateOnly);
     if (touchesHoliday) {
       return NextResponse.json(
         {
@@ -248,11 +252,11 @@ export async function POST(req: Request) {
     }
   }
 
-  const warnings = makeWarnings(parsedInput.type, new Date(today), new Date(start));
+  const warnings = makeWarnings(parsedInput.type, today, startDateOnly);
 
   // Soft warning: CL advance notice <5 working days (allow submit)
   if (t === "CASUAL") {
-    const workingDaysUntilStart = countWorkingDays(today, start);
+    const workingDaysUntilStart = await countWorkingDays(today, startDateOnly);
     if (workingDaysUntilStart < policy.clMinNoticeDays) {
       warnings.clShortNotice = true;
     }
