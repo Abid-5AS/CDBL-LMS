@@ -130,13 +130,11 @@ export function LeaveSummaryCard() {
     },
   ];
 
-  // Calculate totals
-  const totalRemaining = balances.reduce((sum, b) => {
-    const remaining = b.total - b.value;
-    return sum + Math.max(0, remaining);
-  }, 0);
-
-  const totalUsed = balances.reduce((sum, b) => sum + b.value, 0);
+  // Calculate totals - value is already the remaining balance from API
+  const totalRemaining = balances.reduce((sum, b) => sum + b.value, 0);
+  
+  // Calculate used = total - remaining
+  const totalUsed = balances.reduce((sum, b) => sum + (b.total - b.value), 0);
   const totalEntitlement = balances.reduce((sum, b) => sum + b.total, 0);
 
   return (
@@ -160,9 +158,9 @@ export function LeaveSummaryCard() {
       <CardContent className="space-y-4">
         <TooltipProvider>
           {balances.map((balance) => {
-            const used = balance.value;
+            const remaining = balance.value; // API returns remaining balance
             const total = balance.total;
-            const remaining = total - used;
+            const used = total - remaining;
             const remainingPercentage = (remaining / total) * 100;
             const usedPercentage = (used / total) * 100;
             
