@@ -4,6 +4,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { LeaveStatus } from "@prisma/client";
 import { canCancel } from "@/lib/rbac";
 import { z } from "zod";
+import { error } from "@/lib/errors";
+import { getTraceId } from "@/lib/trace";
 
 export const cache = "no-store";
 
@@ -19,15 +21,16 @@ const CancelSchema = z.object({
  * - Restores balance when cancelling approved leave
  */
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const traceId = getTraceId(request as any);
   const user = await getCurrentUser();
   if (!user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
   }
 
   const { id } = await params;
   const leaveId = Number(id);
   if (Number.isNaN(leaveId)) {
-    return NextResponse.json({ error: "invalid_id" }, { status: 400 });
+    return NextResponse.json(error("invalid_id", undefined, traceId), { status: 400 });
   }
 
   const userRole = user.role as "EMPLOYEE" | "DEPT_HEAD" | "HR_ADMIN" | "HR_HEAD" | "CEO";
@@ -35,7 +38,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   // Check if user can cancel (admin roles only)
   if (!canCancel(userRole, false)) {
     return NextResponse.json(
-      { error: "forbidden", message: "Only HR Admin, HR Head, or CEO can cancel leaves" },
+      error("forbidden", "Only HR Admin, HR Head, or CEO can cancel leaves", traceId),
       { status: 403 }
     );
   }
@@ -44,7 +47,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const body = await request.json().catch(() => ({}));
   const parsed = CancelSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "invalid_input" }, { status: 400 });
+    return NextResponse.json(error("invalid_input", undefined, traceId), { status: 400 });
   }
 
   // Get the leave request with requester
@@ -54,13 +57,18 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   });
 
   if (!leave) {
-    return NextResponse.json({ error: "not_found" }, { status: 404 });
+    return NextResponse.json(error("not_found", undefined, traceId), { status: 404 });
+  }
+
+  // Check if already cancelled
+  if (leave.status === LeaveStatus.CANCELLED) {
+    return NextResponse.json(error("already_cancelled", undefined, traceId), { status: 400 });
   }
 
   // Check valid cancellation states (APPROVED or CANCELLATION_REQUESTED)
   if (!["APPROVED", "CANCELLATION_REQUESTED"].includes(leave.status)) {
     return NextResponse.json(
-      { error: "cannot_cancel_now", currentStatus: leave.status },
+      error("cancellation_request_invalid", undefined, traceId, { currentStatus: leave.status }),
       { status: 400 }
     );
   }

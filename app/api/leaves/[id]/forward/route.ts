@@ -5,6 +5,8 @@ import { canForwardTo, getStepForRole, getNextRoleInChain, getStatusAfterAction,
 import { canPerformAction } from "@/lib/workflow";
 import type { AppRole } from "@/lib/rbac";
 import { LeaveStatus } from "@prisma/client";
+import { error } from "@/lib/errors";
+import { getTraceId } from "@/lib/trace";
 
 export const cache = "no-store";
 
@@ -12,15 +14,16 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const traceId = getTraceId(request as any);
   const user = await getCurrentUser();
   if (!user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
   }
 
   const { id } = await params;
   const leaveId = Number(id);
   if (Number.isNaN(leaveId)) {
-    return NextResponse.json({ error: "invalid_id" }, { status: 400 });
+    return NextResponse.json(error("invalid_id", undefined, traceId), { status: 400 });
   }
 
   const userRole = user.role as AppRole;
@@ -35,18 +38,18 @@ export async function POST(
   });
 
   if (!leave) {
-    return NextResponse.json({ error: "not_found" }, { status: 404 });
+    return NextResponse.json(error("not_found", undefined, traceId), { status: 404 });
   }
 
   // Check if user can forward for this leave type (per-type chain logic)
   if (!canPerformAction(userRole, "FORWARD", leave.type)) {
-    return NextResponse.json({ error: "forbidden", message: "You cannot forward leave requests" }, { status: 403 });
+    return NextResponse.json(error("forbidden", "You cannot forward leave requests", traceId), { status: 403 });
   }
 
   // Check if leave is in a forwardable state
   if (!["SUBMITTED", "PENDING"].includes(leave.status)) {
     return NextResponse.json(
-      { error: "invalid_status", currentStatus: leave.status },
+      error("invalid_status", undefined, traceId, { currentStatus: leave.status }),
       { status: 400 }
     );
   }
@@ -55,7 +58,7 @@ export async function POST(
   const nextRole = getNextRoleInChain(userRole, leave.type);
   if (!nextRole) {
     return NextResponse.json(
-      { error: "no_next_role", message: "No next role in approval chain" },
+      error("no_next_role", "No next role in approval chain", traceId),
       { status: 400 }
     );
   }
@@ -63,7 +66,7 @@ export async function POST(
   // Validate forward target (using per-type chain)
   if (!canForwardTo(userRole, nextRole, leave.type)) {
     return NextResponse.json(
-      { error: "invalid_forward_target", message: `Cannot forward to ${nextRole}` },
+      error("invalid_forward_target", `Cannot forward to ${nextRole}`, traceId),
       { status: 400 }
     );
   }

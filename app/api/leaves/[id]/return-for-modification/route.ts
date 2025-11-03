@@ -5,6 +5,8 @@ import { LeaveStatus } from "@prisma/client";
 import { canReturn } from "@/lib/rbac";
 import { z } from "zod";
 import type { AppRole } from "@/lib/rbac";
+import { error } from "@/lib/errors";
+import { getTraceId } from "@/lib/trace";
 
 export const cache = "no-store";
 
@@ -22,15 +24,16 @@ const ReturnSchema = z.object({
  * - Records audit log action: RETURN_TO_DUTY (for modification flow)
  */
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const traceId = getTraceId(request as any);
   const user = await getCurrentUser();
   if (!user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
   }
 
   const { id } = await params;
   const leaveId = Number(id);
   if (Number.isNaN(leaveId)) {
-    return NextResponse.json({ error: "invalid_id" }, { status: 400 });
+    return NextResponse.json(error("invalid_id", undefined, traceId), { status: 400 });
   }
 
   const userRole = user.role as AppRole;
@@ -38,7 +41,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   // Check if user can return requests
   if (!canReturn(userRole)) {
     return NextResponse.json(
-      { error: "forbidden", message: "Only approvers can return leave requests for modification" },
+      error("forbidden", "Only approvers can return leave requests for modification", traceId),
       { status: 403 }
     );
   }
@@ -48,7 +51,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const parsed = ReturnSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: "invalid_input", message: parsed.error.issues[0]?.message },
+      error("invalid_input", parsed.error.issues[0]?.message, traceId),
       { status: 400 }
     );
   }
@@ -60,13 +63,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   });
 
   if (!leave) {
-    return NextResponse.json({ error: "not_found" }, { status: 404 });
+    return NextResponse.json(error("not_found", undefined, traceId), { status: 404 });
   }
 
   // Check valid return states
   if (!["SUBMITTED", "PENDING"].includes(leave.status)) {
     return NextResponse.json(
-      { error: "cannot_return_now", currentStatus: leave.status },
+      error("return_action_invalid", undefined, traceId, { currentStatus: leave.status }),
       { status: 400 }
     );
   }

@@ -6,6 +6,8 @@ import path from "path";
 import { randomUUID } from "crypto";
 import { fileTypeFromBuffer } from "file-type";
 import { generateSignedUrl } from "@/lib/storage";
+import { error } from "@/lib/errors";
+import { getTraceId } from "@/lib/trace";
 
 export const cache = "no-store";
 
@@ -20,15 +22,16 @@ export const cache = "no-store";
  * - Update leave.certificateUrl or leave.fitnessCertificateUrl
  */
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const traceId = getTraceId(request as any);
   const user = await getCurrentUser();
   if (!user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
   }
 
   const { id } = await params;
   const leaveId = Number(id);
   if (Number.isNaN(leaveId)) {
-    return NextResponse.json({ error: "invalid_id" }, { status: 400 });
+    return NextResponse.json(error("invalid_id", undefined, traceId), { status: 400 });
   }
 
   // Get the leave request
@@ -38,7 +41,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   });
 
   if (!leave) {
-    return NextResponse.json({ error: "not_found" }, { status: 404 });
+    return NextResponse.json(error("not_found", undefined, traceId), { status: 404 });
   }
 
   // Check authorization: employee can upload for own leave, HR roles can upload for any
@@ -47,7 +50,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   
   if (!isOwnLeave && !isHRRole) {
     return NextResponse.json(
-      { error: "forbidden", message: "You can only upload certificates for your own leaves" },
+      error("forbidden", "You can only upload certificates for your own leaves", traceId),
       { status: 403 }
     );
   }
@@ -58,7 +61,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const certificateType = (formData.get("type") as string) || "medical"; // "medical" or "fitness"
 
   if (!certificateFile) {
-    return NextResponse.json({ error: "file_required", message: "Certificate file is required" }, { status: 400 });
+    return NextResponse.json(error("file_required", "Certificate file is required", traceId), { status: 400 });
   }
 
   // Validate file extension
@@ -66,7 +69,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const allowed = ["pdf", "jpg", "jpeg", "png"];
   if (!allowed.includes(ext)) {
     return NextResponse.json(
-      { error: "unsupported_file_type", message: "Unsupported file type. Use PDF, JPG, or PNG." },
+      error("unsupported_file_type", "Unsupported file type. Use PDF, JPG, or PNG.", traceId),
       { status: 400 }
     );
   }
@@ -75,7 +78,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const maxSize = 5 * 1024 * 1024; // 5MB
   if (certificateFile.size > maxSize) {
     return NextResponse.json(
-      { error: "file_too_large", message: "File too large (max 5 MB)." },
+      error("file_too_large", "File too large (max 5 MB).", traceId),
       { status: 400 }
     );
   }
@@ -88,7 +91,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const fileType = await fileTypeFromBuffer(buffer);
   if (!fileType) {
     return NextResponse.json(
-      { error: "certificate_invalid_type", message: "Cannot determine file type. Upload a valid PDF, JPG, or PNG file." },
+      error("certificate_invalid_type", "Cannot determine file type. Upload a valid PDF, JPG, or PNG file.", traceId),
       { status: 400 }
     );
   }
@@ -96,7 +99,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const allowedMimeTypes = ["application/pdf", "image/jpeg", "image/png"];
   if (!allowedMimeTypes.includes(fileType.mime)) {
     return NextResponse.json(
-      { error: "certificate_invalid_type", message: `File content type (${fileType.mime}) not allowed. PDF, JPG, PNG only.` },
+      error("certificate_invalid_type", `File content type (${fileType.mime}) not allowed. PDF, JPG, PNG only.`, traceId),
       { status: 400 }
     );
   }

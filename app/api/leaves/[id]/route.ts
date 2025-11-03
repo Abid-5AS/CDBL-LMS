@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { LeaveStatus } from "@prisma/client";
 import { normalizeToDhakaMidnight } from "@/lib/date-utils";
+import { error } from "@/lib/errors";
+import { getTraceId } from "@/lib/trace";
 
 /**
  * Employee-initiated cancellation
@@ -11,12 +13,13 @@ import { normalizeToDhakaMidnight } from "@/lib/date-utils";
  * - APPROVED → CANCELLATION_REQUESTED (requires HR review)
  */
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const traceId = getTraceId(request as any);
   const me = await getCurrentUser();
-  if (!me) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!me) return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
 
   const { id: paramId } = await params;
   const id = Number(paramId);
-  if (Number.isNaN(id)) return NextResponse.json({ error: "invalid_id" }, { status: 400 });
+  if (Number.isNaN(id)) return NextResponse.json(error("invalid_id", undefined, traceId), { status: 400 });
 
   const leave = await prisma.leaveRequest.findUnique({
     where: { id },
@@ -24,13 +27,18 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   });
 
   if (!leave || leave.requesterId !== me.id) {
-    return NextResponse.json({ error: "not_found" }, { status: 404 });
+    return NextResponse.json(error("not_found", undefined, traceId), { status: 404 });
+  }
+
+  // Check if already cancelled
+  if (leave.status === LeaveStatus.CANCELLED) {
+    return NextResponse.json(error("already_cancelled", undefined, traceId), { status: 400 });
   }
 
   // Check valid cancellation states
   if (!["SUBMITTED", "PENDING", "APPROVED"].includes(leave.status)) {
     return NextResponse.json(
-      { error: "cannot_cancel_now", currentStatus: leave.status },
+      error("cancellation_request_invalid", undefined, traceId, { currentStatus: leave.status }),
       { status: 400 }
     );
   }

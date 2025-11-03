@@ -5,6 +5,8 @@ import { canPerformAction, getStepForRole, getStatusAfterAction, isFinalApprover
 import type { AppRole } from "@/lib/rbac";
 import { LeaveStatus } from "@prisma/client";
 import { z } from "zod";
+import { error } from "@/lib/errors";
+import { getTraceId } from "@/lib/trace";
 
 export const cache = "no-store";
 
@@ -16,15 +18,16 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const traceId = getTraceId(request as any);
   const user = await getCurrentUser();
   if (!user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
   }
 
   const { id } = await params;
   const leaveId = Number(id);
   if (Number.isNaN(leaveId)) {
-    return NextResponse.json({ error: "invalid_id" }, { status: 400 });
+    return NextResponse.json(error("invalid_id", undefined, traceId), { status: 400 });
   }
 
   const userRole = user.role as AppRole;
@@ -36,18 +39,18 @@ export async function POST(
   });
 
   if (!leave) {
-    return NextResponse.json({ error: "not_found" }, { status: 404 });
+    return NextResponse.json(error("not_found", undefined, traceId), { status: 404 });
   }
 
   // Check if user can reject for this leave type (per-type chain logic)
   if (!canPerformAction(userRole, "REJECT", leave.type)) {
-    return NextResponse.json({ error: "forbidden", message: "You cannot reject leave requests" }, { status: 403 });
+    return NextResponse.json(error("forbidden", "You cannot reject leave requests", traceId), { status: 403 });
   }
 
   // Verify user is final approver for this leave type
   if (!isFinalApprover(userRole, leave.type)) {
     return NextResponse.json(
-      { error: "forbidden", message: "Only the final approver can reject leave requests" },
+      error("forbidden", "Only the final approver can reject leave requests", traceId),
       { status: 403 }
     );
   }
@@ -56,18 +59,18 @@ export async function POST(
   const body = await request.json().catch(() => ({}));
   const parsed = RejectSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "invalid_input" }, { status: 400 });
+    return NextResponse.json(error("invalid_input", undefined, traceId), { status: 400 });
   }
 
   // Prevent self-rejection
   if (leave.requesterId === user.id) {
-    return NextResponse.json({ error: "self_rejection_disallowed" }, { status: 403 });
+    return NextResponse.json(error("self_rejection_disallowed", undefined, traceId), { status: 403 });
   }
 
   // Check if leave is in a rejectable state
   if (!["SUBMITTED", "PENDING"].includes(leave.status)) {
     return NextResponse.json(
-      { error: "invalid_status", currentStatus: leave.status },
+      error("invalid_status", undefined, traceId, { currentStatus: leave.status }),
       { status: 400 }
     );
   }

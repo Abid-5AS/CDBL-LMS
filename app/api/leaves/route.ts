@@ -19,6 +19,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { getBackdateSettings, type BackdateSetting } from "@/lib/org-settings";
 import { countWorkingDays } from "@/lib/working-days";
 import { normalizeToDhakaMidnight } from "@/lib/date-utils";
+import { error } from "@/lib/errors";
+import { getTraceId } from "@/lib/trace";
 
 const ApplySchema = z.object({
   type: z.enum([
@@ -40,9 +42,10 @@ const ApplySchema = z.object({
   needsCertificate: z.boolean().optional(),
 });
 
-export async function GET() {
+export async function GET(req: Request) {
   const me = await getCurrentUser();
-  if (!me) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const traceId = getTraceIdUtil(req as any);
+  if (!me) return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
 
   const items = await prisma.leaveRequest.findMany({
     where: { requesterId: me.id },
@@ -108,8 +111,9 @@ async function touchesHolidayOrWeekendOnSides(start: Date, end: Date): Promise<b
 }
 
 export async function POST(req: Request) {
+  const traceId = getTraceId(req as any);
   const me = await getCurrentUser();
-  if (!me) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!me) return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
 
   const contentType = req.headers.get("content-type") ?? "";
   let certificateFile: File | null = null;
@@ -139,10 +143,12 @@ export async function POST(req: Request) {
     parsedInput = ApplySchema.parse(json);
   }
 
+  const traceId = getTraceIdUtil(req as any);
+  
   const start = new Date(parsedInput.startDate);
   const end = new Date(parsedInput.endDate);
   if (isNaN(start.getTime()) || isNaN(end.getTime()) || start > end) {
-    return NextResponse.json({ error: "invalid_dates" }, { status: 400 });
+    return NextResponse.json(error("invalid_dates", undefined, traceId), { status: 400 });
   }
 
   let certificateUrl: string | undefined;
@@ -150,10 +156,10 @@ export async function POST(req: Request) {
     const ext = (certificateFile.name.split(".").pop() ?? "").toLowerCase();
     const allowed = ["pdf", "jpg", "jpeg", "png"];
     if (!allowed.includes(ext)) {
-      return NextResponse.json({ error: "unsupported_file_type" }, { status: 400 });
+      return NextResponse.json(error("unsupported_file_type", undefined, traceId), { status: 400 });
     }
     if (certificateFile.size > 5 * 1024 * 1024) {
-      return NextResponse.json({ error: "file_too_large" }, { status: 400 });
+      return NextResponse.json(error("file_too_large", undefined, traceId), { status: 400 });
     }
     const arrayBuffer = await certificateFile.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
@@ -179,7 +185,10 @@ export async function POST(req: Request) {
     const workingDaysNotice = await countWorkingDays(today, startDateOnly);
     if (workingDaysNotice < policy.elMinNoticeDays) {
       return NextResponse.json(
-        { error: "el_insufficient_notice", required: policy.elMinNoticeDays, provided: workingDaysNotice },
+        error("el_insufficient_notice", undefined, traceId, {
+          required: policy.elMinNoticeDays,
+          provided: workingDaysNotice,
+        }),
         { status: 400 }
       );
     }
@@ -189,7 +198,10 @@ export async function POST(req: Request) {
   if (t === "CASUAL") {
     if (workingDays > policy.clMaxConsecutiveDays) {
       return NextResponse.json(
-        { error: "cl_exceeds_consecutive_limit", max: policy.clMaxConsecutiveDays, requested: workingDays },
+        error("cl_exceeds_consecutive_limit", undefined, traceId, {
+          max: policy.clMaxConsecutiveDays,
+          requested: workingDays,
+        }),
         { status: 400 }
       );
     }
@@ -199,7 +211,10 @@ export async function POST(req: Request) {
   const mustCert = needsMedicalCertificate(parsedInput.type, workingDays);
   if (mustCert && !certificateUrl && !parsedInput.needsCertificate) {
     return NextResponse.json(
-      { error: "medical_certificate_required", days: workingDays, requiredDays: 3 },
+      error("medical_certificate_required", undefined, traceId, {
+        days: workingDays,
+        requiredDays: 3,
+      }),
       { status: 400 }
     );
   }
@@ -212,7 +227,7 @@ export async function POST(req: Request) {
     
     if (setting === false) {
       return NextResponse.json(
-        { error: "backdate_disallowed_by_policy", type: leaveTypeKey },
+        error("backdate_disallowed_by_policy", undefined, traceId, { type: leaveTypeKey }),
         { status: 400 }
       );
     }
@@ -234,7 +249,7 @@ export async function POST(req: Request) {
     
     // Still validate within backdate limit
     if (!withinBackdateLimit(t, today, startDateOnly)) {
-      return NextResponse.json({ error: "backdate_window_exceeded", type: t }, { status: 400 });
+      return NextResponse.json(error("backdate_window_exceeded", undefined, traceId, { type: t }), { status: 400 });
     }
   }
 
@@ -243,10 +258,11 @@ export async function POST(req: Request) {
     const touchesHoliday = await touchesHolidayOrWeekendOnSides(startDateOnly, endDateOnly);
     if (touchesHoliday) {
       return NextResponse.json(
-        {
-          error: "cl_cannot_touch_holiday",
-          message: "Casual Leave cannot be adjacent to holidays or weekends. Please use Earned Leave instead.",
-        },
+        error(
+          "cl_cannot_touch_holiday",
+          "Casual Leave cannot be adjacent to holidays or weekends. Please use Earned Leave instead.",
+          traceId
+        ),
         { status: 400 }
       );
     }
@@ -288,7 +304,11 @@ export async function POST(req: Request) {
     const totalUsed = (usedThisYear._sum.workingDays ?? 0) + workingDays;
     if (totalUsed > policy.accrual.CL_PER_YEAR) {
       return NextResponse.json(
-        { error: "cl_annual_cap_exceeded", cap: policy.accrual.CL_PER_YEAR, used: usedThisYear._sum.workingDays ?? 0, requested: workingDays },
+        error("cl_annual_cap_exceeded", undefined, traceId, {
+          cap: policy.accrual.CL_PER_YEAR,
+          used: usedThisYear._sum.workingDays ?? 0,
+          requested: workingDays,
+        }),
         { status: 400 }
       );
     }
@@ -309,7 +329,11 @@ export async function POST(req: Request) {
     const totalUsed = (usedThisYear._sum.workingDays ?? 0) + workingDays;
     if (totalUsed > policy.accrual.ML_PER_YEAR) {
       return NextResponse.json(
-        { error: "ml_annual_cap_exceeded", cap: policy.accrual.ML_PER_YEAR, used: usedThisYear._sum.workingDays ?? 0, requested: workingDays },
+        error("ml_annual_cap_exceeded", undefined, traceId, {
+          cap: policy.accrual.ML_PER_YEAR,
+          used: usedThisYear._sum.workingDays ?? 0,
+          requested: workingDays,
+        }),
         { status: 400 }
       );
     }
@@ -327,12 +351,11 @@ export async function POST(req: Request) {
         const afterRequest = totalCarry - (elBalance.used ?? 0) - workingDays;
         if (afterRequest > policy.carryForwardCap.EL) {
           return NextResponse.json(
-            {
-              error: "el_carry_cap_exceeded",
+            error("el_carry_cap_exceeded", undefined, traceId, {
               cap: policy.carryForwardCap.EL,
               currentTotal: totalCarry,
               requested: workingDays,
-            },
+            }),
             { status: 400 }
           );
         }
@@ -343,7 +366,11 @@ export async function POST(req: Request) {
   const available = await getAvailableDays(me.id, t, year);
   if (available < workingDays) {
     return NextResponse.json(
-      { error: "insufficient_balance", available, requested: workingDays, type: t },
+      error("insufficient_balance", undefined, traceId, {
+        available,
+        requested: workingDays,
+        type: t,
+      }),
       { status: 400 }
     );
   }

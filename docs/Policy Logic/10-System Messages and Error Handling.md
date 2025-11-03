@@ -1,18 +1,20 @@
 # 🏛️ CDBL Leave Management – Policy & Logic Reference
 
-> **Change Log & Engineering Tasks (applied today)**
-> 1) **EL notice fixed:** Updated `el_insufficient_notice` message to reflect ≥5 working days instead of 15.
-> 2) **New statuses:** Added errors for `cancellation_request_invalid`, `return_action_invalid`, and `already_cancelled`.
-> 3) **Error consistency:** Standardized error format to include `timestamp` and `traceId`.
-> 4) **UI toasts:** Added new success messages for cancellation and return flows.
-> 5) **Audit integration:** Each backend error triggers audit log with `error_code`, `user`, and `path`.
-> 6) **Frontend mapping:** Ensure each error code is mapped to user-friendly toast in `/lib/errors.ts`.
-> 7) **New warnings:** Add friendly hints for RETURNED and CANCELLATION_REQUESTED statuses in UI.
-> 8) **Engineering tasks:**
->    - Update `lib/errors.ts` mapping.
->    - Update backend endpoints for cancellation and return errors.
->    - Add `traceId` generator middleware.
->    - Localize all messages under `en.json` translation file for future i18n support.
+> **Change Log & Engineering Tasks**
+> **Phase 8 (Policy v2.0) — Centralized Error Handling & Toasts**
+> 1) **Centralized error mapping:** Created `/lib/errors.ts` with all error codes mapped to user-friendly messages per Policy §10.
+> 2) **Standardized error format:** All API errors now include `{ error, message?, traceId, timestamp }` with optional additional fields.
+> 3) **Trace ID middleware:** Created `/lib/trace.ts` utilities for attaching trace IDs to requests for error tracking.
+> 4) **Updated all endpoints:** All API routes (`/api/leaves/*`) now use centralized `error()` function with trace IDs.
+> 5) **Toast message mapping:** Created `/lib/toast-messages.ts` with success/warning/info message constants for frontend use.
+> 6) **Error code coverage:** Added mappings for all Policy v2.0 error codes including:
+>    - `el_insufficient_notice`, `cl_cannot_touch_holiday`, `start_or_end_on_holiday`
+>    - `backdate_window_exceeded`, `certificate_invalid_type`, `fitness_certificate_required`
+>    - `cancellation_request_invalid`, `already_cancelled`, `return_action_invalid`
+> 7) **Tests:** Added unit tests for error mapping and structure; integration test scaffolding for endpoint error format validation.
+> 8) **Previous changes:**
+>    - EL notice fixed to reflect ≥5 working days (Phase 2).
+>    - Added errors for new statuses and flows (Phase 5, Phase 6).
 
 ## Part 10: System Messages & Error Handling
 

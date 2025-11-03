@@ -5,6 +5,8 @@ import { LeaveStatus } from "@prisma/client";
 import { canCancel } from "@/lib/rbac";
 import { z } from "zod";
 import { normalizeToDhakaMidnight } from "@/lib/date-utils";
+import { error } from "@/lib/errors";
+import { getTraceId } from "@/lib/trace";
 
 export const cache = "no-store";
 
@@ -21,15 +23,16 @@ const RecallSchema = z.object({
  * - Only valid for future/ongoing leaves (not past leaves)
  */
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const traceId = getTraceId(request as any);
   const user = await getCurrentUser();
   if (!user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
   }
 
   const { id } = await params;
   const leaveId = Number(id);
   if (Number.isNaN(leaveId)) {
-    return NextResponse.json({ error: "invalid_id" }, { status: 400 });
+    return NextResponse.json(error("invalid_id", undefined, traceId), { status: 400 });
   }
 
   const userRole = user.role as "EMPLOYEE" | "DEPT_HEAD" | "HR_ADMIN" | "HR_HEAD" | "CEO";
@@ -37,7 +40,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   // Check if user can recall (admin roles only)
   if (!canCancel(userRole, false)) {
     return NextResponse.json(
-      { error: "forbidden", message: "Only HR Admin, HR Head, or CEO can recall employees from leave" },
+      error("forbidden", "Only HR Admin, HR Head, or CEO can recall employees from leave", traceId),
       { status: 403 }
     );
   }
@@ -46,7 +49,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const body = await request.json().catch(() => ({}));
   const parsed = RecallSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "invalid_input" }, { status: 400 });
+    return NextResponse.json(error("invalid_input", undefined, traceId), { status: 400 });
   }
 
   // Get the leave request with requester
@@ -56,13 +59,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   });
 
   if (!leave) {
-    return NextResponse.json({ error: "not_found" }, { status: 404 });
+    return NextResponse.json(error("not_found", undefined, traceId), { status: 404 });
   }
 
   // Only APPROVED leaves can be recalled
   if (leave.status !== LeaveStatus.APPROVED) {
     return NextResponse.json(
-      { error: "cannot_recall_now", currentStatus: leave.status },
+      error("cannot_recall_now", undefined, traceId, { currentStatus: leave.status }),
       { status: 400 }
     );
   }
@@ -75,7 +78,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   // Can only recall future or ongoing leaves
   if (leaveEnd < today) {
     return NextResponse.json(
-      { error: "cannot_recall_past_leave", message: "Cannot recall leaves that have already ended" },
+      error("cannot_recall_past_leave", "Cannot recall leaves that have already ended", traceId),
       { status: 400 }
     );
   }

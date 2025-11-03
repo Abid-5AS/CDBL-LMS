@@ -5,6 +5,8 @@ import { LeaveStatus } from "@prisma/client";
 import { canReturn } from "@/lib/rbac";
 import { z } from "zod";
 import type { AppRole } from "@/lib/rbac";
+import { error } from "@/lib/errors";
+import { getTraceId } from "@/lib/trace";
 
 export const cache = "no-store";
 
@@ -23,15 +25,16 @@ const DutyReturnSchema = z.object({
  * - Valid states: APPROVED, RECALLED (ongoing or completed medical leave)
  */
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const traceId = getTraceId(request as any);
   const user = await getCurrentUser();
   if (!user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
   }
 
   const { id } = await params;
   const leaveId = Number(id);
   if (Number.isNaN(leaveId)) {
-    return NextResponse.json({ error: "invalid_id" }, { status: 400 });
+    return NextResponse.json(error("invalid_id", undefined, traceId), { status: 400 });
   }
 
   const userRole = user.role as AppRole;
@@ -41,7 +44,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const parsed = DutyReturnSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: "invalid_input", message: parsed.error.issues[0]?.message },
+      error("invalid_input", parsed.error.issues[0]?.message, traceId),
       { status: 400 }
     );
   }
@@ -53,13 +56,13 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   });
 
   if (!leave) {
-    return NextResponse.json({ error: "not_found" }, { status: 404 });
+    return NextResponse.json(error("not_found", undefined, traceId), { status: 404 });
   }
 
   // Only MEDICAL leave type requires duty return
   if (leave.type !== "MEDICAL") {
     return NextResponse.json(
-      { error: "invalid_leave_type", message: "Duty return is only applicable for Medical Leave" },
+      error("invalid_leave_type", "Duty return is only applicable for Medical Leave", traceId),
       { status: 400 }
     );
   }
@@ -68,7 +71,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const isOwnLeave = leave.requesterId === user.id;
   if (!isOwnLeave && !canReturn(userRole)) {
     return NextResponse.json(
-      { error: "forbidden", message: "Only the employee or approvers can record duty return" },
+      error("forbidden", "Only the employee or approvers can record duty return", traceId),
       { status: 403 }
     );
   }
@@ -76,7 +79,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   // Check valid states
   if (!["APPROVED", "RECALLED"].includes(leave.status)) {
     return NextResponse.json(
-      { error: "cannot_return_to_duty", currentStatus: leave.status },
+      error("cannot_return_to_duty", undefined, traceId, { currentStatus: leave.status }),
       { status: 400 }
     );
   }
@@ -85,10 +88,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (leave.workingDays > 7) {
     if (!parsed.data.fitnessCertificateUrl) {
       return NextResponse.json(
-        {
-          error: "fitness_certificate_required",
-          message: "Fitness certificate is required for Medical Leave exceeding 7 days",
-        },
+        error("fitness_certificate_required", "Fitness certificate is required for Medical Leave exceeding 7 days", traceId),
         { status: 400 }
       );
     }
