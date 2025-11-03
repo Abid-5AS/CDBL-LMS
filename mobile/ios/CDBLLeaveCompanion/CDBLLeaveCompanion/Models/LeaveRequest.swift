@@ -47,11 +47,11 @@ enum LeaveType: String, Codable, CaseIterable, Identifiable {
     var policyTips: [String] {
         switch self {
         case .CASUAL:
-            return ["Max 7 consecutive days", "Must retain 5 days balance"]
+            return ["Max 3 consecutive days", "Must retain 5 days balance"]
         case .MEDICAL:
             return ["> 3 days requires certificate", "Backdating allowed up to 30 days"]
         case .EARNED:
-            return ["Submit at least 15 days in advance", "Balance carries forward up to 60 days"]
+            return ["Submit at least 5 working days in advance", "Balance carries forward up to 60 days"]
         default:
             return []
         }
@@ -61,7 +61,7 @@ enum LeaveType: String, Codable, CaseIterable, Identifiable {
     var maximumConsecutiveDays: Int? {
         switch self {
         case .CASUAL:
-            return 7
+            return 3  // Policy v2.0: CL max 3 consecutive days
         default:
             return nil
         }
@@ -91,6 +91,11 @@ enum LeaveStatus: String, Codable, CaseIterable, Identifiable {
     case APPROVED
     case REJECTED
     case CANCELLED
+    // Policy v2.0 additions
+    case RETURNED
+    case CANCELLATION_REQUESTED
+    case RECALLED
+    case OVERSTAY_PENDING
     
     var displayName: String {
         switch self {
@@ -100,6 +105,10 @@ enum LeaveStatus: String, Codable, CaseIterable, Identifiable {
         case .APPROVED: return "Approved"
         case .REJECTED: return "Rejected"
         case .CANCELLED: return "Cancelled"
+        case .RETURNED: return "Returned"
+        case .CANCELLATION_REQUESTED: return "Cancellation Requested"
+        case .RECALLED: return "Recalled"
+        case .OVERSTAY_PENDING: return "Overstay Pending"
         }
     }
 }

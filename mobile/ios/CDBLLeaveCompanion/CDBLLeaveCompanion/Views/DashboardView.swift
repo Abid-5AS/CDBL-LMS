@@ -12,11 +12,21 @@ import Combine
 struct DashboardView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject private var balanceService = BalanceServiceViewModel()
+    @State private var showReconciliation = false
+    @State private var pendingCount = 0
     
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: StyleGuide.Spacing.lg) {
+                    // Pending actions badge (if any)
+                    if pendingCount > 0 {
+                        PendingActionsBadge(count: pendingCount) {
+                            showReconciliation = true
+                        }
+                        .padding(.horizontal, StyleGuide.Spacing.md)
+                    }
+                    
                     // Profile Section
                     EmployeeProfileCard()
                         .padding(.horizontal, StyleGuide.Spacing.md)
@@ -72,6 +82,20 @@ struct DashboardView: View {
             }
             .task {
                 await balanceService.loadBalances()
+                loadPendingCount()
+            }
+            .sheet(isPresented: $showReconciliation) {
+                ReconciliationModal()
+            }
+        }
+    }
+    
+    private func loadPendingCount() {
+        Task {
+            do {
+                pendingCount = try QueueManager.shared.fetchPendingCount()
+            } catch {
+                pendingCount = 0
             }
         }
     }

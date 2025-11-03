@@ -13,7 +13,13 @@
         <attribute name="exported" optional="NO" attributeType="Boolean" usesScalarValueType="YES" defaultValueString="NO"/>
         <attribute name="workingDays" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
     </entity>
+    <entity name="SyncMetadata" representedClassName="SyncMetadata" syncable="YES" codeGenerationType="class">
+        <attribute name="lastSyncTimestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="snapshotHash" optional="YES" attributeType="String"/>
+        <attribute name="policyVersion" optional="YES" attributeType="String"/>
+    </entity>
     <elements>
         <element name="LeaveEntity" positionX="-63" positionY="-18" width="128" height="308"/>
+        <element name="SyncMetadata" positionX="-63" positionY="327.5" width="128" height="118"/>
     </elements>
 </model>

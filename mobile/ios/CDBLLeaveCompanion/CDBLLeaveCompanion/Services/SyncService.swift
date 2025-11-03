@@ -71,11 +71,13 @@ struct SyncPackage: Codable {
     let signature: String
     let timestamp: Date
     let expiry: Date
+    let policyVersion: String?  // Policy v2.0 compatibility
 }
 
 struct SyncData: Codable {
     let balances: LeaveBalance
     let history: [LeaveHistoryItem]
+    let holidays: [Holiday]?
     let profile: EmployeeProfile?
 }
 
