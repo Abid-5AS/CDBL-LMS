@@ -1,12 +1,12 @@
 export const policy = {
-  version: "v1.1",
-  accrual: { EL_PER_YEAR: 20, CL_PER_YEAR: 10, ML_PER_YEAR: 14 }, // CL: 10 days/year per policy
+  version: "v2.0",
+  accrual: { EL_PER_YEAR: 24, CL_PER_YEAR: 10, ML_PER_YEAR: 14 }, // EL: 24 days/year (2 × 12) per Policy 6.19
   carryForward: { EL: true, EARNED: true },
   carryForwardCap: { EL: 60, EARNED: 60 }, // cap total carry at 60
   allowBackdate: { EL: true, CL: false, ML: true, EARNED: true, CASUAL: false, MEDICAL: true },
   maxBackdateDays: { EL: 30, ML: 30, EARNED: 30, MEDICAL: 30 },
   clMinNoticeDays: 5, // warning only for CL (soft rule)
-  elMinNoticeDays: 15, // hard requirement for EARNED leave
+  elMinNoticeDays: 5, // hard requirement: ≥5 working days per Policy 6.11
   clMaxConsecutiveDays: 3, // Policy: max 3 days per spell
   elAccrualPerMonth: 2, // EL accrues 2 days/month
 };

@@ -1,15 +1,20 @@
 # 🏛️ CDBL Leave Management – Policy & Logic Reference
 
-> **Change Log & Engineering Tasks (applied today)**
-> 1) **EL entitlement fixed:** 24 days/year (2 × 12) per Policy 6.19. Removed prior assumption of 20/year.
-> 2) **Docs aligned:** Updated all references to EL annual total and theoretical max.
-> 3) **Monthly accrual clarified:** 2 days are accrued per active month. Add proration for partial-month service.
-> 4) **Seeds to update:** In `prisma/seed.ts`, change any EL `accrued: 20` to `accrued: 24`.
-> 5) **Policy constants to update:** In `lib/policy.ts`, ensure `EL_PER_YEAR = 24` and `elAccrualPerMonth = 2`.
-> 6) **UI text:** In apply form and dashboards, ensure EL totals reflect 24/year.
-> 7) **Jobs:** Add a monthly accrual job and a year-end rollover job (EL carry-forward up to 60; CL/ML lapse).
-> 8) **Approval side-effects:** On APPROVE, increment `Balance.used`; on CANCEL of APPROVED, restore `used`.
-> 9) **Carry-forward enforcement:** Review enforcement so 60-day cap is applied at rollover; document decision.
+> **Change Log & Engineering Tasks**
+> 
+> **Phase 1 (Policy v2.0 - Constants & Schema):**
+> 1) **EL entitlement fixed:** 24 days/year (2 × 12) per Policy 6.19. Updated `lib/policy.ts` EL_PER_YEAR = 24.
+> 2) **EL notice fixed:** 5 working days per Policy 6.11. Updated `lib/policy.ts` elMinNoticeDays = 5.
+> 3) **Policy version:** Updated to v2.0 in `lib/policy.ts` and all seed data.
+> 4) **Schema extended:** Added RETURNED, CANCELLATION_REQUESTED, RECALLED, OVERSTAY_PENDING statuses to LeaveStatus enum.
+> 5) **Fitness certificate field:** Added fitnessCertificateUrl to LeaveRequest model for ML > 7 days return validation.
+> 6) **Seed data updated:** EL accrued changed from 20 to 24 days in `prisma/seed.ts`.
+> 
+> **Previous Tasks:**
+> 7) **Monthly accrual clarified:** 2 days are accrued per active month. Add proration for partial-month service.
+> 8) **Jobs:** Add a monthly accrual job and a year-end rollover job (EL carry-forward up to 60; CL/ML lapse).
+> 9) **Approval side-effects:** On APPROVE, increment `Balance.used`; on CANCEL of APPROVED, restore `used`.
+> 10) **Carry-forward enforcement:** Review enforcement so 60-day cap is applied at rollover; document decision.
 
 ## Part 4: Leave Balance & Accrual Logic
 
