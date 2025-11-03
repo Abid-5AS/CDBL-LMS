@@ -24,23 +24,28 @@ git push origin v2.0.0-policy-compliant
 
 ### 2️⃣ Database Migration
 
-**Status:** Schema verified ✅
+**Status:** ⚠️ Migration Pending
 
-**Verification Results:**
-- ✅ LeaveStatus enum includes: RETURNED, CANCELLATION_REQUESTED, RECALLED, OVERSTAY_PENDING
-- ✅ fitnessCertificateUrl field exists in LeaveRequest model
-- ✅ certificateUrl field exists
-- ✅ policyVersion field exists
+**Current State:**
+- ✅ Migration file exists: `20251103113919_policy_v2_0_constants_and_schema`
+- ⚠️ Migration not yet applied to database (pending deployment)
+- ✅ Schema file has all required fields defined
 
 **Migration Command:**
 ```bash
 npx prisma migrate deploy
 ```
 
+**What This Migration Adds:**
+1. New LeaveStatus enum values: RETURNED, CANCELLATION_REQUESTED, RECALLED, OVERSTAY_PENDING
+2. New field: `fitnessCertificateUrl` (String, optional)
+
 **Post-Migration Verification:**
 ```bash
 npm run verify:deployment
 ```
+
+**Note:** The verification script will show failures until migration is applied. This is expected behavior.
 
 ---
 
