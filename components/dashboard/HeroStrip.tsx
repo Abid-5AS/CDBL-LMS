@@ -77,7 +77,7 @@ export function HeroStrip({ name }: HeroStripProps) {
   }, [leavesData, holidaysData, name]);
 
   return (
-    <div className="bg-card text-card-foreground border border-border rounded-2xl p-4 transition-transform duration-300 will-change-transform">
+    <div className="w-full rounded-2xl border border-border bg-card/90 backdrop-blur-sm p-4 shadow-sm transition-colors duration-200">
       <div className="flex flex-col gap-3">
         {pendingCount > 0 ? (
           <Link 
@@ -101,7 +101,7 @@ export function HeroStrip({ name }: HeroStripProps) {
               strokeWidth={2.4}
             />
             <span className="leading-relaxed">
-              Next holiday: <span className="font-medium text-foreground">{nextHoliday.name}</span> on {formatDate(nextHoliday.date)}
+              Next holiday: <span className="font-medium text-primary">{nextHoliday.name}</span> on {formatDate(nextHoliday.date)}
             </span>
           </p>
         )}
