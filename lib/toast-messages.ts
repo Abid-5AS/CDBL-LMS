@@ -27,6 +27,7 @@ export const SUCCESS_MESSAGES = {
   returned_for_modification: "Leave request returned to employee for modification",
   duty_return_success: "Return to duty recorded successfully",
   certificate_uploaded: "Certificate uploaded successfully",
+  view_saved: "View saved successfully",
   leave_approved: "Leave request approved successfully",
   leave_rejected: "Leave request rejected successfully",
   leave_forwarded: "Leave request forwarded successfully",

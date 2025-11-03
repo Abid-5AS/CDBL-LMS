@@ -8,7 +8,7 @@ import { ClipboardCheck, Plus } from "lucide-react";
 import StatusBadge from "@/app/dashboard/components/status-badge";
 import { leaveTypeLabel } from "@/lib/ui";
 import { Button } from "@/components/ui/button";
-import { formatDate } from "@/lib/utils";
+import { formatDate, cn } from "@/lib/utils";
 import Link from "next/link";
 import {
   AlertDialog,
@@ -25,6 +25,9 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import { FilterBar } from "@/components/filters/FilterBar";
 import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/toast-messages";
+import { RoleAwareDock } from "@/components/dock/RoleAwareDock";
+import { useUser } from "@/lib/user-context";
+import { useSelectedIds, useSelectionContext } from "@/lib/selection-context";
 
 type LeaveRow = {
   id: number;
@@ -66,6 +69,9 @@ export function MyLeavesContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
+  const user = useUser();
+  const selectedIds = useSelectedIds();
+  const { toggleSelection } = useSelectionContext();
 
   const { data, isLoading, error, mutate } = useSWR<{ items: LeaveRow[] }>("/api/leaves?mine=1", fetcher, {
     revalidateOnFocus: false,
@@ -218,9 +224,29 @@ export function MyLeavesContent() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredRows.map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell className="font-medium">{leaveTypeLabel[row.type] ?? row.type}</TableCell>
+                filteredRows.map((row) => {
+                  const isSelected = selectedIds.includes(row.id);
+                  return (
+                  <TableRow 
+                    key={row.id}
+                    className={cn(
+                      "cursor-pointer",
+                      isSelected && "bg-indigo-50 dark:bg-indigo-900/20"
+                    )}
+                    onClick={() => toggleSelection(row.id)}
+                  >
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleSelection(row.id)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                        />
+                        {leaveTypeLabel[row.type] ?? row.type}
+                      </div>
+                    </TableCell>
                     <TableCell className="hidden sm:table-cell">
                       <span className="sr-only">Dates: </span>
                       {formatDate(row.startDate)} → {formatDate(row.endDate)}
@@ -258,12 +284,19 @@ export function MyLeavesContent() {
                       )}
                     </TableCell>
                   </TableRow>
-                ))
+                ))}
               )}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
+
+      {user && (
+        <RoleAwareDock 
+          role={user.role as any} 
+          selectedIds={selectedIds.map(id => Number(id))} 
+        />
+      )}
     </div>
   );
 }
