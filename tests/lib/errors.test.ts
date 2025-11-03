@@ -91,5 +91,54 @@ describe("lib/errors", () => {
       expect(id).toMatch(uuidRegex);
     });
   });
+
+  describe("error code coverage", () => {
+    const requiredCodes = [
+      "el_insufficient_notice",
+      "cl_cannot_touch_holiday",
+      "start_or_end_on_holiday",
+      "backdate_window_exceeded",
+      "certificate_invalid_type",
+      "fitness_certificate_required",
+      "cancellation_request_invalid",
+      "already_cancelled",
+      "return_action_invalid",
+      "unauthorized",
+      "forbidden",
+      "invalid_dates",
+      "invalid_id",
+      "not_found",
+      "el_carry_cap_exceeded",
+      "cl_exceeds_consecutive_limit",
+      "cl_annual_cap_exceeded",
+      "medical_certificate_required",
+      "ml_annual_cap_exceeded",
+      "backdate_disallowed_by_policy",
+      "unsupported_file_type",
+      "file_too_large",
+      "insufficient_balance",
+      "self_approval_disallowed",
+      "self_rejection_disallowed",
+      "invalid_status",
+      "no_next_role",
+      "invalid_forward_target",
+      "cannot_cancel_now",
+    ];
+
+    it("should have all required error codes mapped", () => {
+      requiredCodes.forEach((code) => {
+        expect(isValidErrorCode(code)).toBe(true);
+        expect(getErrorMessage(code)).toBeTruthy();
+      });
+    });
+
+    it("should have user-friendly messages for all codes", () => {
+      requiredCodes.forEach((code) => {
+        const message = getErrorMessage(code);
+        expect(message.length).toBeGreaterThan(0);
+        expect(message).not.toBe("An error occurred. Please try again.");
+      });
+    });
+  });
 });
 
