@@ -1,26 +1,19 @@
 # 🏛️ CDBL Leave Management – Policy & Logic Reference
 
-> **Change Log & Engineering Tasks (applied today)**
-> 1) **ML > 3 days validation:** Confirmed as per Policy 6.21 — medical certificate mandatory if leave exceeds 3 working days.
-> 2) **Fitness certificate on return:** Added check for ML > 7 days before marking `RETURNED_TO_DUTY`.
-> 3) **API endpoints:**  
->    - `POST /api/leaves/[id]/certificate` — upload medical/fitness certificate.  
->    - `PATCH /api/leaves/[id]/duty-return` — validate and mark duty return with fitness certificate (ML > 7 days).
-> 4) **Error handling:** Added new error codes:
->    - `fitness_certificate_required`
->    - `certificate_invalid_type`
-> 5) **Audit tracking:** Added `UPLOAD_CERTIFICATE` and `RETURN_TO_DUTY` entries to audit logs.
-> 6) **Frontend:**  
->    - Show “Fitness Certificate Required” banner for ML > 7 days on return flow.  
->    - Display uploaded certificates as downloadable links in leave details.
-> 7) **Security improvement:** Validate MIME type using `file-type` library before saving.
-> 8) **Storage migration:** Move certificate uploads from `/public/uploads/` to `/private/uploads/` with signed URL access.
-> 9) **Engineering tasks summary:**
->    - Create `/api/leaves/[id]/certificate` handler with MIME + size validation.  
->    - Add `fitnessCertificateUrl` field in schema.  
->    - Extend audit model.  
->    - Add signed URL generation via `lib/storage.ts`.  
->    - Add integration tests for both upload and return flows.
+> **Change Log & Engineering Tasks**
+> 
+> **Phase 6 (Policy v2.0 - Uploads & Certificates):**
+> 1) **Secure storage:** Created `lib/storage.ts` with `generateSignedUrl()` function - 15-minute expiry, HMAC signature verification.
+> 2) **Certificate upload:** Created `POST /api/leaves/[id]/certificate` - MIME validation via file-type, size ≤ 5MB, saves to `/private/uploads/`, returns signed URL.
+> 3) **Signed file serving:** Created `GET /api/files/signed/[filename]` - verifies signature/expiry, serves files with appropriate headers.
+> 4) **Fitness certificate enforcement:** Updated `PATCH /api/leaves/[id]/duty-return` - requires fitnessCertificateUrl when ML > 7 days per Policy 6.14.
+> 5) **MIME validation:** Uses file-type library to detect real MIME type from file buffer (prevents spoofed extensions).
+> 6) **File storage:** All certificates stored in `/private/uploads/` (not web-accessible) - accessed only via signed URLs.
+> 7) **Audit logging:** Certificate uploads and duty returns create audit log entries.
+> 
+> **Previous Tasks:**
+> 8) **Frontend:** Show "Fitness Certificate Required" banner for ML > 7 days on return flow (to be implemented in Phase 9).
+> 9) **Error codes:** `fitness_certificate_required`, `certificate_invalid_type` (to be added to lib/errors.ts in Phase 8).
 
 ## Part 5: File Upload & Medical Certificate Rules
 
