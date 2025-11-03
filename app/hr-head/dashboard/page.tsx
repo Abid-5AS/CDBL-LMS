@@ -3,6 +3,10 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { HeroStrip } from "@/components/dashboard/HeroStrip";
 import { PendingLeaveRequestsTable } from "@/components/dashboard/PendingLeaveRequestsTable";
+import { ReturnedRequestsPanel } from "@/components/dashboard/ReturnedRequestsPanel";
+import { CancellationRequestsPanel } from "@/components/dashboard/CancellationRequestsPanel";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 async function HRHeadDashboardContent() {
   const user = await getCurrentUser();
@@ -20,6 +24,21 @@ async function HRHeadDashboardContent() {
         <PendingLeaveRequestsTable />
       </div>
 
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">Returned for Modification</h3>
+          <Suspense fallback={<PanelSkeleton />}>
+            <ReturnedRequestsPanel />
+          </Suspense>
+        </div>
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-slate-900">Cancellation Requests</h3>
+          <Suspense fallback={<PanelSkeleton />}>
+            <CancellationRequestsPanel />
+          </Suspense>
+        </div>
+      </div>
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <h3 className="text-lg font-medium text-slate-900 mb-3">HR Compliance</h3>
@@ -35,6 +54,19 @@ async function HRHeadDashboardContent() {
         </div>
       </div>
     </div>
+  );
+}
+
+function PanelSkeleton() {
+  return (
+    <Card>
+      <CardHeader>
+        <Skeleton className="h-6 w-48" />
+      </CardHeader>
+      <CardContent>
+        <Skeleton className="h-32 w-full" />
+      </CardContent>
+    </Card>
   );
 }
 

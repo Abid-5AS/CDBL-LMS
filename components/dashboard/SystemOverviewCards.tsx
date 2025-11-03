@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 import { LeaveStatus, Role } from "@prisma/client";
-import { Users, ShieldCheck, Clock, Calendar as CalendarIcon } from "lucide-react";
+import { Users, ShieldCheck, Clock, Calendar as CalendarIcon, AlertCircle, RotateCcw } from "lucide-react";
 
 export async function SystemOverviewCards() {
   const [
@@ -9,6 +9,8 @@ export async function SystemOverviewCards() {
     activeAdmins,
     pendingRequests,
     upcomingHolidays,
+    cancellationRequests,
+    returnedRequests,
   ] = await Promise.all([
     prisma.user.count({
       where: { role: Role.EMPLOYEE },
@@ -26,6 +28,16 @@ export async function SystemOverviewCards() {
         date: {
           gte: new Date(),
         },
+      },
+    }),
+    prisma.leaveRequest.count({
+      where: {
+        status: LeaveStatus.CANCELLATION_REQUESTED,
+      },
+    }),
+    prisma.leaveRequest.count({
+      where: {
+        status: LeaveStatus.RETURNED,
       },
     }),
   ]);
@@ -56,6 +68,22 @@ export async function SystemOverviewCards() {
       bgColor: "bg-amber-50",
     },
     {
+      title: "Cancellation Requests",
+      value: cancellationRequests,
+      description: "Awaiting HR review",
+      icon: AlertCircle,
+      color: "text-orange-600",
+      bgColor: "bg-orange-50",
+    },
+    {
+      title: "Returned for Modification",
+      value: returnedRequests,
+      description: "Awaiting employee resubmission",
+      icon: RotateCcw,
+      color: "text-cyan-600",
+      bgColor: "bg-cyan-50",
+    },
+    {
       title: "Upcoming Holidays",
       value: upcomingHolidays,
       description: "Scheduled holidays",
@@ -66,7 +94,7 @@ export async function SystemOverviewCards() {
   ];
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {cards.map((card) => {
         const Icon = card.icon;
         return (

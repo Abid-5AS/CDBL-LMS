@@ -109,3 +109,32 @@ export function canAssignRole(viewerRole: AppRole, targetRole: AppRole): boolean
 export function canCreateEmployee(role: AppRole): boolean {
   return role === "HR_ADMIN" || role === "HR_HEAD" || role === "CEO";
 }
+
+/**
+ * Check if a role can cancel leave requests
+ * Rules:
+ * - HR_ADMIN, HR_HEAD, CEO can cancel any approved leave (admin override)
+ * - EMPLOYEE can initiate cancellation request for their own approved leave
+ * @param role - The role of the person trying to cancel
+ * @param isOwnLeave - Whether the leave belongs to the actor
+ */
+export function canCancel(role: AppRole, isOwnLeave: boolean = false): boolean {
+  // Admin roles can cancel any leave
+  if (role === "HR_ADMIN" || role === "HR_HEAD" || role === "CEO") {
+    return true;
+  }
+  // Employees can only cancel their own leave (triggers CANCELLATION_REQUESTED)
+  return isOwnLeave && role === "EMPLOYEE";
+}
+
+/**
+ * Check if a role can return a leave request for modification
+ * Rules:
+ * - Only approvers (HR_ADMIN, HR_HEAD, CEO, DEPT_HEAD) can return requests
+ * - Used to set status to RETURNED so employee can modify and resubmit
+ * @param role - The role of the person trying to return
+ */
+export function canReturn(role: AppRole): boolean {
+  // Only approvers can return requests for modification
+  return role === "HR_ADMIN" || role === "HR_HEAD" || role === "CEO" || role === "DEPT_HEAD";
+}

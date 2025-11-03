@@ -8,6 +8,7 @@ import { PendingLeaveRequestsTable } from "./PendingLeaveRequestsTable";
 import { LeaveTrendChartData } from "./LeaveTrendChartData";
 import { LeaveTypePieChartData } from "./LeaveTypePieChartData";
 import { HRQuickActions } from "./HRQuickActions";
+import { CancellationRequestsPanel } from "./CancellationRequestsPanel";
 
 type HRDashboardProps = {
   username: string;
@@ -40,6 +41,14 @@ export function HRDashboard({ username }: HRDashboardProps) {
             <PendingLeaveRequestsTable />
           </Suspense>
         </div>
+      </section>
+
+      {/* Cancellation Requests */}
+      <section className="space-y-4" aria-label="Cancellation requests">
+        <h3 className="text-lg font-semibold text-slate-900">Cancellation Requests</h3>
+        <Suspense fallback={<CardSkeleton />}>
+          <CancellationRequestsPanel />
+        </Suspense>
       </section>
 
       {/* Analytics Charts */}
@@ -81,5 +90,18 @@ function TableSkeleton() {
 
 function ChartSkeleton() {
   return <Skeleton className="h-[250px] w-full" />;
+}
+
+function CardSkeleton() {
+  return (
+    <Card>
+      <CardHeader>
+        <Skeleton className="h-6 w-48" />
+      </CardHeader>
+      <CardContent>
+        <Skeleton className="h-32 w-full" />
+      </CardContent>
+    </Card>
+  );
 }
 

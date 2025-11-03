@@ -1,17 +1,19 @@
 # 🏛️ CDBL Leave Management – Policy & Logic Reference
 
-> **Change Log & Engineering Tasks (applied today)**
-> 1) **New statuses integrated:** Updated role-based behavior to include visibility for `RETURNED` and `CANCELLATION_REQUESTED` leaves.
-> 2) **Approval logic alignment:** Adjusted approver roles to use new per-type workflow chain via `getChainFor(type)`.
-> 3) **RBAC update:** Add `canCancel()` and `canReturn()` functions in `lib/rbac.ts` to support new flows.
-> 4) **Dashboard permissions:** DEPT_HEAD now sees `CANCELLATION_REQUESTED` for their team; HR roles see all.
-> 5) **Audit visibility:** HR_HEAD and CEO dashboards can access full audit trail.
-> 6) **UI refresh:** Add new tabs in dashboards for `Returned` and `Cancellation Requests`.
-> 7) **Engineering tasks:**
->    - Update `lib/rbac.ts` to export `canCancel(role)` and `canReturn(role)`.
->    - Update API endpoints to validate using new RBAC.
->    - Update frontend dashboards to show new statuses.
-> 8) **Supervisor review:** Confirm if DEPT_HEAD can approve CL directly as final approver under new workflow.
+> **Change Log & Engineering Tasks**
+> 
+> **Phase 4 (Policy v2.0 - RBAC & Role Logic):**
+> 1) **RBAC extensions:** Added `canCancel(role, isOwnLeave)` and `canReturn(role)` functions to `lib/rbac.ts`.
+> 2) **Cancellation permissions:** HR_ADMIN, HR_HEAD, CEO can cancel any approved leave; EMPLOYEE can initiate cancellation for own leave.
+> 3) **Return permissions:** HR_ADMIN, HR_HEAD, CEO, DEPT_HEAD can return requests for modification.
+> 4) **Dashboard panels:** Added CancellationRequestsPanel and ReturnedRequestsPanel components.
+> 5) **HR Admin dashboard:** Added Cancellation Requests panel.
+> 6) **HR Head dashboard:** Added both Returned for Modification and Cancellation Requests panels.
+> 7) **CEO dashboard:** Enhanced SystemOverviewCards with cancellation and returned request metrics.
+> 
+> **Previous Tasks:**
+> 8) **Approval logic alignment:** Adjusted approver roles to use new per-type workflow chain via `getChainFor(type)`.
+> 9) **Supervisor review:** Confirm if DEPT_HEAD can approve CL directly as final approver under new workflow.
 
 ## Part 9: Role-Based Behavior
 
