@@ -18,7 +18,9 @@ import { FileUploadSection } from "./file-upload-section";
 import { useDraftAutosave } from "./use-draft-autosave";
 import { DateRangePicker } from "./date-range-picker";
 import { useHolidays } from "./use-holidays";
-import { totalDaysInclusive, rangeContainsNonWorking, isWeekendOrHoliday, fmtDDMMYYYY } from "@/lib/date-utils";
+import { totalDaysInclusive, rangeContainsNonWorking, isWeekendOrHoliday, fmtDDMMYYYY, normalizeToDhakaMidnight } from "@/lib/date-utils";
+import { SUCCESS_MESSAGES, INFO_MESSAGES, getToastMessage } from "@/lib/toast-messages";
+import { countWorkingDaysSync } from "@/lib/working-days";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -40,7 +42,7 @@ const LEAVE_OPTIONS: { value: LeaveType; label: string }[] = [
 const RULE_TIPS: Record<LeaveType, string[]> = {
   CASUAL: ["Max 3 consecutive days", "Must retain 5 days balance"],
   MEDICAL: ["> 3 days requires certificate", "Backdating allowed up to 30 days"],
-  EARNED: ["Submit at least 15 days in advance", "Balance carries forward up to 60 days"],
+  EARNED: ["Submit at least 5 working days in advance", "Balance carries forward up to 60 days"],
 };
 
 function startOfDay(date: Date) {
@@ -108,7 +110,7 @@ export function ApplyLeaveForm() {
               end: draft.endDate ? new Date(draft.endDate) : undefined,
             });
             setReason(draft.reason);
-            toast.success("Draft restored successfully");
+            toast.success(INFO_MESSAGES.draft_restored);
           },
         },
       });
@@ -164,9 +166,20 @@ export function ApplyLeaveForm() {
     warnings.push(`Casual Leave cannot exceed ${policy.clMaxConsecutiveDays} consecutive days.`);
   }
   if (type === "EARNED" && dateRange.start) {
-    const daysUntil = Math.floor((dateRange.start.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-    if (daysUntil < policy.elMinNoticeDays && daysUntil >= 0) {
-      warnings.push(`Earned Leave requires ${policy.elMinNoticeDays} days' advance notice.`);
+    // Calculate working days notice using holidays
+    const today = normalizeToDhakaMidnight(new Date());
+    const startDate = normalizeToDhakaMidnight(dateRange.start);
+    const workingDaysUntil = countWorkingDaysSync(today, startDate, holidays);
+    if (workingDaysUntil < policy.elMinNoticeDays && workingDaysUntil >= 0) {
+      warnings.push(`Earned Leave requires at least ${policy.elMinNoticeDays} working days advance notice (you have ${workingDaysUntil} working days).`);
+    }
+  }
+  // CL side-touch warning
+  if (type === "CASUAL" && dateRange.start && dateRange.end) {
+    const startTouches = isWeekendOrHoliday(dateRange.start, holidays);
+    const endTouches = isWeekendOrHoliday(dateRange.end, holidays);
+    if (startTouches || endTouches) {
+      warnings.push("Casual Leave cannot start or end on Friday, Saturday, or a company holiday. Please use Earned Leave instead.");
     }
   }
   if (requiresCertificate && !file) {
@@ -236,7 +249,7 @@ export function ApplyLeaveForm() {
     if (submitting) return;
 
     if (!validateForm()) {
-      toast.error("Please fix the errors in the form");
+      toast.error(getToastMessage("validation_error", "Please fix the errors in the form"));
       return;
     }
 
@@ -276,16 +289,17 @@ export function ApplyLeaveForm() {
 
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        toast.error(data?.error ?? "Unable to submit request");
+        const errorMessage = getToastMessage(data?.error || "Unable to submit request", data?.message);
+        toast.error(errorMessage);
         return;
       }
 
       clearDraft();
-      toast.success("Leave request submitted successfully");
+      toast.success(SUCCESS_MESSAGES.leave_submitted);
       router.push("/leaves");
     } catch (error) {
       console.error(error);
-      toast.error("Network error. Please try again.");
+      toast.error(getToastMessage("network_error", "Network error. Please try again."));
     } finally {
       setSubmitting(false);
       setShowConfirmModal(false);

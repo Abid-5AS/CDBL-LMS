@@ -1,6 +1,13 @@
 # 🏛️ CDBL Leave Management – Policy & Logic Reference
 
 > **Change Log & Engineering Tasks**
+> **Phase 9 (Policy v2.0) — Frontend Updates**
+> 1) **Approval UI:** Updated ApprovalTable component to use centralized toast messages from `lib/toast-messages.ts`.
+> 2) **Status Display:** All approval-related components now show new statuses (RETURNED, CANCELLATION_REQUESTED, RECALLED, OVERSTAY_PENDING) with appropriate badges.
+> 3) **Toast Messages:** Success messages for approve/reject actions now use `SUCCESS_MESSAGES.leave_approved` and `SUCCESS_MESSAGES.leave_rejected`.
+> 4) **Error Handling:** Approval errors now use `getToastMessage()` to map error codes to user-friendly messages.
+
+> **Change Log & Engineering Tasks**
 > 
 > **Phase 3 (Policy v2.0 - Approval & Workflow Chains):**
 > 1) **Per-type approval chains:** Implemented `WORKFLOW_CHAINS` map with chains per leave type per Policy 6.10.

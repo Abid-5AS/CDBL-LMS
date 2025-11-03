@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
+import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/toast-messages";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -35,13 +36,14 @@ export function PendingApprovals({ role }: { role: string }) {
       });
       const payload = await res.json().catch(() => ({}));
       if (!res.ok) {
-        toast.error(payload?.error ?? `Failed to ${action.toLowerCase()} request`);
+        const errorMessage = getToastMessage(payload?.error || `Failed to ${action.toLowerCase()} request`, payload?.message);
+        toast.error(errorMessage);
         return;
       }
-      toast.success(`Leave ${action === "APPROVED" ? "approved" : "rejected"}`);
+      toast.success(action === "APPROVED" ? SUCCESS_MESSAGES.leave_approved : SUCCESS_MESSAGES.leave_rejected);
       await mutate();
     } catch {
-      toast.error("Unable to update request");
+      toast.error(getToastMessage("network_error", "Unable to update request"));
     }
   };
 

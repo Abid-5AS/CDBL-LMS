@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { LeaveDetailsModal } from "@/components/dashboard/LeaveDetailsModal";
 import { toast } from "sonner";
+import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/toast-messages";
 import { useSelectionContext } from "@/lib/selection-context";
 import { Checkbox } from "@/components/ui/checkbox";
 import clsx from "clsx";
@@ -115,12 +116,13 @@ export function RequestsTable({ limit, showFilter = true }: RequestsTableProps =
       const res = await fetch(`/api/leaves/${id}`, { method: "PATCH" });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        toast.error("Couldn't cancel request", {
-          description: body?.error ?? "Please try again.",
-        });
+        const errorMessage = getToastMessage(body?.error || "Unable to cancel request", body?.message);
+        toast.error(errorMessage);
         return;
       }
-      toast.success("Request cancelled");
+      const body = await res.json().catch(() => ({}));
+      const isImmediate = body?.status === "CANCELLED";
+      toast.success(isImmediate ? SUCCESS_MESSAGES.cancellation_success : SUCCESS_MESSAGES.cancellation_request_submitted);
       // Remove from selection if selected
       setSelectedIds((prev) => {
         const next = new Set(prev);
@@ -130,9 +132,7 @@ export function RequestsTable({ limit, showFilter = true }: RequestsTableProps =
       mutate();
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't cancel request", {
-        description: "Network error. Please try again.",
-      });
+      toast.error(getToastMessage("network_error", "Network error. Please try again."));
     }
   };
 

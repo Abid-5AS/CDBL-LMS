@@ -14,6 +14,7 @@ import { leaveTypeLabel } from "@/lib/ui";
 import { useSelectionContext } from "@/lib/selection-context";
 import { Checkbox } from "@/components/ui/checkbox";
 import clsx from "clsx";
+import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/toast-messages";
 
 type ApprovalsResponse = { items: HRApprovalItem[] };
 
@@ -110,7 +111,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     try {
       setProcessingId(id + action);
       await submitApprovalDecision(id, action);
-      toast.success(`Request ${action === "approve" ? "approved" : "rejected"}`);
+      toast.success(action === "approve" ? SUCCESS_MESSAGES.leave_approved : SUCCESS_MESSAGES.leave_rejected);
       // Remove from selection if selected
       setSelectedIds((prev) => {
         const next = new Set(prev);
@@ -119,7 +120,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
       });
       await mutate();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to update request";
+      const message = err instanceof Error ? getToastMessage(err.message, err.message) : getToastMessage("approval_failed", "Failed to update request");
       toast.error(message);
     } finally {
       setProcessingId(null);

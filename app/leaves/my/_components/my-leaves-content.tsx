@@ -24,6 +24,7 @@ import {
 import { toast } from "sonner";
 import useSWR from "swr";
 import { FilterBar } from "@/components/filters/FilterBar";
+import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/toast-messages";
 
 type LeaveRow = {
   id: number;
@@ -31,13 +32,13 @@ type LeaveRow = {
   startDate: string;
   endDate: string;
   workingDays: number;
-  status: "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
+  status: "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "RETURNED" | "CANCELLATION_REQUESTED" | "RECALLED" | "OVERSTAY_PENDING";
   updatedAt: string;
   reason?: string;
 };
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
-const CANCELABLE_STATUSES = new Set<LeaveRow["status"]>(["SUBMITTED", "PENDING"]);
+const CANCELABLE_STATUSES = new Set<LeaveRow["status"]>(["SUBMITTED", "PENDING", "RETURNED", "CANCELLATION_REQUESTED"]);
 
 const STATUS_OPTIONS = [
   { value: "PENDING", label: "Pending" },
@@ -45,6 +46,10 @@ const STATUS_OPTIONS = [
   { value: "REJECTED", label: "Rejected" },
   { value: "SUBMITTED", label: "Submitted" },
   { value: "CANCELLED", label: "Cancelled" },
+  { value: "RETURNED", label: "Returned" },
+  { value: "CANCELLATION_REQUESTED", label: "Cancellation Requested" },
+  { value: "RECALLED", label: "Recalled" },
+  { value: "OVERSTAY_PENDING", label: "Overstay" },
 ];
 
 const TYPE_OPTIONS = [
@@ -102,18 +107,18 @@ export function MyLeavesContent() {
       const res = await fetch(`/api/leaves/${id}`, { method: "PATCH" });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        toast.error("Couldn't cancel request", {
-          description: body?.error ?? "Please try again.",
-        });
+        const errorMessage = getToastMessage(body?.error || "Unable to cancel request", body?.message);
+        toast.error(errorMessage);
         return;
       }
-      toast.success("Request cancelled");
+      const body = await res.json().catch(() => ({}));
+      // Check if cancellation was immediate or requested
+      const isImmediate = body?.status === "CANCELLED";
+      toast.success(isImmediate ? SUCCESS_MESSAGES.cancellation_success : SUCCESS_MESSAGES.cancellation_request_submitted);
       mutate();
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't cancel request", {
-        description: "Network error. Please try again.",
-      });
+      toast.error(getToastMessage("network_error", "Network error. Please try again."));
     }
   };
 

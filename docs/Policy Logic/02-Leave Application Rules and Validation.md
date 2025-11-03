@@ -1,6 +1,19 @@
 
 # 🏛️ CDBL Leave Management – Policy & Logic Reference
 
+> **Change Log & Engineering Tasks**
+> **Phase 9 (Policy v2.0) — Frontend Updates**
+> 1) **Apply Leave Form:** Updated notice text from "15 days" to "5 working days" per Policy § 6.11.
+> 2) **Working Days Validation:** Added `countWorkingDaysSync()` integration for EL advance notice calculation using holidays.
+> 3) **CL Side-Touch Warning:** Added inline warning when Casual Leave starts/ends on Friday, Saturday, or holidays.
+> 4) **Status Badges:** Added badges for new statuses (RETURNED 🟡, CANCELLATION_REQUESTED 🟠, RECALLED 🟣, OVERSTAY_PENDING 🔴) with policy-based tooltips.
+> 5) **Toast Integration:** All frontend toasts now use centralized messages from `lib/toast-messages.ts`:
+>    - Success messages for cancellation, approval, rejection, submission
+>    - Error messages mapped from error codes via `getToastMessage()`
+> 6) **My Leaves Page:** Updated status filter options and cancellation logic to handle new statuses (RETURNED, CANCELLATION_REQUESTED now cancelable).
+> 7) **Approval Flows:** Updated toast messages to use centralized constants.
+> 8) **Tests:** Added snapshot tests for status badge rendering including new statuses.
+
 > **Change Log & Engineering Tasks (applied today)**
 > 1) **EL Advance Notice fixed:** from 15 days to ≥5 working days as per Policy 6.11. CL and Quarantine remain exempt.
 > 2) **Docs aligned:** Updated all occurrences and error examples that referenced 15 days.

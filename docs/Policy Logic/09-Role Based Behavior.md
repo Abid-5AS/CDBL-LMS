@@ -1,6 +1,13 @@
 # 🏛️ CDBL Leave Management – Policy & Logic Reference
 
 > **Change Log & Engineering Tasks**
+> **Phase 9 (Policy v2.0) — Frontend Updates**
+> 1) **Status Visibility:** Added badges and tooltips for new statuses across all dashboards and leave lists.
+> 2) **Dashboard Panels:** Updated Cancellation Requests Panel and Returned Requests Panel (from Phase 4) to use new status badges.
+> 3) **Toast Messages:** All role-based actions (approve, reject, cancel, return) now use centralized toast messages.
+> 4) **Filter Options:** Updated status filter dropdowns to include new statuses in My Leaves and approval pages.
+
+> **Change Log & Engineering Tasks**
 > 
 > **Phase 4 (Policy v2.0 - RBAC & Role Logic):**
 > 1) **RBAC extensions:** Added `canCancel(role, isOwnLeave)` and `canReturn(role)` functions to `lib/rbac.ts`.
