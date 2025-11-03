@@ -5,7 +5,7 @@
 > 2) **Fitness certificate on return:** Added check for ML > 7 days before marking `RETURNED_TO_DUTY`.
 > 3) **API endpoints:**  
 >    - `POST /api/leaves/[id]/certificate` — upload medical/fitness certificate.  
->    - `PATCH /api/leaves/[id]/return` — validate and mark duty return with fitness certificate.
+>    - `PATCH /api/leaves/[id]/duty-return` — validate and mark duty return with fitness certificate (ML > 7 days).
 > 4) **Error handling:** Added new error codes:
 >    - `fitness_certificate_required`
 >    - `certificate_invalid_type`
@@ -66,7 +66,7 @@ This document summarizes all rules related to file uploads, medical certificates
 - **Trigger Condition**: MEDICAL leave where `workingDays > 7`.
 - **Policy Reference**: Section 6.14 — “Medical leave over 7 days requires fitness certificate on return.”
 - **Implementation:**
-  - Endpoint: `PATCH /api/leaves/[id]/return`
+  - Endpoint: `PATCH /api/leaves/[id]/duty-return`
   - Validation: Reject if `fitnessCertificateUrl` is `null`.
   - Error Code: `fitness_certificate_required`
   - Error Response:

@@ -303,7 +303,7 @@ This document lists all validation messages, error codes, and user-facing messag
 - **Status**: `400`
 - **Condition**: Approver attempts to return a request that is not pending
 - **Message**: "Request cannot be returned at this stage."
-- **Location**: `app/api/leaves/[id]/return/route.ts`
+- **Location**: `app/api/leaves/[id]/duty-return/route.ts`
 
 ---
 

@@ -14,10 +14,12 @@ const ReturnSchema = z.object({
 
 /**
  * Return leave request for modification
+ * Endpoint: POST /api/leaves/[id]/return-for-modification
  * Rules:
  * - Only approvers (HR_ADMIN, HR_HEAD, CEO, DEPT_HEAD) can return requests
  * - Sets status to RETURNED so employee can modify and resubmit
  * - Valid states: SUBMITTED, PENDING
+ * - Records audit log action: RETURN_TO_DUTY (for modification flow)
  */
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();

@@ -294,7 +294,8 @@
 
 ### New Endpoints & Jobs
 - **File**: `app/api/leaves/[id]/recall/route.ts` (Recall from Leave)
-- **File**: `app/api/leaves/[id]/return/route.ts` (Return-to-Duty)
+- **File**: `app/api/leaves/[id]/return-for-modification/route.ts` (Return for Modification)
+- **File**: `app/api/leaves/[id]/duty-return/route.ts` (Return-to-Duty for ML > 7)
 - **File**: `scripts/jobs/auto-lapse.ts` (CL lapse)
 - **File**: `scripts/jobs/el-accrual.ts` (Monthly EL accrual)
 - **File**: `scripts/jobs/overstay-check.ts` (Daily overstay detection)
@@ -390,7 +391,8 @@
 13. `app/api/balance/mine/route.ts` - Balance retrieval
 14. `app/api/holidays/route.ts` - Holiday management
 23. `app/api/leaves/[id]/recall/route.ts` - Recall from leave
-24. `app/api/leaves/[id]/return/route.ts` - Return-to-duty handler
+24. `app/api/leaves/[id]/return-for-modification/route.ts` - Return for modification handler
+25. `app/api/leaves/[id]/duty-return/route.ts` - Return-to-duty handler (ML > 7 days)
 25. `scripts/jobs/el-accrual.ts` - Monthly EL accrual job
 26. `scripts/jobs/auto-lapse.ts` - Year-end CL lapse
 27. `scripts/jobs/overstay-check.ts` - Daily overstay detection

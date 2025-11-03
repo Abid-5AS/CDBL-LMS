@@ -6,7 +6,7 @@
 > 1) **Employee cancellation:** Updated `PATCH /api/leaves/[id]` - SUBMITTED/PENDING → CANCELLED, APPROVED → CANCELLATION_REQUESTED.
 > 2) **Admin cancellation:** Created `POST /api/leaves/[id]/cancel` - HR roles can cancel APPROVED or approve CANCELLATION_REQUESTED with balance restoration.
 > 3) **Balance restoration:** Implemented balance restoration on admin cancellation - decrements `Balance.used` and updates `Balance.closing`.
-> 4) **Return endpoint:** Created `POST /api/leaves/[id]/return` - approvers can return SUBMITTED/PENDING requests for modification (sets RETURNED status).
+> 4) **Return for modification endpoint:** Created `POST /api/leaves/[id]/return-for-modification` - approvers can return SUBMITTED/PENDING requests for modification (sets RETURNED status).
 > 5) **Recall endpoint:** Created `POST /api/leaves/[id]/recall` - HR roles can recall employees from APPROVED leave, restores remaining balance.
 > 6) **Balance on approval:** Updated approve endpoint to increment balance when leave is approved.
 > 7) **Audit logging:** All cancellation, return, and recall actions create audit log entries.
