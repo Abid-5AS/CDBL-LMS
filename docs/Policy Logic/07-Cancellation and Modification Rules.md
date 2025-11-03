@@ -1,18 +1,19 @@
 # 🏛️ CDBL Leave Management – Policy & Logic Reference
 
-> **Change Log & Engineering Tasks (applied today)**
-> 1) **Balance restoration logic added:** When cancelling an approved leave, decrement `Balance.used` by the number of leave days and recompute `Balance.closing`.
-> 2) **Admin cancellation rights:** Added HR/Admin override with `canApprove(role)` permission to cancel on behalf of employees.
-> 3) **Audit logging:** Every cancellation now generates an audit entry (`LEAVE_CANCELLED`).
-> 4) **Partial cancellation support:** Allow employee to request partial cancellation of an approved leave; HR/Admin approves it.
-> 5) **New status added:** `CANCELLATION_REQUESTED` (pending admin confirmation).
-> 6) **Returned status support:** Introduced `RETURNED` for modifications; employee can resubmit.
-> 7) **UI flow updates:** Confirmation modal for cancel, success toast, audit display in leave history.
-> 8) **Endpoints to update:**
->    - `PATCH /api/leaves/[id]`: Handle status update and balance restoration.
->    - `POST /api/leaves/[id]/cancel/admin`: New route for admin override.
->    - `POST /api/leaves/[id]/cancel/partial`: New route for partial cancellation requests.
-> 9) **Database:** Add `LeaveStatus` enums: `CANCELLATION_REQUESTED`, `RETURNED`.
+> **Change Log & Engineering Tasks**
+> 
+> **Phase 5 (Policy v2.0 - Cancellation / Recall / Return Endpoints):**
+> 1) **Employee cancellation:** Updated `PATCH /api/leaves/[id]` - SUBMITTED/PENDING → CANCELLED, APPROVED → CANCELLATION_REQUESTED.
+> 2) **Admin cancellation:** Created `POST /api/leaves/[id]/cancel` - HR roles can cancel APPROVED or approve CANCELLATION_REQUESTED with balance restoration.
+> 3) **Balance restoration:** Implemented balance restoration on admin cancellation - decrements `Balance.used` and updates `Balance.closing`.
+> 4) **Return endpoint:** Created `POST /api/leaves/[id]/return` - approvers can return SUBMITTED/PENDING requests for modification (sets RETURNED status).
+> 5) **Recall endpoint:** Created `POST /api/leaves/[id]/recall` - HR roles can recall employees from APPROVED leave, restores remaining balance.
+> 6) **Balance on approval:** Updated approve endpoint to increment balance when leave is approved.
+> 7) **Audit logging:** All cancellation, return, and recall actions create audit log entries.
+> 
+> **Previous Tasks:**
+> 8) **Partial cancellation support:** Future enhancement - allow employee to request partial cancellation.
+> 9) **UI flow updates:** Confirmation modal for cancel, success toast, audit display in leave history.
 
 ---
 

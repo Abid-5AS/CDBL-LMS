@@ -93,6 +93,37 @@ export async function POST(
     data: { status: newStatus as LeaveStatus },
   });
 
+  // Update balance when leave is approved
+  const currentYear = new Date().getFullYear();
+  const balance = await prisma.balance.findUnique({
+    where: {
+      userId_type_year: {
+        userId: leave.requesterId,
+        type: leave.type,
+        year: currentYear,
+      },
+    },
+  });
+
+  if (balance) {
+    const newUsed = (balance.used || 0) + leave.workingDays;
+    const newClosing = Math.max((balance.opening || 0) + (balance.accrued || 0) - newUsed, 0);
+
+    await prisma.balance.update({
+      where: {
+        userId_type_year: {
+          userId: leave.requesterId,
+          type: leave.type,
+          year: currentYear,
+        },
+      },
+      data: {
+        used: newUsed,
+        closing: newClosing,
+      },
+    });
+  }
+
   // Create audit log
   await prisma.auditLog.create({
     data: {
