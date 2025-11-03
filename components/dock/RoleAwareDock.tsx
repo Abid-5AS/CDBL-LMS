@@ -209,13 +209,13 @@ export function RoleAwareDock({
             "rounded-md px-3 py-2 text-sm font-medium transition-all relative",
             a.disabled 
               ? "opacity-40 cursor-not-allowed text-muted-foreground" 
-              : "hover:bg-accent text-foreground hover:text-primary",
+              : "hover:bg-accent text-foreground hover:text-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             a.badge && "pr-8"
           )}
         >
           {a.label}
           {a.badge && a.badge > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 text-white text-[10px] font-bold shadow-lg">
+            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold shadow-lg">
               {a.badge > 99 ? "99+" : a.badge}
             </span>
           )}

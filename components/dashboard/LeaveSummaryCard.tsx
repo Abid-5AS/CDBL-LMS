@@ -290,7 +290,7 @@ export function LeaveSummaryCard() {
             </span>
             <div className="text-right">
               <div className="flex items-baseline gap-1.5">
-                <span className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                <span className="text-lg font-bold text-foreground">
                   {totalRemaining}
                 </span>
                 <span className="text-xs font-medium text-muted-foreground">

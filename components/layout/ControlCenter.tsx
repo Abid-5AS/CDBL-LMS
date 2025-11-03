@@ -1,8 +1,14 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "@/lib/user-context";
 import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type BalanceData = {
   earned?: number;
@@ -59,31 +65,6 @@ export default function ControlCenter({ onClose }: { onClose: () => void }) {
     fetchData();
   }, [user?.role]);
 
-  // Handle outside click to close
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('[data-control-center]')) {
-        onClose();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [onClose]);
-
-  // Handle Escape key to close
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [onClose]);
-
   const handleLogout = async () => {
     onClose();
     try {
@@ -100,98 +81,91 @@ export default function ControlCenter({ onClose }: { onClose: () => void }) {
   const medical = balances.medical ?? balances.MEDICAL ?? 0;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: -10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.9, y: -8 }}
-        transition={{ type: "spring", stiffness: 240, damping: 24 }}
-        className="fixed right-6 top-[64px] w-72 rounded-2xl z-50 overflow-hidden glass-base border border-white/30 dark:border-white/10"
+    <Dialog open={true} onOpenChange={onClose}>
+      <DialogContent 
+        className="max-w-sm w-[calc(100vw-2rem)]"
         data-control-center
-        role="dialog"
-        aria-modal="true"
-        aria-label="Control Center"
       >
-        {/* Content wrapper */}
-        <div className="relative z-10 p-4">
-          {/* User Info */}
-          <div className="flex items-center gap-3 border-b border-gray-200/40 dark:border-gray-700/40 pb-3 mb-3">
-            <div className="h-10 w-10 rounded-full bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center text-white font-semibold text-sm shadow-md">
-              {user?.name?.[0]?.toUpperCase() ?? "U"}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-sm text-gray-900 dark:text-gray-100 truncate drop-shadow-sm">{user?.name ?? "User"}</p>
-              <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{user?.email ?? ""}</p>
-              <span className="inline-block mt-1 text-xs text-indigo-700 dark:text-indigo-400 font-medium bg-indigo-50/90 dark:bg-indigo-500/20 backdrop-blur-sm px-2 py-0.5 rounded shadow-sm">
-                {formatRole(user?.role ?? "")}
-              </span>
-            </div>
+        <DialogHeader>
+          <DialogTitle>Control Center</DialogTitle>
+          <DialogDescription className="sr-only">User settings and information</DialogDescription>
+        </DialogHeader>
+        
+        {/* User Info */}
+        <div className="flex items-center gap-3 border-b border-border pb-3 mb-3">
+          <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold text-sm shadow-md">
+            {user?.name?.[0]?.toUpperCase() ?? "U"}
           </div>
-
-          {/* Leave Balances - Only for non-executive roles */}
-          {user?.role && user.role !== "CEO" && user.role !== "HR_HEAD" && (
-            <div className="space-y-2 text-sm mb-3">
-              <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-2 drop-shadow-sm">
-                Leave Balance
-              </h3>
-              {loading ? (
-                <div className="space-y-2">
-                  <div className="h-4 bg-gray-200/80 dark:bg-gray-700/60 rounded animate-pulse backdrop-blur-sm" />
-                  <div className="h-4 bg-gray-200/80 dark:bg-gray-700/60 rounded animate-pulse backdrop-blur-sm" />
-                  <div className="h-4 bg-gray-200/80 dark:bg-gray-700/60 rounded animate-pulse backdrop-blur-sm" />
-                </div>
-              ) : (
-                <>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-800 dark:text-gray-200 drop-shadow-sm">Earned</span>
-                    <span className="font-semibold text-gray-900 dark:text-gray-100 drop-shadow-sm">{earned}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-800 dark:text-gray-200 drop-shadow-sm">Casual</span>
-                    <span className="font-semibold text-gray-900 dark:text-gray-100 drop-shadow-sm">{casual}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-800 dark:text-gray-200 drop-shadow-sm">Medical</span>
-                    <span className="font-semibold text-gray-900 dark:text-gray-100 drop-shadow-sm">{medical}</span>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Recent Notifications */}
-          {notes.length > 0 && (
-            <div className="mt-3 border-t border-gray-200/40 dark:border-gray-700/40 pt-3 text-xs text-gray-700 dark:text-gray-300 max-h-32 overflow-auto soft-scrollbar">
-              <p className="font-semibold mb-2 text-gray-800 dark:text-gray-200 drop-shadow-sm">Recent Notifications</p>
-              <ul className="space-y-1">
-                {notes.map((note, i) => (
-                  <li key={i} className="truncate flex items-start gap-2">
-                    <span className="text-indigo-600 dark:text-indigo-400 mt-0.5 drop-shadow-sm">•</span>
-                    <span className="drop-shadow-sm">{note}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Logout Button */}
-          <div className="mt-4 flex justify-end">
-            <button
-              onClick={handleLogout}
-              className="rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-4 py-2 text-sm font-medium 
-                hover:from-indigo-700 hover:to-indigo-800 
-                shadow-lg shadow-indigo-500/30
-                transition-all duration-200 
-                focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-transparent
-                backdrop-blur-sm"
-              aria-label="Logout"
-            >
-              Logout
-            </button>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm text-foreground truncate">{user?.name ?? "User"}</p>
+            <p className="text-xs text-muted-foreground truncate">{user?.email ?? ""}</p>
+            <span className="inline-block mt-1 text-xs text-primary font-medium bg-accent px-2 py-0.5 rounded shadow-sm">
+              {formatRole(user?.role ?? "")}
+            </span>
           </div>
         </div>
-      </motion.div>
-    </AnimatePresence>
+
+        {/* Leave Balances - Only for non-executive roles */}
+        {user?.role && user.role !== "CEO" && user.role !== "HR_HEAD" && (
+          <div className="space-y-2 text-sm mb-3">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+              Leave Balance
+            </h3>
+            {loading ? (
+              <div className="space-y-2">
+                <div className="h-4 bg-muted rounded animate-pulse" />
+                <div className="h-4 bg-muted rounded animate-pulse" />
+                <div className="h-4 bg-muted rounded animate-pulse" />
+              </div>
+            ) : (
+              <>
+                <div className="flex justify-between items-center">
+                  <span className="text-foreground">Earned</span>
+                  <span className="font-semibold text-foreground">{earned}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-foreground">Casual</span>
+                  <span className="font-semibold text-foreground">{casual}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-foreground">Medical</span>
+                  <span className="font-semibold text-foreground">{medical}</span>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Recent Notifications */}
+        {notes.length > 0 && (
+          <div className="mt-3 border-t border-border pt-3 text-xs text-muted-foreground max-h-32 overflow-auto">
+            <p className="font-semibold mb-2 text-foreground">Recent Notifications</p>
+            <ul className="space-y-1">
+              {notes.map((note, i) => (
+                <li key={i} className="truncate flex items-start gap-2">
+                  <span className="text-primary mt-0.5">•</span>
+                  <span>{note}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Logout Button */}
+        <div className="mt-4 flex justify-end">
+          <button
+            onClick={handleLogout}
+            className="rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-medium 
+              hover:bg-primary/90 
+              shadow-lg
+              transition-all duration-200 
+              focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            aria-label="Logout"
+          >
+            Logout
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
-

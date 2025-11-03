@@ -52,7 +52,7 @@ export default function FloatingDock({ pageContext }: FloatingDockProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 200, damping: 20 }}
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-2xl px-2 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3 glass-base transition-all duration-300"
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-2xl px-2 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3 bg-card/90 backdrop-blur-xl border border-border shadow-lg transition-all duration-300"
       role="navigation"
       aria-label="Page actions"
     >
@@ -80,7 +80,7 @@ export default function FloatingDock({ pageContext }: FloatingDockProps) {
               "flex items-center gap-2 p-2.5 rounded-full transition-all duration-200 relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
               "hover:scale-[1.05] active:scale-[0.95]",
               isActive
-                ? "text-primary bg-accent shadow-lg ring-2 ring-ring/20"
+                ? "text-primary-foreground bg-primary shadow-lg ring-2 ring-ring/20 font-semibold"
                 : "text-foreground hover:text-primary hover:bg-accent"
             )}
           >

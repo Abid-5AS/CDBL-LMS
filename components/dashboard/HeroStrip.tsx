@@ -77,32 +77,32 @@ export function HeroStrip({ name }: HeroStripProps) {
   }, [leavesData, holidaysData, name]);
 
   return (
-    <div className="glass-base border border-white/30 dark:border-white/10 rounded-2xl p-4 transition-transform duration-300 will-change-transform">
+    <div className="bg-card border border-border rounded-2xl p-4 transition-transform duration-300 will-change-transform">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           {pendingCount > 0 ? (
             <Link 
               href="/leaves?status=pending"
-              className="text-base font-medium text-gray-900 dark:text-gray-100 mb-2 flex items-start gap-2 underline-offset-4 hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors"
+              className="text-base font-medium text-foreground mb-2 flex items-start gap-2 underline-offset-4 hover:text-primary transition-colors"
             >
-              <AlertIcon className="mt-0.5 size-4 text-amber-500 dark:text-amber-300 flex-shrink-0" strokeWidth={2} />
+              <AlertIcon className="mt-0.5 size-4 text-amber-500 dark:text-amber-400 flex-shrink-0" strokeWidth={2} />
               <span className="line-clamp-2">{message}</span>
             </Link>
           ) : (
-            <p className="text-base font-medium text-gray-900 dark:text-gray-100 mb-2 flex items-start gap-2">
-              <ApplyIcon className="mt-0.5 size-4 text-emerald-500 dark:text-emerald-300 flex-shrink-0" strokeWidth={2} />
+            <p className="text-base font-medium text-foreground mb-2 flex items-start gap-2">
+              <ApplyIcon className="mt-0.5 size-4 text-emerald-500 dark:text-emerald-400 flex-shrink-0" strokeWidth={2} />
               <span className="line-clamp-2">{message}</span>
             </p>
           )}
           {nextHoliday && (
-            <p className="flex items-start gap-1.5 text-xs text-gray-600 dark:text-gray-300">
+            <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
               <CalendarIcon
-                className="flex-shrink-0 text-sky-600 dark:text-sky-300"
+                className="flex-shrink-0 text-primary"
                 size={iconSizes.sm}
                 strokeWidth={2.4}
               />
               <span className="leading-relaxed">
-                Next holiday: <span className="font-medium text-gray-700 dark:text-gray-200">{nextHoliday.name}</span> on {formatDate(nextHoliday.date)}
+                Next holiday: <span className="font-medium text-foreground">{nextHoliday.name}</span> on {formatDate(nextHoliday.date)}
               </span>
             </p>
           )}

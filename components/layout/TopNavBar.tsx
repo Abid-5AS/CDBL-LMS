@@ -251,11 +251,11 @@ export default function TopNavBar() {
         role="navigation"
         aria-label="Global navigation"
       >
-        <div className="mx-auto max-w-7xl h-full px-4 grid grid-cols-[auto_1fr_auto] items-center gap-4">
+        <div className="mx-auto w-full h-full px-4 grid grid-cols-[auto_1fr_auto] items-center gap-4">
           {/* Left Section: Breadcrumbs + New */}
           <div className="flex items-center gap-2 min-w-0">
             <nav
-              className="flex items-center gap-1.5 text-sm text-slate-700 dark:text-slate-300 shrink-0 min-w-0"
+              className="flex items-center gap-1.5 text-sm text-foreground shrink-0 min-w-0"
               aria-label="Breadcrumb"
             >
               {breadcrumbs.map((crumb, index) => (
