@@ -1,0 +1,19 @@
+---
+alwaysApply: true
+---
+
+# Logs, build, env
+
+node*modules/
+.next/
+dist/
+coverage/
+*.log
+.env\_
+/public/uploads/\*\*
+
+# Don’t propose edits here
+
+**/.git/**
+**/README.md
+**/LICENSE

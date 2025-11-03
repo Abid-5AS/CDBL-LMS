@@ -2,7 +2,7 @@ Clause → System Behavior → Enforcement
 ======================================
 
 Model reference: `LeaveRequest` (Prisma), table `LeaveRequest`.  
-Roles: `employee`, `hr_admin`.
+Roles: `EMPLOYEE`, `DEPT_HEAD`, `HR_ADMIN`, `HR_HEAD`, `CEO` (5 roles - see [User Roles Documentation](./04-User-Roles-and-Permissions.md)).
 
 Submission & Timing
 -------------------
@@ -34,9 +34,10 @@ Type-Specific Rules
 
 Approval Flow
 -------------
-- **Form & policy (6.11b, form footer)**  
-  Route: `hr_admin`.  
-  System prevents unassigned HRs from acting; delegation handled via HR Admin assignment.
+- **4-Step Approval Chain (6.11b, form footer)**  
+  Route: `HR_ADMIN → DEPT_HEAD → HR_HEAD → CEO`.  
+  System enforces sequential approval chain. HR_ADMIN and DEPT_HEAD can forward; HR_HEAD and CEO can approve/reject.  
+  See [Approval Workflow Documentation](./Policy%20Logic/06-Approval-Workflow-and-Chain.md) and [Workflow Spec](./References/Workflow_Spec.md).
 
 Return/Fitness
 --------------

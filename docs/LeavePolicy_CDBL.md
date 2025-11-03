@@ -43,9 +43,15 @@ System of record: Prisma `LeaveRequest` table (MySQL).
 
 5) Approval Hierarchy (System Implementation)
 ---------------------------------------------
-- HR Admin – validates policy compliance, adjusts balances, approves/rejects requests.
+- **4-Step Approval Chain**: HR_ADMIN → DEPT_HEAD → HR_HEAD → CEO
 
-Policy documents reference additional escalation (Dept Head, HR Senior, CEO). These stages can be reintroduced later; the MVP focuses on HR Admin as the single approver to unblock rollout.
+**Current Implementation**:
+- HR_ADMIN: Validates policy compliance, forwards to DEPT_HEAD
+- DEPT_HEAD: Reviews team requests, forwards to HR_HEAD
+- HR_HEAD: Final approval authority, can approve/reject or forward to CEO
+- CEO: Executive approval authority for sensitive/strategic cases
+
+Each step creates an approval record and audit log. See [Approval Workflow Documentation](./Policy%20Logic/06-Approval-Workflow-and-Chain.md) for details.
 
 6) System Enforcement Matrix (high level)
 -----------------------------------------

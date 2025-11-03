@@ -1,0 +1,89 @@
+---
+alwaysApply: true
+---
+
+# CDBL Leave Management — Cursor Rules (Policy v2.0)
+
+## Tech Stack & Constraints
+
+- Framework: Next.js (App Router), TypeScript
+- DB: Prisma + MySQL
+- Timezone: **Asia/Dhaka** (use `date-fns-tz` or `dayjs` with TZ)
+- UI: Tailwind + shadcn/ui
+- Storage: **/private/uploads** + signed URLs (no public file serving)
+- Tests: vitest/playwright (prefer unit + integration for policy logic)
+
+## Global Principles
+
+1. **Source of truth**: `/docs/Policy Logic/` — always read relevant file(s) before coding.
+2. **Idempotent rules**: business logic must be centralized in `/lib/**` and reused by API + UI.
+3. **Safe refactors**: write small PRs with tests; prefer pure functions in `/lib`.
+4. **Consistency**: handle all dates in **Asia/Dhaka**, normalize with `normalizeToDhakaMidnight()`.
+
+## Policy v2.0 Must-Haves (enforce)
+
+- **EL**: 24/year, accrues 2/mo (prorate), carry forward up to 60.
+- **EL notice**: ≥ **5 working days** (Fri/Sat + company holidays excluded).
+- **CL**: cannot start/end on Fri/Sat/holiday and **cannot touch** them on either side.
+- **ML**: certificate required if > 3 days; **fitness certificate required to return** if ML > 7 days.
+- **Approval chains**: per-type via `WORKFLOW_CHAINS`; only final approver can APPROVE/REJECT; others FORWARD/RETURN.
+- **Statuses**: add/handle `RETURNED`, `CANCELLATION_REQUESTED`, `RECALLED`, `OVERSTAY_PENDING`.
+- **Cancellations**: approved leave cancellation restores balance; partial cancel → `CANCELLATION_REQUESTED`.
+- **Jobs**: EL accrual monthly; CL auto-lapse yearly; daily overstay check.
+
+## File Ownership (where to put things)
+
+- `lib/policy.ts` → constants (EL_PER_YEAR=24, elAccrualPerMonth=2, elMinNoticeDays=5)
+- `lib/working-days.ts` → `countWorkingDays()`, holiday awareness
+- `lib/date-utils.ts` → `normalizeToDhakaMidnight()`, `fmtDDMMYYYY()`
+- `lib/workflow.ts` → `WORKFLOW_CHAINS`, `getChainFor()`, `isFinalApprover()`
+- `lib/rbac.ts` → `canCancel()`, `canReturn()`
+- `lib/storage.ts` → `generateSignedUrl()`
+- `scripts/jobs/*` → el-accrual, auto-lapse, overstay
+- `app/api/leaves/[id]/*` → approve/reject/forward/cancel/recall/return/certificate
+
+## Error Codes & Messages (map in `/lib/errors.ts`)
+
+- Keep existing and add: `cancellation_request_invalid`, `already_cancelled`, `return_action_invalid`, `fitness_certificate_required`
+- All responses include `{ error, message?, timestamp, traceId }`
+
+## API Rules
+
+- Normalize input dates to Dhaka midnight **before** validation/persistence.
+- Validate:
+  - start/end not weekend/holiday
+  - backdate window (CL/Quarantine none; EL/ML ≤ 30 days)
+  - CL side-touch rule (hard block)
+- Approval endpoints must resolve **per-type** chain.
+
+## Upload & Security
+
+- `/api/leaves/[id]/certificate`: check MIME via `file-type`, ≤ 5MB, save to `/private/uploads`, return signed URL.
+- Never link to `/public/uploads`. Use signed URLs only.
+
+## Testing Requirements (block PR if missing)
+
+- Unit: working-days with holidays, CL side-touch, EL notice calc, certificate rules.
+- Integration: cancel restores balance; partial cancel flow; ML return requires fitness cert; recall refunds remaining; per-type approval chain.
+- Snapshot/visual tests optional for dashboards.
+
+## Commit Style
+
+- `policy(v2): ...` for rule changes
+- `api: ...`, `ui: ...`, `db: ...`, `jobs: ...`, `tests: ...`, `docs: ...`
+- Keep PRs < 300 lines when possible; add a “Change Log & Engineering Tasks” block in edited docs (same style as Policy Logic files).
+
+## Don’ts
+
+- Don’t hardcode dates/timezones.
+- Don’t bypass `WORKFLOW_CHAINS`.
+- Don’t store files under `/public`.
+- Don’t change documented rules without updating `/docs/Policy Logic/` and referencing the clause.
+
+## Review Checklist (Cursor should auto-apply)
+
+- [ ] Touched policy docs read & cited in PR description
+- [ ] Dhaka TZ normalization present
+- [ ] Error codes mapped in `/lib/errors.ts`
+- [ ] Tests added/updated
+- [ ] Migrations + seed updates included if schema changed
