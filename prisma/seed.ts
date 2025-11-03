@@ -751,7 +751,6 @@ async function seedLeaveRequests() {
       status: "RECALLED" as LeaveStatus,
       policyVersion: "v2.0",
       needsCertificate: false,
-      returnConfirmed: true,
     },
     update: {},
   });
@@ -782,7 +781,6 @@ async function seedLeaveRequests() {
       status: "OVERSTAY_PENDING" as LeaveStatus,
       policyVersion: "v2.0",
       needsCertificate: false,
-      returnConfirmed: false,
     },
     update: {},
   });
