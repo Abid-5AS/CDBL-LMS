@@ -41,7 +41,7 @@ export function FilterBar({
   const hasActiveFilters = searchValue || statusFilter?.value || typeFilter?.value;
 
   return (
-    <div className={`flex flex-col gap-3 sm:flex-row sm:items-center ${className || ""}`}>
+    <div className={`flex flex-col gap-3 sm:flex-row sm:items-center ${className || ""}`} data-filter-bar>
       <div className="flex-1 min-w-0">
         <SearchInput
           value={searchValue}

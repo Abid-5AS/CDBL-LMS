@@ -1,7 +1,8 @@
 "use client";
 
 import { useUser } from "@/lib/user-context";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +10,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Plane, Clock, LogOut, FileText, User, Calendar, CheckCircle2, AlertCircle, XCircle } from "lucide-react";
+import { formatDate } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import useSWR from "swr";
 
 type BalanceData = {
   earned?: number;
@@ -17,6 +23,14 @@ type BalanceData = {
   EARNED?: number;
   CASUAL?: number;
   MEDICAL?: number;
+};
+
+type LeaveItem = {
+  id: number;
+  type: string;
+  startDate: string;
+  endDate: string;
+  status: string;
 };
 
 const formatRole = (role: string) => {
@@ -30,11 +44,25 @@ const formatRole = (role: string) => {
   return labels[role] || role;
 };
 
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+type TabValue = "balance" | "actions" | "recent";
+
 export default function ControlCenter({ onClose }: { onClose: () => void }) {
   const user = useUser();
+  const router = useRouter();
   const [balances, setBalances] = useState<BalanceData>({});
-  const [notes, setNotes] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<TabValue>("balance");
+
+  // Fetch recent leaves
+  const { data: leavesData } = useSWR<{ items: LeaveItem[] }>(
+    user?.role && user.role !== "CEO" && user.role !== "HR_HEAD" 
+      ? "/api/leaves?mine=1" 
+      : null,
+    fetcher,
+    { revalidateOnFocus: false }
+  );
 
   // Fetch live data
   useEffect(() => {
@@ -47,13 +75,6 @@ export default function ControlCenter({ onClose }: { onClose: () => void }) {
             const balanceData = await balanceRes.json();
             setBalances(balanceData);
           }
-        }
-
-        // Fetch notifications (stub)
-        const notesRes = await fetch("/api/notifications/latest");
-        if (notesRes.ok) {
-          const notesData = await notesRes.json();
-          setNotes(Array.isArray(notesData) ? notesData : []);
         }
       } catch (error) {
         console.error("Failed to fetch ControlCenter data:", error);
@@ -80,90 +101,255 @@ export default function ControlCenter({ onClose }: { onClose: () => void }) {
   const casual = balances.casual ?? balances.CASUAL ?? 0;
   const medical = balances.medical ?? balances.MEDICAL ?? 0;
 
+  // Process recent leaves
+  const recentLeaves = useMemo(() => {
+    if (!leavesData?.items) return [];
+    return leavesData.items
+      .slice(0, 5)
+      .map((leave) => ({
+        ...leave,
+        statusIcon: leave.status === "APPROVED" ? CheckCircle2 : 
+                     leave.status === "PENDING" || leave.status === "SUBMITTED" ? AlertCircle :
+                     leave.status === "REJECTED" || leave.status === "CANCELLED" ? XCircle : AlertCircle,
+        statusColor: leave.status === "APPROVED" ? "text-green-600 dark:text-green-400" :
+                     leave.status === "PENDING" || leave.status === "SUBMITTED" ? "text-amber-600 dark:text-amber-400" :
+                     leave.status === "REJECTED" || leave.status === "CANCELLED" ? "text-red-600 dark:text-red-400" :
+                     "text-muted-foreground",
+      }));
+  }, [leavesData]);
+
+  const showEmployeeContent = user?.role && user.role !== "CEO" && user.role !== "HR_HEAD";
+
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent 
-        className="max-w-sm w-[calc(100vw-2rem)]"
+        className="sm:max-w-md w-[calc(100vw-2rem)] rounded-2xl p-6 bg-card border border-border shadow-lg backdrop-blur-sm"
         data-control-center
       >
-        <DialogHeader>
+        <DialogHeader className="sr-only">
           <DialogTitle>Control Center</DialogTitle>
-          <DialogDescription className="sr-only">User settings and information</DialogDescription>
+          <DialogDescription>User settings and information</DialogDescription>
         </DialogHeader>
         
-        {/* User Info */}
-        <div className="flex items-center gap-3 border-b border-border pb-3 mb-3">
-          <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold text-sm shadow-md">
+        {/* User Info Header */}
+        <div className="flex items-center gap-4 mb-4 pb-4 border-b border-border/50">
+          <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold text-base shadow-md flex-shrink-0">
             {user?.name?.[0]?.toUpperCase() ?? "U"}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm text-foreground truncate">{user?.name ?? "User"}</p>
-            <p className="text-xs text-muted-foreground truncate">{user?.email ?? ""}</p>
-            <span className="inline-block mt-1 text-xs text-primary font-medium bg-accent px-2 py-0.5 rounded shadow-sm">
-              {formatRole(user?.role ?? "")}
-            </span>
+            <h2 className="font-semibold text-lg text-foreground truncate">{user?.name ?? "User"}</h2>
+            {user?.department && (
+              <p className="text-sm text-muted-foreground truncate">{user.department}</p>
+            )}
+            <div className="flex items-center gap-2 mt-1">
+              <span className="inline-block text-xs text-primary font-medium bg-accent/50 px-2 py-0.5 rounded">
+                {formatRole(user?.role ?? "")}
+              </span>
+              <span className="text-xs text-muted-foreground">Policy v2.0</span>
+            </div>
           </div>
         </div>
 
-        {/* Leave Balances - Only for non-executive roles */}
-        {user?.role && user.role !== "CEO" && user.role !== "HR_HEAD" && (
-          <div className="space-y-2 text-sm mb-3">
-            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-              Leave Balance
-            </h3>
-            {loading ? (
-              <div className="space-y-2">
-                <div className="h-4 bg-muted rounded animate-pulse" />
-                <div className="h-4 bg-muted rounded animate-pulse" />
-                <div className="h-4 bg-muted rounded animate-pulse" />
-              </div>
-            ) : (
-              <>
-                <div className="flex justify-between items-center">
-                  <span className="text-foreground">Earned</span>
-                  <span className="font-semibold text-foreground">{earned}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-foreground">Casual</span>
-                  <span className="font-semibold text-foreground">{casual}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-foreground">Medical</span>
-                  <span className="font-semibold text-foreground">{medical}</span>
-                </div>
-              </>
-            )}
+        {/* Tabs Navigation */}
+        {showEmployeeContent && (
+          <div className="flex gap-1 mb-4 p-1 bg-muted/30 rounded-lg">
+            <button
+              onClick={() => setActiveTab("balance")}
+              className={cn(
+                "flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all",
+                activeTab === "balance"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Balances
+            </button>
+            <button
+              onClick={() => setActiveTab("actions")}
+              className={cn(
+                "flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all",
+                activeTab === "actions"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Actions
+            </button>
+            <button
+              onClick={() => setActiveTab("recent")}
+              className={cn(
+                "flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all",
+                activeTab === "recent"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Recent
+            </button>
           </div>
         )}
 
-        {/* Recent Notifications */}
-        {notes.length > 0 && (
-          <div className="mt-3 border-t border-border pt-3 text-xs text-muted-foreground max-h-32 overflow-auto">
-            <p className="font-semibold mb-2 text-foreground">Recent Notifications</p>
-            <ul className="space-y-1">
-              {notes.map((note, i) => (
-                <li key={i} className="truncate flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  <span>{note}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        {/* Tab Content */}
+        <div className="min-h-[200px]">
+          {showEmployeeContent ? (
+            <>
+              {activeTab === "balance" && (
+                <div className="space-y-3">
+                  {loading ? (
+                    <div className="space-y-3">
+                      <div className="h-5 bg-muted rounded animate-pulse" />
+                      <div className="h-5 bg-muted rounded animate-pulse" />
+                      <div className="h-5 bg-muted rounded animate-pulse" />
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex justify-between items-center text-sm py-2">
+                        <span className="text-muted-foreground flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          Earned Leave
+                        </span>
+                        <span className="font-semibold text-foreground">{earned} days</span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm py-2">
+                        <span className="text-muted-foreground flex items-center gap-2">
+                          <Clock className="h-4 w-4" />
+                          Casual Leave
+                        </span>
+                        <span className="font-semibold text-foreground">{casual} days</span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm py-2">
+                        <span className="text-muted-foreground flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          Medical Leave
+                        </span>
+                        <span className="font-semibold text-foreground">{medical} days</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {activeTab === "actions" && (
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      onClose();
+                      router.push("/leaves/apply");
+                    }}
+                    className="h-auto py-3 flex-col gap-2"
+                  >
+                    <Plane className="h-5 w-5" />
+                    <span>Apply Leave</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      onClose();
+                      router.push("/leaves");
+                    }}
+                    className="h-auto py-3 flex-col gap-2"
+                  >
+                    <FileText className="h-5 w-5" />
+                    <span>View Requests</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      onClose();
+                      router.push("/dashboard");
+                    }}
+                    className="h-auto py-3 flex-col gap-2"
+                  >
+                    <User className="h-5 w-5" />
+                    <span>Dashboard</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      onClose();
+                      router.push("/policies");
+                    }}
+                    className="h-auto py-3 flex-col gap-2"
+                  >
+                    <FileText className="h-5 w-5" />
+                    <span>Policy</span>
+                  </Button>
+                </div>
+              )}
+
+              {activeTab === "recent" && (
+                <div className="space-y-2 max-h-[280px] overflow-y-auto">
+                  {recentLeaves.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-8">
+                      No recent leave requests
+                    </p>
+                  ) : (
+                    recentLeaves.map((leave) => {
+                      const StatusIcon = leave.statusIcon;
+                      return (
+                        <div
+                          key={leave.id}
+                          className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors text-sm"
+                          onClick={() => {
+                            onClose();
+                            router.push(`/leaves?highlight=${leave.id}`);
+                          }}
+                        >
+                          <StatusIcon className={cn("h-4 w-4 mt-0.5 flex-shrink-0", leave.statusColor)} />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-foreground capitalize">
+                              {leave.type.toLowerCase()} Leave
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
+                            </p>
+                            <p className="text-xs font-medium mt-1 capitalize" style={{ color: 'inherit' }}>
+                              {leave.status.toLowerCase().replace('_', ' ')}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-sm text-muted-foreground mb-4">
+                Executive view - organizational metrics available in dashboard
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  onClose();
+                  router.push("/dashboard");
+                }}
+              >
+                <User className="h-4 w-4" />
+                Go to Dashboard
+              </Button>
+            </div>
+          )}
+        </div>
 
         {/* Logout Button */}
-        <div className="mt-4 flex justify-end">
-          <button
+        <div className="mt-6 pt-4 border-t border-border/50 flex justify-end">
+          <Button
+            variant="destructive"
+            size="sm"
             onClick={handleLogout}
-            className="rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-medium 
-              hover:bg-primary/90 
-              shadow-lg
-              transition-all duration-200 
-              focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            aria-label="Logout"
+            className="gap-2"
           >
+            <LogOut className="h-4 w-4" />
             Logout
-          </button>
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

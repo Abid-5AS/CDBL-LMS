@@ -15,7 +15,7 @@ type FilterChipsProps = {
 
 export function FilterChips({ options, selectedValue, onChange }: FilterChipsProps) {
   return (
-    <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+    <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide" data-filter-chips>
       {options.map((option) => {
         const isSelected = selectedValue === option.value;
         return (

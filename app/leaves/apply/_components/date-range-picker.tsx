@@ -156,7 +156,7 @@ export function DateRangePicker({
           <div className="p-4 space-y-4">
             {/* Quick Select Buttons - Updated for "Next Working Day" and "Next Week" */}
             {showQuickSelect && (
-              <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700 pb-3">
+              <div className="flex gap-2 border-b border-border pb-3">
                 <Button
                   type="button"
                   variant="ghost"
@@ -181,11 +181,11 @@ export function DateRangePicker({
             
             {/* Hover Preview */}
             {previewStart && previewEnd && previewDays > 0 && (
-              <div className="text-xs text-slate-600 dark:text-slate-400 px-1 pb-2 border-b border-slate-200 dark:border-slate-700">
+              <div className="text-xs text-muted-foreground px-1 pb-2 border-b border-border">
                 <span className="font-medium">
                   {previewDays} day{previewDays !== 1 ? 's' : ''}
                 </span>
-                <span className="text-slate-500 ml-2">
+                <span className="text-muted-foreground ml-2 opacity-70">
                   ({fmtDDMMYYYY(previewStart)} → {fmtDDMMYYYY(previewEnd)})
                 </span>
               </div>
@@ -216,12 +216,12 @@ export function DateRangePicker({
 
             {/* Breakdown Summary */}
             {breakdown && (
-              <div className="text-xs text-slate-600 dark:text-slate-400 px-1 pt-2 border-t border-slate-200 dark:border-slate-700">
+              <div className="text-xs text-muted-foreground px-1 pt-2 border-t border-border">
                 <div className="font-medium mb-1">
                   {breakdown.total} total day{breakdown.total !== 1 ? 's' : ''}
                 </div>
                 {(breakdown.weekends > 0 || breakdown.holidays > 0) && (
-                  <div className="text-slate-500">
+                  <div className="text-muted-foreground opacity-70">
                     {breakdown.weekends > 0 && (
                       <span>{breakdown.weekends} weekend{breakdown.weekends !== 1 ? 's' : ''}</span>
                     )}
@@ -235,13 +235,13 @@ export function DateRangePicker({
             )}
 
             {/* Legend */}
-            <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-700">
+            <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t border-border">
               <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded border border-indigo-300 bg-indigo-50" />
+                <div className="w-3 h-3 rounded border border-primary/20 bg-primary/10" />
                 <span>Holiday</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded border border-slate-300" />
+                <div className="w-3 h-3 rounded border border-border" />
                 <span>Weekend</span>
               </div>
             </div>

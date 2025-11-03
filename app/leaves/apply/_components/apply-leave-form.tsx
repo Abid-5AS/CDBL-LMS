@@ -21,6 +21,7 @@ import { useHolidays } from "./use-holidays";
 import { totalDaysInclusive, rangeContainsNonWorking, isWeekendOrHoliday, fmtDDMMYYYY, normalizeToDhakaMidnight } from "@/lib/date-utils";
 import { SUCCESS_MESSAGES, INFO_MESSAGES, getToastMessage } from "@/lib/toast-messages";
 import { countWorkingDaysSync } from "@/lib/working-days";
+import { leaveTypeLabel } from "@/lib/ui";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -29,20 +30,82 @@ type BalanceResponse = {
   CASUAL: number;
   EARNED: number;
   MEDICAL: number;
+  MATERNITY?: number;
+  PATERNITY?: number;
+  STUDY?: number;
+  SPECIAL_DISABILITY?: number;
+  QUARANTINE?: number;
+  EXTRAWITHPAY?: number;
+  EXTRAWITHOUTPAY?: number;
 };
 
-type LeaveType = "CASUAL" | "MEDICAL" | "EARNED";
+type LeaveType = "EARNED" | "CASUAL" | "MEDICAL" | "MATERNITY" | "PATERNITY" | "STUDY" | "SPECIAL_DISABILITY" | "QUARANTINE" | "EXTRAWITHPAY" | "EXTRAWITHOUTPAY";
 
+// Use leaveTypeLabel from lib/ui.ts as source of truth for all leave types
 const LEAVE_OPTIONS: { value: LeaveType; label: string }[] = [
-  { value: "CASUAL", label: "Casual Leave" },
-  { value: "MEDICAL", label: "Medical Leave (Sick Leave)" },
-  { value: "EARNED", label: "Earned Leave" },
+  { value: "EARNED", label: leaveTypeLabel.EARNED },
+  { value: "CASUAL", label: leaveTypeLabel.CASUAL },
+  { value: "MEDICAL", label: leaveTypeLabel.MEDICAL },
+  { value: "MATERNITY", label: leaveTypeLabel.MATERNITY },
+  { value: "PATERNITY", label: leaveTypeLabel.PATERNITY },
+  { value: "STUDY", label: leaveTypeLabel.STUDY },
+  { value: "SPECIAL_DISABILITY", label: leaveTypeLabel.SPECIAL_DISABILITY },
+  { value: "QUARANTINE", label: leaveTypeLabel.QUARANTINE },
+  { value: "EXTRAWITHPAY", label: leaveTypeLabel.EXTRAWITHPAY },
+  { value: "EXTRAWITHOUTPAY", label: leaveTypeLabel.EXTRAWITHOUTPAY },
 ];
 
 const RULE_TIPS: Record<LeaveType, string[]> = {
-  CASUAL: ["Max 3 consecutive days", "Must retain 5 days balance"],
-  MEDICAL: ["> 3 days requires certificate", "Backdating allowed up to 30 days"],
-  EARNED: ["Submit at least 5 working days in advance", "Balance carries forward up to 60 days"],
+  CASUAL: [
+    "Max 3 consecutive days per spell",
+    "Cannot start/end on Friday, Saturday, or holidays",
+    "Must retain 5 days balance",
+  ],
+  EARNED: [
+    "Submit at least 5 working days in advance",
+    "Accrues 2 days per month",
+    "Balance carries forward up to 60 days",
+  ],
+  MEDICAL: [
+    "Certificate required if > 3 days",
+    "Fitness certificate required to return if > 7 days",
+    "Backdating allowed up to 30 days",
+  ],
+  MATERNITY: [
+    "Requires medical certificate",
+    "Usually 16 weeks duration",
+    "Apply well in advance",
+  ],
+  PATERNITY: [
+    "Usually up to 14 days",
+    "Apply with sufficient notice",
+    "May require supporting documentation",
+  ],
+  STUDY: [
+    "Requires approval from HR",
+    "Supporting documentation may be required",
+    "Apply in advance for planning",
+  ],
+  SPECIAL_DISABILITY: [
+    "Medical certificate required",
+    "Subject to HR approval",
+    "Duration varies by case",
+  ],
+  QUARANTINE: [
+    "Backdating allowed if applicable",
+    "Medical certificate may be required",
+    "Subject to HR verification",
+  ],
+  EXTRAWITHPAY: [
+    "Requires CEO approval",
+    "Subject to company policy",
+    "May require supporting documentation",
+  ],
+  EXTRAWITHOUTPAY: [
+    "Requires CEO approval",
+    "Does not affect leave balance",
+    "Subject to company policy",
+  ],
 };
 
 function startOfDay(date: Date) {
@@ -62,7 +125,7 @@ type FormErrors = {
 
 export function ApplyLeaveForm() {
   const router = useRouter();
-  const [type, setType] = useState<LeaveType>("CASUAL");
+  const [type, setType] = useState<LeaveType>("EARNED");
   const [dateRange, setDateRange] = useState<{ start: Date | undefined; end: Date | undefined }>({
     start: undefined,
     end: undefined,
@@ -79,7 +142,10 @@ export function ApplyLeaveForm() {
     data: balances,
     error: balancesError,
     isLoading: balancesLoading,
-  } = useSWR<BalanceResponse>("/api/balance/mine", fetcher);
+  } = useSWR<BalanceResponse>("/api/balance/mine", fetcher, {
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
+  });
 
   // Fetch holidays
   const { holidays } = useHolidays();
@@ -125,7 +191,8 @@ export function ApplyLeaveForm() {
   const requiresCertificate = type === "MEDICAL" && requestedDays > 3;
 
   const minSelectableDate = useMemo(() => {
-    if (type === "MEDICAL" || type === "EARNED") {
+    // Types that allow backdating up to 30 days
+    if (type === "MEDICAL" || type === "EARNED" || type === "QUARANTINE") {
       const today = startOfDay(new Date());
       today.setDate(today.getDate() - 30);
       return today;
@@ -379,6 +446,7 @@ export function ApplyLeaveForm() {
                   holidays={holidays}
                   disabled={submitting}
                   minDate={minSelectableDate}
+                  showQuickSelect={false}
                 />
 
                 {/* Duration feedback */}

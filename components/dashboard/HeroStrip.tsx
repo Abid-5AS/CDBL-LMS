@@ -1,10 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { formatDate } from "@/lib/utils";
 import { getIcon, iconSizes } from "@/lib/icons";
+import { LeaveTimeline } from "./LeaveTimeline";
+import { cn } from "@/lib/utils";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -15,10 +17,20 @@ type HeroStripProps = {
 const CalendarIcon = getIcon("CalendarDays");
 const AlertIcon = getIcon("AlertCircle");
 const ApplyIcon = getIcon("CalendarPlus");
+const ClockIcon = getIcon("Clock");
+
+type LeaveItem = {
+  id: number;
+  type: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+};
 
 export function HeroStrip({ name }: HeroStripProps) {
-
-  const { data: leavesData } = useSWR("/api/leaves?mine=1", fetcher, {
+  const router = useRouter();
+  
+  const { data: leavesData } = useSWR<{ items: LeaveItem[] }>("/api/leaves?mine=1", fetcher, {
     revalidateOnFocus: false,
   });
   
@@ -26,13 +38,14 @@ export function HeroStrip({ name }: HeroStripProps) {
     revalidateOnFocus: false,
   });
 
-  const { message, pendingCount, approvedUpcoming, nextHoliday } = useMemo(() => {
+  const { message, pendingCount, approvedUpcoming, nextHoliday, firstPendingLeave } = useMemo(() => {
     if (!leavesData?.items) {
       return {
         message: `All clear, ${name}. No pending requests.`,
         pendingCount: 0,
         approvedUpcoming: null,
         nextHoliday: null,
+        firstPendingLeave: null,
       };
     }
 
@@ -40,9 +53,12 @@ export function HeroStrip({ name }: HeroStripProps) {
     today.setHours(0, 0, 0, 0);
 
     const pending = leavesData.items.filter(
-      (item: { status: string }) => item.status === "SUBMITTED" || item.status === "PENDING"
+      (item: LeaveItem) => item.status === "SUBMITTED" || item.status === "PENDING"
     );
-    const approvedUpcoming = leavesData.items.find((item: { status: string; startDate: string }) => {
+    
+    const firstPending = pending.length > 0 ? pending[0] : null;
+    
+    const approvedUpcoming = leavesData.items.find((item: LeaveItem) => {
       if (item.status !== "APPROVED") return false;
       const startDate = new Date(item.startDate);
       startDate.setHours(0, 0, 0, 0);
@@ -73,37 +89,120 @@ export function HeroStrip({ name }: HeroStripProps) {
         name: nextHoliday.name,
         date: nextHoliday.date,
       } : null,
+      firstPendingLeave: firstPending,
     };
   }, [leavesData, holidaysData, name]);
 
+  const hasPending = pendingCount > 0;
+  const hasApprovedUpcoming = approvedUpcoming !== null;
+
+  const handleClick = () => {
+    if (firstPendingLeave) {
+      router.push(`/leaves?status=pending&highlight=${firstPendingLeave.id}`);
+    } else if (hasPending) {
+      router.push("/leaves?status=pending");
+    }
+  };
+
   return (
-    <div className="w-full rounded-2xl border border-border bg-card/90 backdrop-blur-sm p-4 shadow-sm transition-colors duration-200">
+    <div
+      className={cn(
+        "group relative w-full rounded-2xl border-2 border-border",
+        "bg-card hover:bg-accent/30 text-foreground",
+        "p-4 shadow-sm hover:shadow-md hover:scale-[1.01]",
+        "transition-all duration-200 ease-out",
+        "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30 focus-visible:ring-offset-2",
+        hasPending && "cursor-pointer"
+      )}
+      onClick={hasPending ? handleClick : undefined}
+      role={hasPending ? "button" : undefined}
+      tabIndex={hasPending ? 0 : undefined}
+      aria-label={hasPending ? "View pending leave request details" : undefined}
+      onKeyDown={
+        hasPending
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                handleClick();
+              }
+            }
+          : undefined
+      }
+    >
       <div className="flex flex-col gap-3">
-        {pendingCount > 0 ? (
-          <Link 
-            href="/leaves?status=pending"
-            className="text-base font-medium text-foreground flex items-start gap-2 underline-offset-4 hover:text-primary transition-colors"
+        {/* Main message with icon */}
+        <div className="flex items-start gap-3">
+          <div
+            className={cn(
+              "flex items-center justify-center w-10 h-10 rounded-full border flex-shrink-0",
+              hasPending
+                ? "bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800"
+                : hasApprovedUpcoming
+                ? "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800"
+                : "bg-accent/20 border-border/50"
+            )}
           >
-            <AlertIcon className="mt-0.5 size-4 text-amber-600 dark:text-amber-400 flex-shrink-0" strokeWidth={2} />
-            <span className="line-clamp-2">{message}</span>
-          </Link>
-        ) : (
-          <p className="text-base font-medium text-foreground flex items-start gap-2">
-            <ApplyIcon className="mt-0.5 size-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" strokeWidth={2} />
-            <span className="line-clamp-2">{message}</span>
-          </p>
+            {hasPending ? (
+              <AlertIcon
+                className={cn(
+                  "w-5 h-5 flex-shrink-0",
+                  "text-amber-600 dark:text-amber-400"
+                )}
+                strokeWidth={2}
+              />
+            ) : hasApprovedUpcoming ? (
+              <ApplyIcon
+                className={cn(
+                  "w-5 h-5 flex-shrink-0",
+                  "text-emerald-600 dark:text-emerald-400"
+                )}
+                strokeWidth={2}
+              />
+            ) : (
+              <ClockIcon
+                className="w-5 h-5 text-muted-foreground flex-shrink-0"
+                strokeWidth={2}
+              />
+            )}
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <p className="text-base font-medium text-foreground line-clamp-2 mb-0.5">
+              {message}
+            </p>
+            {firstPendingLeave && (
+              <div className="text-sm text-muted-foreground">
+                <span className="font-semibold capitalize text-foreground">
+                  {firstPendingLeave.type.toLowerCase()} Leave
+                </span>
+                {": "}
+                {formatDate(firstPendingLeave.startDate)} → {formatDate(firstPendingLeave.endDate)}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Approval Timeline for pending requests */}
+        {firstPendingLeave && (
+          <div className="mt-2 pt-3 border-t border-border/40">
+            <LeaveTimeline requestId={firstPendingLeave.id} variant="compact" />
+          </div>
         )}
+
+        {/* Next holiday info */}
         {nextHoliday && (
-          <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+          <div className="flex items-start gap-1.5 text-xs text-muted-foreground pt-1">
             <CalendarIcon
-              className="flex-shrink-0 text-primary"
+              className="flex-shrink-0 text-primary mt-0.5"
               size={iconSizes.sm}
               strokeWidth={2.4}
             />
             <span className="leading-relaxed">
-              Next holiday: <span className="font-medium text-primary">{nextHoliday.name}</span> on {formatDate(nextHoliday.date)}
+              Next holiday:{" "}
+              <span className="font-medium text-primary">{nextHoliday.name}</span> on{" "}
+              {formatDate(nextHoliday.date)}
             </span>
-          </p>
+          </div>
         )}
       </div>
     </div>

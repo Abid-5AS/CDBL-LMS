@@ -3,7 +3,6 @@
 import { Suspense } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LeaveStatusBanner } from "./LeaveStatusBanner";
 import { LeaveSummaryCard } from "./LeaveSummaryCard";
 import { RequestsTable } from "@/app/dashboard/components/requests-table";
 import { HeroStrip } from "./HeroStrip";
@@ -13,16 +12,11 @@ type EmployeeDashboardUnifiedProps = {
 };
 
 export function EmployeeDashboardUnified({ username }: EmployeeDashboardUnifiedProps) {
-  return (
+return (
     <div className="space-y-6">
       {/* Hero Strip with status and actions */}
       <Suspense fallback={<HeroSkeleton />}>
         <HeroStrip name={username} />
-      </Suspense>
-
-      {/* Leave Status Banner (conditional) */}
-      <Suspense fallback={<BannerSkeleton />}>
-        <LeaveStatusBanner />
       </Suspense>
 
       {/* Main Content Grid */}
@@ -50,14 +44,6 @@ function HeroSkeleton() {
   return (
     <div className="rounded-2xl border border-border bg-card/90 p-4">
       <Skeleton className="h-12 w-full" />
-    </div>
-  );
-}
-
-function BannerSkeleton() {
-  return (
-    <div className="rounded-2xl border-2 border-border p-4 bg-card/90">
-      <Skeleton className="h-16 w-full" />
     </div>
   );
 }

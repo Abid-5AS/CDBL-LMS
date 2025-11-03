@@ -20,6 +20,8 @@ alwaysApply: true
 3. **Safe refactors**: write small PRs with tests; prefer pure functions in `/lib`.
 4. **Consistency**: handle all dates in **Asia/Dhaka**, normalize with `normalizeToDhakaMidnight()`.
 
+> **Role Enforcement Rule**: See `.cursor/rules/role-context-enforcement-optimized.md` for complete role-based separation, permissions, and workflow chains per Policy v2.0.
+
 ## Policy v2.0 Must-Haves (enforce)
 
 - **EL**: 24/year, accrues 2/mo (prorate), carry forward up to 60.

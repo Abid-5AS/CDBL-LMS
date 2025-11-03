@@ -1,0 +1,270 @@
+{
+  "name": "CDBL Policy v2.0 — Role Context Enforcement",
+  "version": "v2.0",
+  "description": "Strict role-based separation aligned with Policy Logic docs. Cross-reference policy files before implementing role features.",
+  "source_of_truth": {
+    "primary": "docs/Policy Logic/09-Role Based Behavior.md",
+    "approval_workflow": "docs/Policy Logic/06-Approval Workflow and Chain.md",
+    "rbac_functions": "lib/rbac.ts",
+    "workflow_functions": "lib/workflow.ts"
+  },
+  "rules": [
+    {
+      "trigger": "always",
+      "match": ["src/**", "app/**", "components/**", "lib/**"],
+      "actions": [
+        {
+          "precondition": "Working on role-based features",
+          "then": [
+            "1. READ relevant Policy Logic file FIRST from docs/Policy Logic/",
+            "2. VERIFY role permissions in lib/rbac.ts match policy",
+            "3. CHECK workflow chains in lib/workflow.ts for approval logic",
+            "4. ONLY THEN implement changes"
+          ]
+        },
+        {
+          "if": "Creating or modifying components, modals, API routes, or dashboards",
+          "then": [
+            "Include explicit role validation using functions from lib/rbac.ts",
+            "Prefix by role scope: Employee*, Dept*, HR*, CEO* only if universal",
+            "Use existing RBAC functions: canViewAllRequests(), canApprove(), canCancel(), canReturn(), canViewEmployee(), etc.",
+            "Disallow shared/mixed-role components unless universal (e.g., date utils, theme)"
+          ]
+        },
+        {
+          "if": "Generating UI elements (docks, dashboards, control centers)",
+          "then": [
+            "Render actions conditionally via getActionsForContext() from lib/page-context.ts",
+            "Ensure each role sees ONLY allowed actions per Policy 09-Role Based Behavior.md",
+            "Do NOT reuse employee actions (e.g., Apply Leave) for HR/Admin roles",
+            "Check pageContext to infer correct actions (dashboard, approvals, employees, etc.)"
+          ]
+        },
+        {
+          "if": "Implementing API handlers or backend logic",
+          "then": [
+            "Guard ALL handlers with RBAC checks from lib/rbac.ts",
+            "For approvals: use per-type workflow chains via getChainFor(type) from lib/workflow.ts",
+            "For cancel: use canCancel(role, isOwnLeave)",
+            "For return: use canReturn(role)",
+            "Log role context in audit trail entries",
+            "Example guard: if (!canCancel(role, leave.requesterId === user.id)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })"
+          ]
+        },
+        {
+          "if": "Adding new pages or routes",
+          "then": [
+            "Confirm which role(s) can access per Policy 09-Role Based Behavior.md",
+            "Generate under correct folder: /app/dashboard, /app/admin, /app/hr-head, /app/ceo, /app/manager",
+            "Update getActionsForContext() if adding new page contexts",
+            "Ask for policy mapping if unclear which authority owns that page"
+          ]
+        },
+        {
+          "if": "Working with approval workflows",
+          "then": [
+            "Use per-type chains from WORKFLOW_CHAINS in lib/workflow.ts",
+            "Check isFinalApprover(role, type) to determine APPROVE/REJECT vs FORWARD",
+            "CASUAL uses ['DEPT_HEAD'] chain, others use ['HR_ADMIN', 'DEPT_HEAD', 'HR_HEAD', 'CEO']",
+            "Only final approver in chain can APPROVE/REJECT; intermediates can FORWARD",
+            "Never hardcode approval sequences - use getChainFor(type)"
+          ]
+        },
+        {
+          "if": "Unsure about feature authority or permission",
+          "then": [
+            "Ask developer: 'Is this approved under Policy v2.0 for this role?'",
+            "If developer cannot confirm, skip implementation and log uncertainty",
+            "Reference exact policy clause number (e.g., Policy 6.10, Policy 6.19)"
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "roles": {
+      "EMPLOYEE": {
+        "can": [
+          "Apply Leave",
+          "Cancel Leave (SUBMITTED/PENDING)",
+          "Initiate Cancellation Request (APPROVED)",
+          "View Own Requests",
+          "View Own Balances",
+          "View Policy Document"
+        ],
+        "cannot": [
+          "Approve Any Requests",
+          "Access Other Employee Data",
+          "Generate Reports",
+          "View HR Audits",
+          "Self-approve (hard block in API)"
+        ],
+        "approval_chain": "NOT IN CHAIN",
+        "cancel_permission": "canCancel('EMPLOYEE', isOwnLeave=true) → CANCELLATION_REQUESTED for APPROVED"
+      },
+      "DEPT_HEAD": {
+        "can": [
+          "Forward to next step in chain",
+          "Approve/Reject CASUAL (final step in CL chain)",
+          "View Team Members",
+          "View Team Balances",
+          "Return Requests for Modification"
+        ],
+        "cannot": [
+          "Approve/Reject non-CASUAL (intermediate only)",
+          "View/Edit HR_HEAD, CEO, or other DEPT_HEADS",
+          "Generate Org-wide Reports",
+          "Create/Edit Employees"
+        ],
+        "approval_chain": "Step 2 in DEFAULT chain, Step 1 (final) in CASUAL chain",
+        "cancel_permission": "canCancel('DEPT_HEAD', isOwnLeave=false) → ADMIN OVERRIDE"
+      },
+      "HR_ADMIN": {
+        "can": [
+          "Forward to next step in chain",
+          "Review Requests (first step)",
+          "Approve/Reject CASUAL when final step",
+          "Return Requests for Modification",
+          "Cancel Any Approved Leave",
+          "View Employees & DEPT_HEAD",
+          "Generate Reports",
+          "View Audit Logs",
+          "Create/Edit Employees",
+          "Assign EMPLOYEE/DEPT_HEAD roles"
+        ],
+        "cannot": [
+          "Approve/Reject non-CASUAL (intermediate only)",
+          "View/Edit HR_HEAD or CEO",
+          "Assign HR_HEAD/CEO roles"
+        ],
+        "approval_chain": "Step 1 in DEFAULT chain",
+        "cancel_permission": "canCancel('HR_ADMIN', isOwnLeave=false) → ADMIN OVERRIDE"
+      },
+      "HR_HEAD": {
+        "can": [
+          "Approve/Reject (final step)",
+          "Forward to CEO if in chain",
+          "Return Requests for Modification",
+          "Cancel Any Approved Leave",
+          "View Everyone Except CEO",
+          "Edit Everyone Except CEO",
+          "Assign EMPLOYEE/DEPT_HEAD/HR_ADMIN roles",
+          "All HR_ADMIN features"
+        ],
+        "cannot": ["View/Edit CEO", "Assign CEO role"],
+        "approval_chain": "Step 3 in DEFAULT chain (final approver for non-CASUAL)",
+        "cancel_permission": "canCancel('HR_HEAD', isOwnLeave=false) → ADMIN OVERRIDE"
+      },
+      "CEO": {
+        "can": [
+          "Approve/Reject (final step in chain)",
+          "Return Requests for Modification",
+          "Cancel Any Approved Leave",
+          "View Everyone (full access)",
+          "Edit Everyone (full access)",
+          "Assign Any Role",
+          "Organization-wide Analytics",
+          "System Health & Diagnostics"
+        ],
+        "cannot": [
+          "Self-approve own requests",
+          "Modify System Configuration without migration"
+        ],
+        "approval_chain": "Step 4 in DEFAULT chain (final fallback)",
+        "cancel_permission": "canCancel('CEO', isOwnLeave=false) → ADMIN OVERRIDE"
+      }
+    },
+    "workflow_chains": {
+      "DEFAULT": {
+        "chain": ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
+        "applies_to": [
+          "EARNED",
+          "MEDICAL",
+          "EXTRAWITHPAY",
+          "EXTRAWITHOUTPAY",
+          "MATERNITY",
+          "PATERNITY",
+          "STUDY",
+          "SPECIAL_DISABILITY",
+          "QUARANTINE"
+        ],
+        "actions": {
+          "HR_ADMIN": "FORWARD to DEPT_HEAD",
+          "DEPT_HEAD": "FORWARD to HR_HEAD",
+          "HR_HEAD": "APPROVE/REJECT (final)",
+          "CEO": "APPROVE/REJECT (fallback final)"
+        }
+      },
+      "CASUAL": {
+        "chain": ["DEPT_HEAD"],
+        "applies_to": ["CASUAL"],
+        "actions": {
+          "DEPT_HEAD": "APPROVE/REJECT (final)"
+        }
+      },
+      "note": "Only final step in chain can APPROVE/REJECT. Intermediates can FORWARD or RETURN."
+    },
+    "leave_status_lifecycle": {
+      "DRAFT": "Created, not submitted",
+      "SUBMITTED": "Employee submitted → goes to first chain step",
+      "PENDING": "In approval process (forwarded between roles)",
+      "APPROVED": "Final approval granted",
+      "REJECTED": "Final rejection",
+      "CANCELLED": "Employee cancelled before approval",
+      "RETURNED": "Returned for modification",
+      "CANCELLATION_REQUESTED": "Employee requested cancellation of APPROVED leave",
+      "RECALLED": "Recalled by HR before end date",
+      "OVERSTAY_PENDING": "Past end date without return confirmation"
+    },
+    "ui_enforcement": {
+      "EmployeeDashboard": "/app/dashboard/page.tsx → Apply Leave, My Requests, Own Balances",
+      "ManagerDashboard": "/app/manager/dashboard/page.tsx → Team Requests, Approvals",
+      "HRAdminDashboard": "/app/admin/page.tsx → All Requests, Approval Queue, Employees, Holidays, Audit",
+      "HRHeadDashboard": "/app/hr-head/dashboard/page.tsx → All HR_ADMIN + Final Approvals, Full Audit",
+      "CEODashboard": "/app/ceo/dashboard/page.tsx → Org Analytics, Top KPIs, System Health",
+      "floating_dock": "lib/page-context.ts → getActionsForContext() provides role-aware actions"
+    },
+    "rbac_functions_reference": {
+      "lib/rbac.ts": [
+        "canViewAllRequests(role)",
+        "canApprove(role)",
+        "canViewEmployee(viewerRole, targetRole)",
+        "canEditEmployee(viewerRole, targetRole)",
+        "canAssignRole(viewerRole, targetRole)",
+        "canCreateEmployee(role)",
+        "canCancel(role, isOwnLeave)",
+        "canReturn(role)",
+        "getVisibleRoles(role)"
+      ],
+      "lib/workflow.ts": [
+        "getChainFor(type)",
+        "getNextRoleInChain(currentRole, type)",
+        "getStepForRole(role, type)",
+        "isFinalApprover(role, type)",
+        "canPerformAction(role, action, type)",
+        "canForwardTo(actorRole, targetRole, type)",
+        "getInitialStatus()",
+        "getStatusAfterAction(currentStatus, action, targetRole)"
+      ]
+    },
+    "critical_safeguards": [
+      "NEVER allow EMPLOYEE to approve ANY requests (even own)",
+      "NEVER allow HR_ADMIN to approve/reject DEFAULT chain (only FORWARD)",
+      "NEVER allow intermediate roles to APPROVE/REJECT (only final approver)",
+      "NEVER create shared dashboards without role checks",
+      "NEVER expose HR/Admin APIs to employees",
+      "NEVER create shared states without checking roleContext",
+      "ALWAYS use per-type workflow chains, never hardcode sequences",
+      "ALWAYS verify permissions before rendering UI actions",
+      "ALWAYS log role context in audit trail"
+    ],
+    "common_mistakes_to_avoid": [
+      "Don't assume HR_ADMIN can approve non-CASUAL (forward only)",
+      "Don't forget CASUAL uses different chain than DEFAULT",
+      "Don't allow self-approval without checking leave.requesterId !== user.id",
+      "Don't mix employee/HR dashboard features",
+      "Don't skip balance restoration on admin cancellation",
+      "Don't bypass canCancel() or canReturn() checks"
+    ]
+  }
+}

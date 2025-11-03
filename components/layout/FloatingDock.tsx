@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useUser, useUserStatus } from "@/lib/user-context";
 import { useSelectionCount } from "@/lib/selection-context";
 import {
@@ -8,6 +8,13 @@ import {
   inferPageContext,
   type PageContext,
 } from "@/lib/page-context";
+import {
+  routeToPage,
+  assertValidDockActions,
+  getDockActions,
+  isUnknownPage,
+  type Page,
+} from "@/lib/role-ui";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 // Tooltips removed - relying on hover styles and aria-labels for accessibility
@@ -19,6 +26,7 @@ type FloatingDockProps = {
 export default function FloatingDock({ pageContext }: FloatingDockProps) {
   const user = useUser();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const status = useUserStatus();
   const selectionCount = useSelectionCount();
@@ -29,12 +37,44 @@ export default function FloatingDock({ pageContext }: FloatingDockProps) {
   // Infer page context from pathname if not provided
   const resolvedPageContext = pageContext || inferPageContext(pathname);
 
+  // Get canonical page type for validation
+  const canonicalPage = routeToPage(pathname);
+
+  // Unknown page detection with dev warning
+  if (!canonicalPage) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn(
+        "[Dock] Unclassified route; please add to routeToPage():",
+        pathname
+      );
+    }
+    return null;
+  }
+
   // Get actions for current context, role, and selection state
   const actions = getActionsForContext(
     user.role as any,
     resolvedPageContext,
-    selectionCount
+    selectionCount,
+    pathname,
+    searchParams
   );
+
+  // Runtime validation using canonical matrix (dev mode only)
+  if (process.env.NODE_ENV === "development" && canonicalPage) {
+    // Get expected actions from canonical matrix
+    const expectedActions = getDockActions(
+      user.role as any,
+      canonicalPage as Page,
+      {
+        hasSelection: selectionCount > 0,
+        hasTabularData: true, // Conservative: assume tabular data present
+      }
+    );
+
+    // Assert that no banned actions appear
+    assertValidDockActions(user.role as any, canonicalPage as Page, expectedActions);
+  }
 
   // If no actions, don't render (or show minimal dock)
   if (actions.length === 0) {
