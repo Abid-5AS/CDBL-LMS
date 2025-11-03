@@ -74,9 +74,9 @@ export function LeaveStatusBanner() {
   }
 
   const variantStyles = {
-    success: "bg-green-50 border-green-200 text-green-900",
-    warning: "bg-indigo-50 border-indigo-200 text-indigo-900",
-    info: "bg-amber-50 border-amber-200 text-amber-900",
+    success: "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800 text-green-900 dark:text-green-100",
+    warning: "bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800 text-indigo-900 dark:text-indigo-100",
+    info: "bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100",
   };
 
   const Icon = icon;
@@ -96,7 +96,7 @@ export function LeaveStatusBanner() {
       }}
     >
       <div className="flex items-center gap-3 mb-3">
-        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/50">
+        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-card/50 dark:bg-card/30 border border-border/50">
           <Icon className="h-5 w-5" />
         </div>
         <div className="flex-1 min-w-0">

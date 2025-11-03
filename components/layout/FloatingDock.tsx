@@ -10,12 +10,7 @@ import {
 } from "@/lib/page-context";
 import { motion } from "framer-motion";
 import clsx from "clsx";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  TooltipProvider,
-} from "@/components/ui/tooltip";
+// Tooltips removed - relying on hover styles and aria-labels for accessibility
 
 type FloatingDockProps = {
   pageContext?: PageContext;

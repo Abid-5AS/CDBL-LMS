@@ -49,13 +49,13 @@ const getStageIcon = (status: string) => {
 const getStageColor = (status: string) => {
   switch (status) {
     case "completed":
-      return "text-green-600 bg-green-100";
+      return "text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-950/40 border border-green-200 dark:border-green-800";
     case "active":
-      return "text-indigo-600 bg-indigo-100 animate-pulse";
+      return "text-indigo-700 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 animate-pulse";
     case "rejected":
-      return "text-red-600 bg-red-100";
+      return "text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-950/40 border border-red-200 dark:border-red-800";
     default:
-      return "text-gray-400 bg-gray-100";
+      return "text-muted-foreground bg-muted/50 border border-border";
   }
 };
 
@@ -153,11 +153,11 @@ function StageItem({
       
       {/* Tooltip for approver info */}
       {showTooltip && stage.approver && variant === "compact" && (
-        <div className="absolute left-1/2 transform -translate-x-1/2 -top-12 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg whitespace-nowrap z-20">
+        <div className="absolute left-1/2 transform -translate-x-1/2 -top-12 px-3 py-2 bg-popover text-popover-foreground border border-border text-xs rounded-lg shadow-lg whitespace-nowrap z-20">
           <div className="font-medium">Approved by</div>
-          <div className="text-gray-300">{stage.approver}</div>
+          <div className="text-muted-foreground">{stage.approver}</div>
           {stage.completedAt && (
-            <div className="text-gray-400 mt-1">
+            <div className="text-muted-foreground mt-1">
               {formatDate(stage.completedAt)}
             </div>
           )}
@@ -165,7 +165,7 @@ function StageItem({
       )}
       
       {!isLast && (
-        <div className={clsx("h-0.5 w-8", stage.status === "completed" ? "bg-green-300" : "bg-gray-200")} />
+        <div className={clsx("h-0.5 w-8", stage.status === "completed" ? "bg-green-300 dark:bg-green-800" : "bg-border")} />
       )}
     </div>
   );

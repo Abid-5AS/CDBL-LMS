@@ -48,7 +48,7 @@ export function EmployeeDashboardUnified({ username }: EmployeeDashboardUnifiedP
 
 function HeroSkeleton() {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white/80 p-4">
+    <div className="rounded-2xl border border-border bg-card/90 p-4">
       <Skeleton className="h-12 w-full" />
     </div>
   );
@@ -56,7 +56,7 @@ function HeroSkeleton() {
 
 function BannerSkeleton() {
   return (
-    <div className="rounded-2xl border-2 p-4 bg-gray-100">
+    <div className="rounded-2xl border-2 border-border p-4 bg-card/90">
       <Skeleton className="h-16 w-full" />
     </div>
   );
