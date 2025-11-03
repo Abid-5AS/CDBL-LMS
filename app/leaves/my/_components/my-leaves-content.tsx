@@ -230,64 +230,65 @@ export function MyLeavesContent() {
                 filteredRows.map((row) => {
                   const isSelected = selectedIds.includes(row.id);
                   return (
-                  <TableRow 
-                    key={row.id}
-                    className={cn(
-                      "cursor-pointer",
-                      isSelected && "bg-indigo-50 dark:bg-indigo-900/20"
-                    )}
-                    onClick={() => toggleSelection(row.id)}
-                  >
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => toggleSelection(row.id)}
-                          onClick={(e) => e.stopPropagation()}
-                          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                        />
-                        {leaveTypeLabel[row.type] ?? row.type}
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell">
-                      <span className="sr-only">Dates: </span>
-                      {formatDate(row.startDate)} → {formatDate(row.endDate)}
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">{row.workingDays}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={row.status} />
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell">{formatDate(row.updatedAt)}</TableCell>
-                    <TableCell className="text-right">
-                      {CANCELABLE_STATUSES.has(row.status) ? (
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="outline" size="sm" aria-label={`Cancel leave request from ${formatDate(row.startDate)} to ${formatDate(row.endDate)}`}>
-                              Cancel
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Cancel this request?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This will mark the request as cancelled. Approvers will no longer see it.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Keep</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => cancelRequest(row.id)}>
-                                Cancel Request
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
+                    <TableRow 
+                      key={row.id}
+                      className={cn(
+                        "cursor-pointer",
+                        isSelected && "bg-indigo-50 dark:bg-indigo-900/20"
                       )}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      onClick={() => toggleSelection(row.id)}
+                    >
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleSelection(row.id)}
+                            onClick={(e) => e.stopPropagation()}
+                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                          />
+                          {leaveTypeLabel[row.type] ?? row.type}
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        <span className="sr-only">Dates: </span>
+                        {formatDate(row.startDate)} → {formatDate(row.endDate)}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">{row.workingDays}</TableCell>
+                      <TableCell>
+                        <StatusBadge status={row.status} />
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">{formatDate(row.updatedAt)}</TableCell>
+                      <TableCell className="text-right">
+                        {CANCELABLE_STATUSES.has(row.status) ? (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="outline" size="sm" aria-label={`Cancel leave request from ${formatDate(row.startDate)} to ${formatDate(row.endDate)}`}>
+                                Cancel
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Cancel this request?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This will mark the request as cancelled. Approvers will no longer see it.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Keep</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => cancelRequest(row.id)}>
+                                  Cancel Request
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>

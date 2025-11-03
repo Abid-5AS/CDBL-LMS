@@ -35,7 +35,7 @@ type LeaveRow = {
   startDate: string;
   endDate: string;
   workingDays: number;
-  status: "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
+  status: "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "RETURNED" | "CANCELLATION_REQUESTED" | "RECALLED" | "OVERSTAY_PENDING";
   updatedAt: string;
   reason?: string;
   createdAt?: string;

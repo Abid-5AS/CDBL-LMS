@@ -6,7 +6,7 @@ import { countWorkingDaysSync } from "../lib/working-days";
 
 const YEAR = new Date().getFullYear();
 
-async function upsertBalances(userId: number) {
+async function upsertBalances(userId: number, initialUsed: { [key in LeaveType]?: number } = {}) {
   const templates: Array<{ type: LeaveType; accrued: number }> = [
     { type: LeaveType.EARNED, accrued: 24 }, // Policy v2.0: 24 days/year (2 × 12 months)
     { type: LeaveType.CASUAL, accrued: 10 },
@@ -14,17 +14,24 @@ async function upsertBalances(userId: number) {
   ];
 
   for (const template of templates) {
+    const used = initialUsed[template.type] || 0;
+    const closing = Math.max(template.accrued - used, 0);
+    
     await prisma.balance.upsert({
       where: { userId_type_year: { userId, type: template.type, year: YEAR } },
-      update: {},
+      update: {
+        accrued: template.accrued,
+        used: used,
+        closing: closing,
+      },
       create: {
         userId,
         type: template.type,
         year: YEAR,
         opening: 0,
         accrued: template.accrued,
-        used: 0,
-        closing: template.accrued,
+        used: used,
+        closing: closing,
       },
     });
   }
@@ -59,6 +66,7 @@ async function upsertUser(user: {
     },
   });
 
+  // Balances will be updated after leave requests are created
   await upsertBalances(created.id);
   return created;
 }
@@ -597,44 +605,7 @@ async function seedLeaveRequests() {
     data: { decision: "FORWARDED", toRole: "CEO" },
   });
 
-  // Update balances based on approved leaves
-  const approvedLeaves = await prisma.leaveRequest.findMany({
-    where: {
-      status: "APPROVED",
-      requesterId: { in: [employee1.id, employee2.id, employee3.id, employee4.id] },
-    },
-  });
-
-  for (const leave of approvedLeaves) {
-    const balance = await prisma.balance.findUnique({
-      where: {
-        userId_type_year: {
-          userId: leave.requesterId,
-          type: leave.type,
-          year: currentYear,
-        },
-      },
-    });
-
-    if (balance) {
-      const newUsed = (balance.used || 0) + leave.workingDays;
-      const newClosing = Math.max((balance.opening || 0) + (balance.accrued || 0) - newUsed, 0);
-      
-      await prisma.balance.update({
-        where: {
-          userId_type_year: {
-            userId: leave.requesterId,
-            type: leave.type,
-            year: currentYear,
-          },
-        },
-        data: {
-          used: newUsed,
-          closing: newClosing,
-        },
-      });
-    }
-  }
+  // Balance calculation moved to end of function, after all leaves are created
 
   // Add additional audit logs for LOGIN, LOGOUT, POLICY_UPDATED, etc. to reach 40+
   const auditLogs = [
@@ -682,15 +653,232 @@ async function seedLeaveRequests() {
     });
   }
 
+  // 13. Employee1 - EL 10 days, APPROVED (example for balance calculation)
+  const leave13Start = new Date(currentYear, 11, 14); // Dec 14
+  const leave13End = new Date(currentYear, 11, 25);   // Dec 25
+  const leave13 = await prisma.leaveRequest.upsert({
+    where: { id: 13 },
+    create: {
+      id: 13,
+      requesterId: employee1.id,
+      type: LeaveType.EARNED,
+      startDate: leave13Start,
+      endDate: leave13End,
+      workingDays: calcWorkingDays(leave13Start, leave13End),
+      reason: "Example approved leave for employee1 balance calculation",
+      status: "APPROVED" as LeaveStatus,
+      policyVersion: "v2.0",
+      needsCertificate: false,
+    },
+    update: {},
+  });
+  await createFullChain(leave13.id, "APPROVED", employee1.email, 100, 40);
+
+  // 14. Employee1 - EL 2 days, CANCELLATION_REQUESTED (new Policy v2.0 status)
+  const leave14Start = new Date(currentYear, 11, 7); // Dec 7
+  const leave14End = new Date(currentYear, 11, 9);   // Dec 9
+  const leave14 = await prisma.leaveRequest.upsert({
+    where: { id: 14 },
+    create: {
+      id: 14,
+      requesterId: employee1.id,
+      type: LeaveType.EARNED,
+      startDate: leave14Start,
+      endDate: leave14End,
+      workingDays: calcWorkingDays(leave14Start, leave14End),
+      reason: "Leave that employee wants to cancel after approval",
+      status: "CANCELLATION_REQUESTED" as LeaveStatus,
+      policyVersion: "v2.0",
+      needsCertificate: false,
+    },
+    update: {},
+  });
+  await createFullChain(leave14.id, "APPROVED", employee1.email, 110, 35);
+  await prisma.auditLog.create({
+    data: {
+      actorEmail: employee1.email,
+      action: "LEAVE_CANCELLATION_REQUESTED",
+      targetEmail: employee1.email,
+      details: { leaveId: leave14.id },
+      createdAt: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000),
+    },
+  });
+
+  // 15. Employee2 - ML 3 days, RETURNED (new Policy v2.0 status)
+  const leave15Start = getFutureWorkingDate(15);
+  const leave15End = new Date(leave15Start);
+  leave15End.setDate(leave15End.getDate() + 2);
+  const leave15 = await prisma.leaveRequest.upsert({
+    where: { id: 15 },
+    create: {
+      id: 15,
+      requesterId: employee2.id,
+      type: LeaveType.MEDICAL,
+      startDate: leave15Start,
+      endDate: leave15End,
+      workingDays: calcWorkingDays(leave15Start, leave15End),
+      reason: "Medical leave returned for modification",
+      status: "RETURNED" as LeaveStatus,
+      policyVersion: "v2.0",
+      needsCertificate: false,
+    },
+    update: {},
+  });
+  await createApprovalAndAudit(leave15.id, 1, hrAdmin, "FORWARDED", "DEPT_HEAD", "Returned for employee to add certificate", employee2.email, 120, 8);
+  await prisma.auditLog.create({
+    data: {
+      actorEmail: hrAdmin.email,
+      action: "LEAVE_RETURNED",
+      targetEmail: employee2.email,
+      details: { leaveId: leave15.id, reason: "Missing required certificate" },
+      createdAt: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000),
+    },
+  });
+
+  // 16. Employee3 - EL 5 days, RECALLED (new Policy v2.0 status)
+  const leave16Start = new Date(currentYear, 11, 1); // Dec 1
+  const leave16End = new Date(currentYear, 11, 5);   // Dec 5
+  const leave16 = await prisma.leaveRequest.upsert({
+    where: { id: 16 },
+    create: {
+      id: 16,
+      requesterId: employee3.id,
+      type: LeaveType.EARNED,
+      startDate: leave16Start,
+      endDate: leave16End,
+      workingDays: calcWorkingDays(leave16Start, leave16End),
+      reason: "Leave that was recalled by HR",
+      status: "RECALLED" as LeaveStatus,
+      policyVersion: "v2.0",
+      needsCertificate: false,
+      returnConfirmed: true,
+    },
+    update: {},
+  });
+  await createFullChain(leave16.id, "APPROVED", employee3.email, 130, 50);
+  await prisma.auditLog.create({
+    data: {
+      actorEmail: hrHead.email,
+      action: "LEAVE_RECALL",
+      targetEmail: employee3.email,
+      details: { leaveId: leave16.id, reason: "Urgent project requirement" },
+      createdAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000),
+    },
+  });
+
+  // 17. Employee4 - CL 1 day, OVERSTAY_PENDING (new Policy v2.0 status)
+  const leave17Start = new Date(currentYear, 10, 1); // Nov 1 (past date)
+  const leave17End = new Date(currentYear, 10, 1);   // Nov 1
+  const leave17 = await prisma.leaveRequest.upsert({
+    where: { id: 17 },
+    create: {
+      id: 17,
+      requesterId: employee4.id,
+      type: LeaveType.CASUAL,
+      startDate: leave17Start,
+      endDate: leave17End,
+      workingDays: 1,
+      reason: "Leave with overstay pending status",
+      status: "OVERSTAY_PENDING" as LeaveStatus,
+      policyVersion: "v2.0",
+      needsCertificate: false,
+      returnConfirmed: false,
+    },
+    update: {},
+  });
+  await createFullChain(leave17.id, "APPROVED", employee4.email, 140, 60);
+  await prisma.auditLog.create({
+    data: {
+      actorEmail: hrAdmin.email,
+      action: "OVERSTAY_FLAGGED",
+      targetEmail: employee4.email,
+      details: { leaveId: leave17.id, endDate: leave17End.toISOString() },
+      createdAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000),
+    },
+  });
+
+  // Calculate balances for each employee based on approved leaves
+  const employeeIds = [employee1.id, employee2.id, employee3.id, employee4.id];
+  
+  for (const empId of employeeIds) {
+    const approvedLeaves = await prisma.leaveRequest.findMany({
+      where: {
+        status: "APPROVED",
+        requesterId: empId,
+      },
+    });
+
+    // Calculate used days per type
+    const usedByType: { [key in LeaveType]?: number } = {};
+    for (const leave of approvedLeaves) {
+      usedByType[leave.type] = (usedByType[leave.type] || 0) + leave.workingDays;
+    }
+
+    // Update balances with calculated used values
+    for (const type of [LeaveType.EARNED, LeaveType.CASUAL, LeaveType.MEDICAL] as LeaveType[]) {
+      const used = usedByType[type] || 0;
+      const balance = await prisma.balance.findUnique({
+        where: {
+          userId_type_year: {
+            userId: empId,
+            type: type,
+            year: currentYear,
+          },
+        },
+      });
+
+      if (balance) {
+        const newClosing = Math.max((balance.opening || 0) + (balance.accrued || 0) - used, 0);
+        await prisma.balance.update({
+          where: {
+            userId_type_year: {
+              userId: empId,
+              type: type,
+              year: currentYear,
+            },
+          },
+          data: {
+            used: used,
+            closing: newClosing,
+          },
+        });
+      } else {
+        // Create balance if it doesn't exist
+        const templates: { [key in LeaveType]?: number } = {
+          [LeaveType.EARNED]: 24,
+          [LeaveType.CASUAL]: 10,
+          [LeaveType.MEDICAL]: 14,
+        };
+        const accrued = templates[type] || 0;
+        await prisma.balance.create({
+          data: {
+            userId: empId,
+            type: type,
+            year: currentYear,
+            opening: 0,
+            accrued: accrued,
+            used: used,
+            closing: Math.max(accrued - used, 0),
+          },
+        });
+      }
+    }
+  }
+
   const stats = {
     pending: [leave1, leave4, leave9, leave12].filter(Boolean).length,
-    approved: [leave2, leave6, leave7, leave10].filter(Boolean).length,
+    approved: [leave2, leave6, leave7, leave10, leave13].filter(Boolean).length,
     rejected: [leave3, leave11].filter(Boolean).length,
     cancelled: leave5 ? 1 : 0,
     submitted: leave8 ? 1 : 0,
+    cancellation_requested: leave14 ? 1 : 0,
+    returned: leave15 ? 1 : 0,
+    recalled: leave16 ? 1 : 0,
+    overstay_pending: leave17 ? 1 : 0,
   };
 
   console.log(`Created ${stats.pending} pending, ${stats.approved} approved, ${stats.rejected} rejected, ${stats.cancelled} cancelled, ${stats.submitted} submitted leave requests.`);
+  console.log(`Created ${stats.cancellation_requested} cancellation_requested, ${stats.returned} returned, ${stats.recalled} recalled, ${stats.overstay_pending} overstay_pending leave requests.`);
   console.log(`Created ${auditLogs.length} additional audit logs.`);
   return stats;
 }

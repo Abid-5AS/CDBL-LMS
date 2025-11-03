@@ -17,7 +17,11 @@ export async function GET() {
   const remaining = (type: LeaveType) => {
     const record = balances.find((b) => b.type === type);
     if (!record) return 0;
-    return (record.opening ?? 0) + (record.accrued ?? 0) - (record.used ?? 0);
+    // Use closing balance if available, otherwise calculate from opening + accrued - used
+    if (record.closing !== null && record.closing !== undefined) {
+      return record.closing;
+    }
+    return Math.max((record.opening ?? 0) + (record.accrued ?? 0) - (record.used ?? 0), 0);
   };
 
   return NextResponse.json({
