@@ -1,19 +1,20 @@
 # 🏛️ CDBL Leave Management – Policy & Logic Reference
 
-> **Change Log & Engineering Tasks (applied today)**
-> 1) **Recall from Leave implemented:** Add backend route `POST /api/leaves/[id]/recall` with audit log and automatic balance adjustment.
-> 2) **Return-to-Duty workflow:** Add fitness certificate upload validation for ML > 7 days; update status to `RETURNED_TO_DUTY`.
-> 3) **Overstay detection:** Add background job to detect endDate < today + no return record; flag as `OVERSTAY_PENDING`.
-> 4) **Balance update alignment:** Integrate approval balance decrement and cancellation restoration.
-> 5) **Automatic EL accrual job:** Implement scheduled job (`cron` or queue worker) to run monthly and skip months where employee was on leave.
-> 6) **CL auto-lapse job:** Add yearly scheduled job to zero CL balances on Dec 31.
-> 7) **Policy version tracking:** Update `policyVersion` to `"v2.0"` in `lib/policy.ts`.
-> 8) **Audit enrichment:** Include new actions: `LEAVE_RECALL`, `RETURN_TO_DUTY`, `OVERSTAY_FLAGGED`.
-> 9) **Engineering tasks summary:**
->    - Add new endpoints and jobs.
->    - Extend audit model.
->    - Update cron scheduler configuration.
->    - Sync dashboard metrics to show overstay, recall, and duty return counts.
+> **Change Log & Engineering Tasks**
+> 
+> **Phase 7 (Policy v2.0 - Background Jobs):**
+> 1) **EL accrual job:** Implemented monthly accrual job - adds 2 days/month, skips months when employee on leave entire month, respects 60-day cap.
+> 2) **CL auto-lapse job:** Implemented yearly job running Dec 31 23:59 Asia/Dhaka - resets CL balance to 0.
+> 3) **Overstay detection job:** Implemented daily job - flags approved leaves past endDate without return confirmation as OVERSTAY_PENDING.
+> 4) **Scheduler:** Created centralized scheduler using node-cron with Asia/Dhaka timezone configuration.
+> 5) **Audit logging:** All jobs create audit entries (EL_ACCRUED, CL_LAPSED, OVERSTAY_FLAGGED).
+> 6) **Tests:** Added comprehensive unit and integration tests for all background jobs.
+> 
+> **Previous Tasks:**
+> 7) **Recall from Leave:** Implemented in Phase 5 - `POST /api/leaves/[id]/recall` with balance adjustment.
+> 8) **Return-to-Duty workflow:** Implemented in Phase 6 - fitness certificate validation for ML > 7 days.
+> 9) **Policy version tracking:** Updated to `"v2.0"` in Phase 1.
+> 10) **Audit enrichment:** Added actions: `LEAVE_RECALL`, `RETURN_TO_DUTY`, `OVERSTAY_FLAGGED`, `EL_ACCRUED`, `CL_LAPSED`.
 
 ## Part 11: Miscellaneous Business Rules
 

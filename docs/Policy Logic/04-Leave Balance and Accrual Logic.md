@@ -10,11 +10,18 @@
 > 5) **Fitness certificate field:** Added fitnessCertificateUrl to LeaveRequest model for ML > 7 days return validation.
 > 6) **Seed data updated:** EL accrued changed from 20 to 24 days in `prisma/seed.ts`.
 > 
+> **Phase 7 (Policy v2.0 - Background Jobs):**
+> 1) **EL accrual job:** Created `scripts/jobs/el-accrual.ts` - runs monthly on 1st at 00:00 Asia/Dhaka, adds 2 days/month, skips months when employee was on leave entire month, respects 60-day cap.
+> 2) **CL auto-lapse job:** Created `scripts/jobs/auto-lapse.ts` - runs annually on Dec 31 23:59 Asia/Dhaka, resets CL balance to 0 for all employees.
+> 3) **Overstay detection job:** Created `scripts/jobs/overstay-check.ts` - runs daily at midnight Asia/Dhaka, flags approved leaves past endDate without return confirmation as OVERSTAY_PENDING.
+> 4) **Scheduler:** Created `scripts/scheduler.ts` using node-cron with Asia/Dhaka timezone for all jobs.
+> 5) **Audit logging:** All jobs create audit log entries (EL_ACCRUED, CL_LAPSED, OVERSTAY_FLAGGED).
+> 6) **Tests:** Added unit tests for accrual and lapse logic, integration tests for overstay detection.
+> 
 > **Previous Tasks:**
 > 7) **Monthly accrual clarified:** 2 days are accrued per active month. Add proration for partial-month service.
-> 8) **Jobs:** Add a monthly accrual job and a year-end rollover job (EL carry-forward up to 60; CL/ML lapse).
-> 9) **Approval side-effects:** On APPROVE, increment `Balance.used`; on CANCEL of APPROVED, restore `used`.
-> 10) **Carry-forward enforcement:** Review enforcement so 60-day cap is applied at rollover; document decision.
+> 8) **Approval side-effects:** On APPROVE, increment `Balance.used`; on CANCEL of APPROVED, restore `used` (completed in Phase 5).
+> 9) **Carry-forward enforcement:** 60-day cap enforced in accrual job and leave application validation.
 
 ## Part 4: Leave Balance & Accrual Logic
 
