@@ -31,10 +31,10 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   // macOS-style unified layout with TopNavBar and FloatingDock
   return (
     <SelectionProvider>
-      <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-[#0B0F19] dark:bg-gradient-to-br dark:from-[#0B0F19] dark:to-[#131822]" suppressHydrationWarning>
+      <div className="flex min-h-screen flex-col bg-card" suppressHydrationWarning>
         <TopNavBar />
         <main className="flex-1 overflow-y-auto pt-14 pb-20" role="main" aria-label="Main content">
-          <div className="mx-auto w-full max-w-7xl px-6 py-6">{children}</div>
+          <div className="mx-auto w-full px-6 py-6">{children}</div>
         </main>
         <FloatingDock pageContext={pageContext} />
       </div>

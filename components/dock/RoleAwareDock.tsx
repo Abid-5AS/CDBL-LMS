@@ -197,8 +197,7 @@ export function RoleAwareDock({
 
   return (
     <div className={cn(
-      "fixed bottom-4 left-1/2 z-40 -translate-x-1/2 rounded-xl border bg-white/80 backdrop-blur px-3 py-2 shadow-lg flex gap-2 items-center",
-      "dark:bg-neutral-900/80 dark:border-neutral-700",
+      "fixed bottom-4 left-1/2 z-40 -translate-x-1/2 rounded-xl border bg-card backdrop-blur px-3 py-2 shadow-lg flex gap-2 items-center",
       className
     )}>
       {visibleActions.map(a => (
@@ -209,8 +208,8 @@ export function RoleAwareDock({
           className={cn(
             "rounded-md px-3 py-2 text-sm font-medium transition-all relative",
             a.disabled 
-              ? "opacity-40 cursor-not-allowed text-gray-400" 
-              : "hover:bg-black/5 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400",
+              ? "opacity-40 cursor-not-allowed text-muted-foreground" 
+              : "hover:bg-accent text-foreground hover:text-primary",
             a.badge && "pr-8"
           )}
         >

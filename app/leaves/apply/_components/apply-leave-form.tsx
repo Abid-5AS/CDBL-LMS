@@ -35,7 +35,7 @@ type LeaveType = "CASUAL" | "MEDICAL" | "EARNED";
 
 const LEAVE_OPTIONS: { value: LeaveType; label: string }[] = [
   { value: "CASUAL", label: "Casual Leave" },
-  { value: "MEDICAL", label: "Sick Leave" },
+  { value: "MEDICAL", label: "Medical Leave (Sick Leave)" },
   { value: "EARNED", label: "Earned Leave" },
 ];
 

@@ -58,11 +58,14 @@ const STATUS_OPTIONS = [
 const TYPE_OPTIONS = [
   { value: "EARNED", label: "Earned Leave" },
   { value: "CASUAL", label: "Casual Leave" },
-  { value: "MEDICAL", label: "Medical Leave" },
-  { value: "EXTRAWITHPAY", label: "Extra with Pay" },
-  { value: "EXTRAWITHOUTPAY", label: "Extra without Pay" },
-  { value: "MATERNITY", label: "Maternity" },
-  { value: "PATERNITY", label: "Paternity" },
+  { value: "MEDICAL", label: "Medical Leave (Sick Leave)" },
+  { value: "EXTRAWITHPAY", label: "Extraordinary Leave (with pay)" },
+  { value: "EXTRAWITHOUTPAY", label: "Extraordinary Leave (without pay)" },
+  { value: "MATERNITY", label: "Maternity Leave" },
+  { value: "PATERNITY", label: "Paternity Leave" },
+  { value: "STUDY", label: "Study Leave" },
+  { value: "SPECIAL_DISABILITY", label: "Special Disability Leave" },
+  { value: "QUARANTINE", label: "Quarantine Leave" },
 ];
 
 export function MyLeavesContent() {

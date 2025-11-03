@@ -242,8 +242,8 @@ export default function TopNavBar() {
     <>
       <nav
         className={clsx(
-          "fixed top-0 left-0 right-0 z-50 h-14 border-b border-white/10 dark:border-white/10",
-          "backdrop-blur-xl bg-white/30 dark:bg-[rgba(19,24,34,0.6)]",
+          "fixed top-0 left-0 right-0 z-50 h-14 border-b border-border",
+          "backdrop-blur-xl bg-card/80",
           "supports-backdrop-filter:bg-transparent",
           "shadow-sm transition-shadow duration-300",
           scrolled && "shadow-md"
@@ -264,15 +264,15 @@ export default function TopNavBar() {
                   className="flex items-center gap-1.5 shrink-0"
                 >
                   {index > 0 && (
-                    <ChevronRight className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                   )}
                   <Link
                     href={crumb.href}
                     className={clsx(
-                      "transition-colors truncate hover:text-indigo-600 dark:hover:text-indigo-400",
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 rounded",
+                      "transition-colors truncate hover:text-primary",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded",
                       index === breadcrumbs.length - 1
-                        ? "font-semibold text-slate-900 dark:text-slate-100"
+                        ? "font-semibold text-foreground"
                         : "hover:underline"
                     )}
                   >
@@ -289,7 +289,7 @@ export default function TopNavBar() {
                     onClick={() => {
                       router.push(pathname.split("?")[0]);
                     }}
-                    className="px-2 py-0.5 text-xs font-medium rounded-md bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 shrink-0"
+                    className="px-2 py-0.5 text-xs font-medium rounded-md bg-accent text-accent-foreground hover:bg-accent/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 shrink-0"
                     aria-label="Remove filter"
                   >
                     {pathname.includes("status=pending")
@@ -348,7 +348,7 @@ export default function TopNavBar() {
             className={clsx(
               "hidden md:flex flex-col items-center text-xs text-muted-foreground select-none",
               "transition-opacity hover:opacity-80 cursor-pointer",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 rounded px-2 py-1"
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded px-2 py-1"
             )}
             onClick={() => setControlCenterOpen(!controlCenterOpen)}
             onKeyDown={(e) => {
@@ -376,7 +376,7 @@ export default function TopNavBar() {
                   <GlassButton
                     variant="ghost"
                     size="icon"
-                    className="glass-light hover:bg-white/80 dark:hover:bg-white/5 transition-all focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1"
+                    className="glass-light hover:bg-accent transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                     aria-label="More options"
                   >
                     <MoreVertical className="h-4 w-4" />
@@ -404,7 +404,7 @@ export default function TopNavBar() {
                   onClick={() => setSearchOpen(true)}
                   aria-label="Search"
                   aria-keyshortcuts="Meta+K Ctrl+K"
-                  className="glass-light hover:bg-white/80 dark:hover:bg-white/5 transition-all hover:scale-105 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1"
+                  className="glass-light hover:bg-accent transition-all hover:scale-105 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                   title="Search (⌘K / Ctrl+K)"
                 >
                   <Search className="h-4 w-4" />
@@ -432,7 +432,7 @@ export default function TopNavBar() {
               className={clsx(
                 "glass-light relative h-9 w-9 rounded-full overflow-hidden border-2 transition-all",
                 "hover:scale-110 active:scale-95",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
                 controlCenterOpen
                   ? "border-indigo-500 dark:border-indigo-400 shadow-lg shadow-indigo-500/50"
                   : "border-white/20 dark:border-white/10 hover:border-indigo-300 dark:hover:border-indigo-700"

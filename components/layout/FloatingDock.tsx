@@ -56,73 +56,49 @@ export default function FloatingDock({ pageContext }: FloatingDockProps) {
       role="navigation"
       aria-label="Page actions"
     >
-      <TooltipProvider>
-        {actions.map((action) => {
-          const Icon = action.icon;
-          const isActive = action.href
-            ? pathname === action.href || pathname.startsWith(action.href + "/")
-            : false;
+      {actions.map((action) => {
+        const Icon = action.icon;
+        const isActive = action.href
+          ? pathname === action.href || pathname.startsWith(action.href + "/")
+          : false;
 
-          const handleClick = () => {
-            if (action.onClick) {
-              action.onClick();
-            } else if (action.href) {
-              router.push(action.href);
-            }
-          };
+        const handleClick = () => {
+          if (action.onClick) {
+            action.onClick();
+          } else if (action.href) {
+            router.push(action.href);
+          }
+        };
 
-          return (
-            <Tooltip key={action.label}>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={handleClick}
-                  aria-label={action.label}
-                  aria-current={isActive ? "page" : undefined}
-                  className={clsx(
-                    "flex items-center gap-2 p-2.5 rounded-full transition-all duration-200 relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2",
-                    "hover:scale-[1.05] active:scale-[0.95]",
-                    isActive
-                      ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/40 shadow-lg ring-2 ring-indigo-500/20 dark:ring-indigo-400/30"
-                      : "text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white/20 dark:hover:bg-white/5"
-                  )}
-                  style={
-                    isActive
-                      ? {
-                          color: "oklch(70% 0.1 250)",
-                        }
-                      : undefined
-                  }
-                >
-                  <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-                  <span className="hidden md:inline text-xs font-medium whitespace-nowrap">
-                    {action.label}
-                  </span>
-                  {action.badge !== undefined && action.badge > 0 && (
-                    <span
-                      className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 dark:bg-indigo-500 text-white text-[10px] font-bold shadow-lg"
-                      aria-label={`${action.badge} items selected`}
-                    >
-                      {action.badge > 99 ? "99+" : action.badge}
-                    </span>
-                  )}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent
-                side="top"
-                sideOffset={8}
+        return (
+          <button
+            key={action.label}
+            onClick={handleClick}
+            aria-label={action.label}
+            aria-current={isActive ? "page" : undefined}
+            className={clsx(
+              "flex items-center gap-2 p-2.5 rounded-full transition-all duration-200 relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+              "hover:scale-[1.05] active:scale-[0.95]",
+              isActive
+                ? "text-primary bg-accent shadow-lg ring-2 ring-ring/20"
+                : "text-foreground hover:text-primary hover:bg-accent"
+            )}
+          >
+            <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+            <span className="hidden md:inline text-xs font-medium whitespace-nowrap">
+              {action.label}
+            </span>
+            {action.badge !== undefined && action.badge > 0 && (
+              <span
+                className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold shadow-lg"
+                aria-label={`${action.badge} items selected`}
               >
-                <p className="text-xs font-semibold">{action.label}</p>
-                {selectionCount > 0 && (
-                  <p className="text-[10px] text-slate-400 dark:text-slate-300 mt-0.5">
-                    {selectionCount} row{selectionCount !== 1 ? "s" : ""}{" "}
-                    selected
-                  </p>
-                )}
-              </TooltipContent>
-            </Tooltip>
-          );
-        })}
-      </TooltipProvider>
+                {action.badge > 99 ? "99+" : action.badge}
+              </span>
+            )}
+          </button>
+        );
+      })}
     </motion.div>
   );
 }
