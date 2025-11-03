@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { canPerformAction, getStepForRole, getStatusAfterAction, type ApprovalAction } from "@/lib/workflow";
+import { canPerformAction, getStepForRole, getStatusAfterAction, isFinalApprover, type ApprovalAction } from "@/lib/workflow";
 import type { AppRole } from "@/lib/rbac";
 import { LeaveStatus } from "@prisma/client";
 import { z } from "zod";
@@ -29,19 +29,7 @@ export async function POST(
 
   const userRole = user.role as AppRole;
 
-  // Check if user can reject
-  if (!canPerformAction(userRole, "REJECT")) {
-    return NextResponse.json({ error: "forbidden", message: "You cannot reject leave requests" }, { status: 403 });
-  }
-
-  // Parse request body
-  const body = await request.json().catch(() => ({}));
-  const parsed = RejectSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: "invalid_input" }, { status: 400 });
-  }
-
-  // Get the leave request with requester
+  // Get the leave request with requester (need type for per-type chain resolution)
   const leave = await prisma.leaveRequest.findUnique({
     where: { id: leaveId },
     include: { requester: { select: { email: true } } },
@@ -49,6 +37,26 @@ export async function POST(
 
   if (!leave) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
+  }
+
+  // Check if user can reject for this leave type (per-type chain logic)
+  if (!canPerformAction(userRole, "REJECT", leave.type)) {
+    return NextResponse.json({ error: "forbidden", message: "You cannot reject leave requests" }, { status: 403 });
+  }
+
+  // Verify user is final approver for this leave type
+  if (!isFinalApprover(userRole, leave.type)) {
+    return NextResponse.json(
+      { error: "forbidden", message: "Only the final approver can reject leave requests" },
+      { status: 403 }
+    );
+  }
+
+  // Parse request body
+  const body = await request.json().catch(() => ({}));
+  const parsed = RejectSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "invalid_input" }, { status: 400 });
   }
 
   // Prevent self-rejection
@@ -64,7 +72,7 @@ export async function POST(
     );
   }
 
-  const step = getStepForRole(userRole);
+  const step = getStepForRole(userRole, leave.type);
   const newStatus = getStatusAfterAction(leave.status as LeaveStatus, "REJECT");
 
   // Create approval record

@@ -1,12 +1,19 @@
 # 🏛️ CDBL Leave Management – Policy & Logic Reference
 
-> **Change Log & Engineering Tasks (applied today)**
-> 1) **Per‑type approval chains:** Introduced configurable chains by leave type to honor Policy 6.10 (CL exception).
-> 2) **Default vs CL:** Default chain unchanged; **CASUAL** uses a shorter chain (provisionally DEPT_HEAD only) pending HR confirmation.
-> 3) **Permissions rule updated:** Final step in the active chain can **APPROVE/REJECT**; intermediate steps can only **FORWARD**.
-> 4) **Endpoints:** Approve/Reject/Forward now resolve next role from the leave type’s chain, not a single global chain.
-> 5) **UI:** Approval timeline and labels must read from the active chain for the specific request.
-> 6) **Supervisor check:** Confirm whether CL chain is `["DEPT_HEAD"]` or `["DEPT_HEAD", "HR_HEAD"]`. Update `WORKFLOW_CHAINS.CASUAL` accordingly.
+> **Change Log & Engineering Tasks**
+> 
+> **Phase 3 (Policy v2.0 - Approval & Workflow Chains):**
+> 1) **Per-type approval chains:** Implemented `WORKFLOW_CHAINS` map with chains per leave type per Policy 6.10.
+> 2) **CASUAL exception:** CASUAL uses shorter chain `["DEPT_HEAD"]` per Policy 6.10 (CL exception).
+> 3) **Chain resolution:** Added `getChainFor(type)` to resolve chain per leave type.
+> 4) **Final approver logic:** Added `isFinalApprover(role, type)` - only final step can APPROVE/REJECT.
+> 5) **Updated permissions:** `canPerformAction()` now uses per-type chain logic - intermediate steps can FORWARD, final can APPROVE/REJECT.
+> 6) **Endpoints updated:** All approve/reject/forward endpoints now use per-type chain resolution.
+> 7) **Legacy support:** Maintained backward compatibility with APPROVAL_CHAIN constant.
+> 
+> **Previous Tasks:**
+> 8) **UI:** Approval timeline and labels must read from the active chain for the specific request.
+> 9) **Supervisor check:** Confirm whether CL chain is `["DEPT_HEAD"]` or `["DEPT_HEAD", "HR_HEAD"]`. Update `WORKFLOW_CHAINS.CASUAL` accordingly.
 
 ## Part 6: Approval Workflow & Chain
 

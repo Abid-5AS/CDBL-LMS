@@ -25,12 +25,7 @@ export async function POST(
 
   const userRole = user.role as AppRole;
 
-  // Check if user can forward
-  if (!canPerformAction(userRole, "FORWARD")) {
-    return NextResponse.json({ error: "forbidden", message: "You cannot forward leave requests" }, { status: 403 });
-  }
-
-  // Get the leave request
+  // Get the leave request (need type for per-type chain resolution)
   const leave = await prisma.leaveRequest.findUnique({
     where: { id: leaveId },
     include: {
@@ -43,6 +38,11 @@ export async function POST(
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
+  // Check if user can forward for this leave type (per-type chain logic)
+  if (!canPerformAction(userRole, "FORWARD", leave.type)) {
+    return NextResponse.json({ error: "forbidden", message: "You cannot forward leave requests" }, { status: 403 });
+  }
+
   // Check if leave is in a forwardable state
   if (!["SUBMITTED", "PENDING"].includes(leave.status)) {
     return NextResponse.json(
@@ -51,8 +51,8 @@ export async function POST(
     );
   }
 
-  // Get next role in chain
-  const nextRole = getNextRoleInChain(userRole);
+  // Get next role in chain for this leave type
+  const nextRole = getNextRoleInChain(userRole, leave.type);
   if (!nextRole) {
     return NextResponse.json(
       { error: "no_next_role", message: "No next role in approval chain" },
@@ -60,15 +60,15 @@ export async function POST(
     );
   }
 
-  // Validate forward target
-  if (!canForwardTo(userRole, nextRole)) {
+  // Validate forward target (using per-type chain)
+  if (!canForwardTo(userRole, nextRole, leave.type)) {
     return NextResponse.json(
       { error: "invalid_forward_target", message: `Cannot forward to ${nextRole}` },
       { status: 400 }
     );
   }
 
-  const step = getStepForRole(userRole);
+  const step = getStepForRole(userRole, leave.type);
   const newStatus = getStatusAfterAction(leave.status as LeaveStatus, "FORWARD", nextRole);
 
   // Create approval record with FORWARDED decision
