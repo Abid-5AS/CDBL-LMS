@@ -1,12 +1,12 @@
 /**
  * Role-Aware Dock & UI Guardrails (Policy v2.0)
- * 
+ *
  * Authoritative sources:
  * - /docs/Policy Logic/09-Role Based Behavior.md
  * - /docs/Policy Logic/06-Approval Workflow and Chain.md
  * - /docs/Policy Logic/02-Leave Application Rules and Validation.md
  * - /docs/Policy Logic/10-System Messages and Error Handling.md
- * 
+ *
  * This module provides a canonical mapping of Role × Page → Dock actions
  * with strict enforcement to prevent mixing employee/admin features.
  */
@@ -41,7 +41,7 @@ export type Action =
 
 /**
  * Canonical mapping: Role × Page → Allowed Actions
- * 
+ *
  * Rules:
  * - EMPLOYEE: No admin actions (EXPORT_CSV, REPORTS, AUDIT_LOGS, BULK_APPROVE, BULK_REJECT)
  * - BULK actions only when hasSelection=true
@@ -83,7 +83,7 @@ export const DOCK_MATRIX: Record<Role, Partial<Record<Page, Action[]>>> = {
 
 /**
  * Get allowed dock actions for a role and page with context pruning
- * 
+ *
  * @param role - User's role
  * @param page - Current page context
  * @param opts - Optional context for pruning actions
@@ -121,7 +121,7 @@ export function getDockActions(
 /**
  * Resolve highest authority role from multiple roles
  * Hierarchy: CEO > HR_HEAD > HR_ADMIN > DEPT_HEAD > EMPLOYEE
- * 
+ *
  * @param roles - Array of roles
  * @returns Highest authority role
  */
@@ -141,7 +141,7 @@ export function resolveHighestAuthority(roles: Role[]): Role {
 
 /**
  * Check if an action is banned for a role
- * 
+ *
  * @param role - User's role
  * @param action - Action to check
  * @returns true if banned
@@ -149,14 +149,20 @@ export function resolveHighestAuthority(roles: Role[]): Role {
 export function isActionBanned(role: Role, action: Action): boolean {
   // Banned actions for EMPLOYEE
   if (role === "EMPLOYEE") {
-    return ["EXPORT_CSV", "REPORTS", "AUDIT_LOGS", "BULK_APPROVE", "BULK_REJECT"].includes(action);
+    return [
+      "EXPORT_CSV",
+      "REPORTS",
+      "AUDIT_LOGS",
+      "BULK_APPROVE",
+      "BULK_REJECT",
+    ].includes(action);
   }
   return false;
 }
 
 /**
  * Convert a route pathname to a canonical Page key
- * 
+ *
  * @param pathname - Current pathname
  * @returns Page key or undefined if unknown
  */
@@ -180,7 +186,7 @@ export function routeToPage(pathname: string): Page | undefined {
 
 /**
  * Check if a page is unknown (not in canonical Page type)
- * 
+ *
  * @param pathname - Current pathname
  * @returns true if unknown
  */
@@ -190,7 +196,7 @@ export function isUnknownPage(pathname: string): boolean {
 
 /**
  * Validate that no employee actions leak into admin context
- * 
+ *
  * @param role - User's role
  * @param actions - Actions to validate
  * @throws Error if validation fails
@@ -207,7 +213,7 @@ export function validateRoleActions(role: Role, actions: Action[]): void {
 
 /**
  * Runtime assertion for dock actions (dev mode only)
- * 
+ *
  * @param role - User's role
  * @param page - Current page
  * @param actions - Actions to validate

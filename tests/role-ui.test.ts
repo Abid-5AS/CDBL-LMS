@@ -1,6 +1,6 @@
 /**
  * Unit tests for role-aware dock configuration
- * 
+ *
  * Verifies:
  * - No employee pages show admin actions
  * - Bulk actions only appear when hasSelection=true
@@ -29,7 +29,11 @@ describe("Role-Aware Dock Configuration", () => {
 
     it("should return correct actions for DEPT_HEAD on APPROVALS", () => {
       const actions = getDockActions("DEPT_HEAD", "APPROVALS");
-      expect(actions).toEqual(["APPROVAL_QUEUE", "BULK_APPROVE", "BULK_REJECT"]);
+      expect(actions).toEqual([
+        "APPROVAL_QUEUE",
+        "BULK_APPROVE",
+        "BULK_REJECT",
+      ]);
     });
 
     it("should return correct actions for HR_ADMIN on REPORTS", () => {
@@ -188,7 +192,13 @@ describe("Role-Aware Dock Configuration", () => {
 
   describe("DOCK_MATRIX completeness", () => {
     it("should have a mapping for every role", () => {
-      const roles: Role[] = ["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"];
+      const roles: Role[] = [
+        "EMPLOYEE",
+        "DEPT_HEAD",
+        "HR_ADMIN",
+        "HR_HEAD",
+        "CEO",
+      ];
       roles.forEach((role) => {
         expect(DOCK_MATRIX[role]).toBeDefined();
       });
