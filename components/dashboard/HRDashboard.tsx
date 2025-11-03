@@ -20,7 +20,7 @@ export function HRDashboard({ username }: HRDashboardProps) {
       {/* Header */}
       <section className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:p-6 shadow-sm md:flex-row md:items-center md:justify-between" aria-label="HR Admin Dashboard Header">
         <div>
-          <h2 className="text-2xl font-semibold text-slate-900">HR Admin Dashboard</h2>
+          <h2 className="text-2xl font-semibold text-foreground">HR Admin Dashboard</h2>
           <p className="text-sm text-muted-foreground mt-1">Welcome back, {username}</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -31,7 +31,7 @@ export function HRDashboard({ username }: HRDashboardProps) {
       {/* Pending Leave Requests */}
       <section className="space-y-4" aria-label="Pending leave requests">
         <div className="flex items-center justify-between flex-col sm:flex-row gap-2 sm:gap-0">
-          <h3 className="text-lg font-semibold text-slate-900">Pending Leave Requests</h3>
+          <h3 className="text-lg font-semibold text-foreground">Pending Leave Requests</h3>
           <Button asChild variant="ghost" className="text-blue-600">
             <Link href="/approvals">View all</Link>
           </Button>
@@ -45,7 +45,7 @@ export function HRDashboard({ username }: HRDashboardProps) {
 
       {/* Cancellation Requests */}
       <section className="space-y-4" aria-label="Cancellation requests">
-        <h3 className="text-lg font-semibold text-slate-900">Cancellation Requests</h3>
+        <h3 className="text-lg font-semibold text-foreground">Cancellation Requests</h3>
         <Suspense fallback={<CardSkeleton />}>
           <CancellationRequestsPanel />
         </Suspense>
