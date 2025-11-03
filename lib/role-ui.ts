@@ -52,7 +52,9 @@ export type Action =
 export const DOCK_MATRIX: Record<Role, Partial<Record<Page, Action[]>>> = {
   EMPLOYEE: {
     DASHBOARD: ["APPLY_LEAVE", "MY_REQUESTS", "VIEW_POLICY"],
-    LEAVES_LIST: ["APPLY_LEAVE", "DASHBOARD", "VIEW_POLICY"],
+    // Note: On the employee /leaves list we prioritize quick self-navigation over policy view.
+    // "MY_REQUESTS" is the active context link; "VIEW_POLICY" remains available from top nav.
+    LEAVES_LIST: ["APPLY_LEAVE", "MY_REQUESTS", "DASHBOARD"],
     LEAVES_APPLY: ["MY_REQUESTS", "DASHBOARD"],
   },
   DEPT_HEAD: {
