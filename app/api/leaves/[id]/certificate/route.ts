@@ -4,7 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
-import { fileTypeFromBuffer } from "file-type";
+import { fromBuffer } from "file-type";
 import { generateSignedUrl } from "@/lib/storage";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const buffer = Buffer.from(arrayBuffer);
 
   // Validate MIME type using file-type library
-  const fileType = await fileTypeFromBuffer(buffer);
+  const fileType = await fromBuffer(buffer);
   if (!fileType) {
     return NextResponse.json(
       error("certificate_invalid_type", "Cannot determine file type. Upload a valid PDF, JPG, or PNG file.", traceId),

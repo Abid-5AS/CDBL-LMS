@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
+import { attachTraceId } from "@/lib/trace";
 
 const SECRET = process.env.JWT_SECRET || process.env.AUTH_SECRET || "dev-secret";
 const SECRET_KEY = new TextEncoder().encode(SECRET);
 
 export async function proxy(req: NextRequest) {
+  // Attach trace ID to request for error tracking (Next.js 16 proxy pattern)
+  attachTraceId(req);
+  
   const token = req.cookies.get("session_token")?.value;
   const { pathname } = req.nextUrl;
 

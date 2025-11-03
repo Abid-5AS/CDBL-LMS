@@ -117,7 +117,7 @@ export function EmployeeDashboard({ data, pendingRequestId, viewerRole, isHRView
       />
       <div className="mx-auto w-full max-w-[1400px] px-4 py-10 space-y-8">
         <motion.header
-          variants={slideUp({ distance: 24, duration: 0.4 }, prefersReducedMotion)}
+          variants={slideUp({ distance: 24, duration: 0.4 }, prefersReducedMotion ?? false)}
           initial="initial"
           animate="animate"
           className="rounded-3xl border backdrop-blur-sm"
@@ -185,7 +185,7 @@ export function EmployeeDashboard({ data, pendingRequestId, viewerRole, isHRView
           className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]"
         >
           <motion.div
-            variants={slideUp({ distance: 28, duration: 0.45 }, prefersReducedMotion)}
+            variants={slideUp({ distance: 28, duration: 0.45 }, prefersReducedMotion ?? false)}
             className="space-y-4"
           >
             <DashboardContainer
@@ -196,7 +196,7 @@ export function EmployeeDashboard({ data, pendingRequestId, viewerRole, isHRView
             />
           </motion.div>
           <motion.aside
-            variants={slideUp({ distance: 32, duration: 0.5 }, prefersReducedMotion)}
+            variants={slideUp({ distance: 32, duration: 0.5 }, prefersReducedMotion ?? false)}
             className="space-y-4"
           >
             <div className="sticky top-4 space-y-4 rounded-3xl border backdrop-blur-sm p-1.5" style={cardSurfaceStyle}>
@@ -206,7 +206,7 @@ export function EmployeeDashboard({ data, pendingRequestId, viewerRole, isHRView
         </motion.section>
       </div>
 
-      <motion.div variants={slideUp({ distance: 32, duration: 0.45 }, prefersReducedMotion)} initial="initial" animate="animate">
+      <motion.div variants={slideUp({ distance: 32, duration: 0.45 }, prefersReducedMotion ?? false)} initial="initial" animate="animate">
         <ApprovalActions
           pendingRequestId={pendingRequestId}
           employeeName={data.name}
@@ -217,7 +217,7 @@ export function EmployeeDashboard({ data, pendingRequestId, viewerRole, isHRView
 
       {isHRView && viewerRole && canEditEmployee(viewerRole, data.role as AppRole) && (
         <motion.div
-          variants={slideUp({ distance: 36, duration: 0.5 }, prefersReducedMotion)}
+          variants={slideUp({ distance: 36, duration: 0.5 }, prefersReducedMotion ?? false)}
           initial="initial"
           animate="animate"
           className="mx-auto mt-8 w-full max-w-[1400px] px-4 pb-10"

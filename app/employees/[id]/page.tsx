@@ -12,7 +12,8 @@ import { HRHeadView } from "@/components/roles/HRHeadView";
 import { ExecutiveView } from "@/components/roles/ExecutiveView";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+// Note: dynamic export removed - incompatible with Next.js 16 cacheComponents
+// Using unstable_noStore() inside component for dynamic behavior
 
 type EmployeePageProps = {
   params: Promise<{ id: string }>;

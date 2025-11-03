@@ -8,21 +8,22 @@
 
 ## 📋 Quick Status Overview
 
-| Item | Status | Notes |
-|------|--------|-------|
-| **Code Implementation** | ✅ Complete | All 10 phases implemented |
-| **Testing** | ✅ Complete | ~80% coverage, all tests passing |
-| **Documentation** | ✅ Complete | Policy docs, QA summary, release plan |
-| **Git Tag** | ✅ Created | `v2.0.0-policy-compliant` (local) |
-| **Database Migration** | ⚠️ Pending | Ready to deploy when DB access available |
-| **Remote Push** | ⚠️ Pending | Requires network/SSH access |
-| **Background Scheduler** | ✅ Ready | Can start immediately after deployment |
+| Item                     | Status      | Notes                                    |
+| ------------------------ | ----------- | ---------------------------------------- |
+| **Code Implementation**  | ✅ Complete | All 10 phases implemented                |
+| **Testing**              | ✅ Complete | ~80% coverage, all tests passing         |
+| **Documentation**        | ✅ Complete | Policy docs, QA summary, release plan    |
+| **Git Tag**              | ✅ Created  | `v2.0.0-policy-compliant` (local)        |
+| **Database Migration**   | ⚠️ Pending  | Ready to deploy when DB access available |
+| **Remote Push**          | ⚠️ Pending  | Requires network/SSH access              |
+| **Background Scheduler** | ✅ Ready    | Can start immediately after deployment   |
 
 ---
 
 ## ✅ What's Been Completed
 
 ### Implementation (All 10 Phases)
+
 1. ✅ **Phase 1:** Constants & Schema — Policy constants, new statuses, schema updates
 2. ✅ **Phase 2:** Date, Time & Holidays — Asia/Dhaka timezone, working days calculation
 3. ✅ **Phase 3:** Approval Chains — Per-type workflow chains
@@ -35,6 +36,7 @@
 10. ✅ **Phase 10:** Test Suite — Comprehensive unit, integration, and E2E tests
 
 ### Documentation
+
 - ✅ `DEMO-READINESS-SUMMARY.md` — Complete feature list and QA matrix
 - ✅ `RELEASE_PLAN_v2.0.md` — Step-by-step deployment checklist
 - ✅ `DEPLOYMENT_STATUS.md` — Real-time deployment tracking
@@ -42,6 +44,7 @@
 - ✅ All Policy Logic docs updated with change logs
 
 ### Tools & Scripts
+
 - ✅ `scripts/verify-deployment.ts` — Automated deployment verification
 - ✅ `scripts/jobs/*.ts` — All background job scripts
 - ✅ `scripts/scheduler.ts` — Job scheduler configuration
@@ -52,6 +55,7 @@
 ## 🎯 Immediate Next Steps
 
 ### When Network/SSH Available:
+
 ```bash
 # 1. Push branch and tag
 git push origin feature/policy-v2.0
@@ -61,6 +65,7 @@ git push origin v2.0.0-policy-compliant
 ```
 
 ### When Database Access Available:
+
 ```bash
 # 1. Run migration
 npx prisma migrate deploy
@@ -73,6 +78,7 @@ npm run jobs:scheduler
 ```
 
 ### When Ready for Testing:
+
 ```bash
 # 1. Run full test suite
 npm run test
@@ -90,12 +96,14 @@ npm run test:e2e
 ## 📊 Key Metrics
 
 ### Code Quality
+
 - **Linter Errors:** 0
 - **TypeScript Errors:** 0
 - **Test Coverage:** ~80%
 - **Policy Compliance:** 100%
 
 ### Implementation Stats
+
 - **New Files Created:** 35+
 - **Files Modified:** 55+
 - **Lines of Code:** ~3000+ (across all phases)
@@ -103,6 +111,7 @@ npm run test:e2e
 - **Background Jobs:** 3 (all implemented)
 
 ### Policy Coverage
+
 - ✅ **§6.10:** Per-type approval chains
 - ✅ **§6.11:** Overstay detection
 - ✅ **§6.14:** Fitness certificate enforcement
@@ -118,24 +127,28 @@ npm run test:e2e
 Before marking as "Deployed to Production":
 
 ### Code Verification
+
 - [x] All commits pushed to remote
 - [x] Tag pushed to remote
 - [x] PR created and approved
 - [x] Merge to main completed
 
 ### Database Verification
+
 - [ ] Migration applied successfully
 - [ ] New statuses available in enum
 - [ ] fitnessCertificateUrl field exists
 - [ ] No data loss during migration
 
 ### Runtime Verification
+
 - [ ] Background scheduler running
 - [ ] EL accrual job scheduled correctly
 - [ ] CL auto-lapse job scheduled correctly
 - [ ] Overstay detection job running daily
 
 ### Functional Verification
+
 - [ ] EL application with 5 working days notice works
 - [ ] CL side-touch restrictions enforced
 - [ ] Per-type approval chains function correctly
@@ -146,6 +159,7 @@ Before marking as "Deployed to Production":
 - [ ] All new statuses display correctly in UI
 
 ### Test Verification
+
 - [ ] All unit tests pass
 - [ ] All integration tests pass
 - [ ] E2E tests pass (or scaffolded for manual testing)
@@ -156,15 +170,17 @@ Before marking as "Deployed to Production":
 ## 🚨 Known Dependencies
 
 ### Required Before Deployment:
+
 1. **Database Access:** MySQL connection for migration
 2. **Network Access:** SSH/Git push capability
 3. **File System:** `/private/uploads/` directory must exist and be writable
-4. **Environment Variables:** 
+4. **Environment Variables:**
    - `DATABASE_URL`
    - `FILE_STORAGE_SECRET` (for signed URLs)
    - Timezone set to `Asia/Dhaka` for scheduler
 
 ### Post-Deployment Monitoring:
+
 - Monitor background job execution logs
 - Track error rates via trace IDs
 - Verify audit log entries
@@ -175,17 +191,20 @@ Before marking as "Deployed to Production":
 ## 📞 Support Resources
 
 ### Documentation
+
 - **Release Plan:** `RELEASE_PLAN_v2.0.md`
 - **QA Summary:** `DEMO-READINESS-SUMMARY.md`
 - **Deployment Status:** `DEPLOYMENT_STATUS.md`
 - **Policy Reference:** `/docs/Policy Logic/`
 
 ### Verification Tools
+
 - `npm run verify:deployment` — Check deployment readiness
 - `npm run verify:demo` — Verify demo data
 - `npm run jobs:scheduler` — Start background jobs
 
 ### Test Commands
+
 - `npm run test` — All tests
 - `npm run test:unit` — Unit tests only
 - `npm run test:integration` — Integration tests only
@@ -201,6 +220,7 @@ All implementation, testing, and documentation complete.
 Awaiting network access for remote push and database access for migration.
 
 **Recommendation:** Proceed with staging deployment as soon as:
+
 1. Network/SSH access is available
 2. Database access is confirmed
 3. Staging environment is prepared
@@ -210,4 +230,3 @@ Awaiting network access for remote push and database access for migration.
 **Prepared By:** Development Team  
 **Last Updated:** November 2025  
 **Next Review:** After staging deployment
-

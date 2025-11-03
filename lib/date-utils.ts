@@ -1,5 +1,5 @@
 import { addDays, differenceInCalendarDays } from "date-fns";
-import { utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
+import { toZonedTime, fromZonedTime } from "date-fns-tz";
 
 export type Holiday = { date: string; name: string }; // ISO format yyyy-mm-dd
 
@@ -23,13 +23,13 @@ export const normalize = (d: Date) =>
  */
 export const normalizeToDhakaMidnight = (d: Date): Date => {
   // Convert to Dhaka timezone
-  const zoned = utcToZonedTime(d, DHAKA_TZ);
+  const zoned = toZonedTime(d, DHAKA_TZ);
   // Get year, month, date in Dhaka timezone
   const year = zoned.getFullYear();
   const month = zoned.getMonth();
   const date = zoned.getDate();
   // Create a new Date at midnight in Dhaka, then convert back to UTC
-  const dhakaMidnight = zonedTimeToUtc(
+  const dhakaMidnight = fromZonedTime(
     new Date(year, month, date, 0, 0, 0, 0),
     DHAKA_TZ
   );

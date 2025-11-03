@@ -44,7 +44,7 @@ const ApplySchema = z.object({
 
 export async function GET(req: Request) {
   const me = await getCurrentUser();
-  const traceId = getTraceIdUtil(req as any);
+  const traceId = getTraceId(req as any);
   if (!me) return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
 
   const items = await prisma.leaveRequest.findMany({
@@ -143,8 +143,6 @@ export async function POST(req: Request) {
     parsedInput = ApplySchema.parse(json);
   }
 
-  const traceId = getTraceIdUtil(req as any);
-  
   const start = new Date(parsedInput.startDate);
   const end = new Date(parsedInput.endDate);
   if (isNaN(start.getTime()) || isNaN(end.getTime()) || start > end) {

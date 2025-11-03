@@ -51,7 +51,7 @@ export function ThemeToggle() {
       <AnimatePresence mode="wait" initial={false}>
         <motion.span
           key={isDark ? "sun" : "moon"}
-          variants={scaleIn({ duration: prefersReducedMotion ? 0 : 0.25 }, prefersReducedMotion)}
+          variants={scaleIn({ duration: prefersReducedMotion ? 0 : 0.25 }, prefersReducedMotion ?? false)}
           initial="initial"
           animate="animate"
           exit="exit"

@@ -9,12 +9,14 @@
 ## ✅ Deployment Checklist Status
 
 ### 1️⃣ Commit and Tag
+
 - [x] All changes committed to `feature/policy-v2.0` branch
 - [x] Tag `v2.0.0-policy-compliant` created locally
 - [ ] **PENDING:** Push branch to remote (SSH connection required)
 - [ ] **PENDING:** Push tag to remote
 
 **Commands to run when network available:**
+
 ```bash
 git push origin feature/policy-v2.0
 git push origin v2.0.0-policy-compliant
@@ -27,20 +29,24 @@ git push origin v2.0.0-policy-compliant
 **Status:** ⚠️ Migration Pending
 
 **Current State:**
+
 - ✅ Migration file exists: `20251103113919_policy_v2_0_constants_and_schema`
 - ⚠️ Migration not yet applied to database (pending deployment)
 - ✅ Schema file has all required fields defined
 
 **Migration Command:**
+
 ```bash
 npx prisma migrate deploy
 ```
 
 **What This Migration Adds:**
+
 1. New LeaveStatus enum values: RETURNED, CANCELLATION_REQUESTED, RECALLED, OVERSTAY_PENDING
 2. New field: `fitnessCertificateUrl` (String, optional)
 
 **Post-Migration Verification:**
+
 ```bash
 npm run verify:deployment
 ```
@@ -54,11 +60,13 @@ npm run verify:deployment
 **Status:** Ready to start ✅
 
 **Start Command:**
+
 ```bash
 npm run jobs:scheduler
 ```
 
 **Expected Logs:**
+
 ```
 [Scheduler] Initializing background jobs...
 [Scheduler] All jobs scheduled successfully
@@ -68,6 +76,7 @@ npm run jobs:scheduler
 ```
 
 **Manual Job Testing:**
+
 ```bash
 # Test individual jobs
 npm run jobs:el-accrual
@@ -80,6 +89,7 @@ npm run jobs:overstay
 ### 4️⃣ Test Validation
 
 **Available Test Commands:**
+
 ```bash
 npm run test:unit        # Unit tests (~85% coverage)
 npm run test:integration # Integration tests (~75% coverage)
@@ -88,6 +98,7 @@ npm run test            # All tests
 ```
 
 **Expected Results:**
+
 - ✅ All unit tests pass
 - ✅ All integration tests pass
 - ✅ Error responses include `{ error, message?, traceId, timestamp }`
@@ -98,11 +109,13 @@ npm run test            # All tests
 ### 5️⃣ Staging Demo Preparation
 
 **Reference Documents:**
+
 - `DEMO-READINESS-SUMMARY.md` - Complete feature list and demo scenarios
 - `RELEASE_PLAN_v2.0.md` - Deployment checklist
 - `DEMO-RUN-SHEET.md` - Demo execution guide
 
 **Demo Scenarios to Validate:**
+
 1. ✅ EL Application with 5 working days notice
 2. ✅ CL Side-Touch Block (Friday/Saturday/holiday)
 3. ✅ Per-Type Approval Chain Flow
@@ -112,6 +125,7 @@ npm run test            # All tests
 7. ✅ Overstay Detection
 
 **Pre-Demo Setup:**
+
 - [ ] Create test users (EMPLOYEE, DEPT_HEAD, HR_ADMIN, HR_HEAD, CEO)
 - [ ] Add test holidays to database
 - [ ] Prepare screen recordings
@@ -122,17 +136,20 @@ npm run test            # All tests
 ### 6️⃣ Pull Request
 
 **PR Title:**
+
 ```
 Release: Policy v2.0 — CDBL Leave Management System (Full HR Compliance)
 ```
 
 **PR Description Template:**
+
 ```markdown
 ## Policy v2.0 Implementation — Full HR Compliance
 
 This release implements full compliance with CDBL HR Policy v2.0.
 
 ### Key Features
+
 - ✅ Per-type approval workflow chains
 - ✅ Enhanced validation (EL 5 working days, CL side-touch restrictions)
 - ✅ New statuses: RETURNED, CANCELLATION_REQUESTED, RECALLED, OVERSTAY_PENDING
@@ -142,21 +159,25 @@ This release implements full compliance with CDBL HR Policy v2.0.
 - ✅ Comprehensive test coverage (~80%)
 
 ### Testing
+
 - Unit tests: ~85% coverage
 - Integration tests: ~75% coverage
 - E2E tests: Scaffolded for full workflow validation
 
 ### Breaking Changes
+
 - New LeaveStatus enum values (database migration required)
 - New fitnessCertificateUrl field (optional, backward compatible)
 
 ### Documentation
+
 - Policy documentation: `/docs/Policy Logic/`
 - QA Summary: `DEMO-READINESS-SUMMARY.md`
 - Release Plan: `RELEASE_PLAN_v2.0.md`
 - Deployment Status: `DEPLOYMENT_STATUS.md`
 
 ### Deployment Steps
+
 1. Run database migration: `npx prisma migrate deploy`
 2. Start background scheduler: `npm run jobs:scheduler`
 3. Verify deployment: `npm run verify:deployment`
@@ -168,6 +189,7 @@ This release implements full compliance with CDBL HR Policy v2.0.
 ### 7️⃣ Post-Deployment Verification
 
 **Immediate Checks (Within 24 Hours):**
+
 - [ ] Monitor error rates via trace IDs
 - [ ] Verify EL accrual job runs on 1st of month
 - [ ] Verify CL auto-lapse job runs on Dec 31
@@ -178,6 +200,7 @@ This release implements full compliance with CDBL HR Policy v2.0.
 - [ ] Verify dashboards display new status badges
 
 **Weekly Checks (First Month):**
+
 - [ ] Review approval chain efficiency metrics
 - [ ] Monitor balance calculations for accuracy
 - [ ] Check for policy rule violations
@@ -188,6 +211,7 @@ This release implements full compliance with CDBL HR Policy v2.0.
 ## 📊 Implementation Summary
 
 ### Completed Phases
+
 1. ✅ Phase 1: Constants & Schema
 2. ✅ Phase 2: Date, Time & Holiday Handling
 3. ✅ Phase 3: Approval & Workflow Chains
@@ -200,6 +224,7 @@ This release implements full compliance with CDBL HR Policy v2.0.
 10. ✅ Phase 10: Test Suite Extension & QA Summary
 
 ### Code Quality Metrics
+
 - **Linter Errors:** 0
 - **TypeScript Errors:** 0
 - **Test Failures:** 0 (pending E2E setup)
@@ -207,6 +232,7 @@ This release implements full compliance with CDBL HR Policy v2.0.
 - **Policy Compliance:** 100%
 
 ### Files Created/Modified
+
 - **New Files:** 30+ (tests, jobs, utilities, documentation)
 - **Modified Files:** 50+ (endpoints, components, lib functions)
 - **Documentation:** 3 major documents (DEMO-READINESS, RELEASE-PLAN, DEPLOYMENT-STATUS)
@@ -216,19 +242,23 @@ This release implements full compliance with CDBL HR Policy v2.0.
 ## 🚀 Next Actions
 
 ### Immediate (Before Demo)
+
 1. **Push to Remote:** When network available
+
    ```bash
    git push origin feature/policy-v2.0
    git push origin v2.0.0-policy-compliant
    ```
 
 2. **Run Migration:**
+
    ```bash
    npx prisma migrate deploy
    npm run verify:deployment
    ```
 
 3. **Start Scheduler:**
+
    ```bash
    npm run jobs:scheduler
    ```
@@ -239,6 +269,7 @@ This release implements full compliance with CDBL HR Policy v2.0.
    ```
 
 ### Before Production
+
 1. Create Pull Request (use template above)
 2. Code review approval
 3. Merge to `main`
@@ -258,4 +289,3 @@ Pending network access to push branch/tag and final staging validation.
 
 **Last Updated:** November 2025  
 **Maintained By:** Development Team
-
