@@ -1,107 +1,123 @@
-# Dashboard Page Files for Gemini Redesign
+# ActiveRequestsTimeline Component - Redesign Package
 
-This directory contains all the files needed to redesign the CDBL Leave Management dashboard page.
+This directory contains all files needed for the Gemini redesign of the ActiveRequestsTimeline component, which displays live activity of upcoming/recent leave requests.
 
-## File Structure (10 files)
+## File Structure (5 files)
 
-1. **dashboard-page.tsx** - Main dashboard page entry point
-2. **EmployeeDashboardUnified.tsx** - Main employee dashboard component (unified layout)
-3. **HeroStrip.tsx** - Hero/header component with status messages and quick actions
-4. **LeaveSummaryCard.tsx** - Leave balance summary card with progress indicators
-5. **requests-table.tsx** - Leave requests table component (recent requests)
-6. **card.tsx** - Card UI component (shadcn/ui)
-7. **progress.tsx** - Progress bar component (shadcn/ui)
-8. **skeleton.tsx** - Loading skeleton component (shadcn/ui)
-9. **utils.ts** - Utility functions (cn helper, formatDate, etc.)
-10. **globals.css** - Global styles and design system
+1. **ActiveRequestsTimeline.tsx** - Main component (shows up to 3 active requests)
+2. **api-leaves-route.ts** - Backend API endpoint handler
+3. **utils.ts** - Consolidated utilities (formatDate, cn, Card, Skeleton, Progress components)
+4. **status-badge.tsx** - Status badge component with Policy v2.0 statuses
+5. **globals.css** - Global styles and design system
 
-## Key Components for Redesign
+## Component Overview
 
-### Primary Components
+The `ActiveRequestsTimeline` component displays up to 3 most recent active leave requests that are:
+- Status: `PENDING`, `APPROVED`, or `SUBMITTED`
+- End date >= today (upcoming or recent)
 
-1. **EmployeeDashboardUnified.tsx** - Main dashboard layout
+### Features
 
-   - 2-column grid (2/3 for requests, 1/3 for summary)
-   - Uses HeroStrip and LeaveSummaryCard
+- Shows status badge with icon
+- Displays leave type and date range
+- Shows days until start for upcoming leaves
+- "View All" link to full leaves page
+- Loading skeleton state
+- Error handling
 
-2. **HeroStrip.tsx** - Status banner component
+## API Endpoint
 
-   - Shows pending requests count
-   - Displays approved upcoming leave
-   - Shows next holiday information
-   - Clickable to view pending requests
-   - Uses SWR for data fetching
+### GET /api/leaves?mine=1
 
-3. **LeaveSummaryCard.tsx** - Balance summary card
+**Authentication:** Required (current user)
 
-   - Shows EARNED, CASUAL, MEDICAL leave balances
-   - Progress bars for each leave type
-   - Color-coded status (available, warning, low, exhausted)
-   - Total remaining days summary
-   - Uses SWR for data fetching
+**Response:**
+```json
+{
+  "items": [
+    {
+      "id": 1,
+      "type": "EARNED",
+      "startDate": "2025-01-20T00:00:00.000Z",
+      "endDate": "2025-01-25T00:00:00.000Z",
+      "workingDays": 5,
+      "status": "PENDING",
+      "approvals": [...]
+    }
+  ]
+}
+```
 
-4. **requests-table.tsx** - Leave requests table
-   - Shows recent leave requests (limit: 3)
-   - Status badges
-   - Filter options (all, pending, approved, cancelled)
-   - Responsive (table on desktop, cards on mobile)
-   - Cancel functionality for pending requests
+## Usage
 
-### Supporting Components
+```tsx
+import { ActiveRequestsTimeline } from "@/components/dashboard/ActiveRequestsTimeline";
 
-5. **card.tsx** - Card component with glassmorphism
-6. **progress.tsx** - Progress bar for leave usage
-7. **skeleton.tsx** - Loading states
-8. **utils.ts** - Utility functions (formatDate, cn)
+export function Dashboard() {
+  return (
+    <div>
+      <ActiveRequestsTimeline />
+    </div>
+  );
+}
+```
 
-### Design System
+## Dependencies
 
-9. **globals.css** - Complete design system
-   - Color tokens
-   - Glassmorphism effects
-   - Animations
-   - Dark mode support
+### Frontend
+- `swr` - Data fetching
+- `@/components/ui/card` - Card components (or use from utils.ts)
+- `@/components/ui/button` - Button component
+- `@/components/ui/skeleton` - Skeleton component (or use from utils.ts)
+- `@/components/ui/badge` - Badge component
+- `lucide-react` - Icons
+- `@/lib/utils` - formatDate utility (or use from utils.ts)
+- `@/app/dashboard/components/status-badge` - Status badge (or use status-badge.tsx)
 
-## Current Design Features
+### Backend
+- `@/lib/prisma` - Database client
+- `@/lib/auth` - Authentication
+- `@/lib/errors` - Error handling
+- `@/lib/trace` - Tracing
 
-- **Glassmorphism**: Backdrop blur effects on cards
-- **Responsive**: Mobile-friendly with card view on small screens
-- **Dark mode support**: Full dark mode styling
-- **Loading states**: Skeleton loaders for async data
-- **Status indicators**: Color-coded leave balances and request statuses
-- **Interactive**: Clickable hero strip, filterable table
+## Component Logic
 
-## Data Flow
+1. **Data Fetching:** Uses SWR to fetch `/api/leaves?mine=1` with `revalidateOnFocus: true`
+2. **Filtering:** Filters leaves where:
+   - Status is `PENDING`, `APPROVED`, or `SUBMITTED`
+   - End date >= today
+3. **Sorting:** Most recent first (from API)
+4. **Limiting:** Shows only first 3 items
+5. **Date Calculation:** Calculates days until start for upcoming leaves
 
-### HeroStrip
+## Policy v2.0 Status Support
 
-- Fetches: `/api/leaves?mine=1` and `/api/holidays?upcoming=true`
-- Displays: Pending count, approved upcoming leave, next holiday
-
-### LeaveSummaryCard
-
-- Fetches: `/api/balance/mine`
-- Displays: EARNED, CASUAL, MEDICAL balances with progress bars
-
-### RequestsTable
-
-- Fetches: `/api/leaves?mine=1`
-- Displays: Recent 3 requests (or all if on full page)
-- Supports: Filtering, canceling, viewing details
+The component supports all Policy v2.0 statuses:
+- `SUBMITTED`, `PENDING`, `APPROVED`, `REJECTED`, `CANCELLED`
+- `RETURNED`, `CANCELLATION_REQUESTED`, `RECALLED`, `OVERSTAY_PENDING`
 
 ## Notes for Redesign
 
 - Maintain the data fetching logic (SWR hooks)
-- Keep role-based rendering (EmployeeDashboardUnified)
+- Keep filtering and sorting logic
 - Preserve accessibility (ARIA labels, keyboard navigation)
 - Support both light and dark modes
 - Ensure mobile responsiveness
 - Keep loading states and error handling
-- Maintain the 2-column grid layout (requests left, summary right)
-- HeroStrip should remain prominent at the top
+- Maintain the card-based layout
+- "View All" should navigate to `/leaves`
 
-## API Endpoints Used
+## Integration
 
-- `GET /api/leaves?mine=1` - User's leave requests
-- `GET /api/balance/mine` - User's leave balances
-- `GET /api/holidays?upcoming=true` - Upcoming holidays
+The component automatically handles:
+- Loading states (skeleton)
+- Error states (returns null)
+- Empty states (returns null if no active requests)
+- Data revalidation on focus
+
+## Future Enhancements
+
+- Add click handler to navigate to individual leave details
+- Add approval timeline visualization
+- Add ability to cancel pending requests directly from card
+- Add filter options (e.g., show only upcoming, only pending)
