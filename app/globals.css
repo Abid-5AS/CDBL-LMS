@@ -1,6 +1,57 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Dashboard Redesign Styles */
+.modern-background {
+  background-color: #F9FAFB;
+  background-image: radial-gradient(circle at 50% 50%, #ffffff 0%, #F0F2F5 100%);
+}
+
+.dark .modern-background {
+  background-color: #0F172A;
+  background-image: radial-gradient(circle at 50% 50%, #1E293B 0%, #0F172A 100%);
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+.animate-delay-100ms {
+  animation-delay: 100ms;
+}
+
+.animate-delay-200ms {
+  animation-delay: 200ms;
+}
+
+.animate-delay-300ms {
+  animation-delay: 300ms;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -390,6 +441,24 @@
     box-shadow: var(--shadow-lg);
   }
 
+  /* Login page specific glass-card override - solid white background */
+  .glass-card:has(form) {
+    position: relative;
+    z-index: 10;
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 4px 6px rgba(15, 23, 42, 0.1);
+    transition: transform 250ms ease-out, box-shadow 250ms ease-out;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .dark .glass-card:has(form) {
+    background-color: rgba(26, 31, 46, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
   .glass-nav {
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
@@ -603,6 +672,48 @@
   }
 }
 
+/* Modern background for login page */
+.modern-background {
+  background-color: #F9FAFB;
+  background-image: radial-gradient(circle at 50% 50%, #ffffff 0%, #F0F2F5 100%);
+}
+
+/* Animation utilities */
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-shake-x {
+  animation: shake-x 0.5s ease-out;
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes shake-x {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+  20%, 40%, 60%, 80% { transform: translateX(10px); }
+}
+
+.animate-duration-500ms { animation-duration: 500ms; }
+.animate-duration-700ms { animation-duration: 700ms; }
+.animate-duration-1000ms { animation-duration: 1000ms; }
+.animate-delay-500ms { animation-delay: 500ms; }
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -611,5 +722,12 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  
+  .animate-fade-in-up,
+  .animate-fade-in,
+  .animate-shake-x {
+    animation: none !important;
+    opacity: 1 !important;
   }
 }
