@@ -10,6 +10,7 @@ import { WelcomeHero } from "./WelcomeHero";
 import { ActionItems } from "./ActionItems";
 import { LeaveSummaryCardNew } from "./LeaveSummaryCardNew";
 import { StatusBadgeSimple } from "./StatusBadgeSimple";
+import { LiveActivityTimeline } from "./LiveActivityTimeline";
 import { formatDate } from "@/lib/utils";
 import { SegmentedControlGlider } from "./SegmentedControlGlider";
 
@@ -34,6 +35,12 @@ type LeaveRow = {
   workingDays: number;
   status: LeaveStatus;
   updatedAt: string;
+  approvals?: Array<{
+    step: number;
+    decision: "PENDING" | "FORWARDED" | "APPROVED" | "REJECTED" | "RETURNED";
+    approver?: { name: string | null } | null;
+    toRole?: string | null;
+  }>;
 };
 
 /**
@@ -194,7 +201,12 @@ export function EmployeeDashboardUnified({
         <ActionItems leaves={leaves} isLoading={isLoadingLeaves} />
       </Suspense>
 
-      {/* 3. Main Content Grid */}
+      {/* 3. Live Activity Timeline - Shows active requests with approval tracking */}
+      <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+        <LiveActivityTimeline leaves={leaves} isLoading={isLoadingLeaves} />
+      </Suspense>
+
+      {/* 4. Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column (2/3): Requests Table */}
         <div className="lg:col-span-2">
