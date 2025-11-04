@@ -106,7 +106,7 @@ export function ActionItems({
             <Card
               key={item.title}
               className={cn(
-                "p-4 animate-fade-in-up",
+                "solid-card p-4 animate-fade-in-up",
                 item.color,
                 item.bg
               )}

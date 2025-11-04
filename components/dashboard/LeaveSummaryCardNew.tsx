@@ -71,7 +71,7 @@ export function LeaveSummaryCardNew({
   }
 
   return (
-    <Card className="animate-fade-in-up animate-delay-200ms">
+    <Card className="solid-card animate-fade-in-up animate-delay-200ms">
       <CardHeader className="pb-4">
         <CardTitle className="text-lg">Leave Balances</CardTitle>
         <CardDescription>

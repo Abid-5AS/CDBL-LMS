@@ -27,7 +27,7 @@ export function WelcomeHero({ username }: { username: string }) {
   }, [holidaysData]);
 
   return (
-    <Card className="animate-fade-in-up">
+    <Card className="solid-card animate-fade-in-up">
       <CardContent className="flex flex-col md:flex-row items-center justify-between gap-6 p-6">
         <div className="flex-1">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">

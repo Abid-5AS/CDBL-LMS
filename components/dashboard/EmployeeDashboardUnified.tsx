@@ -9,9 +9,9 @@ import { Inbox } from "lucide-react";
 import { WelcomeHero } from "./WelcomeHero";
 import { ActionItems } from "./ActionItems";
 import { LeaveSummaryCardNew } from "./LeaveSummaryCardNew";
-import StatusBadge from "@/app/dashboard/components/status-badge";
+import { StatusBadgeSimple } from "./StatusBadgeSimple";
 import { formatDate } from "@/lib/utils";
-import { SegmentedControl } from "@/components/ui/segmented-control";
+import { SegmentedControlGlider } from "./SegmentedControlGlider";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -52,8 +52,6 @@ function RequestsTable({
   const router = useRouter();
   const [filter, setFilter] = useState("all");
 
-  const filterOptions = ["all", "pending", "returned", "history"];
-
   const filteredRows = useMemo(() => {
     let filtered: LeaveRow[] = [];
     if (filter === "all") {
@@ -87,16 +85,23 @@ function RequestsTable({
     return limit ? sorted.slice(0, limit) : sorted;
   }, [leaves, filter, limit]);
 
+  const filterOptions = [
+    { value: "all", label: "All" },
+    { value: "pending", label: "Pending" },
+    { value: "returned", label: "Returned" },
+    { value: "history", label: "History" },
+  ];
+
   return (
-    <Card className="animate-fade-in-up animate-delay-300ms">
+    <Card className="solid-card animate-fade-in-up animate-delay-300ms">
       <CardHeader className="pb-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <CardTitle className="text-lg">Recent Requests</CardTitle>
           <div className="w-full md:w-auto">
-            <SegmentedControl
-              options={filterOptions.map((opt) => opt.charAt(0).toUpperCase() + opt.slice(1))}
-              value={filter.charAt(0).toUpperCase() + filter.slice(1)}
-              onChange={(value) => setFilter(value.toLowerCase())}
+            <SegmentedControlGlider
+              options={filterOptions}
+              selected={filter}
+              onChange={setFilter}
             />
           </div>
         </div>
@@ -138,7 +143,7 @@ function RequestsTable({
                     </p>
                   </div>
                   <div className="flex-shrink-0 flex flex-col items-end gap-1">
-                    <StatusBadge status={row.status} />
+                    <StatusBadgeSimple status={row.status} />
                     <span className="text-xs text-gray-400 dark:text-gray-500 sm:hidden">
                       {row.workingDays} days
                     </span>
@@ -178,7 +183,7 @@ export function EmployeeDashboardUnified({
   const leaves = leavesData?.items || [];
 
   return (
-    <div className="space-y-6 p-4 md:p-8 modern-background min-h-screen">
+    <div className="space-y-6">
       {/* 1. Welcome Hero */}
       <Suspense fallback={<Skeleton className="h-36 w-full" />}>
         <WelcomeHero username={username} />

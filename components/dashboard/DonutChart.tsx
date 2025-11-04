@@ -51,8 +51,8 @@ export function DonutChart({
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-xl font-bold text-gray-900 dark:text-gray-100">{value}</span>
-        <span className="text-xs text-gray-500 dark:text-gray-400">days</span>
+        <span className="text-xl font-bold text-gray-900">{value}</span>
+        <span className="text-xs text-gray-500">days</span>
       </div>
     </div>
   );
