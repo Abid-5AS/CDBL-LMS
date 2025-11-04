@@ -290,17 +290,22 @@ enum LeaveStatus: String, Codable {
     case APPROVED
     case REJECTED
     case CANCELLED
+    case RETURNED                 // Policy v2.0: Returned for modification
+    case CANCELLATION_REQUESTED   // Policy v2.0: Cancellation request pending
+    case RECALLED                 // Policy v2.0: Recalled by HR
+    case OVERSTAY_PENDING         // Policy v2.0: Overstay detected
 }
 
 struct LeaveRequest: Codable {
     let type: LeaveType
-    let startDate: Date          // ISO8601
-    let endDate: Date            // ISO8601
-    let workingDays: Int         // Calculated: (endDate - startDate) + 1
-    let reason: String
-    let needsCertificate: Bool
+    let startDate: Date          // ISO8601, normalized to Asia/Dhaka midnight
+    let endDate: Date            // ISO8601, normalized to Asia/Dhaka midnight
+    let workingDays: Int         // Calculated: (endDate - startDate) + 1 (inclusive calendar days)
+    let reason: String            // Minimum 10 characters
+    let needsCertificate: Bool     // Required if MEDICAL > 3 days
     let status: LeaveStatus
-    let policyVersion: String    // "v1.1" (from web app)
+    let policyVersion: String    // "v2.0" (Policy v2.0)
+    let fitnessCertificateUrl: String?  // Optional: Required for ML > 7 days on return
 }
 ```
 
@@ -335,6 +340,221 @@ struct SignedLeavePackage: Codable {
 
 ---
 
+## 📋 Policy Logic Compliance (Policy v2.0)
+
+> **Source of Truth**: All rules in this section align with `/docs/Policy Logic/` documentation, which is the ultimate source of truth for business rules.
+
+### Leave Entitlements & Annual Caps
+
+| Leave Type | Annual Entitlement | Accrual Rate | Carry Forward | Annual Cap |
+|------------|-------------------|--------------|---------------|------------|
+| **EARNED (EL)** | 24 days/year | 2 working days/month | Yes, up to 60 days | None (subject to accrual) |
+| **CASUAL (CL)** | 10 days/year | Granted at start of year | No (lapses Dec 31) | 10 days/year (hard limit) |
+| **MEDICAL (ML)** | 14 days/year | Granted at start of year | No | 14 days/year (hard limit) |
+
+### Earned Leave (EL) Rules
+
+#### Entitlement & Accrual
+- **Annual Total**: 24 days/year (2 days × 12 months)
+- **Accrual**: 2 working days per month while on duty
+- **Carry-Forward**: Up to 60 days maximum (opening + accrued combined)
+- **Calculation**: Available balance = `(opening ?? 0) + (accrued ?? 0) - (used ?? 0)`
+
+#### Advance Notice Requirement
+- **Minimum**: ≥ **5 working days** before start date (Policy 6.11)
+- **Calculation**: Counts working days only (excludes Friday, Saturday, and company holidays)
+- **Enforcement**: Hard block if insufficient notice
+- **Error**: `el_insufficient_notice`
+
+#### Backdating Rules
+- **Allowed**: Yes, up to 30 days back
+- **Org Setting**: May require confirmation (`"ask"` mode)
+- **Validation**: Window limit enforced at server
+
+### Casual Leave (CL) Rules
+
+#### Annual Cap
+- **Limit**: 10 days per calendar year
+- **Counting**: Includes `APPROVED` + `PENDING` status
+- **Enforcement**: Hard block if annual usage exceeds 10 days
+
+#### Consecutive Days Limit
+- **Maximum**: **3 consecutive days per spell** (not 7 days)
+- **Enforcement**: Hard block
+- **Error**: `cl_exceeds_consecutive_limit`
+
+#### Holiday/Weekend Side-Touch Restriction
+- **Critical Rule**: CL **cannot start or end** on Friday, Saturday, or company holidays
+- **Enforcement**: Hard block
+- **Error**: `cl_cannot_touch_holiday`
+- **Message**: "Casual Leave cannot be adjacent to holidays or weekends. Please use Earned Leave instead."
+
+#### Advance Notice (Soft Warning)
+- **Recommended**: 5 working days before start
+- **Enforcement**: Warning only (allows submission)
+- **Warning Flag**: `clShortNotice`
+
+#### Backdating Rules
+- **Allowed**: **No** (start date must be >= today)
+- **Enforcement**: Hard block
+
+### Medical Leave (ML) Rules
+
+#### Annual Cap
+- **Limit**: 14 days per calendar year
+- **Counting**: Same as CL (includes `APPROVED` + `PENDING`)
+- **Enforcement**: Hard block if annual usage exceeds 14 days
+
+#### Medical Certificate Requirement
+- **Trigger**: Required if leave duration > 3 days
+- **Enforcement**: Hard block (checked before other validations)
+- **Error**: `medical_certificate_required`
+- **File Validation**:
+  - Types: PDF, JPG, JPEG, PNG only
+  - Size: Maximum 5 MB
+  - MIME validation: Server-side validation using `file-type` library
+
+#### Fitness Certificate Requirement (Return-to-Duty)
+- **Trigger**: MEDICAL leave where `workingDays > 7`
+- **Policy**: Section 6.14 — "Medical leave over 7 days requires fitness certificate on return"
+- **Field**: `fitnessCertificateUrl` in LeaveRequest
+- **Enforcement**: Required when submitting duty return for ML > 7 days
+
+#### Advance Notice
+- **Required**: **None** (can be submitted same-day)
+- **Exception**: Can be submitted on day of rejoining (Policy 6.11a)
+
+#### Backdating Rules
+- **Allowed**: Yes, up to 30 days back
+- **Validation**: Window limit enforced
+
+### Date & Time Handling
+
+#### Timezone
+- **Standard**: **Asia/Dhaka** (GMT+6)
+- **Normalization**: All dates normalized to Dhaka midnight before validation
+- **Display Format**: `DD/MM/YYYY` (British English format)
+- **Function**: Use `normalizeToDhakaMidnight()` for all date comparisons
+
+#### Weekend Definition (Bangladesh)
+- **Weekend Days**: Friday (day index 5), Saturday (day index 6)
+- **Working Days**: Sunday (0) through Thursday (4)
+
+#### Start/End Date Restrictions
+- **Cannot Be**: Friday, Saturday, or any company holiday
+- **Enforcement**: Hard block in UI and API
+- **UI Messages**:
+  - "Start date cannot be on Friday, Saturday, or a company holiday"
+  - "End date cannot be on Friday, Saturday, or a company holiday"
+
+#### Leave Duration Calculation
+- **Method**: **Inclusive calendar days** (all days count, including weekends/holidays)
+- **Formula**: `(endDate - startDate) + 1` calendar days
+- **Note**: Weekends and holidays **inside** the range count toward leave balance
+
+#### Working Days Calculation (for Notice)
+- **Purpose**: Used for advance notice calculations only
+- **Method**: Excludes weekends (Fri/Sat) and company holidays
+- **Usage**: EL ≥5 working days notice calculation
+
+### File Upload Rules
+
+#### Medical Certificate Upload
+- **Required**: When MEDICAL leave > 3 days
+- **File Types**: PDF, JPG, JPEG, PNG only (case-insensitive)
+- **File Size**: Maximum 5 MB (5,242,880 bytes)
+- **Validation**:
+  - Extension check (client-side)
+  - MIME type validation (server-side via `file-type` library)
+  - Size validation (both client and server)
+
+#### File Storage
+- **Location**: `/private/uploads/` (not publicly accessible)
+- **Access**: Via signed URLs only (15-minute expiry)
+- **Naming**: `{UUID}-{sanitized-filename}`
+- **Security**: HMAC signature verification required
+
+#### Error Messages (Exact Text)
+- "Unsupported file type. Use PDF, JPG, or PNG."
+- "File too large (max 5 MB)."
+- "Medical certificate is required for sick leave over 3 days"
+- "File content type not allowed (PDF, JPG, PNG only)." (server-side MIME validation)
+
+### Reason Field Validation
+
+#### Requirements
+- **Required**: Yes
+- **Minimum Length**: 10 characters (UI display), 3 characters (API minimum)
+- **Display**: Shows character count: "{count} / 10 characters minimum"
+- **Enforcement**: Frontend prevents submit if < 10 chars; API validates 3 char minimum
+
+### Balance Validation
+
+#### Available Balance Formula
+```
+available = (opening ?? 0) + (accrued ?? 0) - (used ?? 0)
+```
+
+#### Validation Order
+1. EL advance notice (≥5 working days)
+2. CL consecutive limit (3 days max)
+3. ML medical certificate requirement (>3 days)
+4. Backdate settings check
+5. Backdate window limit (30 days for EL/ML)
+6. CL holiday/weekend side-touch check
+7. CL annual cap (10 days/year)
+8. ML annual cap (14 days/year)
+9. EL carry-forward cap (60 days)
+10. Balance availability check
+
+#### Error Codes
+- `insufficient_balance`: Requested days exceed available balance
+- `cl_annual_cap_exceeded`: CL annual usage exceeds 10 days
+- `ml_annual_cap_exceeded`: ML annual usage exceeds 14 days
+- `el_carry_cap_exceeded`: EL carry-forward would exceed 60 days
+
+### Status Lifecycle
+
+#### Standard Flow
+```
+DRAFT → SUBMITTED → PENDING → { APPROVED | REJECTED }
+                              ↓
+                         CANCELLED (can happen from SUBMITTED/PENDING)
+```
+
+#### Policy v2.0 Additional Statuses
+- **RETURNED**: Returned for modification by approver
+- **CANCELLATION_REQUESTED**: Employee requested cancellation of APPROVED leave
+- **RECALLED**: Recalled by HR (balance restored)
+- **OVERSTAY_PENDING**: Employee past endDate without return confirmation
+
+### Cancellation Rules
+
+#### Employee Cancellation
+- **Valid Status**: `SUBMITTED` or `PENDING`
+- **Invalid Status**: `APPROVED`, `REJECTED`, `CANCELLED`, `DRAFT`
+- **Action**: Status → `CANCELLED`
+- **After Approval**: Requires `CANCELLATION_REQUESTED` → HR reviews
+
+#### Balance Restoration
+- **Rule**: If approved leave is cancelled, balance is restored
+- **Implementation**: `Balance.used` decremented by `workingDays`
+- **Audit**: Creates audit log entry
+
+### Date Format Standards
+
+#### Display Format
+- **Standard**: `DD/MM/YYYY` (day/month/year)
+- **Example**: `23/10/2024`
+- **Locale**: British English (`en-GB`)
+
+#### API Format
+- **Input**: ISO date string (`"2024-10-23T00:00:00.000Z"` or `"2024-10-23"`)
+- **Output**: ISO date string (from database)
+- **Normalization**: All dates normalized to Asia/Dhaka midnight before persistence
+
+---
+
 ## 🔄 Demo Flow Storyboard
 
 ### Scene 1: Launch
@@ -345,10 +565,18 @@ struct SignedLeavePackage: Codable {
 ### Scene 2: Create Leave Request
 1. User selects leave type (CASUAL, MEDICAL, EARNED)
 2. Picks date range using DatePicker
-3. Enters reason in TextEditor (min 10 chars)
-4. If MEDICAL > 3 days, file picker appears
-5. Real-time validation feedback
-6. Save draft button (optional) → Core Data
+   - **Validation**: Start/end cannot be Friday, Saturday, or holidays
+   - **CL Special**: Start/end cannot touch Fri/Sat/holidays (hard block)
+   - **Min Date**: Today for CL; 30 days back for EL/ML
+3. Enters reason in TextEditor (min 10 chars, shows character count)
+4. **Real-time Policy Validation**:
+   - EL: Checks ≥5 working days notice (excludes Fri/Sat/holidays)
+   - CL: Checks 3-day consecutive limit, warns if <5 working days notice
+   - CL: Blocks if start/end touches Fri/Sat/holiday
+   - ML: No notice requirement, certificate required if >3 days
+5. If MEDICAL > 3 days, file picker appears (required)
+6. Real-time validation feedback with policy-specific error messages
+7. Save draft button (optional) → Core Data
 
 ### Scene 3: Export
 1. User taps "Generate Export" or "Submit"
@@ -392,7 +620,7 @@ The iOS app generates JSON matching the Prisma `LeaveRequest` model:
     "reason": "Medical treatment required",
     "needsCertificate": true,
     "status": "DRAFT",
-    "policyVersion": "v1.1"
+    "policyVersion": "v2.0"
   },
   "signature": "a1b2c3d4...",
   "timestamp": "2025-10-31T12:00:00Z",
@@ -458,5 +686,11 @@ The iOS app generates JSON matching the Prisma `LeaveRequest` model:
 - [Apple Developer: iOS 26 Liquid Glass](https://developer.apple.com/documentation)
 - [SwiftUI NavigationSplitView](https://developer.apple.com/documentation/swiftui/navigationsplitview)
 - [CryptoKit Documentation](https://developer.apple.com/documentation/cryptokit)
-- [CDBL Web App: Prisma Schema](../prisma/schema.prisma)
+- [CDBL Web App: Prisma Schema](../../prisma/schema.prisma)
+- [Policy Logic Documentation](../../docs/Policy%20Logic/) - **Ultimate Source of Truth**
+  - [01-Leave Types and Entitlements](../../docs/Policy%20Logic/01-Leave%20Types%20and%20Entitlements.md)
+  - [02-Leave Application Rules and Validation](../../docs/Policy%20Logic/02-Leave%20Application%20Rules%20and%20Validation.md)
+  - [03-Holiday and Weekend Handling](../../docs/Policy%20Logic/03-Holiday%20and%20Weekend%20Handling.md)
+  - [04-Leave Balance and Accrual Logic](../../docs/Policy%20Logic/04-Leave%20Balance%20and%20Accrual%20Logic.md)
+  - [05-File Upload and Medical Certificate Rules](../../docs/Policy%20Logic/05-File%20Upload%20and%20Medical%20Certificate%20Rules.md)
 
