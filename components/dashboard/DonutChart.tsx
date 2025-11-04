@@ -51,8 +51,14 @@ export function DonutChart({
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-xl font-bold text-gray-900">{value}</span>
-        <span className="text-xs text-gray-500">days</span>
+        <span className={cn(
+          "font-bold text-gray-900",
+          className?.includes("size-16") ? "text-sm" : "text-xl"
+        )}>{value}</span>
+        <span className={cn(
+          "text-gray-500",
+          className?.includes("size-16") ? "text-[10px]" : "text-xs"
+        )}>days</span>
       </div>
     </div>
   );

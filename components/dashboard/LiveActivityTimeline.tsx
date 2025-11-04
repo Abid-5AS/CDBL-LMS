@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import {
@@ -122,7 +122,7 @@ function ApprovalChainTracker({ leave }: { leave: LeaveRequest }) {
   }
 
   return (
-    <div className="flex items-center px-2 pt-2">
+    <div className="flex items-center px-1 pt-1">
       {chain.map((role, index) => {
         const { name, icon: Icon } =
           ROLE_DISPLAY[role] || ROLE_DISPLAY.DEFAULT;
@@ -140,11 +140,11 @@ function ApprovalChainTracker({ leave }: { leave: LeaveRequest }) {
 
         return (
           <React.Fragment key={role}>
-            {/* Checkpoint Icon and Label */}
+            {/* Checkpoint Icon and Label - COMPACT */}
             <div className="flex flex-col items-center">
               <div
                 className={cn(
-                  "size-8 rounded-full flex items-center justify-center border-2",
+                  "size-5 rounded-full flex items-center justify-center border",
                   stepStatus === "COMPLETED" &&
                     "bg-green-600 border-green-600 text-white",
                   stepStatus === "ACTIVE" &&
@@ -154,14 +154,14 @@ function ApprovalChainTracker({ leave }: { leave: LeaveRequest }) {
                 )}
               >
                 {stepStatus === "COMPLETED" ? (
-                  <Check className="size-4" />
+                  <Check className="size-3" />
                 ) : (
-                  <Icon className="size-4" />
+                  <Icon className="size-3" />
                 )}
               </div>
               <span
                 className={cn(
-                  "text-xs mt-1",
+                  "text-[12px] leading-tight mt-0.5",
                   stepStatus === "ACTIVE" && "font-bold text-blue-600",
                   stepStatus === "COMPLETED" && "font-medium text-gray-700",
                   stepStatus === "PENDING" && "text-gray-400"
@@ -171,9 +171,9 @@ function ApprovalChainTracker({ leave }: { leave: LeaveRequest }) {
               </span>
             </div>
 
-            {/* Connector Line */}
+            {/* Connector Line - COMPACT */}
             {!isLastStep && (
-              <div className="flex-1 h-1 mx-2 bg-gray-200 rounded-full">
+              <div className="flex-1 h-0.5 mx-1 bg-gray-200 rounded-full">
                 <div
                   className={cn(
                     "h-full rounded-full transition-all duration-500",
@@ -259,7 +259,7 @@ export function LiveActivityTimeline({
   }, [leaves, today]);
 
   /**
-   * Renders a single live activity card
+   * Renders a single live activity card - COMPACT VERSION
    */
   const renderTimelineItem = (leave: LeaveRequest) => {
     const startDate = new Date(leave.startDate);
@@ -299,7 +299,7 @@ export function LiveActivityTimeline({
     return (
       <li
         key={leave.id}
-        className="solid-card cursor-pointer transition-all hover:scale-[1.01]"
+        className="solid-card cursor-pointer transition-all hover:scale-[1.01] h-[120px] flex flex-col"
         onClick={() => router.push(`/leaves?id=${leave.id}`)}
         role="button"
         tabIndex={0}
@@ -310,32 +310,35 @@ export function LiveActivityTimeline({
           }
         }}
       >
-        {/* Header: Type and Status */}
-        <div className="flex items-center justify-between gap-4 p-4 border-b border-gray-100 dark:border-gray-800">
-          <p className="text-base font-bold text-gray-900 dark:text-gray-100 truncate">
+        {/* Header: Type and Status - COMPACT */}
+        <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-gray-100 dark:border-gray-800">
+          <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">
             {leave.type} Leave
           </p>
           <StatusBadgeSimple status={leave.status} />
         </div>
 
-        {/* Content: Dates and Live Tracker/Action */}
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+        {/* Content: Dates, Time, Status in single row - COMPACT */}
+        <div className="flex-1 px-3 py-2 flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">
               {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              ({leave.workingDays} days)
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {leave.workingDays}d
             </p>
           </div>
 
-          <p className={cn("text-sm font-medium mt-1", timeTextClass)}>
-            {timeText}
-          </p>
+          {/* Single row: time text + duration */}
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <p className={cn("text-xs font-medium", timeTextClass)}>
+              {timeText}
+            </p>
+          </div>
 
-          {/* Approval Chain Tracker */}
+          {/* Approval Chain Tracker - COMPACT */}
           {showTracker && (
-            <div className="mt-4">
+            <div className="mt-1">
               <ApprovalChainTracker leave={leave} />
             </div>
           )}
@@ -364,22 +367,22 @@ export function LiveActivityTimeline({
 
   return (
     <Card className="solid-card animate-fade-in-up">
-      <CardHeader className="pb-4">
+      <CardHeader className="pb-2 px-3 pt-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Active Timeline</CardTitle>
+          <CardTitle className="text-base">Active Timeline</CardTitle>
           <Button
             variant="ghost"
             size="sm"
-            className="text-blue-600 font-semibold hover:bg-blue-50 dark:hover:bg-blue-950/30"
+            className="text-blue-600 font-semibold hover:bg-blue-50 dark:hover:bg-blue-950/30 h-7 px-2 text-xs"
             onClick={() => router.push("/leaves?status=pending")}
           >
             View All
-            <ChevronRight className="ml-1 size-4" />
+            <ChevronRight className="ml-1 size-3" />
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="p-4 pt-0">
-        <ul className="space-y-4">{activeLeaves.map(renderTimelineItem)}</ul>
+      <CardContent className="p-2 pt-0">
+        <ul className="space-y-1.5 md:space-y-2">{activeLeaves.map(renderTimelineItem)}</ul>
       </CardContent>
     </Card>
   );

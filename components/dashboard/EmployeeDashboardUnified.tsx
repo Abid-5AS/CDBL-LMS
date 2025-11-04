@@ -9,6 +9,7 @@ import { Inbox } from "lucide-react";
 import { WelcomeHero } from "./WelcomeHero";
 import { ActionItems } from "./ActionItems";
 import { LeaveSummaryCardNew } from "./LeaveSummaryCardNew";
+import { LeaveBalancesCompact } from "./LeaveBalancesCompact";
 import { StatusBadgeSimple } from "./StatusBadgeSimple";
 import { LiveActivityTimeline } from "./LiveActivityTimeline";
 import { formatDate } from "@/lib/utils";
@@ -101,9 +102,9 @@ function RequestsTable({
 
   return (
     <Card className="solid-card animate-fade-in-up animate-delay-300ms">
-      <CardHeader className="pb-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <CardTitle className="text-lg">Recent Requests</CardTitle>
+      <CardHeader className="pb-2 px-3 pt-3">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+          <CardTitle className="text-base">Recent Requests</CardTitle>
           <div className="w-full md:w-auto">
             <SegmentedControlGlider
               options={filterOptions}
@@ -134,14 +135,14 @@ function RequestsTable({
               {filteredRows.map((row) => (
                 <li
                   key={row.id}
-                  className="flex items-center justify-between gap-4 p-4 md:p-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
+                  className="flex items-center justify-between gap-3 p-3 md:p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
                   onClick={() => router.push(`/leaves?id=${row.id}`)}
                 >
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
                       {row.type} Leave
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       {formatDate(row.startDate)} → {formatDate(row.endDate)}
                       <span className="hidden sm:inline">
                         {" "}
@@ -151,7 +152,7 @@ function RequestsTable({
                   </div>
                   <div className="flex-shrink-0 flex flex-col items-end gap-1">
                     <StatusBadgeSimple status={row.status} />
-                    <span className="text-xs text-gray-400 dark:text-gray-500 sm:hidden">
+                    <span className="text-[10px] text-gray-400 dark:text-gray-500 sm:hidden">
                       {row.workingDays} days
                     </span>
                   </div>
@@ -190,24 +191,32 @@ export function EmployeeDashboardUnified({
   const leaves = leavesData?.items || [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* 1. Welcome Hero */}
-      <Suspense fallback={<Skeleton className="h-36 w-full" />}>
+      <Suspense fallback={<Skeleton className="h-32 w-full" />}>
         <WelcomeHero username={username} />
       </Suspense>
 
       {/* 2. Action Items (v2.0 Statuses) */}
-      <Suspense fallback={<Skeleton className="h-28 w-full" />}>
+      <Suspense fallback={<Skeleton className="h-24 w-full" />}>
         <ActionItems leaves={leaves} isLoading={isLoadingLeaves} />
       </Suspense>
 
-      {/* 3. Live Activity Timeline - Shows active requests with approval tracking */}
+      {/* 3. Leave Balances - COMPACT - Above Active Timeline */}
+      <Suspense fallback={<Skeleton className="h-32 w-full" />}>
+        <LeaveBalancesCompact
+          balanceData={balanceData}
+          isLoading={isLoadingBalance}
+        />
+      </Suspense>
+
+      {/* 4. Live Activity Timeline - Shows active requests with approval tracking */}
       <Suspense fallback={<Skeleton className="h-96 w-full" />}>
         <LiveActivityTimeline leaves={leaves} isLoading={isLoadingLeaves} />
       </Suspense>
 
-      {/* 4. Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* 5. Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Left Column (2/3): Requests Table */}
         <div className="lg:col-span-2">
           <Suspense fallback={<Skeleton className="h-96 w-full" />}>
@@ -215,7 +224,7 @@ export function EmployeeDashboardUnified({
           </Suspense>
         </div>
 
-        {/* Right Column (1/3): Summary Card */}
+        {/* Right Column (1/3): Summary Card - Keep for detailed view */}
         <div className="lg:col-span-1">
           <Suspense fallback={<Skeleton className="h-80 w-full" />}>
             <LeaveSummaryCardNew
