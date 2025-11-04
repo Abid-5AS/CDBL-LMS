@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FileClock, RefreshCcw, AlertOctagon, Archive } from "lucide-react";
@@ -33,6 +34,8 @@ export function ActionItems({
   leaves: LeaveRow[];
   isLoading: boolean;
 }) {
+  const router = useRouter();
+  
   const stats = useMemo(() => {
     const pendingCount = leaves.filter(
       (l) => l.status === "SUBMITTED" || l.status === "PENDING"
@@ -58,6 +61,7 @@ export function ActionItems({
       icon: FileClock,
       color: "text-blue-600 dark:text-blue-400",
       bg: "bg-blue-50 dark:bg-blue-950/30",
+      href: "/leaves?status=pending",
     },
     {
       title: "Returned to You",
@@ -65,6 +69,7 @@ export function ActionItems({
       icon: RefreshCcw,
       color: "text-yellow-600 dark:text-yellow-400",
       bg: "bg-yellow-50 dark:bg-yellow-950/30",
+      href: "/leaves?status=returned",
     },
     {
       title: "Overstay Alerts",
@@ -72,6 +77,7 @@ export function ActionItems({
       icon: AlertOctagon,
       color: "text-red-600 dark:text-red-400",
       bg: "bg-red-50 dark:bg-red-950/30",
+      href: "/leaves?status=overstay",
     },
     {
       title: "Cancelling",
@@ -79,8 +85,13 @@ export function ActionItems({
       icon: Archive,
       color: "text-orange-600 dark:text-orange-400",
       bg: "bg-orange-50 dark:bg-orange-950/30",
+      href: "/leaves?status=cancellation_requested",
     },
   ];
+
+  const handleCardClick = (href: string) => {
+    router.push(href);
+  };
 
   if (isLoading) {
     return (
@@ -106,11 +117,21 @@ export function ActionItems({
             <Card
               key={item.title}
               className={cn(
-                "solid-card p-4 animate-fade-in-up",
+                "solid-card p-4 animate-fade-in-up cursor-pointer transition-all hover:scale-[1.02]",
                 item.color,
                 item.bg
               )}
               style={{ animationDelay: `${i * 100}ms` }}
+              onClick={() => handleCardClick(item.href)}
+              role="button"
+              tabIndex={0}
+              aria-label={`View ${item.title.toLowerCase()} requests`}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleCardClick(item.href);
+                }
+              }}
             >
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">{item.title}</span>

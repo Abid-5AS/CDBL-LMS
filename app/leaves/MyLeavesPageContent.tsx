@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -31,26 +32,63 @@ type LeaveRow = {
   startDate: string;
   endDate: string;
   workingDays: number;
-  status: "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
+  status: "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "RETURNED" | "CANCELLATION_REQUESTED" | "RECALLED" | "OVERSTAY_PENDING";
   updatedAt: string;
   reason?: string;
 };
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
-const CANCELABLE_STATUSES = new Set<LeaveRow["status"]>(["SUBMITTED", "PENDING"]);
+const CANCELABLE_STATUSES = new Set<LeaveRow["status"]>(["SUBMITTED", "PENDING", "RETURNED", "CANCELLATION_REQUESTED"]);
 
 const FILTER_OPTIONS = [
   { value: "all", label: "All" },
   { value: "pending", label: "Pending" },
+  { value: "returned", label: "Returned" },
   { value: "approved", label: "Approved" },
   { value: "rejected", label: "Rejected" },
   { value: "cancelled", label: "Cancelled" },
+  { value: "overstay", label: "Overstay" },
+  { value: "cancellation_requested", label: "Cancelling" },
 ];
 
 export function MyLeavesPageContent() {
-  const [selectedFilter, setSelectedFilter] = useState("all");
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [selectedLeave, setSelectedLeave] = useState<LeaveRow | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  
+  // Get initial filter and highlight from URL
+  const urlFilter = searchParams.get("status") || "all";
+  const highlightId = searchParams.get("highlight") || searchParams.get("id");
+  const [selectedFilter, setSelectedFilter] = useState(urlFilter);
+
+  // Update filter when URL changes
+  useEffect(() => {
+    const urlFilter = searchParams.get("status") || "all";
+    setSelectedFilter(urlFilter);
+  }, [searchParams]);
+
+  // Handle highlight ID when leaves data is loaded
+  useEffect(() => {
+    if (highlightId && allRows.length > 0) {
+      const leaveId = parseInt(highlightId, 10);
+      const leave = allRows.find((row) => row.id === leaveId);
+      if (leave) {
+        setSelectedLeave(leave);
+        setModalOpen(true);
+      }
+    }
+  }, [highlightId, allRows]);
+
+  // Update URL when filter changes
+  const handleFilterChange = (value: string) => {
+    setSelectedFilter(value);
+    if (value === "all") {
+      router.push("/leaves");
+    } else {
+      router.push(`/leaves?status=${value}`);
+    }
+  };
   
   const { data, isLoading, error, mutate } = useSWR("/api/leaves?mine=1", fetcher, {
     revalidateOnFocus: false,
@@ -62,8 +100,18 @@ export function MyLeavesPageContent() {
     if (selectedFilter === "all") return allRows;
     return allRows.filter(row => {
       const status = row.status.toLowerCase();
-      return status === selectedFilter || 
-             (selectedFilter === "pending" && (status === "submitted" || status === "pending"));
+      switch (selectedFilter) {
+        case "pending":
+          return status === "submitted" || status === "pending" || status === "cancellation_requested";
+        case "returned":
+          return status === "returned";
+        case "overstay":
+          return status === "overstay_pending";
+        case "cancellation_requested":
+          return status === "cancellation_requested";
+        default:
+          return status === selectedFilter;
+      }
     });
   }, [allRows, selectedFilter]);
 
@@ -100,7 +148,7 @@ export function MyLeavesPageContent() {
       {/* Filters */}
       <Card>
         <CardContent className="p-4">
-          <FilterChips options={FILTER_OPTIONS} selectedValue={selectedFilter} onChange={setSelectedFilter} />
+          <FilterChips options={FILTER_OPTIONS} selectedValue={selectedFilter} onChange={handleFilterChange} />
         </CardContent>
       </Card>
 
