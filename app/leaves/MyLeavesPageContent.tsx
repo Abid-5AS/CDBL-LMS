@@ -57,6 +57,14 @@ export function MyLeavesPageContent() {
   const [selectedLeave, setSelectedLeave] = useState<LeaveRow | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   
+  // Fetch data first
+  const { data, isLoading, error, mutate } = useSWR("/api/leaves?mine=1", fetcher, {
+    revalidateOnFocus: false,
+  });
+
+  // Get all rows from data
+  const allRows: LeaveRow[] = Array.isArray(data?.items) ? data.items : [];
+
   // Get initial filter and highlight from URL
   const urlFilter = searchParams.get("status") || "all";
   const highlightId = searchParams.get("highlight") || searchParams.get("id");
@@ -89,12 +97,6 @@ export function MyLeavesPageContent() {
       router.push(`/leaves?status=${value}`);
     }
   };
-  
-  const { data, isLoading, error, mutate } = useSWR("/api/leaves?mine=1", fetcher, {
-    revalidateOnFocus: false,
-  });
-
-  const allRows: LeaveRow[] = Array.isArray(data?.items) ? data.items : [];
 
   const filteredRows = useMemo(() => {
     if (selectedFilter === "all") return allRows;
