@@ -17,27 +17,15 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { AlertCircle, FileText, Clock, Info, HelpCircle } from "lucide-react";
+import { AlertCircle, FileText, Clock, Info, HelpCircle, Calendar, MessageSquare, Paperclip, ClipboardList, BookOpenText, Send, CheckCircle2 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { policy } from "@/lib/policy";
@@ -439,105 +427,96 @@ export function ApplyLeaveForm() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-        {/* Breadcrumbs */}
-        <Breadcrumb className="mb-6">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href="/dashboard">Dashboard</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href="/leaves">Leaves</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Apply</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+    <div className="min-h-screen bg-muted/30 py-12">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8 space-y-8">
+        {/* Header */}
+        <div className="space-y-2">
+          <h1 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">Apply for Leave</h1>
+          <p className="text-sm text-muted-foreground leading-6">
+            Fill out the details below and submit your request for review.
+          </p>
+        </div>
 
-        {/* Main grid: 65% form, 35% summary */}
-        <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-          {/* LEFT: Form Section (65%) */}
-          <div className="space-y-6">
-            <Card className="rounded-2xl border-muted shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-2xl">New Leave Application</CardTitle>
-                <CardDescription>
-                  Select leave type, duration, and add a short reason. Attach supporting documents when necessary.
-                </CardDescription>
-                {lastSavedTime && (
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-2">
-                    <Clock className="h-3 w-3" />
-                    <span>Last saved at {lastSavedTime}</span>
-                  </div>
-                )}
+        {/* Two-column responsive layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* LEFT: Form Section (8 columns) */}
+          <div className="lg:col-span-8 space-y-8">
+            <Card className="bg-white dark:bg-neutral-950/60 border border-neutral-200/60 dark:border-neutral-800/60 shadow-sm hover:shadow-md transition-all duration-300 rounded-xl">
+              <CardHeader className="p-6">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-base font-semibold text-neutral-900 dark:text-neutral-100 leading-6">
+                    <Calendar className="w-4 h-4 text-indigo-500" />
+                    Leave Details
+                  </CardTitle>
+                  {lastSavedTime && (
+                    <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800">
+                      <CheckCircle2 className="w-3 h-3 mr-1" />
+                      Saved just now
+                    </Badge>
+                  )}
+                </div>
               </CardHeader>
 
               <form onSubmit={handleReviewClick} noValidate aria-label="Leave application form">
-                <CardContent className="space-y-6">
-                  {/* Leave Type */}
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Label htmlFor="leave-type" className="text-sm font-medium">
-                        Leave Type <span className="text-destructive">*</span>
-                      </Label>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button type="button" className="inline-flex items-center">
-                              <HelpCircle className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground transition-colors" />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent side="right" className="max-w-xs">
-                            <p className="text-xs">{POLICY_TOOLTIPS[type]}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                    <Select
-                      value={type}
-                      onValueChange={(value) => {
-                        handleTypeChange(value as LeaveType);
-                        clearErrors();
-                      }}
-                    >
-                      <SelectTrigger
-                        id="leave-type"
-                        className={cn("h-11", errors.type && "border-destructive")}
-                        aria-label="Leave type"
-                        aria-required="true"
-                        aria-invalid={!!errors.type}
-                        aria-describedby={errors.type ? "type-error" : undefined}
+                <CardContent className="p-6 space-y-6">
+                  {/* Leave Type and Date Range in Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    {/* Leave Type */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Label htmlFor="leave-type" className="text-sm font-medium leading-6">
+                          Leave Type <span className="text-destructive">*</span>
+                        </Label>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button type="button" className="inline-flex items-center">
+                                <HelpCircle className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground transition-colors" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="right" className="max-w-xs">
+                              <p className="text-xs">{POLICY_TOOLTIPS[type]}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                      <Select
+                        value={type}
+                        onValueChange={(value) => {
+                          handleTypeChange(value as LeaveType);
+                          clearErrors();
+                        }}
                       >
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {LEAVE_OPTIONS.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {errors.type && (
-                      <p id="type-error" className="text-sm text-destructive flex items-center gap-1.5" role="alert">
-                        <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />
-                        {errors.type}
-                      </p>
-                    )}
-                  </div>
+                        <SelectTrigger
+                          id="leave-type"
+                          className={cn("h-11", errors.type && "border-destructive")}
+                          aria-label="Leave type"
+                          aria-required="true"
+                          aria-invalid={!!errors.type}
+                          aria-describedby={errors.type ? "type-error" : undefined}
+                        >
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {LEAVE_OPTIONS.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {errors.type && (
+                        <p id="type-error" className="text-sm text-destructive flex items-center gap-1.5" role="alert">
+                          <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />
+                          {errors.type}
+                        </p>
+                      )}
+                    </div>
 
-                  {/* Date Range Picker */}
-                  <div className="space-y-2">
+                    {/* Date Range Picker */}
+                    <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <Label htmlFor="leave-dates" className="text-sm font-medium">
+                      <Label htmlFor="leave-dates" className="text-sm font-medium leading-6">
                         Leave Dates <span className="text-destructive">*</span>
                       </Label>
                       <TooltipProvider>
@@ -595,17 +574,22 @@ export function ApplyLeaveForm() {
                       </div>
                     )}
 
-                    {(errors.start || errors.end) && (
-                      <p className="text-sm text-destructive flex items-center gap-1.5 mt-2" role="alert">
-                        <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
-                        {errors.start || errors.end}
-                      </p>
-                    )}
+                      {(errors.start || errors.end) && (
+                        <p className="text-sm text-destructive flex items-center gap-1.5 mt-2" role="alert">
+                          <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
+                          {errors.start || errors.end}
+                        </p>
+                      )}
+                    </div>
                   </div>
+
+                  {/* Separator */}
+                  <Separator className="my-4" />
 
                   {/* Reason Textarea */}
                   <div className="space-y-2">
-                    <Label htmlFor="reason" className="text-sm font-medium">
+                    <Label htmlFor="reason" className="flex items-center gap-2 text-sm font-medium leading-6">
+                      <MessageSquare className="w-4 h-4 text-indigo-500" />
                       Reason <span className="text-destructive">*</span>
                     </Label>
                     <Textarea
@@ -615,11 +599,13 @@ export function ApplyLeaveForm() {
                         setReason(event.target.value);
                         setErrors((prev) => ({ ...prev, reason: undefined }));
                       }}
-                      placeholder="Family event, personal errand, medical follow-up..."
-                      rows={6}
+                      placeholder="Describe your reason for leave (min 10 characters)"
+                      rows={4}
                       className={cn(
-                        "min-h-[120px] resize-y",
-                        errors.reason && "border-destructive focus-visible:ring-destructive"
+                        "min-h-[120px] resize-none leading-6 transition-all focus-visible:ring-2",
+                        errors.reason 
+                          ? "border-destructive focus-visible:ring-destructive" 
+                          : "border-neutral-300 dark:border-neutral-700 focus-visible:ring-indigo-500/40 hover:border-indigo-400 dark:hover:border-indigo-600"
                       )}
                       aria-label="Reason for leave"
                       aria-required="true"
@@ -640,28 +626,37 @@ export function ApplyLeaveForm() {
                     </div>
                   </div>
 
-                  {/* File Upload */}
-                  {(requiresCertificate || showOptionalUpload) && (
-                    <FileUploadSection
-                      value={file}
-                      onChange={setFile}
-                      onError={handleFileError}
-                      error={errors.file}
-                      required={requiresCertificate}
-                      disabled={submitting}
-                    />
-                  )}
+                  {/* Separator */}
+                  <Separator className="my-4" />
 
-                  {!requiresCertificate && !showOptionalUpload && (
-                    <button
-                      type="button"
-                      onClick={() => setShowOptionalUpload(true)}
-                      className="text-sm text-primary hover:text-primary/80 flex items-center gap-1.5 transition-colors"
-                    >
-                      <FileText className="h-4 w-4" />
-                      Add supporting document (optional)
-                    </button>
-                  )}
+                  {/* File Upload */}
+                  <div className="space-y-2">
+                    {!requiresCertificate && !showOptionalUpload ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowOptionalUpload(true)}
+                        className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1.5 transition-colors font-medium"
+                      >
+                        <Paperclip className="h-4 w-4" />
+                        Add supporting document (optional)
+                      </button>
+                    ) : (
+                      <>
+                        <Label className="flex items-center gap-2 text-sm font-medium leading-6">
+                          <Paperclip className="w-4 h-4 text-indigo-500" />
+                          Supporting Document {requiresCertificate && <span className="text-destructive">*</span>}
+                        </Label>
+                        <FileUploadSection
+                          value={file}
+                          onChange={setFile}
+                          onError={handleFileError}
+                          error={errors.file}
+                          required={requiresCertificate}
+                          disabled={submitting}
+                        />
+                      </>
+                    )}
+                  </div>
 
                   {/* General errors */}
                   {errors.general && (
@@ -675,79 +670,118 @@ export function ApplyLeaveForm() {
                   )}
                 </CardContent>
 
-                <CardFooter className="flex justify-end gap-3 pt-6 border-t">
-                  <Button type="button" variant="outline" onClick={() => router.back()} disabled={submitting}>
+                {/* Actions inside form */}
+                <div className="flex justify-end gap-4 pt-4 border-t border-muted mt-10 px-6 pb-6">
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    onClick={() => router.back()} 
+                    disabled={submitting}
+                    className="transition-transform hover:scale-[1.02]"
+                  >
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={submitting}>
-                    {submitting ? "Submitting..." : "Review Application"}
+                  <Button 
+                    type="submit"
+                    disabled={submitting}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white transition-all hover:scale-[1.02] hover:shadow-md"
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    {submitting ? "Submitting..." : "Submit Request"}
                   </Button>
-                </CardFooter>
+                </div>
               </form>
             </Card>
           </div>
 
-          {/* RIGHT: Summary Section (35%) - Sticky on desktop, accordion on mobile */}
-          <aside className="lg:sticky lg:top-6 lg:h-fit space-y-4">
-            {/* Mobile: Accordion wrapper */}
-            <div className="lg:hidden">
-              <Accordion type="single" collapsible defaultValue="summary">
-                <AccordionItem value="summary" className="border-none">
-                  <AccordionTrigger className="text-base font-semibold px-0">
-                    Show Summary
-                  </AccordionTrigger>
-                  <AccordionContent className="px-0 space-y-4">
-                    <LeaveSummaryCard
-                      type={type}
-                      requestedDays={requestedDays}
-                      remainingBalance={remainingBalance}
-                      balancesLoading={balancesLoading}
-                      balancesError={balancesError}
-                      projectedBalancePercent={projectedBalancePercent}
-                      warnings={warnings}
-                    />
-                    <CurrentBalancesCard
-                      balances={balances}
-                      balancesLoading={balancesLoading}
-                      balancesError={balancesError}
-                    />
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </div>
+          {/* RIGHT: Unified Guidance Panel (4 columns) */}
+          <aside className="lg:col-span-4">
+            <Card className="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-950/40 dark:to-sky-950/30 border-none shadow-md rounded-xl p-6 space-y-6 lg:sticky lg:top-24">
+              {/* Leave Summary Section */}
+              <div>
+                <h4 className="flex items-center gap-2 text-base font-semibold text-neutral-900 dark:text-neutral-100 mb-4 leading-6">
+                  <ClipboardList className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  Leave Summary
+                </h4>
+                <div className="text-sm text-muted-foreground space-y-3 leading-6">
+                  <div className="flex justify-between">
+                    <span>Type:</span>
+                    <span className="font-medium text-neutral-900 dark:text-neutral-100">
+                      {LEAVE_OPTIONS.find((o) => o.value === type)?.label ?? "—"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Duration:</span>
+                    <span className="font-medium text-neutral-900 dark:text-neutral-100">
+                      {requestedDays > 0 && dateRange.start && dateRange.end
+                        ? `${requestedDays} day(s) (${fmtDDMMYYYY(dateRange.start)} → ${fmtDDMMYYYY(dateRange.end)})`
+                        : "—"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Projected Balance:</span>
+                    <span className={cn(
+                      "font-medium",
+                      remainingBalance < 0
+                        ? "text-destructive"
+                        : remainingBalance < 2
+                        ? "text-amber-600 dark:text-amber-400"
+                        : "text-emerald-600 dark:text-emerald-400"
+                    )}>
+                      {balancesLoading ? "Loading..." : balancesError ? "Unavailable" : `${Math.max(remainingBalance, 0)} days`}
+                    </span>
+                  </div>
+                </div>
+              </div>
 
-            {/* Desktop: Always visible */}
-            <div className="hidden lg:block space-y-4">
-              <LeaveSummaryCard
-                type={type}
-                requestedDays={requestedDays}
-                remainingBalance={remainingBalance}
-                balancesLoading={balancesLoading}
-                balancesError={balancesError}
-                projectedBalancePercent={projectedBalancePercent}
-                warnings={warnings}
-              />
-              <CurrentBalancesCard
-                balances={balances}
-                balancesLoading={balancesLoading}
-                balancesError={balancesError}
-              />
-            </div>
+              {/* Divider */}
+              <Separator className="bg-neutral-200/70 dark:bg-neutral-800/70" />
+
+              {/* Policy Highlights Section */}
+              <div>
+                <h4 className="flex items-center gap-2 text-base font-semibold text-neutral-900 dark:text-neutral-100 mb-3 leading-6">
+                  <BookOpenText className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  Policy Highlights
+                </h4>
+                <ul className="list-disc pl-4 text-sm text-muted-foreground space-y-1 leading-6">
+                  {RULE_TIPS[type].slice(0, 3).map((tip, idx) => (
+                    <li key={idx}>{tip}</li>
+                  ))}
+                </ul>
+                <Link 
+                  href="/policies" 
+                  className="text-indigo-600 dark:text-indigo-400 text-sm font-medium hover:text-indigo-700 dark:hover:text-indigo-300 mt-4 inline-flex items-center gap-1 leading-6 transition-colors"
+                >
+                  View Full Policy →
+                </Link>
+              </div>
+
+              {/* Warnings Section */}
+              {warnings.length > 0 && (
+                <>
+                  <Separator className="bg-neutral-200/70 dark:bg-neutral-800/70" />
+                  <div className="rounded-lg border border-amber-200/70 dark:border-amber-800/70 bg-amber-50/50 dark:bg-amber-950/20 p-4">
+                    <h4 className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-2 flex items-center gap-2 leading-6">
+                      <Info className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                      Important Note
+                    </h4>
+                    <ul className="text-sm text-amber-700 dark:text-amber-300 space-y-1 leading-6">
+                      {warnings.map((warning, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <span className="mt-0.5">•</span>
+                          <span>{warning}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </>
+              )}
+            </Card>
           </aside>
         </div>
-
-        {/* Footer */}
-        <footer className="mt-8 pt-6 border-t border-muted text-center text-xs text-muted-foreground">
-          <p>
-            {lastSavedTime && (
-              <span>Last saved at {lastSavedTime} • </span>
-            )}
-            Policy v2.0 • © CDBL HRD
-          </p>
-        </footer>
       </div>
 
-      {/* Sticky Review Button (visible on scroll) */}
+      {/* Sticky Submit Button (visible on scroll for mobile) */}
       {showStickyButton && (
         <div className="fixed bottom-6 right-6 z-50 lg:hidden">
           <Button
@@ -761,9 +795,10 @@ export function ApplyLeaveForm() {
             }}
             disabled={submitting}
             size="lg"
-            className="shadow-lg"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg transition-all hover:scale-[1.02]"
           >
-            {submitting ? "Submitting..." : "Review Application"}
+            <Send className="w-4 h-4 mr-2" />
+            {submitting ? "Submitting..." : "Submit Request"}
           </Button>
         </div>
       )}

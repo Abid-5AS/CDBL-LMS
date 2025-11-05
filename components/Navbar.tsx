@@ -68,10 +68,23 @@ export function Navbar() {
   ];
 
   const isActive = (href: string) => {
+    // Exact match for dashboard
     if (href === "/dashboard") {
       return pathname === "/dashboard";
     }
-    return pathname.startsWith(href);
+    // Exact match for apply leave page
+    if (href === "/leaves/apply") {
+      return pathname === "/leaves/apply";
+    }
+    // For /leaves route, match /leaves but exclude /leaves/apply
+    if (href === "/leaves") {
+      return (
+        pathname === "/leaves" ||
+        (pathname.startsWith("/leaves/") && pathname !== "/leaves/apply")
+      );
+    }
+    // For other routes, check exact match first, then startsWith for nested routes
+    return pathname === href || pathname.startsWith(`${href}/`);
   };
 
   return (

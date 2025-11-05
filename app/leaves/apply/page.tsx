@@ -34,15 +34,18 @@ export default function ApplyLeavePage() {
 
 function ApplyLeaveFallback() {
   return (
-    <div className="max-w-7xl mx-auto px-8 lg:px-12 py-6">
-      <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-        <div className="space-y-6">
-          <div className="h-36 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/30 dark:border-white/10 rounded-xl shadow-sm" />
-          <div className="h-96 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/30 dark:border-white/10 rounded-xl shadow-sm" />
-        </div>
-        <div className="space-y-4">
-          <div className="h-64 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/30 dark:border-white/10 rounded-xl shadow-sm" />
-          <div className="h-48 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/30 dark:border-white/10 rounded-xl shadow-sm" />
+    <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
+      <div className="space-y-6">
+        <div className="h-8 bg-muted/40 rounded-lg w-48" />
+        <div className="h-4 bg-muted/40 rounded-lg w-64" />
+        <div className="grid gap-6 lg:grid-cols-12">
+          <div className="lg:col-span-8 space-y-6">
+            <div className="h-96 bg-white/60 dark:bg-neutral-900/40 border border-neutral-200/70 dark:border-neutral-800/70 rounded-xl backdrop-blur-sm" />
+          </div>
+          <div className="lg:col-span-4 space-y-4">
+            <div className="h-64 bg-white/60 dark:bg-neutral-900/40 border border-neutral-200/70 dark:border-neutral-800/70 rounded-xl backdrop-blur-sm" />
+            <div className="h-48 bg-white/60 dark:bg-neutral-900/40 border border-neutral-200/70 dark:border-neutral-800/70 rounded-xl backdrop-blur-sm" />
+          </div>
         </div>
       </div>
     </div>
