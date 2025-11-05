@@ -3,980 +3,1009 @@ import { LeaveType, Role, LeaveStatus } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { initDefaultOrgSettings } from "../lib/org-settings";
 import { countWorkingDaysSync } from "../lib/working-days";
+import { normalizeToDhakaMidnight } from "../lib/date-utils";
+import { getChainFor } from "../lib/workflow";
+import * as fs from "fs/promises";
+import * as path from "path";
+import { randomUUID } from "crypto";
 
 const YEAR = new Date().getFullYear();
+const SEED_RESET = process.env.SEED_RESET === "true";
 
-async function upsertBalances(userId: number, initialUsed: { [key in LeaveType]?: number } = {}) {
-  const templates: Array<{ type: LeaveType; accrued: number }> = [
-    { type: LeaveType.EARNED, accrued: 24 }, // Policy v2.0: 24 days/year (2 × 12 months)
-    { type: LeaveType.CASUAL, accrued: 10 },
-    { type: LeaveType.MEDICAL, accrued: 14 },
-  ];
+// Deterministic random number generator
+class SeededRandom {
+  private seed: number;
 
-  for (const template of templates) {
-    const used = initialUsed[template.type] || 0;
-    const closing = Math.max(template.accrued - used, 0);
-    
-    await prisma.balance.upsert({
-      where: { userId_type_year: { userId, type: template.type, year: YEAR } },
-      update: {
-        accrued: template.accrued,
-        used: used,
-        closing: closing,
-      },
-      create: {
-        userId,
-        type: template.type,
-        year: YEAR,
-        opening: 0,
-        accrued: template.accrued,
-        used: used,
-        closing: closing,
-      },
-    });
+  constructor(seed: number = 12345) {
+    this.seed = seed;
+  }
+
+  next(): number {
+    this.seed = (this.seed * 9301 + 49297) % 233280;
+    return this.seed / 233280;
+  }
+
+  nextInt(min: number, max: number): number {
+    return Math.floor(this.next() * (max - min + 1)) + min;
+  }
+
+  nextFloat(min: number, max: number): number {
+    return this.next() * (max - min) + min;
+  }
+
+  pick<T>(array: T[]): T {
+    return array[this.nextInt(0, array.length - 1)];
   }
 }
 
-async function upsertUser(user: {
-  name: string;
-  email: string;
-  role: Role;
-  empCode?: string;
-  department?: string;
-  password?: string;
-}) {
-  const password = user.password || await bcrypt.hash("demo123", 10);
+const rng = new SeededRandom(12345);
+
+// Departments
+const DEPARTMENTS = ["IT", "HR", "Finance", "Operations"];
+
+// First names and last names for realistic names
+const FIRST_NAMES = [
+  "Ahmed",
+  "Fatima",
+  "Hasan",
+  "Ayesha",
+  "Rahman",
+  "Khan",
+  "Ali",
+  "Begum",
+  "Ibrahim",
+  "Sultana",
+  "Mahmud",
+  "Noor",
+  "Karim",
+  "Jahan",
+  "Hossain",
+  "Chowdhury",
+  "Islam",
+  "Akter",
+  "Uddin",
+  "Parvin",
+  "Miah",
+  "Khatun",
+  "Rashid",
+  "Haque",
+  "Alam",
+  "Siddique",
+  "Mallik",
+  "Bhuiyan",
+];
+
+const LAST_NAMES = [
+  "Rahman",
+  "Hossain",
+  "Khan",
+  "Ahmed",
+  "Ali",
+  "Islam",
+  "Chowdhury",
+  "Hasan",
+  "Karim",
+  "Uddin",
+  "Miah",
+  "Haque",
+  "Alam",
+  "Siddique",
+  "Mallik",
+  "Bhuiyan",
+  "Begum",
+  "Khatun",
+  "Sultana",
+  "Jahan",
+];
+
+function generateName(): string {
+  const firstName = rng.pick(FIRST_NAMES);
+  const lastName = rng.pick(LAST_NAMES);
+  return `${firstName} ${lastName}`;
+}
+
+function generateEmail(
+  name: string,
+  role: Role,
+  dept: string,
+  index: number
+): string {
+  const cleanName = name.toLowerCase().replace(/\s+/g, ".");
+  if (role === Role.SYSTEM_ADMIN) return "sysadmin@cdbl.local";
+  if (role === Role.CEO) return "ceo@cdbl.local";
+  if (role === Role.HR_HEAD) return "hrhead@cdbl.local";
+  if (role === Role.HR_ADMIN) return `hradmin${index}@cdbl.local`;
+  if (role === Role.DEPT_HEAD)
+    return `depthead.${dept.toLowerCase()}@cdbl.local`;
+  return `${cleanName}${index}@cdbl.local`;
+}
+
+function generateEmpCode(role: Role, dept: string, index: number): string {
+  if (role === Role.SYSTEM_ADMIN) return "SA001";
+  if (role === Role.CEO) return "CEO001";
+  if (role === Role.HR_HEAD) return "HRH001";
+  if (role === Role.HR_ADMIN) return `HRA${String(index).padStart(2, "0")}`;
+  if (role === Role.DEPT_HEAD) {
+    const deptCode = dept.substring(0, 2).toUpperCase();
+    return `${deptCode}H001`;
+  }
+  const deptCode = dept.substring(0, 2).toUpperCase();
+  return `${deptCode}${String(index).padStart(3, "0")}`;
+}
+
+async function resetDatabase() {
+  if (!SEED_RESET) return;
+
+  console.log("🗑️  Resetting core tables...");
+  await prisma.auditLog.deleteMany();
+  await prisma.approval.deleteMany();
+  await prisma.leaveRequest.deleteMany();
+  await prisma.balance.deleteMany();
+  await prisma.holiday.deleteMany();
+  await prisma.user.deleteMany();
+  console.log("✅ Tables reset complete");
+}
+
+async function createUsers() {
+  const users: Array<{
+    id: number;
+    role: Role;
+    department: string;
+    email: string;
+  }> = [];
+  const password = await bcrypt.hash("demo123", 10);
+
+  // 1. SYSTEM_ADMIN
+  const sysAdminEmpCode = "SA001";
+  // Handle empCode conflict by updating conflicting user's empCode
+  const existingSysAdminEmpCode = await prisma.user.findFirst({ where: { empCode: sysAdminEmpCode, email: { not: "sysadmin@cdbl.local" } } });
+  if (existingSysAdminEmpCode) {
+    await prisma.user.update({ where: { id: existingSysAdminEmpCode.id }, data: { empCode: `SA001_OLD_${Date.now()}` } });
+  }
   
-  const created = await prisma.user.upsert({
-    where: { email: user.email },
-    update: {
-      name: user.name,
-      role: user.role,
-      empCode: user.empCode,
-      department: user.department,
-      password,
-    },
+  const sysAdmin = await prisma.user.upsert({
+    where: { email: "sysadmin@cdbl.local" },
+    update: { role: Role.SYSTEM_ADMIN, department: "IT", empCode: sysAdminEmpCode },
     create: {
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      empCode: user.empCode,
-      department: user.department,
+      name: "System Administrator",
+      email: "sysadmin@cdbl.local",
+      role: Role.SYSTEM_ADMIN,
+      empCode: sysAdminEmpCode,
+      department: "IT",
       password,
     },
   });
+  users.push({
+    id: sysAdmin.id,
+    role: Role.SYSTEM_ADMIN,
+    department: "IT",
+    email: sysAdmin.email,
+  });
 
-  // Balances will be updated after leave requests are created
-  await upsertBalances(created.id);
-  return created;
+  // 2. CEO
+  const ceoEmpCode = "CEO001";
+  // Handle empCode conflict by updating conflicting user's empCode
+  const existingCeoEmpCode = await prisma.user.findFirst({ where: { empCode: ceoEmpCode, email: { not: "ceo@cdbl.local" } } });
+  if (existingCeoEmpCode) {
+    await prisma.user.update({ where: { id: existingCeoEmpCode.id }, data: { empCode: `CEO001_OLD_${Date.now()}` } });
+  }
+  
+  const ceo = await prisma.user.upsert({
+    where: { email: "ceo@cdbl.local" },
+    update: { role: Role.CEO, department: "Executive", empCode: ceoEmpCode },
+    create: {
+      name: "Chief Executive Officer",
+      email: "ceo@cdbl.local",
+      role: Role.CEO,
+      empCode: ceoEmpCode,
+      department: "Executive",
+      password,
+    },
+  });
+  users.push({
+    id: ceo.id,
+    role: Role.CEO,
+    department: "Executive",
+    email: ceo.email,
+  });
+
+  // 3. HR_HEAD
+  const hrHeadEmpCode = "HRH001";
+  // Handle empCode conflict by updating conflicting user's empCode
+  const existingHrHeadEmpCode = await prisma.user.findFirst({ where: { empCode: hrHeadEmpCode, email: { not: "hrhead@cdbl.local" } } });
+  if (existingHrHeadEmpCode) {
+    await prisma.user.update({ where: { id: existingHrHeadEmpCode.id }, data: { empCode: `HRH001_OLD_${Date.now()}` } });
+  }
+  
+  const hrHead = await prisma.user.upsert({
+    where: { email: "hrhead@cdbl.local" },
+    update: { role: Role.HR_HEAD, department: "HR", empCode: hrHeadEmpCode },
+    create: {
+      name: "HR Head",
+      email: "hrhead@cdbl.local",
+      role: Role.HR_HEAD,
+      empCode: hrHeadEmpCode,
+      department: "HR",
+      password,
+    },
+  });
+  users.push({
+    id: hrHead.id,
+    role: Role.HR_HEAD,
+    department: "HR",
+    email: hrHead.email,
+  });
+
+  // 4. HR_ADMIN (1)
+  const hrAdminName = "HR Admin";
+  const hrAdminEmail = "hradmin1@cdbl.local";
+  const hrAdminEmpCode = generateEmpCode(Role.HR_ADMIN, "HR", 1);
+  // Handle empCode conflict by updating conflicting user's empCode
+  const existingHrAdminEmpCode = await prisma.user.findFirst({ where: { empCode: hrAdminEmpCode, email: { not: hrAdminEmail } } });
+  if (existingHrAdminEmpCode) {
+    await prisma.user.update({ where: { id: existingHrAdminEmpCode.id }, data: { empCode: `${hrAdminEmpCode}_OLD_${Date.now()}` } });
+  }
+  
+  const hrAdmin = await prisma.user.upsert({
+    where: { email: hrAdminEmail },
+    update: { role: Role.HR_ADMIN, department: "HR", empCode: hrAdminEmpCode },
+    create: {
+      name: hrAdminName,
+      email: hrAdminEmail,
+      role: Role.HR_ADMIN,
+      empCode: hrAdminEmpCode,
+      department: "HR",
+      password,
+    },
+  });
+  users.push({
+    id: hrAdmin.id,
+    role: Role.HR_ADMIN,
+    department: "HR",
+    email: hrAdmin.email,
+  });
+
+  // 5. DEPT_HEAD (3 total - IT, HR, Finance)
+  const deptHeads: Array<{ id: number; department: string; email: string }> =
+    [];
+  const selectedDepts = ["IT", "HR", "Finance"]; // Select 3 departments
+  for (const dept of selectedDepts) {
+    const name = `Head of ${dept}`;
+    const email = `depthead.${dept.toLowerCase()}@cdbl.local`;
+    const empCode = generateEmpCode(Role.DEPT_HEAD, dept, 1);
+
+    // Handle empCode conflict by updating conflicting user's empCode
+    const existingEmpCode = await prisma.user.findFirst({ where: { empCode, email: { not: email } } });
+    if (existingEmpCode) {
+      await prisma.user.update({ where: { id: existingEmpCode.id }, data: { empCode: `${empCode}_OLD_${Date.now()}` } });
+    }
+
+    const deptHead = await prisma.user.upsert({
+      where: { email },
+      update: { role: Role.DEPT_HEAD, department: dept, empCode },
+      create: {
+        name,
+        email,
+        role: Role.DEPT_HEAD,
+        empCode,
+        department: dept,
+        password,
+      },
+    });
+    users.push({
+      id: deptHead.id,
+      role: Role.DEPT_HEAD,
+      department: dept,
+      email: deptHead.email,
+    });
+    deptHeads.push({
+      id: deptHead.id,
+      department: dept,
+      email: deptHead.email,
+    });
+  }
+
+  // 6. EMPLOYEE (12 total - 4 per department for IT, HR, Finance)
+  const employeeDepts = ["IT", "HR", "Finance"]; // Match selected departments
+  for (const dept of employeeDepts) {
+    const deptHeadId = deptHeads.find((dh) => dh.department === dept)?.id;
+    if (!deptHeadId) continue;
+
+    const employeesPerDept = 4; // 4 per department = 12 total
+    for (let i = 1; i <= employeesPerDept; i++) {
+      const name = generateName();
+      const email = generateEmail(name, Role.EMPLOYEE, dept, i);
+      const empCode = generateEmpCode(Role.EMPLOYEE, dept, i);
+
+      // Handle empCode conflict by updating conflicting user's empCode
+      const existingEmpCode = await prisma.user.findFirst({ where: { empCode, email: { not: email } } });
+      if (existingEmpCode) {
+        await prisma.user.update({ where: { id: existingEmpCode.id }, data: { empCode: `${empCode}_OLD_${Date.now()}` } });
+      }
+
+      const employee = await prisma.user.upsert({
+        where: { email },
+        update: {
+          role: Role.EMPLOYEE,
+          department: dept,
+          deptHeadId,
+          empCode,
+        },
+    create: {
+          name,
+          email,
+          role: Role.EMPLOYEE,
+          empCode,
+          department: dept,
+          deptHeadId,
+          password,
+        },
+      });
+      users.push({
+        id: employee.id,
+        role: Role.EMPLOYEE,
+        department: dept,
+        email: employee.email,
+      });
+    }
+  }
+
+  console.log(`✅ Created ${users.length} users`);
+  return users;
 }
 
-async function seedHoliday() {
-  // All holidays for 2025 from CDBL's official list
+async function createBalances(users: Array<{ id: number; role: Role }>) {
+  const employees = users.filter((u) => u.role === Role.EMPLOYEE);
+  const balances: Array<{ userId: number; type: LeaveType; used: number }> = [];
+
+  for (const user of employees) {
+    // Match requirements: Earned Leave 23/24, Casual Leave 4/10, Medical Leave 10/14
+    // This means: Earned Used=1, Casual Used=6, Medical Used=4
+    // But vary slightly for realism
+    const earnedUsed = rng.nextInt(1, 2); // 1-2 used, leaving 23-22 remaining
+    const casualUsed = rng.nextInt(4, 6); // 4-6 used, leaving 6-4 remaining
+    const medicalUsed = rng.nextInt(4, 6); // 4-6 used, leaving 10-8 remaining
+
+    for (const type of [
+      LeaveType.EARNED,
+      LeaveType.CASUAL,
+      LeaveType.MEDICAL,
+    ] as LeaveType[]) {
+      const used =
+        type === LeaveType.EARNED
+          ? earnedUsed
+          : type === LeaveType.CASUAL
+          ? casualUsed
+          : medicalUsed;
+      const accrued =
+        type === LeaveType.EARNED ? 24 : type === LeaveType.CASUAL ? 10 : 14;
+      const closing = Math.max(accrued - used, 0);
+
+      await prisma.balance.upsert({
+        where: { userId_type_year: { userId: user.id, type, year: YEAR } },
+        update: { used, closing },
+        create: {
+          userId: user.id,
+          type,
+          year: YEAR,
+          opening: 0,
+          accrued,
+          used,
+          closing,
+      },
+    });
+
+      balances.push({ userId: user.id, type, used });
+    }
+  }
+
+  // Also create balances for non-employees
+  for (const user of users.filter((u) => u.role !== Role.EMPLOYEE)) {
+    for (const type of [
+      LeaveType.EARNED,
+      LeaveType.CASUAL,
+      LeaveType.MEDICAL,
+    ] as LeaveType[]) {
+      const accrued =
+        type === LeaveType.EARNED ? 24 : type === LeaveType.CASUAL ? 10 : 14;
+      await prisma.balance.upsert({
+        where: { userId_type_year: { userId: user.id, type, year: YEAR } },
+        update: {},
+    create: {
+          userId: user.id,
+          type,
+          year: YEAR,
+          opening: 0,
+          accrued,
+          used: 0,
+          closing: accrued,
+        },
+      });
+    }
+  }
+
+  console.log(`✅ Created balances for ${users.length} users`);
+  return balances;
+}
+
+async function createHolidays() {
   const holidays = [
     { date: `${YEAR}-01-01T00:00:00.000Z`, name: "New Year's Day" },
-    { date: `${YEAR}-02-15T00:00:00.000Z`, name: "Shab-e-Barat", isOptional: true },
-    { date: `${YEAR}-02-21T00:00:00.000Z`, name: "Shaheed Day and International Mother Language Day" },
-    { date: `${YEAR}-03-26T00:00:00.000Z`, name: "Independence & National day" },
-    { date: `${YEAR}-03-28T00:00:00.000Z`, name: "Shab-e-Qadar", isOptional: true },
-    // Eid-ul-Fitr spans multiple days
+    {
+      date: `${YEAR}-02-21T00:00:00.000Z`,
+      name: "Shaheed Day and International Mother Language Day",
+    },
+    {
+      date: `${YEAR}-03-26T00:00:00.000Z`,
+      name: "Independence & National day",
+    },
     { date: `${YEAR}-03-29T00:00:00.000Z`, name: "Eid-ul-Fitr" },
     { date: `${YEAR}-03-30T00:00:00.000Z`, name: "Eid-ul-Fitr" },
     { date: `${YEAR}-03-31T00:00:00.000Z`, name: "Eid-ul-Fitr" },
     { date: `${YEAR}-04-01T00:00:00.000Z`, name: "Eid-ul-Fitr" },
-    { date: `${YEAR}-04-02T00:00:00.000Z`, name: "Eid-ul-Fitr" },
     { date: `${YEAR}-04-14T00:00:00.000Z`, name: "Bengali New Year's day" },
     { date: `${YEAR}-05-01T00:00:00.000Z`, name: "May Day" },
-    { date: `${YEAR}-05-11T00:00:00.000Z`, name: "Budha Purnima", isOptional: true },
-    // Eid-ul-Azha spans multiple days
     { date: `${YEAR}-06-05T00:00:00.000Z`, name: "Eid-ul-Azha" },
     { date: `${YEAR}-06-06T00:00:00.000Z`, name: "Eid-ul-Azha" },
     { date: `${YEAR}-06-07T00:00:00.000Z`, name: "Eid-ul-Azha" },
-    { date: `${YEAR}-06-08T00:00:00.000Z`, name: "Eid-ul-Azha" },
-    { date: `${YEAR}-06-09T00:00:00.000Z`, name: "Eid-ul-Azha" },
-    { date: `${YEAR}-06-10T00:00:00.000Z`, name: "Eid-ul-Azha" },
-    { date: `${YEAR}-07-01T00:00:00.000Z`, name: "Trading Holiday (Bank Holiday)" },
-    { date: `${YEAR}-07-06T00:00:00.000Z`, name: "Muharram (Ashura)", isOptional: true },
-    { date: `${YEAR}-08-16T00:00:00.000Z`, name: "Janmashtami", isOptional: true },
-    { date: `${YEAR}-09-05T00:00:00.000Z`, name: "Eid-E-Milad-un-Nabi" },
-    // Durgapuja spans multiple days
-    { date: `${YEAR}-10-01T00:00:00.000Z`, name: "Durgapuja" },
-    { date: `${YEAR}-10-02T00:00:00.000Z`, name: "Durgapuja" },
+    {
+      date: `${YEAR}-07-01T00:00:00.000Z`,
+      name: "Trading Holiday (Bank Holiday)",
+    },
+    { date: `${YEAR}-08-15T00:00:00.000Z`, name: "National Mourning Day" },
     { date: `${YEAR}-12-16T00:00:00.000Z`, name: "Victory Day" },
-    { date: `${YEAR}-12-25T00:00:00.000Z`, name: "Christmas Day" },
-    { date: `${YEAR}-12-31T00:00:00.000Z`, name: "Trading Holiday (Bank Holiday)" },
   ];
+
+  // Add next year holidays
+  const nextYear = YEAR + 1;
+  holidays.push(
+    { date: `${nextYear}-01-01T00:00:00.000Z`, name: "New Year's Day" },
+    {
+      date: `${nextYear}-02-21T00:00:00.000Z`,
+      name: "Shaheed Day and International Mother Language Day",
+    },
+    {
+      date: `${nextYear}-03-26T00:00:00.000Z`,
+      name: "Independence & National day",
+    }
+  );
 
   for (const holiday of holidays) {
     await prisma.holiday.upsert({
       where: { date: new Date(holiday.date) },
-      update: {
-        name: holiday.name,
-        isOptional: holiday.isOptional ?? false,
-      },
-      create: {
+      update: { name: holiday.name },
+    create: {
         date: new Date(holiday.date),
         name: holiday.name,
-        isOptional: holiday.isOptional ?? false,
+        isOptional: false,
       },
     });
   }
+
+  console.log(`✅ Created ${holidays.length} holidays`);
+  return holidays.map((h) => ({
+    date: normalizeToDhakaMidnight(new Date(h.date)).toISOString().slice(0, 10),
+    name: h.name,
+  }));
 }
 
-async function seedPolicies() {
-  const policies: Array<{
-    leaveType: LeaveType;
-    maxDays?: number;
-    minDays?: number;
-    noticeDays?: number;
-    carryLimit?: number;
-  }> = [
-    { leaveType: LeaveType.CASUAL, maxDays: 7, noticeDays: 5 },
-    { leaveType: LeaveType.MEDICAL, maxDays: 14, minDays: 1 },
-    { leaveType: LeaveType.EARNED, maxDays: 30, noticeDays: 5, carryLimit: 60 }, // Policy v2.0: 5 working days per 6.11
-  ];
-
-  const policyClient = (prisma as any).policyConfig as {
-    upsert: (args: unknown) => Promise<unknown>;
-  };
-
-  if (!policyClient) {
-    console.warn("PolicyConfig model missing; skipping policy seeding.");
-    return;
-  }
-
-  await Promise.all(
-    policies.map((policy) =>
-      policyClient.upsert({
-        where: { leaveType: policy.leaveType },
-        update: policy,
-        create: policy,
-      }),
-    ),
-  );
-}
-
-// Helper function to find next working day (Sun-Thu)
-function getNextWorkingDay(date: Date): Date {
-  const next = new Date(date);
+function getNextWorkingDay(
+  date: Date,
+  holidays: Array<{ date: string }>
+): Date {
+  let next = new Date(date);
   next.setDate(next.getDate() + 1);
-  const day = next.getDay();
-  // Skip weekends (Fri=5, Sat=6)
-  if (day === 5) next.setDate(next.getDate() + 2); // Skip to Sunday
-  if (day === 6) next.setDate(next.getDate() + 1); // Skip to Sunday
+  while (
+    next.getDay() >= 5 ||
+    holidays.some(
+      (h) =>
+        h.date === normalizeToDhakaMidnight(next).toISOString().slice(0, 10)
+    )
+  ) {
+    next.setDate(next.getDate() + 1);
+  }
   return next;
 }
 
-// Helper function to get date N working days from today
-function getFutureWorkingDate(daysFromNow: number): Date {
-  let date = new Date();
-  date.setHours(0, 0, 0, 0);
-  for (let i = 0; i < daysFromNow; i++) {
-    date = getNextWorkingDay(date);
-  }
-  return date;
+async function createCertificateFile(leaveId: number): Promise<string> {
+  const uploadDir = path.join(process.cwd(), "private", "uploads");
+  await fs.mkdir(uploadDir, { recursive: true });
+
+  const filename = `medical-cert-${leaveId}-${randomUUID()}.pdf`;
+  const filePath = path.join(uploadDir, filename);
+
+  // Create a minimal PDF placeholder (PDF header + minimal content)
+  const pdfContent = Buffer.from(
+    `%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] >>
+endobj
+xref
+0 4
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+trailer
+<< /Size 4 /Root 1 0 R >>
+startxref
+178
+%%EOF`
+  );
+
+  await fs.writeFile(filePath, pdfContent);
+  return filename;
 }
 
-// Helper to create approval chain for a leave
-async function createApprovalChain(
-  leaveId: number,
-  approvers: Array<{ id: number; role: Role; email: string }>,
-  finalDecision: "APPROVED" | "REJECTED",
-  startId: number,
-  baseTimeOffset: number
+async function createLeaveRequests(
+  users: Array<{ id: number; role: Role; department: string; email: string }>,
+  holidays: Array<{ date: string; name: string }>
 ) {
-  const chain = [];
-  for (let i = 0; i < approvers.length; i++) {
-    const approver = approvers[i];
-    if (!approver) continue;
-
-    const isLast = i === approvers.length - 1;
-    const approval = await prisma.approval.upsert({
-      where: { id: startId + i },
-      create: {
-        id: startId + i,
-        leaveId,
-        step: i + 1,
-        approverId: approver.id,
-        decision: isLast ? finalDecision : "FORWARDED",
-        toRole: isLast ? null : approvers[i + 1]?.role || null,
-        comment: isLast
-          ? `${finalDecision} by ${approver.role}`
-          : `Forwarded to ${approvers[i + 1]?.role || "next"}`,
-        decidedAt: new Date(Date.now() - (baseTimeOffset - i * 2) * 24 * 60 * 60 * 1000),
-      },
-      update: {},
-    });
-    chain.push(approval);
-
-    // Create audit log for each action
-    await prisma.auditLog.create({
-      data: {
-        actorEmail: approver.email,
-        action: isLast ? `LEAVE_${finalDecision}` : "LEAVE_FORWARD",
-        targetEmail: "", // Will be updated with requester email
-        details: {
-          leaveId,
-          actorRole: approver.role,
-          toRole: isLast ? null : approvers[i + 1]?.role || null,
-          step: i + 1,
-        },
-      },
-    });
-  }
-  return chain;
-}
-
-async function seedLeaveRequests() {
-  const users = await prisma.user.findMany({
-    select: { id: true, email: true, role: true },
-  });
-
-  const employee1 = users.find((u) => u.email === "employee1@demo.local");
-  const employee2 = users.find((u) => u.email === "employee2@demo.local");
-  const employee3 = users.find((u) => u.email === "employee3@demo.local");
-  const employee4 = users.find((u) => u.email === "employee4@demo.local");
-  const hrAdmin = users.find((u) => u.role === Role.HR_ADMIN);
-  const deptHead = users.find((u) => u.role === Role.DEPT_HEAD);
+  const employees = users.filter((u) => u.role === Role.EMPLOYEE);
+  const hrAdmins = users.filter((u) => u.role === Role.HR_ADMIN);
+  const deptHeads = users.filter((u) => u.role === Role.DEPT_HEAD);
   const hrHead = users.find((u) => u.role === Role.HR_HEAD);
   const ceo = users.find((u) => u.role === Role.CEO);
 
-  if (!employee1 || !employee2 || !employee3 || !employee4 || !hrAdmin || !deptHead || !hrHead || !ceo) {
-    console.warn("Missing required users for leave requests seeding");
+  if (!hrAdmins.length || !deptHeads.length || !hrHead || !ceo) {
+    console.warn("⚠️  Missing approvers, skipping leave requests");
     return;
   }
 
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const approvers = [hrAdmin, deptHead, hrHead, ceo];
+  const today = normalizeToDhakaMidnight(new Date());
+  const next90Days = new Date(today);
+  next90Days.setDate(next90Days.getDate() + 90);
 
-  // Helper to calculate working days (using sync version since we're in a seed script)
-  const calcWorkingDays = (start: Date, end: Date) => countWorkingDaysSync(start, end);
+  let leaveId = 1;
+  let approvalId = 1;
+  const leaveRequests: Array<{
+    id: number;
+    requesterId: number;
+    status: LeaveStatus;
+    type: LeaveType;
+  }> = [];
 
-  // Helper to create approval and audit log
-  async function createApprovalAndAudit(
-    leaveId: number,
-    step: number,
-    approver: { id: number; email: string; role: Role },
-    decision: "FORWARDED" | "APPROVED" | "REJECTED",
-    toRole: string | null,
-    comment: string,
-    requesterEmail: string,
-    approvalId: number,
-    daysAgo: number
-  ) {
-    await prisma.approval.upsert({
-      where: { id: approvalId },
-      create: {
-        id: approvalId,
-        leaveId,
-        step,
-        approverId: approver.id,
-        decision,
-        toRole,
-        comment,
-        decidedAt: new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000),
-      },
-      update: {},
-    });
+  for (const employee of employees) {
+    const deptHead = deptHeads.find(
+      (dh) => dh.department === employee.department
+    );
+    if (!deptHead) continue;
 
-    await prisma.auditLog.create({
-      data: {
-        actorEmail: approver.email,
-        action: decision === "FORWARDED" ? "LEAVE_FORWARD" : decision === "APPROVED" ? "LEAVE_APPROVE" : "LEAVE_REJECT",
-        targetEmail: requesterEmail,
-        details: {
-          leaveId,
-          actorRole: approver.role,
-          toRole,
-          step,
-        },
-      },
-    });
-  }
+    const hrAdmin = hrAdmins[0]; // Use first HR admin
+    const approvers = [hrAdmin, deptHead, hrHead, ceo];
 
-  // Helper to create full approval chain
-  async function createFullChain(
-    leaveId: number,
-    finalDecision: "APPROVED" | "REJECTED",
-    requesterEmail: string,
-    startApprovalId: number,
-    daysAgoStart: number,
-    skipSteps: number[] = []
-  ) {
-    let approvalId = startApprovalId;
-    let daysAgo = daysAgoStart;
-    const activeSteps = approvers.map((_, i) => i).filter(i => !skipSteps.includes(i));
-    
-    for (let idx = 0; idx < activeSteps.length; idx++) {
-      const i = activeSteps[idx];
-      const approver = approvers[i];
-      const isLast = idx === activeSteps.length - 1;
-      
-      await createApprovalAndAudit(
-        leaveId,
-        i + 1,
-        approver,
-        isLast ? finalDecision : "FORWARDED",
-        isLast ? null : approvers[activeSteps[idx + 1]]?.role || null,
-        isLast ? `${finalDecision} by ${approver.role}` : `Forwarded to ${approvers[activeSteps[idx + 1]]?.role || "next"}`,
-        requesterEmail,
-        approvalId++,
-        daysAgo
-      );
-      daysAgo -= 2;
-    }
-  }
+    // Create 6-10 leave requests per employee
+    const numRequests = rng.nextInt(6, 10);
 
-  // 1. Employee1 - CL 3 days, PENDING (near holiday, soft warning) - forwarded to Dept Head
-  const leave1Start = new Date(currentYear, 10, 10); // Nov 10, 2025
-  const leave1End = new Date(currentYear, 10, 12);
-  const leave1 = await prisma.leaveRequest.upsert({
-    where: { id: 1 },
-    create: {
-      id: 1,
-      requesterId: employee1.id,
-      type: LeaveType.CASUAL,
-      startDate: leave1Start,
-      endDate: leave1End,
-      workingDays: calcWorkingDays(leave1Start, leave1End),
-      reason: "Need time off for personal matters and family obligations",
-      status: "PENDING" as LeaveStatus,
-      policyVersion: "v2.0",
-      needsCertificate: false,
-    },
-    update: {},
-  });
-  await createApprovalAndAudit(leave1.id, 1, hrAdmin, "FORWARDED", "DEPT_HEAD", "Forwarded to Department Head for review", employee1.email, 1, 2);
+    for (let i = 0; i < numRequests; i++) {
+      const leaveType = rng.pick([
+        LeaveType.EARNED,
+        LeaveType.CASUAL,
+        LeaveType.MEDICAL,
+      ]);
+      let status: LeaveStatus;
+      let startDate: Date;
+      let endDate: Date;
+      let workingDays: number;
+      let needsCertificate = false;
+      let certificateUrl: string | null = null;
+      let fitnessCertificateUrl: string | null = null;
 
-  // 2. Employee2 - EL 5 days, APPROVED (full chain: HR Admin → Dept Head → HR Head → CEO)
-  const leave2Start = new Date(currentYear, 8, 1); // Sep 1
-  const leave2End = new Date(currentYear, 8, 5);
-  const leave2 = await prisma.leaveRequest.upsert({
-    where: { id: 2 },
-    create: {
-      id: 2,
-      requesterId: employee2.id,
-      type: LeaveType.EARNED,
-      startDate: leave2Start,
-      endDate: leave2End,
-      workingDays: calcWorkingDays(leave2Start, leave2End),
-      reason: "Family vacation planned well in advance with proper notice",
-      status: "APPROVED" as LeaveStatus,
-      policyVersion: "v2.0",
-      needsCertificate: false,
-    },
-    update: {},
-  });
-  await createFullChain(leave2.id, "APPROVED", employee2.email, 10, 30);
+      // Determine status distribution: APPROVED (60%), PENDING (20%), REJECTED (10%), RETURNED (10%)
+      const statusRoll = rng.next();
+      if (statusRoll < 0.6) {
+        status = "APPROVED";
+      } else if (statusRoll < 0.8) {
+        status = "PENDING";
+      } else if (statusRoll < 0.9) {
+        status = "REJECTED";
+      } else if (statusRoll < 0.95) {
+        status = "RETURNED";
+      } else if (statusRoll < 0.97) {
+        status = "CANCELLATION_REQUESTED";
+      } else if (statusRoll < 0.99) {
+        status = "OVERSTAY_PENDING";
+      } else {
+        status = "CANCELLED";
+      }
 
-  // 3. Employee3 - ML 5 days, REJECTED (missing certificate)
-  const leave3Start = new Date(currentYear, 9, 20); // Oct 20
-  const leave3End = new Date(currentYear, 9, 24);
-  const leave3 = await prisma.leaveRequest.upsert({
-    where: { id: 3 },
-    create: {
-      id: 3,
-      requesterId: employee3.id,
-      type: LeaveType.MEDICAL,
-      startDate: leave3Start,
-      endDate: leave3End,
-      workingDays: calcWorkingDays(leave3Start, leave3End),
-      reason: "Medical treatment required for ongoing health condition",
-      status: "REJECTED" as LeaveStatus,
-      policyVersion: "v2.0",
-      needsCertificate: true,
-      certificateUrl: null,
-    },
-    update: {},
-  });
-  await createFullChain(leave3.id, "REJECTED", employee3.email, 20, 10, [0, 1]); // Only HR Head rejects
+      // Generate dates - distribute across past 6 months and upcoming 1 month
+      if (
+        status === "APPROVED" ||
+        status === "PENDING" ||
+        status === "SUBMITTED"
+      ) {
+        // Future dates (upcoming 1 month) - create some overlaps within departments
+        const daysFromNow = rng.nextInt(1, 30); // Upcoming month
+        startDate = new Date(today);
+        startDate.setDate(startDate.getDate() + daysFromNow);
+        startDate = getNextWorkingDay(startDate, holidays);
 
-  // 4. Employee4 - EL 2 days, PENDING (forwarded to Dept Head)
-  const leave4Start = new Date(currentYear, 6, 15); // Jul 15
-  const leave4End = new Date(currentYear, 6, 16);
-  const leave4 = await prisma.leaveRequest.upsert({
-    where: { id: 4 },
-    create: {
-      id: 4,
-      requesterId: employee4.id,
-      type: LeaveType.EARNED,
-      startDate: leave4Start,
-      endDate: leave4End,
-      workingDays: calcWorkingDays(leave4Start, leave4End),
-      reason: "Short break needed for personal errands and rest",
-      status: "PENDING" as LeaveStatus,
-      policyVersion: "v2.0",
-      needsCertificate: false,
-    },
-    update: {},
-  });
-  await createApprovalAndAudit(leave4.id, 1, hrAdmin, "FORWARDED", "DEPT_HEAD", "Forwarded for department head review", employee4.email, 30, 5);
+        const duration =
+          leaveType === LeaveType.EARNED
+            ? rng.nextInt(3, 10)
+            : leaveType === LeaveType.CASUAL
+            ? rng.nextInt(1, 3)
+            : rng.nextInt(1, 8);
+        endDate = new Date(startDate);
+        for (let j = 1; j < duration; j++) {
+          endDate = getNextWorkingDay(endDate, holidays);
+        }
+      } else {
+        // Past dates (past 6 months = ~180 days) for other statuses
+        const daysAgo = rng.nextInt(1, 180); // Past 6 months
+        endDate = new Date(today);
+        endDate.setDate(endDate.getDate() - daysAgo);
+        const duration = rng.nextInt(1, 5);
+        startDate = new Date(endDate);
+        startDate.setDate(startDate.getDate() - duration);
+      }
 
-  // 5. Employee1 - CL 2 days, CANCELLED
-  const leave5Start = new Date(currentYear, 4, 5); // May 5
-  const leave5End = new Date(currentYear, 4, 6);
-  const leave5 = await prisma.leaveRequest.upsert({
-    where: { id: 5 },
-    create: {
-      id: 5,
-      requesterId: employee1.id,
-      type: LeaveType.CASUAL,
-      startDate: leave5Start,
-      endDate: leave5End,
-      workingDays: calcWorkingDays(leave5Start, leave5End),
-      reason: "Personal matters that were later resolved - cancelled",
-      status: "CANCELLED" as LeaveStatus,
-      policyVersion: "v2.0",
-      needsCertificate: false,
-    },
-    update: {},
-  });
-  await prisma.auditLog.create({
-    data: {
-      actorEmail: employee1.email,
-      action: "LEAVE_CANCEL",
-      targetEmail: employee1.email,
-      details: { leaveId: leave5.id, reason: "Cancelled by employee" },
-    },
-  });
+      startDate = normalizeToDhakaMidnight(startDate);
+      endDate = normalizeToDhakaMidnight(endDate);
+      workingDays = countWorkingDaysSync(startDate, endDate, holidays);
 
-  // 6. Employee2 - CL 1 day, APPROVED (single day)
-  const leave6Start = new Date(currentYear, 7, 15); // Aug 15
-  const leave6 = await prisma.leaveRequest.upsert({
-    where: { id: 6 },
-    create: {
-      id: 6,
-      requesterId: employee2.id,
-      type: LeaveType.CASUAL,
-      startDate: leave6Start,
-      endDate: leave6Start,
-      workingDays: 1,
-      reason: "Single day personal leave for urgent family matter",
-      status: "APPROVED" as LeaveStatus,
-      policyVersion: "v2.0",
-      needsCertificate: false,
-    },
-    update: {},
-  });
-  await createFullChain(leave6.id, "APPROVED", employee2.email, 40, 25);
+      // Medical leave certificate requirements
+      if (leaveType === LeaveType.MEDICAL) {
+        if (workingDays > 3) {
+          needsCertificate = true;
+          if (status === "APPROVED") {
+            const certFile = await createCertificateFile(leaveId);
+            certificateUrl = certFile;
+          }
+        }
+        if (workingDays > 7 && status === "APPROVED") {
+          // ML > 7 days requires fitness certificate on return
+          // For seed data, we'll leave this null for some to test the requirement
+          if (rng.next() > 0.5) {
+            const fitnessCertFile = await createCertificateFile(leaveId);
+            fitnessCertificateUrl = fitnessCertFile;
+          }
+        }
+      }
 
-  // 7. Employee3 - ML 2 days, APPROVED (no cert needed, ≤3 days)
-  const leave7Start = new Date(currentYear, 8, 10); // Sep 10
-  const leave7End = new Date(currentYear, 8, 11);
-  const leave7 = await prisma.leaveRequest.upsert({
-    where: { id: 7 },
-    create: {
-      id: 7,
-      requesterId: employee3.id,
-      type: LeaveType.MEDICAL,
-      startDate: leave7Start,
-      endDate: leave7End,
-      workingDays: calcWorkingDays(leave7Start, leave7End),
-      reason: "Minor medical issue requiring two days of rest and recovery",
-      status: "APPROVED" as LeaveStatus,
-      policyVersion: "v2.0",
-      needsCertificate: false,
-    },
-    update: {},
-  });
-  await createFullChain(leave7.id, "APPROVED", employee3.email, 50, 20);
+      // Generate realistic reason
+      const reasons: Record<LeaveType, string[]> = {
+        EARNED: [
+          "Family vacation and personal time",
+          "Family wedding celebration",
+          "Personal errands and rest",
+          "Family gathering and reunion",
+        ],
+        CASUAL: [
+          "Personal errands and appointments",
+          "Family commitments",
+          "Urgent personal work",
+          "Short personal break",
+        ],
+        MEDICAL: [
+          "Medical consultation and treatment",
+          "Health check-up and follow-up",
+          "Medical treatment and recovery",
+          "Doctor's appointment and medication",
+        ],
+        MATERNITY: ["Maternity leave for childbirth"],
+        PATERNITY: ["Paternity leave for newborn"],
+        STUDY: ["Study leave for professional development"],
+        SPECIAL_DISABILITY: ["Special disability leave"],
+        QUARANTINE: ["Quarantine period as per medical advice"],
+        EXTRAWITHPAY: ["Extra leave with pay as approved"],
+        EXTRAWITHOUTPAY: ["Extra leave without pay"],
+      };
+      const reasonOptions = reasons[leaveType] || [`Leave request for ${leaveType.toLowerCase()} leave`];
+      const reason = rng.pick(reasonOptions);
 
-  // 8. Employee4 - EL 8 days, SUBMITTED (awaiting HR Admin)
-  const leave8Start = getFutureWorkingDate(20); // 20 working days from now
-  const leave8End = new Date(leave8Start);
-  leave8End.setDate(leave8End.getDate() + 7); // 8 days total
-  const leave8 = await prisma.leaveRequest.upsert({
-    where: { id: 8 },
-    create: {
-      id: 8,
-      requesterId: employee4.id,
-      type: LeaveType.EARNED,
-      startDate: leave8Start,
-      endDate: leave8End,
-      workingDays: calcWorkingDays(leave8Start, leave8End),
-      reason: "Extended vacation planned with adequate advance notice period",
-      status: "SUBMITTED" as LeaveStatus,
-      policyVersion: "v2.0",
-      needsCertificate: false,
-    },
-    update: {},
-  });
-  await prisma.auditLog.create({
-    data: {
-      actorEmail: employee4.email,
-      action: "LEAVE_SUBMITTED",
-      targetEmail: employee4.email,
-      details: { leaveId: leave8.id },
-    },
-  });
-
-  // 9. Employee1 - EL 3 days, PENDING (forwarded by HR Admin, awaiting Dept Head)
-  const leave9Start = getFutureWorkingDate(25);
-  const leave9End = new Date(leave9Start);
-  leave9End.setDate(leave9End.getDate() + 2);
-  const leave9 = await prisma.leaveRequest.upsert({
-    where: { id: 9 },
-    create: {
-      id: 9,
-      requesterId: employee1.id,
-      type: LeaveType.EARNED,
-      startDate: leave9Start,
-      endDate: leave9End,
-      workingDays: calcWorkingDays(leave9Start, leave9End),
-      reason: "Short earned leave for personal commitments and relaxation",
-      status: "PENDING" as LeaveStatus,
-      policyVersion: "v2.0",
-      needsCertificate: false,
-    },
-    update: {},
-  });
-  await createApprovalAndAudit(leave9.id, 1, hrAdmin, "FORWARDED", "DEPT_HEAD", "Forwarded to Department Head", employee1.email, 60, 3);
-
-  // 10. Employee2 - ML 7 days, APPROVED (with certificate URL)
-  const leave10Start = new Date(currentYear, 7, 5); // Aug 5
-  const leave10End = new Date(currentYear, 7, 11);
-  const leave10 = await prisma.leaveRequest.upsert({
-    where: { id: 10 },
-    create: {
-      id: 10,
-      requesterId: employee2.id,
-      type: LeaveType.MEDICAL,
-      startDate: leave10Start,
-      endDate: leave10End,
-      workingDays: calcWorkingDays(leave10Start, leave10End),
-      reason: "Medical treatment requiring extended recovery period with documentation",
-      status: "APPROVED" as LeaveStatus,
-      policyVersion: "v2.0",
-      needsCertificate: true,
-      certificateUrl: "https://example.com/certs/med-cert-2025-08.pdf",
-    },
-    update: {},
-  });
-  await createFullChain(leave10.id, "APPROVED", employee2.email, 70, 35);
-
-  // 11. Employee3 - CL 2 days, REJECTED (insufficient notice)
-  const leave11Start = getFutureWorkingDate(2); // Only 2 working days notice
-  const leave11End = new Date(leave11Start);
-  leave11End.setDate(leave11End.getDate() + 1);
-  const leave11 = await prisma.leaveRequest.upsert({
-    where: { id: 11 },
-    create: {
-      id: 11,
-      requesterId: employee3.id,
-      type: LeaveType.CASUAL,
-      startDate: leave11Start,
-      endDate: leave11End,
-      workingDays: calcWorkingDays(leave11Start, leave11End),
-      reason: "Emergency personal matter requiring immediate attention",
-      status: "REJECTED" as LeaveStatus,
-      policyVersion: "v2.0",
-      needsCertificate: false,
-    },
-    update: {},
-  });
-  await createFullChain(leave11.id, "REJECTED", employee3.email, 80, 5, [0, 1]); // HR Head rejects
-
-  // 12. Employee1 - EL 12 days, PENDING (forwarded to HR Head, awaiting decision)
-  const leave12Start = getFutureWorkingDate(30);
-  const leave12End = new Date(leave12Start);
-  leave12End.setDate(leave12End.getDate() + 11);
-  const leave12 = await prisma.leaveRequest.upsert({
-    where: { id: 12 },
-    create: {
-      id: 12,
-      requesterId: employee1.id,
-      type: LeaveType.EARNED,
-      startDate: leave12Start,
-      endDate: leave12End,
-      workingDays: calcWorkingDays(leave12Start, leave12End),
-      reason: "Extended vacation with family planned with sufficient advance notice and approval",
-      status: "PENDING" as LeaveStatus,
-      policyVersion: "v2.0",
-      needsCertificate: false,
-    },
-    update: {},
-  });
-  // Full chain up to HR Head (forward to CEO, but status remains PENDING)
-  await createFullChain(leave12.id, "FORWARDED" as any, employee1.email, 90, 10, [3]); // Skip CEO step
-  // Update last approval (HR Head) to forward to CEO
-  await prisma.approval.updateMany({
-    where: { leaveId: leave12.id, step: 3 },
-    data: { decision: "FORWARDED", toRole: "CEO" },
-  });
-
-  // Balance calculation moved to end of function, after all leaves are created
-
-  // Add additional audit logs for LOGIN, LOGOUT, POLICY_UPDATED, etc. to reach 40+
-  const auditLogs = [
-    // Login logs for each user
-    { email: "employee1@demo.local", action: "LOGIN", daysAgo: 1 },
-    { email: "employee2@demo.local", action: "LOGIN", daysAgo: 2 },
-    { email: "employee3@demo.local", action: "LOGIN", daysAgo: 1 },
-    { email: "employee4@demo.local", action: "LOGIN", daysAgo: 3 },
-    { email: "manager@demo.local", action: "LOGIN", daysAgo: 1 },
-    { email: "hradmin@demo.local", action: "LOGIN", daysAgo: 0 },
-    { email: "hrhead@demo.local", action: "LOGIN", daysAgo: 0 },
-    { email: "ceo@demo.local", action: "LOGIN", daysAgo: 1 },
-    // Logout logs
-    { email: "employee1@demo.local", action: "LOGOUT", daysAgo: 1 },
-    { email: "employee2@demo.local", action: "LOGOUT", daysAgo: 2 },
-    { email: "hradmin@demo.local", action: "LOGOUT", daysAgo: 0 },
-    // Policy updates
-    { email: "hrhead@demo.local", action: "POLICY_UPDATED", daysAgo: 15, details: { setting: "allowBackdate", value: { EL: "ask", CL: false, ML: true } } },
-    { email: "hradmin@demo.local", action: "POLICY_UPDATED", daysAgo: 10, details: { setting: "clPerYear", value: 10 } },
-    // Employee updates
-    { email: "hradmin@demo.local", action: "UPDATE_EMPLOYEE", daysAgo: 5, targetEmail: "employee1@demo.local", details: { field: "department", oldValue: "Engineering", newValue: "Engineering" } },
-    // Balance adjustments
-    { email: "hradmin@demo.local", action: "BALANCE_ADJUSTED", daysAgo: 8, targetEmail: "employee2@demo.local", details: { type: "EARNED", adjustment: 2 } },
-    // Additional leave-related audit logs
-    { email: "employee1@demo.local", action: "LEAVE_DRAFT_CREATED", daysAgo: 4, targetEmail: "employee1@demo.local", details: { leaveId: leave1.id } },
-    { email: "employee2@demo.local", action: "LEAVE_DRAFT_CREATED", daysAgo: 35, targetEmail: "employee2@demo.local", details: { leaveId: leave2.id } },
-    { email: "employee3@demo.local", action: "LEAVE_DRAFT_CREATED", daysAgo: 12, targetEmail: "employee3@demo.local", details: { leaveId: leave3.id } },
-    { email: "employee4@demo.local", action: "LEAVE_DRAFT_CREATED", daysAgo: 6, targetEmail: "employee4@demo.local", details: { leaveId: leave4.id } },
-    // View logs
-    { email: "hradmin@demo.local", action: "EMPLOYEE_VIEWED", daysAgo: 2, targetEmail: "employee1@demo.local" },
-    { email: "hrhead@demo.local", action: "EMPLOYEE_VIEWED", daysAgo: 1, targetEmail: "employee2@demo.local" },
-    { email: "manager@demo.local", action: "EMPLOYEE_VIEWED", daysAgo: 3, targetEmail: "employee1@demo.local" },
-    { email: "ceo@demo.local", action: "EMPLOYEE_VIEWED", daysAgo: 1, targetEmail: "hrhead@demo.local" },
-  ];
-
-  for (const log of auditLogs) {
-    await prisma.auditLog.create({
-      data: {
-        actorEmail: log.email,
-        action: log.action,
-        targetEmail: log.targetEmail || log.email,
-        details: log.details || {},
-        createdAt: new Date(now.getTime() - (log.daysAgo || 0) * 24 * 60 * 60 * 1000),
-      },
-    });
-  }
-
-  // 13. Employee1 - EL 10 days, APPROVED (example for balance calculation)
-  const leave13Start = new Date(currentYear, 11, 14); // Dec 14
-  const leave13End = new Date(currentYear, 11, 25);   // Dec 25
-  const leave13 = await prisma.leaveRequest.upsert({
-    where: { id: 13 },
-    create: {
-      id: 13,
-      requesterId: employee1.id,
-      type: LeaveType.EARNED,
-      startDate: leave13Start,
-      endDate: leave13End,
-      workingDays: calcWorkingDays(leave13Start, leave13End),
-      reason: "Example approved leave for employee1 balance calculation",
-      status: "APPROVED" as LeaveStatus,
-      policyVersion: "v2.0",
-      needsCertificate: false,
-    },
-    update: {},
-  });
-  await createFullChain(leave13.id, "APPROVED", employee1.email, 100, 40);
-
-  // 14. Employee1 - EL 2 days, CANCELLATION_REQUESTED (new Policy v2.0 status)
-  const leave14Start = new Date(currentYear, 11, 7); // Dec 7
-  const leave14End = new Date(currentYear, 11, 9);   // Dec 9
-  const leave14 = await prisma.leaveRequest.upsert({
-    where: { id: 14 },
-    create: {
-      id: 14,
-      requesterId: employee1.id,
-      type: LeaveType.EARNED,
-      startDate: leave14Start,
-      endDate: leave14End,
-      workingDays: calcWorkingDays(leave14Start, leave14End),
-      reason: "Leave that employee wants to cancel after approval",
-      status: "CANCELLATION_REQUESTED" as LeaveStatus,
-      policyVersion: "v2.0",
-      needsCertificate: false,
-    },
-    update: {},
-  });
-  await createFullChain(leave14.id, "APPROVED", employee1.email, 110, 35);
-  await prisma.auditLog.create({
-    data: {
-      actorEmail: employee1.email,
-      action: "LEAVE_CANCELLATION_REQUESTED",
-      targetEmail: employee1.email,
-      details: { leaveId: leave14.id },
-      createdAt: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000),
-    },
-  });
-
-  // 15. Employee2 - ML 3 days, RETURNED (new Policy v2.0 status)
-  const leave15Start = getFutureWorkingDate(15);
-  const leave15End = new Date(leave15Start);
-  leave15End.setDate(leave15End.getDate() + 2);
-  const leave15 = await prisma.leaveRequest.upsert({
-    where: { id: 15 },
-    create: {
-      id: 15,
-      requesterId: employee2.id,
-      type: LeaveType.MEDICAL,
-      startDate: leave15Start,
-      endDate: leave15End,
-      workingDays: calcWorkingDays(leave15Start, leave15End),
-      reason: "Medical leave returned for modification",
-      status: "RETURNED" as LeaveStatus,
-      policyVersion: "v2.0",
-      needsCertificate: false,
-    },
-    update: {},
-  });
-  await createApprovalAndAudit(leave15.id, 1, hrAdmin, "FORWARDED", "DEPT_HEAD", "Returned for employee to add certificate", employee2.email, 120, 8);
-  await prisma.auditLog.create({
-    data: {
-      actorEmail: hrAdmin.email,
-      action: "LEAVE_RETURNED",
-      targetEmail: employee2.email,
-      details: { leaveId: leave15.id, reason: "Missing required certificate" },
-      createdAt: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000),
-    },
-  });
-
-  // 16. Employee3 - EL 5 days, RECALLED (new Policy v2.0 status)
-  const leave16Start = new Date(currentYear, 11, 1); // Dec 1
-  const leave16End = new Date(currentYear, 11, 5);   // Dec 5
-  const leave16 = await prisma.leaveRequest.upsert({
-    where: { id: 16 },
-    create: {
-      id: 16,
-      requesterId: employee3.id,
-      type: LeaveType.EARNED,
-      startDate: leave16Start,
-      endDate: leave16End,
-      workingDays: calcWorkingDays(leave16Start, leave16End),
-      reason: "Leave that was recalled by HR",
-      status: "RECALLED" as LeaveStatus,
-      policyVersion: "v2.0",
-      needsCertificate: false,
-    },
-    update: {},
-  });
-  await createFullChain(leave16.id, "APPROVED", employee3.email, 130, 50);
-  await prisma.auditLog.create({
-    data: {
-      actorEmail: hrHead.email,
-      action: "LEAVE_RECALL",
-      targetEmail: employee3.email,
-      details: { leaveId: leave16.id, reason: "Urgent project requirement" },
-      createdAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000),
-    },
-  });
-
-  // 17. Employee4 - CL 1 day, OVERSTAY_PENDING (new Policy v2.0 status)
-  const leave17Start = new Date(currentYear, 10, 1); // Nov 1 (past date)
-  const leave17End = new Date(currentYear, 10, 1);   // Nov 1
-  const leave17 = await prisma.leaveRequest.upsert({
-    where: { id: 17 },
-    create: {
-      id: 17,
-      requesterId: employee4.id,
-      type: LeaveType.CASUAL,
-      startDate: leave17Start,
-      endDate: leave17End,
-      workingDays: 1,
-      reason: "Leave with overstay pending status",
-      status: "OVERSTAY_PENDING" as LeaveStatus,
-      policyVersion: "v2.0",
-      needsCertificate: false,
-    },
-    update: {},
-  });
-  await createFullChain(leave17.id, "APPROVED", employee4.email, 140, 60);
-  await prisma.auditLog.create({
-    data: {
-      actorEmail: hrAdmin.email,
-      action: "OVERSTAY_FLAGGED",
-      targetEmail: employee4.email,
-      details: { leaveId: leave17.id, endDate: leave17End.toISOString() },
-      createdAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000),
-    },
-  });
-
-  // Calculate balances for each employee based on approved leaves
-  const employeeIds = [employee1.id, employee2.id, employee3.id, employee4.id];
-  
-  for (const empId of employeeIds) {
-    const approvedLeaves = await prisma.leaveRequest.findMany({
-      where: {
-        status: "APPROVED",
-        requesterId: empId,
-      },
-    });
-
-    // Calculate used days per type
-    const usedByType: { [key in LeaveType]?: number } = {};
-    for (const leave of approvedLeaves) {
-      usedByType[leave.type] = (usedByType[leave.type] || 0) + leave.workingDays;
-    }
-
-    // Update balances with calculated used values
-    for (const type of [LeaveType.EARNED, LeaveType.CASUAL, LeaveType.MEDICAL] as LeaveType[]) {
-      const used = usedByType[type] || 0;
-      const balance = await prisma.balance.findUnique({
-        where: {
-          userId_type_year: {
-            userId: empId,
-            type: type,
-            year: currentYear,
-          },
+      // Create leave request
+      const leave = await prisma.leaveRequest.create({
+        data: {
+          requesterId: employee.id,
+          type: leaveType,
+          startDate,
+          endDate,
+          workingDays,
+          reason,
+          status,
+          policyVersion: "v2.0",
+          needsCertificate,
+          certificateUrl,
+          fitnessCertificateUrl,
         },
       });
 
-      if (balance) {
-        const newClosing = Math.max((balance.opening || 0) + (balance.accrued || 0) - used, 0);
-        await prisma.balance.update({
-          where: {
-            userId_type_year: {
-              userId: empId,
-              type: type,
-              year: currentYear,
-            },
-          },
+      leaveRequests.push({
+        id: leave.id,
+        requesterId: employee.id,
+        status,
+        type: leaveType,
+      });
+
+      // Create approval chain for APPROVED, PENDING, REJECTED, RETURNED
+      if (["APPROVED", "PENDING", "REJECTED", "RETURNED"].includes(status)) {
+        const chain = getChainFor(leaveType);
+        const chainApprovers = chain
+          .map((role) => approvers.find((a) => a.role === role))
+          .filter(Boolean) as Array<{ id: number; role: Role; email: string }>;
+
+        if (chainApprovers.length > 0) {
+          const finalDecision =
+            status === "APPROVED"
+              ? "APPROVED"
+              : status === "REJECTED"
+              ? "REJECTED"
+              : "PENDING";
+          const daysAgo = rng.nextInt(1, 30);
+
+          for (let step = 0; step < chainApprovers.length; step++) {
+            const approver = chainApprovers[step];
+            const isLast = step === chainApprovers.length - 1;
+            // For PENDING status: only create approvals up to the current pending step
+            // If finalDecision is PENDING, stop before the last step (leave it pending for the last approver)
+            const shouldStopAtThisStep = finalDecision === "PENDING" && isLast;
+            if (shouldStopAtThisStep) {
+              break; // Don't create approval for the pending step - it's waiting for approval
+            }
+            
+            const decision = isLast
+              ? finalDecision === "APPROVED"
+                ? "APPROVED"
+                : finalDecision === "REJECTED"
+                ? "REJECTED"
+                : "FORWARDED" // This shouldn't be reached due to break above
+              : "FORWARDED";
+
+            await prisma.approval.create({
+              data: {
+                leaveId: leave.id,
+                step: step + 1,
+                approverId: approver.id,
+                decision: decision as any,
+                toRole: isLast ? null : chainApprovers[step + 1]?.role || null,
+                comment: isLast
+                  ? `${finalDecision} by ${approver.role}`
+                  : `Forwarded to ${chainApprovers[step + 1]?.role || "next"}`,
+                decidedAt:
+                  isLast && finalDecision !== "PENDING"
+                    ? new Date(
+                        Date.now() - (daysAgo - step * 2) * 24 * 60 * 60 * 1000
+                      )
+                    : null,
+        },
+      });
+
+            await prisma.auditLog.create({
           data: {
-            used: used,
-            closing: newClosing,
-          },
-        });
-      } else {
-        // Create balance if it doesn't exist
-        const templates: { [key in LeaveType]?: number } = {
-          [LeaveType.EARNED]: 24,
-          [LeaveType.CASUAL]: 10,
-          [LeaveType.MEDICAL]: 14,
-        };
-        const accrued = templates[type] || 0;
-        await prisma.balance.create({
-          data: {
-            userId: empId,
-            type: type,
-            year: currentYear,
-            opening: 0,
-            accrued: accrued,
-            used: used,
-            closing: Math.max(accrued - used, 0),
+                actorEmail: approver.email,
+                action: isLast ? `LEAVE_${finalDecision}` : "LEAVE_FORWARD",
+                targetEmail: employee.email,
+                details: {
+                  leaveId: leave.id,
+                  actorRole: approver.role,
+                  toRole: isLast
+                    ? null
+                    : chainApprovers[step + 1]?.role || null,
+                  step: step + 1,
+                },
+                createdAt:
+                  isLast && finalDecision !== "PENDING"
+                    ? new Date(
+                        Date.now() - (daysAgo - step * 2) * 24 * 60 * 60 * 1000
+                      )
+                    : new Date(),
           },
         });
       }
     }
   }
 
-  const stats = {
-    pending: [leave1, leave4, leave9, leave12].filter(Boolean).length,
-    approved: [leave2, leave6, leave7, leave10, leave13].filter(Boolean).length,
-    rejected: [leave3, leave11].filter(Boolean).length,
-    cancelled: leave5 ? 1 : 0,
-    submitted: leave8 ? 1 : 0,
-    cancellation_requested: leave14 ? 1 : 0,
-    returned: leave15 ? 1 : 0,
-    recalled: leave16 ? 1 : 0,
-    overstay_pending: leave17 ? 1 : 0,
-  };
+      leaveId++;
+    }
+  }
 
-  console.log(`Created ${stats.pending} pending, ${stats.approved} approved, ${stats.rejected} rejected, ${stats.cancelled} cancelled, ${stats.submitted} submitted leave requests.`);
-  console.log(`Created ${stats.cancellation_requested} cancellation_requested, ${stats.returned} returned, ${stats.recalled} recalled, ${stats.overstay_pending} overstay_pending leave requests.`);
-  console.log(`Created ${auditLogs.length} additional audit logs.`);
-  return stats;
+  console.log(`✅ Created ${leaveRequests.length} leave requests`);
+  return leaveRequests;
+}
+
+/**
+ * Create specific pending requests for IT department head
+ * These requests should have HR_ADMIN forwarding to DEPT_HEAD
+ */
+async function createPendingRequestsForITDeptHead(
+  itEmployees: Array<{ id: number; email: string; name: string }>,
+  itDeptHead: { id: number; role: Role; email: string },
+  hrAdmin: { id: number; role: Role; email: string },
+  holidays: Array<{ date: Date }>
+): Promise<void> {
+  if (!itEmployees.length || !itDeptHead || !hrAdmin) {
+    console.warn("⚠️  Missing IT employees or dept head, skipping pending requests");
+    return;
+  }
+
+  const today = normalizeToDhakaMidnight(new Date());
+  const rng = new SeededRandom(42);
+
+  // Create 2-3 pending requests specifically for IT dept head
+  const numPending = Math.min(3, itEmployees.length);
+  const selectedEmployees = itEmployees.slice(0, numPending);
+
+  for (const employee of selectedEmployees) {
+    // Use EARNED or MEDICAL (not CASUAL as it has different chain)
+    const leaveType = rng.pick([LeaveType.EARNED, LeaveType.MEDICAL]);
+    const chain = getChainFor(leaveType);
+
+    // Generate future dates (upcoming 2-3 weeks)
+    const daysFromNow = rng.nextInt(14, 21);
+    let startDate = new Date(today);
+    startDate.setDate(startDate.getDate() + daysFromNow);
+    startDate = getNextWorkingDay(startDate, holidays);
+
+    const duration = leaveType === LeaveType.EARNED ? rng.nextInt(3, 7) : rng.nextInt(2, 5);
+    let endDate = new Date(startDate);
+    for (let j = 1; j < duration; j++) {
+      endDate = getNextWorkingDay(endDate, holidays);
+    }
+
+    startDate = normalizeToDhakaMidnight(startDate);
+    endDate = normalizeToDhakaMidnight(endDate);
+    const workingDays = countWorkingDaysSync(startDate, endDate, holidays);
+
+    const reasons: Record<LeaveType, string[]> = {
+      EARNED: [
+        "Family vacation and personal time",
+        "Family wedding celebration",
+        "Personal errands and rest",
+      ],
+      MEDICAL: [
+        "Medical consultation and treatment",
+        "Health check-up and follow-up",
+        "Medical treatment and recovery",
+      ],
+      CASUAL: [],
+      MATERNITY: [],
+      PATERNITY: [],
+      STUDY: [],
+      SPECIAL_DISABILITY: [],
+      QUARANTINE: [],
+      EXTRAWITHPAY: [],
+      EXTRAWITHOUTPAY: [],
+    };
+
+    const reasonOptions = reasons[leaveType] || [`Leave request for ${leaveType.toLowerCase()} leave`];
+    const reason = rng.pick(reasonOptions);
+
+    // Create leave request with PENDING status
+    const leave = await prisma.leaveRequest.create({
+      data: {
+        requesterId: employee.id,
+        type: leaveType,
+        startDate,
+        endDate,
+        workingDays,
+        reason,
+        status: "PENDING",
+        policyVersion: "v2.0",
+        needsCertificate: leaveType === LeaveType.MEDICAL && workingDays > 3,
+        certificateUrl: null,
+        fitnessCertificateUrl: null,
+      },
+    });
+
+    // Create approval chain: HR_ADMIN forwards to DEPT_HEAD
+    // Step 1: HR_ADMIN forwards to DEPT_HEAD
+    await prisma.approval.create({
+      data: {
+        leaveId: leave.id,
+        step: 1,
+        approverId: hrAdmin.id,
+        decision: "FORWARDED",
+        toRole: "DEPT_HEAD",
+        comment: "Forwarded to Department Head for approval",
+        decidedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+      },
+    });
+
+    // Step 2: DEPT_HEAD approval is NOT created - it's pending
+    // This is what makes it show up in DEPT_HEAD's pending queue
+
+    // Create audit log
+    await prisma.auditLog.create({
+      data: {
+        actorEmail: hrAdmin.email,
+        action: "LEAVE_FORWARD",
+        targetEmail: employee.email,
+        details: {
+          leaveId: leave.id,
+          actorRole: hrAdmin.role,
+          toRole: "DEPT_HEAD",
+          step: 1,
+        },
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      },
+    });
+
+    console.log(`   ✅ Created pending ${leaveType} request for ${employee.name} (ID: ${leave.id})`);
+  }
+
+  console.log(`✅ Created ${numPending} pending requests for IT Department Head`);
 }
 
 async function main() {
-  // Create 8 demo users
-  const users = await Promise.all([
-    upsertUser({
-      name: "Employee One",
-      email: "employee1@demo.local",
-      role: Role.EMPLOYEE,
-      empCode: "E001",
-      department: "Engineering",
-    }),
-    upsertUser({
-      name: "Employee Two",
-      email: "employee2@demo.local",
-      role: Role.EMPLOYEE,
-      empCode: "E002",
-      department: "Operations",
-    }),
-    upsertUser({
-      name: "Employee Three",
-      email: "employee3@demo.local",
-      role: Role.EMPLOYEE,
-      empCode: "E003",
-      department: "HR & Admin",
-    }),
-    upsertUser({
-      name: "Employee Four",
-      email: "employee4@demo.local",
-      role: Role.EMPLOYEE,
-      empCode: "E004",
-      department: "Finance",
-    }),
-    upsertUser({
-      name: "Dept Head",
-      email: "manager@demo.local",
-      role: Role.DEPT_HEAD,
-      empCode: "M001",
-      department: "Engineering",
-    }),
-    upsertUser({
-      name: "HR Admin",
-      email: "hradmin@demo.local",
-      role: Role.HR_ADMIN,
-      empCode: "HR001",
-      department: "HR & Admin",
-    }),
-    upsertUser({
-      name: "HR Head",
-      email: "hrhead@demo.local",
-      role: Role.HR_HEAD,
-      empCode: "HRH001",
-      department: "HR & Admin",
-    }),
-    upsertUser({
-      name: "CEO One",
-      email: "ceo@demo.local",
-      role: Role.CEO,
-      empCode: "C001",
-      department: "Executive",
-    }),
-  ]);
+  console.log("🌱 Starting seed process...");
 
-  await Promise.all([seedHoliday(), seedPolicies()]);
+  await resetDatabase();
 
-  // Initialize orgSettings (may fail if model doesn't exist yet)
+  // Initialize org settings
   try {
     await initDefaultOrgSettings();
-    console.log("✅ Initialized orgSettings with backdate toggles (EL=ask, CL=false, ML=true).");
+    console.log("✅ Initialized orgSettings");
   } catch (error) {
-    console.warn("⚠️ Could not initialize orgSettings (model may not exist yet):", error);
+    console.warn("⚠️  Could not initialize orgSettings:", error);
   }
 
-  // Seed leave requests with realistic workflow states
-  let leaveStats;
-  try {
-    leaveStats = await seedLeaveRequests();
-    console.log("✅ Seeded leave requests with workflow states.");
-  } catch (error) {
-    console.warn("⚠️ Could not seed leave requests:", error);
-    leaveStats = { pending: 0, approved: 0, rejected: 0, cancelled: 0, submitted: 0 };
+  // Create users
+  const users = await createUsers();
+
+  // Re-fetch users to ensure valid IDs
+  const allUsers = await prisma.user.findMany({
+    select: { id: true, role: true, email: true },
+  });
+  const usersWithRoles = allUsers.map((u) => ({
+    id: u.id,
+    role: u.role as Role,
+    email: u.email,
+  }));
+
+  // Create balances
+  await createBalances(usersWithRoles);
+
+  // Create holidays
+  const holidays = await createHolidays();
+
+  // Create leave requests
+  await createLeaveRequests(usersWithRoles, holidays);
+
+  // Create specific pending requests for IT department head
+  const allUsersWithDept = await prisma.user.findMany({
+    select: { id: true, role: true, email: true, department: true },
+  });
+  
+  const itDeptHeadFull = allUsersWithDept.find(
+    (u) => u.role === Role.DEPT_HEAD && u.department === "IT"
+  );
+  const itEmployeesFull = allUsersWithDept.filter(
+    (u) => u.role === Role.EMPLOYEE && u.department === "IT"
+  );
+  const hrAdminFull = allUsersWithDept.find((u) => u.role === Role.HR_ADMIN);
+
+  if (itDeptHeadFull && itEmployeesFull.length > 0 && hrAdminFull) {
+    await createPendingRequestsForITDeptHead(
+      itEmployeesFull.map((e) => {
+        // Get name from user record if available, otherwise use email prefix
+        const userRecord = allUsers.find((au) => au.id === e.id);
+        return { id: e.id, email: e.email, name: userRecord?.name || e.email.split("@")[0] };
+      }),
+      { id: itDeptHeadFull.id, role: itDeptHeadFull.role as Role, email: itDeptHeadFull.email },
+      { id: hrAdminFull.id, role: hrAdminFull.role as Role, email: hrAdminFull.email },
+      holidays.map((h) => ({ date: new Date(h.date) }))
+    );
+  } else {
+    console.warn("⚠️  Could not find IT dept head or employees for pending requests");
   }
 
-  console.log("\n✅ Demo data seeded successfully!");
+  console.log("\n✅ Seed completed successfully!");
   console.log("📋 All passwords: demo123");
-  console.log("\n👥 Users created:");
-  console.log("   - Employee One (Engineering) - employee1@demo.local");
-  console.log("   - Employee Two (Operations) - employee2@demo.local");
-  console.log("   - Employee Three (HR & Admin) - employee3@demo.local");
-  console.log("   - Employee Four (Finance) - employee4@demo.local");
-  console.log("   - Dept Head (Engineering) - manager@demo.local");
-  console.log("   - HR Admin - hradmin@demo.local");
-  console.log("   - HR Head - hrhead@demo.local");
-  console.log("   - CEO One - ceo@demo.local");
-  console.log("\n📅 Leave requests created:");
-  if (leaveStats) {
-    console.log(`   - ${leaveStats.pending} PENDING, ${leaveStats.approved} APPROVED, ${leaveStats.rejected} REJECTED, ${leaveStats.cancelled} CANCELLED, ${leaveStats.submitted} SUBMITTED`);
-  }
+  console.log(`\n👥 Users created: ${users.length}`);
+  console.log("   - 1 SYSTEM_ADMIN (sysadmin@cdbl.local)");
+  console.log("   - 1 CEO (ceo@cdbl.local)");
+  console.log("   - 1 HR_HEAD (hrhead@cdbl.local)");
+  console.log("   - 1 HR_ADMIN (hradmin1@cdbl.local)");
+  console.log("   - 3 DEPT_HEAD (IT, HR, Finance)");
+  console.log("   - 12 EMPLOYEE (4 per department)");
 }
 
 if (require.main === module) {

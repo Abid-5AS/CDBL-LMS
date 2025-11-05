@@ -180,14 +180,6 @@ export function WelcomeHero({ username }: { username: string }) {
           </svg>
         </div>
 
-        <Button
-          size="lg"
-          className="w-full md:w-auto animate-fade-in-up"
-          onClick={() => router.push("/leaves/apply")}
-        >
-          <Plus className="-ml-1 size-5" />
-          Apply for Leave
-        </Button>
       </CardContent>
     </Card>
   );

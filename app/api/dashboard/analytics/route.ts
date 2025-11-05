@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { normalizeToDhakaMidnight } from "@/lib/date-utils";
 
 export const cache = "no-store";
 
@@ -13,15 +14,33 @@ interface MonthlyUsage {
   total: number;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   const me = await getCurrentUser();
   if (!me) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const year = new Date().getFullYear();
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // Check for window parameter (rolling vs full year)
+  const { searchParams } = new URL(req.url);
+  const window = searchParams.get("window") || "year"; // default: full year
 
-  // Fetch all leave requests for the current year
+  const year = new Date().getFullYear();
+  const today = normalizeToDhakaMidnight(new Date());
+
+  // Determine date range based on mode
+  let startDate: Date;
+  let endDate: Date;
+
+  if (window === "rolling12") {
+    // Rolling 12 months: from 12 months ago to today
+    startDate = normalizeToDhakaMidnight(new Date(today));
+    startDate.setMonth(startDate.getMonth() - 12);
+    endDate = today;
+  } else {
+    // Full calendar year: Jan 1 to Dec 31
+    startDate = normalizeToDhakaMidnight(new Date(year, 0, 1));
+    endDate = normalizeToDhakaMidnight(new Date(year, 11, 31));
+  }
+
+  // Fetch all leave requests for the date range
   const leaves = await prisma.leaveRequest.findMany({
     where: {
       requesterId: me.id,
@@ -29,8 +48,8 @@ export async function GET() {
         in: ["APPROVED"],
       },
       startDate: {
-        gte: new Date(year, 0, 1),
-        lt: new Date(year + 1, 0, 1),
+        gte: startDate,
+        lte: endDate,
       },
     },
     select: {
@@ -118,22 +137,63 @@ export async function GET() {
     ? Math.round((medicalUsed / (medical + medicalUsed)) * 100)
     : 0;
 
+  // Generate heatmap data: array of { date, count, types }
+  const heatmapData: Array<{ date: string; count: number; types: string[] }> = [];
+  const heatmapMap = new Map<string, { count: number; types: Set<string> }>();
+
+  // Iterate through all days in the range
+  const currentDate = new Date(startDate);
+  while (currentDate <= endDate) {
+    const dateKey = normalizeToDhakaMidnight(currentDate).toISOString().slice(0, 10);
+    heatmapMap.set(dateKey, { count: 0, types: new Set() });
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  // Mark days that have leave
+  leaves.forEach((leave) => {
+    const leaveStart = normalizeToDhakaMidnight(leave.startDate);
+    const leaveEnd = normalizeToDhakaMidnight(leave.endDate);
+    const currentDate = new Date(leaveStart);
+
+    while (currentDate <= leaveEnd) {
+      const dateKey = normalizeToDhakaMidnight(currentDate).toISOString().slice(0, 10);
+      const entry = heatmapMap.get(dateKey);
+      if (entry) {
+        entry.count += 1;
+        entry.types.add(leave.type);
+      }
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+  });
+
+  // Convert map to array
+  heatmapMap.forEach((value, date) => {
+    if (value.count > 0) {
+      heatmapData.push({
+        date,
+        count: value.count,
+        types: Array.from(value.types),
+      });
+    }
+  });
+
   return NextResponse.json({
-    monthlyUsage,
+    period: window,
     summary: {
-      totalUsed,
-      projectedAnnualUsage,
-      utilization: {
-        earned: earnedUtilization,
-        casual: casualUtilization,
-        medical: medicalUtilization,
-      },
-      breakdown: {
-        earned: earnedUsed,
-        casual: casualUsed,
-        medical: medicalUsed,
-      },
+      monthUsed: monthlyUsage[new Date().getMonth()]?.total ?? 0,
+      yearUsed: totalUsed,
+      remainingAll: earned + casual + medical,
     },
+    heatmap: heatmapData.map((item) => ({
+      date: item.date,
+      value: item.count,
+      type: item.types[0] || "UNKNOWN",
+    })),
+    distribution: [
+      { type: "EARNED", days: earnedUsed, pct: totalUsed > 0 ? Math.round((earnedUsed / totalUsed) * 100) : 0 },
+      { type: "CASUAL", days: casualUsed, pct: totalUsed > 0 ? Math.round((casualUsed / totalUsed) * 100) : 0 },
+      { type: "MEDICAL", days: medicalUsed, pct: totalUsed > 0 ? Math.round((medicalUsed / totalUsed) * 100) : 0 },
+    ].filter((d) => d.days > 0),
   });
 }
 

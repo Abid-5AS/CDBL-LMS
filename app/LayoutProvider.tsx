@@ -15,7 +15,7 @@ async function UserFetcher({ children }: { children: React.ReactNode }) {
 function AuthFallback({ children }: { children: React.ReactNode }) {
   return (
     <UserProvider user={null}>
-      <>{children}</>
+      <LayoutWrapper>{children}</LayoutWrapper>
     </UserProvider>
   );
 }

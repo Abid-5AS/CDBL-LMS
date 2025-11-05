@@ -42,10 +42,18 @@ export function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
     return [{ label: "Dashboard", href: "/dashboard" }];
   }
 
+  // Special handling for manager/dashboard - return clean breadcrumb
+  if (pathname === "/manager/dashboard" || pathname.startsWith("/manager/dashboard")) {
+    return [
+      { label: "Home", href: "/dashboard" },
+      { label: "Department Head", href: "/manager/dashboard" },
+    ];
+  }
+
   const breadcrumbs: BreadcrumbItem[] = [];
   
-  // Always start with Dashboard
-  breadcrumbs.push({ label: "Dashboard", href: "/dashboard" });
+  // Always start with Dashboard (or Home for cleaner naming)
+  breadcrumbs.push({ label: "Home", href: "/dashboard" });
 
   // Build breadcrumbs from segments
   let currentPath = "";

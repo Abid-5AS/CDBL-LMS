@@ -41,10 +41,12 @@ export async function proxy(req: NextRequest) {
       HR_ADMIN: ["/admin"],
       HR_HEAD: ["/hr-head"],
       CEO: ["/ceo", "/admin"],
+      SYSTEM_ADMIN: ["/admin"],
     };
 
     // 🧱 RBAC checks
-    if (pathname.startsWith("/admin") && !["HR_ADMIN", "HR_HEAD", "CEO"].includes(role))
+    // /admin routes: HR_ADMIN, HR_HEAD, CEO, SYSTEM_ADMIN can access
+    if (pathname.startsWith("/admin") && !["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"].includes(role))
       return NextResponse.redirect(new URL("/dashboard", req.url));
 
     if (pathname.startsWith("/ceo") && role !== "CEO")

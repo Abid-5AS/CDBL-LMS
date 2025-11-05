@@ -14,7 +14,7 @@ export default function AdminConsolePage() {
 
 async function AdminConsoleGate() {
   const user = await getCurrentUser();
-  const allowedRoles = ["HR_ADMIN", "HR_HEAD", "CEO"];
+  const allowedRoles = ["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"];
   if (!user || !allowedRoles.includes(user.role as string)) {
     redirect("/dashboard");
   }

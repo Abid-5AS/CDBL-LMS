@@ -15,6 +15,8 @@ type LeaveWithApprovals = Prisma.LeaveRequestGetPayload<{
 type SerializedApproval = {
   role: string;
   status: string;
+  decision?: string; // Include decision field for filtering (FORWARDED, APPROVED, etc.)
+  toRole?: string | null; // Include toRole for forwarded requests
   decidedById: string | null;
   decidedByName: string | null;
   decidedAt: string | null;
@@ -32,6 +34,7 @@ type SerializedLeave = {
   requestedDays: number;
   reason: string;
   status: string;
+  isModified?: boolean;
   approvals: SerializedApproval[];
   currentStageIndex: number;
   requestedById: string | null;
@@ -46,9 +49,9 @@ type SerializedLeave = {
   createdAt: string | null;
 };
 
-async function requireHR(): Promise<Response | NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>> {
+async function requireApprover(): Promise<Response | NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>> {
   const me = await getCurrentUser();
-  if (!me || me.role !== "HR_ADMIN") {
+  if (!me || !["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"].includes(me.role)) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
   return me;
@@ -59,6 +62,8 @@ function normalizeApprovals(leave: LeaveWithApprovals): SerializedApproval[] {
     return leave.approvals.map((record) => ({
       role: "HR_ADMIN",
       status: record.decision,
+      decision: record.decision, // Include decision field for filtering
+      toRole: record.toRole, // Include toRole for forwarded requests
       decidedById: record.approverId ? String(record.approverId) : null,
       decidedByName: record.approver?.name ?? null,
       decidedAt: record.decidedAt ? new Date(record.decidedAt).toISOString() : null,
@@ -93,6 +98,7 @@ function serializeLeave(leave: LeaveWithApprovals): SerializedLeave {
     requestedDays: leave.workingDays,
     reason: leave.reason,
     status: leave.status,
+    isModified: (leave as any).isModified ?? false,
     approvals: normalizeApprovals(leave),
     currentStageIndex: 0,
     requestedById: leave.requesterId ? String(leave.requesterId) : null,
@@ -111,24 +117,76 @@ function serializeLeave(leave: LeaveWithApprovals): SerializedLeave {
 }
 
 export async function GET() {
-  const me = await requireHR();
+  const me = await requireApprover();
   if (me instanceof Response) return me;
 
-  const items = await prisma.leaveRequest.findMany({
-    where: {
-      status: {
-        in: [LeaveStatus.SUBMITTED, LeaveStatus.PENDING],
-      },
+  // Build where clause based on role
+  let whereClause: any = {
+    status: {
+      in: [LeaveStatus.SUBMITTED, LeaveStatus.PENDING],
     },
-    include: {
-      requester: { select: { id: true, name: true, email: true } },
-      approvals: {
-        include: {
-          approver: { select: { name: true } },
+  };
+
+  // For DEPT_HEAD: only show requests from team members (deptHeadId matches)
+  // Must match the exact logic used in dashboard summary count
+  if (me.role === "DEPT_HEAD") {
+    whereClause.requester = {
+      deptHeadId: me.id,
+    };
+    // Ensure there's an approval forwarded TO DEPT_HEAD
+    // AND this DEPT_HEAD hasn't acted on it yet
+    whereClause.AND = [
+      {
+        approvals: {
+          some: {
+            decision: "FORWARDED",
+            toRole: "DEPT_HEAD",
+          },
         },
       },
+      {
+        approvals: {
+          none: {
+            approverId: me.id,
+            decision: {
+              in: ["FORWARDED", "APPROVED", "REJECTED"],
+            },
+          },
+        },
+      },
+    ];
+  } else if (me.role === "HR_HEAD") {
+    // For HR_HEAD: show requests that have been forwarded from DEPT_HEAD
+    whereClause.approvals = {
+      some: {
+        decision: "FORWARDED",
+        toRole: "HR_HEAD",
+      },
+    };
+  } else if (me.role === "CEO") {
+    // For CEO: show requests that have been forwarded from HR_HEAD
+    whereClause.approvals = {
+      some: {
+        decision: "FORWARDED",
+        toRole: "CEO",
+      },
+    };
+  }
+  // HR_ADMIN sees all SUBMITTED/PENDING requests (no filter)
+
+  // Get pending requests (no duplicates since we're querying LeaveRequest directly)
+  const items = await prisma.leaveRequest.findMany({
+    where: whereClause,
+    include: {
+      requester: { select: { id: true, name: true, email: true, deptHeadId: true } },
+      approvals: {
+        include: {
+          approver: { select: { name: true, role: true } },
+        },
+        orderBy: { step: "asc" },
+      },
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { startDate: "asc" }, // Sort by start date for better UX
   });
 
   return NextResponse.json({ items: items.map(serializeLeave) });

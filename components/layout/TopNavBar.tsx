@@ -174,7 +174,13 @@ export default function TopNavBar() {
     return () => clearInterval(interval);
   }, []);
 
-  const breadcrumbs = useMemo(() => generateBreadcrumbs(pathname), [pathname]);
+  const breadcrumbs = useMemo(() => {
+    // For manager/dashboard, don't show breadcrumbs in navbar (page has its own)
+    if (pathname.startsWith("/manager/dashboard")) {
+      return [];
+    }
+    return generateBreadcrumbs(pathname);
+  }, [pathname]);
 
   // Get "+ New" menu items based on role
   type MenuItem = {
@@ -211,13 +217,8 @@ export default function TopNavBar() {
           },
         ];
       case "DEPT_HEAD":
-        return [
-          {
-            label: "Apply Leave",
-            href: "/leaves/apply",
-            icon: CalendarPlus,
-          },
-        ];
+        // Department Heads manage requests, they don't apply for leave in this context
+        return [];
       default:
         return [];
     }
@@ -242,131 +243,141 @@ export default function TopNavBar() {
     <>
       <nav
         className={clsx(
-          "fixed top-0 left-0 right-0 z-50 h-14 border-b border-border",
-          "backdrop-blur-xl bg-card/80",
-          "supports-backdrop-filter:bg-transparent",
+          "fixed top-0 left-0 right-0 z-50 border-b border-border bg-background",
+          pathname.startsWith("/manager/dashboard") ? "h-12" : "h-14",
           "shadow-sm transition-shadow duration-300",
           scrolled && "shadow-md"
         )}
         role="navigation"
         aria-label="Global navigation"
       >
-        <div className="mx-auto w-full h-full px-4 grid grid-cols-[auto_1fr_auto] items-center gap-4">
-          {/* Left Section: Breadcrumbs + New */}
-          <div className="flex items-center gap-2 min-w-0">
-            <nav
-              className="flex items-center gap-1.5 text-sm text-foreground shrink-0 min-w-0"
-              aria-label="Breadcrumb"
-            >
-              {breadcrumbs.map((crumb, index) => (
-                <div
-                  key={`${crumb.href}-${index}`}
-                  className="flex items-center gap-1.5 shrink-0"
-                >
-                  {index > 0 && (
-                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                  )}
-                  <Link
-                    href={crumb.href}
-                    className={clsx(
-                      "transition-colors truncate hover:text-primary",
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded",
-                      index === breadcrumbs.length - 1
-                        ? "font-semibold text-foreground"
-                        : "hover:underline"
+        <div className={clsx(
+          "h-full flex items-center justify-between",
+          pathname.startsWith("/manager/dashboard") ? "w-full px-3 sm:px-4 lg:px-6" : "w-full px-4"
+        )}>
+          {/* Left Section: App Name - Only for manager dashboard */}
+          {pathname.startsWith("/manager/dashboard") ? (
+            <h1 className="text-sm font-semibold tracking-tight text-muted-foreground">
+              CDBL Leave Management
+            </h1>
+          ) : (
+            <div className="flex items-center gap-2 min-w-0">
+              <nav
+                className="flex items-center gap-1.5 text-sm text-foreground shrink-0 min-w-0"
+                aria-label="Breadcrumb"
+              >
+                {breadcrumbs.map((crumb, index) => (
+                  <div
+                    key={`${crumb.href}-${index}`}
+                    className="flex items-center gap-1.5 shrink-0"
+                  >
+                    {index > 0 && (
+                      <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                     )}
-                  >
-                    {crumb.label}
-                  </Link>
-                </div>
-              ))}
-              {/* Filter chip for list pages */}
-              {(pathname.startsWith("/leaves") ||
-                pathname.startsWith("/approvals")) && (
-                <>
-                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                  <button
-                    onClick={() => {
-                      router.push(pathname.split("?")[0]);
-                    }}
-                    className="px-2 py-0.5 text-xs font-medium rounded-md bg-accent text-accent-foreground hover:bg-accent/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 shrink-0"
-                    aria-label="Remove filter"
-                  >
-                    {pathname.includes("status=pending")
-                      ? "Pending"
-                      : pathname.includes("status=approved")
-                      ? "Approved"
-                      : "All"}
-                    <span className="ml-1 text-indigo-500">×</span>
-                  </button>
-                </>
+                    <Link
+                      href={crumb.href}
+                      className={clsx(
+                        "transition-colors truncate hover:text-primary",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded",
+                        index === breadcrumbs.length - 1
+                          ? "font-semibold text-foreground"
+                          : "hover:underline"
+                      )}
+                    >
+                      {crumb.label}
+                    </Link>
+                  </div>
+                ))}
+                {/* Filter chip for list pages */}
+                {(pathname.startsWith("/leaves") ||
+                  pathname.startsWith("/approvals")) && (
+                  <>
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                    <button
+                      onClick={() => {
+                        router.push(pathname.split("?")[0]);
+                      }}
+                      className="px-2 py-0.5 text-xs font-medium rounded-md bg-accent text-accent-foreground hover:bg-accent/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 shrink-0"
+                      aria-label="Remove filter"
+                    >
+                      {pathname.includes("status=pending")
+                        ? "Pending"
+                        : pathname.includes("status=approved")
+                        ? "Approved"
+                        : "All"}
+                      <span className="ml-1 text-indigo-500">×</span>
+                    </button>
+                  </>
+                )}
+              </nav>
+
+              {/* + New Menu */}
+              {newMenuItems.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      size="sm"
+                      className="h-8 px-3 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all hover:scale-105 active:scale-95 shrink-0"
+                      aria-label="New"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span className="hidden sm:inline ml-1">New</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-56">
+                    <DropdownMenuLabel>New</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {newMenuItems.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <DropdownMenuItem key={item.href} asChild>
+                          <Link
+                            href={item.href}
+                            className="flex items-center gap-2"
+                          >
+                            <Icon className="h-4 w-4" />
+                            <span>{item.label}</span>
+                            {item.shortcut && (
+                              <DropdownMenuShortcut>
+                                {item.shortcut}
+                              </DropdownMenuShortcut>
+                            )}
+                          </Link>
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
-            </nav>
+            </div>
+          )}
 
-            {/* + New Menu */}
-            {newMenuItems.length > 0 && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    size="sm"
-                    className="h-8 px-3 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all hover:scale-105 active:scale-95 shrink-0"
-                    aria-label="New"
-                  >
-                    <Plus className="h-4 w-4" />
-                    <span className="hidden sm:inline ml-1">New</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56">
-                  <DropdownMenuLabel>New</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {newMenuItems.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <DropdownMenuItem key={item.href} asChild>
-                        <Link
-                          href={item.href}
-                          className="flex items-center gap-2"
-                        >
-                          <Icon className="h-4 w-4" />
-                          <span>{item.label}</span>
-                          {item.shortcut && (
-                            <DropdownMenuShortcut>
-                              {item.shortcut}
-                            </DropdownMenuShortcut>
-                          )}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
-
-          {/* Center Section: Greeting, Time, Date */}
-          <div
-            className={clsx(
-              "hidden md:flex flex-col items-center text-xs text-muted-foreground select-none",
-              "transition-opacity hover:opacity-80 cursor-pointer",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded px-2 py-1"
-            )}
-            onClick={() => setControlCenterOpen(!controlCenterOpen)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                setControlCenterOpen(!controlCenterOpen);
-              }
-            }}
-            role="button"
-            tabIndex={0}
-            aria-label="Control Center (Ctrl+,)"
-            title="Control Center (Ctrl+,)"
-          >
-            <span className="font-medium">{greeting}</span>
-            <span className="text-[10px] opacity-75">
-              {time} | {date}
-            </span>
-          </div>
+          {/* Center Section: Greeting, Time, Date - Hidden for manager dashboard */}
+          {!pathname.startsWith("/manager/dashboard") && (
+            <div
+              className={clsx(
+                "hidden md:flex flex-col items-center text-xs text-muted-foreground select-none",
+                "transition-opacity hover:opacity-80 cursor-pointer",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded px-2 py-1"
+              )}
+              onClick={() => setControlCenterOpen(!controlCenterOpen)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setControlCenterOpen(!controlCenterOpen);
+                }
+              }}
+              role="button"
+              tabIndex={0}
+              aria-label="Control Center (Ctrl+,)"
+              title="Control Center (Ctrl+,)"
+            >
+              <span className="font-medium">{greeting}</span>
+              <span className="text-[10px] opacity-75">
+                {time} | {date}
+              </span>
+            </div>
+          )}
 
           {/* Right Section: Utilities */}
           <div className="flex items-center gap-2 shrink-0">

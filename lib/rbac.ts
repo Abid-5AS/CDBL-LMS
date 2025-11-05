@@ -1,11 +1,29 @@
-export type AppRole = "EMPLOYEE" | "DEPT_HEAD" | "HR_ADMIN" | "HR_HEAD" | "CEO";
+export type AppRole =
+  | "EMPLOYEE"
+  | "DEPT_HEAD"
+  | "HR_ADMIN"
+  | "HR_HEAD"
+  | "CEO"
+  | "SYSTEM_ADMIN";
 
 export function canViewAllRequests(role: AppRole) {
-  return role === "HR_ADMIN" || role === "HR_HEAD" || role === "CEO" || role === "DEPT_HEAD";
+  return (
+    role === "HR_ADMIN" ||
+    role === "HR_HEAD" ||
+    role === "CEO" ||
+    role === "DEPT_HEAD" ||
+    role === "SYSTEM_ADMIN"
+  );
 }
 
 export function canApprove(role: AppRole) {
-  return role === "HR_ADMIN" || role === "HR_HEAD" || role === "CEO" || role === "DEPT_HEAD";
+  return (
+    role === "HR_ADMIN" ||
+    role === "HR_HEAD" ||
+    role === "CEO" ||
+    role === "DEPT_HEAD" ||
+    role === "SYSTEM_ADMIN"
+  );
 }
 
 /**
@@ -13,25 +31,31 @@ export function canApprove(role: AppRole) {
  * @param viewerRole - The role of the person trying to view
  * @param targetRole - The role of the person being viewed
  */
-export function canViewEmployee(viewerRole: AppRole, targetRole: AppRole): boolean {
+export function canViewEmployee(
+  viewerRole: AppRole,
+  targetRole: AppRole
+): boolean {
+  // SYSTEM_ADMIN can view everyone
+  if (viewerRole === "SYSTEM_ADMIN") return true;
+
   // CEO can view everyone
   if (viewerRole === "CEO") return true;
-  
+
   // HR_HEAD can view everyone except CEO
   if (viewerRole === "HR_HEAD") {
     return targetRole !== "CEO";
   }
-  
+
   // HR_ADMIN can only view EMPLOYEE and DEPT_HEAD
   if (viewerRole === "HR_ADMIN") {
     return targetRole === "EMPLOYEE" || targetRole === "DEPT_HEAD";
   }
-  
+
   // DEPT_HEAD can view their team members
   if (viewerRole === "DEPT_HEAD") {
     return targetRole === "EMPLOYEE";
   }
-  
+
   // EMPLOYEE can view their own profile
   return viewerRole === targetRole;
 }
@@ -41,20 +65,26 @@ export function canViewEmployee(viewerRole: AppRole, targetRole: AppRole): boole
  * @param viewerRole - The role of the person trying to edit
  * @param targetRole - The role of the person being edited
  */
-export function canEditEmployee(viewerRole: AppRole, targetRole: AppRole): boolean {
+export function canEditEmployee(
+  viewerRole: AppRole,
+  targetRole: AppRole
+): boolean {
+  // SYSTEM_ADMIN can edit everyone
+  if (viewerRole === "SYSTEM_ADMIN") return true;
+
   // CEO can edit everyone
   if (viewerRole === "CEO") return true;
-  
+
   // HR_HEAD can edit HR_ADMIN, EMPLOYEE, and DEPT_HEAD
   if (viewerRole === "HR_HEAD") {
     return targetRole !== "CEO" && targetRole !== "HR_HEAD";
   }
-  
+
   // HR_ADMIN can only edit EMPLOYEE and DEPT_HEAD
   if (viewerRole === "HR_ADMIN") {
     return targetRole === "EMPLOYEE" || targetRole === "DEPT_HEAD";
   }
-  
+
   // DEPT_HEAD and EMPLOYEE cannot edit other users
   return false;
 }
@@ -66,6 +96,15 @@ export function canEditEmployee(viewerRole: AppRole, targetRole: AppRole): boole
  */
 export function getVisibleRoles(role: AppRole): AppRole[] {
   switch (role) {
+    case "SYSTEM_ADMIN":
+      return [
+        "EMPLOYEE",
+        "DEPT_HEAD",
+        "HR_ADMIN",
+        "HR_HEAD",
+        "CEO",
+        "SYSTEM_ADMIN",
+      ];
     case "CEO":
       return ["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"];
     case "HR_HEAD":
@@ -84,20 +123,26 @@ export function getVisibleRoles(role: AppRole): AppRole[] {
  * @param viewerRole - The role of the person trying to assign
  * @param targetRole - The role being assigned
  */
-export function canAssignRole(viewerRole: AppRole, targetRole: AppRole): boolean {
+export function canAssignRole(
+  viewerRole: AppRole,
+  targetRole: AppRole
+): boolean {
+  // SYSTEM_ADMIN can assign any role
+  if (viewerRole === "SYSTEM_ADMIN") return true;
+
   // CEO can assign any role
   if (viewerRole === "CEO") return true;
-  
+
   // HR_HEAD can assign EMPLOYEE, DEPT_HEAD, HR_ADMIN
   if (viewerRole === "HR_HEAD") {
     return ["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN"].includes(targetRole);
   }
-  
+
   // HR_ADMIN can only assign EMPLOYEE and DEPT_HEAD
   if (viewerRole === "HR_ADMIN") {
     return ["EMPLOYEE", "DEPT_HEAD"].includes(targetRole);
   }
-  
+
   // Others cannot assign roles
   return false;
 }
@@ -107,7 +152,12 @@ export function canAssignRole(viewerRole: AppRole, targetRole: AppRole): boolean
  * @param role - The role of the person trying to create
  */
 export function canCreateEmployee(role: AppRole): boolean {
-  return role === "HR_ADMIN" || role === "HR_HEAD" || role === "CEO";
+  return (
+    role === "HR_ADMIN" ||
+    role === "HR_HEAD" ||
+    role === "CEO" ||
+    role === "SYSTEM_ADMIN"
+  );
 }
 
 /**
@@ -120,7 +170,12 @@ export function canCreateEmployee(role: AppRole): boolean {
  */
 export function canCancel(role: AppRole, isOwnLeave: boolean = false): boolean {
   // Admin roles can cancel any leave
-  if (role === "HR_ADMIN" || role === "HR_HEAD" || role === "CEO") {
+  if (
+    role === "HR_ADMIN" ||
+    role === "HR_HEAD" ||
+    role === "CEO" ||
+    role === "SYSTEM_ADMIN"
+  ) {
     return true;
   }
   // Employees can only cancel their own leave (triggers CANCELLATION_REQUESTED)
@@ -136,5 +191,19 @@ export function canCancel(role: AppRole, isOwnLeave: boolean = false): boolean {
  */
 export function canReturn(role: AppRole): boolean {
   // Only approvers can return requests for modification
-  return role === "HR_ADMIN" || role === "HR_HEAD" || role === "CEO" || role === "DEPT_HEAD";
+  return (
+    role === "HR_ADMIN" ||
+    role === "HR_HEAD" ||
+    role === "CEO" ||
+    role === "DEPT_HEAD" ||
+    role === "SYSTEM_ADMIN"
+  );
+}
+
+/**
+ * Check if a role can manage system structure (departments, users, hierarchies)
+ * Only SYSTEM_ADMIN can manage system structure
+ */
+export function canManageSystemStructure(role: AppRole): boolean {
+  return role === "SYSTEM_ADMIN";
 }

@@ -47,8 +47,24 @@ export async function GET(req: Request) {
   const traceId = getTraceId(req as any);
   if (!me) return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
 
+  // Parse query parameters
+  const url = new URL(req.url);
+  const statusFilter = url.searchParams.get("status");
+  const mine = url.searchParams.get("mine") === "1";
+
+  // Build where clause
+  const where: any = {};
+  
+  if (mine) {
+    where.requesterId = me.id;
+  }
+
+  if (statusFilter && statusFilter !== "all") {
+    where.status = statusFilter;
+  }
+
   const items = await prisma.leaveRequest.findMany({
-    where: { requesterId: me.id },
+    where,
     orderBy: { createdAt: "desc" },
     include: {
       approvals: {
@@ -62,6 +78,9 @@ export async function GET(req: Request) {
         orderBy: {
           step: "asc",
         },
+      },
+      comments: {
+        orderBy: { createdAt: "asc" },
       },
     },
   });

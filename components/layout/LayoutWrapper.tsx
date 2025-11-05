@@ -6,6 +6,7 @@ import FloatingDock from "@/components/layout/FloatingDock";
 import { useUser } from "@/lib/user-context";
 import { SelectionProvider } from "@/lib/selection-context";
 import { inferPageContext } from "@/lib/page-context";
+import { cn } from "@/lib/utils";
 
 type LayoutWrapperProps = {
   children: React.ReactNode;
@@ -33,8 +34,20 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
     <SelectionProvider>
       <div className="flex min-h-screen flex-col bg-card" suppressHydrationWarning>
         <TopNavBar />
-        <main className="flex-1 overflow-y-auto pt-14 pb-20" role="main" aria-label="Main content">
-          <div className="mx-auto w-full px-6 py-6">{children}</div>
+        <main 
+          className={cn(
+            "flex-1 overflow-y-auto pb-20",
+            pathname.startsWith("/manager/dashboard") ? "pt-12" : "pt-14"
+          )} 
+          role="main" 
+          aria-label="Main content"
+        >
+          <div className={cn(
+            "mx-auto w-full",
+            pathname.startsWith("/manager/dashboard") ? "px-0 py-6" : "px-6 py-6"
+          )}>
+            {children}
+          </div>
         </main>
         <FloatingDock pageContext={pageContext} />
       </div>

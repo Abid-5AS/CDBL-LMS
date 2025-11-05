@@ -8,10 +8,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Inbox } from "lucide-react";
 import { WelcomeHero } from "./WelcomeHero";
 import { ActionItems } from "./ActionItems";
-import { LeaveSummaryCardNew } from "./LeaveSummaryCardNew";
-import { LeaveBalancesCompact } from "./LeaveBalancesCompact";
+import { LeaveBalanceCards } from "./LeaveBalanceCards";
 import { StatusBadgeSimple } from "./StatusBadgeSimple";
-import { LiveActivityTimeline } from "./LiveActivityTimeline";
+import { SortedTimeline } from "./SortedTimeline";
+import { QuickActions } from "./QuickActions";
+import { TeamOnLeaveWidget } from "./TeamOnLeaveWidget";
+import { InsightsWidget } from "./InsightsWidget";
+import { AnalyticsSection } from "./AnalyticsSection";
+import { ReturnedRequestsSection } from "./ReturnedRequestsSection";
 import { formatDate } from "@/lib/utils";
 import { SegmentedControlGlider } from "./SegmentedControlGlider";
 
@@ -191,49 +195,60 @@ export function EmployeeDashboardUnified({
   const leaves = leavesData?.items || [];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* 1. Welcome Hero */}
       <Suspense fallback={<Skeleton className="h-32 w-full" />}>
         <WelcomeHero username={username} />
       </Suspense>
 
-      {/* 2. Action Items (v2.0 Statuses) */}
-      <Suspense fallback={<Skeleton className="h-24 w-full" />}>
-        <ActionItems leaves={leaves} isLoading={isLoadingLeaves} />
+      {/* 2. Quick Actions Bar */}
+      <Suspense fallback={<Skeleton className="h-12 w-full" />}>
+        <QuickActions leaves={leaves} isLoading={isLoadingLeaves} />
       </Suspense>
 
-      {/* 3. Leave Balances - COMPACT - Above Active Timeline */}
-      <Suspense fallback={<Skeleton className="h-32 w-full" />}>
-        <LeaveBalancesCompact
+      {/* 2.5. Returned Requests Section (if any) */}
+      <Suspense fallback={null}>
+        <ReturnedRequestsSection />
+      </Suspense>
+
+      {/* 3. Leave Balance Cards - Enhanced with gradients and icons */}
+      <Suspense fallback={<Skeleton className="h-40 w-full" />}>
+        <LeaveBalanceCards
           balanceData={balanceData}
+          leavesData={leavesData}
           isLoading={isLoadingBalance}
         />
       </Suspense>
 
-      {/* 4. Live Activity Timeline - Shows active requests with approval tracking */}
-      <Suspense fallback={<Skeleton className="h-96 w-full" />}>
-        <LiveActivityTimeline leaves={leaves} isLoading={isLoadingLeaves} />
-      </Suspense>
-
-      {/* 5. Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Left Column (2/3): Requests Table */}
-        <div className="lg:col-span-2">
-          <Suspense fallback={<Skeleton className="h-96 w-full" />}>
-            <RequestsTable leaves={leaves} isLoading={isLoadingLeaves} limit={5} />
+      {/* 4. Two-column grid: Team/Insights (left) + Analytics (right) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left Column: Team on Leave + Insights */}
+        <div className="space-y-4">
+          <Suspense fallback={<Skeleton className="h-48 w-full" />}>
+            <TeamOnLeaveWidget />
+          </Suspense>
+          <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+            <InsightsWidget />
           </Suspense>
         </div>
 
-        {/* Right Column (1/3): Summary Card - Keep for detailed view */}
-        <div className="lg:col-span-1">
-          <Suspense fallback={<Skeleton className="h-80 w-full" />}>
-            <LeaveSummaryCardNew
-              balanceData={balanceData}
-              isLoading={isLoadingBalance}
-            />
+        {/* Right Column: Analytics Section */}
+        <div>
+          <Suspense fallback={<Skeleton className="h-[600px] w-full" />}>
+            <AnalyticsSection />
           </Suspense>
         </div>
       </div>
+
+      {/* 5. Sorted Timeline - Full width, sorted by start date */}
+      <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+        <SortedTimeline leaves={leaves} isLoading={isLoadingLeaves} />
+      </Suspense>
+
+      {/* 6. Recent Requests Table */}
+      <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+        <RequestsTable leaves={leaves} isLoading={isLoadingLeaves} limit={5} />
+      </Suspense>
     </div>
   );
 }

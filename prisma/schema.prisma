@@ -13,6 +13,7 @@ enum Role {
   HR_ADMIN
   HR_HEAD
   CEO
+  SYSTEM_ADMIN
 }
 
 enum LeaveType {
@@ -49,12 +50,17 @@ model User {
   empCode    String?  @unique
   role       Role     @default(EMPLOYEE)
   department String?
+  deptHeadId Int? // User ID of department head (self-relation)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  leaves    LeaveRequest[]
-  balances  Balance[]
-  approvals Approval[]     @relation("ApprovalApprover")
+  leaves      LeaveRequest[]
+  balances    Balance[]
+  approvals   Approval[]     @relation("ApprovalApprover")
+  deptHead    User?          @relation("HeadToMembers", fields: [deptHeadId], references: [id])
+  teamMembers User[]         @relation("HeadToMembers")
+
+  @@index([deptHeadId])
 }
 
 model LeaveRequest {
@@ -70,11 +76,16 @@ model LeaveRequest {
   fitnessCertificateUrl String? // fitness certificate for ML > 7 days on return
   status                LeaveStatus @default(DRAFT)
   policyVersion         String // e.g. "v2.0"
+  isModified            Boolean     @default(false) // True if request was returned and resubmitted
   createdAt             DateTime    @default(now())
   updatedAt             DateTime    @updatedAt
 
-  requester User       @relation(fields: [requesterId], references: [id])
+  requester User           @relation(fields: [requesterId], references: [id])
   approvals Approval[]
+  comments  LeaveComment[]
+  versions  LeaveVersion[]
+
+  @@index([requesterId, status])
 }
 
 enum ApprovalDecision {
@@ -142,6 +153,34 @@ model AuditLog {
   createdAt   DateTime @default(now())
 
   @@index([createdAt])
+}
+
+model LeaveComment {
+  id         Int      @id @default(autoincrement())
+  leaveId    Int
+  authorId   Int
+  authorRole String // Role of the person who wrote the comment
+  comment    String
+  createdAt  DateTime @default(now())
+
+  leave LeaveRequest @relation(fields: [leaveId], references: [id], onDelete: Cascade)
+
+  @@index([leaveId])
+}
+
+model LeaveVersion {
+  id          Int      @id @default(autoincrement())
+  leaveId     Int
+  version     Int // Version number (1, 2, 3, etc.)
+  data        Json // JSON snapshot of the leave request at this version
+  createdAt   DateTime @default(now())
+  createdById Int
+  createdByRole String // Role of person who created this version (usually EMPLOYEE on resubmit)
+
+  leave LeaveRequest @relation(fields: [leaveId], references: [id], onDelete: Cascade)
+
+  @@index([leaveId])
+  @@index([leaveId, version])
 }
 
 model OrgSettings {
