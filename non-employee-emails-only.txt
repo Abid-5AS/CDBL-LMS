@@ -1,0 +1,13 @@
+# Non-Employee Emails Only
+# Generated on: 2025-11-05T16:37:28.551Z
+# Total: 9
+
+depthead.finance@cdbl.local
+depthead.hr@cdbl.local
+depthead.it@cdbl.local
+depthead.operations@cdbl.local
+hradmin1@cdbl.local
+hradmin2@cdbl.local
+hrhead@cdbl.local
+ceo@cdbl.local
+sysadmin@cdbl.local

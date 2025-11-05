@@ -1,23 +1,12 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense } from "react";
 import useSWR from "swr";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Inbox } from "lucide-react";
-import { WelcomeHero } from "./WelcomeHero";
-import { ActionItems } from "./ActionItems";
-import { LeaveBalanceCards } from "./LeaveBalanceCards";
-import { StatusBadgeSimple } from "./StatusBadgeSimple";
-import { SortedTimeline } from "./SortedTimeline";
-import { QuickActions } from "./QuickActions";
-import { TeamOnLeaveWidget } from "./TeamOnLeaveWidget";
-import { InsightsWidget } from "./InsightsWidget";
-import { AnalyticsSection } from "./AnalyticsSection";
-import { ReturnedRequestsSection } from "./ReturnedRequestsSection";
-import { formatDate } from "@/lib/utils";
-import { SegmentedControlGlider } from "./SegmentedControlGlider";
+import { DashboardGreeting } from "./DashboardGreeting";
+import { ActionCenterCard } from "./ActionCenterCard";
+import { LeaveOverviewCard } from "./LeaveOverviewCard";
+import { HistoryAnalyticsCard } from "./HistoryAnalyticsCard";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -35,140 +24,11 @@ type LeaveStatus =
 type LeaveRow = {
   id: number;
   type: string;
-  startDate: string;
-  endDate: string;
-  workingDays: number;
   status: LeaveStatus;
-  updatedAt: string;
-  approvals?: Array<{
-    step: number;
-    decision: "PENDING" | "FORWARDED" | "APPROVED" | "REJECTED" | "RETURNED";
-    approver?: { name: string | null } | null;
-    toRole?: string | null;
-  }>;
+  workingDays?: number;
+  endDate?: string;
+  fitnessCertificateUrl?: string | null;
 };
-
-/**
- * [REDESIGNED RequestsTable]
- * Uses SegmentedControl and the new v2.0-aware StatusBadge.
- */
-function RequestsTable({
-  leaves,
-  isLoading,
-  limit,
-}: {
-  leaves: LeaveRow[];
-  isLoading: boolean;
-  limit?: number;
-}) {
-  const router = useRouter();
-  const [filter, setFilter] = useState("all");
-
-  const filteredRows = useMemo(() => {
-    let filtered: LeaveRow[] = [];
-    if (filter === "all") {
-      filtered = leaves;
-    } else {
-      filtered = leaves.filter((row) => {
-        switch (filter) {
-          case "pending":
-            return (
-              row.status === "PENDING" ||
-              row.status === "SUBMITTED" ||
-              row.status === "CANCELLATION_REQUESTED"
-            );
-          case "returned":
-            return row.status === "RETURNED";
-          case "history":
-            return (
-              row.status === "APPROVED" ||
-              row.status === "REJECTED" ||
-              row.status === "CANCELLED" ||
-              row.status === "RECALLED"
-            );
-          default:
-            return true;
-        }
-      });
-    }
-    const sorted = [...filtered].sort(
-      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    );
-    return limit ? sorted.slice(0, limit) : sorted;
-  }, [leaves, filter, limit]);
-
-  const filterOptions = [
-    { value: "all", label: "All" },
-    { value: "pending", label: "Pending" },
-    { value: "returned", label: "Returned" },
-    { value: "history", label: "History" },
-  ];
-
-  return (
-    <Card className="solid-card animate-fade-in-up animate-delay-300ms">
-      <CardHeader className="pb-2 px-3 pt-3">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
-          <CardTitle className="text-base">Recent Requests</CardTitle>
-          <div className="w-full md:w-auto">
-            <SegmentedControlGlider
-              options={filterOptions}
-              selected={filter}
-              onChange={setFilter}
-            />
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="p-0">
-        {isLoading ? (
-          <div className="p-6 space-y-3">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        ) : filteredRows.length === 0 ? (
-          <div className="h-48 flex flex-col items-center justify-center text-center p-6">
-            <Inbox className="size-12 text-gray-300 dark:text-gray-600" />
-            <p className="mt-2 font-semibold">No Requests Found</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              There are no requests matching your filter.
-            </p>
-          </div>
-        ) : (
-          <div className="flow-root">
-            <ul role="list" className="divide-y divide-gray-200 dark:divide-gray-800">
-              {filteredRows.map((row) => (
-                <li
-                  key={row.id}
-                  className="flex items-center justify-between gap-3 p-3 md:p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
-                  onClick={() => router.push(`/leaves?id=${row.id}`)}
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
-                      {row.type} Leave
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {formatDate(row.startDate)} → {formatDate(row.endDate)}
-                      <span className="hidden sm:inline">
-                        {" "}
-                        ({row.workingDays} days)
-                      </span>
-                    </p>
-                  </div>
-                  <div className="flex-shrink-0 flex flex-col items-end gap-1">
-                    <StatusBadgeSimple status={row.status} />
-                    <span className="text-[10px] text-gray-400 dark:text-gray-500 sm:hidden">
-                      {row.workingDays} days
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
 
 type EmployeeDashboardUnifiedProps = {
   username: string;
@@ -176,8 +36,10 @@ type EmployeeDashboardUnifiedProps = {
 
 /**
  * [REDESIGNED EmployeeDashboardUnified]
- * This component now fetches all data and passes it down to the
- * new, redesigned presentational components.
+ * Reorganized into 3 smart clusters with tabbed navigation:
+ * 1. Action Center (returned requests + quick actions)
+ * 2. Leave Overview (Balance | Team | Insights tabs)
+ * 3. History & Analytics (Recent | Timeline | Heatmap | Distribution tabs)
  */
 export function EmployeeDashboardUnified({
   username,
@@ -192,62 +54,34 @@ export function EmployeeDashboardUnified({
     fetcher
   );
 
-  const leaves = leavesData?.items || [];
+  const leaves: LeaveRow[] = leavesData?.items || [];
 
   return (
-    <div className="space-y-6">
-      {/* 1. Welcome Hero */}
-      <Suspense fallback={<Skeleton className="h-32 w-full" />}>
-        <WelcomeHero username={username} />
+    <div className="space-y-4">
+      {/* 1. Simplified Greeting */}
+      <DashboardGreeting />
+
+      {/* 2. Action Center Card */}
+      <Suspense fallback={<Skeleton className="h-48 w-full" />}>
+        <ActionCenterCard leaves={leaves} isLoading={isLoadingLeaves} />
       </Suspense>
 
-      {/* 2. Quick Actions Bar */}
-      <Suspense fallback={<Skeleton className="h-12 w-full" />}>
-        <QuickActions leaves={leaves} isLoading={isLoadingLeaves} />
-      </Suspense>
-
-      {/* 2.5. Returned Requests Section (if any) */}
-      <Suspense fallback={null}>
-        <ReturnedRequestsSection />
-      </Suspense>
-
-      {/* 3. Leave Balance Cards - Enhanced with gradients and icons */}
-      <Suspense fallback={<Skeleton className="h-40 w-full" />}>
-        <LeaveBalanceCards
+      {/* 3. Leave Overview Card (Tabbed) */}
+      <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+        <LeaveOverviewCard
           balanceData={balanceData}
           leavesData={leavesData}
-          isLoading={isLoadingBalance}
+          isLoadingBalance={isLoadingBalance}
+          isLoadingLeaves={isLoadingLeaves}
         />
       </Suspense>
 
-      {/* 4. Two-column grid: Team/Insights (left) + Analytics (right) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Column: Team on Leave + Insights */}
-        <div className="space-y-4">
-          <Suspense fallback={<Skeleton className="h-48 w-full" />}>
-            <TeamOnLeaveWidget />
-          </Suspense>
-          <Suspense fallback={<Skeleton className="h-64 w-full" />}>
-            <InsightsWidget />
-          </Suspense>
-        </div>
-
-        {/* Right Column: Analytics Section */}
-        <div>
-          <Suspense fallback={<Skeleton className="h-[600px] w-full" />}>
-            <AnalyticsSection />
-          </Suspense>
-        </div>
-      </div>
-
-      {/* 5. Sorted Timeline - Full width, sorted by start date */}
-      <Suspense fallback={<Skeleton className="h-96 w-full" />}>
-        <SortedTimeline leaves={leaves} isLoading={isLoadingLeaves} />
-      </Suspense>
-
-      {/* 6. Recent Requests Table */}
-      <Suspense fallback={<Skeleton className="h-96 w-full" />}>
-        <RequestsTable leaves={leaves} isLoading={isLoadingLeaves} limit={5} />
+      {/* 4. History & Analytics Card (Tabbed) */}
+      <Suspense fallback={<Skeleton className="h-[500px] w-full" />}>
+        <HistoryAnalyticsCard
+          leaves={leavesData?.items || []}
+          isLoadingLeaves={isLoadingLeaves}
+        />
       </Suspense>
     </div>
   );

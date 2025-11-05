@@ -1,0 +1,24 @@
+# Non-Employee Users Email List
+# Generated on: 2025-11-05T16:37:28.550Z
+# Total users: 9
+
+# Format: email | name | role
+
+## CEO (1)
+ceo@cdbl.local | Chief Executive Officer | CEO
+
+## DEPT_HEAD (4)
+depthead.finance@cdbl.local | Head of Finance | DEPT_HEAD
+depthead.hr@cdbl.local | Head of HR | DEPT_HEAD
+depthead.it@cdbl.local | Head of IT | DEPT_HEAD
+depthead.operations@cdbl.local | Head of Operations | DEPT_HEAD
+
+## HR_ADMIN (2)
+hradmin1@cdbl.local | HR Admin 1 | HR_ADMIN
+hradmin2@cdbl.local | HR Admin 2 | HR_ADMIN
+
+## HR_HEAD (1)
+hrhead@cdbl.local | HR Head | HR_HEAD
+
+## SYSTEM_ADMIN (1)
+sysadmin@cdbl.local | System Administrator | SYSTEM_ADMIN

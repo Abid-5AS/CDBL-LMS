@@ -87,132 +87,142 @@ export function AnalyticsSection() {
 
   return (
     <div className="space-y-4">
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Days Used - Changes with filter */}
-        <Card className="solid-card animate-fade-in-up">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Days Used</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
-                  {summary?.periodTotal ?? 0}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                  {summary?.periodLabel ?? "This Year"}
-                </p>
-              </div>
-              <BarChart3 className="size-8 text-blue-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Total Used - Always year-to-date (independent of filter) */}
-        <Card className="solid-card animate-fade-in-up" style={{ animationDelay: "100ms" }}>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-1.5">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Used</p>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button type="button" className="inline-flex items-center">
-                          <Info className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="right" className="max-w-xs">
-                        <p className="text-xs">
-                          This value always shows total leaves used in the current year, regardless of the selected view filter.
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+      {/* Summary Cards and Period Filter - Top Row */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 flex-1">
+          {/* Days Used - Changes with filter */}
+          <Card className="solid-card animate-fade-in-up">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Days Used</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+                    {summary?.periodTotal ?? 0}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    {summary?.periodLabel ?? "This Year"}
+                  </p>
                 </div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
-                  {summary?.totalUsed ?? 0}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                  This Year
-                </p>
+                <BarChart3 className="size-8 text-blue-500" />
               </div>
-              <TrendingUp className="size-8 text-green-500" />
-            </div>
+            </CardContent>
+          </Card>
+
+          {/* Total Used - Always year-to-date (independent of filter) */}
+          <Card className="solid-card animate-fade-in-up" style={{ animationDelay: "100ms" }}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Total Used</p>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button type="button" className="inline-flex items-center">
+                            <Info className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="max-w-xs">
+                          <p className="text-xs">
+                            This value always shows total leaves used in the current year, regardless of the selected view filter.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+                    {summary?.totalUsed ?? 0}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    This Year
+                  </p>
+                </div>
+                <TrendingUp className="size-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="solid-card animate-fade-in-up" style={{ animationDelay: "200ms" }}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Remaining</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+                    {summary?.remaining ?? 0}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    All Types
+                  </p>
+                </div>
+                <Calendar className="size-8 text-amber-500" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Period Filter - Right Side */}
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">View:</span>
+          <div className="flex gap-1">
+            <Button
+              variant={period === "month" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setPeriod("month")}
+              className="h-8 px-3 text-xs"
+            >
+              Month
+            </Button>
+            <Button
+              variant={period === "quarter" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setPeriod("quarter")}
+              className="h-8 px-3 text-xs"
+            >
+              Quarter
+            </Button>
+            <Button
+              variant={period === "year" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setPeriod("year")}
+              className="h-8 px-3 text-xs"
+            >
+              Year
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts - Side by Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Heatmap */}
+        <Card className="solid-card animate-fade-in-up">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Calendar className="size-4" />
+              Leave Heatmap
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <LeaveHeatmap
+              defaultScope="me"
+              defaultRange="year"
+            />
           </CardContent>
         </Card>
 
-        <Card className="solid-card animate-fade-in-up" style={{ animationDelay: "200ms" }}>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Remaining</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
-                  {summary?.remaining ?? 0}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                  All Types
-                </p>
-              </div>
-              <Calendar className="size-8 text-amber-500" />
-            </div>
+        {/* Distribution Chart */}
+        <Card className="solid-card animate-fade-in-up">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <TrendingUp className="size-4" />
+              Leave Type Distribution
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <LeaveTypePieChart data={pieData} />
           </CardContent>
         </Card>
       </div>
-
-      {/* Period Filter */}
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-600 dark:text-gray-400">View:</span>
-        <Button
-          variant={period === "month" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setPeriod("month")}
-        >
-          Month
-        </Button>
-        <Button
-          variant={period === "quarter" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setPeriod("quarter")}
-        >
-          Quarter
-        </Button>
-        <Button
-          variant={period === "year" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setPeriod("year")}
-        >
-          Year
-        </Button>
-      </div>
-
-      {/* Heatmap - Decoupled */}
-      <Card className="solid-card animate-fade-in-up">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Calendar className="size-4" />
-            Leave Heatmap
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <LeaveHeatmap
-            defaultScope="me"
-            defaultRange="year"
-          />
-        </CardContent>
-      </Card>
-
-      {/* Distribution Chart */}
-      <Card className="solid-card animate-fade-in-up">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <TrendingUp className="size-4" />
-            Leave Type Distribution
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <LeaveTypePieChart data={pieData} />
-        </CardContent>
-      </Card>
     </div>
   );
 }

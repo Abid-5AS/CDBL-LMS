@@ -15,6 +15,26 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
+type Approval = {
+  step: number;
+  decision: "PENDING" | "FORWARDED" | "APPROVED" | "REJECTED" | "RETURNED";
+  comment: string | null;
+  decidedAt: string | null;
+  approver?: {
+    name: string | null;
+    role?: string | null;
+  } | null;
+};
+
+type LeaveComment = {
+  id: number;
+  comment: string;
+  authorRole: string;
+  authorId: number;
+  authorName?: string;
+  createdAt: string;
+};
+
 type ReturnedLeave = {
   id: number;
   type: string;
@@ -24,14 +44,8 @@ type ReturnedLeave = {
   reason: string;
   status: LeaveStatus;
   updatedAt: string;
-};
-
-type ReturnComment = {
-  id: number;
-  comment: string;
-  authorRole: string;
-  authorName: string;
-  createdAt: string;
+  approvals?: Approval[];
+  comments?: LeaveComment[];
 };
 
 export function ReturnedRequestsSection() {
@@ -99,23 +113,64 @@ export function ReturnedRequestsSection() {
 }
 
 function ReturnedRequestRow({ leave, onResubmit }: { leave: ReturnedLeave; onResubmit: () => void }) {
-  const { data: commentsData } = useSWR<{ items?: ReturnComment[]; comments?: ReturnComment[] }>(
-    `/api/leaves/${leave.id}/comments`,
+  // Extract return information from approvals or comments already in the leave data
+  // When a leave is returned, an approval is created with decision="FORWARDED" and toRole=null
+  // Also a LeaveComment is created with the return reason
+  
+  // Try to get return info from approvals first (most reliable)
+  const returnApproval = Array.isArray(leave.approvals)
+    ? leave.approvals
+        .filter((a) => a.decision === "FORWARDED" && a.comment && a.decidedAt)
+        .sort((a, b) => {
+          const dateA = a.decidedAt ? new Date(a.decidedAt).getTime() : 0;
+          const dateB = b.decidedAt ? new Date(b.decidedAt).getTime() : 0;
+          return dateB - dateA;
+        })[0]
+    : null;
+
+  // Fallback to comments if no approval found
+  const returnComment = returnApproval
+    ? null // Use approval data
+    : Array.isArray(leave.comments)
+    ? leave.comments
+        .filter((c) => c.authorRole !== "EMPLOYEE" && ["DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"].includes(c.authorRole))
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]
+    : null;
+
+  // If we still don't have data, fetch it separately (fallback)
+  const { data: commentsData, isLoading: commentsLoading } = useSWR<{ items?: LeaveComment[] }>(
+    !returnApproval && !returnComment ? `/api/leaves/${leave.id}/comments` : null,
     fetcher,
     {
       revalidateOnFocus: false,
     }
   );
 
-  const comments = Array.isArray(commentsData?.items) 
-    ? commentsData.items 
-    : Array.isArray(commentsData?.comments) 
-    ? commentsData.comments 
-    : [];
-  // Get the most recent non-employee comment (the return comment)
-  const returnComment = comments
-    .filter((c) => c.authorRole !== "EMPLOYEE")
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0] || comments[0];
+  // Final fallback: use fetched comments if available
+  const fetchedComments = Array.isArray(commentsData?.items) ? commentsData.items : [];
+  const finalReturnComment = returnComment || 
+    (fetchedComments.length > 0
+      ? fetchedComments
+          .filter((c) => c.authorRole !== "EMPLOYEE" && ["DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"].includes(c.authorRole))
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]
+      : null);
+
+  // Determine return info - prefer approval data, then comment data
+  const returnInfo = returnApproval
+    ? {
+        authorName: returnApproval.approver?.name || "Unknown",
+        authorRole: returnApproval.approver?.role || "Approver",
+        comment: returnApproval.comment || "",
+        createdAt: returnApproval.decidedAt || "",
+      }
+    : finalReturnComment
+    ? {
+        authorName: finalReturnComment.authorName || "Unknown",
+        authorRole: finalReturnComment.authorRole,
+        comment: finalReturnComment.comment,
+        createdAt: finalReturnComment.createdAt,
+      }
+    : null;
 
   return (
     <TableRow className="hover:bg-amber-50/50 dark:hover:bg-amber-950/10">
@@ -132,20 +187,23 @@ function ReturnedRequestRow({ leave, onResubmit }: { leave: ReturnedLeave; onRes
       </TableCell>
       <TableCell className="hidden md:table-cell">{leave.workingDays}</TableCell>
       <TableCell>
-        {returnComment ? (
+        {commentsLoading && !returnInfo ? (
+          <span className="text-sm text-muted-foreground">Loading...</span>
+        ) : returnInfo ? (
           <div className="text-sm">
-            <div className="font-medium">{returnComment.authorName}</div>
-            <div className="text-xs text-muted-foreground">{returnComment.authorRole}</div>
-            <div className="text-xs text-muted-foreground">{formatDate(returnComment.createdAt)}</div>
+            <div className="font-medium">{returnInfo.authorName}</div>
+            <div className="text-xs text-muted-foreground">{returnInfo.authorRole}</div>
           </div>
         ) : (
-          <span className="text-sm text-muted-foreground">Loading...</span>
+          <span className="text-sm text-muted-foreground">—</span>
         )}
       </TableCell>
       <TableCell className="hidden lg:table-cell max-w-xs">
-        {returnComment ? (
-          <div className="text-sm text-muted-foreground line-clamp-2" title={returnComment.comment}>
-            {returnComment.comment}
+        {commentsLoading && !returnInfo ? (
+          <span className="text-sm text-muted-foreground">Loading...</span>
+        ) : returnInfo?.comment ? (
+          <div className="text-sm text-muted-foreground line-clamp-2" title={returnInfo.comment}>
+            {returnInfo.comment}
           </div>
         ) : (
           <span className="text-sm text-muted-foreground">—</span>

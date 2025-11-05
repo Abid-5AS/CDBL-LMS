@@ -7,6 +7,7 @@ import {
   GlassModalHeader,
   GlassModalTitle,
   GlassModalDescription,
+  GlassModalFooter,
 } from "@/components/ui/glass-modal";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
@@ -36,7 +37,7 @@ type LeaveDetails = {
   startDate: string;
   endDate: string;
   workingDays: number;
-  status: "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
+  status: "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "RETURNED" | "CANCELLATION_REQUESTED" | "RECALLED" | "OVERSTAY_PENDING";
   reason?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -83,9 +84,9 @@ export function LeaveDetailsModal({ open, onOpenChange, leave }: LeaveDetailsMod
 
   return (
     <GlassModal open={open} onOpenChange={onOpenChange}>
-      <GlassModalContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <GlassModalContent className="max-w-3xl max-h-[90vh] overflow-y-auto [&>button]:hidden">
         <GlassModalHeader className="pb-3">
-          {/* Header Row 1: Title + Status + Actions */}
+          {/* Header Row 1: Title + Status + Close Button */}
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <FileText className="h-5 w-5 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -97,42 +98,16 @@ export function LeaveDetailsModal({ open, onOpenChange, leave }: LeaveDetailsMod
               </div>
             </div>
             
-            {/* Actions */}
-            <div className="flex items-center gap-2 shrink-0">
-              {canNudge && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 px-3 text-xs"
-                  onClick={() => {
-                    console.log("Nudge approver for leave", leave.id);
-                  }}
-                  aria-label="Nudge approver"
-                >
-                  <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
-                  Nudge
-                </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 px-3 text-xs"
-                onClick={() => router.push(`/leaves?request=${leave.id}`)}
-                aria-label="View full details"
-              >
-                <Eye className="h-3.5 w-3.5 mr-1.5" />
-                View
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => onOpenChange(false)}
-                aria-label="Close modal"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+            {/* Single Close Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 shrink-0"
+              onClick={() => onOpenChange(false)}
+              aria-label="Close modal"
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
 
           {/* Header Row 2: Stepper */}
@@ -240,6 +215,47 @@ export function LeaveDetailsModal({ open, onOpenChange, leave }: LeaveDetailsMod
           </Accordion>
 
         </div>
+
+        {/* Footer with Actions */}
+        <GlassModalFooter className="flex justify-between items-center pt-4 border-t border-slate-200 dark:border-slate-700 mt-4">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Close
+          </Button>
+          <div className="flex items-center gap-2">
+            {leave.status === "RETURNED" && (
+              <Button
+                onClick={() => {
+                  router.push(`/leaves/${leave.id}/edit`);
+                  onOpenChange(false);
+                }}
+              >
+                Edit & Resubmit
+              </Button>
+            )}
+            {(leave.status === "PENDING" || leave.status === "SUBMITTED") && (
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  router.push(`/leaves?id=${leave.id}`);
+                  onOpenChange(false);
+                }}
+              >
+                Cancel Request
+              </Button>
+            )}
+            {canNudge && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  console.log("Nudge approver for leave", leave.id);
+                }}
+              >
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Nudge
+              </Button>
+            )}
+          </div>
+        </GlassModalFooter>
       </GlassModalContent>
     </GlassModal>
   );

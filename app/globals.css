@@ -803,6 +803,36 @@
 .animate-duration-1000ms { animation-duration: 1000ms; }
 .animate-delay-500ms { animation-delay: 500ms; }
 
+/* Liquid Glass Pill Style for Navbar */
+.glass-pill {
+  /* Core glass effect */
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  
+  /* Light mode glass color */
+  background-color: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.dark .glass-pill {
+  /* Dark mode glass color */
+  background-color: rgba(26, 31, 46, 0.7);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Fly.io-style navbar underline animation */
+.underline-hover {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease-in-out, opacity 0.25s ease-in-out;
+  opacity: 0.5;
+}
+
+.group:hover .underline-hover {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -817,6 +847,11 @@
   .animate-fade-in,
   .animate-shake-x {
     animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .underline-hover {
+    transform: scaleX(1) !important;
     opacity: 1 !important;
   }
 }

@@ -44,7 +44,7 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon"
       aria-label={label}
-      className="relative h-9 w-9 rounded-xl bg-muted/40 backdrop-blur-sm transition-colors hover:bg-muted/70 dark:hover:bg-muted/40"
+      className="relative h-9 w-9 rounded-full text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50 hover:bg-white/50 dark:hover:bg-white/10 transition-colors bg-transparent border-0 focus-visible:ring-2 focus-visible:ring-indigo-500/40"
       onClick={() => setTheme(isDark ? "light" : "dark")}
     >
       <span className="sr-only">{label}</span>

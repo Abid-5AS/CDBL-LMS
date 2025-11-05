@@ -1,12 +1,11 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import TopNavBar from "@/components/layout/TopNavBar";
-import FloatingDock from "@/components/layout/FloatingDock";
+import { Navbar } from "@/components/Navbar";
 import { useUser } from "@/lib/user-context";
 import { SelectionProvider } from "@/lib/selection-context";
-import { inferPageContext } from "@/lib/page-context";
 import { cn } from "@/lib/utils";
+import { SlideDrawer } from "@/components/unified/SlideDrawer";
 
 type LayoutWrapperProps = {
   children: React.ReactNode;
@@ -17,41 +16,54 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const user = useUser();
 
   // Pages that need unified layout
-  const needsUnifiedLayout = ["/dashboard", "/leaves", "/holidays", "/policies", "/approvals", "/employees", "/reports", "/settings", "/manager", "/hr-head", "/ceo", "/admin", "/balance"].some((p) =>
-    pathname.startsWith(p)
-  );
+  const needsUnifiedLayout = [
+    "/dashboard",
+    "/leaves",
+    "/holidays",
+    "/policies",
+    "/approvals",
+    "/employees",
+    "/reports",
+    "/settings",
+    "/manager",
+    "/hr-head",
+    "/ceo",
+    "/admin",
+    "/balance",
+  ].some((p) => pathname.startsWith(p));
 
   // If no user or doesn't need unified layout
   if (!user || !needsUnifiedLayout) {
     return <>{children}</>;
   }
 
-  // Determine page context from pathname
-  const pageContext = inferPageContext(pathname);
-
-  // macOS-style unified layout with TopNavBar and FloatingDock
+  // Modern layout with top navbar (no bottom dock)
   return (
     <SelectionProvider>
-      <div className="flex min-h-screen flex-col bg-card" suppressHydrationWarning>
-        <TopNavBar />
-        <main 
+      <div
+        className="flex min-h-screen flex-col bg-background"
+        suppressHydrationWarning
+      >
+        <Navbar />
+        <main
           className={cn(
-            "flex-1 overflow-y-auto pb-20",
-            pathname.startsWith("/manager/dashboard") ? "pt-12" : "pt-14"
-          )} 
-          role="main" 
+            "flex-1 overflow-y-auto",
+            "pt-[72px]" // Offset for fixed navbar (initial height, animates to 60px on scroll)
+          )}
+          role="main"
           aria-label="Main content"
         >
-          <div className={cn(
-            "mx-auto w-full",
-            pathname.startsWith("/manager/dashboard") ? "px-0 py-6" : "px-6 py-6"
-          )}>
+          <div
+            className={cn(
+              "w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6",
+              pathname.startsWith("/manager/dashboard") && "px-0 max-w-none"
+            )}
+          >
             {children}
           </div>
         </main>
-        <FloatingDock pageContext={pageContext} />
+        <SlideDrawer />
       </div>
     </SelectionProvider>
   );
 }
-

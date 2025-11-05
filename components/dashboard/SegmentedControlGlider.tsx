@@ -40,7 +40,7 @@ export function SegmentedControlGlider({
   }, [selected, options]);
 
   return (
-    <div className="segmented-control-container w-full max-w-md">
+    <div className="segmented-control-container w-full max-w-md overflow-x-auto scrollbar-none">
       <div className="segmented-control-glider" style={gliderStyle} />
       {options.map((option, index) => (
         <button

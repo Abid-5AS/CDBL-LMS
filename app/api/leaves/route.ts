@@ -72,6 +72,7 @@ export async function GET(req: Request) {
           approver: {
             select: {
               name: true,
+              role: true,
             },
           },
         },
@@ -85,7 +86,34 @@ export async function GET(req: Request) {
     },
   });
 
-  return NextResponse.json({ items });
+  // Get author information for comments
+  const allCommentAuthorIds = [
+    ...new Set(
+      items.flatMap((item) => 
+        (item.comments || []).map((c: any) => c.authorId).filter(Boolean)
+      )
+    ),
+  ];
+
+  const commentAuthors = allCommentAuthorIds.length > 0
+    ? await prisma.user.findMany({
+        where: { id: { in: allCommentAuthorIds } },
+        select: { id: true, name: true, role: true },
+      })
+    : [];
+
+  const authorMap = new Map(commentAuthors.map((a) => [a.id, a]));
+
+  // Map items with author information for comments
+  const itemsWithAuthors = items.map((item) => ({
+    ...item,
+    comments: (item.comments || []).map((comment: any) => ({
+      ...comment,
+      authorName: authorMap.get(comment.authorId)?.name || "Unknown",
+    })),
+  }));
+
+  return NextResponse.json({ items: itemsWithAuthors });
 }
 
 function yearOf(d: Date) {

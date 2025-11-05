@@ -23,6 +23,7 @@ import { formatDate } from "@/lib/utils";
 import { StatusBadgeSimple } from "./StatusBadgeSimple";
 import { getChainFor, type LeaveType } from "@/lib/workflow";
 import { cn } from "@/lib/utils";
+import { useUIStore } from "@/lib/ui-state";
 
 type LeaveStatus =
   | "SUBMITTED"
@@ -88,6 +89,7 @@ function getDaysUntilBadge(days: number): { text: string; variant: "default" | "
 
 export function SortedTimeline({ leaves, isLoading }: SortedTimelineProps) {
   const router = useRouter();
+  const { openDrawer } = useUIStore();
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [timeFilter, setTimeFilter] = useState<"upcoming" | "past">("upcoming");
@@ -250,8 +252,8 @@ export function SortedTimeline({ leaves, isLoading }: SortedTimelineProps) {
         </div>
       </CardHeader>
       <CardContent className="p-2 pt-0">
-        <ul className="space-y-2">
-          {sortedLeaves.map((leave) => {
+        <ul className="space-y-2 max-h-[400px] overflow-y-auto">
+          {sortedLeaves.slice(0, 5).map((leave) => {
             const startDate = new Date(leave.startDate);
             const daysDiff = differenceInCalendarDays(startDate, today);
             const badge = getDaysUntilBadge(daysDiff);
@@ -259,33 +261,30 @@ export function SortedTimeline({ leaves, isLoading }: SortedTimelineProps) {
             return (
               <li
                 key={leave.id}
-                className="solid-card cursor-pointer transition-all hover:scale-[1.01] p-4"
-                onClick={() => router.push(`/leaves?id=${leave.id}`)}
+                className="solid-card cursor-pointer transition-all hover:scale-[1.01] p-3"
+                onClick={() => openDrawer(leave.id)}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
-                    router.push(`/leaves?id=${leave.id}`);
+                    openDrawer(leave.id);
                   }
                 }}
               >
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
-                        {leave.type} Leave
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                        {leave.type}
                       </p>
                       <StatusBadgeSimple status={leave.status} />
-                      <Badge variant={badge.variant} className="text-xs">
+                      <Badge variant={badge.variant} className="text-xs shrink-0">
                         {badge.text}
                       </Badge>
                     </div>
                     <p className="text-xs text-gray-600 dark:text-gray-400">
-                      {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {leave.workingDays} day{leave.workingDays > 1 ? "s" : ""}
+                      {formatDate(leave.startDate)} → {formatDate(leave.endDate)} ({leave.workingDays}d)
                     </p>
                   </div>
                 </div>
@@ -293,6 +292,19 @@ export function SortedTimeline({ leaves, isLoading }: SortedTimelineProps) {
             );
           })}
         </ul>
+        {sortedLeaves.length > 5 && (
+          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-800 text-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs"
+              onClick={() => router.push("/leaves")}
+            >
+              View {sortedLeaves.length - 5} more
+              <ChevronRight className="ml-1 size-3" />
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
