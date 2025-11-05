@@ -855,3 +855,95 @@
     opacity: 1 !important;
   }
 }
+
+/* Print-specific styles for PDF export */
+@media print {
+  /* Ensure white background and black text */
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide navigation, buttons, and non-printable elements */
+  nav,
+  button,
+  .no-print,
+  [role="button"] {
+    display: none !important;
+  }
+
+  /* Remove shadows, gradients, and complex backgrounds */
+  .card,
+  .shadow,
+  .shadow-sm,
+  .shadow-md,
+  .shadow-lg,
+  .shadow-xl,
+  .bg-gradient-to-br,
+  .bg-gradient-to-r,
+  .bg-gradient-to-l,
+  .backdrop-blur-sm,
+  .backdrop-blur-md,
+  .backdrop-blur-lg {
+    box-shadow: none !important;
+    background: white !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Ensure headings are black */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: #000 !important;
+    page-break-after: avoid;
+  }
+
+  /* Ensure text is readable */
+  p,
+  li,
+  span,
+  div {
+    color: #000 !important;
+  }
+
+  /* Remove borders and rounded corners for cleaner print */
+  .rounded-xl,
+  .rounded-lg,
+  .rounded-md,
+  .rounded-sm,
+  .rounded-full {
+    border-radius: 0 !important;
+  }
+
+  /* Prevent page breaks inside sections */
+  section {
+    page-break-inside: avoid;
+  }
+
+  /* Remove animations and transitions */
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Ensure links are visible */
+  a {
+    color: #000 !important;
+    text-decoration: underline;
+  }
+
+  /* Print-friendly borders */
+  .border,
+  .border-b,
+  .border-t {
+    border-color: #e5e7eb !important;
+  }
+}
