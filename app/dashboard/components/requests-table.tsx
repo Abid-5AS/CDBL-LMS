@@ -35,7 +35,7 @@ type LeaveRow = {
   startDate: string;
   endDate: string;
   workingDays: number;
-  status: "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "RETURNED" | "CANCELLATION_REQUESTED" | "RECALLED" | "OVERSTAY_PENDING";
+  status: "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "RETURNED" | "CANCELLATION_REQUESTED" | "RECALLED";
   updatedAt: string;
   reason?: string;
   createdAt?: string;
@@ -52,7 +52,9 @@ type LeaveRow = {
 };
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
-const CANCELABLE_STATUSES = new Set<LeaveRow["status"]>(["SUBMITTED", "PENDING"]);
+// Allow cancellation for: SUBMITTED, PENDING, RETURNED, APPROVED
+// Note: CANCELLATION_REQUESTED is excluded - cancellation already in progress
+const CANCELABLE_STATUSES = new Set<LeaveRow["status"]>(["SUBMITTED", "PENDING", "RETURNED", "APPROVED"]);
 
 type FilterStatus = "all" | "pending" | "approved" | "cancelled";
 

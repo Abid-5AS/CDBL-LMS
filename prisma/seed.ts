@@ -609,8 +609,6 @@ async function createLeaveRequests(
         status = "RETURNED";
       } else if (statusRoll < 0.97) {
         status = "CANCELLATION_REQUESTED";
-      } else if (statusRoll < 0.99) {
-        status = "OVERSTAY_PENDING";
       } else {
         status = "CANCELLED";
       }

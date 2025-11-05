@@ -113,7 +113,6 @@ export function randomStatus(rng: SeededRandom): LeaveStatus {
   if (roll < 0.9) return "REJECTED";
   if (roll < 0.95) return "RETURNED";
   if (roll < 0.97) return "CANCELLATION_REQUESTED";
-  if (roll < 0.99) return "OVERSTAY_PENDING";
   return "CANCELLED";
 }
 

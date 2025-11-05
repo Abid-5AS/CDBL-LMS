@@ -16,7 +16,6 @@ type LeaveStatus =
   | "RETURNED"
   | "CANCELLATION_REQUESTED"
   | "RECALLED"
-  | "OVERSTAY_PENDING";
 
 type LeaveRow = {
   id: number;
@@ -43,15 +42,11 @@ export function ActionItems({
 
     const returnedCount = leaves.filter((l) => l.status === "RETURNED").length;
 
-    const overstayCount = leaves.filter(
-      (l) => l.status === "OVERSTAY_PENDING"
-    ).length;
-
     const cancellationCount = leaves.filter(
       (l) => l.status === "CANCELLATION_REQUESTED"
     ).length;
 
-    return { pendingCount, returnedCount, overstayCount, cancellationCount };
+    return { pendingCount, returnedCount, cancellationCount };
   }, [leaves]);
 
   const items = [
@@ -72,14 +67,6 @@ export function ActionItems({
       href: "/leaves?status=returned",
     },
     {
-      title: "Overstay Alerts",
-      count: stats.overstayCount,
-      icon: AlertOctagon,
-      color: "text-red-600 dark:text-red-400",
-      bg: "bg-red-50 dark:bg-red-950/30",
-      href: "/leaves?status=overstay",
-    },
-    {
       title: "Cancelling",
       count: stats.cancellationCount,
       icon: Archive,
@@ -95,8 +82,7 @@ export function ActionItems({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Skeleton className="h-28 w-full" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Skeleton className="h-28 w-full" />
         <Skeleton className="h-28 w-full" />
         <Skeleton className="h-28 w-full" />

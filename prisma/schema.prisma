@@ -39,7 +39,6 @@ enum LeaveStatus {
   RETURNED
   CANCELLATION_REQUESTED
   RECALLED
-  OVERSTAY_PENDING
 }
 
 model User {

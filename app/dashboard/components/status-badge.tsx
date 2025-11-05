@@ -77,13 +77,6 @@ const STATUS_CONFIG: Record<
     icon: getIcon(leaveStatusIcons.PENDING),
     tooltip: "Employee recalled from leave by HR. Remaining balance restored.",
   },
-  OVERSTAY_PENDING: {
-    label: "Overstay",
-    className:
-      "bg-red-50/80 text-red-800 border-red-300 dark:bg-red-900/40 dark:text-red-200 dark:border-red-800",
-    icon: getIcon(leaveStatusIcons.REJECTED),
-    tooltip: "Leave end date passed without return confirmation. Contact HR immediately.",
-  },
 };
 
 export default function StatusBadge({ status, className }: { status: Status; className?: string }) {

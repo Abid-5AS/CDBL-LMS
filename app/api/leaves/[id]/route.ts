@@ -36,7 +36,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
 
   // Check valid cancellation states
-  if (!["SUBMITTED", "PENDING", "APPROVED"].includes(leave.status)) {
+  // SUBMITTED/PENDING: immediate cancellation
+  // APPROVED: request cancellation (needs HR review)
+  // RETURNED: user can cancel instead of fixing
+  if (!["SUBMITTED", "PENDING", "APPROVED", "RETURNED"].includes(leave.status)) {
     return NextResponse.json(
       error("cancellation_request_invalid", undefined, traceId, { currentStatus: leave.status }),
       { status: 400 }
@@ -66,7 +69,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       },
     });
   } else {
-    // SUBMITTED or PENDING can be cancelled immediately
+    // SUBMITTED, PENDING, or RETURNED can be cancelled immediately
     newStatus = LeaveStatus.CANCELLED;
 
     // Create audit log for immediate cancellation

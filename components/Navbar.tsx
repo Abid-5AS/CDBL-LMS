@@ -47,14 +47,18 @@ export function Navbar() {
 
   // Disable body scroll when mobile menu is open
   useEffect(() => {
+    // Only run on client to avoid hydration mismatch
+    if (typeof window === "undefined") return;
+
     if (isMobileMenuOpen) {
+      const originalOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
     } else {
       document.body.style.overflow = "";
     }
-    return () => {
-      document.body.style.overflow = "";
-    };
   }, [isMobileMenuOpen]);
 
   if (!user) return null;

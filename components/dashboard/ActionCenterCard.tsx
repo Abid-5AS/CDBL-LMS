@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { AlertCircle, Edit, RotateCcw, Plus, X, ArrowLeft, FileX } from "lucide-react";
+import { AlertCircle, Edit3, Send, Plus, X, ArrowLeft, FileX } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
 import Link from "next/link";
@@ -14,6 +14,14 @@ import useSWR from "swr";
 import { LeaveStatus } from "@prisma/client";
 import StatusBadge from "@/app/dashboard/components/status-badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -26,7 +34,6 @@ type LeaveStatusType =
   | "RETURNED"
   | "CANCELLATION_REQUESTED"
   | "RECALLED"
-  | "OVERSTAY_PENDING";
 
 type LeaveRow = {
   id: number;
@@ -75,7 +82,15 @@ interface ActionCenterCardProps {
   isLoading: boolean;
 }
 
-function ReturnedRequestRow({ leave, onResubmit }: { leave: ReturnedLeave; onResubmit: () => void }) {
+function ReturnedRequestRow({ 
+  leave, 
+  onResubmit, 
+  index 
+}: { 
+  leave: ReturnedLeave; 
+  onResubmit: () => void;
+  index: number;
+}) {
   // Extract return information from approvals or comments already in the leave data
   const returnApproval = Array.isArray(leave.approvals)
     ? leave.approvals
@@ -127,55 +142,98 @@ function ReturnedRequestRow({ leave, onResubmit }: { leave: ReturnedLeave; onRes
       }
     : null;
 
+  // Get initials for avatar
+  const getInitials = (name: string) => {
+    if (!name) return "?";
+    const parts = name.trim().split(" ");
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  const initials = returnInfo ? getInitials(returnInfo.authorName) : "?";
+
   return (
-    <TableRow className="hover:bg-amber-50/50 dark:hover:bg-amber-950/10">
-      <TableCell>
-        <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300">
-          {leaveTypeLabel[leave.type] ?? leave.type}
-        </Badge>
+    <TableRow 
+      className={cn(
+        "hover:bg-muted/40 transition-colors",
+        index % 2 === 0 && "bg-white dark:bg-neutral-900/50"
+      )}
+    >
+      <TableCell className="font-medium text-sm text-neutral-900 dark:text-neutral-100">
+        {leaveTypeLabel[leave.type] ?? leave.type}
       </TableCell>
-      <TableCell>
-        <div className="text-sm">
-          <div>{formatDate(leave.startDate)} → {formatDate(leave.endDate)}</div>
-          <div className="text-xs text-muted-foreground md:hidden">{leave.workingDays} days</div>
-        </div>
+      <TableCell className="text-sm text-gray-600 dark:text-slate-300">
+        {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
       </TableCell>
-      <TableCell className="hidden md:table-cell">{leave.workingDays}</TableCell>
+      <TableCell className="hidden md:table-cell text-sm text-gray-600 dark:text-slate-300">
+        {leave.workingDays}
+      </TableCell>
       <TableCell>
         {commentsLoading && !returnInfo ? (
           <span className="text-sm text-muted-foreground">Loading...</span>
         ) : returnInfo ? (
-          <div className="text-sm">
-            <div className="font-medium">{returnInfo.authorName}</div>
-            <div className="text-xs text-muted-foreground">{returnInfo.authorRole}</div>
+          <div className="flex items-center gap-2">
+            <Avatar className="h-6 w-6">
+              <AvatarFallback className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 text-xs">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <div className="text-sm">
+              <div className="font-medium text-neutral-900 dark:text-neutral-100">
+                {returnInfo.authorName}
+              </div>
+              <div className="text-xs text-muted-foreground">{returnInfo.authorRole}</div>
+            </div>
           </div>
         ) : (
           <span className="text-sm text-muted-foreground">—</span>
         )}
       </TableCell>
-      <TableCell className="hidden lg:table-cell max-w-xs">
+      <TableCell className="max-w-[160px]">
         {commentsLoading && !returnInfo ? (
           <span className="text-sm text-muted-foreground">Loading...</span>
         ) : returnInfo?.comment ? (
-          <div className="text-sm text-muted-foreground line-clamp-2" title={returnInfo.comment}>
-            {returnInfo.comment}
-          </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <p className="text-sm text-muted-foreground truncate cursor-help">
+                {returnInfo.comment}
+              </p>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs">
+              <p className="text-xs">{returnInfo.comment}</p>
+            </TooltipContent>
+          </Tooltip>
         ) : (
           <span className="text-sm text-muted-foreground">—</span>
         )}
       </TableCell>
-      <TableCell className="text-right">
+      <TableCell className="hidden lg:table-cell text-sm text-gray-600 dark:text-slate-300">
+        {formatDate(leave.updatedAt)}
+      </TableCell>
+      <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-end gap-2">
-          <Button asChild size="sm" variant="outline" className="h-7 text-xs">
-            <Link href={`/leaves/${leave.id}`}>
-              <Edit className="h-3 w-3 mr-1" />
-              View
+          <Button 
+            asChild
+            variant="outline" 
+            size="sm" 
+            className="text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800"
+          >
+            <Link href={`/leaves/${leave.id}/edit`}>
+              <Edit3 className="w-4 h-4 mr-1" />
+              Edit
             </Link>
           </Button>
-          <Button asChild size="sm" variant="default" className="h-7 text-xs">
+          <Button 
+            asChild
+            variant="default"
+            size="sm"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white"
+          >
             <Link href={`/leaves/${leave.id}/edit`}>
-              <RotateCcw className="h-3 w-3 mr-1" />
-              Edit & Resubmit
+              <Send className="w-4 h-4 mr-1" />
+              Resubmit
             </Link>
           </Button>
         </div>
@@ -297,19 +355,25 @@ export function ActionCenterCard({ leaves, isLoading }: ActionCenterCardProps) {
         ) : hasReturnedRequests ? (
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/40">
-                  <TableHead>Type</TableHead>
-                  <TableHead>Dates</TableHead>
-                  <TableHead className="hidden md:table-cell">Days</TableHead>
-                  <TableHead>Returned By</TableHead>
-                  <TableHead className="hidden lg:table-cell">Comment</TableHead>
-                  <TableHead className="text-right">Action</TableHead>
+              <TableHeader className="sticky top-0 bg-background z-10 shadow-sm border-b border-neutral-200/70 dark:border-neutral-800/70">
+                <TableRow className="bg-muted/30 hover:bg-muted/30">
+                  <TableHead className="text-xs font-medium text-neutral-700 dark:text-neutral-300">Type</TableHead>
+                  <TableHead className="text-xs font-medium text-neutral-700 dark:text-neutral-300">Dates</TableHead>
+                  <TableHead className="hidden md:table-cell text-xs font-medium text-neutral-700 dark:text-neutral-300">Days</TableHead>
+                  <TableHead className="text-xs font-medium text-neutral-700 dark:text-neutral-300">Returned By</TableHead>
+                  <TableHead className="text-xs font-medium text-neutral-700 dark:text-neutral-300">Comment</TableHead>
+                  <TableHead className="hidden lg:table-cell text-xs font-medium text-neutral-700 dark:text-neutral-300">Updated</TableHead>
+                  <TableHead className="text-right text-xs font-medium text-neutral-700 dark:text-neutral-300">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {returnedLeaves.map((leave) => (
-                  <ReturnedRequestRow key={leave.id} leave={leave} onResubmit={mutate} />
+                {returnedLeaves.map((leave, index) => (
+                  <ReturnedRequestRow 
+                    key={leave.id} 
+                    leave={leave} 
+                    onResubmit={mutate}
+                    index={index}
+                  />
                 ))}
               </TableBody>
             </Table>

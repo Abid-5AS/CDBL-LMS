@@ -17,8 +17,7 @@
     "verify:deployment": "tsx scripts/verify-deployment.ts",
     "jobs:scheduler": "tsx scripts/scheduler.ts",
     "jobs:el-accrual": "tsx scripts/jobs/el-accrual.ts",
-    "jobs:cl-lapse": "tsx scripts/jobs/auto-lapse.ts",
-    "jobs:overstay": "tsx scripts/jobs/overstay-check.ts"
+    "jobs:cl-lapse": "tsx scripts/jobs/auto-lapse.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

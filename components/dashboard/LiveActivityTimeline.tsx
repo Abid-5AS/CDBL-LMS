@@ -36,7 +36,6 @@ type LeaveStatus =
   | "RETURNED"
   | "CANCELLATION_REQUESTED"
   | "RECALLED"
-  | "OVERSTAY_PENDING"
   | "DRAFT";
 
 type ApprovalRecord = {
@@ -79,7 +78,6 @@ const ACTIVE_STATUSES = new Set<LeaveStatus>([
   "RETURNED",
   "CANCELLATION_REQUESTED",
   "RECALLED",
-  "OVERSTAY_PENDING",
 ]);
 
 /**
@@ -239,7 +237,6 @@ export function LiveActivityTimeline({
       .sort((a, b) => {
         // Priority sorting: action-required items first
         const priority: Record<string, number> = {
-          OVERSTAY_PENDING: 1,
           RETURNED: 2,
           RECALLED: 3,
           PENDING: 4,
@@ -268,10 +265,7 @@ export function LiveActivityTimeline({
     let timeText = "";
     let timeTextClass = "text-blue-600";
 
-    if (leave.status === "OVERSTAY_PENDING") {
-      timeText = "Ended. Please confirm return.";
-      timeTextClass = "text-red-600 font-bold";
-    } else if (leave.status === "RETURNED") {
+    if (leave.status === "RETURNED") {
       timeText = "Action Required: Returned for modification.";
       timeTextClass = "text-yellow-700 font-bold";
     } else if (daysDiff > 1) {

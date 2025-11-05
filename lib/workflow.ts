@@ -26,7 +26,7 @@ export const WORKFLOW_CHAINS: Record<LeaveType | "DEFAULT", AppRole[]> = {
  */
 export const APPROVAL_CHAIN: AppRole[] = WORKFLOW_CHAINS.DEFAULT;
 
-export type LeaveStatus = "DRAFT" | "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "RETURNED" | "CANCELLATION_REQUESTED" | "RECALLED" | "OVERSTAY_PENDING";
+export type LeaveStatus = "DRAFT" | "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "RETURNED" | "CANCELLATION_REQUESTED" | "RECALLED";
 
 export type ApprovalAction = "FORWARD" | "APPROVE" | "REJECT";
 

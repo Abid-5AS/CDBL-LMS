@@ -22,7 +22,6 @@ type LeaveStatus =
   | "RETURNED"
   | "CANCELLATION_REQUESTED"
   | "RECALLED"
-  | "OVERSTAY_PENDING";
 
 /**
  * A badge component to display the leave status with appropriate colors and icons.
@@ -73,12 +72,6 @@ export function StatusBadgeSimple({ status }: { status: LeaveStatus }) {
           label: "Recalled",
           icon: BadgeAlert,
           className: "bg-purple-100 text-purple-700 dark:bg-purple-950/30 dark:text-purple-300",
-        };
-      case "OVERSTAY_PENDING":
-        return {
-          label: "Overstay",
-          icon: AlertOctagon,
-          className: "bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-300 font-bold",
         };
       default:
         return {

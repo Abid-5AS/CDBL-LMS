@@ -34,7 +34,6 @@ type LeaveStatus =
   | "RETURNED"
   | "CANCELLATION_REQUESTED"
   | "RECALLED"
-  | "OVERSTAY_PENDING";
 
 type ApprovalRecord = {
   step: number;
