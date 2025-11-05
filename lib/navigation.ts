@@ -62,6 +62,13 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
     { icon: Activity, label: "Audit", href: "/admin/audit" },
     { icon: Users, label: "Employees", href: "/employees" },
   ],
+
+  SYSTEM_ADMIN: [
+    { icon: Home, label: "Home", href: "/admin" },
+    { icon: Shield, label: "Admin", href: "/admin" },
+    { icon: Users, label: "Employees", href: "/employees" },
+    { icon: Activity, label: "Audit", href: "/admin/audit" },
+  ],
 };
 
 // Role-specific home pages
@@ -71,6 +78,7 @@ export const roleHomePages: Record<UserRole, string> = {
   HR_ADMIN: "/dashboard",
   HR_HEAD: "/hr-head/dashboard",
   CEO: "/ceo/dashboard",
+  SYSTEM_ADMIN: "/admin",
 };
 
 // Get navigation items for a role

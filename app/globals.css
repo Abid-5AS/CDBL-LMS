@@ -786,6 +786,18 @@
   20%, 40%, 60%, 80% { transform: translateX(10px); }
 }
 
+.animate-shake-x {
+  animation: shake-x 0.5s ease-out;
+}
+
+.text-gradient-label {
+  background: linear-gradient(to right, #3730a3, #6366f1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
 .animate-duration-500ms { animation-duration: 500ms; }
 .animate-duration-700ms { animation-duration: 700ms; }
 .animate-duration-1000ms { animation-duration: 1000ms; }
