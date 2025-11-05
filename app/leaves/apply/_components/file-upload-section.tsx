@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ChangeEvent, type DragEvent } from "react";
+import { useState, useRef, type ChangeEvent, type DragEvent } from "react";
 import { Upload, FileText, X, AlertCircle } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -28,7 +28,7 @@ export function FileUploadSection({
   disabled = false,
 }: FileUploadSectionProps) {
   const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = useState<HTMLInputElement | null>(null)[0];
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const validateFile = (file: File): string | null => {
     if (!ACCEPTED_FILE_REGEX.test(file.name)) {
@@ -85,8 +85,8 @@ export function FileUploadSection({
 
   const handleRemove = () => {
     onChange(null);
-    if (fileInputRef) {
-      fileInputRef.value = "";
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -119,11 +119,7 @@ export function FileUploadSection({
           )}
         >
           <input
-            ref={(el) => {
-              if (el) {
-                (fileInputRef as any) = el;
-              }
-            }}
+            ref={fileInputRef}
             type="file"
             accept=".pdf,image/*"
             onChange={handleFileInputChange}
@@ -149,7 +145,7 @@ export function FileUploadSection({
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => (fileInputRef as any)?.click()}
+              onClick={() => fileInputRef.current?.click()}
               disabled={disabled}
               className="mt-2"
             >
