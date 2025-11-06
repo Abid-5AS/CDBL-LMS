@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import useSWR from "swr";
-import { ChartContainer, TypePie } from "@/components/shared/LeaveCharts";
+import { TypePie } from "@/components/shared/LeaveCharts";
 import { fromDashboardAgg } from "@/components/shared/LeaveCharts/adapters";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PieChart } from "lucide-react";
@@ -82,15 +82,6 @@ export function LeaveTypePieChartData() {
     })),
   });
 
-  return (
-    <ChartContainer
-      title="Leave Type Distribution"
-      loading={false}
-      empty={slices.length === 0}
-      height={250}
-    >
-      <TypePie data={slices} height={250} />
-    </ChartContainer>
-  );
+  return <TypePie data={slices} height={250} />;
 }
 
