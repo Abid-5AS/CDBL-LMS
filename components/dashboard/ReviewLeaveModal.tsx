@@ -53,19 +53,40 @@ export function ReviewLeaveModal({
   const user = useUser();
   const viewerRole = (user?.role as AppRole) || "EMPLOYEE";
   const isHRAdmin = viewerRole === "HR_ADMIN";
-  const [action, setAction] = useState<"forward" | "reject" | "return" | null>(initialAction || null);
+  const [action, setAction] = useState<"forward" | "reject" | "return" | null>(null);
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   // When modal opens with initialAction, set it immediately
   useEffect(() => {
-    if (open && initialAction) {
-      setAction(initialAction);
-    } else if (!open) {
+    if (open) {
+      if (initialAction) {
+        // If opening with initial action, set it immediately
+        setAction(initialAction);
+      } else {
+        // If opening without initial action, clear any previous action
+        setAction(null);
+      }
+      setNote("");
+    } else {
+      // Clear action and note when modal closes
       setAction(null);
       setNote("");
     }
   }, [open, initialAction]);
+
+  // Handle main dialog close - ensure nested dialog also closes
+  const handleMainDialogChange = useCallback(
+    (isOpen: boolean) => {
+      if (!isOpen) {
+        // Clear action state first to close nested dialog
+        setAction(null);
+        setNote("");
+      }
+      onOpenChange(isOpen);
+    },
+    [onOpenChange]
+  );
 
   const handleForward = useCallback(async () => {
     if (!leaveRequest) return;
@@ -158,11 +179,12 @@ export function ReviewLeaveModal({
 
   if (!leaveRequest) return null;
 
-  const showActionDialog = action === "reject" || action === "return";
+  const showActionDialog = (action === "reject" || action === "return") && open;
+  const showMainDialog = open && !showActionDialog;
 
   return (
     <>
-      <Dialog open={open && !showActionDialog} onOpenChange={onOpenChange}>
+      <Dialog open={showMainDialog} onOpenChange={handleMainDialogChange}>
         <DialogContent className="glass-modal max-w-2xl">
           <DialogHeader>
             <DialogTitle>Review Leave Request</DialogTitle>
@@ -211,7 +233,15 @@ export function ReviewLeaveModal({
           </div>
 
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setAction(null);
+                setNote("");
+                onOpenChange(false);
+              }} 
+              disabled={submitting}
+            >
               Cancel
             </Button>
             {isHRAdmin ? (
@@ -275,7 +305,17 @@ export function ReviewLeaveModal({
       </Dialog>
 
       {/* Reject/Return Confirmation Dialog */}
-      <Dialog open={showActionDialog} onOpenChange={(open) => !open && setAction(null)}>
+      <Dialog 
+        open={showActionDialog} 
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
+            setAction(null);
+            setNote("");
+            // If closing the nested dialog, also close the main dialog
+            onOpenChange(false);
+          }
+        }}
+      >
         <DialogContent className="glass-modal">
           <DialogHeader>
             <DialogTitle>
