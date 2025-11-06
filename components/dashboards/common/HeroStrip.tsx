@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { formatDate } from "@/lib/utils";
 import { getIcon, iconSizes } from "@/lib/icons";
-import { LeaveTimeline } from "./LeaveTimeline";
+import { SharedTimeline } from "@/components/shared/SharedTimeline";
+import { ApprovalTimelineAdapter } from "@/components/shared/timeline-adapters";
 import { cn } from "@/lib/utils";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
