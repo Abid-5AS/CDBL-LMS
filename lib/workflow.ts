@@ -28,7 +28,7 @@ export const APPROVAL_CHAIN: AppRole[] = WORKFLOW_CHAINS.DEFAULT;
 
 export type LeaveStatus = "DRAFT" | "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "RETURNED" | "CANCELLATION_REQUESTED" | "RECALLED";
 
-export type ApprovalAction = "FORWARD" | "APPROVE" | "REJECT";
+export type ApprovalAction = "FORWARD" | "APPROVE" | "REJECT" | "RETURN";
 
 /**
  * Get the approval chain for a specific leave type
@@ -84,6 +84,9 @@ export function canPerformAction(role: AppRole, action: ApprovalAction, type?: L
       case "APPROVE":
       case "REJECT":
         return isFinal; // Can approve/reject only if final
+      case "RETURN":
+        // HR_ADMIN can return requests for modification (operational role)
+        return role === "HR_ADMIN" || chain.includes(role);
       default:
         return false;
     }
@@ -95,7 +98,11 @@ export function canPerformAction(role: AppRole, action: ApprovalAction, type?: L
       return role === "HR_ADMIN" || role === "DEPT_HEAD";
     case "APPROVE":
     case "REJECT":
-      return role === "HR_HEAD" || role === "CEO";
+      // HR_ADMIN removed from approve/reject (moved to HR_HEAD/CEO)
+      return role === "HR_HEAD" || role === "CEO" || role === "SYSTEM_ADMIN";
+    case "RETURN":
+      // HR_ADMIN can return requests for modification
+      return role === "HR_ADMIN" || role === "HR_HEAD" || role === "CEO" || role === "DEPT_HEAD" || role === "SYSTEM_ADMIN";
     default:
       return false;
   }

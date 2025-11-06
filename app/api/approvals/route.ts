@@ -171,8 +171,19 @@ export async function GET() {
         toRole: "CEO",
       },
     };
+  } else if (me.role === "HR_ADMIN") {
+    // For HR_ADMIN: show only requests that HR_ADMIN hasn't acted on yet
+    // (i.e., no approval record by HR_ADMIN with FORWARDED/APPROVED/REJECTED)
+    whereClause.approvals = {
+      none: {
+        approverId: me.id,
+        decision: {
+          in: ["FORWARDED", "APPROVED", "REJECTED"],
+        },
+      },
+    };
   }
-  // HR_ADMIN sees all SUBMITTED/PENDING requests (no filter)
+  // HR_ADMIN sees all SUBMITTED/PENDING requests that they haven't acted on
 
   // Get pending requests (no duplicates since we're querying LeaveRequest directly)
   const items = await prisma.leaveRequest.findMany({

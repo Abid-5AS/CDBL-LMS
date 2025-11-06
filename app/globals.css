@@ -1,6 +1,77 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Elevation Tokens for Material You × Liquid Glass */
+:root {
+  --elevation-1: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --elevation-2: 0 4px 8px rgba(0, 0, 0, 0.12);
+  --elevation-3: 0 8px 16px rgba(0, 0, 0, 0.16);
+  --elevation-4: 0 12px 24px rgba(0, 0, 0, 0.20);
+}
+
+.dark {
+  --elevation-1: 0 2px 4px rgba(0, 0, 0, 0.35);
+  --elevation-2: 0 4px 8px rgba(0, 0, 0, 0.45);
+  --elevation-3: 0 8px 16px rgba(0, 0, 0, 0.55);
+  --elevation-4: 0 12px 24px rgba(0, 0, 0, 0.65);
+}
+
+/* Liquid Glass Utility Classes - Material You × iOS Glass */
+.glass-card {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1rem;
+  box-shadow: var(--elevation-2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dark .glass-card {
+  background: rgba(26, 31, 46, 0.4);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: var(--elevation-2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: var(--elevation-3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.dark .glass-card:hover {
+  background: rgba(26, 31, 46, 0.5);
+  box-shadow: var(--elevation-3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-nav {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.dark .glass-nav {
+  background: rgba(15, 23, 42, 0.7);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.35);
+}
+
+.glass-modal {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: var(--elevation-4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass-modal {
+  background: rgba(26, 31, 46, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  box-shadow: var(--elevation-4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
 /* Dashboard Redesign Styles */
 .modern-background {
   background-color: #F9FAFB;

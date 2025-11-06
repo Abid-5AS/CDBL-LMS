@@ -17,8 +17,8 @@ export function canViewAllRequests(role: AppRole) {
 }
 
 export function canApprove(role: AppRole) {
+  // HR_ADMIN is operational only (forward/reject/return), not approval authority
   return (
-    role === "HR_ADMIN" ||
     role === "HR_HEAD" ||
     role === "CEO" ||
     role === "DEPT_HEAD" ||
@@ -80,9 +80,9 @@ export function canEditEmployee(
     return targetRole !== "CEO" && targetRole !== "HR_HEAD";
   }
 
-  // HR_ADMIN can only edit EMPLOYEE and DEPT_HEAD
+  // HR_ADMIN cannot edit employees (employee management moved to SYSTEM_ADMIN)
   if (viewerRole === "HR_ADMIN") {
-    return targetRole === "EMPLOYEE" || targetRole === "DEPT_HEAD";
+    return false;
   }
 
   // DEPT_HEAD and EMPLOYEE cannot edit other users
@@ -138,9 +138,9 @@ export function canAssignRole(
     return ["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN"].includes(targetRole);
   }
 
-  // HR_ADMIN can only assign EMPLOYEE and DEPT_HEAD
+  // HR_ADMIN cannot assign roles (role assignment moved to SYSTEM_ADMIN)
   if (viewerRole === "HR_ADMIN") {
-    return ["EMPLOYEE", "DEPT_HEAD"].includes(targetRole);
+    return false;
   }
 
   // Others cannot assign roles
@@ -152,12 +152,8 @@ export function canAssignRole(
  * @param role - The role of the person trying to create
  */
 export function canCreateEmployee(role: AppRole): boolean {
-  return (
-    role === "HR_ADMIN" ||
-    role === "HR_HEAD" ||
-    role === "CEO" ||
-    role === "SYSTEM_ADMIN"
-  );
+  // Employee creation moved to SYSTEM_ADMIN only
+  return role === "SYSTEM_ADMIN";
 }
 
 /**
@@ -205,5 +201,29 @@ export function canReturn(role: AppRole): boolean {
  * Only SYSTEM_ADMIN can manage system structure
  */
 export function canManageSystemStructure(role: AppRole): boolean {
+  return role === "SYSTEM_ADMIN";
+}
+
+/**
+ * Check if a role can manage leave policies
+ * Only SYSTEM_ADMIN can manage policies
+ */
+export function canManagePolicy(role: AppRole): boolean {
+  return role === "SYSTEM_ADMIN";
+}
+
+/**
+ * Check if a role can manage holidays
+ * Only SYSTEM_ADMIN can manage holidays
+ */
+export function canManageHolidays(role: AppRole): boolean {
+  return role === "SYSTEM_ADMIN";
+}
+
+/**
+ * Check if a role can view audit logs
+ * Only SYSTEM_ADMIN can view audit logs
+ */
+export function canViewAudit(role: AppRole): boolean {
   return role === "SYSTEM_ADMIN";
 }

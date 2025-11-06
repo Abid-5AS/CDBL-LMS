@@ -10,8 +10,8 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   
-  const allowedRoles = ["HR_ADMIN", "HR_HEAD", "CEO"];
-  if (!allowedRoles.includes(user.role as string)) {
+  // Audit logs restricted to SYSTEM_ADMIN only
+  if (user.role !== "SYSTEM_ADMIN") {
     return NextResponse.json({ error: "Access denied" }, { status: 403 });
   }
 

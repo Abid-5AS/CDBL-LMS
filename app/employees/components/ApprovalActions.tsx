@@ -14,8 +14,11 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { submitApprovalDecision } from "@/lib/api";
+import { useUser } from "@/lib/user-context";
+import { ArrowRight, RotateCcw } from "lucide-react";
+import type { AppRole } from "@/lib/rbac";
 
-type ActionType = "approve" | "reject";
+type ActionType = "approve" | "reject" | "forward" | "return";
 
 type ApprovalActionsProps = {
   pendingRequestId?: number | null;
@@ -29,6 +32,9 @@ export function ApprovalActions({ pendingRequestId, employeeName, employeeRole, 
   const isEmployee = employeeRole === "EMPLOYEE";
   const canAct = Boolean(pendingRequestId) && isEmployee;
   const router = useRouter();
+  const user = useUser();
+  const viewerRole = (user?.role as AppRole) || "EMPLOYEE";
+  const isHRAdmin = viewerRole === "HR_ADMIN";
   const [dialogOpen, setDialogOpen] = useState(false);
   const [action, setAction] = useState<ActionType>("approve");
   const [note, setNote] = useState("");
@@ -42,15 +48,49 @@ export function ApprovalActions({ pendingRequestId, employeeName, employeeRole, 
 
   const handleOpen = useCallback((nextAction: ActionType) => {
     setAction(nextAction);
-    setDialogOpen(true);
+    // For return action, require comment
+    if (nextAction === "return") {
+      setDialogOpen(true);
+    } else {
+      setDialogOpen(true);
+    }
   }, []);
 
   const runAction = useCallback(async () => {
     if (!pendingRequestId) return;
     try {
       setSubmitting(true);
-      await submitApprovalDecision(String(pendingRequestId), action, note.trim() ? note.trim() : undefined);
-      toast.success(`Request ${action === "approve" ? "approved" : "rejected"} successfully.`);
+      
+      if (action === "forward") {
+        const res = await fetch(`/api/leaves/${pendingRequestId}/forward`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || "Failed to forward request");
+        }
+        toast.success("Request forwarded successfully");
+      } else if (action === "return") {
+        if (!note.trim() || note.trim().length < 5) {
+          toast.error("Comment must be at least 5 characters when returning a request");
+          return;
+        }
+        const res = await fetch(`/api/leaves/${pendingRequestId}/return`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ comment: note.trim() }),
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || "Failed to return request");
+        }
+        toast.success("Request returned for modification");
+      } else {
+        await submitApprovalDecision(String(pendingRequestId), action, note.trim() ? note.trim() : undefined);
+        toast.success(`Request ${action === "approve" ? "approved" : "rejected"} successfully.`);
+      }
+      
       startTransition(() => {
         router.push("/approvals");
         router.refresh();
@@ -77,16 +117,48 @@ export function ApprovalActions({ pendingRequestId, employeeName, employeeRole, 
             <Button variant="outline" onClick={() => router.push("/approvals")} disabled={isPending || submitting}>
               Back to Approvals
             </Button>
-            <Button
-              variant="destructive"
-              onClick={() => handleOpen("reject")}
-              disabled={!canAct || submitting || isPending}
-            >
-              Reject
-            </Button>
-            <Button onClick={() => handleOpen("approve")} disabled={!canAct || submitting || isPending}>
-              Approve
-            </Button>
+            {isHRAdmin ? (
+              // HR Admin: Forward, Reject, Return
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => handleOpen("forward")}
+                  disabled={!canAct || submitting || isPending}
+                >
+                  <ArrowRight className="mr-2 h-4 w-4" />
+                  Forward
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => handleOpen("reject")}
+                  disabled={!canAct || submitting || isPending}
+                >
+                  Reject
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => handleOpen("return")}
+                  disabled={!canAct || submitting || isPending}
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  Return
+                </Button>
+              </>
+            ) : (
+              // HR_HEAD, CEO: Approve, Reject
+              <>
+                <Button
+                  variant="destructive"
+                  onClick={() => handleOpen("reject")}
+                  disabled={!canAct || submitting || isPending}
+                >
+                  Reject
+                </Button>
+                <Button onClick={() => handleOpen("approve")} disabled={!canAct || submitting || isPending}>
+                  Approve
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -94,25 +166,46 @@ export function ApprovalActions({ pendingRequestId, employeeName, employeeRole, 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{action === "approve" ? "Approve Leave Request" : "Reject Leave Request"}</DialogTitle>
+            <DialogTitle>
+              {action === "approve" && "Approve Leave Request"}
+              {action === "reject" && "Reject Leave Request"}
+              {action === "forward" && "Forward Leave Request"}
+              {action === "return" && "Return Leave Request for Modification"}
+            </DialogTitle>
             <DialogDescription>
-              {action === "approve"
-                ? `Confirm you want to approve ${employeeName}'s leave request.`
-                : `Please provide a reason for rejecting ${employeeName}'s leave request.`}
+              {action === "approve" && `Confirm you want to approve ${employeeName}'s leave request.`}
+              {action === "reject" && `Please provide a reason for rejecting ${employeeName}'s leave request.`}
+              {action === "forward" && `Forward ${employeeName}'s leave request to the next approver in the chain.`}
+              {action === "return" && `Return ${employeeName}'s leave request for modification. Please provide a reason (minimum 5 characters).`}
             </DialogDescription>
           </DialogHeader>
           <Textarea
             value={note}
             onChange={(event) => setNote(event.target.value)}
-            placeholder="Add an optional note for the employee..."
+            placeholder={
+              action === "return"
+                ? "Required: Provide a reason for returning this request (minimum 5 characters)..."
+                : action === "forward"
+                ? "Optional: Add a note about forwarding this request..."
+                : "Add an optional note for the employee..."
+            }
             className="min-h-[120px]"
+            required={action === "return"}
           />
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={submitting}>
               Cancel
             </Button>
-            <Button onClick={runAction} disabled={submitting}>
-              {submitting ? "Processing..." : action === "approve" ? "Confirm Approve" : "Confirm Reject"}
+            <Button onClick={runAction} disabled={submitting || (action === "return" && (!note.trim() || note.trim().length < 5))}>
+              {submitting
+                ? "Processing..."
+                : action === "approve"
+                ? "Confirm Approve"
+                : action === "reject"
+                ? "Confirm Reject"
+                : action === "forward"
+                ? "Confirm Forward"
+                : "Confirm Return"}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -52,7 +52,7 @@ const FILTER_OPTIONS = [
   { value: "cancelled", label: "Cancelled" },
 ];
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 5;
 
 export function MyLeavesPageContent() {
   const searchParams = useSearchParams();
@@ -222,9 +222,9 @@ export function MyLeavesPageContent() {
           >
             <Card className="overflow-hidden">
               <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
+                <div className="overflow-x-auto md:overflow-x-visible overflow-y-auto max-h-[450px]">
+                  <Table className="[&_[data-slot=table-container]]:overflow-visible [&_[data-slot=table-container]]:relative">
+                    <TableHeader className="[&_tr]:sticky [&_tr]:top-0 [&_tr]:z-10 [&_tr]:bg-white [&_tr]:dark:bg-neutral-950 [&_tr]:backdrop-blur-sm">
                       <TableRow className="bg-muted/30 hover:bg-muted/30 border-b border-neutral-200/70 dark:border-neutral-800/70">
                         <TableHead className="text-xs font-medium text-neutral-700 dark:text-neutral-300">Type</TableHead>
                         <TableHead className="hidden sm:table-cell text-xs font-medium text-neutral-700 dark:text-neutral-300">Dates</TableHead>

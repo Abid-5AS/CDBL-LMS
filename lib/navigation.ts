@@ -25,7 +25,7 @@ export type NavItem = {
 // Define role-specific navigation
 export const roleNavConfig: Record<UserRole, NavItem[]> = {
   EMPLOYEE: [
-    { icon: Home, label: "Home", href: "/dashboard" },
+    { icon: Home, label: "Home", href: "/dashboard/employee" },
     { icon: FileText, label: "Apply", href: "/leaves/apply" },
     { icon: ClipboardList, label: "My Leaves", href: "/leaves" },
     { icon: BookOpen, label: "Policies", href: "/policies" },
@@ -33,30 +33,27 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
   ],
 
   DEPT_HEAD: [
-    { icon: Home, label: "Home", href: "/manager/dashboard" },
+    { icon: Home, label: "Home", href: "/dashboard/dept-head" },
     { icon: ClipboardList, label: "Approvals", href: "/approvals" },
     { icon: Users, label: "Team", href: "/employees" },
     { icon: FileText, label: "My Leaves", href: "/leaves" },
   ],
 
   HR_ADMIN: [
-    { icon: Home, label: "Home", href: "/dashboard" },
-    { icon: Shield, label: "Admin", href: "/admin" },
-    { icon: Users, label: "Employees", href: "/employees" },
-    { icon: ClipboardList, label: "Approvals", href: "/approvals" },
-    { icon: Activity, label: "Audit", href: "/admin/audit" },
+    { icon: Home, label: "Home", href: "/dashboard/hr-admin" },
+    { icon: BookOpen, label: "Policies", href: "/policies" },
   ],
 
   HR_HEAD: [
-    { icon: Home, label: "Home", href: "/hr-head/dashboard" },
-    { icon: UserCheck, label: "HR Dashboard", href: "/hr-head/dashboard" },
+    { icon: Home, label: "Home", href: "/dashboard/hr-head" },
+    { icon: UserCheck, label: "HR Dashboard", href: "/dashboard/hr-head" },
     { icon: ClipboardList, label: "Approvals", href: "/approvals" },
     { icon: Activity, label: "Audit", href: "/admin/audit" },
     { icon: Shield, label: "Admin", href: "/admin" },
   ],
 
   CEO: [
-    { icon: Home, label: "Home", href: "/ceo/dashboard" },
+    { icon: Home, label: "Home", href: "/dashboard/ceo" },
     { icon: BarChart2, label: "Reports", href: "/reports" },
     { icon: Shield, label: "Admin", href: "/admin" },
     { icon: Activity, label: "Audit", href: "/admin/audit" },
@@ -64,7 +61,7 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
   ],
 
   SYSTEM_ADMIN: [
-    { icon: Home, label: "Home", href: "/admin" },
+    { icon: Home, label: "Home", href: "/dashboard/admin" },
     { icon: Shield, label: "Admin", href: "/admin" },
     { icon: Users, label: "Employees", href: "/employees" },
     { icon: Activity, label: "Audit", href: "/admin/audit" },
@@ -73,12 +70,12 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
 
 // Role-specific home pages
 export const roleHomePages: Record<UserRole, string> = {
-  EMPLOYEE: "/dashboard",
-  DEPT_HEAD: "/manager/dashboard",
-  HR_ADMIN: "/dashboard",
-  HR_HEAD: "/hr-head/dashboard",
-  CEO: "/ceo/dashboard",
-  SYSTEM_ADMIN: "/admin",
+  EMPLOYEE: "/dashboard/employee",
+  DEPT_HEAD: "/dashboard/dept-head",
+  HR_ADMIN: "/dashboard/hr-admin",
+  HR_HEAD: "/dashboard/hr-head",
+  CEO: "/dashboard/ceo",
+  SYSTEM_ADMIN: "/dashboard/admin",
 };
 
 // Get navigation items for a role

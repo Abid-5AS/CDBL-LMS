@@ -1,44 +1,79 @@
-import { format, subMonths } from "date-fns";
-import { prisma } from "@/lib/prisma";
-import { LeaveStatus } from "@prisma/client";
+"use client";
+
+import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { LeaveTrendChart } from "./LeaveTrendChart";
+import { EmptyState } from "@/components/ui/empty-state";
+import { BarChart3 } from "lucide-react";
 
 type ChartData = {
   month: string;
   leaves: number;
 };
 
-async function getLeaveTrendData(): Promise<ChartData[]> {
-  const now = new Date();
-  const data: ChartData[] = [];
+const fetcher = async (url: string) => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch: ${res.statusText}`);
+  }
+  return res.json();
+};
 
-  // Get last 12 months
-  for (let i = 11; i >= 0; i--) {
-    const monthStart = subMonths(now, i);
-    const monthEnd = subMonths(now, i - 1);
-    const monthKey = format(monthStart, "MMM");
+export function LeaveTrendChartData() {
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-    const count = await prisma.leaveRequest.count({
-      where: {
-        status: LeaveStatus.APPROVED,
-        startDate: {
-          gte: monthStart,
-          lt: monthEnd,
-        },
-      },
-    });
+  const { data, error, isLoading } = useSWR<{ data: ChartData[] }>(
+    "/api/dashboard/leave-trend",
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+    }
+  );
 
-    data.push({
-      month: monthKey,
-      leaves: count,
-    });
+  // Prevent hydration mismatch by only rendering after mount
+  if (!mounted) {
+    return (
+      <div className="flex items-center justify-center h-[300px]">
+        <div className="text-sm text-muted-foreground">Loading chart data...</div>
+      </div>
+    );
   }
 
-  return data;
-}
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[300px]">
+        <div className="text-sm text-muted-foreground">Loading chart data...</div>
+      </div>
+    );
+  }
 
-export async function LeaveTrendChartData() {
-  const data = await getLeaveTrendData();
-  return <LeaveTrendChart data={data} />;
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-[300px]">
+        <div className="text-sm text-destructive">
+          Failed to load chart data: {error instanceof Error ? error.message : "Unknown error"}
+        </div>
+      </div>
+    );
+  }
+
+  if (!data?.data || !Array.isArray(data.data) || data.data.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-[300px]">
+        <EmptyState
+          icon={BarChart3}
+          title="No data available"
+          description="No leave trend data available for this period."
+        />
+      </div>
+    );
+  }
+
+  return <LeaveTrendChart data={data.data} />;
 }
 

@@ -175,8 +175,8 @@ export default function TopNavBar() {
   }, []);
 
   const breadcrumbs = useMemo(() => {
-    // For manager/dashboard, don't show breadcrumbs in navbar (page has its own)
-    if (pathname.startsWith("/manager/dashboard")) {
+    // For manager/dashboard and dept-head dashboard, don't show breadcrumbs in navbar (page has its own)
+    if (pathname.startsWith("/manager/dashboard") || pathname.startsWith("/dashboard/dept-head")) {
       return [];
     }
     return generateBreadcrumbs(pathname);
@@ -244,7 +244,7 @@ export default function TopNavBar() {
       <nav
         className={clsx(
           "fixed top-0 left-0 right-0 z-50 border-b border-border bg-background",
-          pathname.startsWith("/manager/dashboard") ? "h-12" : "h-14",
+          (pathname.startsWith("/manager/dashboard") || pathname.startsWith("/dashboard/dept-head")) ? "h-12" : "h-14",
           "shadow-sm transition-shadow duration-300",
           scrolled && "shadow-md"
         )}
@@ -253,10 +253,10 @@ export default function TopNavBar() {
       >
         <div className={clsx(
           "h-full flex items-center justify-between",
-          pathname.startsWith("/manager/dashboard") ? "w-full px-3 sm:px-4 lg:px-6" : "w-full px-4"
+          (pathname.startsWith("/manager/dashboard") || pathname.startsWith("/dashboard/dept-head")) ? "w-full px-3 sm:px-4 lg:px-6" : "w-full px-4"
         )}>
-          {/* Left Section: App Name - Only for manager dashboard */}
-          {pathname.startsWith("/manager/dashboard") ? (
+          {/* Left Section: App Name - Only for manager/dept-head dashboard */}
+          {(pathname.startsWith("/manager/dashboard") || pathname.startsWith("/dashboard/dept-head")) ? (
             <h1 className="text-sm font-semibold tracking-tight text-muted-foreground">
               CDBL Leave Management
             </h1>
@@ -353,7 +353,7 @@ export default function TopNavBar() {
           )}
 
           {/* Center Section: Greeting, Time, Date - Hidden for manager dashboard */}
-          {!pathname.startsWith("/manager/dashboard") && (
+          {!(pathname.startsWith("/manager/dashboard") || pathname.startsWith("/dashboard/dept-head")) && (
             <div
               className={clsx(
                 "hidden md:flex flex-col items-center text-xs text-muted-foreground select-none",

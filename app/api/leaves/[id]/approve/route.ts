@@ -42,6 +42,14 @@ export async function POST(
     return NextResponse.json(error("not_found", undefined, traceId), { status: 404 });
   }
 
+  // Explicitly exclude HR_ADMIN from approval (operational role only)
+  if (userRole === "HR_ADMIN") {
+    return NextResponse.json(
+      error("forbidden", "HR Admin cannot approve requests. Only HR Head, CEO, or System Admin can approve.", traceId),
+      { status: 403 }
+    );
+  }
+
   // Check if user can approve for this leave type (per-type chain logic)
   if (!canPerformAction(userRole, "APPROVE", leave.type)) {
     return NextResponse.json(error("forbidden", "You cannot approve leave requests", traceId), { status: 403 });

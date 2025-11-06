@@ -1,23 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "@/lib/user-context";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
-import {
-  LayoutDashboard,
-  CalendarPlus,
-  FileText,
-  BookOpen,
-  Menu,
-  X,
-  User,
-  Settings,
-  LogOut,
-} from "lucide-react";
+import { Menu, X, User, Settings, LogOut } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { getNavItemsForRole, type UserRole } from "@/lib/navigation";
 
 export function Navbar() {
   const user = useUser();
@@ -61,20 +52,22 @@ export function Navbar() {
     }
   }, [isMobileMenuOpen]);
 
+  // Get role-based navigation links
+  const navLinks = useMemo(() => {
+    if (!user?.role) return [];
+    return getNavItemsForRole(user.role as UserRole);
+  }, [user?.role]);
+
   if (!user) return null;
 
-  // Navigation links for employees
-  const navLinks = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/leaves/apply", label: "Apply Leave", icon: CalendarPlus },
-    { href: "/leaves", label: "My Requests", icon: FileText },
-    { href: "/policies", label: "Policy", icon: BookOpen },
-  ];
-
   const isActive = (href: string) => {
-    // Exact match for dashboard
+    // Dashboard routes - match both /dashboard and /dashboard/{role}
     if (href === "/dashboard") {
-      return pathname === "/dashboard";
+      return pathname === "/dashboard" || pathname.startsWith("/dashboard/");
+    }
+    // Role-specific dashboard routes - exact or starts with
+    if (href.startsWith("/dashboard/")) {
+      return pathname === href || pathname.startsWith(`${href}/`);
     }
     // Exact match for apply leave page
     if (href === "/leaves/apply") {
@@ -95,7 +88,7 @@ export function Navbar() {
     <motion.nav
       animate={{ height: scrolled ? 60 : 72 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="fixed top-0 z-50 w-full"
+      className=" fixed top-0 z-50 w-full"
       role="navigation"
       aria-label="Main navigation"
     >
@@ -122,6 +115,7 @@ export function Navbar() {
           <div className="glass-pill shadow-md rounded-full px-4 py-2 backdrop-blur-sm">
             <ul className="flex items-center gap-2">
               {navLinks.map((link) => {
+                const Icon = link.icon;
                 const active = isActive(link.href);
                 return (
                   <li key={link.href}>
@@ -129,12 +123,13 @@ export function Navbar() {
                       href={link.href}
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "px-3 py-1.5 rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40",
+                        "px-3 py-1.5 rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 flex items-center gap-1.5",
                         active
                           ? "text-indigo-600 dark:text-indigo-400 bg-white/60 dark:bg-white/10"
                           : "text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50 hover:bg-white/50 dark:hover:bg-white/10"
                       )}
                     >
+                      <Icon className="h-3.5 w-3.5" />
                       {link.label}
                     </Link>
                   </li>
@@ -262,6 +257,11 @@ export function Navbar() {
                   >
                     <Icon className="h-4 w-4" />
                     <span>{link.label}</span>
+                    {link.badge && (
+                      <span className="ml-auto px-2 py-0.5 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300">
+                        {link.badge}
+                      </span>
+                    )}
                   </Link>
                 );
               })}

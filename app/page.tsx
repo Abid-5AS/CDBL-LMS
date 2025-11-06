@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { unstable_noStore as noStore } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
+import { getHomePageForRole, type UserRole } from "@/lib/navigation";
 
 export default async function Home() {
   noStore();
@@ -8,14 +9,9 @@ export default async function Home() {
   
   if (user) {
     // User is authenticated, redirect based on role
-    const role = user.role as string;
-    if (role === "HR_ADMIN") {
-      redirect("/approvals");
-    }
-    if (role === "CEO") {
-      redirect("/admin");
-    }
-    redirect("/dashboard");
+    const role = user.role as UserRole;
+    const homePage = getHomePageForRole(role);
+    redirect(homePage);
   }
   
   // User is not authenticated, redirect to login

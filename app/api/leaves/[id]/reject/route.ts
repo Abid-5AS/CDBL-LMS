@@ -42,17 +42,28 @@ export async function POST(
     return NextResponse.json(error("not_found", undefined, traceId), { status: 404 });
   }
 
-  // Check if user can reject for this leave type (per-type chain logic)
-  if (!canPerformAction(userRole, "REJECT", leave.type)) {
-    return NextResponse.json(error("forbidden", "You cannot reject leave requests", traceId), { status: 403 });
-  }
-
-  // Verify user is final approver for this leave type
-  if (!isFinalApprover(userRole, leave.type)) {
-    return NextResponse.json(
-      error("forbidden", "Only the final approver can reject leave requests", traceId),
-      { status: 403 }
-    );
+  // HR_ADMIN can reject (operational role) - allow without final approver check
+  // For other roles, must be final approver
+  if (leave.type) {
+    // HR_ADMIN can always reject (operational role)
+    if (userRole !== "HR_ADMIN") {
+      // For other roles, check if they can reject for this leave type (per-type chain logic)
+      if (!canPerformAction(userRole, "REJECT", leave.type)) {
+        return NextResponse.json(error("forbidden", "You cannot reject leave requests", traceId), { status: 403 });
+      }
+      // Must be final approver (unless HR_ADMIN)
+      if (!isFinalApprover(userRole, leave.type)) {
+        return NextResponse.json(
+          error("forbidden", "Only the final approver can reject leave requests", traceId),
+          { status: 403 }
+        );
+      }
+    }
+  } else {
+    // Fallback: HR_ADMIN can reject, but others need to be final approvers
+    if (userRole !== "HR_ADMIN" && !canPerformAction(userRole, "REJECT")) {
+      return NextResponse.json(error("forbidden", "You cannot reject leave requests", traceId), { status: 403 });
+    }
   }
 
   // Parse request body

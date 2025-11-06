@@ -14,7 +14,7 @@ export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // 🔓 Public paths
-  const publicPaths = ["/login", "/api/login", "/api/logout", "/api/notifications/latest"];
+  const publicPaths = ["/login", "/api/login", "/api/logout", "/api/auth/logout", "/api/notifications/latest"];
   if (
     publicPaths.some((p) => pathname.startsWith(p)) ||
     pathname.startsWith("/_next") ||
@@ -34,29 +34,48 @@ export async function proxy(req: NextRequest) {
     const { payload } = await jwtVerify(token, SECRET_KEY, { algorithms: ["HS256"] });
     const role = payload.role as string;
 
-    // 🧭 Role hierarchy
+    // 🧭 Role hierarchy - updated to new dashboard routes
     const rolePathMap: Record<string, string[]> = {
-      EMPLOYEE: ["/dashboard"],
-      DEPT_HEAD: ["/manager"],
-      HR_ADMIN: ["/admin"],
-      HR_HEAD: ["/hr-head"],
-      CEO: ["/ceo", "/admin"],
-      SYSTEM_ADMIN: ["/admin"],
+      EMPLOYEE: ["/dashboard/employee"],
+      DEPT_HEAD: ["/dashboard/dept-head"],
+      HR_ADMIN: ["/dashboard/hr-admin"],
+      HR_HEAD: ["/dashboard/hr-head"],
+      CEO: ["/dashboard/ceo"],
+      SYSTEM_ADMIN: ["/dashboard/admin"],
     };
 
-    // 🧱 RBAC checks
+    // 🧱 RBAC checks for dashboard routes
+    if (pathname.startsWith("/dashboard/employee") && role !== "EMPLOYEE")
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+
+    if (pathname.startsWith("/dashboard/hr-admin") && role !== "HR_ADMIN")
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+
+    if (pathname.startsWith("/dashboard/dept-head") && !["DEPT_HEAD", "CEO"].includes(role))
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+
+    if (pathname.startsWith("/dashboard/hr-head") && !["HR_HEAD", "CEO"].includes(role))
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+
+    if (pathname.startsWith("/dashboard/ceo") && role !== "CEO")
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+
+    if (pathname.startsWith("/dashboard/admin") && role !== "SYSTEM_ADMIN")
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+
+    // 🧱 RBAC checks for legacy routes (redirect to new routes)
     // /admin routes: HR_ADMIN, HR_HEAD, CEO, SYSTEM_ADMIN can access
     if (pathname.startsWith("/admin") && !["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"].includes(role))
       return NextResponse.redirect(new URL("/dashboard", req.url));
 
     if (pathname.startsWith("/ceo") && role !== "CEO")
-      return NextResponse.redirect(new URL(rolePathMap[role]?.[0] || "/dashboard", req.url));
+      return NextResponse.redirect(new URL("/dashboard", req.url));
 
     if (pathname.startsWith("/hr-head") && !["HR_HEAD", "CEO"].includes(role))
-      return NextResponse.redirect(new URL(rolePathMap[role]?.[0] || "/dashboard", req.url));
+      return NextResponse.redirect(new URL("/dashboard", req.url));
 
     if (pathname.startsWith("/manager") && !["DEPT_HEAD", "CEO"].includes(role))
-      return NextResponse.redirect(new URL(rolePathMap[role]?.[0] || "/dashboard", req.url));
+      return NextResponse.redirect(new URL("/dashboard", req.url));
 
     // Employees page: HR_ADMIN, HR_HEAD, CEO, DEPT_HEAD only
     if (pathname.startsWith("/employees") && !["HR_ADMIN", "HR_HEAD", "CEO", "DEPT_HEAD"].includes(role))

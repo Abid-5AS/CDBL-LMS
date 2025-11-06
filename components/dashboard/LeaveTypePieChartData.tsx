@@ -1,36 +1,79 @@
-import { prisma } from "@/lib/prisma";
-import { LeaveStatus } from "@prisma/client";
+"use client";
+
+import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { LeaveTypePieChart } from "./LeaveTypePieChart";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PieChart } from "lucide-react";
 
 type ChartData = {
   name: string;
   value: number;
 };
 
-async function getLeaveTypeDistribution(): Promise<ChartData[]> {
-  const leaves = await prisma.leaveRequest.findMany({
-    where: {
-      status: LeaveStatus.APPROVED,
-    },
-    select: {
-      type: true,
-    },
-  });
+const fetcher = async (url: string) => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch: ${res.statusText}`);
+  }
+  return res.json();
+};
 
-  const distribution = new Map<string, number>();
-  leaves.forEach((leave) => {
-    const count = distribution.get(leave.type) || 0;
-    distribution.set(leave.type, count + 1);
-  });
+export function LeaveTypePieChartData() {
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  return Array.from(distribution.entries()).map(([type, count]) => ({
-    name: type.replace("_", " "),
-    value: count,
-  }));
-}
+  const { data, error, isLoading } = useSWR<{ data: ChartData[] }>(
+    "/api/dashboard/leave-type-distribution",
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+    }
+  );
 
-export async function LeaveTypePieChartData() {
-  const data = await getLeaveTypeDistribution();
-  return <LeaveTypePieChart data={data} />;
+  // Prevent hydration mismatch by only rendering after mount
+  if (!mounted) {
+    return (
+      <div className="flex items-center justify-center h-[300px]">
+        <div className="text-sm text-muted-foreground">Loading chart data...</div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[300px]">
+        <div className="text-sm text-muted-foreground">Loading chart data...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-[300px]">
+        <div className="text-sm text-destructive">
+          Failed to load chart data: {error instanceof Error ? error.message : "Unknown error"}
+        </div>
+      </div>
+    );
+  }
+
+  if (!data?.data || !Array.isArray(data.data) || data.data.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-[300px]">
+        <EmptyState
+          icon={PieChart}
+          title="No data available"
+          description="No leave type distribution data available."
+        />
+      </div>
+    );
+  }
+
+  return <LeaveTypePieChart data={data.data} />;
 }
 

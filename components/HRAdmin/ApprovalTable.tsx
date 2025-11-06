@@ -15,6 +15,9 @@ import { useSelectionContext } from "@/lib/selection-context";
 import { Checkbox } from "@/components/ui/checkbox";
 import clsx from "clsx";
 import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/toast-messages";
+import { useUser } from "@/lib/user-context";
+import { ArrowRight, RotateCcw } from "lucide-react";
+import type { AppRole } from "@/lib/rbac";
 
 type ApprovalsResponse = { items: HRApprovalItem[] };
 
@@ -57,6 +60,9 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   const [typeFilter, setTypeFilter] = useState("all");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const { setSelectionCount } = useSelectionContext();
+  const user = useUser();
+  const userRole = (user?.role as AppRole) || "EMPLOYEE";
+  const isHRAdmin = userRole === "HR_ADMIN";
 
   // Update selection count when selectedIds changes
   useEffect(() => {
@@ -112,11 +118,42 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     }
   }, [items, onDataChange]);
 
-  async function handleDecision(id: string, action: "approve" | "reject") {
+  async function handleDecision(id: string, action: "approve" | "reject" | "forward" | "return") {
     try {
       setProcessingId(id + action);
-      await submitApprovalDecision(id, action);
-      toast.success(action === "approve" ? SUCCESS_MESSAGES.leave_approved : SUCCESS_MESSAGES.leave_rejected);
+      
+      if (action === "forward") {
+        const res = await fetch(`/api/leaves/${id}/forward`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || "Failed to forward request");
+        }
+        toast.success("Request forwarded successfully");
+      } else if (action === "return") {
+        const comment = prompt("Please provide a reason for returning this request (minimum 5 characters):");
+        if (!comment || comment.length < 5) {
+          toast.error("Comment must be at least 5 characters");
+          setProcessingId(null);
+          return;
+        }
+        const res = await fetch(`/api/leaves/${id}/return`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ comment }),
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || "Failed to return request");
+        }
+        toast.success("Request returned for modification");
+      } else {
+        await submitApprovalDecision(id, action);
+        toast.success(action === "approve" ? SUCCESS_MESSAGES.leave_approved : SUCCESS_MESSAGES.leave_rejected);
+      }
+      
       // Remove from selection if selected
       setSelectedIds((prev) => {
         const next = new Set(prev);
@@ -275,28 +312,84 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                   <TableCell className="text-sm font-medium capitalize text-slate-700">{stage.toLowerCase()}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleDecision(item.id, "approve");
-                        }}
-                        disabled={processingId !== null}
-                      >
-                        {processingId === item.id + "approve" ? "Approving..." : "Approve"}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleDecision(item.id, "reject");
-                        }}
-                        disabled={processingId !== null}
-                      >
-                        {processingId === item.id + "reject" ? "Rejecting..." : "Reject"}
-                      </Button>
+                      {isHRAdmin ? (
+                        // HR Admin: Forward, Reject, Return
+                        <>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleDecision(item.id, "forward");
+                            }}
+                            disabled={processingId !== null}
+                          >
+                            {processingId === item.id + "forward" ? (
+                              "Forwarding..."
+                            ) : (
+                              <>
+                                <ArrowRight className="mr-1 h-3 w-3" />
+                                Forward
+                              </>
+                            )}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleDecision(item.id, "reject");
+                            }}
+                            disabled={processingId !== null}
+                          >
+                            {processingId === item.id + "reject" ? "Rejecting..." : "Reject"}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleDecision(item.id, "return");
+                            }}
+                            disabled={processingId !== null}
+                          >
+                            {processingId === item.id + "return" ? (
+                              "Returning..."
+                            ) : (
+                              <>
+                                <RotateCcw className="mr-1 h-3 w-3" />
+                                Return
+                              </>
+                            )}
+                          </Button>
+                        </>
+                      ) : (
+                        // HR_HEAD, CEO: Approve, Reject
+                        <>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleDecision(item.id, "approve");
+                            }}
+                            disabled={processingId !== null}
+                          >
+                            {processingId === item.id + "approve" ? "Approving..." : "Approve"}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleDecision(item.id, "reject");
+                            }}
+                            disabled={processingId !== null}
+                          >
+                            {processingId === item.id + "reject" ? "Rejecting..." : "Reject"}
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

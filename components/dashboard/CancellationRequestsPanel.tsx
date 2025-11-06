@@ -1,11 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
-import { XCircle, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
 import Link from "next/link";
@@ -42,51 +39,47 @@ export function CancellationRequestsPanel() {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent className="py-12 text-center text-sm text-muted-foreground">Loading...</CardContent>
-      </Card>
+      <div className="glass-card rounded-2xl p-12 text-center text-sm text-muted-foreground">
+        Loading...
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Card>
-        <CardContent className="py-12 text-center text-sm text-red-600">
-          Failed to load cancellation requests
-        </CardContent>
-      </Card>
+      <div className="glass-card rounded-2xl p-12 text-center text-sm text-red-600">
+        Failed to load cancellation requests
+      </div>
     );
   }
 
   if (cancellationRequests.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <div className="glass-card rounded-2xl overflow-hidden">
+        <div className="px-6 pt-6">
+          <div className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5" />
-            Cancellation Requests
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <EmptyState
-            icon={XCircle}
-            title="No cancellation requests"
-            description="There are no pending cancellation requests awaiting HR review."
-          />
-        </CardContent>
-      </Card>
+            <h3 className="text-lg font-semibold">Cancellation Requests</h3>
+          </div>
+        </div>
+        <div className="p-6">
+          <div className="py-8 text-center">
+            <p className="text-sm text-muted-foreground">No cancellation requests</p>
+          </div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <div className="glass-card rounded-2xl overflow-hidden">
+      <div className="px-6 pt-6">
+        <div className="flex items-center gap-2">
           <AlertCircle className="h-5 w-5 text-amber-600" />
-          Cancellation Requests ({cancellationRequests.length})
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
+          <h3 className="text-lg font-semibold">Cancellation Requests</h3>
+        </div>
+      </div>
+      <div className="px-6 pb-6">
         <Table aria-label="Cancellation requests table">
           <TableHeader>
             <TableRow>
@@ -130,15 +123,8 @@ export function CancellationRequestsPanel() {
             })}
           </TableBody>
         </Table>
-        {cancellationRequests.length > 5 && (
-          <div className="p-4 text-center border-t">
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/approvals?status=CANCELLATION_REQUESTED">View all ({cancellationRequests.length})</Link>
-            </Button>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 

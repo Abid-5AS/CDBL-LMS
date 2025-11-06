@@ -132,7 +132,7 @@ export const shadowTokens = {
 
 export const typographyTokens = {
   fontFamily: {
-    sans: "var(--font-geist-sans, 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif)",
+    sans: "var(--font-geist-sans, 'Inter', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif)",
     mono: "var(--font-geist-mono, 'IBM Plex Mono', 'Fira Code', monospace)",
   },
   fontSize: {
@@ -176,6 +176,46 @@ export const transitionTokens = {
     easeOut: "cubic-bezier(0, 0, 0.2, 1)",
     easeInOut: "cubic-bezier(0.4, 0, 0.2, 1)",
     spring: "cubic-bezier(0.22, 1, 0.36, 1)",
+  },
+} as const;
+
+// Transparency tokens for liquid glass effects
+export const transparencyTokens = {
+  light: {
+    glassCard: "rgba(255, 255, 255, 0.4)",
+    glassNav: "rgba(255, 255, 255, 0.7)",
+    glassModal: "rgba(255, 255, 255, 0.9)",
+    glassBorder: "rgba(255, 255, 255, 0.2)",
+    backdropBlur: "blur(24px)",
+    backdropSaturate: "saturate(180%)",
+  },
+  dark: {
+    glassCard: "rgba(26, 31, 46, 0.4)",
+    glassNav: "rgba(15, 23, 42, 0.7)",
+    glassModal: "rgba(26, 31, 46, 0.9)",
+    glassBorder: "rgba(148, 163, 184, 0.18)",
+    backdropBlur: "blur(24px)",
+    backdropSaturate: "saturate(180%)",
+  },
+} as const;
+
+// Dynamic accent palette from system theme (HSL primary, secondary)
+export const dynamicAccentPalette = {
+  light: {
+    primary: "hsl(243, 75%, 59%)", // indigo-600
+    primaryHover: "hsl(243, 75%, 65%)",
+    secondary: "hsl(217, 91%, 60%)", // blue-500
+    secondaryHover: "hsl(217, 91%, 65%)",
+    accent: "hsl(243, 75%, 59%)",
+    accentMuted: "hsla(243, 75%, 59%, 0.12)",
+  },
+  dark: {
+    primary: "hsl(243, 75%, 68%)", // indigo-400
+    primaryHover: "hsl(243, 75%, 73%)",
+    secondary: "hsl(217, 91%, 68%)", // blue-400
+    secondaryHover: "hsl(217, 91%, 73%)",
+    accent: "hsl(243, 75%, 68%)",
+    accentMuted: "hsla(243, 75%, 68%, 0.22)",
   },
 } as const;
 
@@ -310,6 +350,8 @@ export const designTokens = {
   shadowTokens,
   typographyTokens,
   transitionTokens,
+  transparencyTokens,
+  dynamicAccentPalette,
   roleThemes,
 };
 

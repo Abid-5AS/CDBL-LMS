@@ -208,7 +208,7 @@ export function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function onSubmit(e: FormEvent) {
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -230,8 +230,9 @@ export function LoginForm() {
         setLoading(false);
         
         // Add shake animation
-        const form = e.currentTarget.closest("form");
-        if (form) {
+        // In a form submit handler, currentTarget is the form element
+        const form = e.currentTarget;
+        if (form && form instanceof HTMLFormElement) {
           form.classList.add("animate-shake-x", "animate-duration-500ms");
           setTimeout(() => {
             form.classList.remove("animate-shake-x", "animate-duration-500ms");

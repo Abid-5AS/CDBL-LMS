@@ -9,30 +9,20 @@ type NavLink = {
   label: string;
 };
 
-const EMPLOYEE_LINKS: NavLink[] = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/leaves", label: "Requests" },
-  { href: "/leaves/apply", label: "Apply" },
-  { href: "/holidays", label: "Holidays" },
-  { href: "/policies", label: "Policies" },
-];
-
-const HR_ADMIN_LINKS: NavLink[] = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/approvals", label: "Approvals" },
-  { href: "/employees", label: "Employees" },
-  { href: "/reports", label: "Reports" },
-  { href: "/settings", label: "Settings" },
-];
+import { getNavItemsForRole, type UserRole } from "@/lib/navigation";
 
 export function SegmentedNav({ role }: { role: "EMPLOYEE" | "HR_ADMIN" }) {
   const pathname = usePathname();
-  const links = role === "HR_ADMIN" ? HR_ADMIN_LINKS : EMPLOYEE_LINKS;
+  const navItems = getNavItemsForRole(role as UserRole);
+  const links = navItems.map(item => ({ href: item.href, label: item.label }));
 
   return (
     <nav className="flex items-center gap-1 rounded-full bg-gray-100 p-1" role="navigation" aria-label="Main navigation">
       {links.map((link) => {
-        const isActive = pathname === link.href || (link.href !== "/dashboard" && pathname.startsWith(link.href));
+        // Dashboard routes should match both /dashboard and /dashboard/{role}
+        const isActive = link.href === "/dashboard" 
+          ? (pathname === "/dashboard" || pathname.startsWith("/dashboard/"))
+          : (pathname === link.href || (link.href !== "/dashboard" && pathname.startsWith(`${link.href}/`)));
         
         return (
           <Link

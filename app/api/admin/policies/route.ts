@@ -6,8 +6,8 @@ export const cache = "no-store";
 
 export async function GET() {
   const user = await getCurrentUser();
-  const allowedRoles = ["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"];
-  if (!user || !allowedRoles.includes(user.role as string)) {
+  // Policy management restricted to SYSTEM_ADMIN only
+  if (!user || user.role !== "SYSTEM_ADMIN") {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 

@@ -12,6 +12,12 @@ export type BreadcrumbItem = {
  */
 const routeLabels: Record<string, string> = {
   dashboard: "Dashboard",
+  employee: "Employee",
+  "hr-admin": "HR Admin",
+  "dept-head": "Department Head",
+  "hr-head": "HR Head",
+  ceo: "Executive",
+  admin: "Admin",
   leaves: "Leaves",
   apply: "Apply",
   my: "My Requests",
@@ -22,11 +28,8 @@ const routeLabels: Record<string, string> = {
   reports: "Reports",
   settings: "Settings",
   balance: "Leave Balance",
-  admin: "Admin",
   audit: "Audit",
   manager: "Manager",
-  "hr-head": "HR Head",
-  ceo: "Executive",
   login: "Login",
 };
 
@@ -42,11 +45,30 @@ export function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
     return [{ label: "Dashboard", href: "/dashboard" }];
   }
 
-  // Special handling for manager/dashboard - return clean breadcrumb
+  // Special handling for dashboard routes - return clean breadcrumbs
+  if (pathname === "/dashboard/employee" || pathname.startsWith("/dashboard/employee")) {
+    return [{ label: "Employee Dashboard", href: "/dashboard/employee" }];
+  }
+  if (pathname === "/dashboard/hr-admin" || pathname.startsWith("/dashboard/hr-admin")) {
+    return [{ label: "HR Department Dashboard", href: "/dashboard/hr-admin" }];
+  }
+  if (pathname === "/dashboard/dept-head" || pathname.startsWith("/dashboard/dept-head")) {
+    return [{ label: "Department Head Dashboard", href: "/dashboard/dept-head" }];
+  }
+  if (pathname === "/dashboard/hr-head" || pathname.startsWith("/dashboard/hr-head")) {
+    return [{ label: "HR Head Dashboard", href: "/dashboard/hr-head" }];
+  }
+  if (pathname === "/dashboard/ceo" || pathname.startsWith("/dashboard/ceo")) {
+    return [{ label: "Executive Dashboard", href: "/dashboard/ceo" }];
+  }
+  if (pathname === "/dashboard/admin" || pathname.startsWith("/dashboard/admin")) {
+    return [{ label: "Admin Console", href: "/dashboard/admin" }];
+  }
+  // Legacy route handling
   if (pathname === "/manager/dashboard" || pathname.startsWith("/manager/dashboard")) {
     return [
       { label: "Home", href: "/dashboard" },
-      { label: "Department Head", href: "/manager/dashboard" },
+      { label: "Department Head", href: "/dashboard/dept-head" },
     ];
   }
 
