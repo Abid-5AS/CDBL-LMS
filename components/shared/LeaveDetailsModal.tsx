@@ -16,13 +16,13 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Calendar, Clock, FileText, User, MessageSquare, Eye, X } from "lucide-react";
 import { SharedTimeline } from "@/components/shared/SharedTimeline";
 import { ApprovalTimelineAdapter } from "@/components/shared/timeline-adapters";
-import { ApprovalStepper } from "@/components/dashboard/ApprovalStepper";
+import { ApprovalStepper } from "@/components/shared/forms/ApprovalStepper";
 import {
   calculateCurrentStageIndex,
   getNextApproverRole,
   getLatestApprovalDate,
   formatHeaderDate,
-} from "@/components/dashboard/approval-utils";
+} from "@/components/shared/forms/approval-utils";
 import {
   Accordion,
   AccordionContent,

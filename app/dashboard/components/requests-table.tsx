@@ -21,7 +21,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { LeaveDetailsModal } from "@/components/dashboard/LeaveDetailsModal";
+import { LeaveDetailsModal } from "@/components/shared/LeaveDetailsModal";
 import { toast } from "sonner";
 import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/toast-messages";
 import { useSelectionContext } from "@/lib/selection-context";

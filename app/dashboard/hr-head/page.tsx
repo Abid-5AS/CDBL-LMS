@@ -1,10 +1,10 @@
 import { Suspense } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { HeroStrip } from "@/components/dashboard/HeroStrip";
-import { PendingLeaveRequestsTable } from "@/components/dashboard/PendingLeaveRequestsTable";
-import { ReturnedRequestsPanel } from "@/components/dashboard/ReturnedRequestsPanel";
-import { CancellationRequestsPanel } from "@/components/dashboard/CancellationRequestsPanel";
+import { HeroStrip } from "@/components/dashboards/common/HeroStrip";
+import { PendingLeaveRequestsTable } from "@/components/dashboards/hr-admin/Sections/PendingApprovals";
+import { ReturnedRequestsPanel } from "@/components/dashboards/hr-head/Sections/ReturnedRequests";
+import { CancellationRequestsPanel } from "@/components/dashboards/hr-admin/Sections/CancellationRequests";
 import { DashboardLoadingFallback, DashboardCardSkeleton } from "../shared/LoadingFallback";
 import { DashboardLayout } from "../shared/DashboardLayout";
 

@@ -45,7 +45,7 @@ import { useUser } from "@/lib/user-context";
 import { getStatusColors } from "@/lib/status-colors";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { LeaveComparisonModal } from "./LeaveComparisonModal";
+import { LeaveComparisonModal } from "@/components/shared/LeaveComparisonModal";
 import { useFilterFromUrl } from "@/lib/url-filters";
 import { useDebounce } from "@/lib/use-debounce";
 import { DEFAULT_FILTER } from "@/types/filters";

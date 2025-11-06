@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import useSWR from "swr";
 import { useUIStore } from "@/lib/ui-state";
-import { LeaveDetailsModal } from "@/components/dashboard/LeaveDetailsModal";
+import { LeaveDetailsModal } from "@/components/shared/LeaveDetailsModal";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 

@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SegmentedControlGlider } from "./SegmentedControlGlider";
+import { SegmentedControlGlider } from "@/components/shared/widgets/SegmentedControlGlider";
 import { LeaveBalancePanel } from "@/components/shared/LeaveBalancePanel";
 import { fromDashboardSummary } from "@/components/shared/balance-adapters";
-import { TeamOnLeaveWidget } from "./TeamOnLeaveWidget";
-import { InsightsWidget } from "./InsightsWidget";
+import { TeamOnLeaveWidget } from "@/components/shared/widgets/TeamOnLeaveWidget";
+import { InsightsWidget } from "@/components/dashboards/common/InsightsWidget";
 
 interface LeaveOverviewCardProps {
   balanceData: any;

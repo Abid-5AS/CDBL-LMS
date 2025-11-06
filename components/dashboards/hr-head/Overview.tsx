@@ -4,11 +4,13 @@ import { Plus, Users, FileText, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PendingLeaveRequestsTable } from "./PendingLeaveRequestsTable";
-import { LeaveTrendChartData } from "./LeaveTrendChartData";
-import { LeaveTypePieChartData } from "./LeaveTypePieChartData";
-import { HRQuickActions } from "./HRQuickActions";
-import { CancellationRequestsPanel } from "./CancellationRequestsPanel";
+import { PendingLeaveRequestsTable } from "../hr-admin/Sections/PendingApprovals";
+import { CancellationRequestsPanel } from "../hr-admin/Sections/CancellationRequests";
+import { ChartContainer, TrendChart, TypePie } from "@/components/shared/LeaveCharts";
+import { fromDashboardAgg } from "@/components/shared/LeaveCharts/adapters";
+import { QuickActions, type QuickAction } from "@/components/shared/QuickActions";
+import { useApiQuery } from "@/lib/apiClient";
+import { Users, FileText } from "lucide-react";
 
 type HRDashboardProps = {
   username: string;
@@ -24,7 +26,15 @@ export function HRDashboard({ username }: HRDashboardProps) {
           <p className="text-sm text-muted-foreground mt-1">Welcome back, {username}</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <HRQuickActions />
+          <QuickActions
+            actions={[
+              { label: "Add Holiday", icon: Calendar, href: "/admin/holidays" },
+              { label: "Manage Employees", icon: Users, href: "/employees" },
+              { label: "Audit Logs", icon: FileText, href: "/admin/audit" },
+              { label: "Review Policies", icon: FileText, href: "/policies" },
+            ]}
+            variant="dropdown"
+          />
         </div>
       </section>
 
@@ -53,26 +63,22 @@ export function HRDashboard({ username }: HRDashboardProps) {
 
       {/* Analytics Charts */}
       <section className="grid gap-6 lg:grid-cols-2">
-        <Card className="h-auto min-h-[300px]">
-          <CardHeader>
-            <CardTitle>Monthly Leave Trend</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Suspense fallback={<ChartSkeleton />}>
-              <LeaveTrendChartData />
-            </Suspense>
-          </CardContent>
-        </Card>
-        <Card className="h-auto min-h-[300px]">
-          <CardHeader>
-            <CardTitle>Leave Type Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Suspense fallback={<ChartSkeleton />}>
-              <LeaveTypePieChartData />
-            </Suspense>
-          </CardContent>
-        </Card>
+        <ChartContainer
+          title="Monthly Leave Trend"
+          loading={false}
+          empty={false}
+          height={300}
+        >
+          <TrendChart data={[]} height={300} />
+        </ChartContainer>
+        <ChartContainer
+          title="Leave Type Distribution"
+          loading={false}
+          empty={false}
+          height={300}
+        >
+          <TypePie data={[]} height={300} />
+        </ChartContainer>
       </section>
     </div>
   );

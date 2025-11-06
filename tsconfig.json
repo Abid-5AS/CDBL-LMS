@@ -25,6 +25,12 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@shared/*": [
+        "components/shared/*"
+      ],
+      "@dash/*": [
+        "components/dashboards/*"
       ]
     }
   },

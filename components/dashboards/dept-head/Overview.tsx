@@ -1,9 +1,9 @@
 "use client";
 
 import { Suspense } from "react";
-import { DeptHeadPendingTable } from "./DeptHeadPendingTable";
-import { DeptHeadTeamOverview } from "./DeptHeadTeamOverview";
-import { DeptHeadQuickActions } from "./DeptHeadQuickActions";
+import { DeptHeadPendingTable } from "./Sections/PendingTable";
+import { DeptHeadTeamOverview } from "./Sections/TeamOverview";
+import { DeptHeadQuickActions } from "./Sections/QuickActions";
 import { Card, CardContent } from "@/components/ui/card";
 import { useApiQueryWithParams } from "@/lib/apiClient";
 import { useFilterFromUrl } from "@/lib/url-filters";

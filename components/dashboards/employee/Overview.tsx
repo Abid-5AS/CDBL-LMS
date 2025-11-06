@@ -3,10 +3,10 @@
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApiQuery } from "@/lib/apiClient";
-import { DashboardGreeting } from "./DashboardGreeting";
-import { ActionCenterCard } from "./ActionCenterCard";
-import { LeaveOverviewCard } from "./LeaveOverviewCard";
-import { HistoryAnalyticsCard } from "./HistoryAnalyticsCard";
+import { DashboardGreeting } from "./Sections/Greeting";
+import { ActionCenterCard } from "./Sections/ActionCenter";
+import { LeaveOverviewCard } from "./Sections/LeaveOverview";
+import { HistoryAnalyticsCard } from "./Sections/History";
 
 type LeaveStatus =
   | "SUBMITTED"

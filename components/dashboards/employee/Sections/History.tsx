@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SortedTimeline } from "./SortedTimeline";
-import { LeaveHeatmap } from "./LeaveHeatmap";
+import { LeaveHeatmap } from "@/components/shared/widgets/LeaveHeatmap";
 import { ChartContainer, TypePie } from "@/components/shared/LeaveCharts";
 import { fromDashboardAgg } from "@/components/shared/LeaveCharts/adapters";
 import { StatusBadge } from "@/components/shared/StatusBadge";

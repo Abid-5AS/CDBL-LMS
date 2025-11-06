@@ -1,8 +1,8 @@
 "use client";
 
 import { Suspense } from "react";
-import { PendingLeaveRequestsTable } from "./PendingLeaveRequestsTable";
-import { CancellationRequestsPanel } from "./CancellationRequestsPanel";
+import { PendingLeaveRequestsTable } from "./Sections/PendingApprovals";
+import { CancellationRequestsPanel } from "./Sections/CancellationRequests";
 import { DashboardSection } from "@/app/dashboard/shared/DashboardLayout";
 import { DashboardCardSkeleton } from "@/app/dashboard/shared/LoadingFallback";
 

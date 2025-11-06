@@ -37,6 +37,13 @@ const eslintConfig = [
               message: "ApprovalTimeline is deprecated. Use @/components/shared/SharedTimeline with ApprovalTimelineAdapter instead.",
             },
           ],
+          patterns: [
+            {
+              group: ["**/components/dashboard/**"],
+              message: "Dashboards must import from @shared or @dash only. Use @shared/* for primitives or @dash/* for role-specific components.",
+            },
+          ],
+          ],
         },
       ],
     },
