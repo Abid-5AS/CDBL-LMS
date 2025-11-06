@@ -43,7 +43,6 @@ const eslintConfig = [
               message: "Dashboards must import from @shared or @dash only. Use @shared/* for primitives or @dash/* for role-specific components.",
             },
           ],
-          ],
         },
       ],
     },
