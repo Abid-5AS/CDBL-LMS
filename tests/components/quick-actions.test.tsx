@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { QuickActions } from "@/components/dashboard/QuickActions";
+import { QuickActions } from "@/components/shared/QuickActions";
 
 describe("QuickActions Component", () => {
   const mockLeaves = [

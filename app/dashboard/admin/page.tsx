@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { SystemAdminDashboard } from "@/components/dashboard/SystemAdminDashboard";
+import { SystemAdminDashboard } from "@/components/dashboards/admin/Overview";
 import { DashboardLoadingFallback } from "../shared/LoadingFallback";
 import { DashboardLayout } from "../shared/DashboardLayout";
 
