@@ -21,6 +21,8 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronRight, Calendar } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { StatusBadge } from "@/components/shared/StatusBadge";
+import { SharedTimeline } from "@/components/shared/SharedTimeline";
+import { SortedTimelineAdapter } from "@/components/shared/timeline-adapters";
 import { getChainFor, type LeaveType } from "@/lib/workflow";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/ui-state";
@@ -251,46 +253,20 @@ export function SortedTimeline({ leaves, isLoading }: SortedTimelineProps) {
         </div>
       </CardHeader>
       <CardContent className="p-2 pt-0">
-        <ul className="space-y-2 max-h-[400px] overflow-y-auto">
-          {sortedLeaves.slice(0, 5).map((leave) => {
-            const startDate = new Date(leave.startDate);
-            const daysDiff = differenceInCalendarDays(startDate, today);
-            const badge = getDaysUntilBadge(daysDiff);
-
-            return (
-              <li
-                key={leave.id}
-                className="solid-card cursor-pointer transition-all hover:scale-[1.01] p-3"
-                onClick={() => openDrawer(leave.id)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    openDrawer(leave.id);
-                  }
-                }}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
-                        {leave.type}
-                      </p>
-                      <StatusBadge status={leave.status} />
-                      <Badge variant={badge.variant} className="text-xs shrink-0">
-                        {badge.text}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                      {formatDate(leave.startDate)} → {formatDate(leave.endDate)} ({leave.workingDays}d)
-                    </p>
-                  </div>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+        <div className="max-h-[400px] overflow-y-auto">
+          <SharedTimeline
+            items={SortedTimelineAdapter(sortedLeaves, today)}
+            variant="requests"
+            dense
+            limit={5}
+            onItemClick={(item) => {
+              const leaveId = parseInt(item.id.replace("sorted-", ""));
+              if (leaveId) {
+                openDrawer(leaveId);
+              }
+            }}
+          />
+        </div>
         {sortedLeaves.length > 5 && (
           <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-800 text-center">
             <Button
