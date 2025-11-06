@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { canForwardTo, getStepForRole, getNextRoleInChain, getStatusAfterAction, type ApprovalAction } from "@/lib/workflow";
+import { canForwardTo, getStepForRole, getNextRoleInChain, getStatusAfterAction, getChainFor, type ApprovalAction } from "@/lib/workflow";
 import { canPerformAction } from "@/lib/workflow";
 import type { AppRole } from "@/lib/rbac";
 import { LeaveStatus } from "@prisma/client";
@@ -41,9 +41,12 @@ export async function POST(
     return NextResponse.json(error("not_found", undefined, traceId), { status: 404 });
   }
 
-  // Check if user can forward for this leave type (per-type chain logic)
-  if (!canPerformAction(userRole, "FORWARD", leave.type)) {
-    return NextResponse.json(error("forbidden", "You cannot forward leave requests", traceId), { status: 403 });
+  // HR_ADMIN can forward (operational role) - allow without strict chain check
+  // For other roles, check if they can forward for this leave type (per-type chain logic)
+  if (userRole !== "HR_ADMIN") {
+    if (!canPerformAction(userRole, "FORWARD", leave.type)) {
+      return NextResponse.json(error("forbidden", "You cannot forward leave requests", traceId), { status: 403 });
+    }
   }
 
   // Check if leave is in a forwardable state
@@ -55,7 +58,13 @@ export async function POST(
   }
 
   // Get next role in chain for this leave type
-  const nextRole = getNextRoleInChain(userRole, leave.type);
+  // If HR_ADMIN is not in the chain (e.g., CASUAL leave), forward to first role in chain
+  let nextRole = getNextRoleInChain(userRole, leave.type);
+  if (!nextRole && userRole === "HR_ADMIN") {
+    // HR_ADMIN not in chain - forward to first role in chain
+    const chain = getChainFor(leave.type);
+    nextRole = chain.length > 0 ? chain[0] : null;
+  }
   if (!nextRole) {
     return NextResponse.json(
       error("no_next_role", "No next role in approval chain", traceId),
@@ -64,7 +73,8 @@ export async function POST(
   }
 
   // Validate forward target (using per-type chain)
-  if (!canForwardTo(userRole, nextRole, leave.type)) {
+  // HR_ADMIN can forward to any role in the chain (operational role)
+  if (userRole !== "HR_ADMIN" && !canForwardTo(userRole, nextRole, leave.type)) {
     return NextResponse.json(
       error("invalid_forward_target", `Cannot forward to ${nextRole}`, traceId),
       { status: 400 }

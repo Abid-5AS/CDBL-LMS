@@ -1,6 +1,7 @@
 "use client";
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
+import { ChartTooltip } from "@/components/reports/ChartTooltip";
 
 type ChartData = {
   month: string;
@@ -18,7 +19,7 @@ export function LeaveTrendChart({ data }: LeaveTrendChartProps) {
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="month" />
         <YAxis />
-        <Tooltip />
+        <RechartsTooltip content={<ChartTooltip />} />
         <Bar dataKey="leaves" fill="#2563eb" />
       </BarChart>
     </ResponsiveContainer>

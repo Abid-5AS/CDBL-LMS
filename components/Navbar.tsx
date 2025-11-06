@@ -80,6 +80,10 @@ export function Navbar() {
         (pathname.startsWith("/leaves/") && pathname !== "/leaves/apply")
       );
     }
+    // Exact match for reports page
+    if (href === "/reports") {
+      return pathname === "/reports";
+    }
     // For other routes, check exact match first, then startsWith for nested routes
     return pathname === href || pathname.startsWith(`${href}/`);
   };

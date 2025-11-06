@@ -5,6 +5,7 @@ import {
   BookOpen,
   Users,
   BarChart2,
+  ChartBar,
   Shield,
   Activity,
   UserCheck,
@@ -41,12 +42,14 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
 
   HR_ADMIN: [
     { icon: Home, label: "Home", href: "/dashboard/hr-admin" },
+    { icon: ChartBar, label: "Reports", href: "/reports" },
     { icon: BookOpen, label: "Policies", href: "/policies" },
   ],
 
   HR_HEAD: [
     { icon: Home, label: "Home", href: "/dashboard/hr-head" },
     { icon: UserCheck, label: "HR Dashboard", href: "/dashboard/hr-head" },
+    { icon: ChartBar, label: "Reports", href: "/reports" },
     { icon: ClipboardList, label: "Approvals", href: "/approvals" },
     { icon: Activity, label: "Audit", href: "/admin/audit" },
     { icon: Shield, label: "Admin", href: "/admin" },
@@ -54,7 +57,7 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
 
   CEO: [
     { icon: Home, label: "Home", href: "/dashboard/ceo" },
-    { icon: BarChart2, label: "Reports", href: "/reports" },
+    { icon: ChartBar, label: "Reports", href: "/reports" },
     { icon: Shield, label: "Admin", href: "/admin" },
     { icon: Activity, label: "Audit", href: "/admin/audit" },
     { icon: Users, label: "Employees", href: "/employees" },
@@ -62,6 +65,7 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
 
   SYSTEM_ADMIN: [
     { icon: Home, label: "Home", href: "/dashboard/admin" },
+    { icon: ChartBar, label: "Reports", href: "/reports" },
     { icon: Shield, label: "Admin", href: "/admin" },
     { icon: Users, label: "Employees", href: "/employees" },
     { icon: Activity, label: "Audit", href: "/admin/audit" },

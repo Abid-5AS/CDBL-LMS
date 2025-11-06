@@ -1,6 +1,7 @@
 "use client";
 
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from "recharts";
+import { ChartTooltip } from "@/components/reports/ChartTooltip";
 
 type ChartData = {
   name: string;
@@ -39,7 +40,7 @@ export function LeaveTypePieChart({ data }: LeaveTypePieChartProps) {
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip />
+        <RechartsTooltip content={<ChartTooltip />} />
         <Legend />
       </PieChart>
     </ResponsiveContainer>
