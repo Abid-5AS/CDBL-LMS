@@ -38,7 +38,6 @@ import {
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { StatusTabChips } from "./StatusTabChips";
 import { ReviewModal } from "@/components/shared/ReviewModal";
 import useSWR from "swr";
 import { LeaveStatus } from "@prisma/client";
