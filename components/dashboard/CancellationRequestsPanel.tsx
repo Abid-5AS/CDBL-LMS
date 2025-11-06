@@ -6,7 +6,7 @@ import { AlertCircle } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
 import Link from "next/link";
-import StatusBadge from "@/app/dashboard/components/status-badge";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import useSWR from "swr";
 
 type LeaveRequest = {

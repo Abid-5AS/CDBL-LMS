@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ClipboardCheck } from "lucide-react";
-import StatusBadge from "./status-badge";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import { leaveTypeLabel } from "@/lib/ui";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";

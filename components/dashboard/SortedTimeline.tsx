@@ -20,7 +20,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight, Calendar } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { StatusBadgeSimple } from "./StatusBadgeSimple";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import { getChainFor, type LeaveType } from "@/lib/workflow";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/ui-state";
@@ -277,7 +277,7 @@ export function SortedTimeline({ leaves, isLoading }: SortedTimelineProps) {
                       <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
                         {leave.type}
                       </p>
-                      <StatusBadgeSimple status={leave.status} />
+                      <StatusBadge status={leave.status} />
                       <Badge variant={badge.variant} className="text-xs shrink-0">
                         {badge.text}
                       </Badge>

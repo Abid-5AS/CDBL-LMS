@@ -12,7 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
-import StatusBadge from "@/app/dashboard/components/status-badge";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Calendar, Clock, FileText, User, MessageSquare, Eye, X } from "lucide-react";
 import { ApprovalTimeline } from "@/components/dashboard/ApprovalTimeline";
 import { ApprovalStepper } from "@/components/dashboard/ApprovalStepper";

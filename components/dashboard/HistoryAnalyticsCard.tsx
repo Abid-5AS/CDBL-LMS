@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SortedTimeline } from "./SortedTimeline";
 import { LeaveHeatmap } from "./LeaveHeatmap";
 import { LeaveTypePieChart } from "./LeaveTypePieChart";
-import { StatusBadgeSimple } from "./StatusBadgeSimple";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import {
   Tooltip,
   TooltipContent,
@@ -144,7 +144,7 @@ function RequestsTable({
               </p>
             </div>
             <div className="flex-shrink-0">
-              <StatusBadgeSimple status={row.status} />
+              <StatusBadge status={row.status} />
             </div>
           </li>
         ))}

@@ -36,7 +36,7 @@ import { CheckCircle2, RotateCcw, ArrowRight, Search, X, Inbox, Loader2, Chevron
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
 import Link from "next/link";
-import StatusBadge from "@/app/dashboard/components/status-badge";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LeaveStatus, LeaveType, AppRole } from "@prisma/client";
 import { toast } from "sonner";
 import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/toast-messages";

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ClipboardCheck, Plus } from "lucide-react";
-import StatusBadge from "@/app/dashboard/components/status-badge";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import { leaveTypeLabel } from "@/lib/ui";
 import { Button } from "@/components/ui/button";
 import { formatDate, cn } from "@/lib/utils";

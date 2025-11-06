@@ -1,50 +1,32 @@
 "use client";
 
-import Link from "next/link";
-import { Plus, Users, FileText, Calendar, Activity } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { QuickActions, type QuickAction } from "@/components/shared/QuickActions";
+import { Users, FileText, Calendar, Activity } from "lucide-react";
 
 export function HRQuickActions() {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline">
-          Quick Actions
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem asChild>
-          <Link href="/admin/holidays" className="flex items-center">
-            <Calendar className="mr-2 h-4 w-4" />
-            Add Holiday
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/employees" className="flex items-center">
-            <Users className="mr-2 h-4 w-4" />
-            Manage Employees
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/admin/audit" className="flex items-center">
-            <Activity className="mr-2 h-4 w-4" />
-            Audit Logs
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/policies" className="flex items-center">
-            <FileText className="mr-2 h-4 w-4" />
-            Review Policies
-          </Link>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
+  const actions: QuickAction[] = [
+    {
+      label: "Add Holiday",
+      icon: Calendar,
+      href: "/admin/holidays",
+    },
+    {
+      label: "Manage Employees",
+      icon: Users,
+      href: "/employees",
+    },
+    {
+      label: "Audit Logs",
+      icon: Activity,
+      href: "/admin/audit",
+    },
+    {
+      label: "Review Policies",
+      icon: FileText,
+      href: "/policies",
+    },
+  ];
+
+  return <QuickActions actions={actions} variant="dropdown" />;
 }
 

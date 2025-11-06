@@ -15,7 +15,7 @@ import { AlertCircle, RotateCcw, Edit, Calendar, FileText, User, Clock } from "l
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
 import Link from "next/link";
-import StatusBadge from "@/app/dashboard/components/status-badge";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LeaveRequest, LeaveComment, Approval } from "@prisma/client";
 
 type LeaveDetailsContentProps = {

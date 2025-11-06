@@ -37,7 +37,7 @@ import {
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
-import StatusBadge from "@/app/dashboard/components/status-badge";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import { StatusTabChips } from "./StatusTabChips";
 import { ReviewLeaveModal } from "./ReviewLeaveModal";
 import useSWR from "swr";

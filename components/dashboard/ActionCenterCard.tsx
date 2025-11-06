@@ -12,7 +12,7 @@ import { leaveTypeLabel } from "@/lib/ui";
 import Link from "next/link";
 import useSWR from "swr";
 import { LeaveStatus } from "@prisma/client";
-import StatusBadge from "@/app/dashboard/components/status-badge";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {

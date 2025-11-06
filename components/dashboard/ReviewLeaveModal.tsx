@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowRight, RotateCcw, X } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
-import StatusBadge from "@/app/dashboard/components/status-badge";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import { useUser } from "@/lib/user-context";
 import type { AppRole } from "@/lib/rbac";
 import { LeaveStatus } from "@prisma/client";

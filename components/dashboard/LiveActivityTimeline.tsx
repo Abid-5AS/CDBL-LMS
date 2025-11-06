@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate } from "@/lib/utils";
 import { getChainFor, type LeaveType } from "@/lib/workflow";
-import { StatusBadgeSimple } from "./StatusBadgeSimple";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import { cn } from "@/lib/utils";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -309,7 +309,7 @@ export function LiveActivityTimeline({
           <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">
             {leave.type} Leave
           </p>
-          <StatusBadgeSimple status={leave.status} />
+          <StatusBadge status={leave.status} />
         </div>
 
         {/* Content: Dates, Time, Status in single row - COMPACT */}
