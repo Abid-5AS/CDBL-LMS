@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop, feature/*]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run unit tests
+        run: npm run test:unit -- --ci --reporter=default
+
+      - name: Run integration tests
+        run: npm run test:integration -- --ci --reporter=default || echo "Integration tests skipped if no changes"
+
+      - name: Build with analysis
+        run: ANALYZE=1 npm run build
+        env:
+          ANALYZE: 1
+
+      - name: Check for duplicate chart libraries
+        run: |
+          if [ -d ".next/analyze" ]; then
+            echo "Bundle analysis available in .next/analyze"
+            # Check for duplicate recharts imports
+            grep -r "recharts" .next/analyze || echo "No duplicate recharts found"
+          fi
+

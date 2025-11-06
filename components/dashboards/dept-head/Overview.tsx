@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
+import { DashboardErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { DeptHeadPendingTable } from "./Sections/PendingTable";
 import { DeptHeadTeamOverview } from "./Sections/TeamOverview";
 import { DeptHeadQuickActions } from "./Sections/QuickActions";

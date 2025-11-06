@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
+import { DashboardErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { PendingLeaveRequestsTable } from "./Sections/PendingApprovals";
 import { CancellationRequestsPanel } from "./Sections/CancellationRequests";
 import { DashboardSection } from "@/app/dashboard/shared/DashboardLayout";
@@ -21,7 +22,8 @@ type HRAdminDashboardProps = {
  */
 export function HRAdminDashboard({ username }: HRAdminDashboardProps) {
   return (
-    <div className="space-y-6">
+    <DashboardErrorBoundary role="HR_ADMIN">
+      <div className="space-y-6">
       {/* Pending Leave Requests */}
       <DashboardSection title="Pending Leave Requests">
         <Suspense fallback={<DashboardCardSkeleton />}>
@@ -35,7 +37,8 @@ export function HRAdminDashboard({ username }: HRAdminDashboardProps) {
           <CancellationRequestsPanel />
         </Suspense>
       </DashboardSection>
-    </div>
+      </div>
+    </DashboardErrorBoundary>
   );
 }
 

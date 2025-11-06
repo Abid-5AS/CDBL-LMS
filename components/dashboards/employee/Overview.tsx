@@ -3,6 +3,7 @@
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApiQuery } from "@/lib/apiClient";
+import { DashboardErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { DashboardGreeting } from "./Sections/Greeting";
 import { ActionCenterCard } from "./Sections/ActionCenter";
 import { LeaveOverviewCard } from "./Sections/LeaveOverview";
@@ -56,7 +57,8 @@ export function EmployeeDashboardContent({
   const leaves: LeaveRow[] = leavesData?.items || [];
 
   return (
-    <div className="space-y-6">
+    <DashboardErrorBoundary role="EMPLOYEE">
+      <div className="space-y-6">
       {/* 1. Simplified Greeting */}
       <Suspense fallback={<Skeleton className="h-16 w-full" />}>
         <DashboardGreeting />
@@ -84,6 +86,7 @@ export function EmployeeDashboardContent({
           isLoadingLeaves={isLoadingLeaves}
         />
       </Suspense>
-    </div>
+      </div>
+    </DashboardErrorBoundary>
   );
 }
