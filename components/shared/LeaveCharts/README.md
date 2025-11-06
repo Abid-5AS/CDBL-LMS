@@ -270,6 +270,8 @@ const { slices } = fromReportsSummary({ typeDistribution: data });
 <TypePie data={slices} />
 ```
 
+> **Note:** The old `components/dashboard/` paths are deprecated and will be blocked by ESLint. Use `@shared/*` or `@dash/*` path aliases instead.
+
 ## Testing
 
 See test files:
