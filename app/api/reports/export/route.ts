@@ -50,27 +50,57 @@ export async function GET(req: NextRequest) {
   }
 
   const { searchParams } = new URL(req.url);
+  const context = (searchParams.get("context") || "reports") as "reports" | "leaves" | "approvals" | "holidays";
   const duration = (searchParams.get("duration") || "month") as Duration;
   const departmentIdParam = searchParams.get("department");
   const leaveTypeParam = searchParams.get("leaveType");
-  const format = searchParams.get("format") || "csv";
+  const statusParam = searchParams.get("status");
+  const startDateParam = searchParams.get("startDate");
+  const endDateParam = searchParams.get("endDate");
+  const type = (searchParams.get("type") || searchParams.get("format") || "csv") as "pdf" | "csv";
   
   // Handle "all" values - convert to null
   const departmentId = departmentIdParam && departmentIdParam !== "all" ? departmentIdParam : null;
   const leaveType = leaveTypeParam && leaveTypeParam !== "all" ? leaveTypeParam : null;
 
-  const { start, end } = getDateRange(duration);
+  // Determine date range based on context
+  let start: Date;
+  let end: Date;
+  
+  if (startDateParam && endDateParam) {
+    // Use provided date range
+    start = normalizeToDhakaMidnight(new Date(startDateParam));
+    end = normalizeToDhakaMidnight(new Date(endDateParam));
+  } else {
+    // Use duration-based range
+    const range = getDateRange(duration);
+    start = range.start;
+    end = range.end;
+  }
 
-  // Build where clause
+  // Build where clause based on context
   const whereClause: any = {
-    status: {
-      in: ["APPROVED", "PENDING", "SUBMITTED"],
-    },
     startDate: {
       gte: start,
       lte: end,
     },
   };
+
+  // Context-specific status filters
+  if (context === "reports") {
+    whereClause.status = {
+      in: ["APPROVED", "PENDING", "SUBMITTED"],
+    };
+  } else if (context === "leaves") {
+    // Leaves context: respect status filter if provided, otherwise show all
+    if (statusParam && statusParam !== "all") {
+      whereClause.status = statusParam;
+    }
+  } else if (context === "approvals") {
+    whereClause.status = {
+      in: ["PENDING", "SUBMITTED", "FORWARDED"],
+    };
+  }
 
   if (departmentId) {
     // Get all unique departments and match by index (since department is stored as string in User)
@@ -103,23 +133,32 @@ export async function GET(req: NextRequest) {
   }
 
   // Get leave requests for export - use select instead of include
-  const leaves = await prisma.leaveRequest.findMany({
-    where: whereClause,
-    select: {
-      id: true,
-      type: true,
-      startDate: true,
-      endDate: true,
-      workingDays: true,
-      status: true,
-      requester: {
-        select: {
-          name: true,
-          email: true,
-          department: true, // This is a string field, not a relation
-        },
+  const selectFields: any = {
+    id: true,
+    type: true,
+    startDate: true,
+    endDate: true,
+    workingDays: true,
+    status: true,
+    requester: {
+      select: {
+        name: true,
+        email: true,
+        department: true, // This is a string field, not a relation
+        ...(context === "leaves" ? { empCode: true } : {}),
       },
     },
+  };
+
+  // Add additional fields for leaves context
+  if (context === "leaves") {
+    selectFields.reason = true;
+    selectFields.createdAt = true;
+  }
+
+  const leaves = await prisma.leaveRequest.findMany({
+    where: whereClause,
+    select: selectFields,
     orderBy: {
       startDate: "desc",
     },
@@ -209,19 +248,53 @@ export async function GET(req: NextRequest) {
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
 
-  if (format === "csv") {
-    // Generate CSV
-    const headers = ["Employee Name", "Email", "Department", "Leave Type", "Start Date", "End Date", "Days", "Status"];
-    const rows = leaves.map((leave) => [
-      leave.requester.name,
-      leave.requester.email,
-      leave.requester.department || "N/A",
-      leave.type,
-      new Date(leave.startDate).toLocaleDateString(),
-      new Date(leave.endDate).toLocaleDateString(),
-      leave.workingDays || 0,
-      leave.status,
-    ]);
+  // Role-based visibility for leaves context
+  if (context === "leaves" && user.role === "EMPLOYEE") {
+    whereClause.requesterId = user.id;
+  } else if (context === "leaves" && user.role === "DEPT_HEAD") {
+    // Dept Head sees their team members
+    const teamMembers = await prisma.user.findMany({
+      where: { department: user.department },
+      select: { id: true },
+    });
+    whereClause.requesterId = { in: teamMembers.map((u) => u.id) };
+  }
+  // HR_ADMIN, HR_HEAD, CEO see all (no additional filter)
+
+  if (type === "csv") {
+    // Generate CSV with context-specific headers
+    const headers = context === "leaves" 
+      ? ["ID", "Employee Name", "Email", "Employee Code", "Type", "Start Date", "End Date", "Working Days", "Status", "Reason", "Created At"]
+      : ["Employee Name", "Email", "Department", "Leave Type", "Start Date", "End Date", "Days", "Status"];
+    
+    const rows = leaves.map((leave) => {
+      if (context === "leaves") {
+        return [
+          leave.id.toString(),
+          leave.requester.name,
+          leave.requester.email,
+          (leave.requester as any).empCode || "",
+          leave.type,
+          new Date(leave.startDate).toISOString().split("T")[0],
+          new Date(leave.endDate).toISOString().split("T")[0],
+          (leave.workingDays || 0).toString(),
+          leave.status,
+          (leave as any).reason?.replace(/"/g, '""') || "",
+          (leave as any).createdAt?.toISOString() || "",
+        ];
+      } else {
+        return [
+          leave.requester.name,
+          leave.requester.email,
+          leave.requester.department || "N/A",
+          leave.type,
+          new Date(leave.startDate).toLocaleDateString(),
+          new Date(leave.endDate).toLocaleDateString(),
+          leave.workingDays || 0,
+          leave.status,
+        ];
+      }
+    });
 
     const csvContent = [
       headers.join(","),

@@ -2,13 +2,13 @@
 
 import { Suspense } from "react";
 import { DeptHeadPendingTable } from "./DeptHeadPendingTable";
-import { DeptHeadSummaryCards } from "./DeptHeadSummaryCards";
 import { DeptHeadTeamOverview } from "./DeptHeadTeamOverview";
 import { DeptHeadQuickActions } from "./DeptHeadQuickActions";
 import { Card, CardContent } from "@/components/ui/card";
-import useSWR from "swr";
+import { useApiQueryWithParams } from "@/lib/apiClient";
 import { useFilterFromUrl } from "@/lib/url-filters";
-import { fetcher } from "@/lib/fetcher";
+import { KPIGrid, KPICard } from "@/components/shared/KPICard";
+import { ClipboardList, CheckCircle, RotateCcw, XCircle } from "lucide-react";
 
 function CardSkeleton() {
   return (
@@ -25,12 +25,25 @@ function CardSkeleton() {
 
 export function DeptHeadDashboardWrapper() {
   const { state } = useFilterFromUrl();
-  const { data, isLoading, error, mutate } = useSWR(
-    ["/api/manager/pending", state],
-    fetcher,
+  const { data, isLoading, error, mutate } = useApiQueryWithParams<{
+    items: unknown[];
+    counts: {
+      pending: number;
+      forwarded: number;
+      returned: number;
+      cancelled: number;
+    };
+  }>(
+    "/api/manager/pending",
+    {
+      q: state.q,
+      status: state.status,
+      type: state.type === "ALL" ? null : state.type,
+      page: state.page,
+      size: state.pageSize,
+    },
     {
       revalidateOnFocus: false,
-      keepPreviousData: true,
     }
   );
 
@@ -42,7 +55,7 @@ export function DeptHeadDashboardWrapper() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
       {/* Left Column - Pending Requests Table (8/12 width) */}
       <main className="lg:col-span-8 space-y-6">
         <div id="pending-requests-table">
@@ -57,13 +70,36 @@ export function DeptHeadDashboardWrapper() {
 
       {/* Right Column - Sidebar (3/12 on lg, 4/12 on xl, sticky) */}
       <aside className="lg:col-span-3 xl:col-span-4 space-y-4 lg:sticky lg:top-6 lg:h-fit">
-        {/* Summary Cards - Moved to top of sidebar */}
-        <DeptHeadSummaryCards
-          pending={counts.pending}
-          approved={counts.forwarded}
-          returned={counts.returned}
-          cancelled={counts.cancelled}
-        />
+        {/* Summary Cards - Using shared KPIGrid */}
+        <KPIGrid columns={1}>
+          <KPICard
+            title="Pending"
+            value={String(counts.pending)}
+            icon={ClipboardList}
+            iconColor="amber"
+            status={counts.pending > 0 ? "low" : "healthy"}
+          />
+          <KPICard
+            title="Forwarded"
+            value={String(counts.forwarded)}
+            icon={CheckCircle}
+            iconColor="emerald"
+            status="healthy"
+          />
+          <KPICard
+            title="Returned"
+            value={String(counts.returned)}
+            icon={RotateCcw}
+            iconColor="yellow"
+            status={counts.returned > 0 ? "low" : "healthy"}
+          />
+          <KPICard
+            title="Cancelled"
+            value={String(counts.cancelled)}
+            icon={XCircle}
+            iconColor="slate"
+          />
+        </KPIGrid>
         
         {/* Team Overview */}
         <Suspense fallback={<CardSkeleton />}>

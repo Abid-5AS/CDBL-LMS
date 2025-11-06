@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { KpiCards } from "@/components/reports/KpiCards";
 import { FilterBar } from "@/components/reports/FilterBar";
 import { ChartsSection } from "@/components/reports/ChartsSection";
-import { ExportSection } from "@/components/reports/ExportSection";
+import { ExportSection } from "@/components/shared/ExportSection";
 import useSWR from "swr";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -81,9 +81,12 @@ export function ReportsContent() {
 
       {/* Export Section */}
       <ExportSection
-        duration={duration}
-        department={department}
-        leaveType={leaveType}
+        context="reports"
+        payload={{
+          duration: duration as "month" | "quarter" | "year",
+          department,
+          leaveType,
+        }}
       />
     </div>
   );

@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import type { Role } from "@prisma/client";
 
 type DashboardLayoutProps = {
   children: ReactNode;
@@ -17,44 +18,72 @@ type DashboardLayoutProps = {
    * Section description (optional)
    */
   description?: string;
+  /**
+   * User role for role-specific styling
+   */
+  role?: Role;
+  /**
+   * Optional action buttons/controls in the header
+   */
+  actions?: ReactNode;
 };
 
 /**
- * Shared layout wrapper for all dashboard pages
+ * Enhanced Dashboard Layout Component
  * Provides consistent padding, margins, and container constraints
  * Material 3 style with responsive grid support
+ * Supports role-specific styling and header actions
  */
-export function DashboardLayout({ 
-  children, 
+export function DashboardLayout({
+  children,
   className,
   fullWidth = false,
   title,
   description,
+  role,
+  actions,
 }: DashboardLayoutProps) {
+  // Role-specific styling classes
+  const roleClasses = {
+    EMPLOYEE: "bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20",
+    DEPT_HEAD: "bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20",
+    HR_ADMIN: "bg-gradient-to-br from-emerald-50/50 to-teal-50/50 dark:from-emerald-950/20 dark:to-teal-950/20",
+    HR_HEAD: "bg-gradient-to-br from-purple-50/50 to-pink-50/50 dark:from-purple-950/20 dark:to-pink-950/20",
+    CEO: "bg-gradient-to-br from-rose-50/50 to-red-50/50 dark:from-rose-950/20 dark:to-red-950/20",
+    SYSTEM_ADMIN: "bg-gradient-to-br from-slate-50/50 to-gray-50/50 dark:from-slate-950/20 dark:to-gray-950/20",
+  };
+
   return (
     <div
       className={cn(
-        "w-full",
-        fullWidth 
-          ? "px-0" 
-          : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
-        "py-6",
+        "w-full min-h-screen",
+        role && roleClasses[role],
         className
       )}
     >
-      {(title || description) && (
-        <div className="mb-6">
-          {title && (
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-              {title}
-            </h1>
-          )}
-          {description && (
-            <p className="mt-2 text-sm text-muted-foreground">{description}</p>
-          )}
-        </div>
-      )}
-      {children}
+      <div
+        className={cn(
+          fullWidth ? "px-0" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+          "py-6"
+        )}
+      >
+        {(title || description || actions) && (
+          <div className={cn("mb-6", actions && "flex items-start justify-between gap-4")}>
+            <div className="flex-1">
+              {title && (
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+                  {title}
+                </h1>
+              )}
+              {description && (
+                <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+              )}
+            </div>
+            {actions && <div className="flex-shrink-0">{actions}</div>}
+          </div>
+        )}
+        {children}
+      </div>
     </div>
   );
 }

@@ -1,11 +1,11 @@
 import { Suspense } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { EmployeeDashboardUnified } from "@/components/dashboard/EmployeeDashboardUnified";
+import { EmployeeDashboardContent } from "@/components/dashboard/EmployeeDashboard";
 import { DashboardLoadingFallback } from "../shared/LoadingFallback";
 import { DashboardLayout } from "../shared/DashboardLayout";
 
-async function EmployeeDashboardContent() {
+async function EmployeeDashboardPageContent() {
   const user = await getCurrentUser();
   
   if (!user) {
@@ -20,8 +20,12 @@ async function EmployeeDashboardContent() {
   const username = user.name ?? "User";
 
   return (
-    <DashboardLayout>
-      <EmployeeDashboardUnified username={username} />
+    <DashboardLayout
+      role="EMPLOYEE"
+      title={`Welcome back, ${username}`}
+      description="Manage your leave requests and track your balance"
+    >
+      <EmployeeDashboardContent username={username} />
     </DashboardLayout>
   );
 }
@@ -29,7 +33,7 @@ async function EmployeeDashboardContent() {
 export default function EmployeeDashboardPage() {
   return (
     <Suspense fallback={<DashboardLoadingFallback />}>
-      <EmployeeDashboardContent />
+      <EmployeeDashboardPageContent />
     </Suspense>
   );
 }

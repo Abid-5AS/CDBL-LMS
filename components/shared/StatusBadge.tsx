@@ -1,9 +1,4 @@
-/**
- * StatusBadge Component
- * 
- * Displays a badge with icon and label for leave request status.
- * Supports all Policy v2.0 statuses with appropriate colors and tooltips.
- */
+"use client";
 
 import { Badge } from "@/components/ui/badge";
 import { LeaveStatus } from "@prisma/client";
@@ -67,7 +62,7 @@ const STATUS_CONFIG: Record<
     label: "Returned",
     className:
       "bg-yellow-50/80 text-yellow-800 border-yellow-300 dark:bg-yellow-900/40 dark:text-yellow-200 dark:border-yellow-800",
-    icon: getIcon(leaveStatusIcons.PENDING), // Use pending icon as fallback
+    icon: getIcon(leaveStatusIcons.PENDING),
     tooltip: "Returned to employee for modification. Please update and resubmit.",
   },
   CANCELLATION_REQUESTED: {
@@ -84,21 +79,39 @@ const STATUS_CONFIG: Record<
     icon: getIcon(leaveStatusIcons.PENDING),
     tooltip: "Employee recalled from leave by HR. Remaining balance restored.",
   },
-  OVERSTAY_PENDING: {
-    label: "Overstay",
+  FORWARDED: {
+    label: "Forwarded",
     className:
-      "bg-red-50/80 text-red-800 border-red-300 dark:bg-red-900/40 dark:text-red-200 dark:border-red-800",
-    icon: getIcon(leaveStatusIcons.REJECTED),
-    tooltip: "Leave end date passed without return confirmation. Contact HR immediately.",
+      "bg-indigo-50/80 text-indigo-800 border-indigo-300 dark:bg-indigo-900/40 dark:text-indigo-200 dark:border-indigo-800",
+    icon: getIcon(leaveStatusIcons.PENDING),
+    tooltip: "Forwarded to next approver in the chain.",
+  },
+  OVERSTAY_PENDING: {
+    label: "Overstay Pending",
+    className:
+      "bg-rose-50/80 text-rose-800 border-rose-300 dark:bg-rose-900/40 dark:text-rose-200 dark:border-rose-800",
+    icon: getIcon(leaveStatusIcons.PENDING),
+    tooltip: "Employee has exceeded approved leave duration. Action required.",
   },
 };
 
-export default function StatusBadge({ status, className }: { status: Status; className?: string }) {
+type StatusBadgeProps = {
+  status: Status;
+  className?: string;
+  showTooltip?: boolean;
+};
+
+/**
+ * Unified Status Badge Component
+ * Consolidates app/dashboard/components/status-badge.tsx and components/dashboard/StatusBadgeSimple.tsx
+ * Supports all LeaveStatus values with consistent styling and tooltips
+ */
+export function StatusBadge({ status, className, showTooltip = true }: StatusBadgeProps) {
   const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.PENDING;
   const Icon = config.icon;
-  
+
   const badge = (
-    <Badge 
+    <Badge
       variant="outline"
       className={cn(
         "flex items-center gap-1.5 font-medium border px-2.5 py-0.5",
@@ -111,7 +124,7 @@ export default function StatusBadge({ status, className }: { status: Status; cla
     </Badge>
   );
 
-  if (config.tooltip) {
+  if (showTooltip && config.tooltip) {
     return (
       <TooltipProvider>
         <Tooltip>
@@ -126,4 +139,7 @@ export default function StatusBadge({ status, className }: { status: Status; cla
 
   return badge;
 }
+
+// Export default for backward compatibility
+export default StatusBadge;
 

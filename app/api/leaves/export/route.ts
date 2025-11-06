@@ -10,6 +10,9 @@ export const cache = "no-store";
  * Export leave requests as CSV
  * GET /api/leaves/export
  * Query params: status, type, startDate, endDate, etc.
+ * 
+ * @deprecated This endpoint is deprecated. Use /api/reports/export?context=leaves&type=csv instead.
+ * This endpoint is kept for backward compatibility but will be removed in a future version.
  */
 export async function GET(req: NextRequest) {
   const traceId = getTraceId(req as any);

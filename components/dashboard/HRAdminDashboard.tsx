@@ -16,16 +16,12 @@ type HRAdminDashboardProps = {
  * 
  * Note: PendingLeaveRequestsTable handles its own modal internally
  * Note: Reports & Analytics is available in the top navbar
+ * 
+ * Refactored to use enhanced DashboardLayout (title/description moved to page level)
  */
 export function HRAdminDashboard({ username }: HRAdminDashboardProps) {
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <DashboardSection
-        title="HR & Admin Dashboard"
-        description="Operational leave management and forwarding"
-      />
-
       {/* Pending Leave Requests */}
       <DashboardSection title="Pending Leave Requests">
         <Suspense fallback={<DashboardCardSkeleton />}>

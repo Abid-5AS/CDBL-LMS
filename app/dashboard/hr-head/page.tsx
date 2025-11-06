@@ -20,10 +20,17 @@ async function HRHeadDashboardContent() {
     redirect("/dashboard");
   }
 
+  const username = user.name ?? "HR Head";
+  const role = user.role === "CEO" ? "CEO" : "HR_HEAD";
+
   return (
-    <DashboardLayout>
+    <DashboardLayout
+      role={role}
+      title={`Welcome, ${username}`}
+      description="Strategic oversight and final approvals for leave management"
+    >
       <div className="space-y-6">
-        <HeroStrip name={user.name ?? "HR Head"} />
+        <HeroStrip name={username} />
 
         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-xl font-semibold text-slate-900 mb-4">High-Priority Leave Requests</h2>

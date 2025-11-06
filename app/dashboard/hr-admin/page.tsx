@@ -20,7 +20,11 @@ async function HRAdminDashboardContent() {
   const username = user.name ?? "HR Admin";
 
   return (
-    <DashboardLayout>
+    <DashboardLayout
+      role="HR_ADMIN"
+      title={`Welcome, ${username}`}
+      description="Operational leave management and forwarding"
+    >
       <HRAdminDashboard username={username} />
     </DashboardLayout>
   );

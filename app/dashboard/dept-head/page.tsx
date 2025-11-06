@@ -17,8 +17,15 @@ async function DeptHeadDashboardContent() {
     redirect("/dashboard");
   }
 
+  const username = user.name ?? "Manager";
+
   return (
-    <DashboardLayout fullWidth>
+    <DashboardLayout
+      role={user.role === "CEO" ? "CEO" : "DEPT_HEAD"}
+      fullWidth
+      title={`Welcome, ${username}`}
+      description="Review and manage team leave requests"
+    >
       <DeptHeadDashboardWrapper />
     </DashboardLayout>
   );

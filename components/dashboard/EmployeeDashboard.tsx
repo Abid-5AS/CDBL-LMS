@@ -1,241 +1,89 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
 import { Suspense } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RequestsTable } from "@/app/dashboard/components/requests-table";
-import { UpcomingHolidays } from "./UpcomingHolidays";
-import { PolicyAlerts } from "./PolicyAlerts";
-import { QuickActionsCard } from "./QuickActionsCard";
-import { LeaveUtilizationCard } from "./LeaveUtilizationCard";
-import { SmartRecommendations } from "./SmartRecommendations";
-import { ActiveRequestsTimeline } from "./ActiveRequestsTimeline";
-import { MiniCalendar } from "./MiniCalendar";
-import { CompactBalances } from "./CompactBalances";
-import { NextHoliday } from "./NextHoliday";
-import { SegmentedControl } from "@/components/ui/segmented-control";
+import { useApiQuery } from "@/lib/apiClient";
+import { DashboardGreeting } from "./DashboardGreeting";
+import { ActionCenterCard } from "./ActionCenterCard";
+import { LeaveOverviewCard } from "./LeaveOverviewCard";
+import { HistoryAnalyticsCard } from "./HistoryAnalyticsCard";
 
-type EmployeeDashboardProps = {
+type LeaveStatus =
+  | "SUBMITTED"
+  | "PENDING"
+  | "APPROVED"
+  | "REJECTED"
+  | "CANCELLED"
+  | "RETURNED"
+  | "CANCELLATION_REQUESTED"
+  | "RECALLED";
+
+type LeaveRow = {
+  id: number;
+  type: string;
+  status: LeaveStatus;
+  workingDays?: number;
+  endDate?: string;
+  fitnessCertificateUrl?: string | null;
+};
+
+type EmployeeDashboardContentProps = {
   username: string;
 };
 
-export function EmployeeDashboard({ username }: EmployeeDashboardProps) {
-  const [activeTab, setActiveTab] = useState("Overview");
+/**
+ * Consolidated Employee Dashboard Component
+ * 
+ * Merges EmployeeDashboardUnified and EmployeeDashboard into a single component.
+ * Uses unified API client and shared components.
+ * 
+ * Structure:
+ * 1. Action Center (returned requests + quick actions)
+ * 2. Leave Overview (Balance | Team | Insights tabs)
+ * 3. History & Analytics (Recent | Timeline | Heatmap | Distribution tabs)
+ */
+export function EmployeeDashboardContent({
+  username,
+}: EmployeeDashboardContentProps) {
+  // Use unified API client for data fetching
+  const { data: leavesData, isLoading: isLoadingLeaves } = useApiQuery<{ items: LeaveRow[] }>(
+    "/api/leaves?mine=1"
+  );
+  const { data: balanceData, isLoading: isLoadingBalance } = useApiQuery<Record<string, number>>(
+    "/api/balance/mine"
+  );
 
-  const TABS = ["Overview", "Activity", "Calendar"];
+  const leaves: LeaveRow[] = leavesData?.items || [];
 
   return (
-    <div className="space-y-4">
-      {/* Header with Tabs */}
-      <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
-        <div className="flex flex-col gap-4">
-          <div>
-            <h2 className="text-2xl font-semibold text-slate-900">Welcome back, {username}</h2>
-            <p className="text-sm text-slate-600 mt-0.5">Manage your leave requests and track your balance</p>
-          </div>
-          
-          {/* iOS-style Segmented Control */}
-          <SegmentedControl
-            options={TABS}
-            value={activeTab}
-            onChange={setActiveTab}
-          />
-        </div>
-      </section>
+    <div className="space-y-6">
+      {/* 1. Simplified Greeting */}
+      <Suspense fallback={<Skeleton className="h-16 w-full" />}>
+        <DashboardGreeting />
+      </Suspense>
 
-      {/* Tab Content */}
-      {activeTab === "Overview" && (
-        <div className="space-y-4">
-          {/* Quick Actions */}
-          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <Suspense fallback={<div className="h-9 w-full" />}>
-              <QuickActionsCard />
-            </Suspense>
-          </section>
+      {/* 2. Action Center Card */}
+      <Suspense fallback={<Skeleton className="h-48 w-full rounded-xl" />}>
+        <ActionCenterCard leaves={leaves} isLoading={isLoadingLeaves} />
+      </Suspense>
 
-          {/* Policy Alerts */}
-          <Suspense fallback={<AlertSkeleton />}>
-            <PolicyAlerts />
-          </Suspense>
+      {/* 3. Leave Overview Card (Tabbed) */}
+      <Suspense fallback={<Skeleton className="h-96 w-full rounded-xl" />}>
+        <LeaveOverviewCard
+          balanceData={balanceData}
+          leavesData={leavesData}
+          isLoadingBalance={isLoadingBalance}
+          isLoadingLeaves={isLoadingLeaves}
+        />
+      </Suspense>
 
-          {/* Main Content Grid */}
-          <div className="grid gap-4 lg:grid-cols-3">
-            {/* Left Column: Active Requests */}
-            <div className="lg:col-span-2 space-y-4">
-              <Suspense fallback={<ActiveRequestsSkeleton />}>
-                <ActiveRequestsTimeline />
-              </Suspense>
-            </div>
-
-            {/* Right Column: Balances & Next Holiday */}
-            <div className="space-y-4">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base font-semibold">Balances</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <Suspense fallback={<BalanceSkeleton />}>
-                    <CompactBalances />
-                  </Suspense>
-                </CardContent>
-              </Card>
-              
-              <Suspense fallback={<NextHolidaySkeleton />}>
-                <NextHoliday />
-              </Suspense>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {activeTab === "Activity" && (
-        <div className="space-y-4">
-          {/* Recent Requests */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">Recent Requests</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Suspense fallback={<TableSkeleton />}>
-                <RequestsTable />
-              </Suspense>
-            </CardContent>
-          </Card>
-
-          {/* Analytics Grid */}
-          <div className="grid gap-4 lg:grid-cols-2">
-            <Suspense fallback={<UtilizationSkeleton />}>
-              <LeaveUtilizationCard />
-            </Suspense>
-            <Suspense fallback={<RecommendationsSkeleton />}>
-              <SmartRecommendations />
-            </Suspense>
-          </div>
-        </div>
-      )}
-
-      {activeTab === "Calendar" && (
-        <div className="space-y-4">
-          <div className="grid gap-4 lg:grid-cols-2">
-            <Suspense fallback={<MiniCalendarSkeleton />}>
-              <MiniCalendar />
-            </Suspense>
-            <Suspense fallback={<HolidayCardSkeleton />}>
-              <UpcomingHolidays />
-            </Suspense>
-          </div>
-        </div>
-      )}
+      {/* 4. History & Analytics Card (Tabbed) */}
+      <Suspense fallback={<Skeleton className="h-[500px] w-full rounded-xl" />}>
+        <HistoryAnalyticsCard
+          leaves={leavesData?.items || []}
+          isLoadingLeaves={isLoadingLeaves}
+        />
+      </Suspense>
     </div>
-  );
-}
-
-function AlertSkeleton() {
-  return (
-    <div className="space-y-3">
-      <Skeleton className="h-16 w-full" />
-    </div>
-  );
-}
-
-function BalanceSkeleton() {
-  return (
-    <div className="space-y-3">
-      {[1, 2, 3].map((i) => (
-        <Skeleton key={i} className="h-8 w-full" />
-      ))}
-    </div>
-  );
-}
-
-function NextHolidaySkeleton() {
-  return (
-    <Card className="bg-slate-50 border-slate-200">
-      <CardContent className="p-4">
-        <Skeleton className="h-16 w-full" />
-      </CardContent>
-    </Card>
-  );
-}
-
-function HolidayCardSkeleton() {
-  return (
-    <Card>
-      <CardHeader>
-        <Skeleton className="h-6 w-40" />
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-4 w-full" />
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function TableSkeleton() {
-  return (
-    <div className="space-y-3">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <Skeleton key={i} className="h-12 w-full" />
-      ))}
-    </div>
-  );
-}
-
-function UtilizationSkeleton() {
-  return (
-    <Card>
-      <CardHeader>
-        <Skeleton className="h-6 w-48" />
-      </CardHeader>
-      <CardContent>
-        <Skeleton className="h-64 w-full" />
-      </CardContent>
-    </Card>
-  );
-}
-
-function RecommendationsSkeleton() {
-  return (
-    <Card>
-      <CardHeader>
-        <Skeleton className="h-6 w-48" />
-      </CardHeader>
-      <CardContent>
-        <Skeleton className="h-32 w-full" />
-      </CardContent>
-    </Card>
-  );
-}
-
-function ActiveRequestsSkeleton() {
-  return (
-    <Card>
-      <CardHeader>
-        <Skeleton className="h-6 w-40" />
-      </CardHeader>
-      <CardContent>
-        <Skeleton className="h-32 w-full" />
-      </CardContent>
-    </Card>
-  );
-}
-
-function MiniCalendarSkeleton() {
-  return (
-    <Card>
-      <CardHeader>
-        <Skeleton className="h-6 w-40" />
-      </CardHeader>
-      <CardContent>
-        <Skeleton className="h-64 w-full" />
-      </CardContent>
-    </Card>
   );
 }
