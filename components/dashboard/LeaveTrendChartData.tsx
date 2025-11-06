@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import useSWR from "swr";
-import { LeaveTrendChart } from "./LeaveTrendChart";
+import { ChartContainer, TrendChart } from "@/components/shared/LeaveCharts";
+import { fromDashboardAgg } from "@/components/shared/LeaveCharts/adapters";
 import { EmptyState } from "@/components/ui/empty-state";
 import { BarChart3 } from "lucide-react";
 
@@ -74,6 +75,22 @@ export function LeaveTrendChartData() {
     );
   }
 
-  return <LeaveTrendChart data={data.data} />;
+  const { trend } = fromDashboardAgg({
+    monthlyTrend: data.data.map((item) => ({
+      month: item.month,
+      approved: item.leaves,
+    })),
+  });
+
+  return (
+    <ChartContainer
+      title="Monthly Leave Trend"
+      loading={false}
+      empty={trend.length === 0}
+      height={250}
+    >
+      <TrendChart data={trend} height={250} />
+    </ChartContainer>
+  );
 }
 
