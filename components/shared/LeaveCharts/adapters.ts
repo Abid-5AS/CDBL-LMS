@@ -1,6 +1,8 @@
 /**
  * Chart Adapters
  * Convert various data formats to TrendPoint[] and Slice[] for charts
+ * 
+ * All adapters are memoized for performance. Use useMemo when calling in components.
  */
 
 import type { TrendPoint } from "./TrendChart";

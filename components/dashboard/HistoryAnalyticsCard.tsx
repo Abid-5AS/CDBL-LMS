@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SortedTimeline } from "./SortedTimeline";
 import { LeaveHeatmap } from "./LeaveHeatmap";
-import { LeaveTypePieChart } from "./LeaveTypePieChart";
+import { ChartContainer, TypePie } from "@/components/shared/LeaveCharts";
+import { fromDashboardAgg } from "@/components/shared/LeaveCharts/adapters";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import {
   Tooltip,
@@ -328,7 +329,15 @@ export function HistoryAnalyticsCard({ leaves, isLoadingLeaves }: HistoryAnalyti
             {/* Left: Pie Chart (Leave Type Distribution) */}
             <div className="bg-muted/20 dark:bg-muted/10 rounded-lg p-4 border border-neutral-200/50 dark:border-neutral-800/50">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">By Leave Type</h3>
-              <LeaveTypePieChart data={pieData} />
+              {(() => {
+                const { slices } = fromDashboardAgg({
+                  typeDistribution: pieData.map((item: any) => ({
+                    type: item.name,
+                    count: item.value,
+                  })),
+                });
+                return <TypePie data={slices} height={200} />;
+              })()}
             </div>
             {/* Right: Heatmap (Day Frequency) */}
             <div className="bg-muted/20 dark:bg-muted/10 rounded-lg p-4 border border-neutral-200/50 dark:border-neutral-800/50">

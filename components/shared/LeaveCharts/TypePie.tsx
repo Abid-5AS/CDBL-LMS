@@ -86,10 +86,15 @@ export function TypePie({
             dataKey="value"
             onClick={(e) => {
               if (onSliceClick && e?.type) {
-                onSliceClick(e.type as Slice["type"]);
+                const type = e.type as Slice["type"];
+                // Telemetry: log click for filter UX confirmation
+                if (typeof window !== "undefined" && window.console) {
+                  console.debug("[TypePie] Slice clicked:", { type, timestamp: Date.now() });
+                }
+                onSliceClick(type);
               }
             }}
-            aria-label="Leave type distribution chart"
+            aria-label={`Leave type distribution chart showing ${chartData.length} leave types with total of ${chartData.reduce((sum, d) => sum + d.value, 0)} days`}
           >
             {chartData.map((entry, index) => (
               <Cell

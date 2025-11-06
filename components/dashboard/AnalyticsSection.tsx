@@ -12,7 +12,8 @@ import {
 } from "@/components/ui/tooltip";
 import { TrendingUp, Calendar, BarChart3, Info } from "lucide-react";
 import { LeaveHeatmap } from "./LeaveHeatmap";
-import { LeaveTypePieChart } from "./LeaveTypePieChart";
+import { TypePie } from "@/components/shared/LeaveCharts";
+import { fromDashboardAgg } from "@/components/shared/LeaveCharts/adapters";
 import useSWR from "swr";
 import { cn } from "@/lib/utils";
 
@@ -219,7 +220,15 @@ export function AnalyticsSection() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <LeaveTypePieChart data={pieData} />
+            {(() => {
+              const { slices } = fromDashboardAgg({
+                typeDistribution: pieData.map((item: any) => ({
+                  type: item.name,
+                  count: item.value,
+                })),
+              });
+              return <TypePie data={slices} height={200} />;
+            })()}
           </CardContent>
         </Card>
       </div>

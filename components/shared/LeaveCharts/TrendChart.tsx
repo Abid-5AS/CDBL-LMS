@@ -90,12 +90,17 @@ export function TrendChart({
         <BarChart
           data={normalizedData}
           margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
-          onClick={(e) => {
-            if (onBarClick && e?.activePayload?.[0]?.payload?.month) {
-              onBarClick(e.activePayload[0].payload.month);
-            }
-          }}
-          aria-label="Monthly leave trend chart"
+            onClick={(e) => {
+              if (onBarClick && e?.activePayload?.[0]?.payload?.month) {
+                const month = e.activePayload[0].payload.month;
+                // Telemetry: log click for filter UX confirmation
+                if (typeof window !== "undefined" && window.console) {
+                  console.debug("[TrendChart] Bar clicked:", { month, timestamp: Date.now() });
+                }
+                onBarClick(month);
+              }
+            }}
+          aria-label={`Monthly leave trend chart showing approved leaves from ${normalizedData[0]?.month || "Jan"} to ${normalizedData[normalizedData.length - 1]?.month || "Dec"}`}
         >
           <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
           <XAxis

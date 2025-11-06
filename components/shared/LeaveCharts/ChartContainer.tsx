@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "../EmptyState";
@@ -18,6 +18,7 @@ type ChartContainerProps = {
   children: ReactNode;
   className?: string;
   height?: number;
+  onRender?: (renderTime: number) => void; // Optional telemetry hook
 };
 
 /**
@@ -35,7 +36,26 @@ export function ChartContainer({
   children,
   className,
   height = 300,
+  onRender,
 }: ChartContainerProps) {
+  const renderStartRef = useRef<number | null>(null);
+  const hasRenderedRef = useRef(false);
+
+  useEffect(() => {
+    if (!loading && !empty && !hasRenderedRef.current && onRender) {
+      renderStartRef.current = performance.now();
+      hasRenderedRef.current = true;
+      
+      // Measure render time after paint
+      requestAnimationFrame(() => {
+        if (renderStartRef.current) {
+          const renderTime = performance.now() - renderStartRef.current;
+          onRender(renderTime);
+        }
+      });
+    }
+  }, [loading, empty, onRender]);
+
   return (
     <Card className={cn("glass-card", className)}>
       <CardHeader>
