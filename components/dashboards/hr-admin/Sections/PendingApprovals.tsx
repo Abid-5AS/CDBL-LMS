@@ -271,12 +271,21 @@ export function PendingLeaveRequestsTable({
       <div className="glass-card rounded-2xl overflow-hidden backdrop-blur-lg bg-white/60 dark:bg-neutral-950/60 border border-neutral-200/70 dark:border-neutral-800/70 shadow-lg">
         <div className="space-y-4 p-6">
           {/* Tab Chips */}
-          <div className="overflow-x-auto scrollbar-hide tablist-pad">
-            <StatusTabChips
-              options={STATUS_TABS}
-              value={statusTab}
-              onChange={setStatusTab}
-            />
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+            {STATUS_TABS.map((tab) => (
+              <button
+                key={tab.value}
+                onClick={() => setStatusTab(tab.value)}
+                className={cn(
+                  "px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
+                  statusTab === tab.value
+                    ? "bg-indigo-600 text-white"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
 
           {/* Search */}
