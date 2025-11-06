@@ -14,7 +14,8 @@ import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Calendar, Clock, FileText, User, MessageSquare, Eye, X } from "lucide-react";
-import { ApprovalTimeline } from "@/components/dashboard/ApprovalTimeline";
+import { SharedTimeline } from "@/components/shared/SharedTimeline";
+import { ApprovalTimelineAdapter } from "@/components/shared/timeline-adapters";
 import { ApprovalStepper } from "@/components/dashboard/ApprovalStepper";
 import {
   calculateCurrentStageIndex,
@@ -192,8 +193,8 @@ export function LeaveDetailsModal({ open, onOpenChange, leave }: LeaveDetailsMod
               </AccordionTrigger>
               <AccordionContent className="pt-2">
                 <div className="max-h-64 overflow-y-auto">
-                  <ApprovalTimeline
-                    approvals={
+                  <SharedTimeline
+                    items={ApprovalTimelineAdapter(
                       leave.approvals?.map((a) => ({
                         step: a.step,
                         approver:
@@ -204,10 +205,11 @@ export function LeaveDetailsModal({ open, onOpenChange, leave }: LeaveDetailsMod
                         comment: a.comment || undefined,
                         decidedAt: a.decidedAt || undefined,
                         toRole: a.toRole,
-                      })) || []
-                    }
-                    createdAt={leave.createdAt}
-                    status={leave.status}
+                      })) || [],
+                      leave.createdAt,
+                      leave.status
+                    )}
+                    variant="approval"
                   />
                 </div>
               </AccordionContent>
