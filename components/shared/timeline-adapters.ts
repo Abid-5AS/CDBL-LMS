@@ -192,6 +192,39 @@ export function ActiveRequestsTimelineAdapter(
   return activeLeaves;
 }
 
+// Sorted Timeline Adapter - for employee leave history sorted by date
+export function SortedTimelineAdapter(
+  leaves: LeaveRequest[],
+  referenceDate?: Date
+): TimelineItem[] {
+  const today = referenceDate || new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const sortedLeaves = [...leaves].sort((a, b) => {
+    const dateA = new Date(a.startDate);
+    const dateB = new Date(b.startDate);
+    return dateB.getTime() - dateA.getTime(); // Most recent first
+  });
+
+  return sortedLeaves.map((leave) => {
+    const startDate = new Date(leave.startDate);
+    const endDate = new Date(leave.endDate);
+    const isUpcoming = startDate >= today;
+
+    return {
+      id: `sorted-${leave.id}`,
+      at: leave.updatedAt || leave.startDate,
+      status: leave.status as TimelineItem["status"],
+      title: `${leave.type} Leave`,
+      subtitle: `${startDate.toLocaleDateString()} → ${endDate.toLocaleDateString()} (${leave.workingDays} days)`,
+      meta: {
+        workingDays: leave.workingDays,
+        isUpcoming: isUpcoming ? 1 : 0,
+      },
+    };
+  });
+}
+
 // Live Activity Timeline Adapter
 type LiveActivityLeave = {
   id: number;

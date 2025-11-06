@@ -56,7 +56,8 @@ export function DeptHeadDashboardWrapper() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <DashboardErrorBoundary role="DEPT_HEAD">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
       {/* Left Column - Pending Requests Table (8/12 width) */}
       <main className="lg:col-span-8 space-y-6">
         <div id="pending-requests-table">
