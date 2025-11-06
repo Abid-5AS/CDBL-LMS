@@ -4,7 +4,8 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SegmentedControlGlider } from "./SegmentedControlGlider";
-import { LeaveBalanceCards } from "./LeaveBalanceCards";
+import { LeaveBalancePanel } from "@/components/shared/LeaveBalancePanel";
+import { fromDashboardSummary } from "@/components/shared/balance-adapters";
 import { TeamOnLeaveWidget } from "./TeamOnLeaveWidget";
 import { InsightsWidget } from "./InsightsWidget";
 
@@ -45,10 +46,16 @@ export function LeaveOverviewCard({
       </CardHeader>
       <CardContent>
         {activeTab === "balance" && (
-          <LeaveBalanceCards
-            balanceData={balanceData}
-            leavesData={leavesData}
-            isLoading={isLoadingBalance}
+          <LeaveBalancePanel
+            balances={fromDashboardSummary(balanceData)}
+            variant="full"
+            showMeters={true}
+            showPolicyHints={true}
+            loading={isLoadingBalance}
+            onClickType={(type) => {
+              // Navigate to apply page with type pre-selected
+              window.location.href = `/leaves/apply?type=${type}`;
+            }}
           />
         )}
         {activeTab === "team" && (

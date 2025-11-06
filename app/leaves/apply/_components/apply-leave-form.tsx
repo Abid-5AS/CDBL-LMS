@@ -26,6 +26,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { AlertCircle, FileText, Clock, Info, HelpCircle, Calendar, MessageSquare, Paperclip, ClipboardList, BookOpenText, Send, CheckCircle2 } from "lucide-react";
+import { LeaveBalancePanel } from "@/components/shared/LeaveBalancePanel";
+import { fromBalanceResponse } from "@/components/shared/balance-adapters";
 import { formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { policy } from "@/lib/policy";
@@ -934,7 +936,7 @@ function LeaveSummaryCard({
   );
 }
 
-// Current Balances Card Component
+// Current Balances Card Component - replaced with LeaveBalancePanel compact variant
 function CurrentBalancesCard({
   balances,
   balancesLoading,
@@ -948,36 +950,23 @@ function CurrentBalancesCard({
     <Card className="rounded-2xl border-muted shadow-sm">
       <CardHeader>
         <CardTitle className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Current Balances
+          Leave Summary
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {balancesLoading ? (
-          <div className="space-y-2">
-            <div className="h-3 w-3/4 animate-pulse rounded bg-muted" />
-            <div className="h-3 w-2/3 animate-pulse rounded bg-muted" />
-            <div className="h-3 w-1/2 animate-pulse rounded bg-muted" />
-          </div>
-        ) : balancesError ? (
-          <p className="text-sm text-amber-600 dark:text-amber-400">
-            Unable to load balances right now. You can still submit your request.
-          </p>
-        ) : (
-          <ul className="space-y-3 text-sm">
-            <li className="flex items-center justify-between">
-              <span className="text-muted-foreground">Casual</span>
-              <span className="font-semibold text-foreground">{balances?.CASUAL ?? "—"} days</span>
-            </li>
-            <li className="flex items-center justify-between">
-              <span className="text-muted-foreground">Medical</span>
-              <span className="font-semibold text-foreground">{balances?.MEDICAL ?? "—"} days</span>
-            </li>
-            <li className="flex items-center justify-between">
-              <span className="text-muted-foreground">Earned</span>
-              <span className="font-semibold text-foreground">{balances?.EARNED ?? "—"} days</span>
-            </li>
-          </ul>
-        )}
+        <LeaveBalancePanel
+          balances={balances ? fromBalanceResponse(balances) : []}
+          variant="compact"
+          showMeters={true}
+          loading={balancesLoading}
+          emptyState={
+            balancesError ? (
+              <p className="text-sm text-amber-600 dark:text-amber-400">
+                Unable to load balances right now. You can still submit your request.
+              </p>
+            ) : undefined
+          }
+        />
       </CardContent>
     </Card>
   );
