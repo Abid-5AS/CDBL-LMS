@@ -4,8 +4,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Shield, Users, Activity, Settings } from "lucide-react";
-import { SystemOverviewCards } from "./SystemOverviewCards";
-import { RecentAuditLogs } from "./RecentAuditLogs";
+import { RecentAuditLogs } from "@/components/shared/widgets/RecentAuditLogs";
 import { KPICard } from "@/app/dashboard/shared/KPICard";
 import { QuickActions } from "@/app/dashboard/shared/QuickActions";
 import { DashboardGrid, DashboardSection } from "@/app/dashboard/shared/DashboardLayout";
@@ -76,7 +75,16 @@ export function SystemAdminDashboard({ username }: SystemAdminDashboardProps) {
         description="Key system metrics and status"
       >
         <Suspense fallback={<DashboardCardSkeleton />}>
-          <SystemOverviewCards />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <KPICard
+              title="System Status"
+              value="Healthy"
+              subtext="All systems operational"
+              icon={Activity}
+              iconColor="text-green-600"
+              accentColor="bg-green-600"
+            />
+          </div>
         </Suspense>
       </DashboardSection>
 

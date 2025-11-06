@@ -112,7 +112,8 @@ export function DeptHeadDashboardWrapper() {
           <DeptHeadQuickActions />
         </Suspense>
       </aside>
-    </div>
+      </div>
+    </DashboardErrorBoundary>
   );
 }
 

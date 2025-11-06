@@ -3,8 +3,7 @@ import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SystemOverviewCards } from "./SystemOverviewCards";
-import { RecentAuditLogs } from "./RecentAuditLogs";
+import { RecentAuditLogs } from "@/components/shared/widgets/RecentAuditLogs";
 
 type SuperAdminDashboardProps = {
   username: string;
@@ -28,7 +27,16 @@ export function SuperAdminDashboard({ username }: SuperAdminDashboardProps) {
       <section className="space-y-4">
         <h3 className="text-lg font-semibold text-slate-900">System Overview</h3>
         <Suspense fallback={<OverviewCardsSkeleton />}>
-          <SystemOverviewCards />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">System Status</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-green-600">Healthy</p>
+              </CardContent>
+            </Card>
+          </div>
         </Suspense>
       </section>
 

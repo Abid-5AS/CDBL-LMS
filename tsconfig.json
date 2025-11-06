@@ -17,6 +17,7 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"
@@ -27,10 +28,10 @@
         "./*"
       ],
       "@shared/*": [
-        "components/shared/*"
+        "./components/shared/*"
       ],
       "@dash/*": [
-        "components/dashboards/*"
+        "./components/dashboards/*"
       ]
     }
   },
