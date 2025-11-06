@@ -11,7 +11,19 @@ type LeaveBalanceCardProps = {
 
 /**
  * LeaveBalanceCard - Wrapper around LeaveBalancePanel for backward compatibility
- * @deprecated Use LeaveBalancePanel directly
+ * 
+ * @deprecated This component is deprecated and will be removed in a future version.
+ * Use LeaveBalancePanel directly from @/components/shared/LeaveBalancePanel
+ * 
+ * Migration:
+ * ```tsx
+ * // Before
+ * <LeaveBalanceCard balances={balances} />
+ * 
+ * // After
+ * import { LeaveBalancePanel, fromDashboardSummary } from "@/components/shared/LeaveBalancePanel";
+ * <LeaveBalancePanel balances={fromDashboardSummary(balances)} variant="full" />
+ * ```
  */
 export function LeaveBalanceCard({ balances }: LeaveBalanceCardProps) {
   // Convert old format to new Balance format
