@@ -32,10 +32,13 @@ type UnifiedModalProps = {
   nestedContent?: ReactNode;
   nestedTitle?: string;
   nestedDescription?: string;
+  // Custom footer for custom mode
+  footer?: ReactNode;
   // Custom styling
   className?: string;
   size?: "sm" | "md" | "lg" | "xl" | "2xl";
   showCloseButton?: boolean;
+  disableOutsideClick?: boolean;
 };
 
 /**
@@ -59,9 +62,11 @@ export function UnifiedModal({
   nestedContent,
   nestedTitle,
   nestedDescription,
+  footer,
   className,
   size = "md",
   showCloseButton = true,
+  disableOutsideClick = false,
 }: UnifiedModalProps) {
   const [showNested, setShowNested] = useState(false);
 
@@ -192,12 +197,19 @@ export function UnifiedModal({
       <DialogContent
         className={cn("glass-modal", sizeClasses[size], className)}
         showCloseButton={showCloseButton}
+        onPointerDownOutside={(e) => {
+          if (disableOutsideClick) e.preventDefault();
+        }}
+        onEscapeKeyDown={(e) => {
+          if (disableOutsideClick) e.preventDefault();
+        }}
       >
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
         {children}
+        {footer && <DialogFooter>{footer}</DialogFooter>}
       </DialogContent>
     </Dialog>
   );

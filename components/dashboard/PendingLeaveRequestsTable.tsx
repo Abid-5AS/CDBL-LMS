@@ -39,7 +39,7 @@ import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { StatusTabChips } from "./StatusTabChips";
-import { ReviewLeaveModal } from "./ReviewLeaveModal";
+import { ReviewModal } from "@/components/shared/ReviewModal";
 import useSWR from "swr";
 import { LeaveStatus } from "@prisma/client";
 import { toast } from "sonner";
@@ -586,7 +586,7 @@ export function PendingLeaveRequestsTable({
 
       {/* Unified Review Modal - handles both viewing details and actions */}
       {selectedLeave && (
-        <ReviewLeaveModal
+        <ReviewModal
           open={modalOpen}
           onOpenChange={handleModalOpenChange}
           leaveRequest={selectedLeave}
