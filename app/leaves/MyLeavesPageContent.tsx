@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useLeaveData } from "@/components/providers/LeaveDataProvider";
+import { CANCELABLE_STATUSES } from "@/hooks/useLeaveRequests";
 
 type LeaveRow = {
   id: number;
@@ -33,14 +34,18 @@ type LeaveRow = {
   startDate: string;
   endDate: string;
   workingDays: number;
-  status: "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | "RETURNED" | "CANCELLATION_REQUESTED" | "RECALLED";
+  status:
+    | "SUBMITTED"
+    | "PENDING"
+    | "APPROVED"
+    | "REJECTED"
+    | "CANCELLED"
+    | "RETURNED"
+    | "CANCELLATION_REQUESTED"
+    | "RECALLED";
   updatedAt: string;
   reason?: string;
 };
-
-// Allow cancellation for: SUBMITTED, PENDING, RETURNED, APPROVED
-// Note: CANCELLATION_REQUESTED is excluded - cancellation already in progress
-const CANCELABLE_STATUSES = new Set<LeaveRow["status"]>(["SUBMITTED", "PENDING", "RETURNED", "APPROVED"]);
 
 const FILTER_OPTIONS = [
   { value: "all", label: "All" },

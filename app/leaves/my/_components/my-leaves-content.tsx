@@ -28,6 +28,7 @@ import { RoleAwareDock } from "@/components/dock/RoleAwareDock";
 import { useUser } from "@/lib/user-context";
 import { useSelectedIds, useSelectionContext } from "@/lib/selection-context";
 import { useLeaveData } from "@/components/providers/LeaveDataProvider";
+import { CANCELABLE_STATUSES } from "@/hooks/useLeaveRequests";
 
 type LeaveRow = {
   id: number;
@@ -39,10 +40,6 @@ type LeaveRow = {
   updatedAt: string;
   reason?: string;
 };
-
-// Allow cancellation for: SUBMITTED, PENDING, RETURNED, APPROVED
-// Note: CANCELLATION_REQUESTED is excluded - cancellation already in progress
-const CANCELABLE_STATUSES = new Set<LeaveRow["status"]>(["SUBMITTED", "PENDING", "RETURNED", "APPROVED"]);
 
 const STATUS_OPTIONS = [
   { value: "PENDING", label: "Pending" },
