@@ -66,7 +66,7 @@ export function LeaveDetailsContent({ leave, comments, currentUserId }: LeaveDet
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="/leaves/my">My Leaves</Link>
+                <Link href="/leaves">My Leaves</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
@@ -318,7 +318,6 @@ export function LeaveDetailsContent({ leave, comments, currentUserId }: LeaveDet
     </div>
   );
 }
-
 
 
 

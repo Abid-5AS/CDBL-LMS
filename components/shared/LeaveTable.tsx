@@ -7,7 +7,7 @@
  * It will consolidate:
  * - components/dashboard/PendingLeaveRequestsTable.tsx
  * - app/dashboard/components/requests-table.tsx
- * - app/leaves/my/_components/my-leaves-content.tsx (table portion)
+ * - app/leaves/MyLeavesPageContent.tsx (table portion)
  * 
  * Features to implement:
  * - Responsive design (no horizontal scroll)
@@ -38,4 +38,3 @@ export function LeaveTable(props: LeaveTableProps) {
     />
   );
 }
-

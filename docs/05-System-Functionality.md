@@ -64,7 +64,7 @@ This document provides a comprehensive list of all features and functionalities 
 ### 2.2 Leave Viewing & History
 
 **Features**:
-- Personal leave history (`/leaves/my`)
+- Personal leave history (`/leaves`)
 - All leaves list (`/leaves`)
 - Leave detail view
 - Status tracking
@@ -72,7 +72,7 @@ This document provides a comprehensive list of all features and functionalities 
 - Filtering by status, type, year
 - Search functionality
 
-**Location**: `app/leaves/my/`, `app/leaves/page.tsx`
+**Location**: `app/leaves/page.tsx`
 
 ---
 
@@ -649,4 +649,3 @@ This document provides a comprehensive list of all features and functionalities 
 **Last Updated**: Current  
 **Total Modules**: 18  
 **Total Features**: 100+ individual features
-

@@ -121,7 +121,7 @@ export function ReturnedRequestsPanel() {
                   </TableCell>
                   <TableCell className="text-right">
                     <Button asChild size="sm" variant="outline">
-                      <Link href={`/leaves/my?leave=${leave.id}`}>View Details</Link>
+                      <Link href={`/leaves?highlight=${leave.id}`}>View Details</Link>
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -140,4 +140,3 @@ export function ReturnedRequestsPanel() {
     </Card>
   );
 }
-

@@ -25,7 +25,7 @@ Refactor data fetching patterns to use Next.js 16 Suspense boundaries and cache 
 - [ ] `/dashboard` - Wrap balance summary cards in Suspense
 - [ ] `/employees/[id]` - Add Suspense for employee data
 - [ ] `/approvals` - Add Suspense for pending approvals list
-- [ ] `/leaves/my` - Add Suspense for leave history
+- [ ] `/leaves` - Add Suspense for leave history
 
 ### 5. Loading States
 - [ ] Create reusable loading skeleton components
@@ -38,4 +38,3 @@ Refactor data fetching patterns to use Next.js 16 Suspense boundaries and cache 
 - Use server components for data fetching when possible
 - Keep loading states consistent across the app
 - Test loading states with slow network simulation
-
