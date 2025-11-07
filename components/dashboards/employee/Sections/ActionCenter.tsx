@@ -82,13 +82,11 @@ interface ActionCenterCardProps {
   isLoading: boolean;
 }
 
-function ReturnedRequestRow({ 
-  leave, 
-  onResubmit, 
-  index 
-}: { 
-  leave: ReturnedLeave; 
-  onResubmit: () => void;
+function ReturnedRequestRow({
+  leave,
+  index,
+}: {
+  leave: ReturnedLeave;
   index: number;
 }) {
   // Extract return information from approvals or comments already in the leave data
@@ -245,16 +243,22 @@ function ReturnedRequestRow({
 export function ActionCenterCard({ leaves, isLoading }: ActionCenterCardProps) {
   const router = useRouter();
 
-  // Fetch returned leaves
-  const { data: leavesData, isLoading: leavesLoading, mutate } = useSWR<{ items: ReturnedLeave[] }>(
-    "/api/leaves?mine=1&status=RETURNED",
-    fetcher,
-    {
-      revalidateOnFocus: false,
-    }
-  );
-
-  const returnedLeaves = Array.isArray(leavesData?.items) ? leavesData.items : [];
+  const returnedLeaves = useMemo<ReturnedLeave[]>(() => {
+    return leaves
+      .filter((leave) => leave.status === "RETURNED")
+      .map((leave) => ({
+        id: leave.id,
+        type: leave.type,
+        startDate: leave.startDate,
+        endDate: leave.endDate,
+        workingDays: leave.workingDays ?? 0,
+        reason: leave.reason ?? "",
+        status: leave.status as LeaveStatus,
+        updatedAt: leave.updatedAt,
+        approvals: (leave as ReturnedLeave).approvals,
+        comments: (leave as ReturnedLeave).comments,
+      }));
+  }, [leaves]);
 
   // Quick actions logic (extracted from QuickActions component)
   const { hasPending, hasApprovedOwn, hasMedicalOver7Days, pendingId, approvedOwnId, medicalOver7Id } = useMemo(() => {
@@ -288,7 +292,7 @@ export function ActionCenterCard({ leaves, isLoading }: ActionCenterCardProps) {
     };
   }, [leaves]);
 
-  const isLoadingData = isLoading || leavesLoading;
+  const isLoadingData = isLoading;
   const hasReturnedRequests = returnedLeaves.length > 0;
 
   return (
@@ -368,10 +372,9 @@ export function ActionCenterCard({ leaves, isLoading }: ActionCenterCardProps) {
               </TableHeader>
               <TableBody>
                 {returnedLeaves.map((leave, index) => (
-                  <ReturnedRequestRow 
-                    key={leave.id} 
-                    leave={leave} 
-                    onResubmit={mutate}
+                  <ReturnedRequestRow
+                    key={leave.id}
+                    leave={leave}
                     index={index}
                   />
                 ))}
@@ -395,4 +398,3 @@ export function ActionCenterCard({ leaves, isLoading }: ActionCenterCardProps) {
     </Card>
   );
 }
-
