@@ -3,16 +3,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import useSWR from "swr";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { useLeaveData } from "@/components/providers/LeaveDataProvider";
 
 export function MiniCalendar() {
-  const { data: leavesData, isLoading: leavesLoading } = useSWR("/api/leaves?mine=1", fetcher, {
-    revalidateOnFocus: false,
-  });
+  const { data: leavesData, isLoading: leavesLoading } = useLeaveData();
 
   const today = new Date();
   const currentMonth = today.getMonth();
@@ -163,4 +159,3 @@ export function MiniCalendar() {
     </Card>
   );
 }
-

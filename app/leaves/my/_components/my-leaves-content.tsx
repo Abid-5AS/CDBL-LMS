@@ -22,12 +22,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import useSWR from "swr";
 import { FilterBar } from "@/components/filters/FilterBar";
 import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/toast-messages";
 import { RoleAwareDock } from "@/components/dock/RoleAwareDock";
 import { useUser } from "@/lib/user-context";
 import { useSelectedIds, useSelectionContext } from "@/lib/selection-context";
+import { useLeaveData } from "@/components/providers/LeaveDataProvider";
 
 type LeaveRow = {
   id: number;
@@ -40,7 +40,6 @@ type LeaveRow = {
   reason?: string;
 };
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 // Allow cancellation for: SUBMITTED, PENDING, RETURNED, APPROVED
 // Note: CANCELLATION_REQUESTED is excluded - cancellation already in progress
 const CANCELABLE_STATUSES = new Set<LeaveRow["status"]>(["SUBMITTED", "PENDING", "RETURNED", "APPROVED"]);
@@ -77,9 +76,7 @@ export function MyLeavesContent() {
   const selectedIds = useSelectedIds();
   const { toggleSelection } = useSelectionContext();
 
-  const { data, isLoading, error, mutate } = useSWR<{ items: LeaveRow[] }>("/api/leaves?mine=1", fetcher, {
-    revalidateOnFocus: false,
-  });
+  const { data, isLoading, error, mutate } = useLeaveData();
 
   const allRows: LeaveRow[] = Array.isArray(data?.items) ? data.items : [];
 
@@ -305,4 +302,3 @@ export function MyLeavesContent() {
     </div>
   );
 }
-

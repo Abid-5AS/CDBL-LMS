@@ -29,3 +29,13 @@ export function LeaveDataProvider({ children }: { children: ReactNode }) {
 export function useLeaveDataContext() {
   return useContext(LeaveDataContext);
 }
+
+export function useLeaveData() {
+  const context = useLeaveDataContext();
+  const fallback = useSWR<LeaveResponse>(
+    context ? null : "/api/leaves?mine=1",
+    fetcher,
+    { revalidateOnFocus: false },
+  );
+  return context ?? fallback;
+}

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import clsx from "clsx";
 import { Plus, Eye, TrendingUp, X } from "lucide-react";
-import useSWR from "swr";
+import { useLeaveData } from "@/components/providers/LeaveDataProvider";
 
 type FABAction = {
   label: string;
@@ -13,8 +13,6 @@ type FABAction = {
   href: string;
   badge?: number;
 };
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export function QuickActionFAB() {
   const pathname = usePathname();
@@ -32,10 +30,8 @@ export function QuickActionFAB() {
     }
   }, [isOpen]);
 
-  // Fetch pending requests for context
-  const { data: leavesData } = useSWR("/api/leaves?mine=1", fetcher, {
-    revalidateOnFocus: false,
-  });
+  // Access pending requests for context
+  const { data: leavesData } = useLeaveData();
 
   const pendingCount = Array.isArray(leavesData?.items)
     ? leavesData.items.filter((item: { status: string }) => 
@@ -143,4 +139,3 @@ export function QuickActionFAB() {
     </div>
   );
 }
-

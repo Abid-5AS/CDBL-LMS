@@ -23,9 +23,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { LeaveDetailsModal } from "@/components/shared/LeaveDetailsModal";
 import { toast } from "sonner";
-import useSWR from "swr";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useLeaveData } from "@/components/providers/LeaveDataProvider";
 
 type LeaveRow = {
   id: number;
@@ -38,7 +38,6 @@ type LeaveRow = {
   reason?: string;
 };
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 // Allow cancellation for: SUBMITTED, PENDING, RETURNED, APPROVED
 // Note: CANCELLATION_REQUESTED is excluded - cancellation already in progress
 const CANCELABLE_STATUSES = new Set<LeaveRow["status"]>(["SUBMITTED", "PENDING", "RETURNED", "APPROVED"]);
@@ -62,9 +61,7 @@ export function MyLeavesPageContent() {
   const [currentPage, setCurrentPage] = useState(1);
   
   // Fetch data first
-  const { data, isLoading, error, mutate } = useSWR("/api/leaves?mine=1", fetcher, {
-    revalidateOnFocus: false,
-  });
+  const { data, isLoading, error, mutate } = useLeaveData();
 
   // Get all rows from data
   const allRows: LeaveRow[] = Array.isArray(data?.items) ? data.items : [];
@@ -371,4 +368,3 @@ export function MyLeavesPageContent() {
     </div>
   );
 }
-

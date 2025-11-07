@@ -2,12 +2,13 @@
 
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import useSWR from "swr";
 import { formatDate } from "@/lib/utils";
 import { getIcon, iconSizes } from "@/lib/icons";
 import { SharedTimeline } from "@/components/shared/SharedTimeline";
 import { ApprovalTimelineAdapter } from "@/components/shared/timeline-adapters";
 import { cn } from "@/lib/utils";
+import useSWR from "swr";
+import { useLeaveData } from "@/components/providers/LeaveDataProvider";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -31,9 +32,7 @@ type LeaveItem = {
 export function HeroStrip({ name }: HeroStripProps) {
   const router = useRouter();
   
-  const { data: leavesData } = useSWR<{ items: LeaveItem[] }>("/api/leaves?mine=1", fetcher, {
-    revalidateOnFocus: false,
-  });
+  const { data: leavesData } = useLeaveData();
   
   const { data: holidaysData } = useSWR("/api/holidays?upcoming=true", fetcher, {
     revalidateOnFocus: false,

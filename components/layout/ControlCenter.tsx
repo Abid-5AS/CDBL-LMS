@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Plane, Clock, LogOut, FileText, User, Calendar, CheckCircle2, AlertCircle, XCircle } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
-import useSWR from "swr";
+import { useLeaveData } from "@/components/providers/LeaveDataProvider";
 
 type BalanceData = {
   earned?: number;
@@ -44,8 +44,6 @@ const formatRole = (role: string) => {
   return labels[role] || role;
 };
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
 type TabValue = "balance" | "actions" | "recent";
 
 export default function ControlCenter({ onClose }: { onClose: () => void }) {
@@ -55,14 +53,7 @@ export default function ControlCenter({ onClose }: { onClose: () => void }) {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabValue>("balance");
 
-  // Fetch recent leaves
-  const { data: leavesData } = useSWR<{ items: LeaveItem[] }>(
-    user?.role && user.role !== "CEO" && user.role !== "HR_HEAD" 
-      ? "/api/leaves?mine=1" 
-      : null,
-    fetcher,
-    { revalidateOnFocus: false }
-  );
+  const { data: leavesData } = useLeaveData();
 
   // Fetch live data
   useEffect(() => {
@@ -103,7 +94,7 @@ export default function ControlCenter({ onClose }: { onClose: () => void }) {
 
   // Process recent leaves
   const recentLeaves = useMemo(() => {
-    if (!leavesData?.items) return [];
+    if (!leavesData?.items || !showEmployeeContent) return [];
     return leavesData.items
       .slice(0, 5)
       .map((leave) => ({
