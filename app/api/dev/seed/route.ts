@@ -5,6 +5,10 @@ import { Role } from "@prisma/client";
 export const cache = "no-store";
 
 export async function POST() {
+  if (process.env.NODE_ENV !== "development") {
+    return NextResponse.json({ error: "not_found" }, { status: 404 });
+  }
+
   const seed = [
     {
       name: "Employee One",
@@ -29,22 +33,29 @@ export async function POST() {
     },
   ];
 
-  for (const user of seed) {
-    await prisma.user.upsert({
-      where: { email: user.email },
-      update: {
-        name: user.name,
-        role: user.role,
-        empCode: user.empCode,
-        department: user.department,
-      },
-      create: user,
+  try {
+    await prisma.$transaction(
+      seed.map((user) =>
+        prisma.user.upsert({
+          where: { email: user.email },
+          update: {
+            name: user.name,
+            role: user.role,
+            empCode: user.empCode,
+            department: user.department,
+          },
+          create: user,
+        }),
+      ),
+    );
+
+    const count = await prisma.user.count({
+      where: { email: { in: seed.map((u) => u.email) } },
     });
+
+    return NextResponse.json({ ok: true, count });
+  } catch (error) {
+    console.error("Failed to run dev seed:", error);
+    return NextResponse.json({ error: "seed_failed" }, { status: 500 });
   }
-
-  const count = await prisma.user.count({
-    where: { email: { in: seed.map((u) => u.email) } },
-  });
-
-  return NextResponse.json({ ok: true, count });
 }
