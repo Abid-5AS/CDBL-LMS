@@ -65,7 +65,7 @@ export type LeaveModalState = {
 
 export function useLeaveRequests({ limit, enableSelection }: UseLeaveRequestsOptions = {}) {
   const selectionEnabled = enableSelection ?? (limit === undefined || limit === null);
-  const { setSelectionCount } = useSelectionContext();
+  const { setSelection } = useSelectionContext();
   const contextValue = useLeaveDataContext();
   const fallback = useSWR<LeaveResponse>("/api/leaves?mine=1", fetcher, {
     revalidateOnFocus: false,
@@ -78,9 +78,15 @@ export function useLeaveRequests({ limit, enableSelection }: UseLeaveRequestsOpt
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    if (!selectionEnabled) return;
-    setSelectionCount(selectedIds.size);
-  }, [selectionEnabled, selectedIds, setSelectionCount]);
+    if (!selectionEnabled) {
+      setSelection([]);
+      return;
+    }
+    setSelection(selectedIds);
+    return () => {
+      setSelection([]);
+    };
+  }, [selectionEnabled, selectedIds, setSelection]);
 
   const allRows: LeaveRow[] = useMemo(() => (Array.isArray(data?.items) ? data.items : []), [data]);
 

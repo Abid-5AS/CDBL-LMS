@@ -59,15 +59,16 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const { setSelectionCount } = useSelectionContext();
+  const { setSelection } = useSelectionContext();
   const user = useUser();
   const userRole = (user?.role as AppRole) || "EMPLOYEE";
   const isHRAdmin = userRole === "HR_ADMIN";
 
   // Update selection count when selectedIds changes
   useEffect(() => {
-    setSelectionCount(selectedIds.size);
-  }, [selectedIds, setSelectionCount]);
+    setSelection(selectedIds);
+    return () => setSelection([]);
+  }, [selectedIds, setSelection]);
 
   const { data, error, isLoading, mutate } = useSWR<ApprovalsResponse>("/api/approvals", fetcher, {
     revalidateOnFocus: true,
