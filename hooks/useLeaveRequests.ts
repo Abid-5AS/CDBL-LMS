@@ -45,6 +45,7 @@ export const CANCELABLE_STATUSES = new Set<LeaveRow["status"]>(["SUBMITTED", "PE
 
 type UseLeaveRequestsOptions = {
   limit?: number;
+  enableSelection?: boolean;
 };
 
 export type SelectionState = {
@@ -62,8 +63,8 @@ export type LeaveModalState = {
   handleOpenChange: (open: boolean) => void;
 };
 
-export function useLeaveRequests({ limit }: UseLeaveRequestsOptions = {}) {
-  const enableSelection = !limit;
+export function useLeaveRequests({ limit, enableSelection }: UseLeaveRequestsOptions = {}) {
+  const selectionEnabled = enableSelection ?? (limit === undefined || limit === null);
   const { setSelectionCount } = useSelectionContext();
   const contextValue = useLeaveDataContext();
   const fallback = useSWR<LeaveResponse>("/api/leaves?mine=1", fetcher, {
@@ -77,8 +78,9 @@ export function useLeaveRequests({ limit }: UseLeaveRequestsOptions = {}) {
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    setSelectionCount(enableSelection ? selectedIds.size : 0);
-  }, [enableSelection, selectedIds, setSelectionCount]);
+    if (!selectionEnabled) return;
+    setSelectionCount(selectedIds.size);
+  }, [selectionEnabled, selectedIds, setSelectionCount]);
 
   const allRows: LeaveRow[] = useMemo(() => (Array.isArray(data?.items) ? data.items : []), [data]);
 
@@ -109,16 +111,16 @@ export function useLeaveRequests({ limit }: UseLeaveRequestsOptions = {}) {
   const changeFilter = useCallback(
     (next: FilterStatus) => {
       setFilter(next);
-      if (enableSelection) {
+      if (selectionEnabled) {
         setSelectedIds(new Set());
       }
     },
-    [enableSelection],
+    [selectionEnabled],
   );
 
   const selectRow = useCallback(
     (id: number, checked: boolean) => {
-      if (!enableSelection) return;
+      if (!selectionEnabled) return;
       setSelectedIds((prev) => {
         const next = new Set(prev);
         if (checked) {
@@ -129,32 +131,40 @@ export function useLeaveRequests({ limit }: UseLeaveRequestsOptions = {}) {
         return next;
       });
     },
-    [enableSelection],
+    [selectionEnabled],
   );
 
   const selectAll = useCallback(
     (checked: boolean) => {
-      if (!enableSelection) return;
-      setSelectedIds(checked ? new Set(filteredRows.map((row) => row.id)) : new Set());
-    },
-    [enableSelection, filteredRows],
+      if (!selectionEnabled) return;
+    setSelectedIds(checked ? new Set(filteredRows.map((row) => row.id)) : new Set());
+  },
+    [selectionEnabled, filteredRows],
   );
 
   const allSelected =
-    enableSelection && filteredRows.length > 0 && selectedIds.size === filteredRows.length;
+    selectionEnabled && filteredRows.length > 0 && selectedIds.size === filteredRows.length;
   const someSelected =
-    enableSelection && selectedIds.size > 0 && selectedIds.size < filteredRows.length;
+    selectionEnabled && selectedIds.size > 0 && selectedIds.size < filteredRows.length;
 
-  const selection: SelectionState = useMemo(
-    () => ({
+  const selection: SelectionState = useMemo(() => {
+    if (!selectionEnabled) {
+      return {
+        allSelected: false,
+        someSelected: false,
+        isSelected: () => false,
+        selectRow: () => {},
+        selectAll: () => {},
+      };
+    }
+    return {
       allSelected,
       someSelected,
       isSelected: (id: number) => selectedIds.has(id),
       selectRow,
       selectAll,
-    }),
-    [allSelected, someSelected, selectedIds, selectRow, selectAll],
-  );
+    };
+  }, [selectionEnabled, allSelected, someSelected, selectedIds, selectRow, selectAll]);
 
   const openDetails = useCallback((leave: LeaveRow) => {
     setSelectedLeave(leave);
@@ -198,7 +208,7 @@ export function useLeaveRequests({ limit }: UseLeaveRequestsOptions = {}) {
             ? SUCCESS_MESSAGES.cancellation_success
             : SUCCESS_MESSAGES.cancellation_request_submitted,
         );
-        if (enableSelection) {
+        if (selectionEnabled) {
           setSelectedIds((prev) => {
             const next = new Set(prev);
             next.delete(id);
@@ -211,7 +221,7 @@ export function useLeaveRequests({ limit }: UseLeaveRequestsOptions = {}) {
         toast.error(getToastMessage("network_error", "Network error. Please try again."));
       }
     },
-    [enableSelection, mutate],
+    [selectionEnabled, mutate],
   );
 
   return {
@@ -221,7 +231,7 @@ export function useLeaveRequests({ limit }: UseLeaveRequestsOptions = {}) {
     changeFilter,
     isLoading,
     error,
-    enableSelection,
+    enableSelection: selectionEnabled,
     selection,
     modal,
     cancelRequest,

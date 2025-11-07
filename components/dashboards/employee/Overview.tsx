@@ -8,25 +8,7 @@ import { DashboardGreeting } from "./Sections/Greeting";
 import { ActionCenterCard } from "./Sections/ActionCenter";
 import { LeaveOverviewCard } from "./Sections/LeaveOverview";
 import { HistoryAnalyticsCard } from "./Sections/History";
-
-type LeaveStatus =
-  | "SUBMITTED"
-  | "PENDING"
-  | "APPROVED"
-  | "REJECTED"
-  | "CANCELLED"
-  | "RETURNED"
-  | "CANCELLATION_REQUESTED"
-  | "RECALLED";
-
-type LeaveRow = {
-  id: number;
-  type: string;
-  status: LeaveStatus;
-  workingDays?: number;
-  endDate?: string;
-  fitnessCertificateUrl?: string | null;
-};
+import { useLeaveRequests } from "@/hooks/useLeaveRequests";
 
 type EmployeeDashboardContentProps = {
   username: string;
@@ -43,17 +25,12 @@ type EmployeeDashboardContentProps = {
  * 2. Leave Overview (Balance | Team | Insights tabs)
  * 3. History & Analytics (Recent | Timeline | Heatmap | Distribution tabs)
  */
-export function EmployeeDashboardContent({
-  username,
-}: EmployeeDashboardContentProps) {
-  // Use unified API client for data fetching
-  const { data: leavesData, isLoading: isLoadingLeaves } = useApiQuery<{
-    items: LeaveRow[];
-  }>("/api/leaves?mine=1");
+export function EmployeeDashboardContent({ username }: EmployeeDashboardContentProps) {
+  const { allRows: leaves, isLoading: isLoadingLeaves } = useLeaveRequests({
+    enableSelection: false,
+  });
   const { data: balanceData, isLoading: isLoadingBalance } =
     useApiQuery<Record<string, number>>("/api/balance/mine");
-
-  const leaves: LeaveRow[] = leavesData?.items || [];
 
   return (
     <DashboardErrorBoundary role="EMPLOYEE">
@@ -72,7 +49,6 @@ export function EmployeeDashboardContent({
         <Suspense fallback={<Skeleton className="h-96 w-full rounded-xl" />}>
           <LeaveOverviewCard
             balanceData={balanceData}
-            leavesData={leavesData}
             isLoadingBalance={isLoadingBalance}
             isLoadingLeaves={isLoadingLeaves}
           />
@@ -82,10 +58,7 @@ export function EmployeeDashboardContent({
         <Suspense
           fallback={<Skeleton className="h-[500px] w-full rounded-xl" />}
         >
-          <HistoryAnalyticsCard
-            leaves={leavesData?.items || []}
-            isLoadingLeaves={isLoadingLeaves}
-          />
+          <HistoryAnalyticsCard leaves={leaves} isLoadingLeaves={isLoadingLeaves} />
         </Suspense>
       </div>
     </DashboardErrorBoundary>
