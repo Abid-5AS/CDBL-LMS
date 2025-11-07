@@ -6,6 +6,7 @@ import { useUser } from "@/lib/user-context";
 import { SelectionProvider } from "@/lib/selection-context";
 import { cn } from "@/lib/utils";
 import { SlideDrawer } from "@/components/unified/SlideDrawer";
+import { LeaveDataProvider } from "@/components/providers/LeaveDataProvider";
 
 type LayoutWrapperProps = {
   children: React.ReactNode;
@@ -40,32 +41,34 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   // Modern layout with top navbar (no bottom dock)
   return (
     <SelectionProvider>
-      <div
-        className="flex min-h-screen flex-col bg-background"
-        suppressHydrationWarning
-      >
-        <Navbar />
-        <main
-          className={cn(
-            "flex-1 overflow-y-auto",
-            "pt-[72px]" // Offset for fixed navbar (initial height, animates to 60px on scroll)
-          )}
-          role="main"
-          aria-label="Main content"
+      <LeaveDataProvider>
+        <div
+          className="flex min-h-screen flex-col bg-background"
+          suppressHydrationWarning
         >
-          <div
+          <Navbar />
+          <main
             className={cn(
-              "w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6",
-              (pathname.startsWith("/manager/dashboard") ||
-                pathname.startsWith("/dashboard/dept-head")) &&
-                "px-0 max-w-none"
+              "flex-1 overflow-y-auto",
+              "pt-[72px]" // Offset for fixed navbar (initial height, animates to 60px on scroll)
             )}
+            role="main"
+            aria-label="Main content"
           >
-            {children}
-          </div>
-        </main>
-        <SlideDrawer />
-      </div>
+            <div
+              className={cn(
+                "w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6",
+                (pathname.startsWith("/manager/dashboard") ||
+                  pathname.startsWith("/dashboard/dept-head")) &&
+                  "px-0 max-w-none"
+              )}
+            >
+              {children}
+            </div>
+          </main>
+          <SlideDrawer />
+        </div>
+      </LeaveDataProvider>
     </SelectionProvider>
   );
 }
