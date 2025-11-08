@@ -7,6 +7,7 @@ export { QuickActions } from "./QuickActions";
 export { FilterBar } from "./FilterBar";
 export { ApprovalActionButtons } from "./ApprovalActionButtons";
 export type { ApprovalAction } from "./ApprovalActionButtons";
+export { EmployeeDetailView } from "./EmployeeDetailView";
 export { SharedTimeline } from "./SharedTimeline";
 export { LeaveBalancePanel } from "./LeaveBalancePanel";
 export { EmptyState } from "./EmptyState";

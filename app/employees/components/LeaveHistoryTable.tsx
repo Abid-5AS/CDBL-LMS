@@ -15,11 +15,11 @@ type LeaveHistoryTableProps = {
 };
 
 const STATUS_VARIANTS: Record<string, string> = {
-  APPROVED: "bg-data-success text-data-success",
-  PENDING: "bg-data-warning text-data-warning",
-  SUBMITTED: "bg-data-info text-data-info",
-  REJECTED: "bg-data-error text-data-error",
-  CANCELLED: "bg-status-cancelled/10 text-status-cancelled",
+  APPROVED: "bg-data-success/10 text-data-success border-data-success/20",
+  PENDING: "bg-data-warning/10 text-data-warning border-data-warning/20",
+  SUBMITTED: "bg-data-info/10 text-data-info border-data-info/20",
+  REJECTED: "bg-data-error/10 text-data-error border-data-error/20",
+  CANCELLED: "bg-status-cancelled/10 text-status-cancelled border-status-cancelled/20",
 };
 
 export function LeaveHistoryTable({ history }: LeaveHistoryTableProps) {
