@@ -52,7 +52,7 @@ import {
 } from "@/components/ui";
 
 // Shared Components (barrel export)
-import { StatusBadge, LeaveComparisonModal } from "@/components/shared";
+import { StatusBadge, LeaveComparisonModal, ApprovalActionButtons } from "@/components/shared";
 
 // Lib utilities (barrel export)
 import { formatDate, leaveTypeLabel, canPerformAction } from "@/lib";
@@ -433,91 +433,36 @@ export function DeptHeadPendingTable({
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-2 flex-nowrap">
+                            <div className="flex items-center justify-end">
                               {isPending && (
-                                <>
-                                  {availableActions.includes("forward") && (
-                                    <TooltipProvider>
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <Button
-                                            size="icon"
-                                            variant="outline"
-                                            className="h-8 w-8 text-data-info hover:bg-data-info hover:text-data-info"
-                                            onClick={() => {
-                                              setSelectedLeave(leave);
-                                              setForwardDialogOpen(true);
-                                            }}
-                                            disabled={isProcessing}
-                                          >
-                                            {isProcessing ? (
-                                              <Loader2 className="h-4 w-4 animate-spin" />
-                                            ) : (
-                                              <ArrowRight className="h-4 w-4" />
-                                            )}
-                                          </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          Forward to HR Head
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </TooltipProvider>
-                                  )}
-                                  {availableActions.includes("return") && (
-                                    <TooltipProvider>
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <Button
-                                            size="icon"
-                                            variant="outline"
-                                            className="h-8 w-8 text-data-error hover:bg-data-error hover:text-data-error"
-                                            onClick={() => {
-                                              setSelectedLeave(leave);
-                                              setReturnDialogOpen(true);
-                                            }}
-                                            disabled={isProcessing}
-                                          >
-                                            {isProcessing ? (
-                                              <Loader2 className="h-4 w-4 animate-spin" />
-                                            ) : (
-                                              <RotateCcw className="h-4 w-4" />
-                                            )}
-                                          </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          Return for Modification
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </TooltipProvider>
-                                  )}
-                                  {availableActions.includes("cancel") && (
-                                    <TooltipProvider>
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <Button
-                                            size="icon"
-                                            variant="ghost"
-                                            className="h-8 w-8 text-text-secondary hover:text-data-error hover:bg-data-error/10"
-                                            onClick={() => {
-                                              setSelectedLeave(leave);
-                                              setCancelDialogOpen(true);
-                                            }}
-                                            disabled={isProcessing}
-                                          >
-                                            {isProcessing ? (
-                                              <Loader2 className="h-4 w-4 animate-spin" />
-                                            ) : (
-                                              <XCircle className="h-4 w-4" />
-                                            )}
-                                          </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          Cancel this request permanently
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </TooltipProvider>
-                                  )}
-                                </>
+                                <ApprovalActionButtons
+                                  onForward={
+                                    availableActions.includes("forward")
+                                      ? () => {
+                                          setSelectedLeave(leave);
+                                          setForwardDialogOpen(true);
+                                        }
+                                      : undefined
+                                  }
+                                  onReturn={
+                                    availableActions.includes("return")
+                                      ? () => {
+                                          setSelectedLeave(leave);
+                                          setReturnDialogOpen(true);
+                                        }
+                                      : undefined
+                                  }
+                                  onCancel={
+                                    availableActions.includes("cancel")
+                                      ? () => {
+                                          setSelectedLeave(leave);
+                                          setCancelDialogOpen(true);
+                                        }
+                                      : undefined
+                                  }
+                                  disabled={isProcessing}
+                                  loading={isProcessing}
+                                />
                               )}
                               {!isPending && (
                                 <Button

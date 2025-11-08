@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 import { toast } from "sonner";
 import clsx from "clsx";
-import { ArrowRight, RotateCcw } from "lucide-react";
 
 // UI Components (barrel export)
 import {
@@ -16,12 +15,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Button,
   Checkbox,
 } from "@/components/ui";
 
 // Shared Components (barrel export)
-import { FilterBar } from "@/components/shared";
+import { FilterBar, ApprovalActionButtons } from "@/components/shared";
+import type { ApprovalAction } from "@/components/shared";
 
 // Lib utilities (barrel export)
 import {
@@ -352,7 +351,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                       </TableCell>
                       <TableCell>
                         <div className="font-medium text-text-primary">
-                          {req.employeeName}
+                          {item.requestedByName}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {item.requestedByEmail ?? "—"}
@@ -381,91 +380,36 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                         {stage.toLowerCase()}
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          {isHRAdmin ? (
-                            // HR Admin: Forward, Reject, Return
-                            <>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  handleDecision(item.id, "forward");
-                                }}
-                                disabled={processingId !== null}
-                              >
-                                {processingId === item.id + "forward" ? (
-                                  "Forwarding..."
-                                ) : (
-                                  <>
-                                    <ArrowRight className="mr-1 h-3 w-3" />
-                                    Forward
-                                  </>
-                                )}
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  handleDecision(item.id, "reject");
-                                }}
-                                disabled={processingId !== null}
-                              >
-                                {processingId === item.id + "reject"
-                                  ? "Rejecting..."
-                                  : "Reject"}
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  handleDecision(item.id, "return");
-                                }}
-                                disabled={processingId !== null}
-                              >
-                                {processingId === item.id + "return" ? (
-                                  "Returning..."
-                                ) : (
-                                  <>
-                                    <RotateCcw className="mr-1 h-3 w-3" />
-                                    Return
-                                  </>
-                                )}
-                              </Button>
-                            </>
-                          ) : (
-                            // HR_HEAD, CEO: Approve, Reject
-                            <>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  handleDecision(item.id, "approve");
-                                }}
-                                disabled={processingId !== null}
-                              >
-                                {processingId === item.id + "approve"
-                                  ? "Approving..."
-                                  : "Approve"}
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  handleDecision(item.id, "reject");
-                                }}
-                                disabled={processingId !== null}
-                              >
-                                {processingId === item.id + "reject"
-                                  ? "Rejecting..."
-                                  : "Reject"}
-                              </Button>
-                            </>
-                          )}
+                        <div 
+                          className="flex justify-end"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <ApprovalActionButtons
+                            ceoMode={userRole === "CEO"}
+                            onForward={
+                              userRole !== "CEO"
+                                ? () => handleDecision(item.id, "forward")
+                                : undefined
+                            }
+                            onReturn={
+                              userRole !== "CEO"
+                                ? () => handleDecision(item.id, "return")
+                                : undefined
+                            }
+                            onCancel={() => handleDecision(item.id, "reject")}
+                            onApprove={
+                              userRole === "CEO"
+                                ? () => handleDecision(item.id, "approve")
+                                : undefined
+                            }
+                            disabled={processingId !== null}
+                            loading={processingId !== null}
+                            loadingAction={
+                              processingId?.startsWith(item.id)
+                                ? (processingId.replace(item.id, "") as ApprovalAction)
+                                : null
+                            }
+                          />
                         </div>
                       </TableCell>
                     </TableRow>

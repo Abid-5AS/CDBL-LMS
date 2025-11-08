@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 import type { Prisma } from "@prisma/client";
@@ -29,7 +30,7 @@ export async function verifyJwt(token: string) {
   return payload as JwtClaims;
 }
 
-export async function getCurrentUser() {
+export const getCurrentUser = cache(async function getCurrentUser() {
   const store = await cookies();
   const token = store.get(JWT_COOKIE)?.value;
   const emailCookie = store.get("auth_user_email")?.value;
@@ -60,7 +61,7 @@ export async function getCurrentUser() {
 
   if (!Object.keys(where).length) return null;
   return prisma.user.findFirst({ where });
-}
+});
 
 export function getJwtCookieName() {
   return JWT_COOKIE;

@@ -44,7 +44,7 @@ export function HRAdminStats({ items, loading }: HRAdminStatsProps) {
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold text-text-primary">
-              {totalCount}
+              {card.value}
             </p>
           </CardContent>
         </Card>

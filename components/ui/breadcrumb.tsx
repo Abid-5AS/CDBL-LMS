@@ -120,7 +120,7 @@ export function BreadcrumbEllipsis({
 }
 
 export function Breadcrumb({
-  items,
+  items = [],
   actions = [],
   className,
   maxItems = 4,

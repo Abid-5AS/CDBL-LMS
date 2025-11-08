@@ -32,7 +32,7 @@ import {
 } from "@/components/ui";
 
 // Shared Components (barrel export)
-import { StatusBadge, ReviewModal } from "@/components/shared";
+import { StatusBadge, ReviewModal, ApprovalActionButtons } from "@/components/shared";
 
 // Lib utilities (barrel export)
 import { cn, formatDate, leaveTypeLabel } from "@/lib";
@@ -395,50 +395,19 @@ export function PendingLeaveRequestsTable({
                             </TableCell>
                             <TableCell className="py-4">
                               <div
-                                className="flex items-center justify-end gap-2"
+                                className="flex items-center justify-end"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 {(leave.status === "PENDING" ||
                                   leave.status === "SUBMITTED") && (
-                                  <>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Button
-                                          size="icon"
-                                          variant="ghost"
-                                          className="h-8 w-8 text-data-info hover:bg-data-info hover:text-data-info"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleForward(leave);
-                                          }}
-                                          disabled={isProcessingThis}
-                                        >
-                                          {isProcessingThis ? (
-                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                          ) : (
-                                            <ArrowRight className="h-4 w-4" />
-                                          )}
-                                        </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>Forward</TooltipContent>
-                                    </Tooltip>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Button
-                                          size="icon"
-                                          variant="ghost"
-                                          className="h-8 w-8 text-data-warning hover:bg-data-warning hover:text-data-warning"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleQuickAction(leave, "return");
-                                          }}
-                                        >
-                                          <RotateCcw className="h-4 w-4" />
-                                        </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>Return</TooltipContent>
-                                    </Tooltip>
-                                  </>
+                                  <ApprovalActionButtons
+                                    onForward={() => handleForward(leave)}
+                                    onReturn={() => handleQuickAction(leave, "return")}
+                                    onCancel={() => handleQuickAction(leave, "reject")}
+                                    disabled={isProcessingThis}
+                                    loading={isProcessingThis}
+                                    loadingAction={isProcessingThis ? "forward" : null}
+                                  />
                                 )}
                               </div>
                             </TableCell>
