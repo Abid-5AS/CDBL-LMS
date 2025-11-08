@@ -58,14 +58,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
               role="main"
               aria-label="Main content"
             >
-              <div
-                className={cn(
-                  "w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6",
-                  (pathname.startsWith("/manager/dashboard") ||
-                    pathname.startsWith("/dashboard/dept-head")) &&
-                    "px-0 max-w-none"
-                )}
-              >
+              <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 {children}
               </div>
             </main>

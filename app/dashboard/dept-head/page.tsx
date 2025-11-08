@@ -22,7 +22,6 @@ async function DeptHeadDashboardContent() {
   return (
     <DashboardLayout
       role={user.role === "CEO" ? "CEO" : "DEPT_HEAD"}
-      fullWidth
       title={`Welcome, ${username}`}
       description="Review and manage team leave requests"
     >

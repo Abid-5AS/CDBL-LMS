@@ -257,11 +257,11 @@ export function EmployeeList() {
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button asChild variant="ghost" size="sm">
-                                <Link href={`/employees/${employee.id}`}>
+                              <Link href={`/employees/${employee.id}`}>
+                                <Button variant="ghost" size="sm">
                                   View
-                                </Link>
-                              </Button>
+                                </Button>
+                              </Link>
                             </TooltipTrigger>
                             <TooltipContent>
                               View employee profile
@@ -276,13 +276,13 @@ export function EmployeeList() {
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Button asChild variant="ghost" size="sm">
-                                    <Link
-                                      href={`/employees/${employee.id}?edit=true`}
-                                    >
+                                  <Link
+                                    href={`/employees/${employee.id}?edit=true`}
+                                  >
+                                    <Button variant="ghost" size="sm">
                                       <Pencil className="h-4 w-4" />
-                                    </Link>
-                                  </Button>
+                                    </Button>
+                                  </Link>
                                 </TooltipTrigger>
                                 <TooltipContent>Update employee</TooltipContent>
                               </Tooltip>

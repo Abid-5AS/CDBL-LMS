@@ -103,8 +103,8 @@ export class ErrorBoundary extends Component<Props, State> {
       );
     }
 
-    // Ensure we return children as-is without any React.Children manipulation
-    return <>{this.props.children}</>;
+    // Return children directly
+    return this.props.children;
   }
 }
 
@@ -119,31 +119,33 @@ export function DashboardErrorBoundary({
   children: ReactNode;
   role?: string;
 }) {
+  const fallbackUI = (
+    <div className="border border-destructive rounded-xl p-6 bg-card">
+      <div className="mb-4">
+        <h3 className="flex items-center gap-2 text-destructive font-semibold">
+          <AlertTriangle className="h-5 w-5" />
+          Dashboard Error
+        </h3>
+      </div>
+      <div>
+        <p className="text-sm text-muted-foreground mb-4">
+          Unable to load the {role ? `${role} ` : ""}dashboard. Please
+          refresh the page or contact support if the problem persists.
+        </p>
+        <Button onClick={() => window.location.reload()} variant="default">
+          Refresh Page
+        </Button>
+      </div>
+    </div>
+  );
+
   return (
     <ErrorBoundary
       onError={(error, errorInfo) => {
         // Log dashboard-specific errors
         console.error(`Dashboard error (${role}):`, error, errorInfo);
       }}
-      fallback={
-        <div className="border border-destructive rounded-xl p-6 bg-card">
-          <div className="mb-4">
-            <h3 className="flex items-center gap-2 text-destructive font-semibold">
-              <AlertTriangle className="h-5 w-5" />
-              Dashboard Error
-            </h3>
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground mb-4">
-              Unable to load the {role ? `${role} ` : ""}dashboard. Please
-              refresh the page or contact support if the problem persists.
-            </p>
-            <Button onClick={() => window.location.reload()} variant="default">
-              Refresh Page
-            </Button>
-          </div>
-        </div>
-      }
+      fallback={fallbackUI}
     >
       {children}
     </ErrorBoundary>

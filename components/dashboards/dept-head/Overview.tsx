@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense } from "react";
-import { DashboardErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { DeptHeadPendingTable } from "./Sections/PendingTable";
 import { DeptHeadTeamOverview } from "./Sections/TeamOverview";
 import { DeptHeadQuickActions } from "./Sections/QuickActions";
@@ -56,8 +55,7 @@ export function DeptHeadDashboardWrapper() {
   };
 
   return (
-    <DashboardErrorBoundary role="DEPT_HEAD">
-      <div className="space-y-6">
+    <div className="space-y-6">
         {/* Top Row - KPI Cards Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="rounded-xl border border-border">
@@ -138,6 +136,5 @@ export function DeptHeadDashboardWrapper() {
           </Suspense>
         </div>
       </div>
-    </DashboardErrorBoundary>
   );
 }
