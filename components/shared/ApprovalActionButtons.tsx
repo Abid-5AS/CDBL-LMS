@@ -42,10 +42,10 @@ export function ApprovalActionButtons({
             variant="ghost"
             onClick={onCancel}
             disabled={disabled || loading}
-            className="h-12 w-12 rounded-2xl border border-border hover:bg-destructive/10 hover:border-destructive transition-colors"
+            className="group h-12 w-12 rounded-2xl border border-border hover:border-destructive transition-colors"
             title="Cancel Request"
           >
-            <X className="h-5 w-5 text-destructive" />
+            <X className="h-5 w-5 text-destructive group-hover:text-destructive transition-colors" />
           </Button>
         )}
       </div>
@@ -62,10 +62,10 @@ export function ApprovalActionButtons({
             variant="ghost"
             onClick={onApprove}
             disabled={disabled || loading}
-            className="h-12 w-12 rounded-2xl border border-border hover:bg-success/10 hover:border-success transition-colors"
+            className="group h-12 w-12 rounded-2xl border border-border hover:border-success transition-colors"
             title="Approve"
           >
-            <Check className="h-5 w-5 text-success" />
+            <Check className="h-5 w-5 text-success group-hover:text-success transition-colors" />
           </Button>
         )}
         {onCancel && (
@@ -74,10 +74,10 @@ export function ApprovalActionButtons({
             variant="ghost"
             onClick={onCancel}
             disabled={disabled || loading}
-            className="h-12 w-12 rounded-2xl border border-border hover:bg-destructive/10 hover:border-destructive transition-colors"
+            className="group h-12 w-12 rounded-2xl border border-border hover:border-destructive transition-colors"
             title="Cancel Request"
           >
-            <X className="h-5 w-5 text-destructive" />
+            <X className="h-5 w-5 text-destructive group-hover:text-destructive transition-colors" />
           </Button>
         )}
       </div>
@@ -93,13 +93,13 @@ export function ApprovalActionButtons({
           variant="ghost"
           onClick={onForward}
           disabled={disabled || loading}
-          className="h-12 w-12 rounded-2xl border border-border hover:bg-primary/10 hover:border-primary transition-colors"
+          className="group h-12 w-12 rounded-2xl border border-border hover:border-primary transition-colors"
           title="Forward to Next Stage"
         >
           {loadingAction === "forward" ? (
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           ) : (
-            <ArrowRight className="h-5 w-5 text-primary" />
+            <ArrowRight className="h-5 w-5 text-primary group-hover:text-primary transition-colors" />
           )}
         </Button>
       )}
@@ -109,13 +109,13 @@ export function ApprovalActionButtons({
           variant="ghost"
           onClick={onReturn}
           disabled={disabled || loading}
-          className="h-12 w-12 rounded-2xl border border-border hover:bg-warning/10 hover:border-warning transition-colors"
+          className="group h-12 w-12 rounded-2xl border border-border hover:border-warning transition-colors"
           title="Return for Modification"
         >
           {loadingAction === "return" ? (
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-warning border-t-transparent" />
           ) : (
-            <RotateCcw className="h-5 w-5 text-warning" />
+            <RotateCcw className="h-5 w-5 text-warning group-hover:text-warning transition-colors" />
           )}
         </Button>
       )}
@@ -125,13 +125,13 @@ export function ApprovalActionButtons({
           variant="ghost"
           onClick={onCancel}
           disabled={disabled || loading}
-          className="h-12 w-12 rounded-2xl border border-border hover:bg-destructive/10 hover:border-destructive transition-colors"
+          className="group h-12 w-12 rounded-2xl border border-border hover:border-destructive transition-colors"
           title="Cancel Request"
         >
           {loadingAction === "cancel" ? (
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-destructive border-t-transparent" />
           ) : (
-            <X className="h-5 w-5 text-destructive" />
+            <X className="h-5 w-5 text-destructive group-hover:text-destructive transition-colors" />
           )}
         </Button>
       )}
