@@ -1,9 +1,14 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Skeleton,
+} from "@/components/ui";
 import { SortedTimeline } from "./SortedTimeline";
 import { LeaveHeatmap } from "@/components/shared/widgets/LeaveHeatmap";
 import { ChartContainer, TypePie } from "@/components/shared/LeaveCharts";
@@ -32,7 +37,7 @@ type LeaveStatus =
   | "CANCELLED"
   | "RETURNED"
   | "CANCELLATION_REQUESTED"
-  | "RECALLED"
+  | "RECALLED";
 
 type LeaveRow = {
   id: number;
@@ -97,7 +102,8 @@ function RequestsTable({
       });
     }
     const sorted = [...filtered].sort(
-      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );
     return limit ? sorted.slice(0, limit) : sorted;
   }, [leaves, filter, limit]);
@@ -115,9 +121,11 @@ function RequestsTable({
   if (filteredRows.length === 0) {
     return (
       <div className="h-48 flex flex-col items-center justify-center text-center py-6">
-        <Inbox className="size-12 text-gray-300 dark:text-gray-600" />
-        <p className="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">No Requests Found</p>
-        <p className="text-xs text-gray-500 dark:text-gray-400">
+        <Inbox className="size-12 text-text-tertiary" />
+        <p className="mt-2 text-sm font-semibold text-text-primary">
+          No Requests Found
+        </p>
+        <p className="text-xs text-text-muted">
           There are no requests matching your filter.
         </p>
       </div>
@@ -130,17 +138,18 @@ function RequestsTable({
         {filteredRows.map((row) => (
           <li
             key={row.id}
-            className="flex items-center justify-between gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
+            className="flex items-center justify-between gap-3 p-3 hover:bg-bg-tertiary cursor-pointer transition-colors"
             onClick={() => openDrawer(row.id)}
           >
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+              <p className="text-sm font-semibold text-text-primary truncate">
                 {row.type} Leave
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-text-muted">
                 {formatDate(row.startDate)} → {formatDate(row.endDate)}
                 <span className="hidden sm:inline">
-                  {" "}({row.workingDays} days)
+                  {" "}
+                  ({row.workingDays} days)
                 </span>
               </p>
             </div>
@@ -154,8 +163,13 @@ function RequestsTable({
   );
 }
 
-export function HistoryAnalyticsCard({ leaves, isLoadingLeaves }: HistoryAnalyticsCardProps) {
-  const [activeTab, setActiveTab] = useState<"recent" | "timeline" | "usage">("recent");
+export function HistoryAnalyticsCard({
+  leaves,
+  isLoadingLeaves,
+}: HistoryAnalyticsCardProps) {
+  const [activeTab, setActiveTab] = useState<"recent" | "timeline" | "usage">(
+    "recent"
+  );
   const [filter, setFilter] = useState<string>("all");
   const [period, setPeriod] = useState<FilterPeriod>("year");
 
@@ -172,7 +186,7 @@ export function HistoryAnalyticsCard({ leaves, isLoadingLeaves }: HistoryAnalyti
 
     let periodLabel = "This Year";
     let periodTotal = summaryInfo.yearUsed ?? 0;
-    
+
     if (period === "month") {
       periodLabel = "This Month";
       periodTotal = summaryInfo.monthUsed ?? 0;
@@ -184,7 +198,9 @@ export function HistoryAnalyticsCard({ leaves, isLoadingLeaves }: HistoryAnalyti
     // Find top leave type
     let topType = "N/A";
     if (summaryData?.distribution && summaryData.distribution.length > 0) {
-      const sorted = [...summaryData.distribution].sort((a: any, b: any) => b.days - a.days);
+      const sorted = [...summaryData.distribution].sort(
+        (a: any, b: any) => b.days - a.days
+      );
       topType = sorted[0].type || "N/A";
     }
 
@@ -222,7 +238,7 @@ export function HistoryAnalyticsCard({ leaves, isLoadingLeaves }: HistoryAnalyti
     <Card className="bg-white/60 dark:bg-neutral-900/40 backdrop-blur-sm border border-neutral-200/70 dark:border-neutral-800/70 shadow-sm animate-fade-in-up">
       <CardHeader className="p-4 sm:p-5 space-y-4">
         {/* Title */}
-        <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <CardTitle className="text-lg font-semibold text-text-primary">
           History & Analytics
         </CardTitle>
 
@@ -268,25 +284,45 @@ export function HistoryAnalyticsCard({ leaves, isLoadingLeaves }: HistoryAnalyti
             {/* Compact Metrics Bar */}
             <div className="grid grid-cols-3 gap-3 text-center">
               <div className="bg-muted/40 dark:bg-muted/20 rounded-lg p-3 border border-neutral-200/50 dark:border-neutral-800/50">
-                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Days Used</p>
-                <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{summary?.periodTotal ?? 0}</p>
-                <p className="text-[10px] text-gray-500 dark:text-gray-500 mt-0.5">{summary?.periodLabel ?? "This Year"}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  Days Used
+                </p>
+                <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                  {summary?.periodTotal ?? 0}
+                </p>
+                <p className="text-[10px] text-gray-500 dark:text-gray-500 mt-0.5">
+                  {summary?.periodLabel ?? "This Year"}
+                </p>
               </div>
               <div className="bg-muted/40 dark:bg-muted/20 rounded-lg p-3 border border-neutral-200/50 dark:border-neutral-800/50">
-                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Remaining</p>
-                <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{summary?.remaining ?? 0}</p>
-                <p className="text-[10px] text-gray-500 dark:text-gray-500 mt-0.5">All Types</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  Remaining
+                </p>
+                <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                  {summary?.remaining ?? 0}
+                </p>
+                <p className="text-[10px] text-gray-500 dark:text-gray-500 mt-0.5">
+                  All Types
+                </p>
               </div>
               <div className="bg-muted/40 dark:bg-muted/20 rounded-lg p-3 border border-neutral-200/50 dark:border-neutral-800/50">
-                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Top Type</p>
-                <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{summary?.topType ?? "N/A"}</p>
-                <p className="text-[10px] text-gray-500 dark:text-gray-500 mt-0.5">Most Used</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  Top Type
+                </p>
+                <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                  {summary?.topType ?? "N/A"}
+                </p>
+                <p className="text-[10px] text-gray-500 dark:text-gray-500 mt-0.5">
+                  Most Used
+                </p>
               </div>
             </div>
 
             {/* Period Filter */}
             <div className="flex flex-wrap items-center justify-center gap-2">
-              <span className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">View:</span>
+              <span className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                View:
+              </span>
               <div className="flex flex-wrap gap-1">
                 <Button
                   variant={period === "month" ? "default" : "outline"}
@@ -319,7 +355,12 @@ export function HistoryAnalyticsCard({ leaves, isLoadingLeaves }: HistoryAnalyti
       </CardHeader>
       <CardContent className="p-4 sm:p-5">
         {activeTab === "recent" && (
-          <RequestsTable leaves={leaves} isLoading={isLoadingLeaves} filter={filter} limit={5} />
+          <RequestsTable
+            leaves={leaves}
+            isLoading={isLoadingLeaves}
+            filter={filter}
+            limit={5}
+          />
         )}
         {activeTab === "timeline" && (
           <SortedTimeline leaves={leaves} isLoading={isLoadingLeaves} />
@@ -328,7 +369,9 @@ export function HistoryAnalyticsCard({ leaves, isLoadingLeaves }: HistoryAnalyti
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Left: Pie Chart (Leave Type Distribution) */}
             <div className="bg-muted/20 dark:bg-muted/10 rounded-lg p-4 border border-neutral-200/50 dark:border-neutral-800/50">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">By Leave Type</h3>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                By Leave Type
+              </h3>
               {(() => {
                 const { slices } = fromDashboardAgg({
                   typeDistribution: pieData.map((item: any) => ({
@@ -341,11 +384,10 @@ export function HistoryAnalyticsCard({ leaves, isLoadingLeaves }: HistoryAnalyti
             </div>
             {/* Right: Heatmap (Day Frequency) */}
             <div className="bg-muted/20 dark:bg-muted/10 rounded-lg p-4 border border-neutral-200/50 dark:border-neutral-800/50">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Day Frequency</h3>
-              <LeaveHeatmap
-                defaultScope="me"
-                defaultRange="year"
-              />
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                Day Frequency
+              </h3>
+              <LeaveHeatmap defaultScope="me" defaultRange="year" />
             </div>
           </div>
         )}
@@ -353,4 +395,3 @@ export function HistoryAnalyticsCard({ leaves, isLoadingLeaves }: HistoryAnalyti
     </Card>
   );
 }
-

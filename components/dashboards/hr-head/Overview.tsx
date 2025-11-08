@@ -1,16 +1,27 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { Plus, Users, FileText, Calendar } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Skeleton,
+} from "@/components/ui";
 import { PendingLeaveRequestsTable } from "../hr-admin/Sections/PendingApprovals";
 import { CancellationRequestsPanel } from "../hr-admin/Sections/CancellationRequests";
-import { ChartContainer, TrendChart, TypePie } from "@/components/shared/LeaveCharts";
+import {
+  ChartContainer,
+  TrendChart,
+  TypePie,
+} from "@/components/shared/LeaveCharts";
 import { fromDashboardAgg } from "@/components/shared/LeaveCharts/adapters";
-import { QuickActions, type QuickAction } from "@/components/shared/QuickActions";
+import {
+  QuickActions,
+  type QuickAction,
+} from "@/components/shared/QuickActions";
 import { useApiQuery } from "@/lib/apiClient";
-import { Users, FileText } from "lucide-react";
 
 type HRDashboardProps = {
   username: string;
@@ -20,10 +31,17 @@ export function HRDashboard({ username }: HRDashboardProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <section className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:p-6 shadow-sm md:flex-row md:items-center md:justify-between" aria-label="HR Admin Dashboard Header">
+      <section
+        className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:p-6 shadow-sm md:flex-row md:items-center md:justify-between"
+        aria-label="HR Admin Dashboard Header"
+      >
         <div>
-          <h2 className="text-2xl font-semibold text-foreground">HR Admin Dashboard</h2>
-          <p className="text-sm text-muted-foreground mt-1">Welcome back, {username}</p>
+          <h2 className="text-2xl font-semibold text-foreground">
+            HR Admin Dashboard
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Welcome back, {username}
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <QuickActions
@@ -41,7 +59,9 @@ export function HRDashboard({ username }: HRDashboardProps) {
       {/* Pending Leave Requests */}
       <section className="space-y-4" aria-label="Pending leave requests">
         <div className="flex items-center justify-between flex-col sm:flex-row gap-2 sm:gap-0">
-          <h3 className="text-lg font-semibold text-foreground">Pending Leave Requests</h3>
+          <h3 className="text-lg font-semibold text-foreground">
+            Pending Leave Requests
+          </h3>
           <Button asChild variant="ghost" className="text-blue-600">
             <Link href="/approvals">View all</Link>
           </Button>
@@ -55,7 +75,9 @@ export function HRDashboard({ username }: HRDashboardProps) {
 
       {/* Cancellation Requests */}
       <section className="space-y-4" aria-label="Cancellation requests">
-        <h3 className="text-lg font-semibold text-foreground">Cancellation Requests</h3>
+        <h3 className="text-lg font-semibold text-foreground">
+          Cancellation Requests
+        </h3>
         <Suspense fallback={<CardSkeleton />}>
           <CancellationRequestsPanel />
         </Suspense>
@@ -110,4 +132,3 @@ function CardSkeleton() {
     </Card>
   );
 }
-

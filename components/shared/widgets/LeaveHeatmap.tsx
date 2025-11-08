@@ -2,8 +2,13 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+  Button,
+} from "@/components/ui";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import useSWR from "swr";
@@ -19,7 +24,12 @@ interface HeatmapData {
 interface LeaveHeatmapProps {
   defaultScope?: "me" | "team";
   defaultRange?: "year" | "rolling12";
-  onParamsChange?: (params: { scope: string; range: string; types: string[]; status: string }) => void;
+  onParamsChange?: (params: {
+    scope: string;
+    range: string;
+    types: string[];
+    status: string;
+  }) => void;
 }
 
 function getIntensityColor(count: number): string {
@@ -37,10 +47,10 @@ function getDayOfWeek(date: Date): number {
   return day === 0 ? 6 : day - 1;
 }
 
-export function LeaveHeatmap({ 
-  defaultScope = "me", 
+export function LeaveHeatmap({
+  defaultScope = "me",
   defaultRange = "year",
-  onParamsChange 
+  onParamsChange,
 }: LeaveHeatmapProps) {
   const router = useRouter();
   const [scope, setScope] = useState(defaultScope);
@@ -56,19 +66,33 @@ export function LeaveHeatmap({
   );
 
   // Notify parent of param changes (optional callback)
-  const handleParamsChange = (newScope: string, newRange: string, newTypes: string[], newStatus: string) => {
+  const handleParamsChange = (
+    newScope: string,
+    newRange: string,
+    newTypes: string[],
+    newStatus: string
+  ) => {
     setScope(newScope);
     setRange(newRange);
     setTypes(newTypes);
     setStatus(newStatus);
     if (onParamsChange) {
-      onParamsChange({ scope: newScope, range: newRange, types: newTypes, status: newStatus });
+      onParamsChange({
+        scope: newScope,
+        range: newRange,
+        types: newTypes,
+        status: newStatus,
+      });
     }
   };
 
   const buckets = heatmapData?.buckets || [];
-  const periodStart = heatmapData?.periodStart ? new Date(heatmapData.periodStart) : new Date();
-  const periodEnd = heatmapData?.periodEnd ? new Date(heatmapData.periodEnd) : new Date();
+  const periodStart = heatmapData?.periodStart
+    ? new Date(heatmapData.periodStart)
+    : new Date();
+  const periodEnd = heatmapData?.periodEnd
+    ? new Date(heatmapData.periodEnd)
+    : new Date();
 
   const { grid, year } = useMemo(() => {
     if (isLoading || !heatmapData) {
@@ -76,24 +100,26 @@ export function LeaveHeatmap({
     }
 
     const currentYear = new Date().getFullYear();
-    const startDate = range === "rolling12"
-      ? periodStart
-      : new Date(currentYear, 0, 1);
-    
-    const endDate = range === "rolling12"
-      ? periodEnd
-      : new Date(currentYear, 11, 31);
+    const startDate =
+      range === "rolling12" ? periodStart : new Date(currentYear, 0, 1);
+
+    const endDate =
+      range === "rolling12" ? periodEnd : new Date(currentYear, 11, 31);
 
     // Create a map for quick lookup from buckets
     const dataMap = new Map<string, { count: number; types: string[] }>();
-    buckets.forEach((bucket: { date: string; count: number; types: string[] }) => {
-      dataMap.set(bucket.date, { count: bucket.count, types: bucket.types });
-    });
+    buckets.forEach(
+      (bucket: { date: string; count: number; types: string[] }) => {
+        dataMap.set(bucket.date, { count: bucket.count, types: bucket.types });
+      }
+    );
 
     // Generate grid: 52 weeks × 7 days
-    const weeks: Array<Array<{ date: Date; data?: { count: number; types: string[] } }>> = [];
+    const weeks: Array<
+      Array<{ date: Date; data?: { count: number; types: string[] } }>
+    > = [];
     let currentDate = new Date(startDate);
-    
+
     // Find the first Monday (or start of year if it's a Monday)
     const firstDay = getDayOfWeek(currentDate);
     if (firstDay !== 0) {
@@ -114,7 +140,7 @@ export function LeaveHeatmap({
         currentDate.setDate(currentDate.getDate() + 1);
       }
       weeks.push(weekDays);
-      
+
       // Stop if we've passed the end date
       if (currentDate > endDate && week > 0) {
         break;
@@ -136,8 +162,8 @@ export function LeaveHeatmap({
     return (
       <div className="text-center py-8 text-gray-500 dark:text-gray-400">
         <p className="text-sm mb-4">
-          {scope === "me" 
-            ? "No leave days in this period." 
+          {scope === "me"
+            ? "No leave days in this period."
             : "No team leave days."}
         </p>
         <div className="flex gap-2 justify-center">
@@ -187,52 +213,68 @@ export function LeaveHeatmap({
         <div className="flex gap-1">
           {/* Day labels */}
           <div className="flex flex-col gap-1 mr-2 pt-7">
-            <div className="text-[10px] text-gray-500 dark:text-gray-400 h-3">Mon</div>
-            <div className="text-[10px] text-gray-500 dark:text-gray-400 h-3">Wed</div>
-            <div className="text-[10px] text-gray-500 dark:text-gray-400 h-3">Fri</div>
+            <div className="text-[10px] text-gray-500 dark:text-gray-400 h-3">
+              Mon
+            </div>
+            <div className="text-[10px] text-gray-500 dark:text-gray-400 h-3">
+              Wed
+            </div>
+            <div className="text-[10px] text-gray-500 dark:text-gray-400 h-3">
+              Fri
+            </div>
           </div>
 
           {/* Grid */}
           <div className="flex gap-1">
             {grid.map((week, weekIndex) => (
               <div key={weekIndex} className="flex flex-col gap-1">
-            {week.map((day, dayIndex) => {
-              const count = day.data?.count ?? 0;
-              const dayTypes = day.data?.types ?? [];
-              const dateStr = format(day.date, "MMM dd, yyyy");
-              const isInRange = day.date >= new Date(year, 0, 1) && day.date <= new Date(year, 11, 31);
+                {week.map((day, dayIndex) => {
+                  const count = day.data?.count ?? 0;
+                  const dayTypes = day.data?.types ?? [];
+                  const dateStr = format(day.date, "MMM dd, yyyy");
+                  const isInRange =
+                    day.date >= new Date(year, 0, 1) &&
+                    day.date <= new Date(year, 11, 31);
 
-              return (
-                <TooltipProvider key={`${weekIndex}-${dayIndex}`}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div
-                        className={cn(
-                          "w-3 h-3 rounded-sm cursor-pointer transition-all hover:scale-125 hover:ring-2 hover:ring-gray-400 dark:hover:ring-gray-600",
-                          isInRange || range === "rolling12"
-                            ? getIntensityColor(count)
-                            : "bg-gray-50 dark:bg-gray-900"
+                  return (
+                    <TooltipProvider key={`${weekIndex}-${dayIndex}`}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div
+                            className={cn(
+                              "w-3 h-3 rounded-sm cursor-pointer transition-all hover:scale-125 hover:ring-2 hover:ring-gray-400 dark:hover:ring-gray-600",
+                              isInRange || range === "rolling12"
+                                ? getIntensityColor(count)
+                                : "bg-gray-50 dark:bg-gray-900"
+                            )}
+                            title={
+                              count > 0
+                                ? `${count} day${
+                                    count > 1 ? "s" : ""
+                                  } on ${dateStr}`
+                                : `No leave on ${dateStr}`
+                            }
+                          />
+                        </TooltipTrigger>
+                        {count > 0 && (
+                          <TooltipContent>
+                            <div className="text-xs">
+                              <p className="font-semibold">
+                                {count} day{count > 1 ? "s" : ""} on leave
+                              </p>
+                              <p className="text-gray-400 mt-1">{dateStr}</p>
+                              {dayTypes.length > 0 && (
+                                <p className="text-gray-400">
+                                  {dayTypes.join(", ")}
+                                </p>
+                              )}
+                            </div>
+                          </TooltipContent>
                         )}
-                        title={count > 0 ? `${count} day${count > 1 ? "s" : ""} on ${dateStr}` : `No leave on ${dateStr}`}
-                      />
-                    </TooltipTrigger>
-                    {count > 0 && (
-                      <TooltipContent>
-                        <div className="text-xs">
-                          <p className="font-semibold">{count} day{count > 1 ? "s" : ""} on leave</p>
-                          <p className="text-gray-400 mt-1">{dateStr}</p>
-                          {dayTypes.length > 0 && (
-                            <p className="text-gray-400">
-                              {dayTypes.join(", ")}
-                            </p>
-                          )}
-                        </div>
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                </TooltipProvider>
-              );
-            })}
+                      </Tooltip>
+                    </TooltipProvider>
+                  );
+                })}
               </div>
             ))}
           </div>

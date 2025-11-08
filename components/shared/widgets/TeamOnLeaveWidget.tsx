@@ -1,8 +1,16 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Skeleton,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui";
 import { Users, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
@@ -40,12 +48,16 @@ function Avatar({ name, className }: { name: string; className?: string }) {
     "bg-red-500",
     "bg-cyan-500",
   ];
-  const colorIndex = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+  const colorIndex =
+    name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) %
+    colors.length;
   const bgColor = colors[colorIndex];
 
   return (
     <div
-      className={`${bgColor} text-white rounded-full flex items-center justify-center font-semibold text-xs ${className || "size-10"}`}
+      className={`${bgColor} text-white rounded-full flex items-center justify-center font-semibold text-xs ${
+        className || "size-10"
+      }`}
     >
       {initials}
     </div>
@@ -55,14 +67,14 @@ function Avatar({ name, className }: { name: string; className?: string }) {
 export function TeamOnLeaveWidget() {
   const router = useRouter();
   const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-  const { data, isLoading, error } = useSWR<{ date: string; count: number; members: Colleague[] }>(
-    `/api/team/on-leave?date=${today}&scope=team`,
-    fetcher,
-    {
-      revalidateOnFocus: true,
-      refreshInterval: 60000, // Refresh every minute
-    }
-  );
+  const { data, isLoading, error } = useSWR<{
+    date: string;
+    count: number;
+    members: Colleague[];
+  }>(`/api/team/on-leave?date=${today}&scope=team`, fetcher, {
+    revalidateOnFocus: true,
+    refreshInterval: 60000, // Refresh every minute
+  });
 
   if (isLoading) {
     return (
@@ -133,7 +145,9 @@ export function TeamOnLeaveWidget() {
                     onClick={(e) => {
                       e.stopPropagation();
                       // Navigate to filtered list
-                      router.push(`/leaves?deptHeadId=${colleague.id}&date=${today}`);
+                      router.push(
+                        `/leaves?deptHeadId=${colleague.id}&date=${today}`
+                      );
                     }}
                   >
                     <Avatar name={colleague.name} />
@@ -154,7 +168,8 @@ export function TeamOnLeaveWidget() {
                       {colleague.type} Leave
                     </p>
                     <p className="text-xs text-gray-400">
-                      {formatDate(colleague.range[0])} → {formatDate(colleague.range[1])}
+                      {formatDate(colleague.range[0])} →{" "}
+                      {formatDate(colleague.range[1])}
                     </p>
                   </div>
                 </TooltipContent>

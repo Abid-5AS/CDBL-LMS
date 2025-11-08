@@ -1,0 +1,115 @@
+@layer base {
+  :root {
+    /* Text Colors - Hierarchical & Accessible (Light Mode) */
+    --text-primary: 15 23 42; /* slate-900 - Main content, headings */
+    --text-secondary: 71 85 105; /* slate-600 - Secondary text, labels */
+    --text-tertiary: 148 163 184; /* slate-400 - Placeholder, disabled */
+    --text-inverted: 248 250 252; /* slate-50 - Text on dark backgrounds */
+    --text-muted: 100 116 139; /* slate-500 - Subtle text */
+
+    /* Background Colors - Surface & Layout */
+    --bg-primary: 255 255 255; /* white - Main background */
+    --bg-secondary: 248 250 252; /* slate-50 - Cards, panels */
+    --bg-tertiary: 241 245 249; /* slate-100 - Subtle backgrounds */
+    --bg-inverted: 15 23 42; /* slate-900 - Dark surfaces */
+    --bg-muted: 226 232 240; /* slate-200 - Borders, dividers */
+
+    /* Leave Types - Semantic & Accessible Colors (Light Mode) */
+    --color-leave-sick: 220 38 38; /* red-600 - Medical/Health */
+    --color-leave-casual: 37 99 235; /* blue-600 - Relaxation/Leisure */
+    --color-leave-earned: 22 163 74; /* green-600 - Achievement/Reward */
+    --color-leave-unpaid: 75 85 99; /* slate-600 - Neutral/Absence */
+    --color-leave-maternity: 219 39 119; /* pink-600 - Care/Nurture */
+    --color-leave-paternity: 147 51 234; /* purple-600 - Care/Family */
+
+    /* Card Types - Functional Colors */
+    --color-card-kpi: 217 119 6; /* amber-600 - Metrics/Performance */
+    --color-card-action: 79 70 229; /* indigo-600 - Interactive/Action */
+    --color-card-summary: 126 34 206; /* violet-600 - Overview/Summary */
+    --color-card-kpi-soft: 254 243 199; /* amber-100 - Soft KPI background */
+    --color-card-kpi-strong: 180 83 9; /* amber-700 - Emphasis KPI */
+    --color-card-action-soft: 224 231 255; /* indigo-100 - Soft action surfaces */
+    --color-card-action-strong: 55 48 163; /* indigo-800 - Emphasis action */
+    --color-card-summary-soft: 245 243 255; /* violet-50 - Soft summary */
+    --color-card-summary-strong: 91 33 182; /* violet-800 - Emphasis summary */
+
+    /* Data States - Universal Status Colors */
+    --color-data-success: 22 163 74; /* green-600 - Success/Positive */
+    --color-data-warning: 217 119 6; /* amber-600 - Caution/Warning */
+    --color-data-error: 220 38 38; /* red-600 - Error/Danger */
+    --color-data-info: 37 99 235; /* blue-600 - Information/Neutral */
+    --color-data-success-soft: 220 252 231; /* green-100 */
+    --color-data-success-strong: 22 101 52; /* green-800 */
+    --color-data-warning-soft: 254 243 199; /* amber-100 */
+    --color-data-warning-strong: 146 64 14; /* amber-800 */
+    --color-data-error-soft: 254 226 226; /* red-100 */
+    --color-data-error-strong: 127 29 29; /* red-900 */
+    --color-data-info-soft: 219 234 254; /* blue-100 */
+    --color-data-info-strong: 30 64 175; /* blue-800 */
+
+    /* UI States - Leave Request Status */
+    --color-status-draft: 100 116 139; /* slate-500 - Incomplete/Draft */
+    --color-status-submitted: 37 99 235; /* blue-600 - In Progress */
+    --color-status-approved: 22 163 74; /* green-600 - Success */
+    --color-status-rejected: 220 38 38; /* red-600 - Failure */
+    --color-status-returned: 217 119 6; /* amber-600 - Needs Action */
+    --color-status-cancelled: 107 114 128; /* gray-500 - Neutral/Void */
+  }
+
+  .dark {
+    /* Text Colors - Enhanced for Dark Mode */
+    --text-primary: 248 250 252; /* slate-50 - High contrast text */
+    --text-secondary: 203 213 225; /* slate-300 - Secondary content */
+    --text-tertiary: 148 163 184; /* slate-400 - Subtle text */
+    --text-inverted: 15 23 42; /* slate-900 - Text on light backgrounds */
+    --text-muted: 100 116 139; /* slate-500 - Muted content */
+
+    /* Background Colors - Dark Theme */
+    --bg-primary: 15 23 42; /* slate-900 - Main dark background */
+    --bg-secondary: 30 41 59; /* slate-800 - Cards, elevated surfaces */
+    --bg-tertiary: 51 65 85; /* slate-700 - Interactive surfaces */
+    --bg-inverted: 248 250 252; /* slate-50 - Light surfaces */
+    --bg-muted: 71 85 105; /* slate-600 - Borders, subtle elements */
+
+    /* Leave Types - Darker variants with better contrast */
+    --color-leave-sick: 248 113 113; /* red-400 - Softer but visible */
+    --color-leave-casual: 96 165 250; /* blue-400 - Bright enough for dark bg */
+    --color-leave-earned: 74 222 128; /* green-400 - Vibrant green */
+    --color-leave-unpaid: 148 163 184; /* slate-400 - Good contrast */
+    --color-leave-maternity: 244 114 182; /* pink-400 - Warm pink */
+    --color-leave-paternity: 167 139 250; /* purple-400 - Soft purple */
+
+    /* Card Types - Enhanced visibility */
+    --color-card-kpi: 251 191 36; /* yellow-400 - High contrast */
+    --color-card-action: 129 140 248; /* indigo-400 - Clear action */
+    --color-card-summary: 196 181 253; /* violet-300 - Subtle but visible */
+    --color-card-kpi-soft: 69 26 3; /* amber-950 - Deep glass tint */
+    --color-card-kpi-strong: 252 211 77; /* amber-300 - Bright KPI */
+    --color-card-action-soft: 30 27 75; /* indigo-950 - Deep action tint */
+    --color-card-action-strong: 199 210 254; /* indigo-200 - Bright action */
+    --color-card-summary-soft: 46 16 101; /* violet-950 - Deep summary tint */
+    --color-card-summary-strong: 221 214 254; /* violet-200 - Bright summary */
+
+    /* Data States - Consistent semantic meaning */
+    --color-data-success: 74 222 128; /* green-400 - Clear success */
+    --color-data-warning: 251 191 36; /* yellow-400 - Alert warning */
+    --color-data-error: 248 113 113; /* red-400 - Clear error */
+    --color-data-info: 96 165 250; /* blue-400 - Information */
+    --color-data-success-soft: 5 46 22; /* green-950 - Deep tint */
+    --color-data-success-strong: 134 239 172; /* green-300 - Bright success */
+    --color-data-warning-soft: 69 26 3; /* amber-950 - Deep tint */
+    --color-data-warning-strong: 252 211 77; /* amber-300 - Bright warning */
+    --color-data-error-soft: 69 10 10; /* red-950 - Deep tint */
+    --color-data-error-strong: 252 165 165; /* red-300 - Bright error */
+    --color-data-info-soft: 23 37 84; /* blue-950 - Deep tint */
+    --color-data-info-strong: 147 197 253; /* blue-300 - Bright info */
+
+    /* UI States - Optimized for dark backgrounds */
+    --color-status-draft: 148 163 184; /* slate-400 - Visible draft */
+    --color-status-submitted: 96 165 250; /* blue-400 - Clear progress */
+    --color-status-approved: 74 222 128; /* green-400 - Success */
+    --color-status-rejected: 248 113 113; /* red-400 - Error */
+    --color-status-returned: 251 191 36; /* yellow-400 - Warning */
+    --color-status-cancelled: 156 163 175; /* gray-400 - Neutral */
+  }
+}

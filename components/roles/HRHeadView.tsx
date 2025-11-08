@@ -4,16 +4,16 @@ import Link from "next/link";
 import type { EmployeeDashboardData } from "@/lib/employee";
 import type { AppRole } from "@/lib/rbac";
 import { canEditEmployee } from "@/lib/rbac";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
+  Button,
+  Badge,
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from "@/components/ui";
 import { EmployeeProfileCard } from "@/app/employees/components/EmployeeProfileCard";
 import { HRStatCards } from "@/components/HRStatCards";
 import { LeaveHistoryTable } from "@/app/employees/components/LeaveHistoryTable";
@@ -80,8 +80,12 @@ export function HRHeadView({ employee, viewerRole }: HRHeadViewProps) {
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <h1 className="text-2xl font-semibold text-slate-900">{employee.name}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{employee.email}</p>
+            <h1 className="text-2xl font-semibold text-slate-900">
+              {employee.name}
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {employee.email}
+            </p>
             <div className="mt-3 flex items-center gap-3">
               <Badge className={getRoleBadgeVariant(employee.role as AppRole)}>
                 {roleLabel(employee.role)}
@@ -97,7 +101,9 @@ export function HRHeadView({ employee, viewerRole }: HRHeadViewProps) {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => router.push(`/employees/${employee.id}?edit=true`)}
+                onClick={() =>
+                  router.push(`/employees/${employee.id}?edit=true`)
+                }
               >
                 <Pencil className="h-4 w-4 mr-2" />
                 Update Employee
@@ -127,7 +133,9 @@ export function HRHeadView({ employee, viewerRole }: HRHeadViewProps) {
 
       {/* Employee Information Card */}
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-slate-900 mb-4">Employee Information</h2>
+        <h2 className="text-xl font-semibold text-slate-900 mb-4">
+          Employee Information
+        </h2>
         <EmployeeProfileCard
           name={employee.name}
           email={employee.email}
@@ -141,16 +149,19 @@ export function HRHeadView({ employee, viewerRole }: HRHeadViewProps) {
 
       {/* Leave Statistics Summary */}
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-slate-900 mb-4">Leave Statistics</h2>
+        <h2 className="text-xl font-semibold text-slate-900 mb-4">
+          Leave Statistics
+        </h2>
         <HRStatCards stats={employee.stats} />
       </div>
 
       {/* Recent Leave Requests */}
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-slate-900 mb-4">Recent Leave Requests</h2>
+        <h2 className="text-xl font-semibold text-slate-900 mb-4">
+          Recent Leave Requests
+        </h2>
         <LeaveHistoryTable history={employee.history.slice(0, 10)} />
       </div>
     </div>
   );
 }
-

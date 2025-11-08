@@ -1,17 +1,26 @@
 "use client";
 
 import useSWR from "swr";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Skeleton,
+  Badge,
+} from "@/components/ui";
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 interface Recommendation {
-  type: "holiday_bridge" | "balance_optimization" | "certificate_reminder" | "consecutive_warning";
+  type:
+    | "holiday_bridge"
+    | "balance_optimization"
+    | "certificate_reminder"
+    | "consecutive_warning";
   title: string;
   message: string;
   severity: "info" | "warning";
@@ -22,10 +31,14 @@ interface Recommendation {
 }
 
 export function SmartRecommendations() {
-  const { data, error, isLoading } = useSWR("/api/dashboard/recommendations", fetcher, {
-    revalidateOnFocus: true,
-    refreshInterval: 600000, // Refresh every 10 minutes
-  });
+  const { data, error, isLoading } = useSWR(
+    "/api/dashboard/recommendations",
+    fetcher,
+    {
+      revalidateOnFocus: true,
+      refreshInterval: 600000, // Refresh every 10 minutes
+    }
+  );
 
   const recommendations: Recommendation[] = data?.recommendations || [];
 
@@ -68,9 +81,13 @@ export function SmartRecommendations() {
               <div className="flex items-start gap-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <h4 className="text-sm font-semibold text-slate-900">{rec.title}</h4>
+                    <h4 className="text-sm font-semibold text-slate-900">
+                      {rec.title}
+                    </h4>
                     <Badge
-                      variant={rec.severity === "warning" ? "destructive" : "secondary"}
+                      variant={
+                        rec.severity === "warning" ? "destructive" : "secondary"
+                      }
                       className="text-xs"
                     >
                       {rec.severity === "warning" ? "Important" : "Suggested"}
@@ -93,4 +110,3 @@ export function SmartRecommendations() {
     </Card>
   );
 }
-

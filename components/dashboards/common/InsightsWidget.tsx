@@ -1,10 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import { Lightbulb, ChevronDown, ChevronUp, Info, AlertTriangle, XCircle } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Skeleton,
+  Button,
+} from "@/components/ui";
+import {
+  Lightbulb,
+  ChevronDown,
+  ChevronUp,
+  Info,
+  AlertTriangle,
+  XCircle,
+} from "lucide-react";
 import useSWR from "swr";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +29,11 @@ interface Insight {
 }
 
 function getSeverityConfig(kind: string) {
-  if (kind.includes("WARNING") || kind.includes("LAPSE") || kind.includes("RISK")) {
+  if (
+    kind.includes("WARNING") ||
+    kind.includes("LAPSE") ||
+    kind.includes("RISK")
+  ) {
     return {
       icon: AlertTriangle,
       color: "text-yellow-600 dark:text-yellow-400",
@@ -114,7 +130,9 @@ export function InsightsWidget() {
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="flex items-start gap-3">
-                  <Icon className={cn("size-5 mt-0.5 flex-shrink-0", config.color)} />
+                  <Icon
+                    className={cn("size-5 mt-0.5 flex-shrink-0", config.color)}
+                  />
                   <div className="flex-1 min-w-0">
                     <p className={cn("text-sm font-medium", config.color)}>
                       {insight.text}

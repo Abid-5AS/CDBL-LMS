@@ -3,16 +3,16 @@
 import { useCallback, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
+  Textarea,
+} from "@/components/ui";
 import { submitApprovalDecision } from "@/lib/api";
 import { useUser } from "@/lib/user-context";
 import { ArrowRight, RotateCcw } from "lucide-react";
@@ -27,7 +27,12 @@ type ApprovalActionsProps = {
   status?: string;
 };
 
-export function ApprovalActions({ pendingRequestId, employeeName, employeeRole, status }: ApprovalActionsProps) {
+export function ApprovalActions({
+  pendingRequestId,
+  employeeName,
+  employeeRole,
+  status,
+}: ApprovalActionsProps) {
   // Only show approve/reject buttons for EMPLOYEE role
   const isEmployee = employeeRole === "EMPLOYEE";
   const canAct = Boolean(pendingRequestId) && isEmployee;
@@ -60,7 +65,7 @@ export function ApprovalActions({ pendingRequestId, employeeName, employeeRole, 
     if (!pendingRequestId) return;
     try {
       setSubmitting(true);
-      
+
       if (action === "forward") {
         const res = await fetch(`/api/leaves/${pendingRequestId}/forward`, {
           method: "POST",
@@ -73,7 +78,9 @@ export function ApprovalActions({ pendingRequestId, employeeName, employeeRole, 
         toast.success("Request forwarded successfully");
       } else if (action === "return") {
         if (!note.trim() || note.trim().length < 5) {
-          toast.error("Comment must be at least 5 characters when returning a request");
+          toast.error(
+            "Comment must be at least 5 characters when returning a request"
+          );
           return;
         }
         const res = await fetch(`/api/leaves/${pendingRequestId}/return`, {
@@ -87,10 +94,18 @@ export function ApprovalActions({ pendingRequestId, employeeName, employeeRole, 
         }
         toast.success("Request returned for modification");
       } else {
-        await submitApprovalDecision(String(pendingRequestId), action, note.trim() ? note.trim() : undefined);
-        toast.success(`Request ${action === "approve" ? "approved" : "rejected"} successfully.`);
+        await submitApprovalDecision(
+          String(pendingRequestId),
+          action,
+          note.trim() ? note.trim() : undefined
+        );
+        toast.success(
+          `Request ${
+            action === "approve" ? "approved" : "rejected"
+          } successfully.`
+        );
       }
-      
+
       startTransition(() => {
         router.push("/approvals");
         router.refresh();
@@ -110,11 +125,19 @@ export function ApprovalActions({ pendingRequestId, employeeName, employeeRole, 
       <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
         <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-4 px-4 py-3">
           <div className="flex flex-col text-xs text-muted-foreground">
-            <span className="font-semibold uppercase tracking-wide text-slate-600">Status</span>
-            <span>{status ?? (canAct ? "Pending HR Review" : "No pending request")}</span>
+            <span className="font-semibold uppercase tracking-wide text-slate-600">
+              Status
+            </span>
+            <span>
+              {status ?? (canAct ? "Pending HR Review" : "No pending request")}
+            </span>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <Button variant="outline" onClick={() => router.push("/approvals")} disabled={isPending || submitting}>
+            <Button
+              variant="outline"
+              onClick={() => router.push("/approvals")}
+              disabled={isPending || submitting}
+            >
               Back to Approvals
             </Button>
             {isHRAdmin ? (
@@ -154,7 +177,10 @@ export function ApprovalActions({ pendingRequestId, employeeName, employeeRole, 
                 >
                   Reject
                 </Button>
-                <Button onClick={() => handleOpen("approve")} disabled={!canAct || submitting || isPending}>
+                <Button
+                  onClick={() => handleOpen("approve")}
+                  disabled={!canAct || submitting || isPending}
+                >
                   Approve
                 </Button>
               </>
@@ -173,10 +199,14 @@ export function ApprovalActions({ pendingRequestId, employeeName, employeeRole, 
               {action === "return" && "Return Leave Request for Modification"}
             </DialogTitle>
             <DialogDescription>
-              {action === "approve" && `Confirm you want to approve ${employeeName}'s leave request.`}
-              {action === "reject" && `Please provide a reason for rejecting ${employeeName}'s leave request.`}
-              {action === "forward" && `Forward ${employeeName}'s leave request to the next approver in the chain.`}
-              {action === "return" && `Return ${employeeName}'s leave request for modification. Please provide a reason (minimum 5 characters).`}
+              {action === "approve" &&
+                `Confirm you want to approve ${employeeName}'s leave request.`}
+              {action === "reject" &&
+                `Please provide a reason for rejecting ${employeeName}'s leave request.`}
+              {action === "forward" &&
+                `Forward ${employeeName}'s leave request to the next approver in the chain.`}
+              {action === "return" &&
+                `Return ${employeeName}'s leave request for modification. Please provide a reason (minimum 5 characters).`}
             </DialogDescription>
           </DialogHeader>
           <Textarea
@@ -193,10 +223,21 @@ export function ApprovalActions({ pendingRequestId, employeeName, employeeRole, 
             required={action === "return"}
           />
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={submitting}>
+            <Button
+              variant="outline"
+              onClick={() => setDialogOpen(false)}
+              disabled={submitting}
+            >
               Cancel
             </Button>
-            <Button onClick={runAction} disabled={submitting || (action === "return" && (!note.trim() || note.trim().length < 5))}>
+            <Button
+              onClick={runAction}
+              disabled={
+                submitting ||
+                (action === "return" &&
+                  (!note.trim() || note.trim().length < 5))
+              }
+            >
               {submitting
                 ? "Processing..."
                 : action === "approve"

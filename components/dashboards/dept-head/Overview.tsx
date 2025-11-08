@@ -5,10 +5,10 @@ import { DashboardErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { DeptHeadPendingTable } from "./Sections/PendingTable";
 import { DeptHeadTeamOverview } from "./Sections/TeamOverview";
 import { DeptHeadQuickActions } from "./Sections/QuickActions";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui";
 import { useApiQueryWithParams } from "@/lib/apiClient";
 import { useFilterFromUrl } from "@/lib/url-filters";
-import { KPIGrid, KPICard } from "@/components/shared/KPICard";
+import { KPIGrid, KPICard } from "@/components/cards/KPICard";
 import { ClipboardList, CheckCircle, RotateCcw, XCircle } from "lucide-react";
 
 function CardSkeleton() {
@@ -58,63 +58,62 @@ export function DeptHeadDashboardWrapper() {
   return (
     <DashboardErrorBoundary role="DEPT_HEAD">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      {/* Left Column - Pending Requests Table (8/12 width) */}
-      <main className="lg:col-span-8 space-y-6">
-        <div id="pending-requests-table">
-          <DeptHeadPendingTable
-            data={data}
-            isLoading={isLoading}
-            error={error}
-            onMutate={mutate}
-          />
-        </div>
-      </main>
+        {/* Left Column - Pending Requests Table (8/12 width) */}
+        <main className="lg:col-span-8 space-y-6">
+          <div id="pending-requests-table">
+            <DeptHeadPendingTable
+              data={data}
+              isLoading={isLoading}
+              error={error}
+              onMutate={mutate}
+            />
+          </div>
+        </main>
 
-      {/* Right Column - Sidebar (3/12 on lg, 4/12 on xl, sticky) */}
-      <aside className="lg:col-span-3 xl:col-span-4 space-y-4 lg:sticky lg:top-6 lg:h-fit">
-        {/* Summary Cards - Using shared KPIGrid */}
-        <KPIGrid columns={1}>
-          <KPICard
-            title="Pending"
-            value={String(counts.pending)}
-            icon={ClipboardList}
-            iconColor="amber"
-            status={counts.pending > 0 ? "low" : "healthy"}
-          />
-          <KPICard
-            title="Forwarded"
-            value={String(counts.forwarded)}
-            icon={CheckCircle}
-            iconColor="emerald"
-            status="healthy"
-          />
-          <KPICard
-            title="Returned"
-            value={String(counts.returned)}
-            icon={RotateCcw}
-            iconColor="yellow"
-            status={counts.returned > 0 ? "low" : "healthy"}
-          />
-          <KPICard
-            title="Cancelled"
-            value={String(counts.cancelled)}
-            icon={XCircle}
-            iconColor="slate"
-          />
-        </KPIGrid>
-        
-        {/* Team Overview */}
-        <Suspense fallback={<CardSkeleton />}>
-          <DeptHeadTeamOverview />
-        </Suspense>
-        
-        {/* Quick Actions */}
-        <Suspense fallback={<CardSkeleton />}>
-          <DeptHeadQuickActions />
-        </Suspense>
-      </aside>
+        {/* Right Column - Sidebar (3/12 on lg, 4/12 on xl, sticky) */}
+        <aside className="lg:col-span-3 xl:col-span-4 space-y-4 lg:sticky lg:top-6 lg:h-fit">
+          {/* Summary Cards - Using shared KPIGrid */}
+          <KPIGrid columns={1}>
+            <KPICard
+              title="Pending"
+              value={String(counts.pending)}
+              icon={ClipboardList}
+              iconColor="amber"
+              status={counts.pending > 0 ? "low" : "healthy"}
+            />
+            <KPICard
+              title="Forwarded"
+              value={String(counts.forwarded)}
+              icon={CheckCircle}
+              iconColor="emerald"
+              status="healthy"
+            />
+            <KPICard
+              title="Returned"
+              value={String(counts.returned)}
+              icon={RotateCcw}
+              iconColor="yellow"
+              status={counts.returned > 0 ? "low" : "healthy"}
+            />
+            <KPICard
+              title="Cancelled"
+              value={String(counts.cancelled)}
+              icon={XCircle}
+              iconColor="slate"
+            />
+          </KPIGrid>
+
+          {/* Team Overview */}
+          <Suspense fallback={<CardSkeleton />}>
+            <DeptHeadTeamOverview />
+          </Suspense>
+
+          {/* Quick Actions */}
+          <Suspense fallback={<CardSkeleton />}>
+            <DeptHeadQuickActions />
+          </Suspense>
+        </aside>
       </div>
     </DashboardErrorBoundary>
   );
 }
-

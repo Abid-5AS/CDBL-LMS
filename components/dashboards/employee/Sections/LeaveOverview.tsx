@@ -1,8 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Skeleton,
+} from "@/components/ui";
 import { SegmentedControlGlider } from "@/components/shared/widgets/SegmentedControlGlider";
 import { LeaveBalancePanel } from "@/components/shared/LeaveBalancePanel";
 import { fromDashboardSummary } from "@/components/shared/balance-adapters";
@@ -22,7 +27,9 @@ export function LeaveOverviewCard({
   isLoadingBalance,
   isLoadingLeaves,
 }: LeaveOverviewCardProps) {
-  const [activeTab, setActiveTab] = useState<"balance" | "team" | "insights">("balance");
+  const [activeTab, setActiveTab] = useState<"balance" | "team" | "insights">(
+    "balance"
+  );
 
   const tabOptions = [
     { value: "balance", label: "Balance" },
@@ -34,12 +41,16 @@ export function LeaveOverviewCard({
     <Card className="solid-card animate-fade-in-up">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-4">
-          <CardTitle className="text-lg font-semibold">Leave Overview</CardTitle>
+          <CardTitle className="text-lg font-semibold">
+            Leave Overview
+          </CardTitle>
           <div className="w-full max-w-xs">
             <SegmentedControlGlider
               options={tabOptions}
               selected={activeTab}
-              onChange={(value) => setActiveTab(value as "balance" | "team" | "insights")}
+              onChange={(value) =>
+                setActiveTab(value as "balance" | "team" | "insights")
+              }
             />
           </div>
         </div>
@@ -72,4 +83,3 @@ export function LeaveOverviewCard({
     </Card>
   );
 }
-

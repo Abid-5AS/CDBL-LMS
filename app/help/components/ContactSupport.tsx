@@ -1,11 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Button,
+  Textarea,
+  Input,
+  Label,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui";
 import { toast } from "sonner";
 import { Mail } from "lucide-react";
 
@@ -73,7 +79,9 @@ export function ContactSupport() {
               type="button"
               variant="outline"
               onClick={() => {
-                window.location.href = `mailto:hr@cdbl.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+                window.location.href = `mailto:hr@cdbl.com?subject=${encodeURIComponent(
+                  subject
+                )}&body=${encodeURIComponent(message)}`;
               }}
             >
               Open Email Client
@@ -81,7 +89,10 @@ export function ContactSupport() {
           </div>
           <p className="text-xs text-muted-foreground">
             Or email us directly at:{" "}
-            <a href="mailto:hr@cdbl.com" className="text-blue-600 dark:text-blue-400 hover:underline">
+            <a
+              href="mailto:hr@cdbl.com"
+              className="text-blue-600 dark:text-blue-400 hover:underline"
+            >
               hr@cdbl.com
             </a>
           </p>
@@ -90,4 +101,3 @@ export function ContactSupport() {
     </Card>
   );
 }
-

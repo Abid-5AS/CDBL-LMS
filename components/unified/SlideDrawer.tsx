@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useUIStore } from "@/lib/ui-state";
-import { LeaveDetailsModal } from "@/components/shared/LeaveDetailsModal";
+import { LeaveDetailsModal } from "@/components/shared/modals/LeaveDetailsModal";
 import { useLeaveData } from "@/components/providers/LeaveDataProvider";
 
 export function SlideDrawer() {
@@ -13,11 +13,9 @@ export function SlideDrawer() {
   // Find the selected leave from the data
   const selectedLeave = useMemo(() => {
     if (!selectedRequestId || !data?.items) return null;
-    return (
-      Array.isArray(data.items)
-        ? data.items.find((item: { id: number }) => item.id === selectedRequestId)
-        : null
-    );
+    return Array.isArray(data.items)
+      ? data.items.find((item: { id: number }) => item.id === selectedRequestId)
+      : null;
   }, [selectedRequestId, data]);
 
   return (

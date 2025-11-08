@@ -1,14 +1,22 @@
 "use client";
 
 import { Suspense } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useApiQuery } from "@/lib/apiClient";
+
+// UI Components (barrel export)
+import { Skeleton } from "@/components/ui";
+
+// Shared components
 import { DashboardErrorBoundary } from "@/components/shared/ErrorBoundary";
+
+// Local sections
 import { DashboardGreeting } from "./Sections/Greeting";
 import { ActionCenterCard } from "./Sections/ActionCenter";
 import { LeaveOverviewCard } from "./Sections/LeaveOverview";
 import { HistoryAnalyticsCard } from "./Sections/History";
-import { useLeaveRequests } from "@/hooks/useLeaveRequests";
+
+// Lib/Hooks
+import { useApiQuery } from "@/lib/apiClient";
+import { useLeaveRequests } from "@/hooks";
 
 type EmployeeDashboardContentProps = {
   username: string;
@@ -25,7 +33,9 @@ type EmployeeDashboardContentProps = {
  * 2. Leave Overview (Balance | Team | Insights tabs)
  * 3. History & Analytics (Recent | Timeline | Heatmap | Distribution tabs)
  */
-export function EmployeeDashboardContent({ username }: EmployeeDashboardContentProps) {
+export function EmployeeDashboardContent({
+  username,
+}: EmployeeDashboardContentProps) {
   const { allRows: leaves, isLoading: isLoadingLeaves } = useLeaveRequests({
     enableSelection: false,
   });
@@ -58,7 +68,10 @@ export function EmployeeDashboardContent({ username }: EmployeeDashboardContentP
         <Suspense
           fallback={<Skeleton className="h-[500px] w-full rounded-xl" />}
         >
-          <HistoryAnalyticsCard leaves={leaves} isLoadingLeaves={isLoadingLeaves} />
+          <HistoryAnalyticsCard
+            leaves={leaves}
+            isLoadingLeaves={isLoadingLeaves}
+          />
         </Suspense>
       </div>
     </DashboardErrorBoundary>

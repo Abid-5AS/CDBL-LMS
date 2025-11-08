@@ -1,10 +1,19 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Users, Calendar, TrendingUp, Clock } from "lucide-react";
-import { formatDate } from "@/lib/utils";
 import useSWR from "swr";
+
+// UI Components (barrel export)
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Skeleton,
+} from "@/components/ui";
+
+// Lib utilities
+import { formatDate } from "@/lib";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -23,9 +32,13 @@ type TeamOverviewData = {
 };
 
 export function DeptHeadTeamOverview() {
-  const { data, isLoading, error } = useSWR<TeamOverviewData>("/api/manager/team-overview", fetcher, {
-    revalidateOnFocus: false,
-  });
+  const { data, isLoading, error } = useSWR<TeamOverviewData>(
+    "/api/manager/team-overview",
+    fetcher,
+    {
+      revalidateOnFocus: false,
+    }
+  );
 
   if (isLoading) {
     return (
@@ -52,7 +65,8 @@ export function DeptHeadTeamOverview() {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            No active team data. Employees may not be assigned to your department.
+            No active team data. Employees may not be assigned to your
+            department.
           </p>
         </CardContent>
       </Card>
@@ -89,31 +103,46 @@ export function DeptHeadTeamOverview() {
               <TrendingUp className="h-4 w-4 text-green-600" />
               <p className="text-xs text-muted-foreground">Top Leave Type</p>
             </div>
-            <p className="text-lg font-semibold">{data.topLeaveType || "N/A"}</p>
+            <p className="text-lg font-semibold">
+              {data.topLeaveType || "N/A"}
+            </p>
           </div>
           <div className="p-3 rounded-lg bg-muted/50">
             <div className="flex items-center gap-2 mb-1">
               <Clock className="h-4 w-4 text-purple-600" />
               <p className="text-xs text-muted-foreground">Avg Approval Time</p>
             </div>
-            <p className="text-lg font-semibold">{data.avgApprovalTime.toFixed(1)} days</p>
+            <p className="text-lg font-semibold">
+              {data.avgApprovalTime.toFixed(1)} days
+            </p>
           </div>
         </div>
 
         {/* Upcoming Leaves */}
         {data.upcomingLeaves && data.upcomingLeaves.length > 0 && (
           <div className="pt-4 border-t border-muted/60">
-            <p className="text-xs font-medium text-muted-foreground mb-2">Upcoming Leaves</p>
+            <p className="text-xs font-medium text-muted-foreground mb-2">
+              Upcoming Leaves
+            </p>
             <div className="space-y-2">
               {data.upcomingLeaves.slice(0, 3).map((leave) => (
-                <div key={leave.id} className="flex items-center justify-between text-sm">
+                <div
+                  key={leave.id}
+                  className="flex items-center justify-between text-sm"
+                >
                   <div>
                     <p className="font-medium">{leave.employeeName}</p>
-                    <p className="text-xs text-muted-foreground">{leave.type}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {leave.type}
+                    </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-medium">{formatDate(leave.startDate)}</p>
-                    <p className="text-xs text-muted-foreground">→ {formatDate(leave.endDate)}</p>
+                    <p className="text-xs font-medium">
+                      {formatDate(leave.startDate)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      → {formatDate(leave.endDate)}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -124,7 +153,3 @@ export function DeptHeadTeamOverview() {
     </Card>
   );
 }
-
-
-
-

@@ -2,8 +2,13 @@
 
 import React, { Component, ReactNode } from "react";
 import { AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui";
 
 interface Props {
   children: ReactNode;
@@ -18,7 +23,7 @@ interface State {
 
 /**
  * ErrorBoundary - Catches React errors and displays fallback UI
- * 
+ *
  * Usage:
  * ```tsx
  * <ErrorBoundary>
@@ -73,11 +78,14 @@ export class ErrorBoundary extends Component<Props, State> {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              An error occurred while rendering this component. Please try refreshing the page.
+              An error occurred while rendering this component. Please try
+              refreshing the page.
             </p>
             {process.env.NODE_ENV === "development" && this.state.error && (
               <details className="rounded-md bg-muted p-3 text-xs">
-                <summary className="cursor-pointer font-medium">Error details</summary>
+                <summary className="cursor-pointer font-medium">
+                  Error details
+                </summary>
                 <pre className="mt-2 overflow-auto text-xs">
                   {this.state.error.toString()}
                   {this.state.error.stack && `\n\n${this.state.error.stack}`}
@@ -132,8 +140,8 @@ export function DashboardErrorBoundary({
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              Unable to load the {role ? `${role} ` : ""}dashboard. Please refresh the page or
-              contact support if the problem persists.
+              Unable to load the {role ? `${role} ` : ""}dashboard. Please
+              refresh the page or contact support if the problem persists.
             </p>
             <Button onClick={() => window.location.reload()} variant="default">
               Refresh Page

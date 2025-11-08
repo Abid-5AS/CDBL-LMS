@@ -1,9 +1,8 @@
 "use client";
 
 import useSWR from "swr";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, Skeleton } from "@/components/ui";
 import { Calendar } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate } from "@/lib/utils";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -42,8 +41,12 @@ export function NextHoliday() {
               <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-xs text-muted-foreground mb-0.5">Next Holiday</div>
-              <div className="text-sm font-medium text-foreground">No upcoming holidays</div>
+              <div className="text-xs text-muted-foreground mb-0.5">
+                Next Holiday
+              </div>
+              <div className="text-sm font-medium text-foreground">
+                No upcoming holidays
+              </div>
             </div>
           </div>
         </CardContent>
@@ -52,7 +55,9 @@ export function NextHoliday() {
   }
 
   const holidayDate = new Date(nextHoliday.date);
-  const daysUntil = Math.ceil((holidayDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  const daysUntil = Math.ceil(
+    (holidayDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+  );
 
   return (
     <Card>
@@ -62,7 +67,9 @@ export function NextHoliday() {
             <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-xs text-muted-foreground mb-0.5">Next Holiday</div>
+            <div className="text-xs text-muted-foreground mb-0.5">
+              Next Holiday
+            </div>
             <div className="text-sm font-medium text-foreground truncate">
               {nextHoliday.name}
             </div>
@@ -70,7 +77,11 @@ export function NextHoliday() {
               {formatDate(nextHoliday.date)}
               {daysUntil >= 0 && (
                 <span className="ml-2 text-blue-600 dark:text-blue-400 font-medium">
-                  {daysUntil === 0 ? "Today" : daysUntil === 1 ? "Tomorrow" : `in ${daysUntil} days`}
+                  {daysUntil === 0
+                    ? "Today"
+                    : daysUntil === 1
+                    ? "Tomorrow"
+                    : `in ${daysUntil} days`}
                 </span>
               )}
             </div>
@@ -80,4 +91,3 @@ export function NextHoliday() {
     </Card>
   );
 }
-

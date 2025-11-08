@@ -1,18 +1,35 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { EmptyState } from "@/components/ui/empty-state";
-import { Users, User, Pencil } from "lucide-react";
-import { FilterBar } from "@/components/filters/FilterBar";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import useSWR from "swr";
-import { Badge } from "@/components/ui/badge";
+import { Users, User, Pencil } from "lucide-react";
+
+// UI Components (barrel export)
+import {
+  Card,
+  CardContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  EmptyState,
+  Button,
+  Badge,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui";
+
+// Shared Components (barrel export)
+import { FilterBar } from "@/components/shared";
+
+// Lib utilities (barrel export)
+import { useUser } from "@/lib";
 import { canEditEmployee, type AppRole } from "@/lib/rbac";
-import { useUser } from "@/lib/user-context";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 type EmployeeRecord = {
   id: number;
@@ -45,11 +62,17 @@ export function EmployeeList() {
   const [roleFilter, setRoleFilter] = useState("all");
   const user = useUser();
 
-  const { data, isLoading, error } = useSWR<{ users: EmployeeRecord[] }>("/api/auth/users", fetcher, {
-    revalidateOnFocus: false,
-  });
+  const { data, isLoading, error } = useSWR<{ users: EmployeeRecord[] }>(
+    "/api/auth/users",
+    fetcher,
+    {
+      revalidateOnFocus: false,
+    }
+  );
 
-  const allEmployees: EmployeeRecord[] = Array.isArray(data?.users) ? data.users : [];
+  const allEmployees: EmployeeRecord[] = Array.isArray(data?.users)
+    ? data.users
+    : [];
 
   // Get unique departments
   const departments = useMemo(() => {
@@ -60,7 +83,10 @@ export function EmployeeList() {
     return Array.from(depts).sort();
   }, [allEmployees]);
 
-  const departmentOptions = departments.map((dept) => ({ value: dept, label: dept }));
+  const departmentOptions = departments.map((dept) => ({
+    value: dept,
+    label: dept,
+  }));
 
   const filteredEmployees = useMemo(() => {
     let filtered = allEmployees;
@@ -114,7 +140,9 @@ export function EmployeeList() {
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="py-12 text-center text-sm text-muted-foreground">Loading employees...</CardContent>
+        <CardContent className="py-12 text-center text-sm text-muted-foreground">
+          Loading employees...
+        </CardContent>
       </Card>
     );
   }
@@ -157,7 +185,11 @@ export function EmployeeList() {
           <CardContent className="p-0">
             <EmptyState
               icon={Users}
-              title={allEmployees.length === 0 ? "No employees found" : "No matching employees"}
+              title={
+                allEmployees.length === 0
+                  ? "No employees found"
+                  : "No matching employees"
+              }
               description={
                 allEmployees.length === 0
                   ? "No employees are registered in the system."
@@ -174,17 +206,28 @@ export function EmployeeList() {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead className="hidden sm:table-cell">Email</TableHead>
-                  <TableHead className="hidden md:table-cell">Employee Code</TableHead>
-                  <TableHead className="hidden lg:table-cell">Department</TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Employee Code
+                  </TableHead>
+                  <TableHead className="hidden lg:table-cell">
+                    Department
+                  </TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredEmployees.map((employee) => (
-                  <TableRow key={employee.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <TableCell className="font-medium text-slate-900 dark:text-slate-100">{employee.name}</TableCell>
-                    <TableCell className="hidden sm:table-cell text-muted-foreground">{employee.email}</TableCell>
+                  <TableRow
+                    key={employee.id}
+                    className="hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                  >
+                    <TableCell className="font-medium text-text-primary">
+                      {employee.name}
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell text-muted-foreground">
+                      {employee.email}
+                    </TableCell>
                     <TableCell className="hidden md:table-cell text-muted-foreground">
                       {employee.empCode || "—"}
                     </TableCell>
@@ -203,7 +246,7 @@ export function EmployeeList() {
                             ? "bg-cyan-50 text-cyan-700 border-cyan-200"
                             : employee.role === "DEPT_HEAD"
                             ? "bg-green-50 text-green-700 border-green-200"
-                            : "bg-slate-50 text-slate-700 border-slate-200"
+                            : "bg-bg-secondary text-text-secondary border-bg-muted"
                         }
                       >
                         {roleLabel(employee.role)}
@@ -215,26 +258,36 @@ export function EmployeeList() {
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button asChild variant="ghost" size="sm">
-                                <Link href={`/employees/${employee.id}`}>View</Link>
+                                <Link href={`/employees/${employee.id}`}>
+                                  View
+                                </Link>
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent>View employee profile</TooltipContent>
+                            <TooltipContent>
+                              View employee profile
+                            </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
-                        {user && canEditEmployee(user.role as AppRole, employee.role) && (
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button asChild variant="ghost" size="sm">
-                                  <Link href={`/employees/${employee.id}?edit=true`}>
-                                    <Pencil className="h-4 w-4" />
-                                  </Link>
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>Update employee</TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        )}
+                        {user &&
+                          canEditEmployee(
+                            user.role as AppRole,
+                            employee.role
+                          ) && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button asChild variant="ghost" size="sm">
+                                    <Link
+                                      href={`/employees/${employee.id}?edit=true`}
+                                    >
+                                      <Pencil className="h-4 w-4" />
+                                    </Link>
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Update employee</TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -253,4 +306,3 @@ export function EmployeeList() {
     </div>
   );
 }
-

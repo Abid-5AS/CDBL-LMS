@@ -140,11 +140,12 @@ export function PoliciesContent() {
       <div className="hidden print:block bg-white text-black text-sm leading-relaxed p-8 max-w-4xl mx-auto">
         <header className="mb-8 text-center border-b pb-4">
           <h1 className="text-2xl font-semibold mb-2">CDBL Leave Policy</h1>
-          <p className="text-xs text-gray-600">
+          <p className="text-xs text-text-secondary">
             Central Depository Bangladesh Limited - Leave Management System
           </p>
-          <p className="text-xs text-gray-500 mt-1">
-            Policy Version {policy.version} | Effective Date: {new Date().getFullYear()}
+          <p className="text-xs text-text-muted mt-1">
+            Policy Version {policy.version} | Effective Date:{" "}
+            {new Date().getFullYear()}
           </p>
         </header>
 
@@ -154,23 +155,25 @@ export function PoliciesContent() {
           </h2>
           <ul className="list-disc ml-6 space-y-2">
             <li>
-              <strong>Casual Leave:</strong> {policy.accrual.CL_PER_YEAR} days/year, max{" "}
-              {policy.clMaxConsecutiveDays} consecutive days
+              <strong>Casual Leave:</strong> {policy.accrual.CL_PER_YEAR}{" "}
+              days/year, max {policy.clMaxConsecutiveDays} consecutive days
             </li>
             <li>
-              <strong>Medical Leave:</strong> {policy.accrual.ML_PER_YEAR} days/year, medical
-              certificate required if &gt;3 days
+              <strong>Medical Leave:</strong> {policy.accrual.ML_PER_YEAR}{" "}
+              days/year, medical certificate required if &gt;3 days
             </li>
             <li>
-              <strong>Earned Leave:</strong> Accrues {policy.elAccrualPerMonth} days/month (
-              {policy.accrual.EL_PER_YEAR} days/year), carry forward up to{" "}
-              {policy.carryForwardCap.EL} days
+              <strong>Earned Leave:</strong> Accrues {policy.elAccrualPerMonth}{" "}
+              days/month ({policy.accrual.EL_PER_YEAR} days/year), carry forward
+              up to {policy.carryForwardCap.EL} days
             </li>
           </ul>
         </section>
 
         <section className="mb-6">
-          <h2 className="font-semibold text-lg mb-3 border-b border-gray-300 pb-2">Key Rules</h2>
+          <h2 className="font-semibold text-lg mb-3 border-b border-gray-300 pb-2">
+            Key Rules
+          </h2>
           <ul className="space-y-2">
             {KEY_RULES.map((rule, index) => (
               <li key={index} className="flex items-start">
@@ -198,167 +201,201 @@ export function PoliciesContent() {
         </section>
 
         <footer className="mt-10 pt-4 border-t border-gray-300 text-center text-xs text-gray-500">
-          <p>© {new Date().getFullYear()} Central Depository Bangladesh Limited</p>
+          <p>
+            © {new Date().getFullYear()} Central Depository Bangladesh Limited
+          </p>
           <p className="mt-1">
-            For the complete policy document, please contact HR or refer to the internal
-            documentation portal.
+            For the complete policy document, please contact HR or refer to the
+            internal documentation portal.
           </p>
         </footer>
       </div>
 
       {/* Screen layout - hidden when printing */}
       <div className="print:hidden mx-auto max-w-6xl px-6 py-10 space-y-10">
-      {/* Header Section */}
-      <motion.header
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-      >
-        <div className="flex items-center gap-3">
-          <ScrollText
-            className="w-7 h-7 text-indigo-600 flex-shrink-0"
-            aria-hidden="true"
-            aria-label=""
-          />
-          <div>
-            <h1 className="text-3xl font-semibold text-gray-900 flex items-center gap-2">
-              Leave Policy Overview
-            </h1>
-            <p className="mt-2 text-muted-foreground max-w-2xl">
-              Explore your annual leave entitlements and key company policies below. Each section
-              highlights essential information with visuals and animation for quick understanding.
-            </p>
-          </div>
-        </div>
-        <Button
-          variant="default"
-          onClick={handleExportPDF}
-          className="rounded-full bg-indigo-600 hover:bg-indigo-700 text-white no-print"
-          aria-label="Export policies as PDF"
+        {/* Header Section */}
+        <motion.header
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
         >
-          <Printer className="w-4 h-4 mr-2" aria-hidden="true" />
-          Export Policy as PDF
-        </Button>
-      </motion.header>
+          <div className="flex items-center gap-3">
+            <ScrollText
+              className="w-7 h-7 text-indigo-600 flex-shrink-0"
+              aria-hidden="true"
+              aria-label=""
+            />
+            <div>
+              <h1 className="text-3xl font-semibold text-text-primary flex items-center gap-2">
+                Leave Policy Overview
+              </h1>
+              <p className="mt-2 text-muted-foreground max-w-2xl">
+                Explore your annual leave entitlements and key company policies
+                below. Each section highlights essential information with
+                visuals and animation for quick understanding.
+              </p>
+            </div>
+          </div>
+          <Button
+            variant="default"
+            onClick={handleExportPDF}
+            className="rounded-full bg-indigo-600 hover:bg-indigo-700 text-white no-print"
+            aria-label="Export policies as PDF"
+          >
+            <Printer className="w-4 h-4 mr-2" aria-hidden="true" />
+            Export Policy as PDF
+          </Button>
+        </motion.header>
 
-      {/* Annual Entitlements - Card Grid */}
-      <motion.section
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
-        variants={containerVariants}
-        className="space-y-4"
-        aria-labelledby="entitlements-heading"
-      >
-        <h2 id="entitlements-heading" className="text-xl font-semibold text-gray-900">
-          Annual Entitlements
-        </h2>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {ENTITLEMENTS.map((item) => {
-            const Icon = item.icon;
-            return (
-              <motion.div
-                key={item.type}
-                variants={cardVariants}
-                whileHover={{ scale: 1.03 }}
-                transition={{ duration: 0.2 }}
-                className={`rounded-xl p-6 shadow-sm bg-gradient-to-br ${item.gradient} border border-white/50 hover:shadow-md transition-shadow`}
-              >
-                <Icon
-                  className={`w-7 h-7 ${item.iconColor} mb-3`}
-                  aria-hidden="true"
-                  aria-label=""
-                />
-                <h3 className="font-semibold text-lg text-gray-900 mb-1">{item.type}</h3>
-                <p className="text-sm font-medium text-gray-800 mt-2">{item.entitlement}</p>
-                <p className="text-sm text-gray-700 mt-1">{item.notes}</p>
-                {item.subtext && (
-                  <p className="text-xs text-gray-600 mt-2 italic">{item.subtext}</p>
-                )}
-              </motion.div>
-            );
-          })}
-        </div>
-      </motion.section>
+        {/* Annual Entitlements - Card Grid */}
+        <motion.section
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={containerVariants}
+          className="space-y-4"
+          aria-labelledby="entitlements-heading"
+        >
+          <h2
+            id="entitlements-heading"
+            className="text-xl font-semibold text-text-primary"
+          >
+            Annual Entitlements
+          </h2>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {ENTITLEMENTS.map((item) => {
+              const Icon = item.icon;
+              return (
+                <motion.div
+                  key={item.type}
+                  variants={cardVariants}
+                  whileHover={{ scale: 1.03 }}
+                  transition={{ duration: 0.2 }}
+                  className={`rounded-xl p-6 shadow-sm bg-gradient-to-br ${item.gradient} border border-white/50 hover:shadow-md transition-shadow`}
+                >
+                  <Icon
+                    className={`w-7 h-7 ${item.iconColor} mb-3`}
+                    aria-hidden="true"
+                    aria-label=""
+                  />
+                  <h3 className="font-semibold text-lg text-text-primary mb-1">
+                    {item.type}
+                  </h3>
+                  <p className="text-sm font-medium text-text-primary mt-2">
+                    {item.entitlement}
+                  </p>
+                  <p className="text-sm text-text-secondary mt-1">
+                    {item.notes}
+                  </p>
+                  {item.subtext && (
+                    <p className="text-xs text-gray-600 mt-2 italic">
+                      {item.subtext}
+                    </p>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.section>
 
-      {/* Separator */}
-      <Separator className="my-10" />
+        {/* Separator */}
+        <Separator className="my-10" />
 
-      {/* Key Rules Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.5 }}
-        className="space-y-4"
-        aria-labelledby="rules-heading"
-      >
-        <h2 id="rules-heading" className="text-xl font-semibold flex items-center gap-2 text-gray-900">
-          <ShieldCheck className="w-5 h-5 text-indigo-600" aria-hidden="true" />
-          Key Rules
-        </h2>
-        <Card className="bg-white/70 backdrop-blur-md rounded-xl border">
-          <Accordion type="multiple" className="w-full">
-            {KEY_RULES.map((rule, index) => (
-              <AccordionItem key={rule.title} value={`rule-${index}`} className="px-6">
-                <AccordionTrigger className="text-base font-medium text-gray-900 hover:no-underline">
-                  {rule.title}
-                </AccordionTrigger>
-                <AccordionContent className="text-sm text-muted-foreground">
-                  {rule.description}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </Card>
-      </motion.section>
+        {/* Key Rules Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.5 }}
+          className="space-y-4"
+          aria-labelledby="rules-heading"
+        >
+          <h2
+            id="rules-heading"
+            className="text-xl font-semibold flex items-center gap-2 text-gray-900"
+          >
+            <ShieldCheck
+              className="w-5 h-5 text-indigo-600"
+              aria-hidden="true"
+            />
+            Key Rules
+          </h2>
+          <Card className="bg-white/70 backdrop-blur-md rounded-xl border">
+            <Accordion type="multiple" className="w-full">
+              {KEY_RULES.map((rule, index) => (
+                <AccordionItem
+                  key={rule.title}
+                  value={`rule-${index}`}
+                  className="px-6"
+                >
+                  <AccordionTrigger className="text-base font-medium text-gray-900 hover:no-underline">
+                    {rule.title}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground">
+                    {rule.description}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </Card>
+        </motion.section>
 
-      {/* Separator */}
-      <Separator className="my-10" />
+        {/* Separator */}
+        <Separator className="my-10" />
 
-      {/* FAQ Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.5 }}
-        className="space-y-4"
-        aria-labelledby="faq-heading"
-      >
-        <h2 id="faq-heading" className="text-xl font-semibold flex items-center gap-2 text-gray-900">
-          <HelpCircle className="w-5 h-5 text-indigo-600" aria-hidden="true" />
-          Frequently Asked Questions
-        </h2>
-        <Card className="bg-white/70 backdrop-blur-md rounded-xl border">
-          <Accordion type="single" collapsible className="w-full">
-            {FAQ_ITEMS.map((item, index) => (
-              <AccordionItem key={item.question} value={`faq-${index}`} className="px-6">
-                <AccordionTrigger className="text-base font-medium text-gray-900 hover:no-underline">
-                  {item.question}
-                </AccordionTrigger>
-                <AccordionContent className="text-sm text-muted-foreground">
-                  {item.answer}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </Card>
-      </motion.section>
+        {/* FAQ Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.5 }}
+          className="space-y-4"
+          aria-labelledby="faq-heading"
+        >
+          <h2
+            id="faq-heading"
+            className="text-xl font-semibold flex items-center gap-2 text-gray-900"
+          >
+            <HelpCircle
+              className="w-5 h-5 text-indigo-600"
+              aria-hidden="true"
+            />
+            Frequently Asked Questions
+          </h2>
+          <Card className="bg-white/70 backdrop-blur-md rounded-xl border">
+            <Accordion type="single" collapsible className="w-full">
+              {FAQ_ITEMS.map((item, index) => (
+                <AccordionItem
+                  key={item.question}
+                  value={`faq-${index}`}
+                  className="px-6"
+                >
+                  <AccordionTrigger className="text-base font-medium text-gray-900 hover:no-underline">
+                    {item.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground">
+                    {item.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </Card>
+        </motion.section>
 
-      {/* Footer Note */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="mt-8 p-4 rounded-lg bg-muted/50 border border-border/50"
-      >
-        <p className="text-sm text-muted-foreground text-center">
-          For the complete policy document, please contact HR or refer to the internal
-          documentation portal.
-        </p>
-      </motion.div>
+        {/* Footer Note */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mt-8 p-4 rounded-lg bg-muted/50 border border-border/50"
+        >
+          <p className="text-sm text-muted-foreground text-center">
+            For the complete policy document, please contact HR or refer to the
+            internal documentation portal.
+          </p>
+        </motion.div>
       </div>
     </>
   );

@@ -13,9 +13,18 @@ type FilterChipsProps = {
   onChange: (value: string) => void;
 };
 
-export function FilterChips({ options, selectedValue, onChange }: FilterChipsProps) {
+export function FilterChips({
+  options,
+  selectedValue,
+  onChange,
+}: FilterChipsProps) {
   return (
-    <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide" data-filter-chips>
+    <div
+      className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide"
+      data-filter-chips
+    >
+      // ARCHIVED: Use FilterChips from components/filters instead. Original
+      code below for reference. //{" "}
       {options.map((option) => {
         const isSelected = selectedValue === option.value;
         return (
@@ -39,4 +48,3 @@ export function FilterChips({ options, selectedValue, onChange }: FilterChipsPro
     </div>
   );
 }
-

@@ -7,17 +7,15 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
+  Button,
+  Skeleton,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+  Badge,
+} from "@/components/ui";
 import { ChevronRight, Calendar } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { StatusBadge } from "@/components/shared/StatusBadge";
@@ -35,7 +33,7 @@ type LeaveStatus =
   | "CANCELLED"
   | "RETURNED"
   | "CANCELLATION_REQUESTED"
-  | "RECALLED"
+  | "RECALLED";
 
 type ApprovalRecord = {
   step: number;
@@ -75,7 +73,10 @@ function differenceInCalendarDays(dateLeft: Date, dateRight: Date): number {
   return Math.round((_dateLeft.getTime() - _dateRight.getTime()) / D_PER_MS);
 }
 
-function getDaysUntilBadge(days: number): { text: string; variant: "default" | "secondary" | "destructive" | "outline" } {
+function getDaysUntilBadge(days: number): {
+  text: string;
+  variant: "default" | "secondary" | "destructive" | "outline";
+} {
   if (days < 0) {
     return { text: "Past", variant: "outline" };
   }
@@ -116,7 +117,7 @@ export function SortedTimeline({ leaves, isLoading }: SortedTimelineProps) {
       startDate.setHours(0, 0, 0, 0);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       if (timeFilter === "upcoming") {
         return startDate >= today;
       } else {

@@ -1,8 +1,10 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, CheckCircle2, Users, TrendingUp, FileText } from "lucide-react";
 import { motion } from "framer-motion";
+
+// UI Components (barrel export)
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 
 type KpiCardsProps = {
   kpis: {
@@ -22,7 +24,12 @@ const cardVariants = {
 };
 
 export function KpiCards({ kpis, duration, isLoading }: KpiCardsProps) {
-  const durationLabel = duration === "month" ? "This Month" : duration === "quarter" ? "This Quarter" : "This Year";
+  const durationLabel =
+    duration === "month"
+      ? "This Month"
+      : duration === "quarter"
+      ? "This Quarter"
+      : "This Year";
 
   const cards = [
     {
@@ -30,24 +37,24 @@ export function KpiCards({ kpis, duration, isLoading }: KpiCardsProps) {
       value: kpis.pendingApprovals,
       icon: FileText,
       trend: durationLabel,
-      color: "text-amber-600 dark:text-amber-400",
-      bgColor: "bg-amber-50 dark:bg-amber-950/20",
+      color: "text-data-warning",
+      bgColor: "bg-data-warning/10",
     },
     {
       title: "Approved Leaves",
       value: kpis.approvedLeaves,
       icon: CheckCircle2,
       trend: durationLabel,
-      color: "text-emerald-600 dark:text-emerald-400",
-      bgColor: "bg-emerald-50 dark:bg-emerald-950/20",
+      color: "text-data-success",
+      bgColor: "bg-data-success/10",
     },
     {
       title: "Avg Approval Time",
       value: `${kpis.avgApprovalTime} days`,
       icon: Clock,
       trend: durationLabel,
-      color: "text-blue-600 dark:text-blue-400",
-      bgColor: "bg-blue-50 dark:bg-blue-950/20",
+      color: "text-data-info",
+      bgColor: "bg-data-info/10",
     },
     {
       title: "Total Employees",
@@ -98,7 +105,9 @@ export function KpiCards({ kpis, duration, isLoading }: KpiCardsProps) {
         >
           <Card className="glass-card hover:shadow-lg transition-all duration-300">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{card.title}</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {card.title}
+              </CardTitle>
               <div className={`p-2 rounded-lg ${card.bgColor}`}>
                 <card.icon className={`h-4 w-4 ${card.color}`} />
               </div>
@@ -113,4 +122,3 @@ export function KpiCards({ kpis, duration, isLoading }: KpiCardsProps) {
     </div>
   );
 }
-

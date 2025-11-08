@@ -1,31 +1,7 @@
 "use client";
 
-import { useMemo, useState, useCallback, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   ArrowRight,
   X,
@@ -34,32 +10,35 @@ import {
   Calendar,
   User,
   Clock,
+  Loader2,
 } from "lucide-react";
-import { formatDate } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
-import { StatusBadge } from "@/components/shared/StatusBadge";
-import { ReviewModal } from "@/components/shared/ReviewModal";
-import useSWR from "swr";
 import { LeaveStatus } from "@prisma/client";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
-// Debounce hook
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+// UI Components (barrel export)
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Button,
+  Badge,
+  Input,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui";
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
+// Shared Components (barrel export)
+import { StatusBadge, ReviewModal } from "@/components/shared";
 
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
+// Lib utilities (barrel export)
+import { cn, formatDate, leaveTypeLabel } from "@/lib";
 
-  return debouncedValue;
-}
+// Hook
+import { usePendingRequests } from "@/components/dashboards/dept-head/hooks/usePendingRequests";
 
 type LeaveRequest = {
   id: number;
@@ -75,8 +54,6 @@ type LeaveRequest = {
     email: string;
   };
 };
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const STATUS_TABS = [
   { value: "PENDING", label: "Pending" },
@@ -94,21 +71,38 @@ const getLeaveTypeColor = (type: string): string => {
     case "MEDICAL":
       return "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/50";
     default:
-      return "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900/40 dark:text-slate-300 dark:border-slate-800/50";
+      return "bg-bg-secondary text-text-secondary border-bg-muted";
   }
 };
 
 type PendingLeaveRequestsTableProps = {
   onRowClick?: (leave: LeaveRequest) => void;
+  data?: { items: LeaveRequest[] };
+  isLoading?: boolean;
+  error?: any;
+  onMutate?: () => Promise<any>;
 };
 
 const ITEMS_PER_PAGE = 10;
 
 export function PendingLeaveRequestsTable({
   onRowClick,
+  data: externalData,
+  isLoading: externalIsLoading,
+  error: externalError,
+  onMutate,
 }: PendingLeaveRequestsTableProps = {}) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const {
+    searchInput,
+    setSearchInput,
+    urlFilters,
+    setUrlFilters,
+    handleSingleAction,
+    isProcessing,
+    refresh,
+  } = usePendingRequests();
+
+  // Local state
   const [statusTab, setStatusTab] = useState("PENDING");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedLeave, setSelectedLeave] = useState<LeaveRequest | null>(null);
@@ -116,20 +110,18 @@ export function PendingLeaveRequestsTable({
   const [actionType, setActionType] = useState<
     "forward" | "reject" | "return" | null
   >(null);
+  const [processingId, setProcessingId] = useState<number | null>(null);
 
-  const { data, isLoading, error, mutate } = useSWR<{ items: LeaveRequest[] }>(
-    "/api/approvals",
-    fetcher,
-    {
-      revalidateOnFocus: false,
-    }
-  );
-
+  // Use external data if provided
   const allLeaves: LeaveRequest[] = useMemo(
-    () => (Array.isArray(data?.items) ? data.items : []),
-    [data?.items]
+    () => (Array.isArray(externalData?.items) ? externalData.items : []),
+    [externalData?.items]
   );
 
+  const isLoading = externalIsLoading || false;
+  const error = externalError;
+
+  // Filter by status tab and search
   const filteredLeaves = useMemo(() => {
     let filtered = allLeaves.filter((leave) => leave.requester);
 
@@ -144,9 +136,9 @@ export function PendingLeaveRequestsTable({
       filtered = filtered.filter((leave) => leave.status === "CANCELLED");
     }
 
-    // Search filter (using debounced value)
-    if (debouncedSearchQuery.trim()) {
-      const query = debouncedSearchQuery.toLowerCase();
+    // Search filter
+    if (searchInput.trim()) {
+      const query = searchInput.toLowerCase();
       filtered = filtered.filter(
         (leave) =>
           leave.requester?.name?.toLowerCase().includes(query) ||
@@ -159,7 +151,7 @@ export function PendingLeaveRequestsTable({
     }
 
     return filtered;
-  }, [allLeaves, statusTab, debouncedSearchQuery]);
+  }, [allLeaves, statusTab, searchInput]);
 
   // Pagination
   const totalPages = Math.ceil(filteredLeaves.length / ITEMS_PER_PAGE);
@@ -171,69 +163,57 @@ export function PendingLeaveRequestsTable({
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [statusTab, debouncedSearchQuery]);
+  }, [statusTab, searchInput]);
 
-  // Handle modal open/close
-  const handleModalOpenChange = useCallback((open: boolean) => {
-    setModalOpen(open);
-    if (!open) {
-      // Clear all state when closing
-      setActionType(null);
-      setSelectedLeave(null);
+  // Action handlers
+  const handleForward = async (leave: LeaveRequest) => {
+    setProcessingId(leave.id);
+    await handleSingleAction(leave.id, "forward");
+    setProcessingId(null);
+
+    if (onMutate) {
+      await onMutate();
+    } else {
+      await refresh();
     }
-  }, []);
+  };
 
-  // Handle row click to show details
-  const handleRowClick = useCallback(
-    (leave: LeaveRequest) => {
-      // Clear any pending actions and open modal
-      setActionType(null);
-      setSelectedLeave(leave);
-      setModalOpen(true);
-      onRowClick?.(leave);
-    },
-    [onRowClick]
-  );
+  const handleQuickAction = (
+    leave: LeaveRequest,
+    action: "reject" | "return"
+  ) => {
+    setSelectedLeave(leave);
+    setActionType(action);
+    setModalOpen(true);
+  };
 
-  const handleForward = useCallback(
-    async (leave: LeaveRequest) => {
-      try {
-        const res = await fetch(`/api/leaves/${leave.id}/forward`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        });
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
-          throw new Error(data.error || "Failed to forward request");
-        }
-        toast.success("Request forwarded successfully");
-        await mutate();
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Unknown error";
-        toast.error(message);
-      }
-    },
-    [mutate]
-  );
+  const handleRowClick = (leave: LeaveRequest) => {
+    setActionType(null);
+    setSelectedLeave(leave);
+    setModalOpen(true);
+    onRowClick?.(leave);
+  };
 
-  const handleQuickAction = useCallback(
-    (leave: LeaveRequest, action: "reject" | "return") => {
-      // Set leave and action, then open modal
-      setSelectedLeave(leave);
-      setActionType(action);
-      setModalOpen(true);
-    },
-    []
-  );
-
-  const handleActionComplete = useCallback(async () => {
-    await mutate();
-    // Clear all state and close modal
+  const handleActionComplete = async () => {
+    if (onMutate) {
+      await onMutate();
+    } else {
+      await refresh();
+    }
     setModalOpen(false);
     setActionType(null);
     setSelectedLeave(null);
-  }, [mutate]);
+  };
 
+  const handleModalOpenChange = (open: boolean) => {
+    setModalOpen(open);
+    if (!open) {
+      setActionType(null);
+      setSelectedLeave(null);
+    }
+  };
+
+  // Loading state
   if (isLoading) {
     return (
       <div className="glass-card rounded-2xl p-12 text-center text-sm text-muted-foreground">
@@ -243,6 +223,7 @@ export function PendingLeaveRequestsTable({
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="glass-card rounded-2xl p-12 text-center text-sm text-red-600">
@@ -251,7 +232,8 @@ export function PendingLeaveRequestsTable({
     );
   }
 
-  if (allLeaves.length === 0 && !searchQuery) {
+  // Empty state
+  if (allLeaves.length === 0 && !searchInput) {
     return (
       <div className="glass-card rounded-2xl overflow-hidden">
         <div className="px-6 pt-6">
@@ -268,7 +250,7 @@ export function PendingLeaveRequestsTable({
 
   return (
     <TooltipProvider>
-      <div className="glass-card rounded-2xl overflow-hidden backdrop-blur-lg bg-white/60 dark:bg-neutral-950/60 border border-neutral-200/70 dark:border-neutral-800/70 shadow-lg">
+      <div className="glass-card rounded-2xl overflow-hidden backdrop-blur-lg bg-bg-primary/60 border border-bg-muted shadow-lg">
         <div className="space-y-4 p-6">
           {/* Tab Chips */}
           <div className="flex gap-2 overflow-x-auto scrollbar-hide">
@@ -294,10 +276,18 @@ export function PendingLeaveRequestsTable({
             <Input
               type="search"
               placeholder="Search by employee, type, or reason..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 bg-white/50 dark:bg-neutral-900/50 border-neutral-200/50 dark:border-neutral-800/50"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="pl-9 bg-bg-primary/50 border-bg-muted"
             />
+            {searchInput && (
+              <button
+                onClick={() => setSearchInput("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
 
           {/* Table/List */}
@@ -308,18 +298,18 @@ export function PendingLeaveRequestsTable({
               className="glass-card rounded-xl p-12 text-center"
             >
               <p className="text-sm text-muted-foreground">
-                No pending requests
+                No matching requests found
               </p>
             </motion.div>
           ) : (
             <>
               {/* Desktop Table View */}
-              <div className="hidden md:block relative overflow-y-auto overflow-x-hidden max-h-[450px] border border-neutral-200/50 dark:border-neutral-800/50 rounded-xl nice-scrollbars">
+              <div className="hidden md:block relative overflow-y-auto overflow-x-hidden max-h-[450px] border border-bg-muted rounded-xl nice-scrollbars">
                 <Table
                   aria-label="Pending leave requests table"
                   className="w-full table-fixed"
                 >
-                  <TableHeader className="sticky top-0 z-10 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-sm border-b border-neutral-200/50 dark:border-neutral-800/50">
+                  <TableHeader className="sticky top-0 z-10 bg-bg-primary/80 backdrop-blur-sm border-b border-bg-muted">
                     <TableRow className="hover:bg-transparent">
                       <TableHead className="w-[25%] font-semibold text-xs text-muted-foreground uppercase tracking-wider">
                         Employee
@@ -345,109 +335,111 @@ export function PendingLeaveRequestsTable({
                     <AnimatePresence mode="popLayout">
                       {paginatedLeaves.map((leave, index) => {
                         if (!leave.requester) return null;
+                        const isProcessingThis = processingId === leave.id;
+
                         return (
                           <motion.tr
                             key={leave.id}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            transition={{ duration: 0.15, delay: index * 0.02 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.2, delay: index * 0.03 }}
+                            className="group border-b border-bg-muted hover:bg-bg-secondary cursor-pointer transition-colors"
                             onClick={() => handleRowClick(leave)}
-                            className={cn(
-                              "group hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 transition-all duration-200 cursor-pointer border-b border-neutral-200/30 dark:border-neutral-800/30",
-                              index % 2 === 0
-                                ? "bg-white/30 dark:bg-neutral-900/30"
-                                : "bg-white/50 dark:bg-neutral-900/50"
-                            )}
                           >
-                            <TableCell className="whitespace-nowrap overflow-hidden text-ellipsis py-4">
-                              <div
-                                className="font-medium truncate text-sm"
-                                title={leave.requester.name}
-                              >
-                                {leave.requester.name}
-                              </div>
-                              <div
-                                className="text-xs text-muted-foreground truncate mt-0.5"
-                                title={leave.requester.email}
-                              >
-                                {leave.requester.email}
+                            <TableCell className="py-4">
+                              <div className="flex items-center gap-3">
+                                <div className="rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 p-2">
+                                  <User className="h-4 w-4 text-white" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="truncate font-medium text-sm">
+                                    {leave.requester.name}
+                                  </p>
+                                  <p className="truncate text-xs text-muted-foreground">
+                                    {leave.requester.email}
+                                  </p>
+                                </div>
                               </div>
                             </TableCell>
-                            <TableCell className="whitespace-nowrap overflow-hidden text-ellipsis py-4">
+                            <TableCell className="py-4">
                               <Badge
                                 variant="outline"
                                 className={cn(
-                                  "font-medium text-xs",
+                                  "font-medium text-xs whitespace-nowrap",
                                   getLeaveTypeColor(leave.type)
                                 )}
                               >
                                 {leaveTypeLabel[leave.type] ?? leave.type}
                               </Badge>
                             </TableCell>
-                            <TableCell className="whitespace-nowrap overflow-hidden text-ellipsis py-4 text-slate-600 dark:text-slate-400 text-sm">
-                              {formatDate(leave.startDate)} →{" "}
-                              {formatDate(leave.endDate)}
+                            <TableCell className="py-4">
+                              <div className="flex items-center gap-2 text-sm">
+                                <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                                <span className="text-xs text-muted-foreground truncate">
+                                  {formatDate(leave.startDate)} →{" "}
+                                  {formatDate(leave.endDate)}
+                                </span>
+                              </div>
                             </TableCell>
-                            <TableCell className="whitespace-nowrap overflow-hidden text-ellipsis py-4 text-slate-600 dark:text-slate-400 text-sm font-medium">
-                              {leave.workingDays}
+                            <TableCell className="py-4">
+                              <div className="flex items-center gap-2">
+                                <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                                <span className="text-sm font-medium">
+                                  {leave.workingDays}
+                                </span>
+                              </div>
                             </TableCell>
-                            <TableCell className="whitespace-nowrap overflow-hidden text-ellipsis py-4">
+                            <TableCell className="py-4">
                               <StatusBadge status={leave.status} />
                             </TableCell>
-                            <TableCell
-                              className="text-right whitespace-nowrap py-4"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <div className="inline-flex items-center gap-1.5">
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleForward(leave);
-                                      }}
-                                      className="h-7 w-7 p-0 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all"
-                                    >
-                                      <ArrowRight className="h-3.5 w-3.5" />
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>Forward</TooltipContent>
-                                </Tooltip>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleQuickAction(leave, "reject");
-                                      }}
-                                      className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 hover:border-red-300 dark:hover:border-red-800 transition-all"
-                                    >
-                                      <X className="h-3.5 w-3.5" />
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>Reject</TooltipContent>
-                                </Tooltip>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleQuickAction(leave, "return");
-                                      }}
-                                      className="h-7 w-7 p-0 hover:bg-amber-100 dark:hover:bg-amber-900/30 hover:border-amber-300 dark:hover:border-amber-700 transition-all"
-                                    >
-                                      <RotateCcw className="h-3.5 w-3.5" />
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>Return</TooltipContent>
-                                </Tooltip>
+                            <TableCell className="py-4">
+                              <div
+                                className="flex items-center justify-end gap-2"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {(leave.status === "PENDING" ||
+                                  leave.status === "SUBMITTED") && (
+                                  <>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          size="icon"
+                                          variant="ghost"
+                                          className="h-8 w-8 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleForward(leave);
+                                          }}
+                                          disabled={isProcessingThis}
+                                        >
+                                          {isProcessingThis ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                          ) : (
+                                            <ArrowRight className="h-4 w-4" />
+                                          )}
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>Forward</TooltipContent>
+                                    </Tooltip>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          size="icon"
+                                          variant="ghost"
+                                          className="h-8 w-8 text-orange-600 hover:bg-orange-50 hover:text-orange-700"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleQuickAction(leave, "return");
+                                          }}
+                                        >
+                                          <RotateCcw className="h-4 w-4" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>Return</TooltipContent>
+                                    </Tooltip>
+                                  </>
+                                )}
                               </div>
                             </TableCell>
                           </motion.tr>
@@ -463,194 +455,139 @@ export function PendingLeaveRequestsTable({
                 <AnimatePresence mode="popLayout">
                   {paginatedLeaves.map((leave, index) => {
                     if (!leave.requester) return null;
+                    const isProcessingThis = processingId === leave.id;
+
                     return (
                       <motion.div
                         key={leave.id}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.15, delay: index * 0.02 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.2, delay: index * 0.03 }}
+                        className="glass-card p-4 rounded-xl border border-neutral-200/50 dark:border-neutral-800/50 cursor-pointer hover:shadow-md transition-all"
                         onClick={() => handleRowClick(leave)}
-                        className="glass-card rounded-xl p-4 border border-neutral-200/50 dark:border-neutral-800/50 hover:shadow-lg hover:scale-[1.01] transition-all cursor-pointer backdrop-blur-lg bg-white/60 dark:bg-neutral-950/60"
                       >
                         <div className="flex items-start justify-between mb-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium text-base mb-1 truncate">
-                              {leave.requester.name}
+                          <div className="flex items-center gap-3">
+                            <div className="rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 p-2">
+                              <User className="h-4 w-4 text-white" />
                             </div>
-                            <div className="text-xs text-muted-foreground truncate mb-2">
-                              {leave.requester.email}
+                            <div>
+                              <p className="font-medium text-sm">
+                                {leave.requester.name}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {leave.requester.email}
+                              </p>
                             </div>
+                          </div>
+                          <StatusBadge status={leave.status} />
+                        </div>
+
+                        <div className="space-y-2 mb-3">
+                          <div className="flex items-center gap-2">
                             <Badge
                               variant="outline"
                               className={cn(
-                                "text-xs",
+                                "text-xs font-medium",
                                 getLeaveTypeColor(leave.type)
                               )}
                             >
                               {leaveTypeLabel[leave.type] ?? leave.type}
                             </Badge>
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Clock className="h-3 w-3" />
+                              <span>{leave.workingDays} days</span>
+                            </div>
                           </div>
-                          <StatusBadge status={leave.status} />
+
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <Calendar className="h-3 w-3 shrink-0" />
+                            <span className="truncate">
+                              {formatDate(leave.startDate)} →{" "}
+                              {formatDate(leave.endDate)}
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 mb-3">
-                          <span>
-                            {formatDate(leave.startDate)} →{" "}
-                            {formatDate(leave.endDate)}
-                          </span>
-                          <span>•</span>
-                          <span>{leave.workingDays} days</span>
-                        </div>
-                        <div
-                          className="flex items-center gap-2"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleForward(leave);
-                            }}
-                            className="flex-1 h-8 text-xs"
+
+                        {(leave.status === "PENDING" ||
+                          leave.status === "SUBMITTED") && (
+                          <div
+                            className="flex gap-2 pt-3 border-t border-neutral-200/50 dark:border-neutral-800/50"
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            <ArrowRight className="h-3 w-3 mr-1" />
-                            Forward
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleQuickAction(leave, "reject");
-                            }}
-                            className="flex-1 h-8 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
-                          >
-                            <X className="h-3 w-3 mr-1" />
-                            Reject
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleQuickAction(leave, "return");
-                            }}
-                            className="flex-1 h-8 text-xs"
-                          >
-                            <RotateCcw className="h-3 w-3 mr-1" />
-                            Return
-                          </Button>
-                        </div>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="flex-1 text-blue-600 border-blue-200 hover:bg-blue-50"
+                              onClick={() => handleForward(leave)}
+                              disabled={isProcessingThis}
+                            >
+                              {isProcessingThis ? (
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              ) : (
+                                <ArrowRight className="h-4 w-4 mr-2" />
+                              )}
+                              Forward
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="flex-1 text-orange-600 border-orange-200 hover:bg-orange-50"
+                              onClick={() => handleQuickAction(leave, "return")}
+                            >
+                              <RotateCcw className="h-4 w-4 mr-2" />
+                              Return
+                            </Button>
+                          </div>
+                        )}
                       </motion.div>
                     );
                   })}
                 </AnimatePresence>
               </div>
-            </>
-          )}
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex items-center justify-between pt-4 mt-3 border-t border-neutral-200/50 dark:border-neutral-800/50"
-            >
-              <div className="text-sm text-muted-foreground">
-                Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to{" "}
-                {Math.min(currentPage * ITEMS_PER_PAGE, filteredLeaves.length)}{" "}
-                of {filteredLeaves.length} requests
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="h-8"
-                >
-                  Previous
-                </Button>
-                <div className="text-sm text-muted-foreground px-3">
-                  Page {currentPage} of {totalPages}
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between pt-4 border-t border-neutral-200/50 dark:border-neutral-800/50">
+                  <div className="text-sm text-muted-foreground">
+                    Page {currentPage} of {totalPages}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        setCurrentPage((p) => Math.min(totalPages, p + 1))
+                      }
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </Button>
+                  </div>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    setCurrentPage((p) => Math.min(totalPages, p + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="h-8"
-                >
-                  Next
-                </Button>
-              </div>
-            </motion.div>
+              )}
+            </>
           )}
         </div>
       </div>
 
-      {/* Unified Review Modal - handles both viewing details and actions */}
-      {selectedLeave && (
-        <ReviewModal
-          open={modalOpen}
-          onOpenChange={handleModalOpenChange}
-          leaveRequest={selectedLeave}
-          onActionComplete={handleActionComplete}
-          initialAction={actionType || undefined}
-        />
-      )}
-      <style jsx>{`
-        .tablist-pad [role="tablist"] {
-          padding: 8px 12px;
-        }
-        /* Hide horizontal scrollbar and beautify vertical scrollbars */
-        .nice-scrollbars {
-          overflow-x: hidden !important;
-          scrollbar-width: thin;
-          scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
-        }
-        .nice-scrollbars::-webkit-scrollbar {
-          width: 6px;
-        }
-        .nice-scrollbars::-webkit-scrollbar-thumb {
-          border-radius: 3px;
-          background: rgba(148, 163, 184, 0.4);
-        }
-        .nice-scrollbars::-webkit-scrollbar-thumb:hover {
-          background: rgba(148, 163, 184, 0.6);
-        }
-        .nice-scrollbars::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .dark .nice-scrollbars {
-          scrollbar-color: rgba(100, 116, 139, 0.3) transparent;
-        }
-        .dark .nice-scrollbars::-webkit-scrollbar-thumb {
-          background: rgba(100, 116, 139, 0.4);
-        }
-        .dark .nice-scrollbars::-webkit-scrollbar-thumb:hover {
-          background: rgba(100, 116, 139, 0.6);
-        }
-        /* Table cell text overflow */
-        .table-fixed th,
-        .table-fixed td {
-          white-space: nowrap;
-          text-overflow: ellipsis;
-          overflow: hidden;
-        }
-        /* Glass card styling */
-        .glass-card {
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-        }
-        .glass-modal {
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-        }
-      `}</style>
+      {/* Review Modal */}
+      <ReviewModal
+        open={modalOpen}
+        onOpenChange={handleModalOpenChange}
+        leaveRequest={selectedLeave}
+        initialAction={actionType || undefined}
+        onActionComplete={handleActionComplete}
+      />
     </TooltipProvider>
   );
 }

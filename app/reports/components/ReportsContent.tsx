@@ -6,7 +6,7 @@ import { FilterBar } from "@/components/reports/FilterBar";
 import { ChartsSection } from "@/components/reports/ChartsSection";
 import { ExportSection } from "@/components/shared/ExportSection";
 import useSWR from "swr";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -60,13 +60,15 @@ export function ReportsContent() {
 
       {/* KPI Cards */}
       <KpiCards
-        kpis={data?.kpis || {
-          pendingApprovals: 0,
-          approvedLeaves: 0,
-          avgApprovalTime: 0,
-          totalEmployees: 0,
-          utilizationRate: 0,
-        }}
+        kpis={
+          data?.kpis || {
+            pendingApprovals: 0,
+            approvedLeaves: 0,
+            avgApprovalTime: 0,
+            totalEmployees: 0,
+            utilizationRate: 0,
+          }
+        }
         duration={duration}
         isLoading={isLoading}
       />

@@ -1,7 +1,10 @@
 "use client";
 
 import type { EmployeeDashboardData } from "@/lib/employee";
-import { useDashboardLayout, type DashboardSectionId } from "@/hooks/useDashboardLayout";
+import {
+  useDashboardLayout,
+  type DashboardSectionId,
+} from "@/hooks/useDashboardLayout";
 import { DashboardContainer } from "@/components/DashboardContainer";
 import { SectionHeader } from "@/components/SectionHeader";
 import { LeaveHistoryTable } from "./LeaveHistoryTable";
@@ -13,9 +16,15 @@ import { ApprovalActions } from "./ApprovalActions";
 import { canEditEmployee, type AppRole } from "@/lib/rbac";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useEffect, type ReactNode, type CSSProperties } from "react";
+import {
+  useMemo,
+  useState,
+  useEffect,
+  type ReactNode,
+  type CSSProperties,
+} from "react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui";
 import { motion, useReducedMotion } from "framer-motion";
 import { getIcon, iconSizes } from "@/lib/icons";
 import { slideUp, staggerChildren } from "@/lib/animations";
@@ -39,9 +48,15 @@ type EmployeeDashboardProps = {
   isHRView?: boolean;
 };
 
-export function EmployeeDashboard({ data, pendingRequestId, viewerRole, isHRView = false }: EmployeeDashboardProps) {
+export function EmployeeDashboard({
+  data,
+  pendingRequestId,
+  viewerRole,
+  isHRView = false,
+}: EmployeeDashboardProps) {
   const router = useRouter();
-  const { layout, saveLayout, resetLayout, defaultLayout } = useDashboardLayout();
+  const { layout, saveLayout, resetLayout, defaultLayout } =
+    useDashboardLayout();
   const [customizeMode, setCustomizeMode] = useState(false);
   const [mounted, setMounted] = useState(false);
   const prefersReducedMotion = useReducedMotion();
@@ -51,37 +66,43 @@ export function EmployeeDashboard({ data, pendingRequestId, viewerRole, isHRView
     setMounted(true);
   }, []);
 
-  const sections = useMemo<Record<DashboardSectionId, ReactNode>>(() => ({
-    [SECTION_MAP.Overview]: (
-      <section className="space-y-4">
-        <SectionHeader title="Employee Overview" />
-        <div className="grid gap-4 xl:grid-cols-2">
-          <EmployeeProfileCard
-            name={data.name}
-            email={data.email}
-            department={data.department}
-            designation={data.designation}
-            manager={data.manager}
-            joiningDate={data.joiningDate}
-            employmentStatus={data.employmentStatus}
+  const sections = useMemo<Record<DashboardSectionId, ReactNode>>(
+    () => ({
+      [SECTION_MAP.Overview]: (
+        <section className="space-y-4">
+          <SectionHeader title="Employee Overview" />
+          <div className="grid gap-4 xl:grid-cols-2">
+            <EmployeeProfileCard
+              name={data.name}
+              email={data.email}
+              department={data.department}
+              designation={data.designation}
+              manager={data.manager}
+              joiningDate={data.joiningDate}
+              employmentStatus={data.employmentStatus}
+            />
+            <LeaveBalanceCard balances={data.balances} />
+          </div>
+        </section>
+      ),
+      [SECTION_MAP.Analytics]: (
+        <section className="space-y-4">
+          <SectionHeader title="Balances & Analytics" />
+          <ChartsSection
+            trend={data.monthlyTrend}
+            distribution={data.distribution}
           />
-          <LeaveBalanceCard balances={data.balances} />
-        </div>
-      </section>
-    ),
-    [SECTION_MAP.Analytics]: (
-      <section className="space-y-4">
-        <SectionHeader title="Balances & Analytics" />
-        <ChartsSection trend={data.monthlyTrend} distribution={data.distribution} />
-      </section>
-    ),
-    [SECTION_MAP.History]: (
-      <section className="space-y-4">
-        <SectionHeader title="Leave History" />
-        <LeaveHistoryTable history={data.history} />
-      </section>
-    ),
-  }), [data]);
+        </section>
+      ),
+      [SECTION_MAP.History]: (
+        <section className="space-y-4">
+          <SectionHeader title="Leave History" />
+          <LeaveHistoryTable history={data.history} />
+        </section>
+      ),
+    }),
+    [data]
+  );
 
   // Use default layout on server to prevent hydration mismatch
   const activeLayout = mounted && layout.length ? layout : [...defaultLayout];
@@ -92,7 +113,7 @@ export function EmployeeDashboard({ data, pendingRequestId, viewerRole, isHRView
       ({
         "--dashboard-accent": `var(--role-${roleSlug}-accent)`,
         "--dashboard-accent-soft": `var(--role-${roleSlug}-accent-soft)`,
-      }) as CSSProperties,
+      } as CSSProperties),
     [roleSlug]
   );
   const cardSurfaceStyle = useMemo(
@@ -101,12 +122,15 @@ export function EmployeeDashboard({ data, pendingRequestId, viewerRole, isHRView
         background: "color-mix(in srgb, var(--card) 90%, transparent)",
         borderColor: "var(--color-border)",
         boxShadow: "var(--shadow-md)",
-      }) as CSSProperties,
+      } as CSSProperties),
     []
   );
 
   return (
-    <div className="relative min-h-screen overflow-hidden pb-24" style={roleAccentStyles}>
+    <div
+      className="relative min-h-screen overflow-hidden pb-24"
+      style={roleAccentStyles}
+    >
       <div
         className="pointer-events-none absolute inset-0 -z-10 opacity-80 dark:opacity-60"
         aria-hidden
@@ -117,7 +141,10 @@ export function EmployeeDashboard({ data, pendingRequestId, viewerRole, isHRView
       />
       <div className="mx-auto w-full max-w-[1400px] px-4 py-10 space-y-8">
         <motion.header
-          variants={slideUp({ distance: 24, duration: 0.4 }, prefersReducedMotion ?? false)}
+          variants={slideUp(
+            { distance: 24, duration: 0.4 },
+            prefersReducedMotion ?? false
+          )}
           initial="initial"
           animate="animate"
           className="rounded-3xl border backdrop-blur-sm"
@@ -133,12 +160,16 @@ export function EmployeeDashboard({ data, pendingRequestId, viewerRole, isHRView
                 Back to Approvals
               </Link>
               <div>
-                <h1 className="text-3xl font-semibold leading-tight text-foreground">{data.name}</h1>
+                <h1 className="text-3xl font-semibold leading-tight text-foreground">
+                  {data.name}
+                </h1>
                 <p className="text-sm text-muted-foreground">{data.email}</p>
               </div>
               <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
                 <span className="rounded-full bg-[var(--dashboard-accent-soft)] px-3 py-1 font-medium text-[color:var(--dashboard-accent)]">
-                  {data.department ? `${data.department}` : "Department not specified"}
+                  {data.department
+                    ? `${data.department}`
+                    : "Department not specified"}
                 </span>
                 {data.designation && (
                   <span className="rounded-full bg-muted/60 px-3 py-1 text-foreground/70">
@@ -185,7 +216,10 @@ export function EmployeeDashboard({ data, pendingRequestId, viewerRole, isHRView
           className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]"
         >
           <motion.div
-            variants={slideUp({ distance: 28, duration: 0.45 }, prefersReducedMotion ?? false)}
+            variants={slideUp(
+              { distance: 28, duration: 0.45 },
+              prefersReducedMotion ?? false
+            )}
             className="space-y-4"
           >
             <DashboardContainer
@@ -196,17 +230,30 @@ export function EmployeeDashboard({ data, pendingRequestId, viewerRole, isHRView
             />
           </motion.div>
           <motion.aside
-            variants={slideUp({ distance: 32, duration: 0.5 }, prefersReducedMotion ?? false)}
+            variants={slideUp(
+              { distance: 32, duration: 0.5 },
+              prefersReducedMotion ?? false
+            )}
             className="space-y-4"
           >
-            <div className="sticky top-4 space-y-4 rounded-3xl border backdrop-blur-sm p-1.5" style={cardSurfaceStyle}>
+            <div
+              className="sticky top-4 space-y-4 rounded-3xl border backdrop-blur-sm p-1.5"
+              style={cardSurfaceStyle}
+            >
               <HRStatCards stats={data.stats} />
             </div>
           </motion.aside>
         </motion.section>
       </div>
 
-      <motion.div variants={slideUp({ distance: 32, duration: 0.45 }, prefersReducedMotion ?? false)} initial="initial" animate="animate">
+      <motion.div
+        variants={slideUp(
+          { distance: 32, duration: 0.45 },
+          prefersReducedMotion ?? false
+        )}
+        initial="initial"
+        animate="animate"
+      >
         <ApprovalActions
           pendingRequestId={pendingRequestId}
           employeeName={data.name}
@@ -215,49 +262,59 @@ export function EmployeeDashboard({ data, pendingRequestId, viewerRole, isHRView
         />
       </motion.div>
 
-      {isHRView && viewerRole && canEditEmployee(viewerRole, data.role as AppRole) && (
-        <motion.div
-          variants={slideUp({ distance: 36, duration: 0.5 }, prefersReducedMotion ?? false)}
-          initial="initial"
-          animate="animate"
-          className="mx-auto mt-8 w-full max-w-[1400px] px-4 pb-10"
-        >
-          <div className="rounded-3xl border backdrop-blur-sm p-6" style={cardSurfaceStyle}>
-            <div className="mb-4 flex items-center justify-between gap-4">
-              <div>
-                <h2 className="text-lg font-semibold text-foreground">Admin Actions</h2>
-                <p className="text-sm text-muted-foreground">
-                  Manage employee information and access controls
-                </p>
+      {isHRView &&
+        viewerRole &&
+        canEditEmployee(viewerRole, data.role as AppRole) && (
+          <motion.div
+            variants={slideUp(
+              { distance: 36, duration: 0.5 },
+              prefersReducedMotion ?? false
+            )}
+            initial="initial"
+            animate="animate"
+            className="mx-auto mt-8 w-full max-w-[1400px] px-4 pb-10"
+          >
+            <div
+              className="rounded-3xl border backdrop-blur-sm p-6"
+              style={cardSurfaceStyle}
+            >
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground">
+                    Admin Actions
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Manage employee information and access controls
+                  </p>
+                </div>
+                <span className="rounded-full bg-[var(--dashboard-accent-soft)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[color:var(--dashboard-accent)]">
+                  HR Tools
+                </span>
               </div>
-              <span className="rounded-full bg-[var(--dashboard-accent-soft)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[color:var(--dashboard-accent)]">
-                HR Tools
-              </span>
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  onClick={() => router.push(`/employees/${data.id}?edit=true`)}
+                  variant="outline"
+                  className="gap-2 border-[color:var(--dashboard-accent)] text-[color:var(--dashboard-accent)] hover:bg-[var(--dashboard-accent-soft)]"
+                >
+                  <EditIcon size={iconSizes.md} strokeWidth={2.1} />
+                  Update Employee
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="gap-2 border border-red-200 bg-red-50/80 text-red-600 hover:bg-red-100 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-200"
+                  disabled
+                >
+                  <DisableIcon size={iconSizes.md} strokeWidth={2.1} />
+                  Deactivate Employee
+                </Button>
+              </div>
+              <p className="mt-4 text-xs italic text-muted-foreground">
+                Note: Deactivation feature coming soon.
+              </p>
             </div>
-            <div className="flex flex-wrap gap-3">
-              <Button
-                onClick={() => router.push(`/employees/${data.id}?edit=true`)}
-                variant="outline"
-                className="gap-2 border-[color:var(--dashboard-accent)] text-[color:var(--dashboard-accent)] hover:bg-[var(--dashboard-accent-soft)]"
-              >
-                <EditIcon size={iconSizes.md} strokeWidth={2.1} />
-                Update Employee
-              </Button>
-              <Button
-                variant="ghost"
-                className="gap-2 border border-red-200 bg-red-50/80 text-red-600 hover:bg-red-100 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-200"
-                disabled
-              >
-                <DisableIcon size={iconSizes.md} strokeWidth={2.1} />
-                Deactivate Employee
-              </Button>
-            </div>
-            <p className="mt-4 text-xs italic text-muted-foreground">
-              Note: Deactivation feature coming soon.
-            </p>
-          </div>
-        </motion.div>
-      )}
+          </motion.div>
+        )}
     </div>
   );
 }

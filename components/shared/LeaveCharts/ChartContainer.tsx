@@ -1,8 +1,13 @@
 "use client";
 
 import { ReactNode, useEffect, useRef } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Skeleton,
+} from "@/components/ui";
 import { EmptyState } from "../EmptyState";
 import { BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -45,7 +50,7 @@ export function ChartContainer({
     if (!loading && !empty && !hasRenderedRef.current && onRender) {
       renderStartRef.current = performance.now();
       hasRenderedRef.current = true;
-      
+
       // Measure render time after paint
       requestAnimationFrame(() => {
         if (renderStartRef.current) {
@@ -90,4 +95,3 @@ export function ChartContainer({
     </Card>
   );
 }
-

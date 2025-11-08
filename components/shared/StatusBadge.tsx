@@ -1,15 +1,15 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { LeaveStatus } from "@prisma/client";
-import { cn } from "@/lib/utils";
-import { getIcon, iconSizes, leaveStatusIcons } from "@/lib/icons";
 import {
+  Badge,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@/components/ui";
+import { getIcon, leaveStatusIcons, iconSizes } from "@/lib/icons";
+import type { LeaveStatus } from "@/lib/workflow";
+import clsx from "clsx";
 
 type Status = LeaveStatus;
 
@@ -24,14 +24,13 @@ const STATUS_CONFIG: Record<
 > = {
   DRAFT: {
     label: "Draft",
-    className:
-      "bg-slate-100/80 text-slate-700 border-slate-200 dark:bg-slate-800/60 dark:text-slate-300 dark:border-slate-700",
+    className: "bg-status-draft/10 text-status-draft border-status-draft/20",
     icon: getIcon(leaveStatusIcons.DRAFT),
   },
   SUBMITTED: {
     label: "Submitted",
     className:
-      "bg-blue-50/80 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
+      "bg-status-submitted text-blue-700 border-blue-200 dark:text-blue-300 dark:border-blue-800",
     icon: getIcon(leaveStatusIcons.SUBMITTED),
   },
   PENDING: {
@@ -43,27 +42,28 @@ const STATUS_CONFIG: Record<
   APPROVED: {
     label: "Approved",
     className:
-      "bg-emerald-50/80 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800",
+      "bg-status-approved text-emerald-700 border-emerald-200 dark:text-emerald-300 dark:border-emerald-800",
     icon: getIcon(leaveStatusIcons.APPROVED),
   },
   REJECTED: {
     label: "Rejected",
     className:
-      "bg-red-50/80 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800",
+      "bg-status-rejected text-red-700 border-red-200 dark:text-red-300 dark:border-red-800",
     icon: getIcon(leaveStatusIcons.REJECTED),
   },
   CANCELLED: {
     label: "Cancelled",
     className:
-      "bg-slate-100/70 text-slate-600 border-slate-200 dark:bg-slate-800/50 dark:text-slate-400 dark:border-slate-700",
+      "bg-status-cancelled/10 text-status-cancelled border-status-cancelled/20",
     icon: getIcon(leaveStatusIcons.CANCELLED),
   },
   RETURNED: {
     label: "Returned",
     className:
-      "bg-yellow-50/80 text-yellow-800 border-yellow-300 dark:bg-yellow-900/40 dark:text-yellow-200 dark:border-yellow-800",
+      "bg-status-returned text-yellow-800 border-yellow-300 dark:bg-yellow-900/40 dark:text-yellow-200 dark:border-yellow-800",
     icon: getIcon(leaveStatusIcons.PENDING),
-    tooltip: "Returned to employee for modification. Please update and resubmit.",
+    tooltip:
+      "Returned to employee for modification. Please update and resubmit.",
   },
   CANCELLATION_REQUESTED: {
     label: "Cancellation Requested",
@@ -79,20 +79,6 @@ const STATUS_CONFIG: Record<
     icon: getIcon(leaveStatusIcons.PENDING),
     tooltip: "Employee recalled from leave by HR. Remaining balance restored.",
   },
-  FORWARDED: {
-    label: "Forwarded",
-    className:
-      "bg-indigo-50/80 text-indigo-800 border-indigo-300 dark:bg-indigo-900/40 dark:text-indigo-200 dark:border-indigo-800",
-    icon: getIcon(leaveStatusIcons.PENDING),
-    tooltip: "Forwarded to next approver in the chain.",
-  },
-  OVERSTAY_PENDING: {
-    label: "Overstay Pending",
-    className:
-      "bg-rose-50/80 text-rose-800 border-rose-300 dark:bg-rose-900/40 dark:text-rose-200 dark:border-rose-800",
-    icon: getIcon(leaveStatusIcons.PENDING),
-    tooltip: "Employee has exceeded approved leave duration. Action required.",
-  },
 };
 
 type StatusBadgeProps = {
@@ -106,20 +92,29 @@ type StatusBadgeProps = {
  * Consolidates app/dashboard/components/status-badge.tsx and components/dashboard/StatusBadgeSimple.tsx
  * Supports all LeaveStatus values with consistent styling and tooltips
  */
-export function StatusBadge({ status, className, showTooltip = true }: StatusBadgeProps) {
+export function StatusBadge({
+  status,
+  className,
+  showTooltip = true,
+}: StatusBadgeProps) {
   const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.PENDING;
   const Icon = config.icon;
 
   const badge = (
     <Badge
       variant="outline"
-      className={cn(
+      className={clsx(
         "flex items-center gap-1.5 font-medium border px-2.5 py-0.5",
         config.className,
         className
       )}
     >
-      <Icon className="h-[14px] w-[14px]" size={iconSizes.sm} strokeWidth={2.5} aria-hidden />
+      <Icon
+        className="h-3.5 w-3.5"
+        size={iconSizes.sm}
+        strokeWidth={2.5}
+        aria-hidden
+      />
       {config.label}
     </Badge>
   );
@@ -142,4 +137,3 @@ export function StatusBadge({ status, className, showTooltip = true }: StatusBad
 
 // Export default for backward compatibility
 export default StatusBadge;
-

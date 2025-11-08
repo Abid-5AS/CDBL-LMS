@@ -1,10 +1,9 @@
 # Web App Refactor Plan
 
 ## High-Priority
-1. `app/dashboard/components/requests-table.tsx`
-   - Extract `useLeaveRequests` hook for data fetch/mutations and selection state.
-   - Split desktop and mobile renderers (`RequestsTableView`, `RequestsCardView`).
-   - Add unit tests around the hook.
+1. `app/dashboard/components/requests-table` (in progress)
+   - ✅ Split desktop and mobile renderers into dedicated files and centralized filter constants.
+   - TODO: tighten `useLeaveRequests` API surface (already extracted) and add unit tests around its behaviors.
 
 2. `components/unified/SlideDrawer.tsx` + `lib/ui-state.ts`
    - Share the leave dataset with RequestsTable (context or Zustand store).
@@ -14,9 +13,10 @@
    - Replace dual states with a reducer managing a `Set`.
    - Derive `selectionCount` from the set length.
 
-4. `components/Navbar.tsx`
-   - Break into `useNavbarState`, `DesktopNav`, `MobileDrawer`.
-   - Lazy-mount the drawer; keep body-lock logic inside the hook.
+4. `components/navbar`
+   - ✅ Split shell into folder-based structure (`Navbar`, `DesktopNav`, `MobileBar`, `MobileMenu`, `ProfileMenu`, `Brand`).
+   - ✅ Hook handles scroll + body-lock logic.
+   - TODO: Add tests around `useNavbarState` body-lock semantics and active-route detection.
 
 5. `app/api/leaves/route.ts`
    - Move policy/validation logic to a service module.

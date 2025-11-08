@@ -2,15 +2,27 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { EmptyState } from "@/components/ui/empty-state";
-import { ClipboardCheck, XCircle, ChevronLeft, ChevronRight } from "lucide-react";
-import { StatusBadge } from "@/components/shared/StatusBadge";
-import { leaveTypeLabel } from "@/lib/ui";
-import { Button } from "@/components/ui/button";
-import { formatDate } from "@/lib/utils";
+import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 import {
+  ClipboardCheck,
+  XCircle,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+
+// UI Components (barrel export)
+import {
+  Card,
+  CardContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  EmptyState,
+  Button,
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -20,11 +32,15 @@ import {
   AlertDialogDescription,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { LeaveDetailsModal } from "@/components/shared/LeaveDetailsModal";
-import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
+} from "@/components/ui";
+
+// Shared Components (barrel export)
+import { StatusBadge, LeaveDetailsModal } from "@/components/shared";
+
+// Lib utilities (barrel export)
+import { cn, formatDate, leaveTypeLabel } from "@/lib";
+
+// Local imports
 import { useLeaveData } from "@/components/providers/LeaveDataProvider";
 import { CANCELABLE_STATUSES } from "@/hooks/useLeaveRequests";
 
@@ -64,7 +80,7 @@ export function MyLeavesPageContent() {
   const [selectedLeave, setSelectedLeave] = useState<LeaveRow | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   // Fetch data first
   const { data, isLoading, error, mutate } = useLeaveData();
 
@@ -108,11 +124,15 @@ export function MyLeavesPageContent() {
 
   const filteredRows = useMemo(() => {
     if (selectedFilter === "all") return allRows;
-    return allRows.filter(row => {
+    return allRows.filter((row) => {
       const status = row.status.toLowerCase();
       switch (selectedFilter) {
         case "pending":
-          return status === "submitted" || status === "pending" || status === "cancellation_requested";
+          return (
+            status === "submitted" ||
+            status === "pending" ||
+            status === "cancellation_requested"
+          );
         case "returned":
           return status === "returned";
         case "cancelled":
@@ -156,7 +176,9 @@ export function MyLeavesPageContent() {
       {/* Header */}
       <header className="flex justify-between items-start mb-4">
         <div>
-          <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mb-1">My Leave Requests</h1>
+          <h1 className="text-xl font-semibold text-text-primary mb-1">
+            My Leave Requests
+          </h1>
           <p className="text-sm text-muted-foreground">
             Track your submitted leave applications and manage requests.
           </p>
@@ -164,7 +186,7 @@ export function MyLeavesPageContent() {
       </header>
 
       {/* Status Filter Pills */}
-      <Card className="bg-white/70 dark:bg-neutral-900/50 border border-neutral-200/70 dark:border-neutral-800/70 backdrop-blur-sm">
+      <Card className="bg-bg-primary/70 border border-bg-muted backdrop-blur-sm">
         <CardContent className="p-4">
           <div className="flex flex-wrap gap-2 justify-center">
             {FILTER_OPTIONS.map((option) => {
@@ -177,7 +199,7 @@ export function MyLeavesPageContent() {
                     "px-4 py-1.5 rounded-full border text-sm font-medium transition-all duration-200",
                     isActive
                       ? "bg-indigo-600 text-white border-indigo-600 shadow-sm hover:bg-indigo-700"
-                      : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700"
+                      : "bg-bg-primary border-bg-muted text-text-secondary hover:bg-bg-secondary hover:border-bg-muted"
                   )}
                 >
                   {option.label}
@@ -192,13 +214,16 @@ export function MyLeavesPageContent() {
       <AnimatePresence mode="wait">
         {isLoading ? (
           <Card>
-            <CardContent className="p-8 text-center text-sm text-gray-600 dark:text-slate-300">
+            <CardContent className="p-8 text-center text-sm text-text-secondary">
               Loading...
             </CardContent>
           </Card>
         ) : error ? (
           <Card>
-            <CardContent className="p-8 text-center text-sm text-red-600 dark:text-red-400" role="alert">
+            <CardContent
+              className="p-8 text-center text-sm text-red-600 dark:text-red-400"
+              role="alert"
+            >
               Failed to load requests
             </CardContent>
           </Card>
@@ -208,9 +233,11 @@ export function MyLeavesPageContent() {
               <EmptyState
                 icon={ClipboardCheck}
                 title="No leave requests"
-                description={selectedFilter === "all" 
-                  ? "Start by applying for your first leave request."
-                  : `No ${selectedFilter} requests found.`}
+                description={
+                  selectedFilter === "all"
+                    ? "Start by applying for your first leave request."
+                    : `No ${selectedFilter} requests found.`
+                }
               />
             </CardContent>
           </Card>
@@ -226,20 +253,32 @@ export function MyLeavesPageContent() {
               <CardContent className="p-0">
                 <div className="overflow-x-auto md:overflow-x-visible overflow-y-auto max-h-[450px]">
                   <Table className="[&_[data-slot=table-container]]:overflow-visible [&_[data-slot=table-container]]:relative">
-                    <TableHeader className="[&_tr]:sticky [&_tr]:top-0 [&_tr]:z-10 [&_tr]:bg-white [&_tr]:dark:bg-neutral-950 [&_tr]:backdrop-blur-sm">
-                      <TableRow className="bg-muted/30 hover:bg-muted/30 border-b border-neutral-200/70 dark:border-neutral-800/70">
-                        <TableHead className="text-xs font-medium text-neutral-700 dark:text-neutral-300">Type</TableHead>
-                        <TableHead className="hidden sm:table-cell text-xs font-medium text-neutral-700 dark:text-neutral-300">Dates</TableHead>
-                        <TableHead className="hidden md:table-cell text-xs font-medium text-neutral-700 dark:text-neutral-300">Days</TableHead>
-                        <TableHead className="text-xs font-medium text-neutral-700 dark:text-neutral-300">Status</TableHead>
-                        <TableHead className="hidden lg:table-cell text-xs font-medium text-neutral-700 dark:text-neutral-300">Updated</TableHead>
-                        <TableHead className="text-right text-xs font-medium text-neutral-700 dark:text-neutral-300">Action</TableHead>
+                    <TableHeader className="[&_tr]:sticky [&_tr]:top-0 [&_tr]:z-10 [&_tr]:bg-bg-primary [&_tr]:backdrop-blur-sm">
+                      <TableRow className="bg-bg-muted/30 hover:bg-bg-muted/30 border-b border-bg-muted">
+                        <TableHead className="text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                          Type
+                        </TableHead>
+                        <TableHead className="hidden sm:table-cell text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                          Dates
+                        </TableHead>
+                        <TableHead className="hidden md:table-cell text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                          Days
+                        </TableHead>
+                        <TableHead className="text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                          Status
+                        </TableHead>
+                        <TableHead className="hidden lg:table-cell text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                          Updated
+                        </TableHead>
+                        <TableHead className="text-right text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                          Action
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {paginatedRows.map((row, index) => (
-                        <TableRow 
-                          key={row.id} 
+                        <TableRow
+                          key={row.id}
                           className={cn(
                             "hover:bg-muted/40 cursor-pointer transition-colors",
                             index % 2 === 0 && "bg-white dark:bg-neutral-900/50"
@@ -253,7 +292,8 @@ export function MyLeavesPageContent() {
                             {leaveTypeLabel[row.type] ?? row.type}
                           </TableCell>
                           <TableCell className="hidden sm:table-cell text-sm text-gray-600 dark:text-slate-300">
-                            {formatDate(row.startDate)} → {formatDate(row.endDate)}
+                            {formatDate(row.startDate)} →{" "}
+                            {formatDate(row.endDate)}
                           </TableCell>
                           <TableCell className="hidden md:table-cell text-sm text-gray-600 dark:text-slate-300">
                             {row.workingDays}
@@ -264,13 +304,16 @@ export function MyLeavesPageContent() {
                           <TableCell className="hidden lg:table-cell text-sm text-gray-600 dark:text-slate-300">
                             {formatDate(row.updatedAt)}
                           </TableCell>
-                          <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                          <TableCell
+                            className="text-right"
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             {CANCELABLE_STATUSES.has(row.status) ? (
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
                                     className="h-8 w-8 p-0 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20"
                                     aria-label="Cancel request"
                                   >
@@ -279,21 +322,28 @@ export function MyLeavesPageContent() {
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
-                                    <AlertDialogTitle>Cancel this request?</AlertDialogTitle>
+                                    <AlertDialogTitle>
+                                      Cancel this request?
+                                    </AlertDialogTitle>
                                     <AlertDialogDescription>
-                                      This will mark the request as cancelled. Approvers will no longer see it.
+                                      This will mark the request as cancelled.
+                                      Approvers will no longer see it.
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
                                     <AlertDialogCancel>Keep</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => cancelRequest(row.id)}>
+                                    <AlertDialogAction
+                                      onClick={() => cancelRequest(row.id)}
+                                    >
                                       Cancel Request
                                     </AlertDialogAction>
                                   </AlertDialogFooter>
                                 </AlertDialogContent>
                               </AlertDialog>
                             ) : (
-                              <span className="text-xs text-gray-500 dark:text-slate-400">—</span>
+                              <span className="text-xs text-gray-500 dark:text-slate-400">
+                                —
+                              </span>
                             )}
                           </TableCell>
                         </TableRow>
@@ -332,12 +382,15 @@ export function MyLeavesPageContent() {
                     return (
                       <Button
                         key={pageNum}
-                        variant={currentPage === pageNum ? "default" : "outline"}
+                        variant={
+                          currentPage === pageNum ? "default" : "outline"
+                        }
                         size="sm"
                         onClick={() => setCurrentPage(pageNum)}
                         className={cn(
                           "w-8 h-8 p-0",
-                          currentPage === pageNum && "bg-indigo-600 hover:bg-indigo-700"
+                          currentPage === pageNum &&
+                            "bg-indigo-600 hover:bg-indigo-700"
                         )}
                       >
                         {pageNum}
@@ -348,7 +401,9 @@ export function MyLeavesPageContent() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  onClick={() =>
+                    setCurrentPage(Math.min(totalPages, currentPage + 1))
+                  }
                   disabled={currentPage === totalPages}
                   className="gap-1"
                 >

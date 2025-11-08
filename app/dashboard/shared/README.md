@@ -193,3 +193,4 @@ Components use Framer Motion for smooth animations:
 - **Desktop**: 3-column grid, full-width tables with sticky headers
 
 
+

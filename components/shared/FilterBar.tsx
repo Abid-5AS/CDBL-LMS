@@ -1,14 +1,14 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
+  Input,
+  Button,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui";
 import { Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -88,7 +88,10 @@ export function FilterBar({
       </div>
 
       {statusFilter && (
-        <Select value={statusFilter.value} onValueChange={statusFilter.onChange}>
+        <Select
+          value={statusFilter.value}
+          onValueChange={statusFilter.onChange}
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
@@ -144,4 +147,3 @@ export function FilterBar({
     </div>
   );
 }
-

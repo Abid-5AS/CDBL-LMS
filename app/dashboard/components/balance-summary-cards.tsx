@@ -1,7 +1,7 @@
 "use client";
 
 import useSWR from "swr";
-import { KPICard } from "./kpi-card";
+import { KPICard } from "@/components/cards/KPICard";
 import { CalendarCheck, Clock, Plus } from "lucide-react";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());

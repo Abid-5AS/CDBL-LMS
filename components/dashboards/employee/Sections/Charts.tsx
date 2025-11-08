@@ -1,15 +1,18 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Skeleton,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@/components/ui";
 import { TrendingUp, Calendar, BarChart3, Info } from "lucide-react";
 import { LeaveHeatmap } from "./LeaveHeatmap";
 import { TypePie } from "@/components/shared/LeaveCharts";
@@ -38,7 +41,7 @@ export function AnalyticsSection() {
     // Get period-specific usage based on filter
     let periodLabel = "This Year";
     let periodTotal = summaryInfo.yearUsed ?? 0;
-    
+
     if (period === "month") {
       periodLabel = "This Month";
       periodTotal = summaryInfo.monthUsed ?? 0;
@@ -96,7 +99,9 @@ export function AnalyticsSection() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Days Used</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Days Used
+                  </p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
                     {summary?.periodTotal ?? 0}
                   </p>
@@ -110,22 +115,32 @@ export function AnalyticsSection() {
           </Card>
 
           {/* Total Used - Always year-to-date (independent of filter) */}
-          <Card className="solid-card animate-fade-in-up" style={{ animationDelay: "100ms" }}>
+          <Card
+            className="solid-card animate-fade-in-up"
+            style={{ animationDelay: "100ms" }}
+          >
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-1.5">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Total Used</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Total Used
+                    </p>
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <button type="button" className="inline-flex items-center">
+                          <button
+                            type="button"
+                            className="inline-flex items-center"
+                          >
                             <Info className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors" />
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="right" className="max-w-xs">
                           <p className="text-xs">
-                            This value always shows total leaves used in the current year, regardless of the selected view filter.
+                            This value always shows total leaves used in the
+                            current year, regardless of the selected view
+                            filter.
                           </p>
                         </TooltipContent>
                       </Tooltip>
@@ -143,11 +158,16 @@ export function AnalyticsSection() {
             </CardContent>
           </Card>
 
-          <Card className="solid-card animate-fade-in-up" style={{ animationDelay: "200ms" }}>
+          <Card
+            className="solid-card animate-fade-in-up"
+            style={{ animationDelay: "200ms" }}
+          >
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Remaining</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Remaining
+                  </p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
                     {summary?.remaining ?? 0}
                   </p>
@@ -163,7 +183,9 @@ export function AnalyticsSection() {
 
         {/* Period Filter - Right Side */}
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">View:</span>
+          <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+            View:
+          </span>
           <div className="flex gap-1">
             <Button
               variant={period === "month" ? "default" : "outline"}
@@ -204,10 +226,7 @@ export function AnalyticsSection() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <LeaveHeatmap
-              defaultScope="me"
-              defaultRange="year"
-            />
+            <LeaveHeatmap defaultScope="me" defaultRange="year" />
           </CardContent>
         </Card>
 

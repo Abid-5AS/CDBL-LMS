@@ -2,10 +2,15 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Progress,
+  Badge,
+  Skeleton,
+} from "@/components/ui";
 import { EmptyState } from "./EmptyState";
 import { Umbrella, Zap, HeartPulse, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -46,7 +51,8 @@ const TYPE_CONFIG: Record<
     label: "Earned Leave",
     icon: Umbrella,
     gradient: "from-amber-500 to-orange-600",
-    bgGradient: "from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30",
+    bgGradient:
+      "from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30",
     borderColor: "border-amber-200 dark:border-amber-800",
     colorClass: "bg-amber-500",
   },
@@ -54,7 +60,8 @@ const TYPE_CONFIG: Record<
     label: "Casual Leave",
     icon: Zap,
     gradient: "from-blue-500 to-cyan-600",
-    bgGradient: "from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30",
+    bgGradient:
+      "from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30",
     borderColor: "border-blue-200 dark:border-blue-800",
     colorClass: "bg-blue-500",
   },
@@ -62,7 +69,8 @@ const TYPE_CONFIG: Record<
     label: "Medical Leave",
     icon: HeartPulse,
     gradient: "from-green-500 to-emerald-600",
-    bgGradient: "from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30",
+    bgGradient:
+      "from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30",
     borderColor: "border-green-200 dark:border-green-800",
     colorClass: "bg-green-500",
   },
@@ -88,7 +96,9 @@ function ProgressBar({
     <div className={cn("space-y-1", className)}>
       <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
         <span>{label}</span>
-        <span className="text-slate-700 dark:text-slate-300">{Math.round(clampedPercent)}%</span>
+        <span className="text-slate-700 dark:text-slate-300">
+          {Math.round(clampedPercent)}%
+        </span>
       </div>
       <Progress
         value={clampedPercent}
@@ -121,7 +131,9 @@ export function LeaveBalancePanel({
   const sortedBalances = useMemo(() => {
     // Sort: EARNED, CASUAL, MEDICAL
     const order: BalanceType[] = ["EARNED", "CASUAL", "MEDICAL"];
-    return [...balances].sort((a, b) => order.indexOf(a.type) - order.indexOf(b.type));
+    return [...balances].sort(
+      (a, b) => order.indexOf(a.type) - order.indexOf(b.type)
+    );
   }, [balances]);
 
   if (loading) {
@@ -170,7 +182,9 @@ export function LeaveBalancePanel({
           <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             {totalRemaining}
           </span>
-          <span className="text-sm text-gray-500 dark:text-gray-400">Days Remaining</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            Days Remaining
+          </span>
         </div>
 
         {/* 3-column compact cards */}
@@ -179,7 +193,8 @@ export function LeaveBalancePanel({
             const config = TYPE_CONFIG[balance.type];
             const Icon = config.icon;
             const remaining = Math.max(balance.total - balance.used, 0);
-            const percentUsed = balance.total > 0 ? (balance.used / balance.total) * 100 : 0;
+            const percentUsed =
+              balance.total > 0 ? (balance.used / balance.total) * 100 : 0;
 
             return (
               <Card
@@ -200,7 +215,10 @@ export function LeaveBalancePanel({
               >
                 {showMeters && (
                   <div className="relative w-16 h-16 mb-1">
-                    <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
+                    <svg
+                      className="w-16 h-16 transform -rotate-90"
+                      viewBox="0 0 36 36"
+                    >
                       <circle
                         cx="18"
                         cy="18"
@@ -253,7 +271,8 @@ export function LeaveBalancePanel({
           const config = TYPE_CONFIG[balance.type];
           const Icon = config.icon;
           const remaining = Math.max(balance.total - balance.used, 0);
-          const percentUsed = balance.total > 0 ? (balance.used / balance.total) * 100 : 0;
+          const percentUsed =
+            balance.total > 0 ? (balance.used / balance.total) * 100 : 0;
           const percentRemaining = 100 - percentUsed;
 
           return (
@@ -316,7 +335,10 @@ export function LeaveBalancePanel({
                   </div>
                   {showMeters && (
                     <div className="w-20 h-20">
-                      <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                      <svg
+                        className="w-20 h-20 transform -rotate-90"
+                        viewBox="0 0 36 36"
+                      >
                         <circle
                           cx="18"
                           cy="18"
@@ -380,4 +402,3 @@ export function LeaveBalancePanel({
     </div>
   );
 }
-

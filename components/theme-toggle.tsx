@@ -5,7 +5,7 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui";
 import { getIcon, iconSizes } from "@/lib/icons";
 import { scaleIn } from "@/lib/animations";
 
@@ -34,7 +34,7 @@ export function ThemeToggle() {
         aria-label="Toggle theme"
         disabled
       >
-        <div className="size-[18px] rounded-full bg-slate-300/60" />
+        <div className="size-[18px] rounded-full bg-text-tertiary/60" />
       </Button>
     );
   }
@@ -44,14 +44,17 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon"
       aria-label={label}
-      className="relative h-9 w-9 rounded-full text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-50 hover:bg-white/50 dark:hover:bg-white/10 transition-colors bg-transparent border-0 focus-visible:ring-2 focus-visible:ring-indigo-500/40"
+      className="relative h-9 w-9 rounded-full text-text-secondary hover:text-text-primary hover:bg-bg-secondary transition-colors bg-transparent border-0 focus-visible:ring-2 focus-visible:ring-card-action/40"
       onClick={() => setTheme(isDark ? "light" : "dark")}
     >
       <span className="sr-only">{label}</span>
       <AnimatePresence mode="wait" initial={false}>
         <motion.span
           key={isDark ? "sun" : "moon"}
-          variants={scaleIn({ duration: prefersReducedMotion ? 0 : 0.25 }, prefersReducedMotion ?? false)}
+          variants={scaleIn(
+            { duration: prefersReducedMotion ? 0 : 0.25 },
+            prefersReducedMotion ?? false
+          )}
           initial="initial"
           animate="animate"
           exit="exit"

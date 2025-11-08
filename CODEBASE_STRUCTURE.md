@@ -1,3 +1,34 @@
+#
+
+# 🗂️ Modern Folder & File Organization (2025-11-08)
+
+## Component Structure
+
+- `components/cards/` – All card UI (KPICard, KpiCard, etc.)
+- `components/filters/` – All filter/search UI (FilterChips, SearchInput, etc.)
+- `components/shared/` – Reusable widgets/utilities (StatusBadge, QuickActions, EmptyState, etc.)
+- `components/ui/` – Atomic UI primitives (Button, Input, Card, Modal, etc.)
+- `components/layout/` – Layout/navigation wrappers (Navbar, SectionHeader, LayoutWrapper, etc.)
+- `components/leaves/` – Leave-specific UI (archived/legacy only)
+- `app/` – Business logic, containers, and route-level code only
+
+## Barrel Exports
+
+- Each folder uses an `index.ts` for clean imports (e.g. `import { FilterChips } from "@/components/filters"`)
+
+## Cleanup & Archival
+
+- Duplicates/legacy (e.g. old FilterChips, kpi-card) are archived in-place with comments.
+- All direct deep imports replaced with barrel imports for maintainability.
+
+## How to Add New Components
+
+- Place new UI in the correct domain folder (cards, filters, shared, ui, layout).
+- Export from the folder’s `index.ts`.
+- Use barrel imports everywhere.
+
+---
+
 # CDBL Leave Management System - Codebase Structure
 
 **Generated:** 2025-11-06T12:13:26.999Z  
@@ -1018,6 +1049,7 @@ cdbl-leave-management/ (55 items)
 ## 🔍 Key Directories
 
 ### Application Code
+
 - `app/` - Next.js App Router pages and API routes
 - `components/` - React components
   - `components/shared/` - **NEW:** Shared reusable components
@@ -1028,11 +1060,13 @@ cdbl-leave-management/ (55 items)
   - `lib/exportUtils.ts` - **NEW:** Unified export utilities
 
 ### Configuration & Data
+
 - `prisma/` - Database schema and migrations
 - `scripts/` - Build and utility scripts
 - `docs/` - Documentation
 
 ### Testing & Quality
+
 - `tests/` - Test files
 - `qa/` - QA artifacts and reports
 
@@ -1047,4 +1081,4 @@ cdbl-leave-management/ (55 items)
 
 ---
 
-*This document is auto-generated. Run `tsx scripts/generate-structure-doc.ts` to regenerate.*
+_This document is auto-generated. Run `tsx scripts/generate-structure-doc.ts` to regenerate._

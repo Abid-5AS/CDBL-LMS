@@ -6,24 +6,54 @@ export type AppRole =
   | "CEO"
   | "SYSTEM_ADMIN";
 
+const VIEW_ALL_REQUESTS = new Set<AppRole>(["HR_ADMIN", "HR_HEAD", "CEO", "DEPT_HEAD", "SYSTEM_ADMIN"]);
+const APPROVER_ROLES = new Set<AppRole>(["HR_HEAD", "CEO", "DEPT_HEAD", "SYSTEM_ADMIN"]);
+const RETURN_ROLES = new Set<AppRole>(["HR_ADMIN", "HR_HEAD", "CEO", "DEPT_HEAD", "SYSTEM_ADMIN"]);
+const ADMIN_CANCEL_ROLES = new Set<AppRole>(["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"]);
+const SYSTEM_ONLY = new Set<AppRole>(["SYSTEM_ADMIN"]);
+
+const PROFILE_VIEW_MATRIX: Record<AppRole, Set<AppRole>> = {
+  SYSTEM_ADMIN: new Set(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"]),
+  CEO: new Set(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"]),
+  HR_HEAD: new Set(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD"]),
+  HR_ADMIN: new Set(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN"]),
+  DEPT_HEAD: new Set(["EMPLOYEE", "DEPT_HEAD"]),
+  EMPLOYEE: new Set(["EMPLOYEE"]),
+};
+
+const PROFILE_EDIT_MATRIX: Record<AppRole, Set<AppRole>> = {
+  SYSTEM_ADMIN: new Set(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"]),
+  CEO: new Set(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"]),
+  HR_HEAD: new Set(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN"]),
+  HR_ADMIN: new Set(),
+  DEPT_HEAD: new Set(),
+  EMPLOYEE: new Set(),
+};
+
+const ASSIGNABLE_ROLES: Record<AppRole, Set<AppRole>> = {
+  SYSTEM_ADMIN: new Set(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"]),
+  CEO: new Set(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"]),
+  HR_HEAD: new Set(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN"]),
+  HR_ADMIN: new Set(),
+  DEPT_HEAD: new Set(),
+  EMPLOYEE: new Set(),
+};
+
+const VISIBLE_ROLES: Record<AppRole, AppRole[]> = {
+  SYSTEM_ADMIN: ["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"],
+  CEO: ["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"],
+  HR_HEAD: ["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD"],
+  HR_ADMIN: ["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN"],
+  DEPT_HEAD: ["EMPLOYEE"],
+  EMPLOYEE: [],
+};
+
 export function canViewAllRequests(role: AppRole) {
-  return (
-    role === "HR_ADMIN" ||
-    role === "HR_HEAD" ||
-    role === "CEO" ||
-    role === "DEPT_HEAD" ||
-    role === "SYSTEM_ADMIN"
-  );
+  return VIEW_ALL_REQUESTS.has(role);
 }
 
 export function canApprove(role: AppRole) {
-  // HR_ADMIN is operational only (forward/reject/return), not approval authority
-  return (
-    role === "HR_HEAD" ||
-    role === "CEO" ||
-    role === "DEPT_HEAD" ||
-    role === "SYSTEM_ADMIN"
-  );
+  return APPROVER_ROLES.has(role);
 }
 
 /**
@@ -35,29 +65,8 @@ export function canViewEmployee(
   viewerRole: AppRole,
   targetRole: AppRole
 ): boolean {
-  // SYSTEM_ADMIN can view everyone
-  if (viewerRole === "SYSTEM_ADMIN") return true;
-
-  // CEO can view everyone
-  if (viewerRole === "CEO") return true;
-
-  // HR_HEAD can view everyone except CEO
-  if (viewerRole === "HR_HEAD") {
-    return targetRole !== "CEO";
-  }
-
-  // HR_ADMIN can only view EMPLOYEE and DEPT_HEAD
-  if (viewerRole === "HR_ADMIN") {
-    return targetRole === "EMPLOYEE" || targetRole === "DEPT_HEAD";
-  }
-
-  // DEPT_HEAD can view their team members
-  if (viewerRole === "DEPT_HEAD") {
-    return targetRole === "EMPLOYEE";
-  }
-
-  // EMPLOYEE can view their own profile
-  return viewerRole === targetRole;
+  const allowed = PROFILE_VIEW_MATRIX[viewerRole] ?? new Set<AppRole>();
+  return allowed.has(targetRole);
 }
 
 /**
@@ -69,24 +78,8 @@ export function canEditEmployee(
   viewerRole: AppRole,
   targetRole: AppRole
 ): boolean {
-  // SYSTEM_ADMIN can edit everyone
-  if (viewerRole === "SYSTEM_ADMIN") return true;
-
-  // CEO can edit everyone
-  if (viewerRole === "CEO") return true;
-
-  // HR_HEAD can edit HR_ADMIN, EMPLOYEE, and DEPT_HEAD
-  if (viewerRole === "HR_HEAD") {
-    return targetRole !== "CEO" && targetRole !== "HR_HEAD";
-  }
-
-  // HR_ADMIN cannot edit employees (employee management moved to SYSTEM_ADMIN)
-  if (viewerRole === "HR_ADMIN") {
-    return false;
-  }
-
-  // DEPT_HEAD and EMPLOYEE cannot edit other users
-  return false;
+  const allowed = PROFILE_EDIT_MATRIX[viewerRole] ?? new Set<AppRole>();
+  return allowed.has(targetRole);
 }
 
 /**
@@ -95,27 +88,7 @@ export function canEditEmployee(
  * @returns Array of roles the viewer can see
  */
 export function getVisibleRoles(role: AppRole): AppRole[] {
-  switch (role) {
-    case "SYSTEM_ADMIN":
-      return [
-        "EMPLOYEE",
-        "DEPT_HEAD",
-        "HR_ADMIN",
-        "HR_HEAD",
-        "CEO",
-        "SYSTEM_ADMIN",
-      ];
-    case "CEO":
-      return ["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"];
-    case "HR_HEAD":
-      return ["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD"];
-    case "HR_ADMIN":
-      return ["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN"];
-    case "DEPT_HEAD":
-      return ["EMPLOYEE"];
-    default:
-      return [];
-  }
+  return VISIBLE_ROLES[role] ?? [];
 }
 
 /**
@@ -127,24 +100,8 @@ export function canAssignRole(
   viewerRole: AppRole,
   targetRole: AppRole
 ): boolean {
-  // SYSTEM_ADMIN can assign any role
-  if (viewerRole === "SYSTEM_ADMIN") return true;
-
-  // CEO can assign any role
-  if (viewerRole === "CEO") return true;
-
-  // HR_HEAD can assign EMPLOYEE, DEPT_HEAD, HR_ADMIN
-  if (viewerRole === "HR_HEAD") {
-    return ["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN"].includes(targetRole);
-  }
-
-  // HR_ADMIN cannot assign roles (role assignment moved to SYSTEM_ADMIN)
-  if (viewerRole === "HR_ADMIN") {
-    return false;
-  }
-
-  // Others cannot assign roles
-  return false;
+  const allowed = ASSIGNABLE_ROLES[viewerRole] ?? new Set<AppRole>();
+  return allowed.has(targetRole);
 }
 
 /**
@@ -152,8 +109,7 @@ export function canAssignRole(
  * @param role - The role of the person trying to create
  */
 export function canCreateEmployee(role: AppRole): boolean {
-  // Employee creation moved to SYSTEM_ADMIN only
-  return role === "SYSTEM_ADMIN";
+  return SYSTEM_ONLY.has(role);
 }
 
 /**
@@ -165,16 +121,7 @@ export function canCreateEmployee(role: AppRole): boolean {
  * @param isOwnLeave - Whether the leave belongs to the actor
  */
 export function canCancel(role: AppRole, isOwnLeave: boolean = false): boolean {
-  // Admin roles can cancel any leave
-  if (
-    role === "HR_ADMIN" ||
-    role === "HR_HEAD" ||
-    role === "CEO" ||
-    role === "SYSTEM_ADMIN"
-  ) {
-    return true;
-  }
-  // Employees can only cancel their own leave (triggers CANCELLATION_REQUESTED)
+  if (ADMIN_CANCEL_ROLES.has(role)) return true;
   return isOwnLeave && role === "EMPLOYEE";
 }
 
@@ -186,14 +133,7 @@ export function canCancel(role: AppRole, isOwnLeave: boolean = false): boolean {
  * @param role - The role of the person trying to return
  */
 export function canReturn(role: AppRole): boolean {
-  // Only approvers can return requests for modification
-  return (
-    role === "HR_ADMIN" ||
-    role === "HR_HEAD" ||
-    role === "CEO" ||
-    role === "DEPT_HEAD" ||
-    role === "SYSTEM_ADMIN"
-  );
+  return RETURN_ROLES.has(role);
 }
 
 /**
@@ -201,7 +141,7 @@ export function canReturn(role: AppRole): boolean {
  * Only SYSTEM_ADMIN can manage system structure
  */
 export function canManageSystemStructure(role: AppRole): boolean {
-  return role === "SYSTEM_ADMIN";
+  return SYSTEM_ONLY.has(role);
 }
 
 /**
@@ -209,7 +149,7 @@ export function canManageSystemStructure(role: AppRole): boolean {
  * Only SYSTEM_ADMIN can manage policies
  */
 export function canManagePolicy(role: AppRole): boolean {
-  return role === "SYSTEM_ADMIN";
+  return SYSTEM_ONLY.has(role);
 }
 
 /**
@@ -217,7 +157,7 @@ export function canManagePolicy(role: AppRole): boolean {
  * Only SYSTEM_ADMIN can manage holidays
  */
 export function canManageHolidays(role: AppRole): boolean {
-  return role === "SYSTEM_ADMIN";
+  return SYSTEM_ONLY.has(role);
 }
 
 /**
@@ -225,5 +165,5 @@ export function canManageHolidays(role: AppRole): boolean {
  * Only SYSTEM_ADMIN can view audit logs
  */
 export function canViewAudit(role: AppRole): boolean {
-  return role === "SYSTEM_ADMIN";
+  return SYSTEM_ONLY.has(role);
 }

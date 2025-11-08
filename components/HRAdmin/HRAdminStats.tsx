@@ -1,6 +1,9 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+// UI Components (barrel export)
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
+
+// Local types
 import { HRApprovalItem } from "./types";
 
 type HRAdminStatsProps = {
@@ -12,9 +15,16 @@ const PLACEHOLDER_ENCASHMENT = 0;
 
 export function HRAdminStats({ items, loading }: HRAdminStatsProps) {
   const pendingRequests = items.length;
-  const employeesOnLeave = new Set(items.map((item) => item.requestedByEmail ?? item.requestedByName ?? "")).size;
+  const employeesOnLeave = new Set(
+    items.map((item) => item.requestedByEmail ?? item.requestedByName ?? "")
+  ).size;
   const avgApprovalTime =
-    items.length > 0 ? `${(items.reduce((acc, item) => acc + item.requestedDays, 0) / items.length).toFixed(1)} days` : "—";
+    items.length > 0
+      ? `${(
+          items.reduce((acc, item) => acc + item.requestedDays, 0) /
+          items.length
+        ).toFixed(1)} days`
+      : "—";
 
   const cards = [
     { title: "Employees on Leave", value: employeesOnLeave },
@@ -28,10 +38,14 @@ export function HRAdminStats({ items, loading }: HRAdminStatsProps) {
       {cards.map((card) => (
         <Card key={card.title}>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-medium uppercase text-muted-foreground">{card.title}</CardTitle>
+            <CardTitle className="text-xs font-medium uppercase text-muted-foreground">
+              {card.title}
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold text-slate-900">{loading ? "…" : card.value}</p>
+            <p className="text-2xl font-semibold text-text-primary">
+              {totalCount}
+            </p>
           </CardContent>
         </Card>
       ))}

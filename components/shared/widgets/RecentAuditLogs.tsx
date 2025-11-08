@@ -1,6 +1,17 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { EmptyState } from "@/components/ui/empty-state";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  EmptyState,
+} from "@/components/ui";
 import { Activity } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
@@ -18,10 +29,12 @@ export async function RecentAuditLogs() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Activity className="h-5 w-5 text-slate-400" />
+            <Activity className="h-5 w-5 text-text-tertiary" />
             <CardTitle>Recent Activity</CardTitle>
           </div>
-          <CardDescription>System audit logs and activity history</CardDescription>
+          <CardDescription>
+            System audit logs and activity history
+          </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           <EmptyState
@@ -70,7 +83,9 @@ export async function RecentAuditLogs() {
                   {log.targetEmail || "—"}
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground max-w-xs truncate">
-                  {log.details ? JSON.stringify(log.details).substring(0, 50) + "..." : "—"}
+                  {log.details
+                    ? JSON.stringify(log.details).substring(0, 50) + "..."
+                    : "—"}
                 </TableCell>
               </TableRow>
             ))}
@@ -80,4 +95,3 @@ export async function RecentAuditLogs() {
     </Card>
   );
 }
-

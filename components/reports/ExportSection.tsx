@@ -1,9 +1,17 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Download, FileText, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
+
+// UI Components (barrel export)
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  Button,
+} from "@/components/ui";
 
 type ExportSectionProps = {
   duration: string;
@@ -11,7 +19,11 @@ type ExportSectionProps = {
   leaveType: string | null;
 };
 
-export function ExportSection({ duration, department, leaveType }: ExportSectionProps) {
+export function ExportSection({
+  duration,
+  department,
+  leaveType,
+}: ExportSectionProps) {
   const handleExport = async (format: "csv" | "pdf") => {
     try {
       // Build query params
@@ -21,10 +33,12 @@ export function ExportSection({ duration, department, leaveType }: ExportSection
       if (leaveType) params.set("leaveType", leaveType);
       params.set("format", format);
 
-      toast.loading(`Generating ${format.toUpperCase()} report...`, { id: "export" });
+      toast.loading(`Generating ${format.toUpperCase()} report...`, {
+        id: "export",
+      });
 
       const response = await fetch(`/api/reports/export?${params.toString()}`);
-      
+
       // Safe null check for response
       if (!response) {
         throw new Error("No response from server");
@@ -42,19 +56,26 @@ export function ExportSection({ duration, department, leaveType }: ExportSection
           // If JSON parsing fails, use status text
           errorData = { message: response.statusText || "Unknown error" };
         }
-        throw new Error(errorData.message || `Export failed with status ${response.status}`);
+        throw new Error(
+          errorData.message || `Export failed with status ${response.status}`
+        );
       }
 
       // Check content type
       const contentType = response.headers.get("content-type");
       const expectedType = format === "pdf" ? "application/pdf" : "text/csv";
-      if (!contentType || !contentType.includes(format === "pdf" ? "pdf" : "csv")) {
-        throw new Error(`Invalid response format. Expected ${expectedType}, got ${contentType}`);
+      if (
+        !contentType ||
+        !contentType.includes(format === "pdf" ? "pdf" : "csv")
+      ) {
+        throw new Error(
+          `Invalid response format. Expected ${expectedType}, got ${contentType}`
+        );
       }
 
       // Get blob and create download
       const blob = await response.blob();
-      
+
       // Verify blob is not empty
       if (blob.size === 0) {
         throw new Error("Received empty file");
@@ -63,15 +84,20 @@ export function ExportSection({ duration, department, leaveType }: ExportSection
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `leave-report-${duration}-${new Date().toISOString().split("T")[0]}.${format}`;
+      a.download = `leave-report-${duration}-${
+        new Date().toISOString().split("T")[0]
+      }.${format}`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
-      toast.success(`Report exported as ${format.toUpperCase()}`, { id: "export" });
+      toast.success(`Report exported as ${format.toUpperCase()}`, {
+        id: "export",
+      });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to export report";
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to export report";
       toast.error(errorMessage, { id: "export" });
       console.error("Export error:", error);
     }
@@ -104,7 +130,12 @@ export function ExportSection({ duration, department, leaveType }: ExportSection
             Export as PDF
           </Button>
           <p className="text-sm text-muted-foreground ml-auto">
-            Current filters: {duration === "month" ? "This Month" : duration === "quarter" ? "This Quarter" : "This Year"}
+            Current filters:{" "}
+            {duration === "month"
+              ? "This Month"
+              : duration === "quarter"
+              ? "This Quarter"
+              : "This Year"}
             {department && " • Department filtered"}
             {leaveType && " • Leave type filtered"}
           </p>
@@ -113,4 +144,3 @@ export function ExportSection({ duration, department, leaveType }: ExportSection
     </Card>
   );
 }
-

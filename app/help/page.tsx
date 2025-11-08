@@ -1,6 +1,12 @@
 import { LifeBuoy, BookOpen } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Button,
+} from "@/components/ui";
 import Link from "next/link";
 import { FAQAccordion } from "./components/FAQAccordion";
 import { ContactSupport } from "./components/ContactSupport";
@@ -15,9 +21,12 @@ export default function HelpPage() {
   return (
     <div className="space-y-6">
       <section className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Help Center</h1>
+        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+          Help Center
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Find answers to common questions and get support for using the leave management system
+          Find answers to common questions and get support for using the leave
+          management system
         </p>
       </section>
 
@@ -32,7 +41,8 @@ export default function HelpPage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              Comprehensive guides on how to use the leave management system effectively.
+              Comprehensive guides on how to use the leave management system
+              effectively.
             </p>
             <Button variant="outline" size="sm" asChild>
               <Link href="/policies">View Policies</Link>
@@ -51,8 +61,13 @@ export default function HelpPage() {
           <CardContent>
             <div className="space-y-2 mb-4">
               {KEYBOARD_SHORTCUTS.map((shortcut, idx) => (
-                <div key={idx} className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">{shortcut.description}</span>
+                <div
+                  key={idx}
+                  className="flex items-center justify-between text-sm"
+                >
+                  <span className="text-muted-foreground">
+                    {shortcut.description}
+                  </span>
                   <kbd className="px-2 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded">
                     {shortcut.key}
                   </kbd>
@@ -66,7 +81,9 @@ export default function HelpPage() {
       <Card>
         <CardHeader>
           <CardTitle>Frequently Asked Questions</CardTitle>
-          <CardDescription>Common questions and answers about leave policies and system usage</CardDescription>
+          <CardDescription>
+            Common questions and answers about leave policies and system usage
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <FAQAccordion />

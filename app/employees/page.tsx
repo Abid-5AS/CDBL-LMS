@@ -1,15 +1,19 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
-import { canViewAllRequests, canCreateEmployee, type AppRole } from "@/lib/rbac";
-import { Button } from "@/components/ui/button";
+import {
+  canViewAllRequests,
+  canCreateEmployee,
+  type AppRole,
+} from "@/lib/rbac";
+import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { EmployeeList } from "./components/EmployeeList";
 
 async function EmployeesPageContent() {
   const user = await getCurrentUser();
-  
+
   if (!user || !canViewAllRequests(user.role as AppRole)) {
     redirect("/dashboard");
   }
@@ -21,9 +25,12 @@ async function EmployeesPageContent() {
       <section className="rounded-xl border border-slate-200/50 dark:border-slate-800/50 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 p-6 shadow-sm">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Employee Directory</h1>
+            <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+              Employee Directory
+            </h1>
             <p className="mt-1 text-sm text-muted-foreground dark:text-slate-300">
-              Browse and search employee profiles, view leave histories, and manage employee information
+              Browse and search employee profiles, view leave histories, and
+              manage employee information
             </p>
           </div>
           {canCreate && (

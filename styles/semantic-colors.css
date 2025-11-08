@@ -1,0 +1,50 @@
+/* Semantic color tokens for leave types, card types, data types, and states. */
+
+:root {
+  /* Leave Types */
+  --color-leave-sick: #f87171;
+  --color-leave-casual: #60a5fa;
+  --color-leave-earned: #34d399;
+  --color-leave-unpaid: #a3a3a3;
+
+  /* Card Types */
+  --color-card-kpi: #fbbf24;
+  --color-card-action: #818cf8;
+  --color-card-summary: #f472b6;
+
+  /* Data Types */
+  --color-data-success: #22c55e;
+  --color-data-warning: #f59e42;
+  --color-data-error: #ef4444;
+  --color-data-info: #3b82f6;
+
+  /* Status/States */
+  --color-status-draft: #e0e7ef;
+  --color-status-submitted: #60a5fa;
+  --color-status-approved: #34d399;
+  --color-status-rejected: #f87171;
+  --color-status-returned: #fbbf24;
+}
+
+[data-theme="dark"],
+.dark {
+  --color-leave-sick: #fca5a5;
+  --color-leave-casual: #93c5fd;
+  --color-leave-earned: #6ee7b7;
+  --color-leave-unpaid: #d1d5db;
+
+  --color-card-kpi: #fde68a;
+  --color-card-action: #a5b4fc;
+  --color-card-summary: #f9a8d4;
+
+  --color-data-success: #4ade80;
+  --color-data-warning: #fbbf24;
+  --color-data-error: #f87171;
+  --color-data-info: #60a5fa;
+
+  --color-status-draft: #334155;
+  --color-status-submitted: #2563eb;
+  --color-status-approved: #059669;
+  --color-status-rejected: #b91c1c;
+  --color-status-returned: #f59e42;
+}

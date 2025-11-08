@@ -7,15 +7,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import type { EmployeeDashboardData } from "@/lib/employee";
-import { Button } from "@/components/ui/button";
 import {
+  Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import {
   Form,
   FormControl,
   FormDescription,
@@ -23,23 +21,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
+  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from "@/components/ui";
 import { canAssignRole, type AppRole } from "@/lib/rbac";
 import Link from "next/link";
 
@@ -56,7 +50,10 @@ type EmployeeEditFormProps = {
   viewerRole: AppRole;
 };
 
-export function EmployeeEditForm({ employee, viewerRole }: EmployeeEditFormProps) {
+export function EmployeeEditForm({
+  employee,
+  viewerRole,
+}: EmployeeEditFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -84,11 +81,22 @@ export function EmployeeEditForm({ employee, viewerRole }: EmployeeEditFormProps
 
     // Calculate changed fields for audit log
     const changedFields: Record<string, { from: any; to: any }> = {};
-    if (values.name !== employee.name) changedFields.name = { from: employee.name, to: values.name };
-    if (values.email !== employee.email) changedFields.email = { from: employee.email, to: values.email };
-    if (values.department !== (employee.department || "")) changedFields.department = { from: employee.department, to: values.department };
-    if (values.role !== employee.role) changedFields.role = { from: employee.role, to: values.role };
-    if (values.empCode !== employee.id.toString()) changedFields.empCode = { from: employee.id.toString(), to: values.empCode };
+    if (values.name !== employee.name)
+      changedFields.name = { from: employee.name, to: values.name };
+    if (values.email !== employee.email)
+      changedFields.email = { from: employee.email, to: values.email };
+    if (values.department !== (employee.department || ""))
+      changedFields.department = {
+        from: employee.department,
+        to: values.department,
+      };
+    if (values.role !== employee.role)
+      changedFields.role = { from: employee.role, to: values.role };
+    if (values.empCode !== employee.id.toString())
+      changedFields.empCode = {
+        from: employee.id.toString(),
+        to: values.empCode,
+      };
 
     try {
       const response = await fetch(`/api/employees/${employee.id}`, {
@@ -159,7 +167,9 @@ export function EmployeeEditForm({ employee, viewerRole }: EmployeeEditFormProps
       <Card>
         <CardHeader>
           <CardTitle>Edit Employee Information</CardTitle>
-          <CardDescription>Update employee details and role information</CardDescription>
+          <CardDescription>
+            Update employee details and role information
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -186,7 +196,11 @@ export function EmployeeEditForm({ employee, viewerRole }: EmployeeEditFormProps
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="john@example.com" {...field} />
+                        <Input
+                          type="email"
+                          placeholder="john@example.com"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -245,7 +259,11 @@ export function EmployeeEditForm({ employee, viewerRole }: EmployeeEditFormProps
                     <FormItem>
                       <FormLabel>Employee Code</FormLabel>
                       <FormControl>
-                        <Input placeholder="EMP001" {...field} value={field.value || ""} />
+                        <Input
+                          placeholder="EMP001"
+                          {...field}
+                          value={field.value || ""}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -257,7 +275,9 @@ export function EmployeeEditForm({ employee, viewerRole }: EmployeeEditFormProps
               {form.formState.isDirty && (
                 <div className="sticky bottom-0 z-10 border-t border-slate-200 bg-white p-4 -mx-4 -mb-4 shadow-lg">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">You have unsaved changes</span>
+                    <span className="text-sm text-gray-600">
+                      You have unsaved changes
+                    </span>
                     <div className="flex gap-3">
                       <Button
                         type="button"
@@ -285,4 +305,3 @@ export function EmployeeEditForm({ employee, viewerRole }: EmployeeEditFormProps
     </div>
   );
 }
-

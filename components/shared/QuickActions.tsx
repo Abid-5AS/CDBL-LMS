@@ -1,21 +1,22 @@
 "use client";
 
 import { ComponentType, ReactNode } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
+  Badge,
+} from "@/components/ui";
 import Link from "next/link";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -129,7 +130,10 @@ export function QuickActions({
                       <Icon className="h-4 w-4" />
                       {action.label}
                       {action.badge && (
-                        <Badge variant="destructive" className="ml-2 h-5 px-1.5 text-xs">
+                        <Badge
+                          variant="destructive"
+                          className="ml-2 h-5 px-1.5 text-xs"
+                        >
                           {action.badge}
                         </Badge>
                       )}
@@ -139,7 +143,10 @@ export function QuickActions({
                       <Icon className="h-4 w-4" />
                       {action.label}
                       {action.badge && (
-                        <Badge variant="destructive" className="ml-2 h-5 px-1.5 text-xs">
+                        <Badge
+                          variant="destructive"
+                          className="ml-2 h-5 px-1.5 text-xs"
+                        >
                           {action.badge}
                         </Badge>
                       )}
@@ -188,7 +195,10 @@ export function QuickActions({
                 <Icon className="h-4 w-4 mr-2" />
                 {action.label}
                 {action.badge && (
-                  <Badge variant="destructive" className="ml-2 h-5 px-1.5 text-xs">
+                  <Badge
+                    variant="destructive"
+                    className="ml-2 h-5 px-1.5 text-xs"
+                  >
                     {action.badge}
                   </Badge>
                 )}
@@ -198,7 +208,10 @@ export function QuickActions({
                 <Icon className="h-4 w-4 mr-2" />
                 {action.label}
                 {action.badge && (
-                  <Badge variant="destructive" className="ml-2 h-5 px-1.5 text-xs">
+                  <Badge
+                    variant="destructive"
+                    className="ml-2 h-5 px-1.5 text-xs"
+                  >
                     {action.badge}
                   </Badge>
                 )}
@@ -223,4 +236,3 @@ export function QuickActions({
     </div>
   );
 }
-

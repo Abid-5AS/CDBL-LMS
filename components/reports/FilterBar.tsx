@@ -1,13 +1,14 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
 import {
+  Card,
+  CardContent,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui";
 import { Filter } from "lucide-react";
 import useSWR from "swr";
 
@@ -66,7 +67,9 @@ export function FilterBar({
 
           <Select
             value={department || "all"}
-            onValueChange={(value) => onDepartmentChange(value === "all" ? null : value)}
+            onValueChange={(value) =>
+              onDepartmentChange(value === "all" ? null : value)
+            }
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="All Departments" />
@@ -83,7 +86,9 @@ export function FilterBar({
 
           <Select
             value={leaveType || "all"}
-            onValueChange={(value) => onLeaveTypeChange(value === "all" ? null : value)}
+            onValueChange={(value) =>
+              onLeaveTypeChange(value === "all" ? null : value)
+            }
           >
             <SelectTrigger className="w-[160px]">
               <SelectValue placeholder="All Leave Types" />
@@ -101,4 +106,3 @@ export function FilterBar({
     </Card>
   );
 }
-

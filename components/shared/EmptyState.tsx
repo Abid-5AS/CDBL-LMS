@@ -4,8 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button, Card, CardContent } from "@/components/ui";
 
 type EmptyStateProps = {
   icon?: LucideIcon;
@@ -77,7 +76,9 @@ export function EmptyState({
         <p
           className={cn(
             "text-sm max-w-md mb-4",
-            variant === "minimal" ? "text-muted-foreground" : "text-muted-foreground"
+            variant === "minimal"
+              ? "text-muted-foreground"
+              : "text-muted-foreground"
           )}
         >
           {description}
@@ -86,7 +87,12 @@ export function EmptyState({
       {action && (
         <div className="flex flex-col gap-2 items-center">
           {action.href ? (
-            <Button asChild variant="outline" size="sm" className="rounded-full">
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="rounded-full"
+            >
               <Link href={action.href} aria-label={action.label}>
                 {action.label}
               </Link>
@@ -125,4 +131,3 @@ export function EmptyState({
 
   return content;
 }
-

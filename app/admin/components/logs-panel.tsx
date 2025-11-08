@@ -2,8 +2,14 @@
 
 import { useMemo, useState } from "react";
 import type { AuditLogRecord } from "./admin-dashboard";
-import { SearchInput } from "@/components/filters/SearchInput";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SearchInput } from "@/components/filters";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -55,7 +61,9 @@ export function LogsPanel({ logs }: LogsPanelProps) {
     <div className="space-y-4">
       <div>
         <h2 className="text-xl font-semibold text-slate-900">Audit Log</h2>
-        <p className="text-sm text-muted-foreground">Recent administrative actions are captured for compliance.</p>
+        <p className="text-sm text-muted-foreground">
+          Recent administrative actions are captured for compliance.
+        </p>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -90,7 +98,9 @@ export function LogsPanel({ logs }: LogsPanelProps) {
       {filteredLogs.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-sm text-muted-foreground">
-            {logs.length === 0 ? "No activity recorded yet." : "No logs match your filters."}
+            {logs.length === 0
+              ? "No activity recorded yet."
+              : "No logs match your filters."}
           </CardContent>
         </Card>
       ) : (
@@ -99,9 +109,14 @@ export function LogsPanel({ logs }: LogsPanelProps) {
             <div className="max-h-[460px] overflow-auto">
               <ul className="divide-y divide-slate-100 text-sm">
                 {filteredLogs.map((log) => (
-                  <li key={log.id} className="flex flex-col gap-1 px-4 py-3 hover:bg-slate-50 transition-colors">
+                  <li
+                    key={log.id}
+                    className="flex flex-col gap-1 px-4 py-3 hover:bg-slate-50 transition-colors"
+                  >
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-slate-900">{log.action.replace(/_/g, " ")}</span>
+                      <span className="font-medium text-slate-900">
+                        {log.action.replace(/_/g, " ")}
+                      </span>
                       <span className="text-xs text-muted-foreground">
                         {new Date(log.createdAt).toLocaleString()}
                       </span>

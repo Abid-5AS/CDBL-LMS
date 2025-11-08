@@ -3,14 +3,23 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Shield, Users, Activity, Settings } from "lucide-react";
-import { RecentAuditLogs } from "@/components/shared/widgets/RecentAuditLogs";
-import { KPICard } from "@/app/dashboard/shared/KPICard";
-import { QuickActions } from "@/app/dashboard/shared/QuickActions";
-import { DashboardGrid, DashboardSection } from "@/app/dashboard/shared/DashboardLayout";
-import { DashboardCardSkeleton } from "@/app/dashboard/shared/LoadingFallback";
-import { Button } from "@/components/ui/button";
 import useSWR from "swr";
+import { Shield, Users, Activity, Settings } from "lucide-react";
+
+// UI Components (barrel export)
+import { Button } from "@/components/ui";
+
+// Shared Components (barrel export)
+import { KPICard } from "@/components/cards/KPICard";
+import { QuickActions } from "@/components/shared";
+import { RecentAuditLogs } from "@/components/shared/widgets/RecentAuditLogs";
+
+// Local imports
+import {
+  DashboardGrid,
+  DashboardSection,
+} from "@/app/dashboard/shared/DashboardLayout";
+import { DashboardCardSkeleton } from "@/app/dashboard/shared/LoadingFallback";
 
 type SystemAdminDashboardProps = {
   username: string;
@@ -109,14 +118,20 @@ export function SystemAdminDashboard({ username }: SystemAdminDashboardProps) {
           />
           <KPICard
             title="System Health"
-            value={systemStats.systemHealth === "healthy" ? "Healthy" : "Warning"}
+            value={
+              systemStats.systemHealth === "healthy" ? "Healthy" : "Warning"
+            }
             subtext="System status"
             icon={Activity}
             iconColor={
-              systemStats.systemHealth === "healthy" ? "text-green-600" : "text-amber-600"
+              systemStats.systemHealth === "healthy"
+                ? "text-green-600"
+                : "text-amber-600"
             }
             accentColor={
-              systemStats.systemHealth === "healthy" ? "bg-green-600" : "bg-amber-600"
+              systemStats.systemHealth === "healthy"
+                ? "bg-green-600"
+                : "bg-amber-600"
             }
             status={systemStats.systemHealth === "healthy" ? "healthy" : "low"}
           />
@@ -144,7 +159,11 @@ export function SystemAdminDashboard({ username }: SystemAdminDashboardProps) {
         description="Common administrative tasks"
       >
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <Button asChild variant="outline" className="h-auto flex-col items-start p-6">
+          <Button
+            asChild
+            variant="outline"
+            className="h-auto flex-col items-start p-6"
+          >
             <Link href="/admin">
               <Users className="mb-2 h-6 w-6" />
               <span className="font-semibold">User Management</span>
@@ -153,7 +172,11 @@ export function SystemAdminDashboard({ username }: SystemAdminDashboardProps) {
               </span>
             </Link>
           </Button>
-          <Button asChild variant="outline" className="h-auto flex-col items-start p-6">
+          <Button
+            asChild
+            variant="outline"
+            className="h-auto flex-col items-start p-6"
+          >
             <Link href="/admin">
               <Settings className="mb-2 h-6 w-6" />
               <span className="font-semibold">Policy Configuration</span>
@@ -162,7 +185,11 @@ export function SystemAdminDashboard({ username }: SystemAdminDashboardProps) {
               </span>
             </Link>
           </Button>
-          <Button asChild variant="outline" className="h-auto flex-col items-start p-6">
+          <Button
+            asChild
+            variant="outline"
+            className="h-auto flex-col items-start p-6"
+          >
             <Link href="/admin/audit">
               <Activity className="mb-2 h-6 w-6" />
               <span className="font-semibold">Audit Logs</span>
@@ -176,5 +203,3 @@ export function SystemAdminDashboard({ username }: SystemAdminDashboardProps) {
     </div>
   );
 }
-
-

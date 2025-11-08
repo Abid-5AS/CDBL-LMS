@@ -5,16 +5,16 @@ import { useRouter } from "next/navigation";
 import type { EmployeeDashboardData } from "@/lib/employee";
 import type { AppRole } from "@/lib/rbac";
 import { canEditEmployee } from "@/lib/rbac";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
+  Button,
+  Badge,
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from "@/components/ui";
 import { EmployeeProfileCard } from "./EmployeeProfileCard";
 import { HRStatCards } from "@/components/HRStatCards";
 import { LeaveHistoryTable } from "./LeaveHistoryTable";
@@ -61,7 +61,10 @@ const roleLabel = (role: string) => {
   }
 };
 
-export function EmployeeManagementProfile({ employee, viewerRole }: EmployeeManagementProfileProps) {
+export function EmployeeManagementProfile({
+  employee,
+  viewerRole,
+}: EmployeeManagementProfileProps) {
   const router = useRouter();
   const canEdit = canEditEmployee(viewerRole, employee.role as AppRole);
 
@@ -86,8 +89,12 @@ export function EmployeeManagementProfile({ employee, viewerRole }: EmployeeMana
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <h1 className="text-2xl font-semibold text-slate-900">{employee.name}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{employee.email}</p>
+            <h1 className="text-2xl font-semibold text-slate-900">
+              {employee.name}
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {employee.email}
+            </p>
             <div className="mt-3 flex items-center gap-3">
               <Badge className={getRoleBadgeVariant(employee.role as AppRole)}>
                 {roleLabel(employee.role)}
@@ -106,7 +113,9 @@ export function EmployeeManagementProfile({ employee, viewerRole }: EmployeeMana
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => router.push(`/employees/${employee.id}?edit=true`)}
+                      onClick={() =>
+                        router.push(`/employees/${employee.id}?edit=true`)
+                      }
                     >
                       <Pencil className="h-4 w-4 mr-2" />
                       Update Employee
@@ -133,7 +142,9 @@ export function EmployeeManagementProfile({ employee, viewerRole }: EmployeeMana
 
       {/* Employee Information Card */}
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-slate-900 mb-4">Employee Information</h2>
+        <h2 className="text-xl font-semibold text-slate-900 mb-4">
+          Employee Information
+        </h2>
         <EmployeeProfileCard
           name={employee.name}
           email={employee.email}
@@ -147,13 +158,17 @@ export function EmployeeManagementProfile({ employee, viewerRole }: EmployeeMana
 
       {/* Leave Statistics Summary */}
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-slate-900 mb-4">Leave Statistics</h2>
+        <h2 className="text-xl font-semibold text-slate-900 mb-4">
+          Leave Statistics
+        </h2>
         <HRStatCards stats={employee.stats} />
       </div>
 
       {/* Recent Leave Requests */}
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-slate-900 mb-4">Recent Leave Requests</h2>
+        <h2 className="text-xl font-semibold text-slate-900 mb-4">
+          Recent Leave Requests
+        </h2>
         <LeaveHistoryTable history={employee.history.slice(0, 5)} />
         {employee.history.length === 0 && (
           <p className="text-sm text-gray-500 mt-4 text-center">
@@ -164,4 +179,3 @@ export function EmployeeManagementProfile({ employee, viewerRole }: EmployeeMana
     </div>
   );
 }
-

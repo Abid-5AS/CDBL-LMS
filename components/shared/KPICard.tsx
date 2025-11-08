@@ -2,9 +2,14 @@
 
 import type { ComponentType, ReactNode } from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Progress,
+  Badge,
+} from "@/components/ui";
 import { cn } from "@/lib/utils";
 
 type KPICardProps = {
@@ -139,7 +144,9 @@ export function KPICard({
               <Progress
                 value={progressPercentage}
                 className="h-2"
-                indicatorClassName={status ? getProgressColor(status) : undefined}
+                indicatorClassName={
+                  status ? getProgressColor(status) : undefined
+                }
               />
             </div>
           )}
@@ -159,11 +166,7 @@ type KPIGridProps = {
  * KPIGrid - Responsive grid container for KPI cards
  * Material 3 style: 1 column (mobile) → 2 columns (tablet) → 3 columns (desktop)
  */
-export function KPIGrid({
-  children,
-  className,
-  columns = 3,
-}: KPIGridProps) {
+export function KPIGrid({ children, className, columns = 3 }: KPIGridProps) {
   const gridCols = {
     1: "grid-cols-1",
     2: "md:grid-cols-2",
@@ -172,15 +175,8 @@ export function KPIGrid({
   };
 
   return (
-    <div
-      className={cn(
-        "grid gap-6 grid-cols-1",
-        gridCols[columns],
-        className
-      )}
-    >
+    <div className={cn("grid gap-6 grid-cols-1", gridCols[columns], className)}>
       {children}
     </div>
   );
 }
-

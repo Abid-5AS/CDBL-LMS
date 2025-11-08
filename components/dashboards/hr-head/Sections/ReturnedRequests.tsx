@@ -1,9 +1,19 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Button,
+  EmptyState,
+} from "@/components/ui";
 import { RotateCcw, FileEdit } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
@@ -37,12 +47,16 @@ export function ReturnedRequestsPanel() {
     }
   );
 
-  const returnedRequests: LeaveRequest[] = Array.isArray(data?.items) ? data.items : [];
+  const returnedRequests: LeaveRequest[] = Array.isArray(data?.items)
+    ? data.items
+    : [];
 
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="py-12 text-center text-sm text-muted-foreground">Loading...</CardContent>
+        <CardContent className="py-12 text-center text-sm text-muted-foreground">
+          Loading...
+        </CardContent>
       </Card>
     );
   }
@@ -109,19 +123,27 @@ export function ReturnedRequestsPanel() {
                     >
                       {leave.requester.name}
                     </Link>
-                    <div className="text-xs text-muted-foreground">{leave.requester.email}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {leave.requester.email}
+                    </div>
                   </TableCell>
-                  <TableCell className="font-medium">{leaveTypeLabel[leave.type] ?? leave.type}</TableCell>
+                  <TableCell className="font-medium">
+                    {leaveTypeLabel[leave.type] ?? leave.type}
+                  </TableCell>
                   <TableCell className="hidden sm:table-cell text-slate-600">
                     {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell text-slate-600">{leave.workingDays}</TableCell>
+                  <TableCell className="hidden md:table-cell text-slate-600">
+                    {leave.workingDays}
+                  </TableCell>
                   <TableCell>
                     <StatusBadge status={leave.status as any} />
                   </TableCell>
                   <TableCell className="text-right">
                     <Button asChild size="sm" variant="outline">
-                      <Link href={`/leaves?highlight=${leave.id}`}>View Details</Link>
+                      <Link href={`/leaves?highlight=${leave.id}`}>
+                        View Details
+                      </Link>
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -132,7 +154,9 @@ export function ReturnedRequestsPanel() {
         {returnedRequests.length > 5 && (
           <div className="p-4 text-center border-t">
             <Button asChild variant="ghost" size="sm">
-              <Link href="/approvals?status=RETURNED">View all ({returnedRequests.length})</Link>
+              <Link href="/approvals?status=RETURNED">
+                View all ({returnedRequests.length})
+              </Link>
             </Button>
           </div>
         )}

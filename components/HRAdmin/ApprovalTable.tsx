@@ -3,21 +3,40 @@
 import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 import { toast } from "sonner";
-import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { submitApprovalDecision } from "@/lib/api";
-import { formatDate } from "@/lib/utils";
-import { HRApprovalItem } from "./types";
-import { FilterBar } from "@/components/filters/FilterBar";
-import { leaveTypeLabel } from "@/lib/ui";
-import { useSelectionContext } from "@/lib/selection-context";
-import { Checkbox } from "@/components/ui/checkbox";
 import clsx from "clsx";
-import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/toast-messages";
-import { useUser } from "@/lib/user-context";
 import { ArrowRight, RotateCcw } from "lucide-react";
+
+// UI Components (barrel export)
+import {
+  Card,
+  CardContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Button,
+  Checkbox,
+} from "@/components/ui";
+
+// Shared Components (barrel export)
+import { FilterBar } from "@/components/shared";
+
+// Lib utilities (barrel export)
+import {
+  formatDate,
+  leaveTypeLabel,
+  SUCCESS_MESSAGES,
+  getToastMessage,
+  useUser,
+} from "@/lib";
 import type { AppRole } from "@/lib/rbac";
+
+// Local imports
+import { submitApprovalDecision } from "@/lib/api";
+import { HRApprovalItem } from "./types";
+import { useSelectionContext } from "@/lib/selection-context";
 
 type ApprovalsResponse = { items: HRApprovalItem[] };
 
@@ -32,7 +51,7 @@ function statusStyle(status: string) {
   const normalized = status.toUpperCase();
   if (normalized === "APPROVED") return "bg-emerald-50";
   if (normalized === "REJECTED") return "bg-rose-50";
-  return "hover:bg-slate-50";
+  return "hover:bg-bg-secondary";
 }
 
 const STATUS_OPTIONS = [
@@ -70,11 +89,18 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     return () => setSelection([]);
   }, [selectedIds, setSelection]);
 
-  const { data, error, isLoading, mutate } = useSWR<ApprovalsResponse>("/api/approvals", fetcher, {
-    revalidateOnFocus: true,
-  });
+  const { data, error, isLoading, mutate } = useSWR<ApprovalsResponse>(
+    "/api/approvals",
+    fetcher,
+    {
+      revalidateOnFocus: true,
+    }
+  );
 
-  const allItems = useMemo(() => (Array.isArray(data?.items) ? data!.items : []), [data]);
+  const allItems = useMemo(
+    () => (Array.isArray(data?.items) ? data!.items : []),
+    [data]
+  );
 
   const items = useMemo(() => {
     let filtered = allItems;
@@ -119,10 +145,13 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     }
   }, [items, onDataChange]);
 
-  async function handleDecision(id: string, action: "approve" | "reject" | "forward" | "return") {
+  async function handleDecision(
+    id: string,
+    action: "approve" | "reject" | "forward" | "return"
+  ) {
     try {
       setProcessingId(id + action);
-      
+
       if (action === "forward") {
         const res = await fetch(`/api/leaves/${id}/forward`, {
           method: "POST",
@@ -134,7 +163,9 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         }
         toast.success("Request forwarded successfully");
       } else if (action === "return") {
-        const comment = prompt("Please provide a reason for returning this request (minimum 5 characters):");
+        const comment = prompt(
+          "Please provide a reason for returning this request (minimum 5 characters):"
+        );
         if (!comment || comment.length < 5) {
           toast.error("Comment must be at least 5 characters");
           setProcessingId(null);
@@ -152,9 +183,13 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         toast.success("Request returned for modification");
       } else {
         await submitApprovalDecision(id, action);
-        toast.success(action === "approve" ? SUCCESS_MESSAGES.leave_approved : SUCCESS_MESSAGES.leave_rejected);
+        toast.success(
+          action === "approve"
+            ? SUCCESS_MESSAGES.leave_approved
+            : SUCCESS_MESSAGES.leave_rejected
+        );
       }
-      
+
       // Remove from selection if selected
       setSelectedIds((prev) => {
         const next = new Set(prev);
@@ -163,7 +198,10 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
       });
       await mutate();
     } catch (err) {
-      const message = err instanceof Error ? getToastMessage(err.message, err.message) : getToastMessage("approval_failed", "Failed to update request");
+      const message =
+        err instanceof Error
+          ? getToastMessage(err.message, err.message)
+          : getToastMessage("approval_failed", "Failed to update request");
       toast.error(message);
     } finally {
       setProcessingId(null);
@@ -196,7 +234,9 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="py-12 text-center text-sm text-muted-foreground">Loading approvals…</CardContent>
+        <CardContent className="py-12 text-center text-sm text-muted-foreground">
+          Loading approvals…
+        </CardContent>
       </Card>
     );
   }
@@ -250,156 +290,191 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         <Card className="overflow-hidden border">
           <CardContent className="p-0">
             <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-12">
-                <Checkbox
-                  checked={allSelected}
-                  onCheckedChange={(checked) => handleSelectAll(checked === true)}
-                  aria-label="Select all rows"
-                  className={someSelected ? "data-[state=checked]:bg-indigo-600" : ""}
-                />
-              </TableHead>
-              <TableHead>Employee</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Dates</TableHead>
-              <TableHead>Days</TableHead>
-              <TableHead>Reason</TableHead>
-              <TableHead>Stage</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {items.map((item) => {
-              const start = formatDate(item.start);
-              const end = formatDate(item.end);
-              const stage = item.approvals?.[item.currentStageIndex]?.status ?? item.status;
-              return (
-                <TableRow
-                  key={item.id}
-                  className={clsx(
-                    "cursor-pointer transition",
-                    statusStyle(item.status),
-                    selectedIds.has(item.id) && "bg-indigo-50 dark:bg-indigo-900/20"
-                  )}
-                  onClick={(e) => {
-                    // Don't trigger onSelect if clicking on checkbox
-                    if (!(e.target as HTMLElement).closest('input[type="checkbox"]')) {
-                      onSelect?.(item);
-                    }
-                  }}
-                >
-                  <TableCell>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-12">
                     <Checkbox
-                      checked={selectedIds.has(item.id)}
-                      onCheckedChange={(checked) => handleSelectRow(item.id, checked === true)}
-                      onClick={(e) => e.stopPropagation()}
-                      aria-label={`Select row ${item.id}`}
+                      checked={allSelected}
+                      onCheckedChange={(checked) =>
+                        handleSelectAll(checked === true)
+                      }
+                      aria-label="Select all rows"
+                      className={
+                        someSelected ? "data-[state=checked]:bg-indigo-600" : ""
+                      }
                     />
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-medium text-slate-900">{item.requestedByName ?? "Unknown"}</div>
-                    <div className="text-xs text-muted-foreground">{item.requestedByEmail ?? "—"}</div>
-                  </TableCell>
-                  <TableCell className="text-sm text-slate-600">{leaveTypeLabel[item.type] ?? item.type}</TableCell>
-                  <TableCell className="text-sm text-slate-600">
-                    <div>{start}</div>
-                    {start !== end && <div className="text-xs text-muted-foreground">to {end}</div>}
-                  </TableCell>
-                  <TableCell className="text-sm text-slate-600">{item.requestedDays}</TableCell>
-                  <TableCell className="max-w-xs text-sm text-slate-600">
-                    <p className="whitespace-pre-wrap break-words">{item.reason}</p>
-                  </TableCell>
-                  <TableCell className="text-sm font-medium capitalize text-slate-700">{stage.toLowerCase()}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      {isHRAdmin ? (
-                        // HR Admin: Forward, Reject, Return
-                        <>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              handleDecision(item.id, "forward");
-                            }}
-                            disabled={processingId !== null}
-                          >
-                            {processingId === item.id + "forward" ? (
-                              "Forwarding..."
-                            ) : (
-                              <>
-                                <ArrowRight className="mr-1 h-3 w-3" />
-                                Forward
-                              </>
-                            )}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              handleDecision(item.id, "reject");
-                            }}
-                            disabled={processingId !== null}
-                          >
-                            {processingId === item.id + "reject" ? "Rejecting..." : "Reject"}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              handleDecision(item.id, "return");
-                            }}
-                            disabled={processingId !== null}
-                          >
-                            {processingId === item.id + "return" ? (
-                              "Returning..."
-                            ) : (
-                              <>
-                                <RotateCcw className="mr-1 h-3 w-3" />
-                                Return
-                              </>
-                            )}
-                          </Button>
-                        </>
-                      ) : (
-                        // HR_HEAD, CEO: Approve, Reject
-                        <>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              handleDecision(item.id, "approve");
-                            }}
-                            disabled={processingId !== null}
-                          >
-                            {processingId === item.id + "approve" ? "Approving..." : "Approve"}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              handleDecision(item.id, "reject");
-                            }}
-                            disabled={processingId !== null}
-                          >
-                            {processingId === item.id + "reject" ? "Rejecting..." : "Reject"}
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </TableCell>
+                  </TableHead>
+                  <TableHead>Employee</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Dates</TableHead>
+                  <TableHead>Days</TableHead>
+                  <TableHead>Reason</TableHead>
+                  <TableHead>Stage</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+              </TableHeader>
+              <TableBody>
+                {items.map((item) => {
+                  const start = formatDate(item.start);
+                  const end = formatDate(item.end);
+                  const stage =
+                    item.approvals?.[item.currentStageIndex]?.status ??
+                    item.status;
+                  return (
+                    <TableRow
+                      key={item.id}
+                      className={clsx(
+                        "cursor-pointer transition",
+                        statusStyle(item.status),
+                        selectedIds.has(item.id) &&
+                          "bg-indigo-50 dark:bg-indigo-900/20"
+                      )}
+                      onClick={(e) => {
+                        // Don't trigger onSelect if clicking on checkbox
+                        if (
+                          !(e.target as HTMLElement).closest(
+                            'input[type="checkbox"]'
+                          )
+                        ) {
+                          onSelect?.(item);
+                        }
+                      }}
+                    >
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedIds.has(item.id)}
+                          onCheckedChange={(checked) =>
+                            handleSelectRow(item.id, checked === true)
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          aria-label={`Select row ${item.id}`}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium text-text-primary">
+                          {req.employeeName}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {item.requestedByEmail ?? "—"}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-sm text-slate-600">
+                        {leaveTypeLabel[item.type] ?? item.type}
+                      </TableCell>
+                      <TableCell className="text-sm text-slate-600">
+                        <div>{start}</div>
+                        {start !== end && (
+                          <div className="text-xs text-muted-foreground">
+                            to {end}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-sm text-slate-600">
+                        {item.requestedDays}
+                      </TableCell>
+                      <TableCell className="max-w-xs text-sm text-slate-600">
+                        <p className="whitespace-pre-wrap break-words">
+                          {item.reason}
+                        </p>
+                      </TableCell>
+                      <TableCell className="text-sm font-medium capitalize text-slate-700">
+                        {stage.toLowerCase()}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          {isHRAdmin ? (
+                            // HR Admin: Forward, Reject, Return
+                            <>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  handleDecision(item.id, "forward");
+                                }}
+                                disabled={processingId !== null}
+                              >
+                                {processingId === item.id + "forward" ? (
+                                  "Forwarding..."
+                                ) : (
+                                  <>
+                                    <ArrowRight className="mr-1 h-3 w-3" />
+                                    Forward
+                                  </>
+                                )}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  handleDecision(item.id, "reject");
+                                }}
+                                disabled={processingId !== null}
+                              >
+                                {processingId === item.id + "reject"
+                                  ? "Rejecting..."
+                                  : "Reject"}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  handleDecision(item.id, "return");
+                                }}
+                                disabled={processingId !== null}
+                              >
+                                {processingId === item.id + "return" ? (
+                                  "Returning..."
+                                ) : (
+                                  <>
+                                    <RotateCcw className="mr-1 h-3 w-3" />
+                                    Return
+                                  </>
+                                )}
+                              </Button>
+                            </>
+                          ) : (
+                            // HR_HEAD, CEO: Approve, Reject
+                            <>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  handleDecision(item.id, "approve");
+                                }}
+                                disabled={processingId !== null}
+                              >
+                                {processingId === item.id + "approve"
+                                  ? "Approving..."
+                                  : "Approve"}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  handleDecision(item.id, "reject");
+                                }}
+                                disabled={processingId !== null}
+                              >
+                                {processingId === item.id + "reject"
+                                  ? "Rejecting..."
+                                  : "Reject"}
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       )}
       {items.length !== allItems.length && allItems.length > 0 && (
         <p className="text-sm text-muted-foreground text-center">

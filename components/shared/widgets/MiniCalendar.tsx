@@ -1,9 +1,14 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Skeleton,
+  Badge,
+} from "@/components/ui";
 import { Calendar } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { useLeaveData } from "@/components/providers/LeaveDataProvider";
 
@@ -22,17 +27,19 @@ export function MiniCalendar() {
 
   // Get approved leaves for this month
   const leaves = Array.isArray(leavesData?.items) ? leavesData.items : [];
-  const approvedLeaves = leaves.filter((leave: any) => leave.status === "APPROVED");
-  
+  const approvedLeaves = leaves.filter(
+    (leave: any) => leave.status === "APPROVED"
+  );
+
   // Create a map of dates with leaves
   const dateLeaveMap = new Map();
   approvedLeaves.forEach((leave: any) => {
     const startDate = new Date(leave.startDate);
     const endDate = new Date(leave.endDate);
     let currentDate = new Date(startDate);
-    
+
     while (currentDate <= endDate) {
-      const dateStr = currentDate.toISOString().split('T')[0];
+      const dateStr = currentDate.toISOString().split("T")[0];
       if (!dateLeaveMap.has(dateStr)) {
         dateLeaveMap.set(dateStr, []);
       }
@@ -43,7 +50,7 @@ export function MiniCalendar() {
     }
   });
 
-  const todayStr = today.toISOString().split('T')[0];
+  const todayStr = today.toISOString().split("T")[0];
 
   if (leavesLoading) {
     return (
@@ -58,8 +65,20 @@ export function MiniCalendar() {
     );
   }
 
-  const monthNames = ["January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"];
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -87,9 +106,12 @@ export function MiniCalendar() {
       <CardContent>
         {/* Current date display */}
         <div className="mb-4 p-3 rounded-lg bg-blue-50 border border-blue-200">
-          <div className="text-xs font-medium text-blue-600 uppercase tracking-wide mb-1">Today</div>
+          <div className="text-xs font-medium text-blue-600 uppercase tracking-wide mb-1">
+            Today
+          </div>
           <div className="text-lg font-bold text-blue-900">
-            {new Date().toLocaleDateString("en-GB", { weekday: "long" })} {formatDate(new Date())}
+            {new Date().toLocaleDateString("en-GB", { weekday: "long" })}{" "}
+            {formatDate(new Date())}
           </div>
         </div>
 
@@ -98,7 +120,10 @@ export function MiniCalendar() {
           {/* Week day headers */}
           <div className="grid grid-cols-7 gap-1 mb-2">
             {weekDays.map((day) => (
-              <div key={day} className="text-xs font-medium text-center text-slate-600 py-1">
+              <div
+                key={day}
+                className="text-xs font-medium text-center text-slate-600 py-1"
+              >
                 {day}
               </div>
             ))}
@@ -111,7 +136,9 @@ export function MiniCalendar() {
                 return <div key={index} className="aspect-square" />;
               }
 
-              const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+              const dateStr = `${currentYear}-${String(
+                currentMonth + 1
+              ).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
               const hasLeave = dateLeaveMap.has(dateStr);
               const isToday = dateStr === todayStr;
               const leaveTypes = dateLeaveMap.get(dateStr) || [];
@@ -127,7 +154,11 @@ export function MiniCalendar() {
                       : "hover:bg-slate-50"
                   }`}
                 >
-                  <span className={`text-xs ${isToday ? "text-white" : "text-slate-900"}`}>
+                  <span
+                    className={`text-xs ${
+                      isToday ? "text-white" : "text-slate-900"
+                    }`}
+                  >
                     {day}
                   </span>
                   {hasLeave && !isToday && (
