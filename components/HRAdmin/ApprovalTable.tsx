@@ -49,8 +49,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 function statusStyle(status: string) {
   const normalized = status.toUpperCase();
-  if (normalized === "APPROVED") return "bg-emerald-50";
-  if (normalized === "REJECTED") return "bg-rose-50";
+  if (normalized === "APPROVED") return "bg-data-success";
+  if (normalized === "REJECTED") return "bg-data-error";
   return "hover:bg-bg-secondary";
 }
 
@@ -244,7 +244,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   if (error) {
     return (
       <Card>
-        <CardContent className="py-12 text-center text-sm text-red-600">
+        <CardContent className="py-12 text-center text-sm text-data-error">
           Unable to load approval queue. Please try again.
         </CardContent>
       </Card>
@@ -300,7 +300,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                       }
                       aria-label="Select all rows"
                       className={
-                        someSelected ? "data-[state=checked]:bg-indigo-600" : ""
+                        someSelected ? "data-[state=checked]:bg-card-action" : ""
                       }
                     />
                   </TableHead>
@@ -327,7 +327,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                         "cursor-pointer transition",
                         statusStyle(item.status),
                         selectedIds.has(item.id) &&
-                          "bg-indigo-50 dark:bg-indigo-900/20"
+                          "bg-card-action dark:bg-card-action/20"
                       )}
                       onClick={(e) => {
                         // Don't trigger onSelect if clicking on checkbox
@@ -358,10 +358,10 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                           {item.requestedByEmail ?? "—"}
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm text-slate-600">
+                      <TableCell className="text-sm text-text-secondary">
                         {leaveTypeLabel[item.type] ?? item.type}
                       </TableCell>
-                      <TableCell className="text-sm text-slate-600">
+                      <TableCell className="text-sm text-text-secondary">
                         <div>{start}</div>
                         {start !== end && (
                           <div className="text-xs text-muted-foreground">
@@ -369,15 +369,15 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell className="text-sm text-slate-600">
+                      <TableCell className="text-sm text-text-secondary">
                         {item.requestedDays}
                       </TableCell>
-                      <TableCell className="max-w-xs text-sm text-slate-600">
+                      <TableCell className="max-w-xs text-sm text-text-secondary">
                         <p className="whitespace-pre-wrap break-words">
                           {item.reason}
                         </p>
                       </TableCell>
-                      <TableCell className="text-sm font-medium capitalize text-slate-700">
+                      <TableCell className="text-sm font-medium capitalize text-text-secondary">
                         {stage.toLowerCase()}
                       </TableCell>
                       <TableCell className="text-right">

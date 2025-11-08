@@ -43,31 +43,31 @@ export function LeaveSummarySidebar({
     : `${Math.max(remainingBalance, 0)} days`;
 
   return (
-    <Card className="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-950/40 dark:to-sky-950/30 border-none shadow-md rounded-xl p-6 space-y-6 lg:sticky lg:top-24">
+    <Card className="rounded-2xl border border-border bg-card shadow-lg shadow-black/5 dark:shadow-black/20 p-6 space-y-6 lg:sticky lg:top-24">
       <div>
-        <h4 className="flex items-center gap-2 text-base font-semibold text-neutral-900 dark:text-neutral-100 mb-4 leading-6">
-          <ClipboardList className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+        <h4 className="flex items-center gap-2 text-base font-semibold text-foreground mb-4 leading-6">
+          <ClipboardList className="w-4 h-4 text-primary" />
           Leave Summary
         </h4>
         <div className="text-sm text-muted-foreground space-y-3 leading-6">
           <div className="flex justify-between">
             <span>Type:</span>
-            <span className="font-medium text-neutral-900 dark:text-neutral-100">{typeLabel}</span>
+            <span className="font-semibold text-foreground">{typeLabel}</span>
           </div>
           <div className="flex justify-between">
             <span>Duration:</span>
-            <span className="font-medium text-neutral-900 dark:text-neutral-100">{durationLabel}</span>
+            <span className="font-semibold text-foreground">{durationLabel}</span>
           </div>
           <div className="flex justify-between">
             <span>Projected Balance:</span>
             <span
               className={cn(
-                "font-medium",
+                "font-semibold",
                 remainingBalance < 0
                   ? "text-destructive"
                   : remainingBalance < 2
-                  ? "text-amber-600 dark:text-amber-400"
-                  : "text-emerald-600 dark:text-emerald-400"
+                  ? "text-data-warning dark:text-data-warning"
+                  : "text-data-success dark:text-data-success"
               )}
             >
               {projectedBalanceLabel}
@@ -77,15 +77,15 @@ export function LeaveSummarySidebar({
 
         {requestedDays > 0 && !balancesLoading && !balancesError && (
           <div className="mt-4 space-y-1.5">
-            <div className="h-2 w-full rounded-full bg-neutral-200/70 dark:bg-neutral-800/70 overflow-hidden">
+            <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
               <div
                 className={cn(
                   "h-full transition-all duration-300",
                   remainingBalance < 0
                     ? "bg-destructive"
                     : remainingBalance < 2
-                    ? "bg-amber-500"
-                    : "bg-emerald-500"
+                    ? "bg-data-warning"
+                    : "bg-data-success"
                 )}
                 style={{ width: `${Math.max(0, Math.min(100, projectedBalancePercent))}%` }}
               />
@@ -95,11 +95,11 @@ export function LeaveSummarySidebar({
         )}
       </div>
 
-      <Separator className="bg-neutral-200/70 dark:bg-neutral-800/70" />
+      <Separator />
 
       <div>
-        <h4 className="flex items-center gap-2 text-base font-semibold text-neutral-900 dark:text-neutral-100 mb-3 leading-6">
-          <BookOpenText className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+        <h4 className="flex items-center gap-2 text-base font-semibold text-foreground mb-3 leading-6">
+          <BookOpenText className="w-4 h-4 text-primary" />
           Policy Highlights
         </h4>
         <ul className="list-disc pl-4 text-sm text-muted-foreground space-y-1 leading-6">
@@ -109,7 +109,7 @@ export function LeaveSummarySidebar({
         </ul>
         <Link
           href="/policies"
-          className="text-indigo-600 dark:text-indigo-400 text-sm font-medium hover:text-indigo-700 dark:hover:text-indigo-300 mt-4 inline-flex items-center gap-1 leading-6 transition-colors"
+          className="text-primary text-sm font-semibold hover:text-primary/80 mt-4 inline-flex items-center gap-1 leading-6 transition-colors"
         >
           View Full Policy →
         </Link>
@@ -117,13 +117,13 @@ export function LeaveSummarySidebar({
 
       {warnings.length > 0 && (
         <>
-          <Separator className="bg-neutral-200/70 dark:bg-neutral-800/70" />
-          <div className="rounded-lg border border-amber-200/70 dark:border-amber-800/70 bg-amber-50/50 dark:bg-amber-950/20 p-4">
-            <h4 className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-2 flex items-center gap-2 leading-6">
-              <Info className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+          <Separator />
+          <div className="rounded-2xl border border-data-warning/60 bg-data-warning/10 dark:bg-data-warning/20 p-4">
+            <h4 className="text-sm font-semibold text-data-warning mb-2 flex items-center gap-2 leading-6">
+              <Info className="h-4 w-4 text-data-warning" />
               Important Note
             </h4>
-            <ul className="text-sm text-amber-700 dark:text-amber-300 space-y-1 leading-6">
+            <ul className="text-sm text-data-warning space-y-1 leading-6">
               {warnings.map((warning, idx) => (
                 <li key={idx} className="flex items-start gap-2">
                   <span className="mt-0.5">•</span>

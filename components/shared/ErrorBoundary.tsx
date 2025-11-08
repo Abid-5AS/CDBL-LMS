@@ -2,13 +2,7 @@
 
 import React, { Component, ReactNode } from "react";
 import { AlertTriangle } from "lucide-react";
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui";
+import { Button } from "@/components/ui";
 
 interface Props {
   children: ReactNode;
@@ -69,14 +63,14 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <Card className="border-destructive">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-destructive">
+        <div className="border border-destructive rounded-xl p-6 bg-card">
+          <div className="mb-4">
+            <h3 className="flex items-center gap-2 text-destructive font-semibold">
               <AlertTriangle className="h-5 w-5" />
               Something went wrong
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+            </h3>
+          </div>
+          <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
               An error occurred while rendering this component. Please try
               refreshing the page.
@@ -104,12 +98,13 @@ export class ErrorBoundary extends Component<Props, State> {
                 Refresh page
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       );
     }
 
-    return this.props.children;
+    // Ensure we return children as-is without any React.Children manipulation
+    return <>{this.props.children}</>;
   }
 }
 
@@ -131,14 +126,14 @@ export function DashboardErrorBoundary({
         console.error(`Dashboard error (${role}):`, error, errorInfo);
       }}
       fallback={
-        <Card className="border-destructive">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-destructive">
+        <div className="border border-destructive rounded-xl p-6 bg-card">
+          <div className="mb-4">
+            <h3 className="flex items-center gap-2 text-destructive font-semibold">
               <AlertTriangle className="h-5 w-5" />
               Dashboard Error
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+            </h3>
+          </div>
+          <div>
             <p className="text-sm text-muted-foreground mb-4">
               Unable to load the {role ? `${role} ` : ""}dashboard. Please
               refresh the page or contact support if the problem persists.
@@ -146,8 +141,8 @@ export function DashboardErrorBoundary({
             <Button onClick={() => window.location.reload()} variant="default">
               Refresh Page
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       }
     >
       {children}

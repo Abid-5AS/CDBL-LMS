@@ -62,13 +62,13 @@ export function ThemeToggle() {
         >
           {isDark ? (
             <SunIcon
-              className="text-amber-300 drop-shadow-[0_0_4px_rgba(250,204,21,0.55)]"
+              className="text-data-warning drop-shadow-[0_0_4px_rgba(250,204,21,0.55)]"
               strokeWidth={1.8}
               size={iconSizes.md}
             />
           ) : (
             <MoonIcon
-              className="text-indigo-500 dark:text-indigo-300 drop-shadow-[0_0_6px_rgba(99,102,241,0.55)]"
+              className="text-card-action dark:text-card-action drop-shadow-[0_0_6px_rgba(99,102,241,0.55)]"
               strokeWidth={1.9}
               size={iconSizes.md}
             />

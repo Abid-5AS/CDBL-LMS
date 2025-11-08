@@ -59,7 +59,7 @@ export function RequestsTableView({
                   checked={selection.allSelected}
                   onCheckedChange={(checked) => selection.selectAll(checked === true)}
                   aria-label="Select all rows"
-                  className={selection.someSelected ? "data-[state=checked]:bg-indigo-600" : ""}
+                  className={selection.someSelected ? "data-[state=checked]:bg-card-action" : ""}
                 />
               </th>
             )}
@@ -95,7 +95,7 @@ export function RequestsTableView({
             <tr>
               <td
                 colSpan={enableSelection ? 7 : 6}
-                className="text-center text-sm text-red-600 py-12"
+                className="text-center text-sm text-data-error py-12"
                 role="alert"
               >
                 Failed to load
@@ -136,7 +136,7 @@ export function RequestsTableView({
                   key={row.id}
                   className={clsx(
                     "border-b border-border hover:bg-muted/30 transition-colors cursor-pointer",
-                    isSelected && "bg-indigo-50 dark:bg-indigo-900/20",
+                    isSelected && "bg-card-action dark:bg-card-action/20",
                   )}
                   onClick={(e) => onRowClick(row, e)}
                   aria-label={ariaLabel}

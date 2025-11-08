@@ -102,9 +102,9 @@ export default function ControlCenter({ onClose }: { onClose: () => void }) {
         statusIcon: leave.status === "APPROVED" ? CheckCircle2 : 
                      leave.status === "PENDING" || leave.status === "SUBMITTED" ? AlertCircle :
                      leave.status === "REJECTED" || leave.status === "CANCELLED" ? XCircle : AlertCircle,
-        statusColor: leave.status === "APPROVED" ? "text-green-600 dark:text-green-400" :
-                     leave.status === "PENDING" || leave.status === "SUBMITTED" ? "text-amber-600 dark:text-amber-400" :
-                     leave.status === "REJECTED" || leave.status === "CANCELLED" ? "text-red-600 dark:text-red-400" :
+        statusColor: leave.status === "APPROVED" ? "text-data-success dark:text-data-success" :
+                     leave.status === "PENDING" || leave.status === "SUBMITTED" ? "text-data-warning dark:text-data-warning" :
+                     leave.status === "REJECTED" || leave.status === "CANCELLED" ? "text-data-error dark:text-data-error" :
                      "text-muted-foreground",
       }));
   }, [leavesData]);

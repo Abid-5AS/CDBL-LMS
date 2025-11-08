@@ -36,8 +36,8 @@ export default function MyLeavesPage() {
 function MyLeavesFallback() {
   return (
     <div className="space-y-6">
-      <div className="h-32 rounded-2xl border border-gray-200 bg-white p-6" />
-      <div className="h-96 rounded-2xl border border-gray-200 bg-white p-6" />
+      <div className="h-32 rounded-2xl border border-border-strong bg-bg-primary p-6" />
+      <div className="h-96 rounded-2xl border border-border-strong bg-bg-primary p-6" />
     </div>
   );
 }

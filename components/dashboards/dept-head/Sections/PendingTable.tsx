@@ -217,7 +217,7 @@ export function DeptHeadPendingTable({
           <CardTitle>Pending Requests</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="p-8 text-center text-red-600">
+          <div className="p-8 text-center text-data-error">
             <p>Failed to load pending requests</p>
             <Button
               variant="outline"
@@ -327,8 +327,8 @@ export function DeptHeadPendingTable({
                 </>
               ) : (
                 <>
-                  <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-green-600" />
-                  <p className="text-lg font-medium text-green-700">
+                  <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-data-success" />
+                  <p className="text-lg font-medium text-data-success">
                     All caught up!
                   </p>
                   <p className="text-sm text-muted-foreground mt-2">
@@ -378,7 +378,7 @@ export function DeptHeadPendingTable({
                           <TableCell>
                             <Link
                               href={`/leaves/${leave.id}`}
-                              className="text-blue-600 hover:underline font-medium cursor-pointer"
+                              className="text-data-info hover:underline font-medium cursor-pointer"
                             >
                               {leave.requester.name}
                             </Link>
@@ -425,7 +425,7 @@ export function DeptHeadPendingTable({
                               {leave.isModified && (
                                 <Badge
                                   variant="outline"
-                                  className="text-xs text-blue-600 border-blue-300"
+                                  className="text-xs text-data-info border-data-info"
                                 >
                                   Modified
                                 </Badge>
@@ -443,7 +443,7 @@ export function DeptHeadPendingTable({
                                           <Button
                                             size="icon"
                                             variant="outline"
-                                            className="h-8 w-8 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                                            className="h-8 w-8 text-data-info hover:bg-data-info hover:text-data-info"
                                             onClick={() => {
                                               setSelectedLeave(leave);
                                               setForwardDialogOpen(true);
@@ -470,7 +470,7 @@ export function DeptHeadPendingTable({
                                           <Button
                                             size="icon"
                                             variant="outline"
-                                            className="h-8 w-8 text-red-600 hover:bg-red-50 hover:text-red-700"
+                                            className="h-8 w-8 text-data-error hover:bg-data-error hover:text-data-error"
                                             onClick={() => {
                                               setSelectedLeave(leave);
                                               setReturnDialogOpen(true);

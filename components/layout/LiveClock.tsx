@@ -25,14 +25,14 @@ export function LiveClock() {
   const formattedDate = formatDate(time);
 
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 glass-light rounded-lg text-xs glass-nav-text shrink-0 transition-all hover:bg-white/80 dark:hover:bg-white/5">
+    <div className="flex items-center gap-2 px-3 py-1.5 glass-light rounded-lg text-xs glass-nav-text shrink-0 transition-all hover:bg-bg-primary/80 dark:hover:bg-bg-primary/5">
       <div className="flex items-center gap-1.5">
-        <Clock className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
+        <Clock className="h-3.5 w-3.5 text-card-action dark:text-card-action" />
         <span className="font-mono font-medium">{formattedTime}</span>
       </div>
       <span className="text-muted-foreground/50">|</span>
       <div className="flex items-center gap-1.5">
-        <CalendarIcon className="h-3.5 w-3.5 text-slate-600 dark:text-slate-400" />
+        <CalendarIcon className="h-3.5 w-3.5 text-text-secondary dark:text-text-secondary" />
         <span className="font-medium">{formattedDate}</span>
       </div>
     </div>

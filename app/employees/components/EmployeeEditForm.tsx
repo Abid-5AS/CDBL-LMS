@@ -273,9 +273,9 @@ export function EmployeeEditForm({
 
               {/* Sticky footer - only show when dirty */}
               {form.formState.isDirty && (
-                <div className="sticky bottom-0 z-10 border-t border-slate-200 bg-white p-4 -mx-4 -mb-4 shadow-lg">
+                <div className="sticky bottom-0 z-10 border-t border-border-strong bg-bg-primary p-4 -mx-4 -mb-4 shadow-lg">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-text-secondary">
                       You have unsaved changes
                     </span>
                     <div className="flex gap-3">
@@ -290,7 +290,7 @@ export function EmployeeEditForm({
                       <Button
                         type="submit"
                         disabled={isSubmitting}
-                        className="bg-indigo-600 hover:bg-indigo-700"
+                        className="bg-card-action hover:bg-card-action"
                       >
                         {isSubmitting ? "Saving..." : "Save"}
                       </Button>

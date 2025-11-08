@@ -198,7 +198,7 @@ export function MyLeavesPageContent() {
                   className={cn(
                     "px-4 py-1.5 rounded-full border text-sm font-medium transition-all duration-200",
                     isActive
-                      ? "bg-indigo-600 text-white border-indigo-600 shadow-sm hover:bg-indigo-700"
+                      ? "bg-card-action text-text-inverted border-card-action shadow-sm hover:bg-card-action"
                       : "bg-bg-primary border-bg-muted text-text-secondary hover:bg-bg-secondary hover:border-bg-muted"
                   )}
                 >
@@ -221,7 +221,7 @@ export function MyLeavesPageContent() {
         ) : error ? (
           <Card>
             <CardContent
-              className="p-8 text-center text-sm text-red-600 dark:text-red-400"
+              className="p-8 text-center text-sm text-data-error dark:text-data-error"
               role="alert"
             >
               Failed to load requests
@@ -255,22 +255,22 @@ export function MyLeavesPageContent() {
                   <Table className="[&_[data-slot=table-container]]:overflow-visible [&_[data-slot=table-container]]:relative">
                     <TableHeader className="[&_tr]:sticky [&_tr]:top-0 [&_tr]:z-10 [&_tr]:bg-bg-primary [&_tr]:backdrop-blur-sm">
                       <TableRow className="bg-bg-muted/30 hover:bg-bg-muted/30 border-b border-bg-muted">
-                        <TableHead className="text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                        <TableHead className="text-xs font-medium text-text-secondary dark:text-text-secondary">
                           Type
                         </TableHead>
-                        <TableHead className="hidden sm:table-cell text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                        <TableHead className="hidden sm:table-cell text-xs font-medium text-text-secondary dark:text-text-secondary">
                           Dates
                         </TableHead>
-                        <TableHead className="hidden md:table-cell text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                        <TableHead className="hidden md:table-cell text-xs font-medium text-text-secondary dark:text-text-secondary">
                           Days
                         </TableHead>
-                        <TableHead className="text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                        <TableHead className="text-xs font-medium text-text-secondary dark:text-text-secondary">
                           Status
                         </TableHead>
-                        <TableHead className="hidden lg:table-cell text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                        <TableHead className="hidden lg:table-cell text-xs font-medium text-text-secondary dark:text-text-secondary">
                           Updated
                         </TableHead>
-                        <TableHead className="text-right text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                        <TableHead className="text-right text-xs font-medium text-text-secondary dark:text-text-secondary">
                           Action
                         </TableHead>
                       </TableRow>
@@ -281,27 +281,27 @@ export function MyLeavesPageContent() {
                           key={row.id}
                           className={cn(
                             "hover:bg-muted/40 cursor-pointer transition-colors",
-                            index % 2 === 0 && "bg-white dark:bg-neutral-900/50"
+                            index % 2 === 0 && "bg-bg-primary dark:bg-bg-secondary/50"
                           )}
                           onClick={() => {
                             setSelectedLeave(row);
                             setModalOpen(true);
                           }}
                         >
-                          <TableCell className="font-medium text-sm text-neutral-900 dark:text-neutral-100">
+                          <TableCell className="font-medium text-sm text-text-secondary dark:text-text-secondary">
                             {leaveTypeLabel[row.type] ?? row.type}
                           </TableCell>
-                          <TableCell className="hidden sm:table-cell text-sm text-gray-600 dark:text-slate-300">
+                          <TableCell className="hidden sm:table-cell text-sm text-text-secondary dark:text-text-secondary">
                             {formatDate(row.startDate)} →{" "}
                             {formatDate(row.endDate)}
                           </TableCell>
-                          <TableCell className="hidden md:table-cell text-sm text-gray-600 dark:text-slate-300">
+                          <TableCell className="hidden md:table-cell text-sm text-text-secondary dark:text-text-secondary">
                             {row.workingDays}
                           </TableCell>
                           <TableCell>
                             <StatusBadge status={row.status} />
                           </TableCell>
-                          <TableCell className="hidden lg:table-cell text-sm text-gray-600 dark:text-slate-300">
+                          <TableCell className="hidden lg:table-cell text-sm text-text-secondary dark:text-text-secondary">
                             {formatDate(row.updatedAt)}
                           </TableCell>
                           <TableCell
@@ -314,7 +314,7 @@ export function MyLeavesPageContent() {
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="h-8 w-8 p-0 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20"
+                                    className="h-8 w-8 p-0 text-data-error hover:bg-data-error dark:hover:bg-data-error/20"
                                     aria-label="Cancel request"
                                   >
                                     <XCircle className="w-4 h-4" />
@@ -341,7 +341,7 @@ export function MyLeavesPageContent() {
                                 </AlertDialogContent>
                               </AlertDialog>
                             ) : (
-                              <span className="text-xs text-gray-500 dark:text-slate-400">
+                              <span className="text-xs text-text-secondary dark:text-text-secondary">
                                 —
                               </span>
                             )}
@@ -390,7 +390,7 @@ export function MyLeavesPageContent() {
                         className={cn(
                           "w-8 h-8 p-0",
                           currentPage === pageNum &&
-                            "bg-indigo-600 hover:bg-indigo-700"
+                            "bg-card-action hover:bg-card-action"
                         )}
                       >
                         {pageNum}

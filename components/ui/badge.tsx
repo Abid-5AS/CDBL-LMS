@@ -1,46 +1,86 @@
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
+  "inline-flex items-center justify-center font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1.5 [&>svg]:pointer-events-none transition-all duration-200 overflow-hidden focus-ring",
   {
     variants: {
       variant: {
         default:
-          "border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
+          "border-transparent bg-primary/90 text-primary-foreground shadow-sm hover:bg-primary hover:shadow-md",
         secondary:
-          "border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
+          "border-transparent bg-secondary/90 text-secondary-foreground shadow-sm hover:bg-secondary hover:shadow-md",
         destructive:
-          "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+          "border-transparent bg-destructive/90 text-destructive-foreground shadow-sm hover:bg-destructive hover:shadow-md",
+        success:
+          "border-transparent bg-success/90 text-white shadow-sm hover:bg-success hover:shadow-md",
+        warning:
+          "border-transparent bg-warning/90 text-white shadow-sm hover:bg-warning hover:shadow-md",
+        info: "border-transparent bg-info/90 text-white shadow-sm hover:bg-info hover:shadow-md",
         outline:
-          "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+          "border border-border bg-background text-foreground shadow-sm hover:bg-muted/60 hover:border-primary/40",
+        ghost:
+          "border-transparent bg-muted/40 text-foreground hover:bg-muted/60",
+        glass:
+          "glass-base border border-white/20 dark:border-white/10 text-foreground shadow-md hover:shadow-lg",
+      },
+      size: {
+        xs: "px-2 py-0.5 text-xs rounded-md",
+        sm: "px-2.5 py-1 text-xs rounded-lg",
+        default: "px-3 py-1.5 text-sm rounded-xl",
+        lg: "px-4 py-2 text-sm rounded-xl",
+      },
+      dot: {
+        true: "pl-1.5",
+        false: "",
       },
     },
     defaultVariants: {
       variant: "default",
+      size: "default",
+      dot: false,
     },
   }
-)
+);
+
+interface BadgeProps
+  extends React.ComponentProps<"span">,
+    VariantProps<typeof badgeVariants> {
+  asChild?: boolean;
+  dotColor?: string;
+}
 
 function Badge({
   className,
   variant,
+  size,
+  dot,
   asChild = false,
+  dotColor,
+  children,
   ...props
-}: React.ComponentProps<"span"> &
-  VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
-  const Comp = asChild ? Slot : "span"
+}: BadgeProps) {
+  const Comp = asChild ? Slot : "span";
 
   return (
     <Comp
       data-slot="badge"
-      className={cn(badgeVariants({ variant }), className)}
+      className={cn(badgeVariants({ variant, size, dot }), className)}
       {...props}
-    />
-  )
+    >
+      {dot && (
+        <span
+          className="size-2 rounded-full bg-current"
+          style={dotColor ? { backgroundColor: dotColor } : undefined}
+          aria-hidden="true"
+        />
+      )}
+      {children}
+    </Comp>
+  );
 }
 
-export { Badge, badgeVariants }
+export { Badge, badgeVariants };

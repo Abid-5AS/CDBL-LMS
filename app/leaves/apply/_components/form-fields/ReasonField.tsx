@@ -26,7 +26,7 @@ export function ReasonField({
         htmlFor="reason"
         className="flex items-center gap-2 text-sm font-medium leading-6"
       >
-        <MessageSquare className="w-4 h-4 text-indigo-500" />
+        <MessageSquare className="w-4 h-4 text-card-action" />
         Reason <span className="text-destructive">*</span>
       </Label>
       <Textarea
@@ -42,7 +42,7 @@ export function ReasonField({
           "min-h-[120px] resize-none leading-6 transition-all focus-visible:ring-2",
           error
             ? "border-destructive focus-visible:ring-destructive"
-            : "border-neutral-300 dark:border-neutral-700 focus-visible:ring-indigo-500/40 hover:border-indigo-400 dark:hover:border-indigo-600"
+            : "border-border-strong dark:border-border-strong focus-visible:ring-card-action/40 hover:border-card-action dark:hover:border-card-action"
         )}
         aria-label="Reason for leave"
         aria-required="true"

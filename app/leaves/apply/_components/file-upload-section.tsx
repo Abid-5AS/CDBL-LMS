@@ -92,10 +92,10 @@ export function FileUploadSection({
 
   return (
     <div className="space-y-2">
-      <Label className="text-sm font-medium text-slate-900">
+      <Label className="text-sm font-medium text-text-secondary">
         {required ? (
           <>
-            Medical Certificate <span className="text-red-500">*</span>
+            Medical Certificate <span className="text-data-error">*</span>
           </>
         ) : (
           "Supporting Document"
@@ -111,11 +111,11 @@ export function FileUploadSection({
           className={cn(
             "relative rounded-xl border-2 border-dashed p-6 text-center transition-colors",
             isDragging
-              ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20"
-              : "border-slate-300 dark:border-slate-700",
-            error && "border-red-500 dark:border-red-700",
+              ? "border-card-action bg-card-action dark:bg-card-action/20"
+              : "border-border-strong dark:border-border-strong",
+            error && "border-data-error dark:border-data-error",
             disabled && "opacity-50 cursor-not-allowed",
-            "backdrop-blur-sm bg-white/50 dark:bg-slate-800/50"
+            "backdrop-blur-sm bg-bg-primary/50 dark:bg-bg-secondary/50"
           )}
         >
           <input
@@ -130,13 +130,13 @@ export function FileUploadSection({
             <div
               className={cn(
                 "rounded-full p-3",
-                isDragging ? "bg-indigo-100 dark:bg-indigo-900/30" : "bg-slate-100 dark:bg-slate-700"
+                isDragging ? "bg-card-action dark:bg-card-action/30" : "bg-bg-secondary dark:bg-bg-secondary"
               )}
             >
-              <Upload className={cn("h-5 w-5", isDragging ? "text-indigo-600" : "text-slate-600")} />
+              <Upload className={cn("h-5 w-5", isDragging ? "text-card-action" : "text-text-secondary")} />
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+              <p className="text-sm font-medium text-text-secondary dark:text-text-secondary">
                 {isDragging ? "Drop file here" : "Drag & drop a file"}
               </p>
               <p className="text-xs text-muted-foreground mt-1">or click to browse</p>
@@ -158,16 +158,16 @@ export function FileUploadSection({
         <div
           className={cn(
             "flex items-center gap-3 rounded-xl border p-4",
-            "border-slate-200 dark:border-slate-700",
-            "bg-slate-50 dark:bg-slate-800/50",
+            "border-border-strong dark:border-border-strong",
+            "bg-bg-secondary dark:bg-bg-secondary/50",
             "backdrop-blur-sm"
           )}
         >
-          <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/30">
-            <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          <div className="rounded-lg bg-data-info p-2 dark:bg-data-info/30">
+            <FileText className="h-5 w-5 text-data-info dark:text-data-info" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">{value.name}</p>
+            <p className="text-sm font-medium text-text-secondary dark:text-text-secondary truncate">{value.name}</p>
             <p className="text-xs text-muted-foreground">
               {(value.size / 1024).toFixed(1)} KB
             </p>
@@ -187,7 +187,7 @@ export function FileUploadSection({
       )}
 
       {error && (
-        <p className="text-sm text-red-600 flex items-center gap-1" role="alert">
+        <p className="text-sm text-data-error flex items-center gap-1" role="alert">
           <AlertCircle className="h-3 w-3" aria-hidden="true" />
           {error}
         </p>

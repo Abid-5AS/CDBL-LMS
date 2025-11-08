@@ -20,8 +20,8 @@ const KEYBOARD_SHORTCUTS = [
 export default function HelpPage() {
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+      <section className="rounded-xl border border-border-strong dark:border-border-strong bg-bg-primary dark:bg-bg-secondary p-6 shadow-sm">
+        <h1 className="text-2xl font-semibold text-text-secondary dark:text-text-secondary">
           Help Center
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -34,7 +34,7 @@ export default function HelpPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <BookOpen className="h-5 w-5 text-data-info dark:text-data-info" />
               <CardTitle>Documentation</CardTitle>
             </div>
             <CardDescription>User guides and tutorials</CardDescription>
@@ -53,7 +53,7 @@ export default function HelpPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <LifeBuoy className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              <LifeBuoy className="h-5 w-5 text-card-summary dark:text-card-summary" />
               <CardTitle>Quick Help</CardTitle>
             </div>
             <CardDescription>Keyboard shortcuts and tips</CardDescription>
@@ -68,7 +68,7 @@ export default function HelpPage() {
                   <span className="text-muted-foreground">
                     {shortcut.description}
                   </span>
-                  <kbd className="px-2 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded">
+                  <kbd className="px-2 py-1 text-xs font-semibold bg-bg-secondary dark:bg-bg-secondary border border-border-strong dark:border-border-strong rounded">
                     {shortcut.key}
                   </kbd>
                 </div>

@@ -28,15 +28,15 @@ type ExecutiveViewProps = {
 const getRoleBadgeVariant = (role: AppRole) => {
   switch (role) {
     case "CEO":
-      return "bg-purple-50 text-purple-700 border-purple-200";
+      return "bg-card-summary text-card-summary border-card-summary";
     case "HR_HEAD":
-      return "bg-blue-50 text-blue-700 border-blue-200";
+      return "bg-data-info text-data-info border-data-info";
     case "HR_ADMIN":
-      return "bg-cyan-50 text-cyan-700 border-cyan-200";
+      return "bg-data-info text-data-info border-data-info";
     case "DEPT_HEAD":
-      return "bg-green-50 text-green-700 border-green-200";
+      return "bg-data-success text-data-success border-data-success";
     case "EMPLOYEE":
-      return "bg-slate-50 text-slate-700 border-slate-200";
+      return "bg-bg-secondary text-text-secondary border-border-strong";
   }
 };
 
@@ -77,18 +77,18 @@ export function ExecutiveView({ employee, viewerRole }: ExecutiveViewProps) {
       </Breadcrumb>
 
       {/* Header with employee info and executive actions */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <h1 className="text-2xl font-semibold text-slate-900">{employee.name}</h1>
+            <h1 className="text-2xl font-semibold text-text-secondary">{employee.name}</h1>
             <p className="mt-1 text-sm text-muted-foreground">{employee.email}</p>
             <div className="mt-3 flex items-center gap-3">
               <Badge className={getRoleBadgeVariant(employee.role as AppRole)}>
                 {roleLabel(employee.role)}
               </Badge>
               <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-green-500"></span>
-                <span className="text-sm text-gray-600">Active</span>
+                <span className="h-2 w-2 rounded-full bg-data-success"></span>
+                <span className="text-sm text-text-secondary">Active</span>
               </div>
             </div>
           </div>
@@ -126,8 +126,8 @@ export function ExecutiveView({ employee, viewerRole }: ExecutiveViewProps) {
       </div>
 
       {/* Employee Information Card */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-slate-900 mb-4">Employee Information</h2>
+      <div className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-text-secondary mb-4">Employee Information</h2>
         <EmployeeProfileCard
           name={employee.name}
           email={employee.email}
@@ -140,14 +140,14 @@ export function ExecutiveView({ employee, viewerRole }: ExecutiveViewProps) {
       </div>
 
       {/* Leave Statistics Summary - Executive view, no personal balances */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-slate-900 mb-4">Leave Statistics</h2>
+      <div className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-text-secondary mb-4">Leave Statistics</h2>
         <HRStatCards stats={employee.stats} />
       </div>
 
       {/* Recent Leave Requests */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-slate-900 mb-4">Recent Leave Requests</h2>
+      <div className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-text-secondary mb-4">Recent Leave Requests</h2>
         <LeaveHistoryTable history={employee.history.slice(0, 10)} />
       </div>
     </div>

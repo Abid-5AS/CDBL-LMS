@@ -15,7 +15,7 @@ Refactor the apply leave form and overall UI to match modern design patterns, im
 
 ### 2. UI Component Consistency
 - [ ] Audit all components for Tailwind spacing consistency (`gap-6`, `p-6`, `rounded-xl`, `shadow-sm`)
-- [ ] Ensure dark mode compatibility (`bg-gray-50` → `bg-gray-900`)
+- [ ] Ensure dark mode compatibility (`bg-bg-secondary` → `bg-bg-secondary`)
 - [ ] Standardize button styles and sizes
 - [ ] Review and update card components
 

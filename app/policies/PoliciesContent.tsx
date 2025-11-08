@@ -29,24 +29,30 @@ const ENTITLEMENTS = [
     entitlement: `${policy.accrual.CL_PER_YEAR} days / Year`,
     notes: `Max ${policy.clMaxConsecutiveDays} consecutive days`,
     icon: Plane,
-    gradient: "from-amber-100 to-orange-100",
-    iconColor: "text-orange-600",
+    gradient:
+      "from-amber-50 to-amber-100 dark:from-amber-950/30 dark:to-amber-900/20",
+    iconColor: "text-amber-600 dark:text-amber-400",
+    borderColor: "border-amber-200 dark:border-amber-800/50",
   },
   {
     type: "Medical Leave",
     entitlement: `${policy.accrual.ML_PER_YEAR} days / Year`,
     notes: "> 3 days requires medical certificate",
     icon: HeartPulse,
-    gradient: "from-rose-100 to-red-100",
-    iconColor: "text-red-600",
+    gradient:
+      "from-rose-50 to-rose-100 dark:from-rose-950/30 dark:to-rose-900/20",
+    iconColor: "text-rose-600 dark:text-rose-400",
+    borderColor: "border-rose-200 dark:border-rose-800/50",
   },
   {
     type: "Earned Leave",
     entitlement: "Accrues Monthly",
     notes: `Submit ${policy.elMinNoticeDays} days in advance`,
     icon: CalendarDays,
-    gradient: "from-indigo-100 to-sky-100",
-    iconColor: "text-indigo-600",
+    gradient:
+      "from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/20",
+    iconColor: "text-blue-600 dark:text-blue-400",
+    borderColor: "border-blue-200 dark:border-blue-800/50",
     subtext: `Accrues ${policy.elAccrualPerMonth} days/month (${policy.accrual.EL_PER_YEAR} days/year), carry forward up to ${policy.carryForwardCap.EL} days`,
   },
 ];
@@ -137,7 +143,7 @@ export function PoliciesContent() {
   return (
     <>
       {/* Print-optimized layout - only visible when printing */}
-      <div className="hidden print:block bg-white text-black text-sm leading-relaxed p-8 max-w-4xl mx-auto">
+      <div className="hidden print:block bg-bg-primary text-text-primary text-sm leading-relaxed p-8 max-w-4xl mx-auto">
         <header className="mb-8 text-center border-b pb-4">
           <h1 className="text-2xl font-semibold mb-2">CDBL Leave Policy</h1>
           <p className="text-xs text-text-secondary">
@@ -150,7 +156,7 @@ export function PoliciesContent() {
         </header>
 
         <section className="mb-6">
-          <h2 className="font-semibold text-lg mb-3 border-b border-gray-300 pb-2">
+          <h2 className="font-semibold text-lg mb-3 border-b border-border-strong pb-2">
             Annual Entitlements
           </h2>
           <ul className="list-disc ml-6 space-y-2">
@@ -171,7 +177,7 @@ export function PoliciesContent() {
         </section>
 
         <section className="mb-6">
-          <h2 className="font-semibold text-lg mb-3 border-b border-gray-300 pb-2">
+          <h2 className="font-semibold text-lg mb-3 border-b border-border-strong pb-2">
             Key Rules
           </h2>
           <ul className="space-y-2">
@@ -187,20 +193,20 @@ export function PoliciesContent() {
         </section>
 
         <section className="mb-6">
-          <h2 className="font-semibold text-lg mb-3 border-b border-gray-300 pb-2">
+          <h2 className="font-semibold text-lg mb-3 border-b border-border-strong pb-2">
             Frequently Asked Questions
           </h2>
           <ul className="space-y-3">
             {FAQ_ITEMS.map((item, index) => (
               <li key={index}>
                 <strong className="block mb-1">Q: {item.question}</strong>
-                <p className="ml-4 text-gray-700">A: {item.answer}</p>
+                <p className="ml-4 text-text-secondary">A: {item.answer}</p>
               </li>
             ))}
           </ul>
         </section>
 
-        <footer className="mt-10 pt-4 border-t border-gray-300 text-center text-xs text-gray-500">
+        <footer className="mt-10 pt-4 border-t border-border-strong text-center text-xs text-text-secondary">
           <p>
             © {new Date().getFullYear()} Central Depository Bangladesh Limited
           </p>
@@ -222,12 +228,12 @@ export function PoliciesContent() {
         >
           <div className="flex items-center gap-3">
             <ScrollText
-              className="w-7 h-7 text-indigo-600 flex-shrink-0"
+              className="w-8 h-8 text-primary shrink-0"
               aria-hidden="true"
               aria-label=""
             />
             <div>
-              <h1 className="text-3xl font-semibold text-text-primary flex items-center gap-2">
+              <h1 className="text-3xl font-semibold text-foreground flex items-center gap-2">
                 Leave Policy Overview
               </h1>
               <p className="mt-2 text-muted-foreground max-w-2xl">
@@ -240,10 +246,10 @@ export function PoliciesContent() {
           <Button
             variant="default"
             onClick={handleExportPDF}
-            className="rounded-full bg-indigo-600 hover:bg-indigo-700 text-white no-print"
+            className="rounded-full no-print px-8"
             aria-label="Export policies as PDF"
+            leftIcon={<Printer className="w-4 h-4" aria-hidden="true" />}
           >
-            <Printer className="w-4 h-4 mr-2" aria-hidden="true" />
             Export Policy as PDF
           </Button>
         </motion.header>
@@ -259,7 +265,7 @@ export function PoliciesContent() {
         >
           <h2
             id="entitlements-heading"
-            className="text-xl font-semibold text-text-primary"
+            className="text-2xl font-semibold text-foreground"
           >
             Annual Entitlements
           </h2>
@@ -270,26 +276,26 @@ export function PoliciesContent() {
                 <motion.div
                   key={item.type}
                   variants={cardVariants}
-                  whileHover={{ scale: 1.03 }}
+                  whileHover={{ scale: 1.02, y: -4 }}
                   transition={{ duration: 0.2 }}
-                  className={`rounded-xl p-6 shadow-sm bg-gradient-to-br ${item.gradient} border border-white/50 hover:shadow-md transition-shadow`}
+                  className={`rounded-2xl p-6 shadow-sm bg-linear-to-br ${item.gradient} border ${item.borderColor} hover:shadow-lg transition-all`}
                 >
                   <Icon
-                    className={`w-7 h-7 ${item.iconColor} mb-3`}
+                    className={`w-8 h-8 ${item.iconColor} mb-4`}
                     aria-hidden="true"
                     aria-label=""
                   />
-                  <h3 className="font-semibold text-lg text-text-primary mb-1">
+                  <h3 className="font-semibold text-xl text-foreground mb-2">
                     {item.type}
                   </h3>
-                  <p className="text-sm font-medium text-text-primary mt-2">
+                  <p className="text-base font-semibold text-foreground mt-2">
                     {item.entitlement}
                   </p>
-                  <p className="text-sm text-text-secondary mt-1">
+                  <p className="text-sm text-muted-foreground mt-2">
                     {item.notes}
                   </p>
                   {item.subtext && (
-                    <p className="text-xs text-gray-600 mt-2 italic">
+                    <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
                       {item.subtext}
                     </p>
                   )}
@@ -300,7 +306,7 @@ export function PoliciesContent() {
         </motion.section>
 
         {/* Separator */}
-        <Separator className="my-10" />
+        <Separator className="my-10 lg:hidden" />
 
         {/* Key Rules Section */}
         <motion.section
@@ -313,15 +319,12 @@ export function PoliciesContent() {
         >
           <h2
             id="rules-heading"
-            className="text-xl font-semibold flex items-center gap-2 text-gray-900"
+            className="text-2xl font-semibold flex items-center gap-2 text-foreground"
           >
-            <ShieldCheck
-              className="w-5 h-5 text-indigo-600"
-              aria-hidden="true"
-            />
+            <ShieldCheck className="w-6 h-6 text-primary" aria-hidden="true" />
             Key Rules
           </h2>
-          <Card className="bg-white/70 backdrop-blur-md rounded-xl border">
+          <Card className="bg-card/50 backdrop-blur-sm rounded-2xl border border-border shadow-sm">
             <Accordion type="multiple" className="w-full">
               {KEY_RULES.map((rule, index) => (
                 <AccordionItem
@@ -329,10 +332,10 @@ export function PoliciesContent() {
                   value={`rule-${index}`}
                   className="px-6"
                 >
-                  <AccordionTrigger className="text-base font-medium text-gray-900 hover:no-underline">
+                  <AccordionTrigger className="text-base font-medium text-foreground hover:text-primary hover:no-underline transition-colors">
                     {rule.title}
                   </AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground">
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
                     {rule.description}
                   </AccordionContent>
                 </AccordionItem>
@@ -342,7 +345,7 @@ export function PoliciesContent() {
         </motion.section>
 
         {/* Separator */}
-        <Separator className="my-10" />
+        <Separator className="my-10 lg:hidden" />
 
         {/* FAQ Section */}
         <motion.section
@@ -355,15 +358,12 @@ export function PoliciesContent() {
         >
           <h2
             id="faq-heading"
-            className="text-xl font-semibold flex items-center gap-2 text-gray-900"
+            className="text-2xl font-semibold flex items-center gap-2 text-foreground"
           >
-            <HelpCircle
-              className="w-5 h-5 text-indigo-600"
-              aria-hidden="true"
-            />
+            <HelpCircle className="w-6 h-6 text-primary" aria-hidden="true" />
             Frequently Asked Questions
           </h2>
-          <Card className="bg-white/70 backdrop-blur-md rounded-xl border">
+          <Card className="bg-card/50 backdrop-blur-sm rounded-2xl border border-border shadow-sm">
             <Accordion type="single" collapsible className="w-full">
               {FAQ_ITEMS.map((item, index) => (
                 <AccordionItem
@@ -371,10 +371,10 @@ export function PoliciesContent() {
                   value={`faq-${index}`}
                   className="px-6"
                 >
-                  <AccordionTrigger className="text-base font-medium text-gray-900 hover:no-underline">
+                  <AccordionTrigger className="text-base font-medium text-foreground hover:text-primary hover:no-underline transition-colors">
                     {item.question}
                   </AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground">
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
                     {item.answer}
                   </AccordionContent>
                 </AccordionItem>
@@ -389,9 +389,9 @@ export function PoliciesContent() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="mt-8 p-4 rounded-lg bg-muted/50 border border-border/50"
+          className="mt-8 p-5 rounded-2xl bg-muted/30 border border-border"
         >
-          <p className="text-sm text-muted-foreground text-center">
+          <p className="text-sm text-muted-foreground text-center leading-relaxed">
             For the complete policy document, please contact HR or refer to the
             internal documentation portal.
           </p>

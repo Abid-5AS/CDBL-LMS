@@ -136,9 +136,9 @@ export function HeroStrip({ name }: HeroStripProps) {
             className={cn(
               "flex items-center justify-center w-10 h-10 rounded-full border flex-shrink-0",
               hasPending
-                ? "bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800"
+                ? "bg-data-warning dark:bg-data-warning/30 border-data-warning dark:border-data-warning"
                 : hasApprovedUpcoming
-                ? "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800"
+                ? "bg-data-success dark:bg-data-success/30 border-data-success dark:border-data-success"
                 : "bg-accent/20 border-border/50"
             )}
           >
@@ -146,7 +146,7 @@ export function HeroStrip({ name }: HeroStripProps) {
               <AlertIcon
                 className={cn(
                   "w-5 h-5 flex-shrink-0",
-                  "text-amber-600 dark:text-amber-400"
+                  "text-data-warning dark:text-data-warning"
                 )}
                 strokeWidth={2}
               />
@@ -154,7 +154,7 @@ export function HeroStrip({ name }: HeroStripProps) {
               <ApplyIcon
                 className={cn(
                   "w-5 h-5 flex-shrink-0",
-                  "text-emerald-600 dark:text-emerald-400"
+                  "text-data-success dark:text-data-success"
                 )}
                 strokeWidth={2}
               />

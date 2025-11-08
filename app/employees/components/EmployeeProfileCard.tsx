@@ -32,10 +32,10 @@ export function EmployeeProfileCard(props: EmployeeProfileCardProps) {
   };
 
   return (
-    <div className="rounded-lg border border-slate-200/50 dark:border-slate-800/50 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 p-4 shadow-sm">
+    <div className="rounded-lg border border-border-strong/50 dark:border-border-strong/50 backdrop-blur-xl bg-bg-primary/70 dark:bg-bg-secondary/70 p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Profile</h3>
-        <span className="text-xs font-medium text-blue-600 dark:text-blue-400">{name}</span>
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-text-secondary dark:text-text-secondary">Profile</h3>
+        <span className="text-xs font-medium text-data-info dark:text-data-info">{name}</span>
       </div>
       <dl className="grid gap-x-6 gap-y-3 lg:grid-cols-2">
         {FIELDS.map((field) => (
@@ -43,7 +43,7 @@ export function EmployeeProfileCard(props: EmployeeProfileCardProps) {
             <dt className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
               {field.label}
             </dt>
-            <dd className={cn("mt-1 text-sm text-slate-900 dark:text-slate-100", field.key === "email" && "font-medium")}
+            <dd className={cn("mt-1 text-sm text-text-secondary dark:text-text-secondary", field.key === "email" && "font-medium")}
             >
               {values[field.key]}
             </dd>

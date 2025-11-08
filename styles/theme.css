@@ -1,115 +1,320 @@
-@layer base {
-  :root {
-    /* Text Colors - Hierarchical & Accessible (Light Mode) */
-    --text-primary: 15 23 42; /* slate-900 - Main content, headings */
-    --text-secondary: 71 85 105; /* slate-600 - Secondary text, labels */
-    --text-tertiary: 148 163 184; /* slate-400 - Placeholder, disabled */
-    --text-inverted: 248 250 252; /* slate-50 - Text on dark backgrounds */
-    --text-muted: 100 116 139; /* slate-500 - Subtle text */
+/* ===== Core semantic palette (Light) ===== */
+:root {
+  /* TEXT */
+  --color-text-primary: #0b1220; /* slate-950 */
+  --color-text-secondary: #334155; /* slate-700 */
+  --color-text-tertiary: #64748b; /* slate-500 */
+  --color-text-muted: #6b7280; /* gray-500 */
+  --color-text-inverted: #ffffff;
 
-    /* Background Colors - Surface & Layout */
-    --bg-primary: 255 255 255; /* white - Main background */
-    --bg-secondary: 248 250 252; /* slate-50 - Cards, panels */
-    --bg-tertiary: 241 245 249; /* slate-100 - Subtle backgrounds */
-    --bg-inverted: 15 23 42; /* slate-900 - Dark surfaces */
-    --bg-muted: 226 232 240; /* slate-200 - Borders, dividers */
+  /* SURFACES */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f8fafc; /* slate-50 */
+  --color-bg-tertiary: #eef2f7; /* soft neutral */
+  --color-bg-muted: #e5eaf1; /* subtle border/skeleton */
+  --color-bg-inverted: #0b1220; /* slate-950 */
 
-    /* Leave Types - Semantic & Accessible Colors (Light Mode) */
-    --color-leave-sick: 220 38 38; /* red-600 - Medical/Health */
-    --color-leave-casual: 37 99 235; /* blue-600 - Relaxation/Leisure */
-    --color-leave-earned: 22 163 74; /* green-600 - Achievement/Reward */
-    --color-leave-unpaid: 75 85 99; /* slate-600 - Neutral/Absence */
-    --color-leave-maternity: 219 39 119; /* pink-600 - Care/Nurture */
-    --color-leave-paternity: 147 51 234; /* purple-600 - Care/Family */
+  /* BRAND / ACCENTS */
+  --color-brand: #4f46e5; /* indigo-600 */
+  --color-brand-soft: #e7e9ff; /* indigo-100 */
+  --color-brand-strong: #3730a3; /* indigo-800 */
 
-    /* Card Types - Functional Colors */
-    --color-card-kpi: 217 119 6; /* amber-600 - Metrics/Performance */
-    --color-card-action: 79 70 229; /* indigo-600 - Interactive/Action */
-    --color-card-summary: 126 34 206; /* violet-600 - Overview/Summary */
-    --color-card-kpi-soft: 254 243 199; /* amber-100 - Soft KPI background */
-    --color-card-kpi-strong: 180 83 9; /* amber-700 - Emphasis KPI */
-    --color-card-action-soft: 224 231 255; /* indigo-100 - Soft action surfaces */
-    --color-card-action-strong: 55 48 163; /* indigo-800 - Emphasis action */
-    --color-card-summary-soft: 245 243 255; /* violet-50 - Soft summary */
-    --color-card-summary-strong: 91 33 182; /* violet-800 - Emphasis summary */
+  /* DATA STATES */
+  --color-data-success: #16a34a; /* emerald-600 */
+  --color-data-success-soft: #dcfce7; /* emerald-100 */
+  --color-data-success-strong: #166534; /* emerald-800 */
 
-    /* Data States - Universal Status Colors */
-    --color-data-success: 22 163 74; /* green-600 - Success/Positive */
-    --color-data-warning: 217 119 6; /* amber-600 - Caution/Warning */
-    --color-data-error: 220 38 38; /* red-600 - Error/Danger */
-    --color-data-info: 37 99 235; /* blue-600 - Information/Neutral */
-    --color-data-success-soft: 220 252 231; /* green-100 */
-    --color-data-success-strong: 22 101 52; /* green-800 */
-    --color-data-warning-soft: 254 243 199; /* amber-100 */
-    --color-data-warning-strong: 146 64 14; /* amber-800 */
-    --color-data-error-soft: 254 226 226; /* red-100 */
-    --color-data-error-strong: 127 29 29; /* red-900 */
-    --color-data-info-soft: 219 234 254; /* blue-100 */
-    --color-data-info-strong: 30 64 175; /* blue-800 */
+  --color-data-warning: #d97706; /* amber-600 */
+  --color-data-warning-soft: #fef3c7; /* amber-100 */
+  --color-data-warning-strong: #92400e; /* amber-800 */
 
-    /* UI States - Leave Request Status */
-    --color-status-draft: 100 116 139; /* slate-500 - Incomplete/Draft */
-    --color-status-submitted: 37 99 235; /* blue-600 - In Progress */
-    --color-status-approved: 22 163 74; /* green-600 - Success */
-    --color-status-rejected: 220 38 38; /* red-600 - Failure */
-    --color-status-returned: 217 119 6; /* amber-600 - Needs Action */
-    --color-status-cancelled: 107 114 128; /* gray-500 - Neutral/Void */
-  }
+  --color-data-error: #e11d48; /* rose-600 */
+  --color-data-error-soft: #ffe4e6; /* rose-100 */
+  --color-data-error-strong: #9f1239; /* rose-800 */
 
-  .dark {
-    /* Text Colors - Enhanced for Dark Mode */
-    --text-primary: 248 250 252; /* slate-50 - High contrast text */
-    --text-secondary: 203 213 225; /* slate-300 - Secondary content */
-    --text-tertiary: 148 163 184; /* slate-400 - Subtle text */
-    --text-inverted: 15 23 42; /* slate-900 - Text on light backgrounds */
-    --text-muted: 100 116 139; /* slate-500 - Muted content */
+  --color-data-info: #0284c7; /* sky-600 */
+  --color-data-info-soft: #e0f2fe; /* sky-100 */
+  --color-data-info-strong: #075985; /* sky-800 */
 
-    /* Background Colors - Dark Theme */
-    --bg-primary: 15 23 42; /* slate-900 - Main dark background */
-    --bg-secondary: 30 41 59; /* slate-800 - Cards, elevated surfaces */
-    --bg-tertiary: 51 65 85; /* slate-700 - Interactive surfaces */
-    --bg-inverted: 248 250 252; /* slate-50 - Light surfaces */
-    --bg-muted: 71 85 105; /* slate-600 - Borders, subtle elements */
+  /* LEAVE TYPES (consistent, muted, HR-friendly) */
+  --color-leave-earned: #16a34a; /* emerald-600 */
+  --color-leave-casual: #2563eb; /* blue-600 */
+  --color-leave-medical: #0ea5e9; /* cyan-600 */
+  --color-leave-sick: #e11d48; /* rose-600 */
+  --color-leave-unpaid: #6b7280; /* gray-500 */
+  --color-leave-maternity: #db2777; /* pink-600 */
+  --color-leave-paternity: #7c3aed; /* violet-600 */
 
-    /* Leave Types - Darker variants with better contrast */
-    --color-leave-sick: 248 113 113; /* red-400 - Softer but visible */
-    --color-leave-casual: 96 165 250; /* blue-400 - Bright enough for dark bg */
-    --color-leave-earned: 74 222 128; /* green-400 - Vibrant green */
-    --color-leave-unpaid: 148 163 184; /* slate-400 - Good contrast */
-    --color-leave-maternity: 244 114 182; /* pink-400 - Warm pink */
-    --color-leave-paternity: 167 139 250; /* purple-400 - Soft purple */
+  /* CARD CATEGORIES (subtle, not neon) */
+  --color-card-kpi: #b45309; /* amber-700 for titles/icons */
+  --color-card-kpi-soft: #fff7ed; /* amber-50 */
+  --color-card-action: var(--color-brand);
+  --color-card-action-soft: var(--color-brand-soft);
+  --color-card-summary: #7c3aed; /* violet-600 */
+  --color-card-summary-soft: #f3e8ff; /* violet-100 */
+  --color-card-kpi-strong: #92400e;
+  --color-card-action-strong: var(--color-brand-strong);
+  --color-card-summary-strong: #5b21b6;
 
-    /* Card Types - Enhanced visibility */
-    --color-card-kpi: 251 191 36; /* yellow-400 - High contrast */
-    --color-card-action: 129 140 248; /* indigo-400 - Clear action */
-    --color-card-summary: 196 181 253; /* violet-300 - Subtle but visible */
-    --color-card-kpi-soft: 69 26 3; /* amber-950 - Deep glass tint */
-    --color-card-kpi-strong: 252 211 77; /* amber-300 - Bright KPI */
-    --color-card-action-soft: 30 27 75; /* indigo-950 - Deep action tint */
-    --color-card-action-strong: 199 210 254; /* indigo-200 - Bright action */
-    --color-card-summary-soft: 46 16 101; /* violet-950 - Deep summary tint */
-    --color-card-summary-strong: 221 214 254; /* violet-200 - Bright summary */
+  /* UI STATUSES */
+  --color-status-draft: #6b7280; /* gray-500 */
+  --color-status-submitted: #2563eb; /* blue-600 */
+  --color-status-approved: #16a34a; /* emerald-600 */
+  --color-status-rejected: #e11d48; /* rose-600 */
+  --color-status-returned: #d97706; /* amber-600 */
+  --color-status-cancelled: #94a3b8; /* slate-400 */
 
-    /* Data States - Consistent semantic meaning */
-    --color-data-success: 74 222 128; /* green-400 - Clear success */
-    --color-data-warning: 251 191 36; /* yellow-400 - Alert warning */
-    --color-data-error: 248 113 113; /* red-400 - Clear error */
-    --color-data-info: 96 165 250; /* blue-400 - Information */
-    --color-data-success-soft: 5 46 22; /* green-950 - Deep tint */
-    --color-data-success-strong: 134 239 172; /* green-300 - Bright success */
-    --color-data-warning-soft: 69 26 3; /* amber-950 - Deep tint */
-    --color-data-warning-strong: 252 211 77; /* amber-300 - Bright warning */
-    --color-data-error-soft: 69 10 10; /* red-950 - Deep tint */
-    --color-data-error-strong: 252 165 165; /* red-300 - Bright error */
-    --color-data-info-soft: 23 37 84; /* blue-950 - Deep tint */
-    --color-data-info-strong: 147 197 253; /* blue-300 - Bright info */
+  /* FOCUS / RING */
+  --color-ring: #6366f1; /* indigo-500 */
 
-    /* UI States - Optimized for dark backgrounds */
-    --color-status-draft: 148 163 184; /* slate-400 - Visible draft */
-    --color-status-submitted: 96 165 250; /* blue-400 - Clear progress */
-    --color-status-approved: 74 222 128; /* green-400 - Success */
-    --color-status-rejected: 248 113 113; /* red-400 - Error */
-    --color-status-returned: 251 191 36; /* yellow-400 - Warning */
-    --color-status-cancelled: 156 163 175; /* gray-400 - Neutral */
-  }
+  /* SURFACES - Elevation Scale */
+  --surface-canvas: #ffffff; /* page background */
+  --surface-subtle: #f8fafc; /* section bg / strips */
+  --surface-1: #ffffff; /* cards/panels */
+  --surface-2: #fcfcfd; /* nested cards */
+
+  /* BORDERS + DIVIDERS */
+  --border-soft: #e5e7eb; /* gray-200 */
+  --border-strong: #cbd5e1; /* slate-300 */
+
+  /* SHADOWS */
+  --shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-2: 0 2px 6px rgba(15, 23, 42, 0.08), 0 1px 1px rgba(15, 23, 42, 0.04);
+
+  /* RADIUS */
+  --radius-md: 14px;
+  --radius-lg: 18px;
+}
+
+/* ===== Dark mode ===== */
+.dark {
+  /* TEXT */
+  --color-text-primary: #e5e7eb; /* gray-200 */
+  --color-text-secondary: #cbd5e1; /* slate-300 */
+  --color-text-tertiary: #94a3b8; /* slate-400 */
+  --color-text-muted: #94a3b8;
+  --color-text-inverted: #0b1220;
+
+  /* SURFACES */
+  --color-bg-primary: #0b1220; /* slate-950 */
+  --color-bg-secondary: #111827; /* gray-900 */
+  --color-bg-tertiary: #1f2937; /* gray-800 */
+  --color-bg-muted: #2a3444; /* subtle border */
+  --color-bg-inverted: #ffffff;
+
+  /* BRAND / ACCENTS */
+  --color-brand: #818cf8; /* indigo-400 */
+  --color-brand-soft: #1f235a; /* indigo-950 */
+  --color-brand-strong: #c7d2fe; /* indigo-200 */
+
+  /* DATA STATES */
+  --color-data-success: #34d399; /* emerald-400 */
+  --color-data-success-soft: #062e22; /* deep emerald bg */
+  --color-data-success-strong: #bbf7d0; /* emerald-200 */
+
+  --color-data-warning: #f59e0b; /* amber-500 */
+  --color-data-warning-soft: #3b2a07; /* deep amber bg */
+  --color-data-warning-strong: #fde68a; /* amber-200 */
+
+  --color-data-error: #fb7185; /* rose-400 */
+  --color-data-error-soft: #3a0a13; /* deep rose bg */
+  --color-data-error-strong: #fecdd3; /* rose-200 */
+
+  --color-data-info: #38bdf8; /* sky-400 */
+  --color-data-info-soft: #072637; /* deep sky bg */
+  --color-data-info-strong: #bae6fd; /* sky-200 */
+
+  /* LEAVE TYPES */
+  --color-leave-earned: #34d399; /* emerald-400 */
+  --color-leave-casual: #60a5fa; /* blue-400 */
+  --color-leave-medical: #22d3ee; /* cyan-400 */
+  --color-leave-sick: #fb7185; /* rose-400 */
+  --color-leave-unpaid: #9ca3af; /* gray-400 */
+  --color-leave-maternity: #f472b6; /* pink-400 */
+  --color-leave-paternity: #a78bfa; /* violet-400 */
+
+  /* CARDS */
+  --color-card-kpi: #f59e0b;
+  --color-card-kpi-soft: #1a1205;
+  --color-card-kpi-strong: #fde68a;
+  --color-card-action: var(--color-brand);
+  --color-card-action-soft: #151637;
+  --color-card-action-strong: var(--color-brand-strong);
+  --color-card-summary: #a78bfa;
+  --color-card-summary-soft: #1b1030;
+  --color-card-summary-strong: #ddd6fe;
+
+  /* UI STATUSES */
+  --color-status-draft: #9ca3af;
+  --color-status-submitted: #93c5fd;
+  --color-status-approved: #86efac;
+  --color-status-rejected: #fca5a5;
+  --color-status-returned: #fbbf24;
+  --color-status-cancelled: #9ca3af;
+
+  --color-ring: #818cf8;
+
+  /* SURFACES - Dark Mode */
+  --surface-canvas: #0b1220;
+  --surface-subtle: #111827;
+  --surface-1: #0f172a;
+  --surface-2: #111827;
+
+  /* BORDERS - Dark Mode */
+  --border-soft: #243244;
+  --border-strong: #314156;
+
+  /* SHADOWS - Dark Mode */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-2: 0 2px 8px rgba(0, 0, 0, 0.5), 0 1px 1px rgba(0, 0, 0, 0.35);
+}
+
+/* ===== Tailwind @theme bridge (unchanged) ===== */
+@theme {
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-tertiary: var(--color-text-tertiary);
+  --color-text-inverted: var(--color-text-inverted);
+  --color-text-muted: var(--color-text-muted);
+
+  --color-bg-primary: var(--color-bg-primary);
+  --color-bg-secondary: var(--color-bg-secondary);
+  --color-bg-tertiary: var(--color-bg-tertiary);
+  --color-bg-inverted: var(--color-bg-inverted);
+  --color-bg-muted: var(--color-bg-muted);
+
+  --color-brand: var(--color-brand);
+  --color-brand-soft: var(--color-brand-soft);
+  --color-brand-strong: var(--color-brand-strong);
+
+  --color-data-success: var(--color-data-success);
+  --color-data-success-soft: var(--color-data-success-soft);
+  --color-data-success-strong: var(--color-data-success-strong);
+  --color-data-warning: var(--color-data-warning);
+  --color-data-warning-soft: var(--color-data-warning-soft);
+  --color-data-warning-strong: var(--color-data-warning-strong);
+  --color-data-error: var(--color-data-error);
+  --color-data-error-soft: var(--color-data-error-soft);
+  --color-data-error-strong: var(--color-data-error-strong);
+  --color-data-info: var(--color-data-info);
+  --color-data-info-soft: var(--color-data-info-soft);
+  --color-data-info-strong: var(--color-data-info-strong);
+
+  --color-leave-earned: var(--color-leave-earned);
+  --color-leave-casual: var(--color-leave-casual);
+  --color-leave-medical: var(--color-leave-medical);
+  --color-leave-sick: var(--color-leave-sick);
+  --color-leave-unpaid: var(--color-leave-unpaid);
+  --color-leave-maternity: var(--color-leave-maternity);
+  --color-leave-paternity: var(--color-leave-paternity);
+
+  --color-card-kpi: var(--color-card-kpi);
+  --color-card-kpi-soft: var(--color-card-kpi-soft);
+  --color-card-kpi-strong: var(--color-card-kpi-strong);
+  --color-card-action: var(--color-card-action);
+  --color-card-action-soft: var(--color-card-action-soft);
+  --color-card-action-strong: var(--color-card-action-strong);
+  --color-card-summary: var(--color-card-summary);
+  --color-card-summary-soft: var(--color-card-summary-soft);
+  --color-card-summary-strong: var(--color-card-summary-strong);
+
+  --color-status-draft: var(--color-status-draft);
+  --color-status-submitted: var(--color-status-submitted);
+  --color-status-approved: var(--color-status-approved);
+  --color-status-rejected: var(--color-status-rejected);
+  --color-status-returned: var(--color-status-returned);
+  --color-status-cancelled: var(--color-status-cancelled);
+
+  --color-ring: var(--color-ring);
+
+  /* Surface tokens */
+  --surface-canvas: var(--surface-canvas);
+  --surface-subtle: var(--surface-subtle);
+  --surface-1: var(--surface-1);
+  --surface-2: var(--surface-2);
+
+  /* Border tokens */
+  --border-soft: var(--border-soft);
+  --border-strong: var(--border-strong);
+
+  /* Shadow tokens */
+  --shadow-1: var(--shadow-1);
+  --shadow-2: var(--shadow-2);
+
+  /* Radius tokens */
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+}
+
+/* ===== Elevation System Utilities ===== */
+
+/* Page background */
+body {
+  background: var(--surface-canvas);
+}
+
+/* App panel - main container */
+.app-panel {
+  background: var(--surface-1);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2);
+}
+
+/* Section - dashboard block */
+.section {
+  background: var(--surface-1);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+}
+
+/* Section header strip */
+.section-header {
+  background: var(--surface-subtle);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+/* Card - KPI tiles, inner cards */
+.card {
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-1);
+}
+
+/* Table styling */
+.table {
+  background: var(--surface-1);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.table thead th {
+  background: var(--surface-subtle);
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.table tbody tr {
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background: color-mix(in srgb, var(--color-brand-soft) 35%, transparent);
+}
+
+/* Dividers */
+.divider {
+  border-color: var(--border-soft);
+}
+
+.divider-strong {
+  border-color: var(--border-strong);
 }

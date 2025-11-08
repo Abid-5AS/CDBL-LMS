@@ -60,7 +60,7 @@ export function LogsPanel({ logs }: LogsPanelProps) {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-xl font-semibold text-slate-900">Audit Log</h2>
+        <h2 className="text-xl font-semibold text-text-secondary">Audit Log</h2>
         <p className="text-sm text-muted-foreground">
           Recent administrative actions are captured for compliance.
         </p>
@@ -111,10 +111,10 @@ export function LogsPanel({ logs }: LogsPanelProps) {
                 {filteredLogs.map((log) => (
                   <li
                     key={log.id}
-                    className="flex flex-col gap-1 px-4 py-3 hover:bg-slate-50 transition-colors"
+                    className="flex flex-col gap-1 px-4 py-3 hover:bg-bg-secondary transition-colors"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-slate-900">
+                      <span className="font-medium text-text-secondary">
                         {log.action.replace(/_/g, " ")}
                       </span>
                       <span className="text-xs text-muted-foreground">
@@ -126,7 +126,7 @@ export function LogsPanel({ logs }: LogsPanelProps) {
                       {log.targetEmail ? ` • Target: ${log.targetEmail}` : null}
                     </div>
                     {log.details ? (
-                      <pre className="whitespace-pre-wrap rounded bg-slate-50 p-2 text-xs text-slate-600 mt-1">
+                      <pre className="whitespace-pre-wrap rounded bg-bg-secondary p-2 text-xs text-text-secondary mt-1">
                         {JSON.stringify(log.details, null, 2)}
                       </pre>
                     ) : null}

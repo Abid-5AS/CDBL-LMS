@@ -187,20 +187,20 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
 
       {/* Return Comment Alert */}
       {returnComment && (
-        <Card className="rounded-2xl border-amber-200 bg-amber-50/30 dark:bg-amber-950/10 shadow-sm">
+        <Card className="rounded-2xl border-data-warning bg-data-warning/30 dark:bg-data-warning/10 shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-amber-900 dark:text-amber-100">
-              <AlertCircle className="h-5 w-5 text-amber-600" />
+            <CardTitle className="flex items-center gap-2 text-data-warning dark:text-data-warning">
+              <AlertCircle className="h-5 w-5 text-data-warning" />
               Return Reason
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <p className="text-sm font-medium text-amber-900 dark:text-amber-100">
+              <p className="text-sm font-medium text-data-warning dark:text-data-warning">
                 Returned by {returnComment.authorName} ({returnComment.authorRole})
               </p>
-              <p className="text-sm text-amber-800 dark:text-amber-200">{returnComment.comment}</p>
-              <p className="text-xs text-amber-600 dark:text-amber-400">
+              <p className="text-sm text-data-warning dark:text-data-warning">{returnComment.comment}</p>
+              <p className="text-xs text-data-warning dark:text-data-warning">
                 {formatDate(returnComment.createdAt)}
               </p>
             </div>
@@ -244,7 +244,7 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
               {/* Reason */}
               <div className="space-y-2">
                 <Label htmlFor="reason">
-                  Reason <span className="text-red-500">*</span>
+                  Reason <span className="text-data-error">*</span>
                 </Label>
                 <Textarea
                   id="reason"
@@ -270,7 +270,7 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
                         href={leave.certificateUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:underline"
+                        className="text-sm text-data-info hover:underline"
                       >
                         View current certificate
                       </a>

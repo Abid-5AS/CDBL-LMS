@@ -186,7 +186,7 @@ export function EmployeeDashboard({
                 className={cn(
                   "min-w-[180px] justify-center gap-2",
                   customizeMode
-                    ? "bg-[color:var(--dashboard-accent)] text-white hover:bg-[color-mix(in_srgb,var(--dashboard-accent) 88%,#000 12%)] dark:hover:bg-[color-mix(in_srgb,var(--dashboard-accent) 82%,#fff 18%)]"
+                    ? "bg-[color:var(--dashboard-accent)] text-text-inverted hover:bg-[color-mix(in_srgb,var(--dashboard-accent) 88%,#000 12%)] dark:hover:bg-[color-mix(in_srgb,var(--dashboard-accent) 82%,#fff 18%)]"
                     : "border border-[color:var(--dashboard-accent)] text-[color:var(--dashboard-accent)] hover:bg-[var(--dashboard-accent-soft)]"
                 )}
               >
@@ -302,7 +302,7 @@ export function EmployeeDashboard({
                 </Button>
                 <Button
                   variant="ghost"
-                  className="gap-2 border border-red-200 bg-red-50/80 text-red-600 hover:bg-red-100 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-200"
+                  className="gap-2 border border-data-error bg-data-error/80 text-data-error hover:bg-data-error dark:border-data-error/40 dark:bg-data-error/10 dark:text-data-error"
                   disabled
                 >
                   <DisableIcon size={iconSizes.md} strokeWidth={2.1} />

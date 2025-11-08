@@ -61,7 +61,7 @@ export function NotificationDropdown() {
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
             <span
-              className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"
+              className="absolute top-1 right-1 h-2 w-2 bg-data-error rounded-full"
               aria-label={`${unreadCount} unread notifications`}
             />
           )}
@@ -94,7 +94,7 @@ export function NotificationDropdown() {
               <DropdownMenuItem
                 key={notification.id}
                 asChild
-                className={!notification.read ? "bg-blue-50" : ""}
+                className={!notification.read ? "bg-data-info" : ""}
               >
                 {notification.link ? (
                   <Link
@@ -140,7 +140,7 @@ export function NotificationDropdown() {
             <DropdownMenuItem asChild>
               <Link
                 href="/notifications"
-                className="w-full text-center text-sm text-blue-600"
+                className="w-full text-center text-sm text-data-info"
               >
                 View all notifications
               </Link>

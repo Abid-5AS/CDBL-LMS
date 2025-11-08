@@ -1,0 +1,749 @@
+"use client";
+
+import * as React from "react";
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import {
+  Calendar,
+  Clock,
+  TrendingUp,
+  Users,
+  AlertCircle,
+  CheckCircle2,
+  Plus,
+  ArrowRight,
+  Sparkles,
+  BarChart3,
+  PieChart,
+  Activity,
+  Settings,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Badge,
+  Avatar,
+  AvatarFallback,
+  Progress,
+} from "@/components/ui";
+import { useApiQuery } from "@/lib/apiClient";
+import { useLeaveRequests } from "@/hooks";
+import { formatDate } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { leaveTypeLabel } from "@/lib/ui";
+import { StatusBadge } from "@/components/shared/StatusBadge";
+import { RoleBasedDashboard, RoleKPICard } from "../shared/RoleBasedDashboard";
+import {
+  ResponsiveDashboardGrid,
+  DashboardWithSidebar,
+} from "../shared/ResponsiveDashboardGrid";
+import { TabbedContent, ExpandableCard } from "../shared/ProgressiveDisclosure";
+import useSWR from "swr";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+type EmployeeDashboardContentProps = {
+  username: string;
+};
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
+type FloatingAction = {
+  label: string;
+  description: string;
+  icon: LucideIcon;
+  accent: string;
+  onClick: () => void;
+};
+
+function FloatingQuickActions({ actions }: { actions: FloatingAction[] }) {
+  return (
+    <>
+      <div className="fixed bottom-6 right-6 z-40 hidden lg:flex flex-col gap-3">
+        {actions.map((action) => {
+          const Icon = action.icon;
+          return (
+            <button
+              key={action.label}
+              type="button"
+              onClick={action.onClick}
+              className="group relative h-14 w-14 rounded-2xl border border-border bg-card shadow-lg shadow-black/10 hover:border-primary/40 transition-all"
+              aria-label={action.label}
+            >
+              <span
+                className={cn(
+                  "flex h-full w-full items-center justify-center rounded-2xl text-base font-semibold",
+                  action.accent
+                )}
+              >
+                <Icon className="h-5 w-5" />
+              </span>
+              <div className="pointer-events-none absolute right-full mr-3 hidden min-w-[180px] rounded-2xl border border-border bg-card/95 px-3 py-2 text-left text-xs text-muted-foreground shadow-lg group-hover:block">
+                <p className="font-semibold text-foreground">{action.label}</p>
+                <p>{action.description}</p>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+      <div className="fixed bottom-4 inset-x-0 z-40 flex justify-center lg:hidden px-4">
+        <div className="flex items-center gap-2 rounded-full border border-border bg-card/95 backdrop-blur-md px-3 py-2 shadow-lg">
+          {actions.map((action) => {
+            const Icon = action.icon;
+            return (
+              <button
+                key={action.label}
+                type="button"
+                onClick={action.onClick}
+                className="flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <span
+                  className={cn(
+                    "flex h-7 w-7 items-center justify-center rounded-full",
+                    action.accent
+                  )}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                </span>
+                <span>{action.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
+}
+
+export function ModernEmployeeDashboard({
+  username,
+}: EmployeeDashboardContentProps) {
+  const router = useRouter();
+  const [showCustomization, setShowCustomization] = React.useState(false);
+
+  const { allRows: leaves, isLoading: isLoadingLeaves } = useLeaveRequests({
+    enableSelection: false,
+  });
+  const { data: balanceData, isLoading: isLoadingBalance } =
+    useApiQuery<Record<string, number>>("/api/balance/mine");
+
+  // Fetch team data
+  const { data: teamData, isLoading: isLoadingTeam } = useSWR(
+    "/api/team/status",
+    fetcher
+  );
+
+  // Fetch holidays data
+  const { data: holidaysData, isLoading: isLoadingHolidays } = useSWR(
+    "/api/holidays/upcoming",
+    fetcher
+  );
+
+  // Process data for modern cards
+  const dashboardData = React.useMemo(() => {
+    const pendingLeaves =
+      leaves?.filter(
+        (l) => l.status === "PENDING" || l.status === "SUBMITTED"
+      ) || [];
+    const returnedLeaves = leaves?.filter((l) => l.status === "RETURNED") || [];
+    const approvedLeaves = leaves?.filter((l) => l.status === "APPROVED") || [];
+
+    const totalBalance = balanceData
+      ? Object.values(balanceData).reduce((sum, val) => sum + val, 0)
+      : 0;
+    const usedThisYear =
+      leaves
+        ?.filter((l) => l.status === "APPROVED")
+        .reduce((sum, l) => sum + (l.workingDays || 0), 0) || 0;
+
+    // Process recent leaves with proper formatting
+    const recentLeaves =
+      leaves?.slice(0, 3).map((leave) => ({
+        ...leave,
+        typeLabel: leaveTypeLabel[leave.type] || leave.type,
+        formattedDates: `${formatDate(leave.startDate)} - ${formatDate(
+          leave.endDate
+        )}`,
+      })) || [];
+
+    return {
+      pendingCount: pendingLeaves.length,
+      returnedCount: returnedLeaves.length,
+      approvedCount: approvedLeaves.length,
+      totalBalance,
+      usedThisYear,
+      balanceData: balanceData || {},
+      recentLeaves,
+      pendingLeaves,
+      returnedLeaves,
+    };
+  }, [leaves, balanceData]);
+
+  // Header actions
+  const headerActions = (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={() => setShowCustomization(true)}
+      className="gap-2"
+    >
+      <Settings className="w-4 h-4" />
+      <span className="hidden sm:inline">Customize</span>
+    </Button>
+  );
+
+  const quickActions = [
+    {
+      label: "Apply for Leave",
+      description: "Start a new leave request",
+      icon: Plus,
+      accent: "bg-gradient-to-br from-indigo-500 to-purple-500 text-white",
+      onClick: () => router.push("/leaves/apply"),
+    },
+    {
+      label: "View Calendar",
+      description: "See upcoming leaves",
+      icon: Calendar,
+      accent: "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300",
+      onClick: () => router.push("/leaves"),
+    },
+    {
+      label: "Reports",
+      description: "Track your leave trends",
+      icon: BarChart3,
+      accent: "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300",
+      onClick: () => router.push("/reports"),
+    },
+    {
+      label: "Team Status",
+      description: "Check team availability",
+      icon: Users,
+      accent: "bg-slate-100 text-slate-600 dark:bg-slate-800/60 dark:text-slate-200",
+      onClick: () => router.push("/team"),
+    },
+  ];
+
+  return (
+    <>
+      <FloatingQuickActions actions={quickActions} />
+      <RoleBasedDashboard
+        role="EMPLOYEE"
+        title={`Welcome back, ${username}`}
+        description="Manage your time off, track balances, and stay updated with your leave requests"
+        actions={headerActions}
+        animate={true}
+        backgroundVariant="solid"
+      >
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="space-y-6 lg:space-y-8"
+      >
+        {/* Quick Stats Grid */}
+        <ResponsiveDashboardGrid
+          columns="2:2:4:4"
+          gap="md"
+          animate={true}
+          staggerChildren={0.1}
+          delayChildren={0.2}
+        >
+          <RoleKPICard
+            title="Pending Requests"
+            value={dashboardData.pendingCount}
+            subtitle="Awaiting approval"
+            icon={Clock}
+            role="EMPLOYEE"
+            animate={true}
+          />
+
+          <RoleKPICard
+            title="Returned Requests"
+            value={dashboardData.returnedCount}
+            subtitle="Need revision"
+            icon={AlertCircle}
+            role="EMPLOYEE"
+            animate={true}
+            trend={
+              dashboardData.returnedCount > 0
+                ? {
+                    value: dashboardData.returnedCount,
+                    label: "Action required",
+                    direction: "down" as const,
+                  }
+                : undefined
+            }
+          />
+
+          <RoleKPICard
+            title="Total Balance"
+            value={dashboardData.totalBalance}
+            subtitle="Days available"
+            icon={Calendar}
+            role="EMPLOYEE"
+            animate={true}
+          />
+
+          <RoleKPICard
+            title="Days Used"
+            value={dashboardData.usedThisYear}
+            subtitle="This year"
+            icon={BarChart3}
+            role="EMPLOYEE"
+            animate={true}
+          />
+        </ResponsiveDashboardGrid>
+
+        {/* Action Center - Show if there are returned requests */}
+        {dashboardData.returnedCount > 0 && (
+          <motion.div variants={itemVariants}>
+            <Card className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl border-l-4 border-l-red-500">
+              <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <CardTitle className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 dark:text-red-400" />
+                    <span className="hidden sm:inline">Action Required</span>
+                    <span className="sm:hidden">Action Needed</span>
+                  </CardTitle>
+                  <Badge
+                    variant="destructive"
+                    className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 text-xs"
+                  >
+                    <span className="hidden sm:inline">
+                      {dashboardData.returnedCount} Returned
+                    </span>
+                    <span className="sm:hidden">
+                      {dashboardData.returnedCount}
+                    </span>
+                  </Badge>
+                </div>
+                <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm">
+                  <span className="hidden sm:inline">
+                    You have leave requests that need to be revised and
+                    resubmitted
+                  </span>
+                  <span className="sm:hidden">Requests need revision</span>
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {dashboardData.returnedLeaves
+                    .slice(0, 3)
+                    .map((leave, index) => (
+                      <motion.div
+                        key={leave.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-xl bg-red-50/50 dark:bg-red-900/10 border border-red-200/50 dark:border-red-800/30 gap-3 sm:gap-2"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-slate-900 dark:text-white text-sm">
+                            {leaveTypeLabel[leave.type] || leave.type} Leave
+                          </p>
+                          <p className="text-xs text-slate-600 dark:text-slate-400">
+                            {formatDate(leave.startDate)} -{" "}
+                            {formatDate(leave.endDate)} ({leave.workingDays}{" "}
+                            days)
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 sm:flex-shrink-0">
+                          <StatusBadge status={leave.status} />
+                          <Button
+                            size="sm"
+                            className="bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm h-8 sm:h-9"
+                            onClick={() =>
+                              router.push(`/leaves/${leave.id}/edit`)
+                            }
+                          >
+                            <span className="hidden sm:inline">
+                              Edit & Resubmit
+                            </span>
+                            <span className="sm:hidden">Edit</span>
+                          </Button>
+                        </div>
+                      </motion.div>
+                    ))}
+                </div>
+                {dashboardData.returnedCount > 3 && (
+                  <Button
+                    variant="outline"
+                    className="w-full mt-4 border-red-200 text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-900/20"
+                    onClick={() => router.push("/leaves?filter=returned")}
+                  >
+                    View All {dashboardData.returnedCount} Returned Requests
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Main Content with Sidebar */}
+        <DashboardWithSidebar
+          sidebarPosition="right"
+          sidebar={
+            <motion.div variants={itemVariants} className="space-y-6">
+              {/* Team Status */}
+              <ExpandableCard
+                title="Team Status"
+                subtitle="Current team availability"
+                icon={Users}
+                expandedContent={
+                  <Button
+                    variant="ghost"
+                    className="w-full text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                    onClick={() => router.push("/team")}
+                  >
+                    View All Team Members
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                }
+                className="rounded-2xl border border-border bg-card shadow-sm"
+              >
+                <div className="space-y-3">
+                  {isLoadingTeam ? (
+                    <div className="space-y-3">
+                      {[1, 2, 3].map((i) => (
+                        <div
+                          key={i}
+                          className="animate-pulse flex items-center space-x-3"
+                        >
+                          <div className="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+                          <div className="flex-1 space-y-2">
+                            <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+                            <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : teamData?.members?.length > 0 ? (
+                    teamData.members
+                      .slice(0, 3)
+                      .map((member: any, index: number) => (
+                        <motion.div
+                          key={member.name}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="flex items-center space-x-3"
+                        >
+                          <Avatar className="w-8 h-8">
+                            <AvatarFallback
+                              className={cn(
+                                "text-white text-xs font-semibold",
+                                member.isOnLeave ? "bg-red-500" : "bg-green-500"
+                              )}
+                            >
+                              {member.name
+                                ?.split(" ")
+                                .map((n: string) => n[0])
+                                .join("")
+                                .slice(0, 2) || "U"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-slate-900 dark:text-white text-sm truncate">
+                              {member.name}
+                            </p>
+                            <p
+                              className={cn(
+                                "text-xs",
+                                !member.isOnLeave
+                                  ? "text-green-600 dark:text-green-400"
+                                  : "text-red-600 dark:text-red-400"
+                              )}
+                            >
+                              {member.isOnLeave ? "On Leave" : "Available"}
+                            </p>
+                          </div>
+                          <div
+                            className={cn(
+                              "w-2 h-2 rounded-full",
+                              !member.isOnLeave ? "bg-green-500" : "bg-red-500"
+                            )}
+                          />
+                        </motion.div>
+                      ))
+                  ) : (
+                    <div className="text-center py-4">
+                      <Users className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                        No team data available
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </ExpandableCard>
+
+              {/* Upcoming Holidays */}
+              <ExpandableCard
+                title="Upcoming Holidays"
+                subtitle="Company holidays and events"
+                icon={Sparkles}
+                className="rounded-2xl border border-border bg-card shadow-sm"
+              >
+                <div className="space-y-3">
+                  {isLoadingHolidays ? (
+                    <div className="space-y-3">
+                      {[1, 2].map((i) => (
+                        <div
+                          key={i}
+                          className="animate-pulse p-3 rounded-xl bg-slate-100 dark:bg-slate-700"
+                        >
+                          <div className="h-4 bg-slate-200 dark:bg-slate-600 rounded mb-2"></div>
+                          <div className="h-3 bg-slate-200 dark:bg-slate-600 rounded w-2/3"></div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : holidaysData?.holidays?.length > 0 ? (
+                    holidaysData.holidays
+                      .slice(0, 2)
+                      .map((holiday: any, index: number) => (
+                        <motion.div
+                          key={holiday.name}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="flex items-center justify-between rounded-xl border border-border bg-muted/40 dark:bg-slate-900/30 p-3"
+                        >
+                          <div>
+                            <p className="font-medium text-slate-900 dark:text-white text-sm">
+                              {holiday.name}
+                            </p>
+                            <p className="text-xs text-slate-600 dark:text-slate-400">
+                              {formatDate(holiday.date)}
+                            </p>
+                          </div>
+                          <Badge
+                            variant="outline"
+                            className="text-xs border-indigo-200 text-indigo-700 dark:border-indigo-800 dark:text-indigo-300"
+                          >
+                            {holiday.daysAway
+                              ? `${holiday.daysAway} days away`
+                              : "Today"}
+                          </Badge>
+                        </motion.div>
+                      ))
+                  ) : (
+                    <div className="text-center py-4">
+                      <Sparkles className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                        No upcoming holidays
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </ExpandableCard>
+            </motion.div>
+          }
+        >
+          <motion.div variants={itemVariants} className="space-y-6">
+            <TabbedContent
+              title="Leave Management"
+              subtitle="Balance overview and recent activity"
+              headerActions={
+                <Button
+                  size="sm"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg"
+                  onClick={() => router.push("/leaves/apply")}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Apply Leave
+                </Button>
+              }
+              tabs={[
+                {
+                  id: "balance",
+                  label: "Balance",
+                  icon: PieChart,
+                  content: isLoadingBalance ? (
+                    <div className="space-y-4">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="animate-pulse">
+                          <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded mb-2"></div>
+                          <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <ResponsiveDashboardGrid columns="1:2:2:3" gap="md">
+                      {Object.entries(dashboardData.balanceData).map(
+                        ([type, balance]) => {
+                          const colors = {
+                            CASUAL: {
+                              bg: "bg-blue-500",
+                              text: "text-blue-600",
+                              light: "bg-blue-50 dark:bg-blue-900/20",
+                            },
+                            EARNED: {
+                              bg: "bg-emerald-500",
+                              text: "text-emerald-600",
+                              light: "bg-emerald-50 dark:bg-emerald-900/20",
+                            },
+                            MEDICAL: {
+                              bg: "bg-red-500",
+                              text: "text-red-600",
+                              light: "bg-red-50 dark:bg-red-900/20",
+                            },
+                            MATERNITY: {
+                              bg: "bg-pink-500",
+                              text: "text-pink-600",
+                              light: "bg-pink-50 dark:bg-pink-900/20",
+                            },
+                            PATERNITY: {
+                              bg: "bg-purple-500",
+                              text: "text-purple-600",
+                              light: "bg-purple-50 dark:bg-purple-900/20",
+                            },
+                          };
+                          const color =
+                            colors[type as keyof typeof colors] ||
+                            colors.CASUAL;
+                          const maxBalance = 30;
+                          const percentage = Math.min(
+                            (balance / maxBalance) * 100,
+                            100
+                          );
+
+                          return (
+                            <div
+                              key={type}
+                              className={cn(
+                                "p-4 rounded-xl border border-white/20 dark:border-slate-700/50",
+                                color.light
+                              )}
+                            >
+                              <div className="flex items-center justify-between mb-3">
+                                <h4 className="font-semibold text-slate-900 dark:text-white text-sm">
+                                  {type.charAt(0) + type.slice(1).toLowerCase()}{" "}
+                                  Leave
+                                </h4>
+                                <span
+                                  className={cn(
+                                    "text-2xl font-bold",
+                                    color.text
+                                  )}
+                                >
+                                  {balance}
+                                </span>
+                              </div>
+                              <Progress
+                                value={percentage}
+                                className="h-2 mb-2"
+                              />
+                              <p className="text-xs text-slate-600 dark:text-slate-400">
+                                {balance} days available
+                              </p>
+                            </div>
+                          );
+                        }
+                      )}
+                    </ResponsiveDashboardGrid>
+                  ),
+                },
+                {
+                  id: "activity",
+                  label: "Recent Activity",
+                  icon: Activity,
+                  badge: dashboardData.recentLeaves.length.toString(),
+                  content: isLoadingLeaves ? (
+                    <div className="space-y-4">
+                      {[1, 2, 3].map((i) => (
+                        <div
+                          key={i}
+                          className="animate-pulse flex items-center space-x-4"
+                        >
+                          <div className="w-10 h-10 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+                          <div className="flex-1 space-y-2">
+                            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+                            <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : dashboardData.recentLeaves.length > 0 ? (
+                    <div className="space-y-4">
+                      {dashboardData.recentLeaves.map((leave, index) => (
+                        <motion.div
+                          key={leave.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="flex items-center space-x-4 p-3 rounded-xl bg-slate-50/50 dark:bg-slate-700/30 hover:bg-slate-100/50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
+                          onClick={() => router.push(`/leaves/${leave.id}`)}
+                        >
+                          <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                            {leave.type.charAt(0)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-slate-900 dark:text-white truncate">
+                              {leave.typeLabel}
+                            </p>
+                            <p className="text-sm text-slate-600 dark:text-slate-400">
+                              {leave.formattedDates} ({leave.workingDays} days)
+                            </p>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <StatusBadge status={leave.status} />
+                            <ArrowRight className="w-4 h-4 text-slate-400" />
+                          </div>
+                        </motion.div>
+                      ))}
+                      <Button
+                        variant="ghost"
+                        className="w-full mt-4 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                        onClick={() => router.push("/leaves")}
+                      >
+                        View All Leave Requests
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Calendar className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+                      <p className="text-slate-600 dark:text-slate-400">
+                        No recent activity
+                      </p>
+                      <p className="text-sm text-slate-500 dark:text-slate-500 mt-1">
+                        Your leave requests will appear here
+                      </p>
+                    </div>
+                  ),
+                },
+              ]}
+            />
+          </motion.div>
+        </DashboardWithSidebar>
+      </motion.div>
+    </RoleBasedDashboard>
+    </>
+  );
+}

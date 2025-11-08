@@ -63,7 +63,7 @@ export function SmartRecommendations() {
     <Card>
       <CardHeader>
         <CardTitle className="text-lg font-semibold flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-amber-500" />
+          <Sparkles className="h-5 w-5 text-data-warning" />
           Smart Recommendations
         </CardTitle>
       </CardHeader>
@@ -74,14 +74,14 @@ export function SmartRecommendations() {
               key={index}
               className={`rounded-lg border p-4 ${
                 rec.severity === "warning"
-                  ? "border-amber-200 bg-amber-50"
-                  : "border-blue-200 bg-blue-50"
+                  ? "border-data-warning bg-data-warning"
+                  : "border-data-info bg-data-info"
               }`}
             >
               <div className="flex items-start gap-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <h4 className="text-sm font-semibold text-slate-900">
+                    <h4 className="text-sm font-semibold text-text-secondary">
                       {rec.title}
                     </h4>
                     <Badge
@@ -93,7 +93,7 @@ export function SmartRecommendations() {
                       {rec.severity === "warning" ? "Important" : "Suggested"}
                     </Badge>
                   </div>
-                  <p className="text-sm text-slate-700">{rec.message}</p>
+                  <p className="text-sm text-text-secondary">{rec.message}</p>
                 </div>
               </div>
               {rec.action && (

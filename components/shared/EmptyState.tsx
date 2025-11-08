@@ -50,7 +50,7 @@ export function EmptyState({
             "flex items-center justify-center rounded-full mb-4",
             variant === "minimal"
               ? "h-12 w-12 bg-muted/50"
-              : "h-16 w-16 bg-indigo-100 dark:bg-indigo-900/30"
+              : "h-16 w-16 bg-card-action dark:bg-card-action/30"
           )}
           aria-hidden="true"
         >
@@ -58,7 +58,7 @@ export function EmptyState({
             className={cn(
               variant === "minimal"
                 ? "h-6 w-6 text-muted-foreground"
-                : "h-8 w-8 text-indigo-600 dark:text-indigo-400"
+                : "h-8 w-8 text-card-action dark:text-card-action"
             )}
           />
         </div>
@@ -111,7 +111,7 @@ export function EmptyState({
           {helpText && (
             <Link
               href="/help"
-              className="text-xs text-indigo-600 hover:text-indigo-700 hover:underline dark:text-indigo-400"
+              className="text-xs text-card-action hover:text-card-action hover:underline dark:text-card-action"
             >
               {helpText}
             </Link>

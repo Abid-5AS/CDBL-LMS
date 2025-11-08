@@ -32,20 +32,20 @@ async function HRHeadDashboardContent() {
       <div className="space-y-6">
         <HeroStrip name={username} />
 
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-slate-900 mb-4">High-Priority Leave Requests</h2>
+        <div className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-text-secondary mb-4">High-Priority Leave Requests</h2>
           <PendingLeaveRequestsTable />
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-slate-900">Returned for Modification</h3>
+            <h3 className="text-lg font-semibold text-text-secondary">Returned for Modification</h3>
             <Suspense fallback={<DashboardCardSkeleton />}>
               <ReturnedRequestsPanel />
             </Suspense>
           </div>
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-slate-900">Cancellation Requests</h3>
+            <h3 className="text-lg font-semibold text-text-secondary">Cancellation Requests</h3>
             <Suspense fallback={<DashboardCardSkeleton />}>
               <CancellationRequestsPanel />
             </Suspense>
@@ -53,17 +53,17 @@ async function HRHeadDashboardContent() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="text-lg font-medium text-slate-900 mb-3">HR Compliance</h3>
-            <p className="text-sm text-gray-600">Review policy adherence and audit trails.</p>
+          <div className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
+            <h3 className="text-lg font-medium text-text-secondary mb-3">HR Compliance</h3>
+            <p className="text-sm text-text-secondary">Review policy adherence and audit trails.</p>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="text-lg font-medium text-slate-900 mb-3">Team Management</h3>
-            <p className="text-sm text-gray-600">Oversee HR Admin activities and approvals.</p>
+          <div className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
+            <h3 className="text-lg font-medium text-text-secondary mb-3">Team Management</h3>
+            <p className="text-sm text-text-secondary">Oversee HR Admin activities and approvals.</p>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="text-lg font-medium text-slate-900 mb-3">Reports</h3>
-            <p className="text-sm text-gray-600">Generate organization-wide leave analytics.</p>
+          <div className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
+            <h3 className="text-lg font-medium text-text-secondary mb-3">Reports</h3>
+            <p className="text-sm text-text-secondary">Generate organization-wide leave analytics.</p>
           </div>
         </div>
       </div>

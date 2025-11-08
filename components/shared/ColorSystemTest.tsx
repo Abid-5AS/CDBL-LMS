@@ -1,4 +1,4 @@
-co'use client';
+'use client';
 
 /**
  * Color System Test Component
@@ -86,6 +86,67 @@ export default function ColorSystemTest() {
           <div className="bg-data-info/10 border border-data-info/20 p-4 rounded">
             <p className="text-data-info font-medium">Info</p>
           </div>
+        </div>
+      </section>
+
+      {/* Data Intensities */}
+      <section>
+        <h2 className="text-lg font-semibold text-text-primary mb-4">
+          Data Color Intensities
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            {
+              label: "Info Soft",
+              className: "bg-data-info-soft text-data-info border-data-info/30",
+            },
+            {
+              label: "Info Strong",
+              className: "bg-data-info-strong text-text-inverted border-data-info-strong/40",
+            },
+            {
+              label: "Success Soft",
+              className:
+                "bg-data-success-soft text-data-success border-data-success/30",
+            },
+            {
+              label: "Success Strong",
+              className:
+                "bg-data-success-strong text-text-inverted border-data-success-strong/40",
+            },
+            {
+              label: "Warning Soft",
+              className:
+                "bg-data-warning-soft text-data-warning border-data-warning/30",
+            },
+            {
+              label: "Warning Strong",
+              className:
+                "bg-data-warning-strong text-text-inverted border-data-warning-strong/40",
+            },
+            {
+              label: "Error Soft",
+              className:
+                "bg-data-error-soft text-data-error border-data-error/30",
+            },
+            {
+              label: "Error Strong",
+              className:
+                "bg-data-error-strong text-text-inverted border-data-error-strong/40",
+            },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className={`${item.className} p-4 rounded border`}
+            >
+              <p className="font-medium">{item.label}</p>
+              <p className="text-text-secondary text-sm">
+                {item.label.includes("Soft")
+                  ? "Muted surfaces"
+                  : "High-contrast surfaces"}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 

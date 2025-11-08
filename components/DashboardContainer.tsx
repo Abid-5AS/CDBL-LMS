@@ -50,7 +50,7 @@ function DashboardSection({ id, customizeMode, children }: DashboardSectionProps
       style={style}
       className={cn(
         "transition-all duration-300 ease-in-out",
-        customizeMode ? "rounded-xl border-2 border-dashed border-blue-300 dark:border-blue-600 bg-blue-50/30 dark:bg-blue-900/20 p-2" : "",
+        customizeMode ? "rounded-xl border-2 border-dashed border-data-info dark:border-data-info bg-data-info/30 dark:bg-data-info/20 p-2" : "",
         isDragging && "opacity-80",
       )}
     >
@@ -58,7 +58,7 @@ function DashboardSection({ id, customizeMode, children }: DashboardSectionProps
         {customizeMode && (
           <button
             type="button"
-            className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:text-slate-600"
+            className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full text-text-secondary hover:text-text-secondary"
             {...attributes}
             {...listeners}
             aria-label="Drag section"

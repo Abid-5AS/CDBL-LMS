@@ -52,15 +52,15 @@ export function PolicyPanel({ policies, onUpdatePolicy, busyPolicyId }: PolicyPa
     <div className="space-y-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900">Leave Policy Configuration</h2>
+          <h2 className="text-xl font-semibold text-text-secondary">Leave Policy Configuration</h2>
           <p className="text-sm text-muted-foreground">Tune leave limits and notice periods for each entitlement.</p>
         </div>
         <div className="text-xs text-muted-foreground">Last updated: {new Date(version).toLocaleString()}</div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-xl border border-border-strong bg-bg-primary shadow-sm">
         <table className="min-w-full divide-y divide-slate-200 text-sm">
-          <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+          <thead className="bg-bg-secondary text-left text-xs font-semibold uppercase tracking-wide text-text-secondary">
             <tr>
               <th className="px-4 py-3">Leave Type</th>
               {editableFields.map((field) => (
@@ -75,8 +75,8 @@ export function PolicyPanel({ policies, onUpdatePolicy, busyPolicyId }: PolicyPa
             {policies.map((policy) => {
               const updating = busyPolicyId === policy.id;
               return (
-                <tr key={policy.id} className="hover:bg-slate-50/60">
-                  <td className="px-4 py-3 font-medium text-slate-900">{policy.leaveType}</td>
+                <tr key={policy.id} className="hover:bg-bg-secondary/60">
+                  <td className="px-4 py-3 font-medium text-text-secondary">{policy.leaveType}</td>
                   {editableFields.map((field) => {
                     const fieldKey = field.key as keyof PolicyRecord;
                     const value = policy[fieldKey];
@@ -88,7 +88,7 @@ export function PolicyPanel({ policies, onUpdatePolicy, busyPolicyId }: PolicyPa
                           key={`${policy.id}-${fieldKey}-${value ?? ""}`}
                           defaultValue={value ?? ""}
                           onBlur={(event) => handleNumericChange(policy.id, fieldKey as any, event.target.value)}
-                          className="w-full rounded-md border border-slate-300 bg-white px-2 py-1 text-sm"
+                          className="w-full rounded-md border border-border-strong bg-bg-primary px-2 py-1 text-sm"
                           disabled={updating}
                         />
                       </td>

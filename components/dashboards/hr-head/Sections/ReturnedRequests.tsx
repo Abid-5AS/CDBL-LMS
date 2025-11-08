@@ -64,7 +64,7 @@ export function ReturnedRequestsPanel() {
   if (error) {
     return (
       <Card>
-        <CardContent className="py-12 text-center text-sm text-red-600">
+        <CardContent className="py-12 text-center text-sm text-data-error">
           Failed to load returned requests
         </CardContent>
       </Card>
@@ -95,7 +95,7 @@ export function ReturnedRequestsPanel() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <RotateCcw className="h-5 w-5 text-blue-600" />
+          <RotateCcw className="h-5 w-5 text-data-info" />
           Returned for Modification ({returnedRequests.length})
         </CardTitle>
       </CardHeader>
@@ -119,7 +119,7 @@ export function ReturnedRequestsPanel() {
                   <TableCell>
                     <Link
                       href={`/employees/${leave.requester.id}`}
-                      className="text-blue-600 hover:underline font-medium"
+                      className="text-data-info hover:underline font-medium"
                     >
                       {leave.requester.name}
                     </Link>
@@ -130,10 +130,10 @@ export function ReturnedRequestsPanel() {
                   <TableCell className="font-medium">
                     {leaveTypeLabel[leave.type] ?? leave.type}
                   </TableCell>
-                  <TableCell className="hidden sm:table-cell text-slate-600">
+                  <TableCell className="hidden sm:table-cell text-text-secondary">
                     {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell text-slate-600">
+                  <TableCell className="hidden md:table-cell text-text-secondary">
                     {leave.workingDays}
                   </TableCell>
                   <TableCell>

@@ -87,7 +87,7 @@ const GlassModalTitle = React.forwardRef<
   <DialogPrimitive.Title
     ref={ref}
     className={cn(
-      "text-lg font-semibold leading-none tracking-tight text-slate-900 dark:text-slate-100",
+      "text-lg font-semibold leading-none tracking-tight text-text-secondary dark:text-text-secondary",
       className
     )}
     {...props}
@@ -101,7 +101,7 @@ const GlassModalDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn("text-sm text-slate-600 dark:text-slate-400", className)}
+    className={cn("text-sm text-text-secondary dark:text-text-secondary", className)}
     {...props}
   />
 ));

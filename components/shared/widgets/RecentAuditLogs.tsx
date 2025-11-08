@@ -51,7 +51,7 @@ export async function RecentAuditLogs() {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Activity className="h-5 w-5 text-blue-600" />
+          <Activity className="h-5 w-5 text-data-info" />
           <CardTitle>Recent Activity</CardTitle>
         </div>
         <CardDescription>Last {logs.length} system actions</CardDescription>
@@ -75,7 +75,7 @@ export async function RecentAuditLogs() {
                 </TableCell>
                 <TableCell className="text-sm">{log.actorEmail}</TableCell>
                 <TableCell>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-100 text-blue-700">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-data-info text-data-info">
                     {log.action}
                   </span>
                 </TableCell>

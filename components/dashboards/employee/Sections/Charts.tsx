@@ -99,17 +99,17 @@ export function AnalyticsSection() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-text-secondary dark:text-text-secondary">
                     Days Used
                   </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+                  <p className="text-2xl font-bold text-text-secondary dark:text-text-secondary mt-1">
                     {summary?.periodTotal ?? 0}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                  <p className="text-xs text-text-secondary dark:text-text-secondary mt-1">
                     {summary?.periodLabel ?? "This Year"}
                   </p>
                 </div>
-                <BarChart3 className="size-8 text-blue-500" />
+                <BarChart3 className="size-8 text-data-info" />
               </div>
             </CardContent>
           </Card>
@@ -123,7 +123,7 @@ export function AnalyticsSection() {
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-1.5">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-text-secondary dark:text-text-secondary">
                       Total Used
                     </p>
                     <TooltipProvider>
@@ -133,7 +133,7 @@ export function AnalyticsSection() {
                             type="button"
                             className="inline-flex items-center"
                           >
-                            <Info className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors" />
+                            <Info className="h-3 w-3 text-text-secondary hover:text-text-secondary dark:hover:text-text-secondary transition-colors" />
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="right" className="max-w-xs">
@@ -146,14 +146,14 @@ export function AnalyticsSection() {
                       </Tooltip>
                     </TooltipProvider>
                   </div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+                  <p className="text-2xl font-bold text-text-secondary dark:text-text-secondary mt-1">
                     {summary?.totalUsed ?? 0}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                  <p className="text-xs text-text-secondary dark:text-text-secondary mt-1">
                     This Year
                   </p>
                 </div>
-                <TrendingUp className="size-8 text-green-500" />
+                <TrendingUp className="size-8 text-data-success" />
               </div>
             </CardContent>
           </Card>
@@ -165,17 +165,17 @@ export function AnalyticsSection() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-text-secondary dark:text-text-secondary">
                     Remaining
                   </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
+                  <p className="text-2xl font-bold text-text-secondary dark:text-text-secondary mt-1">
                     {summary?.remaining ?? 0}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                  <p className="text-xs text-text-secondary dark:text-text-secondary mt-1">
                     All Types
                   </p>
                 </div>
-                <Calendar className="size-8 text-amber-500" />
+                <Calendar className="size-8 text-data-warning" />
               </div>
             </CardContent>
           </Card>
@@ -183,7 +183,7 @@ export function AnalyticsSection() {
 
         {/* Period Filter - Right Side */}
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+          <span className="text-sm text-text-secondary dark:text-text-secondary whitespace-nowrap">
             View:
           </span>
           <div className="flex gap-1">

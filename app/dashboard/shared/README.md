@@ -16,10 +16,10 @@ import { Calendar } from "lucide-react";
   value="24"
   subtext="Available days"
   icon={Calendar}
-  iconColor="text-blue-600"
+  iconColor="text-data-info"
   progress={{ used: 5, total: 24 }}
   status="healthy"
-  accentColor="bg-blue-600"
+  accentColor="bg-data-info"
 />
 ```
 

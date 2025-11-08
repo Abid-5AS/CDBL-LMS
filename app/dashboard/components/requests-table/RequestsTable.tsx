@@ -65,7 +65,7 @@ export function RequestsTable({
                   asChild
                   variant="ghost"
                   size="sm"
-                  className="text-indigo-600"
+                  className="text-card-action"
                 >
                   <Link href="/leaves">View All</Link>
                 </Button>
@@ -84,7 +84,7 @@ export function RequestsTable({
                       className={clsx(
                         "h-8 rounded-full text-xs font-medium transition-all",
                         isSelected
-                          ? "bg-indigo-600 hover:bg-indigo-700 text-white border-indigo-600 shadow-sm"
+                          ? "bg-card-action hover:bg-card-action text-text-inverted border-card-action shadow-sm"
                           : "bg-bg-primary hover:bg-bg-secondary text-text-secondary border-bg-muted"
                       )}
                       aria-current={isSelected ? "page" : undefined}

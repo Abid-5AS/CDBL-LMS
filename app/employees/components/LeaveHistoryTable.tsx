@@ -15,10 +15,10 @@ type LeaveHistoryTableProps = {
 };
 
 const STATUS_VARIANTS: Record<string, string> = {
-  APPROVED: "bg-emerald-100 text-emerald-700",
-  PENDING: "bg-amber-100 text-amber-700",
-  SUBMITTED: "bg-blue-100 text-blue-700",
-  REJECTED: "bg-rose-100 text-rose-700",
+  APPROVED: "bg-data-success text-data-success",
+  PENDING: "bg-data-warning text-data-warning",
+  SUBMITTED: "bg-data-info text-data-info",
+  REJECTED: "bg-data-error text-data-error",
   CANCELLED: "bg-status-cancelled/10 text-status-cancelled",
 };
 
@@ -28,23 +28,23 @@ export function LeaveHistoryTable({ history }: LeaveHistoryTableProps) {
       <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-text-secondary">
         Recent Leave History
       </h3>
-      <div className="max-h-[250px] overflow-y-auto rounded-lg border border-slate-100 dark:border-slate-700">
+      <div className="max-h-[250px] overflow-y-auto rounded-lg border border-border-strong dark:border-border-strong">
         <Table>
-          <TableHeader className="bg-slate-50 dark:bg-slate-800/50">
+          <TableHeader className="bg-bg-secondary dark:bg-bg-secondary/50">
             <TableRow>
-              <TableHead className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
+              <TableHead className="text-xs font-semibold uppercase text-text-secondary dark:text-text-secondary">
                 Type
               </TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
+              <TableHead className="text-xs font-semibold uppercase text-text-secondary dark:text-text-secondary">
                 Start
               </TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
+              <TableHead className="text-xs font-semibold uppercase text-text-secondary dark:text-text-secondary">
                 End
               </TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
+              <TableHead className="text-xs font-semibold uppercase text-text-secondary dark:text-text-secondary">
                 Days
               </TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
+              <TableHead className="text-xs font-semibold uppercase text-text-secondary dark:text-text-secondary">
                 Status
               </TableHead>
             </TableRow>
@@ -63,25 +63,25 @@ export function LeaveHistoryTable({ history }: LeaveHistoryTableProps) {
               history.map((leave) => (
                 <TableRow
                   key={leave.id}
-                  className="hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                  className="hover:bg-bg-secondary dark:hover:bg-bg-secondary/50"
                 >
-                  <TableCell className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                  <TableCell className="text-sm font-medium text-text-secondary dark:text-text-secondary">
                     {leave.type}
                   </TableCell>
-                  <TableCell className="text-sm text-slate-600 dark:text-slate-300">
+                  <TableCell className="text-sm text-text-secondary dark:text-text-secondary">
                     {formatDate(leave.start)}
                   </TableCell>
-                  <TableCell className="text-sm text-slate-600 dark:text-slate-300">
+                  <TableCell className="text-sm text-text-secondary dark:text-text-secondary">
                     {formatDate(leave.end)}
                   </TableCell>
-                  <TableCell className="text-sm text-slate-600 dark:text-slate-300">
+                  <TableCell className="text-sm text-text-secondary dark:text-text-secondary">
                     {leave.days}
                   </TableCell>
                   <TableCell>
                     <Badge
                       className={
                         STATUS_VARIANTS[leave.status] ??
-                        "bg-slate-100 text-slate-700"
+                        "bg-bg-secondary text-text-secondary"
                       }
                     >
                       {leave.status.toLowerCase()}

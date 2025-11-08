@@ -39,14 +39,14 @@ function Avatar({ name, className }: { name: string; className?: string }) {
   const initials = getInitials(name);
   // Generate a color based on name hash for consistency
   const colors = [
-    "bg-blue-500",
-    "bg-green-500",
-    "bg-purple-500",
-    "bg-pink-500",
-    "bg-indigo-500",
-    "bg-yellow-500",
-    "bg-red-500",
-    "bg-cyan-500",
+    "bg-leave-casual",
+    "bg-leave-earned",
+    "bg-leave-sick",
+    "bg-leave-maternity",
+    "bg-leave-paternity",
+    "bg-card-action",
+    "bg-card-summary",
+    "bg-data-info",
   ];
   const colorIndex =
     name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) %
@@ -55,7 +55,7 @@ function Avatar({ name, className }: { name: string; className?: string }) {
 
   return (
     <div
-      className={`${bgColor} text-white rounded-full flex items-center justify-center font-semibold text-xs ${
+      className={`${bgColor} text-text-inverted rounded-full flex items-center justify-center font-semibold text-xs ${
         className || "size-10"
       }`}
     >
@@ -110,11 +110,11 @@ export function TeamOnLeaveWidget() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-6 text-center">
-            <User className="size-12 text-gray-300 dark:text-gray-600 mb-2" />
-            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <User className="size-12 text-text-secondary dark:text-text-secondary mb-2" />
+            <p className="text-sm font-medium text-text-secondary dark:text-text-secondary">
               No team members on leave today
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-text-secondary dark:text-text-secondary mt-1">
               All colleagues are present
             </p>
           </div>
@@ -132,7 +132,7 @@ export function TeamOnLeaveWidget() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        <p className="text-sm text-text-secondary dark:text-text-secondary mb-4">
           {count} colleague{count > 1 ? "s" : ""} on leave today
         </p>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
@@ -152,10 +152,10 @@ export function TeamOnLeaveWidget() {
                   >
                     <Avatar name={colleague.name} />
                     <div className="text-center">
-                      <p className="text-xs font-semibold text-gray-900 dark:text-gray-100 truncate max-w-[80px]">
+                      <p className="text-xs font-semibold text-text-secondary dark:text-text-secondary truncate max-w-[80px]">
                         {colleague.name.split(" ")[0]}
                       </p>
-                      <p className="text-[10px] text-gray-500 dark:text-gray-400">
+                      <p className="text-[10px] text-text-secondary dark:text-text-secondary">
                         {colleague.type}
                       </p>
                     </div>
@@ -164,10 +164,10 @@ export function TeamOnLeaveWidget() {
                 <TooltipContent>
                   <div className="text-sm">
                     <p className="font-semibold">{colleague.name}</p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-text-secondary mt-1">
                       {colleague.type} Leave
                     </p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-text-secondary">
                       {formatDate(colleague.range[0])} →{" "}
                       {formatDate(colleague.range[1])}
                     </p>

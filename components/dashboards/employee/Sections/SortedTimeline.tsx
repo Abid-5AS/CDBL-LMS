@@ -169,7 +169,7 @@ export function SortedTimeline({ leaves, isLoading }: SortedTimelineProps) {
           </div>
         </CardHeader>
         <CardContent className="p-6">
-          <div className="text-center text-gray-500 dark:text-gray-400">
+          <div className="text-center text-text-secondary dark:text-text-secondary">
             No leaves match your filters
           </div>
         </CardContent>
@@ -188,7 +188,7 @@ export function SortedTimeline({ leaves, isLoading }: SortedTimelineProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="text-blue-600 font-semibold hover:bg-blue-50 dark:hover:bg-blue-950/30 h-7 px-2 text-xs"
+            className="text-data-info font-semibold hover:bg-data-info dark:hover:bg-data-info/30 h-7 px-2 text-xs"
             onClick={() => router.push("/leaves")}
           >
             View All
@@ -199,14 +199,14 @@ export function SortedTimeline({ leaves, isLoading }: SortedTimelineProps) {
         {/* Filters */}
         <div className="flex flex-wrap gap-2">
           {/* Time filter tabs */}
-          <div className="flex gap-1 rounded-lg border border-gray-200 dark:border-gray-800 p-1">
+          <div className="flex gap-1 rounded-lg border border-border-strong dark:border-border-strong p-1">
             <button
               onClick={() => setTimeFilter("upcoming")}
               className={cn(
                 "px-3 py-1 text-xs rounded-md transition-colors",
                 timeFilter === "upcoming"
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  ? "bg-data-info text-text-inverted"
+                  : "text-text-secondary dark:text-text-secondary hover:bg-bg-secondary dark:hover:bg-bg-secondary"
               )}
             >
               Upcoming
@@ -216,8 +216,8 @@ export function SortedTimeline({ leaves, isLoading }: SortedTimelineProps) {
               className={cn(
                 "px-3 py-1 text-xs rounded-md transition-colors",
                 timeFilter === "past"
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  ? "bg-data-info text-text-inverted"
+                  : "text-text-secondary dark:text-text-secondary hover:bg-bg-secondary dark:hover:bg-bg-secondary"
               )}
             >
               Past
@@ -269,7 +269,7 @@ export function SortedTimeline({ leaves, isLoading }: SortedTimelineProps) {
           />
         </div>
         {sortedLeaves.length > 5 && (
-          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-800 text-center">
+          <div className="mt-3 pt-3 border-t border-border-strong dark:border-border-strong text-center">
             <Button
               variant="ghost"
               size="sm"

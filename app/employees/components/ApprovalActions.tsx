@@ -122,10 +122,10 @@ export function ApprovalActions({
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border-strong bg-bg-primary/95 backdrop-blur supports-[backdrop-filter]:bg-bg-primary/80">
         <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-4 px-4 py-3">
           <div className="flex flex-col text-xs text-muted-foreground">
-            <span className="font-semibold uppercase tracking-wide text-slate-600">
+            <span className="font-semibold uppercase tracking-wide text-text-secondary">
               Status
             </span>
             <span>

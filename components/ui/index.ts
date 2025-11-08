@@ -114,6 +114,12 @@ export {
   AccordionTrigger,
   AccordionContent,
 } from "./accordion";
+export {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from "./collapsible";
+export { Tabs, TabsList, TabsTrigger, TabsContent } from "./tabs";
 export { Alert, AlertTitle, AlertDescription } from "./alert";
 export {
   Breadcrumb,
@@ -139,3 +145,34 @@ export { GlassButton } from "./glass-button";
 export { GlassCard } from "./glass-card";
 export { GlassModal } from "./glass-modal";
 export { default as LiquidGlassWrapper } from "./LiquidGlassWrapper";
+export { MultiStepWizard, useMultiStepWizard } from "./multi-step-wizard";
+export { EnhancedDatePicker } from "./enhanced-date-picker";
+export { DragDropUpload } from "./drag-drop-upload";
+export {
+  FloatingLabelInput,
+  FloatingLabelTextarea,
+} from "./floating-label-input";
+export { EnhancedDataTable } from "./enhanced-data-table";
+export {
+  EnhancedModal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ConfirmationModal,
+  ModalStackProvider,
+  useModalStack,
+} from "./enhanced-modal";
+export {
+  Drawer,
+  DrawerHeader,
+  DrawerBody,
+  DrawerFooter,
+  useDrawer,
+} from "./drawer";
+export { Autocomplete, useAutocomplete } from "./autocomplete";
+export {
+  DateRangePicker,
+  useDateRange,
+  dateRangeUtils,
+} from "./date-range-picker";
+export { SmartInput, validationRules } from "./smart-input";

@@ -45,7 +45,7 @@ export function UserManagement({ users, onRoleChange, onCreate, busyUserId }: Us
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900">User Management</h2>
+          <h2 className="text-xl font-semibold text-text-secondary">User Management</h2>
           <p className="text-sm text-muted-foreground">Assign roles and manage departments for each account.</p>
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
@@ -60,9 +60,9 @@ export function UserManagement({ users, onRoleChange, onCreate, busyUserId }: Us
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-xl border border-border-strong bg-bg-primary shadow-sm">
         <table className="min-w-full divide-y divide-slate-200 text-sm">
-          <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+          <thead className="bg-bg-secondary text-left text-xs font-semibold uppercase tracking-wide text-text-secondary">
             <tr>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Email</th>
@@ -76,14 +76,14 @@ export function UserManagement({ users, onRoleChange, onCreate, busyUserId }: Us
             {filtered.map((user) => {
               const updating = busyUserId === user.id;
               return (
-                <tr key={user.id} className="hover:bg-slate-50/60">
-                  <td className="px-4 py-3 font-medium text-slate-900">{user.name}</td>
-                  <td className="px-4 py-3 text-slate-600">{user.email}</td>
-                  <td className="px-4 py-3 text-slate-600">{user.empCode ?? "—"}</td>
-                  <td className="px-4 py-3 text-slate-600">{user.department ?? "—"}</td>
+                <tr key={user.id} className="hover:bg-bg-secondary/60">
+                  <td className="px-4 py-3 font-medium text-text-secondary">{user.name}</td>
+                  <td className="px-4 py-3 text-text-secondary">{user.email}</td>
+                  <td className="px-4 py-3 text-text-secondary">{user.empCode ?? "—"}</td>
+                  <td className="px-4 py-3 text-text-secondary">{user.department ?? "—"}</td>
                   <td className="px-4 py-3">
                     <select
-                      className="w-full rounded-md border border-slate-300 bg-white px-2 py-1 text-sm"
+                      className="w-full rounded-md border border-border-strong bg-bg-primary px-2 py-1 text-sm"
                       value={user.role}
                       onChange={async (event) => {
                         const nextRole = event.target.value as AdminUserRecord["role"];

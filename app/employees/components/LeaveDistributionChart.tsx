@@ -12,8 +12,8 @@ export function LeaveDistributionChart({ data }: LeaveDistributionChartProps) {
   const total = data.reduce((acc, slice) => acc + slice.value, 0);
 
   return (
-    <div className="rounded-lg border border-slate-200 p-4 shadow-sm">
-      <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-600">
+    <div className="rounded-lg border border-border-strong p-4 shadow-sm">
+      <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-text-secondary">
         Leave Type Distribution
       </h3>
       <div className="h-[180px]">

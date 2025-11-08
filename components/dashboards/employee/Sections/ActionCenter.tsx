@@ -34,7 +34,6 @@ import {
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
-import Link from "next/link";
 import useSWR from "swr";
 import { LeaveStatus } from "@prisma/client";
 import { StatusBadge } from "@/components/shared/StatusBadge";
@@ -106,6 +105,8 @@ function ReturnedRequestRow({
   leave: ReturnedLeave;
   index: number;
 }) {
+  const router = useRouter();
+
   // Extract return information from approvals or comments already in the leave data
   const returnApproval = Array.isArray(leave.approvals)
     ? leave.approvals
@@ -194,7 +195,7 @@ function ReturnedRequestRow({
     <TableRow
       className={cn(
         "hover:bg-muted/40 transition-colors",
-        index % 2 === 0 && "bg-white dark:bg-neutral-900/50"
+        index % 2 === 0 && "bg-bg-primary dark:bg-bg-secondary/50"
       )}
     >
       <TableCell className="font-medium text-sm text-text-primary">
@@ -212,7 +213,7 @@ function ReturnedRequestRow({
         ) : returnInfo ? (
           <div className="flex items-center gap-2">
             <Avatar className="h-6 w-6">
-              <AvatarFallback className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 text-xs">
+              <AvatarFallback className="bg-card-action text-card-action dark:bg-card-action/30 dark:text-card-action text-xs">
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -253,26 +254,22 @@ function ReturnedRequestRow({
       <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-end gap-2">
           <Button
-            asChild
+            onClick={() => router.push(`/leaves/${leave.id}/edit`)}
             variant="outline"
             size="sm"
             className="text-card-action hover:bg-card-action/10 border-card-action/20"
           >
-            <Link href={`/leaves/${leave.id}/edit`}>
-              <Edit3 className="w-4 h-4 mr-1" />
-              Edit
-            </Link>
+            <Edit3 className="w-4 h-4 mr-1" />
+            Edit
           </Button>
           <Button
-            asChild
+            onClick={() => router.push(`/leaves/${leave.id}/edit`)}
             variant="default"
             size="sm"
             className="bg-card-action hover:bg-card-action/90 text-text-inverted"
           >
-            <Link href={`/leaves/${leave.id}/edit`}>
-              <Send className="w-4 h-4 mr-1" />
-              Resubmit
-            </Link>
+            <Send className="w-4 h-4 mr-1" />
+            Resubmit
           </Button>
         </div>
       </TableCell>
@@ -351,7 +348,7 @@ export function ActionCenterCard({ leaves, isLoading }: ActionCenterCardProps) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-500" />
+            <AlertCircle className="h-5 w-5 text-data-warning dark:text-data-warning" />
             <CardTitle className="text-lg font-semibold">
               Action Center
             </CardTitle>
@@ -412,27 +409,27 @@ export function ActionCenterCard({ leaves, isLoading }: ActionCenterCardProps) {
         ) : hasReturnedRequests ? (
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader className="sticky top-0 bg-background z-10 shadow-sm border-b border-neutral-200/70 dark:border-neutral-800/70">
+              <TableHeader className="sticky top-0 bg-background z-10 shadow-sm border-b border-border-strong/70 dark:border-border-strong/70">
                 <TableRow className="bg-muted/30 hover:bg-muted/30">
-                  <TableHead className="text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                  <TableHead className="text-xs font-medium text-text-secondary dark:text-text-secondary">
                     Type
                   </TableHead>
-                  <TableHead className="text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                  <TableHead className="text-xs font-medium text-text-secondary dark:text-text-secondary">
                     Dates
                   </TableHead>
-                  <TableHead className="hidden md:table-cell text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                  <TableHead className="hidden md:table-cell text-xs font-medium text-text-secondary dark:text-text-secondary">
                     Days
                   </TableHead>
-                  <TableHead className="text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                  <TableHead className="text-xs font-medium text-text-secondary dark:text-text-secondary">
                     Returned By
                   </TableHead>
-                  <TableHead className="text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                  <TableHead className="text-xs font-medium text-text-secondary dark:text-text-secondary">
                     Comment
                   </TableHead>
-                  <TableHead className="hidden lg:table-cell text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                  <TableHead className="hidden lg:table-cell text-xs font-medium text-text-secondary dark:text-text-secondary">
                     Updated
                   </TableHead>
-                  <TableHead className="text-right text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                  <TableHead className="text-right text-xs font-medium text-text-secondary dark:text-text-secondary">
                     Action
                   </TableHead>
                 </TableRow>

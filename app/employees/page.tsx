@@ -22,13 +22,13 @@ async function EmployeesPageContent() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-slate-200/50 dark:border-slate-800/50 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 p-6 shadow-sm">
+      <section className="rounded-xl border border-border-strong/50 dark:border-border-strong/50 backdrop-blur-xl bg-bg-primary/70 dark:bg-bg-secondary/70 p-6 shadow-sm">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+            <h1 className="text-2xl font-semibold text-text-secondary dark:text-text-secondary">
               Employee Directory
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground dark:text-slate-300">
+            <p className="mt-1 text-sm text-muted-foreground dark:text-text-secondary">
               Browse and search employee profiles, view leave histories, and
               manage employee information
             </p>
@@ -61,8 +61,8 @@ export default function EmployeesPage() {
 function EmployeeListFallback() {
   return (
     <div className="space-y-4">
-      <div className="h-12 bg-slate-100 dark:bg-slate-800 rounded animate-pulse" />
-      <div className="h-64 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />
+      <div className="h-12 bg-bg-secondary dark:bg-bg-secondary rounded animate-pulse" />
+      <div className="h-64 bg-bg-secondary dark:bg-bg-secondary rounded-xl animate-pulse" />
     </div>
   );
 }

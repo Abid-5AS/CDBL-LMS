@@ -1,230 +1,124 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatDate } from "@/lib/utils";
-import { Calendar } from "lucide-react";
-import { SearchInput } from "@/components/filters";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
-import useSWR from "swr";
-import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
+import { Calendar, Star, Clock, ChevronRight } from "lucide-react";
+import { Badge } from "@/components/ui";
+import { formatDate, cn } from "@/lib/utils";
+import type { Holiday } from "../hooks/useHolidaysData";
 
-type Holiday = {
-  id: number;
-  name: string;
-  date: string;
-  isOptional: boolean;
+type HolidaysListProps = {
+  holidays: Holiday[];
 };
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const itemVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
 
-export function HolidaysList() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [yearFilter, setYearFilter] = useState(
-    new Date().getFullYear().toString()
-  );
-  const [showPast, setShowPast] = useState(false);
-
-  const { data, isLoading, error } = useSWR<{ items: Holiday[] }>(
-    "/api/holidays",
-    fetcher,
-    {
-      revalidateOnFocus: false,
-    }
-  );
-
-  const allHolidays: Holiday[] = Array.isArray(data?.items) ? data.items : [];
-
-  // Get available years
-  const availableYears = useMemo(() => {
-    const years = new Set<number>();
-    allHolidays.forEach((holiday) => {
-      const year = new Date(holiday.date).getFullYear();
-      years.add(year);
-    });
-    return Array.from(years).sort((a, b) => b - a);
-  }, [allHolidays]);
-
-  const filteredHolidays = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    let filtered = allHolidays;
-
-    // Search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (holiday) =>
-          holiday.name.toLowerCase().includes(query) ||
-          formatDate(holiday.date).toLowerCase().includes(query)
-      );
-    }
-
-    // Year filter
-    if (yearFilter !== "all") {
-      const year = parseInt(yearFilter);
-      filtered = filtered.filter(
-        (holiday) => new Date(holiday.date).getFullYear() === year
-      );
-    }
-
-    // Past/Upcoming filter
-    if (!showPast) {
-      filtered = filtered.filter((holiday) => new Date(holiday.date) >= today);
-    }
-
-    return filtered.sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
-  }, [allHolidays, searchQuery, yearFilter, showPast]);
-
-  const clearFilters = () => {
-    setSearchQuery("");
-    setYearFilter(new Date().getFullYear().toString());
-    setShowPast(false);
-  };
-
-  if (isLoading) {
+export function HolidaysList({ holidays }: HolidaysListProps) {
+  if (holidays.length === 0) {
     return (
-      <Card>
-        <CardContent className="py-12 text-center text-sm text-muted-foreground">
-          Loading holidays...
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <CardContent className="py-12 text-center text-sm text-red-600">
-          Failed to load holidays
-        </CardContent>
-      </Card>
+      <div className="text-center py-12">
+        <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+        <p className="text-muted-foreground">No holidays found</p>
+        <p className="text-sm text-muted-foreground mt-1">
+          Try adjusting your filters to see more holidays
+        </p>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="flex-1 min-w-0">
-          <SearchInput
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Search by holiday name..."
-          />
-        </div>
-        <Select value={yearFilter} onValueChange={setYearFilter}>
-          <SelectTrigger className="w-full sm:w-[150px]">
-            <SelectValue placeholder="Year" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Years</SelectItem>
-            {availableYears.map((year) => (
-              <SelectItem key={year} value={year.toString()}>
-                {year}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <div className="flex items-center gap-2">
-          <Button
-            variant={showPast ? "default" : "outline"}
-            size="sm"
-            onClick={() => setShowPast(!showPast)}
-          >
-            {showPast ? "Upcoming Only" : "Show Past"}
-          </Button>
-          {(searchQuery ||
-            yearFilter !== new Date().getFullYear().toString() ||
-            showPast) && (
-            <Button variant="ghost" size="sm" onClick={clearFilters}>
-              <X className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      </div>
+    <div className="space-y-3">
+      {holidays.map((holiday, index) => {
+        const isPast = new Date(holiday.date) < new Date();
+        const holidayDate = new Date(holiday.date);
+        const today = new Date();
+        const daysUntil = Math.ceil(
+          (holidayDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+        );
 
-      {filteredHolidays.length === 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              {showPast ? "All Holidays" : "Upcoming Holidays"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              {allHolidays.length === 0
-                ? "No holidays scheduled"
-                : "No holidays match your filters"}
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              {showPast ? "All Holidays" : "Upcoming Holidays"}
-              {filteredHolidays.length !== allHolidays.length && (
-                <span className="text-sm font-normal text-muted-foreground">
-                  ({filteredHolidays.length} of {allHolidays.length})
-                </span>
-              )}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {filteredHolidays.map((holiday) => {
-                const isPast = new Date(holiday.date) < new Date();
-                return (
-                  <div
-                    key={holiday.id}
-                    className="flex items-center justify-between rounded-lg border border-bg-muted p-4 hover:bg-bg-secondary transition-colors"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium text-text-primary">
-                          {holiday.name}
-                        </p>
-                        {holiday.isOptional && (
-                          <Badge
-                            variant="outline"
-                            className="text-xs bg-blue-50 text-blue-700 border-blue-200"
-                          >
-                            Optional
-                          </Badge>
-                        )}
-                        {isPast && (
-                          <Badge
-                            variant="outline"
-                            className="text-xs bg-bg-secondary text-text-secondary"
-                          >
-                            Past
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {formatDate(holiday.date)}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
+        return (
+          <motion.div
+            key={holiday.id}
+            variants={itemVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: index * 0.05 }}
+            className={cn(
+              "group flex items-center justify-between p-4 rounded-xl border transition-all duration-300",
+              "bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border-white/20 dark:border-slate-700/50",
+              "hover:shadow-lg hover:scale-[1.01] cursor-pointer",
+              isPast && "opacity-75"
+            )}
+          >
+            {/* Left side - Holiday info */}
+            <div className="flex items-center gap-4 flex-1 min-w-0">
+              <div className="p-2 bg-indigo-500/10 rounded-lg shrink-0">
+                <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-semibold text-foreground truncate">
+                    {holiday.name}
+                  </h3>
+                  {holiday.isOptional && (
+                    <Badge variant="outline" className="text-xs shrink-0">
+                      <Star className="w-3 h-3 mr-1" />
+                      Optional
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <span>{formatDate(holiday.date)}</span>
+                  <span>•</span>
+                  <span>
+                    {holidayDate.toLocaleDateString("en-US", {
+                      weekday: "long",
+                    })}
+                  </span>
+
+                  {!isPast && daysUntil > 0 && (
+                    <>
+                      <span>•</span>
+                      <span className="text-orange-600 dark:text-orange-400">
+                        {daysUntil === 1 ? "Tomorrow" : `In ${daysUntil} days`}
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+
+            {/* Right side - Status and actions */}
+            <div className="flex items-center gap-3 shrink-0">
+              {isPast && (
+                <Badge variant="secondary" className="text-xs">
+                  Past
+                </Badge>
+              )}
+
+              {!isPast && daysUntil <= 7 && daysUntil > 0 && (
+                <Badge variant="default" className="text-xs bg-orange-500">
+                  <Clock className="w-3 h-3 mr-1" />
+                  {daysUntil}d
+                </Badge>
+              )}
+
+              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+            </div>
+          </motion.div>
+        );
+      })}
     </div>
   );
 }

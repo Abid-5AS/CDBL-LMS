@@ -5,8 +5,8 @@ import { getCurrentUser } from "@/lib/auth";
 export default async function SettingsPage() {
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Settings</h1>
+      <section className="rounded-xl border border-border-strong dark:border-border-strong bg-bg-primary dark:bg-bg-secondary p-6 shadow-sm">
+        <h1 className="text-2xl font-semibold text-text-secondary dark:text-text-secondary">Settings</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Manage your account preferences and notification settings
         </p>
@@ -40,8 +40,8 @@ async function SettingsGate() {
 function SettingsFallback() {
   return (
     <div className="space-y-6">
-      <div className="h-64 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />
-      <div className="h-48 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />
+      <div className="h-64 bg-bg-secondary dark:bg-bg-secondary rounded-xl animate-pulse" />
+      <div className="h-48 bg-bg-secondary dark:bg-bg-secondary rounded-xl animate-pulse" />
     </div>
   );
 }

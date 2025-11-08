@@ -1,21 +1,221 @@
-import * as React from "react"
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
-  return (
-    <input
-      type={type}
-      data-slot="input"
-      className={cn(
-        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-        className
-      )}
-      {...props}
-    />
-  )
+const inputVariants = cva(
+  "flex w-full border bg-background/50 backdrop-blur-sm text-foreground transition-all file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 touch-target",
+  {
+    variants: {
+      variant: {
+        default:
+          "border-border shadow-sm focus-visible:border-primary/60 focus-visible:ring-4 focus-visible:ring-primary/20 hover:border-border-strong",
+        filled:
+          "border-transparent bg-muted/60 shadow-sm focus-visible:bg-background focus-visible:border-primary/60 focus-visible:ring-4 focus-visible:ring-primary/20 hover:bg-muted/80",
+        ghost:
+          "border-transparent shadow-none focus-visible:border-primary/60 focus-visible:ring-4 focus-visible:ring-primary/20 hover:bg-muted/40",
+        glass:
+          "glass-base border-white/20 dark:border-white/10 shadow-md focus-visible:border-primary/60 focus-visible:ring-4 focus-visible:ring-primary/20",
+      },
+      size: {
+        sm: "h-9 px-3 py-2 text-sm rounded-lg",
+        default: "h-10 px-4 py-2.5 text-sm rounded-xl",
+        lg: "h-11 px-5 py-3 text-base rounded-xl",
+      },
+      state: {
+        default: "",
+        error:
+          "border-destructive/60 focus-visible:border-destructive focus-visible:ring-destructive/20",
+        success:
+          "border-success/60 focus-visible:border-success focus-visible:ring-success/20",
+        warning:
+          "border-warning/60 focus-visible:border-warning focus-visible:ring-warning/20",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+      state: "default",
+    },
+  }
+);
+
+interface InputProps
+  extends React.ComponentProps<"input">,
+    VariantProps<typeof inputVariants> {
+  label?: string;
+  helperText?: string;
+  errorMessage?: string;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+  floating?: boolean;
 }
 
-export { Input }
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  (
+    {
+      className,
+      type,
+      variant,
+      size,
+      state,
+      label,
+      helperText,
+      errorMessage,
+      leftIcon,
+      rightIcon,
+      floating = false,
+      placeholder,
+      ...props
+    },
+    ref
+  ) => {
+    const [focused, setFocused] = React.useState(false);
+    const [hasValue, setHasValue] = React.useState(false);
+    const inputId = React.useId();
+
+    const actualState = errorMessage ? "error" : state;
+    const showFloatingLabel = floating && (focused || hasValue || placeholder);
+
+    const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+      setFocused(true);
+      props.onFocus?.(e);
+    };
+
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+      setFocused(false);
+      props.onBlur?.(e);
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setHasValue(e.target.value.length > 0);
+      props.onChange?.(e);
+    };
+
+    if (floating && label) {
+      return (
+        <div className="relative">
+          <div className="relative">
+            {leftIcon && (
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                {leftIcon}
+              </div>
+            )}
+            <input
+              type={type}
+              id={inputId}
+              ref={ref}
+              className={cn(
+                inputVariants({ variant, size, state: actualState }),
+                leftIcon && "pl-10",
+                rightIcon && "pr-10",
+                floating && "placeholder-transparent",
+                className
+              )}
+              placeholder={placeholder}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              onChange={handleChange}
+              aria-describedby={
+                helperText || errorMessage
+                  ? `${inputId}-description`
+                  : undefined
+              }
+              aria-invalid={actualState === "error"}
+              {...props}
+            />
+            {rightIcon && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                {rightIcon}
+              </div>
+            )}
+            <label
+              htmlFor={inputId}
+              className={cn(
+                "absolute left-4 transition-all duration-200 pointer-events-none text-muted-foreground",
+                leftIcon && "left-10",
+                showFloatingLabel
+                  ? "-top-2 text-xs bg-background px-1 text-primary"
+                  : "top-1/2 -translate-y-1/2 text-sm"
+              )}
+            >
+              {label}
+            </label>
+          </div>
+          {(helperText || errorMessage) && (
+            <p
+              id={`${inputId}-description`}
+              className={cn(
+                "mt-1.5 text-xs",
+                actualState === "error"
+                  ? "text-destructive"
+                  : "text-muted-foreground"
+              )}
+            >
+              {errorMessage || helperText}
+            </p>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-1.5">
+        {label && (
+          <label
+            htmlFor={inputId}
+            className="text-sm font-medium text-foreground"
+          >
+            {label}
+          </label>
+        )}
+        <div className="relative">
+          {leftIcon && (
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              {leftIcon}
+            </div>
+          )}
+          <input
+            type={type}
+            id={inputId}
+            ref={ref}
+            className={cn(
+              inputVariants({ variant, size, state: actualState }),
+              leftIcon && "pl-10",
+              rightIcon && "pr-10",
+              className
+            )}
+            placeholder={placeholder}
+            aria-describedby={
+              helperText || errorMessage ? `${inputId}-description` : undefined
+            }
+            aria-invalid={actualState === "error"}
+            {...props}
+          />
+          {rightIcon && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              {rightIcon}
+            </div>
+          )}
+        </div>
+        {(helperText || errorMessage) && (
+          <p
+            id={`${inputId}-description`}
+            className={cn(
+              "text-xs",
+              actualState === "error"
+                ? "text-destructive"
+                : "text-muted-foreground"
+            )}
+          >
+            {errorMessage || helperText}
+          </p>
+        )}
+      </div>
+    );
+  }
+);
+
+Input.displayName = "Input";
+
+export { Input, inputVariants };

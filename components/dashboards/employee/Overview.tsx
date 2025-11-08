@@ -1,12 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
-
-// UI Components (barrel export)
-import { Skeleton } from "@/components/ui";
-
 // Shared components
-import { DashboardErrorBoundary } from "@/components/shared/ErrorBoundary";
 
 // Local sections
 import { DashboardGreeting } from "./Sections/Greeting";
@@ -43,37 +37,22 @@ export function EmployeeDashboardContent({
     useApiQuery<Record<string, number>>("/api/balance/mine");
 
   return (
-    <DashboardErrorBoundary role="EMPLOYEE">
-      <div className="space-y-6">
-        {/* 1. Simplified Greeting */}
-        <Suspense fallback={<Skeleton className="h-16 w-full" />}>
-          <DashboardGreeting />
-        </Suspense>
+    <div className="space-y-6">
+      {/* 1. Simplified Greeting */}
+      <DashboardGreeting />
 
-        {/* 2. Action Center Card */}
-        <Suspense fallback={<Skeleton className="h-48 w-full rounded-xl" />}>
-          <ActionCenterCard leaves={leaves} isLoading={isLoadingLeaves} />
-        </Suspense>
+      {/* 2. Action Center Card */}
+      <ActionCenterCard leaves={leaves} isLoading={isLoadingLeaves} />
 
-        {/* 3. Leave Overview Card (Tabbed) */}
-        <Suspense fallback={<Skeleton className="h-96 w-full rounded-xl" />}>
-          <LeaveOverviewCard
-            balanceData={balanceData}
-            isLoadingBalance={isLoadingBalance}
-            isLoadingLeaves={isLoadingLeaves}
-          />
-        </Suspense>
+      {/* 3. Leave Overview Card (Tabbed) */}
+      <LeaveOverviewCard
+        balanceData={balanceData}
+        isLoadingBalance={isLoadingBalance}
+        isLoadingLeaves={isLoadingLeaves}
+      />
 
-        {/* 4. History & Analytics Card (Tabbed) */}
-        <Suspense
-          fallback={<Skeleton className="h-[500px] w-full rounded-xl" />}
-        >
-          <HistoryAnalyticsCard
-            leaves={leaves}
-            isLoadingLeaves={isLoadingLeaves}
-          />
-        </Suspense>
-      </div>
-    </DashboardErrorBoundary>
+      {/* 4. History & Analytics Card (Tabbed) */}
+      <HistoryAnalyticsCard leaves={leaves} isLoadingLeaves={isLoadingLeaves} />
+    </div>
   );
 }

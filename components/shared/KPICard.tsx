@@ -51,22 +51,22 @@ export function KPICard({
   const getProgressColor = (status?: string) => {
     switch (status) {
       case "healthy":
-        return "bg-emerald-500";
+        return "bg-data-success";
       case "low":
-        return "bg-amber-500";
+        return "bg-data-warning";
       case "critical":
-        return "bg-red-500";
+        return "bg-data-error";
       default:
-        return accentColor || "bg-blue-600";
+        return accentColor || "bg-data-info";
     }
   };
 
   const getAccentBarColor = () => {
     if (accentColor) return accentColor;
-    if (status === "healthy") return "bg-emerald-500";
-    if (status === "low") return "bg-amber-500";
-    if (status === "critical") return "bg-red-500";
-    return "bg-blue-600";
+    if (status === "healthy") return "bg-data-success";
+    if (status === "low") return "bg-data-warning";
+    if (status === "critical") return "bg-data-error";
+    return "bg-data-info";
   };
 
   return (

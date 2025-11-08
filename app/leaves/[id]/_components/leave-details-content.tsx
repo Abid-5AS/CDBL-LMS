@@ -78,17 +78,17 @@ export function LeaveDetailsContent({ leave, comments, currentUserId }: LeaveDet
 
         {/* Returned Banner */}
         {isReturned && returnComment && (
-          <Card className="mb-6 rounded-2xl border-amber-200 bg-amber-50/30 dark:bg-amber-950/10 shadow-sm">
+          <Card className="mb-6 rounded-2xl border-data-warning bg-data-warning/30 dark:bg-data-warning/10 shadow-sm">
             <CardContent className="pt-6">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
-                  <div className="rounded-full bg-amber-100 dark:bg-amber-900/30 p-3">
-                    <RotateCcw className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                  <div className="rounded-full bg-data-warning dark:bg-data-warning/30 p-3">
+                    <RotateCcw className="h-6 w-6 text-data-warning dark:text-data-warning" />
                   </div>
                 </div>
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-100">
+                    <h3 className="text-lg font-semibold text-data-warning dark:text-data-warning">
                       Request Returned for Modification
                     </h3>
                     {isRequester && (
@@ -100,14 +100,14 @@ export function LeaveDetailsContent({ leave, comments, currentUserId }: LeaveDet
                       </Button>
                     )}
                   </div>
-                  <div className="rounded-lg bg-white dark:bg-card border border-amber-200 dark:border-amber-800 p-4">
-                    <p className="text-sm font-medium text-amber-900 dark:text-amber-100 mb-2">
+                  <div className="rounded-lg bg-bg-primary dark:bg-card border border-data-warning dark:border-data-warning p-4">
+                    <p className="text-sm font-medium text-data-warning dark:text-data-warning mb-2">
                       Returned by {returnComment.authorName} ({returnComment.authorRole})
                     </p>
-                    <p className="text-sm text-amber-800 dark:text-amber-200 mb-2">
+                    <p className="text-sm text-data-warning dark:text-data-warning mb-2">
                       {returnComment.comment}
                     </p>
-                    <p className="text-xs text-amber-600 dark:text-amber-400">
+                    <p className="text-xs text-data-warning dark:text-data-warning">
                       On {formatDate(returnComment.createdAt)}
                     </p>
                   </div>
@@ -203,10 +203,10 @@ export function LeaveDetailsContent({ leave, comments, currentUserId }: LeaveDet
                       <div key={approval.id} className="flex items-start gap-4">
                         <div className="flex-shrink-0">
                           <div className={`w-2 h-2 rounded-full mt-2 ${
-                            approval.decision === "APPROVED" ? "bg-green-500" :
-                            approval.decision === "REJECTED" ? "bg-red-500" :
-                            approval.decision === "FORWARDED" ? "bg-blue-500" :
-                            "bg-gray-400"
+                            approval.decision === "APPROVED" ? "bg-data-success" :
+                            approval.decision === "REJECTED" ? "bg-data-error" :
+                            approval.decision === "FORWARDED" ? "bg-data-info" :
+                            "bg-bg-secondary"
                           }`} />
                           {index < leave.approvals.length - 1 && (
                             <div className="w-0.5 h-8 bg-muted ml-1" />

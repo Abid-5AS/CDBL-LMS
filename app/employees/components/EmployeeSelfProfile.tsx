@@ -39,10 +39,10 @@ export function EmployeeSelfProfile({ employee }: EmployeeSelfProfileProps) {
       </Breadcrumb>
 
       {/* Header with personal greeting */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">
+            <h1 className="text-2xl font-semibold text-text-secondary">
               Your Profile
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -75,8 +75,8 @@ export function EmployeeSelfProfile({ employee }: EmployeeSelfProfileProps) {
       </div>
 
       {/* Analytics Charts */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-slate-900 mb-4">
+      <div className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-text-secondary mb-4">
           Your Leave Analytics
         </h2>
         <ChartsSection
@@ -86,8 +86,8 @@ export function EmployeeSelfProfile({ employee }: EmployeeSelfProfileProps) {
       </div>
 
       {/* Leave History Table */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-slate-900 mb-4">
+      <div className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-text-secondary mb-4">
           Leave History
         </h2>
         <LeaveHistoryTable history={employee.history} />

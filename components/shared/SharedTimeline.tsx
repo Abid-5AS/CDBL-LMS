@@ -87,7 +87,7 @@ export function SharedTimeline({
     return (
       <div className={cn("space-y-6", className)}>
         <div className="relative">
-          <ol className="relative border-l-2 border-slate-200 dark:border-slate-700 ml-4 space-y-6">
+          <ol className="relative border-l-2 border-border-strong dark:border-border-strong ml-4 space-y-6">
             {displayedItems.map((item, index) => {
               const isLast = index === displayedItems.length - 1;
               const status = item.status;
@@ -111,13 +111,13 @@ export function SharedTimeline({
                   {/* Timeline node */}
                   <span
                     className={cn(
-                      "absolute -left-[29px] top-0 flex h-6 w-6 items-center justify-center rounded-full ring-8 ring-white dark:ring-slate-900 transition-colors",
+                      "absolute -left-[29px] top-0 flex h-6 w-6 items-center justify-center rounded-full ring-8 ring-bg-primary dark:ring-border-strong transition-colors",
                       colors.node,
                       status === "PENDING" && "animate-pulse"
                     )}
                     aria-label={`${item.actor || "Timeline"} - ${item.title}`}
                   >
-                    {item.icon || <Icon className="h-3.5 w-3.5 text-white" />}
+                    {item.icon || <Icon className="h-3.5 w-3.5 text-text-inverted" />}
                   </span>
 
                   {/* Content */}
@@ -127,23 +127,23 @@ export function SharedTimeline({
                         <h3 className={cn("font-semibold text-sm", colors.text)}>
                           {item.actor || "Timeline"}
                           {item.status && (
-                            <span className="ml-2 text-xs font-normal text-slate-600 dark:text-slate-400">
+                            <span className="ml-2 text-xs font-normal text-text-secondary dark:text-text-secondary">
                               – {getStatusLabel(item.status)}
                             </span>
                           )}
                         </h3>
                         {item.meta?.approverName && (
-                          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                          <p className="text-xs text-text-secondary dark:text-text-secondary mt-0.5">
                             by {item.meta.approverName}
                           </p>
                         )}
                       </div>
-                      <time className="text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap shrink-0">
+                      <time className="text-xs text-text-secondary dark:text-text-secondary whitespace-nowrap shrink-0">
                         {formatDate(item.at)}
                       </time>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                      <p className="text-sm text-text-secondary dark:text-text-secondary leading-relaxed">
                         {item.title}
                       </p>
                       {item.status && (
@@ -154,7 +154,7 @@ export function SharedTimeline({
                       )}
                     </div>
                     {item.subtitle && (
-                      <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                      <p className="text-sm text-text-secondary dark:text-text-secondary leading-relaxed">
                         {item.subtitle}
                       </p>
                     )}
@@ -175,7 +175,7 @@ export function SharedTimeline({
           </ol>
         </div>
         {hasMore && onLoadMore && (
-          <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+          <div className="pt-4 border-t border-border-strong dark:border-border-strong">
             <Button variant="outline" size="sm" onClick={onLoadMore}>
               Load More
             </Button>
@@ -196,7 +196,7 @@ export function SharedTimeline({
           <div
             key={item.id}
             className={cn(
-              "flex items-center justify-between gap-4 p-4 rounded-lg bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-sm transition-all",
+              "flex items-center justify-between gap-4 p-4 rounded-lg bg-bg-primary dark:bg-bg-secondary border-2 border-border-strong dark:border-border-strong hover:border-data-info dark:hover:border-data-info hover:shadow-sm transition-all",
               dense && "p-3",
               onItemClick && "cursor-pointer"
             )}
@@ -215,17 +215,17 @@ export function SharedTimeline({
                 {status && (
                   <StatusBadge status={status as LeaveStatus} />
                 )}
-                <span className="text-base font-bold text-slate-900 dark:text-slate-100 capitalize">
+                <span className="text-base font-bold text-text-secondary dark:text-text-secondary capitalize">
                   {item.title}
                 </span>
               </div>
               {item.subtitle && (
-                <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <div className="text-sm font-semibold text-text-secondary dark:text-text-secondary mb-1">
                   {item.subtitle}
                 </div>
               )}
               {item.meta?.daysUntil !== undefined && (
-                <div className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-2.5 py-1 rounded-full mt-1">
+                <div className="inline-flex items-center gap-1.5 text-xs font-medium text-data-info dark:text-data-info bg-data-info dark:bg-data-info/30 px-2.5 py-1 rounded-full mt-1">
                   <Clock className="h-3 w-3 flex-shrink-0" strokeWidth={2} />
                   <span>
                     {item.meta.daysUntil === 0
@@ -238,11 +238,11 @@ export function SharedTimeline({
               )}
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              <time className="text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap">
+              <time className="text-xs text-text-secondary dark:text-text-secondary whitespace-nowrap">
                 {formatDate(item.at)}
               </time>
               {onItemClick && (
-                <ArrowRight className="h-4 w-4 text-slate-400" />
+                <ArrowRight className="h-4 w-4 text-text-secondary" />
               )}
             </div>
           </div>
@@ -282,39 +282,39 @@ function getStatusColors(
   switch (status) {
     case "APPROVED":
       return {
-        node: "bg-green-500 ring-green-200 dark:ring-green-900",
-        text: "text-green-700 dark:text-green-400",
-        border: "bg-green-300 dark:bg-green-700",
+        node: "bg-data-success ring-data-success dark:ring-data-success",
+        text: "text-data-success dark:text-data-success",
+        border: "bg-data-success dark:bg-data-success",
       };
     case "REJECTED":
       return {
-        node: "bg-red-500 ring-red-200 dark:ring-red-900",
-        text: "text-red-700 dark:text-red-400",
-        border: "bg-red-300 dark:bg-red-700",
+        node: "bg-data-error ring-data-error dark:ring-data-error",
+        text: "text-data-error dark:text-data-error",
+        border: "bg-data-error dark:bg-data-error",
       };
     case "FORWARDED":
       return {
-        node: "bg-blue-500 ring-blue-200 dark:ring-blue-900",
-        text: "text-blue-700 dark:text-blue-400",
-        border: "bg-blue-300 dark:bg-blue-700",
+        node: "bg-data-info ring-data-info dark:ring-data-info",
+        text: "text-data-info dark:text-data-info",
+        border: "bg-data-info dark:bg-data-info",
       };
     case "PENDING":
       return {
-        node: "bg-amber-500 ring-amber-200 dark:ring-amber-900",
-        text: "text-amber-700 dark:text-amber-400",
-        border: "bg-amber-300 dark:bg-amber-700",
+        node: "bg-data-warning ring-data-warning dark:ring-data-warning",
+        text: "text-data-warning dark:text-data-warning",
+        border: "bg-data-warning dark:bg-data-warning",
       };
     case "RETURNED":
       return {
-        node: "bg-yellow-500 ring-yellow-200 dark:ring-yellow-900",
-        text: "text-yellow-700 dark:text-yellow-400",
-        border: "bg-yellow-300 dark:bg-yellow-700",
+        node: "bg-data-warning ring-data-warning dark:ring-data-warning",
+        text: "text-data-warning dark:text-data-warning",
+        border: "bg-data-warning dark:bg-data-warning",
       };
     default:
       return {
-        node: "bg-gray-400 ring-gray-200 dark:ring-gray-800",
-        text: "text-gray-600 dark:text-gray-400",
-        border: "bg-gray-300 dark:bg-gray-700",
+        node: "bg-bg-secondary ring-border-strong dark:ring-border-strong",
+        text: "text-text-secondary dark:text-text-secondary",
+        border: "bg-bg-secondary dark:bg-bg-secondary",
       };
   }
 }

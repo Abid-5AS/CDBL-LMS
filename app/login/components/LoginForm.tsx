@@ -40,12 +40,12 @@ Label.displayName = LabelPrimitive.Root.displayName;
 // Input Component (Enhanced)
 const inputVariants = cva(
   [
-    "flex w-full min-w-0 rounded-xl border bg-gray-50/70 px-4 py-1 text-base shadow-xs",
+    "flex w-full min-w-0 rounded-xl border bg-bg-secondary/70 px-4 py-1 text-base shadow-xs",
     "transition-all duration-200 ease-out outline-none",
-    "placeholder:text-gray-400",
+    "placeholder:text-text-secondary",
     "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
-    "focus-visible:border-indigo-500",
-    "focus-visible:ring-4 focus-visible:ring-indigo-500/20",
+    "focus-visible:border-card-action",
+    "focus-visible:ring-4 focus-visible:ring-card-action/20",
   ],
   {
     variants: {
@@ -90,7 +90,7 @@ const buttonVariants = cva(
     "disabled:pointer-events-none disabled:opacity-60",
     "[&_svg:not([class*='size-'])]:size-5",
     "outline-none",
-    "focus-visible:ring-4 focus-visible:ring-indigo-500/30",
+    "focus-visible:ring-4 focus-visible:ring-card-action/30",
     "hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]",
     "hover:shadow-lg",
   ],
@@ -98,14 +98,14 @@ const buttonVariants = cva(
     variants: {
       variant: {
         gradient: [
-          "text-white shadow-lg shadow-indigo-500/30",
-          "bg-gradient-to-r from-indigo-500 to-blue-600",
-          "hover:from-indigo-600 hover:to-blue-700",
+          "text-text-inverted shadow-lg shadow-indigo-500/30",
+          "bg-gradient-to-r from-card-action to-data-info",
+          "hover:from-card-action hover:to-data-info",
         ],
         outline:
-          "border border-gray-300 bg-white text-gray-700 shadow-sm hover:bg-gray-50",
-        ghost: "hover:bg-gray-100 shadow-none",
-        link: "text-indigo-600 hover:text-indigo-700 shadow-none p-0 h-auto",
+          "border border-border-strong bg-bg-primary text-text-secondary shadow-sm hover:bg-bg-secondary",
+        ghost: "hover:bg-bg-secondary shadow-none",
+        link: "text-card-action hover:text-card-action shadow-none p-0 h-auto",
       },
       size: {
         default: "h-11 px-5 py-2",
@@ -186,15 +186,15 @@ function LoginIllustration() {
       }}
     >
       <CheckSquare
-        className="absolute -top-16 -left-16 size-32 text-gray-200/80 -rotate-12"
+        className="absolute -top-16 -left-16 size-32 text-text-secondary/80 -rotate-12"
         strokeWidth={1}
       />
       <Calendar
-        className="relative z-10 w-full h-auto text-gray-300/90"
+        className="relative z-10 w-full h-auto text-text-secondary/90"
         strokeWidth={1}
       />
-      <div className="absolute -bottom-16 -right-16 size-40 bg-blue-500/10 rounded-full blur-3xl" />
-      <div className="absolute top-0 -left-16 size-40 bg-indigo-500/10 rounded-full blur-3xl" />
+      <div className="absolute -bottom-16 -right-16 size-40 bg-data-info/10 rounded-full blur-3xl" />
+      <div className="absolute top-0 -left-16 size-40 bg-card-action/10 rounded-full blur-3xl" />
     </motion.div>
   );
 }
@@ -275,10 +275,10 @@ export function LoginForm() {
           style={getAnimationDelay(1)}
         >
           <CDBLLogo />
-          <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-700">
+          <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r bg-bg-secondary bg-bg-secondary">
             Welcome Back
           </h2>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-text-secondary">
             Sign in to your CDBL account
           </p>
         </div>
@@ -292,7 +292,7 @@ export function LoginForm() {
             <Label htmlFor="email">Email</Label>
             <div className="relative">
               <Mail
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-gray-400"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-text-secondary"
                 aria-hidden="true"
               />
               <Input
@@ -325,7 +325,7 @@ export function LoginForm() {
             </div>
             <div className="relative">
               <Lock
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-gray-400"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-text-secondary"
                 aria-hidden="true"
               />
               <Input
@@ -342,7 +342,7 @@ export function LoginForm() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-800 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-text-secondary hover:text-text-secondary transition-colors"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
@@ -357,7 +357,7 @@ export function LoginForm() {
           <AnimatePresence>
             {error && (
               <motion.div
-                className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 p-3 rounded-lg"
+                className="flex items-center gap-2 text-sm text-data-error bg-data-error border border-data-error p-3 rounded-lg"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}

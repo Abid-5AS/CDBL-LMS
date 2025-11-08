@@ -102,12 +102,12 @@ async function EmployeeDashboardSection({ params, searchParams }: EmployeePagePr
 
 function EmployeeDashboardFallback() {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="h-4 w-32 rounded bg-slate-100" />
+    <div className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
+      <div className="h-4 w-32 rounded bg-bg-secondary" />
       <div className="mt-4 space-y-3">
-        <div className="h-28 rounded-lg bg-slate-100" />
-        <div className="h-28 rounded-lg bg-slate-100" />
-        <div className="h-48 rounded-lg bg-slate-100" />
+        <div className="h-28 rounded-lg bg-bg-secondary" />
+        <div className="h-28 rounded-lg bg-bg-secondary" />
+        <div className="h-48 rounded-lg bg-bg-secondary" />
       </div>
     </div>
   );

@@ -38,10 +38,10 @@ export function ApprovalStepper({
                 className={clsx(
                   "h-1.5 w-full rounded-full transition-colors",
                   i < currentIndex
-                    ? "bg-green-500 dark:bg-green-600"
+                    ? "bg-data-success dark:bg-data-success"
                     : i === currentIndex
-                    ? "bg-amber-500 dark:bg-amber-600"
-                    : "bg-gray-300 dark:bg-gray-700"
+                    ? "bg-data-warning dark:bg-data-warning"
+                    : "bg-bg-secondary dark:bg-bg-secondary"
                 )}
                 aria-hidden="true"
               />
@@ -49,20 +49,20 @@ export function ApprovalStepper({
               {/* Stage indicator */}
               <div className="mt-2 flex items-center gap-1.5">
                 {i < currentIndex ? (
-                  <CheckCircle2 className="h-3.5 w-3.5 text-green-600 dark:text-green-500 shrink-0" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-data-success dark:text-data-success shrink-0" />
                 ) : i === currentIndex ? (
                   <div className="relative shrink-0">
-                    <div className="h-3.5 w-3.5 rounded-full bg-amber-500 dark:bg-amber-600 animate-pulse" />
-                    <div className="absolute inset-0 h-3.5 w-3.5 rounded-full border-2 border-amber-500 dark:border-amber-600 animate-ping opacity-75" />
+                    <div className="h-3.5 w-3.5 rounded-full bg-data-warning dark:bg-data-warning animate-pulse" />
+                    <div className="absolute inset-0 h-3.5 w-3.5 rounded-full border-2 border-data-warning dark:border-data-warning animate-ping opacity-75" />
                   </div>
                 ) : (
-                  <Circle className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500 shrink-0" strokeWidth={2} />
+                  <Circle className="h-3.5 w-3.5 text-text-secondary dark:text-text-secondary shrink-0" strokeWidth={2} />
                 )}
                 <span
                   className={clsx(
                     "text-[10px] leading-tight",
                     i === currentIndex
-                      ? "font-semibold text-slate-900 dark:text-slate-100"
+                      ? "font-semibold text-text-secondary dark:text-text-secondary"
                       : "text-muted-foreground"
                   )}
                 >

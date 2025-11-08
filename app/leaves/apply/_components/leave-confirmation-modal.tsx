@@ -75,51 +75,51 @@ export function LeaveConfirmationModal({
 
         <div className="space-y-4 py-4">
           {/* Leave Summary Card */}
-          <div className="rounded-xl border border-white/20 bg-white/50 dark:bg-slate-800/50 p-4 backdrop-blur-sm">
+          <div className="rounded-xl border border-bg-primary/20 bg-bg-primary/50 dark:bg-bg-secondary/50 p-4 backdrop-blur-sm">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="flex items-start gap-3">
-                <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/30">
-                  <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <div className="rounded-lg bg-data-info p-2 dark:bg-data-info/30">
+                  <Calendar className="h-4 w-4 text-data-info dark:text-data-info" />
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                  <p className="text-xs font-medium text-text-secondary dark:text-text-secondary">
                     Leave Type
                   </p>
-                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  <p className="text-sm font-semibold text-text-secondary dark:text-text-secondary">
                     {LEAVE_TYPE_LABELS[type]}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="rounded-lg bg-emerald-100 p-2 dark:bg-emerald-900/30">
-                  <Clock className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <div className="rounded-lg bg-data-success p-2 dark:bg-data-success/30">
+                  <Clock className="h-4 w-4 text-data-success dark:text-data-success" />
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                  <p className="text-xs font-medium text-text-secondary dark:text-text-secondary">
                     Duration
                   </p>
-                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  <p className="text-sm font-semibold text-text-secondary dark:text-text-secondary">
                     {duration} day(s)
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="mt-4 space-y-2 border-t border-slate-200 dark:border-slate-700 pt-4">
+            <div className="mt-4 space-y-2 border-t border-border-strong dark:border-border-strong pt-4">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600 dark:text-slate-400">
+                <span className="text-text-secondary dark:text-text-secondary">
                   Start Date
                 </span>
-                <span className="font-medium text-slate-900 dark:text-slate-100">
+                <span className="font-medium text-text-secondary dark:text-text-secondary">
                   {formatDate(startDate)}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600 dark:text-slate-400">
+                <span className="text-text-secondary dark:text-text-secondary">
                   End Date
                 </span>
-                <span className="font-medium text-slate-900 dark:text-slate-100">
+                <span className="font-medium text-text-secondary dark:text-text-secondary">
                   {formatDate(endDate)}
                 </span>
               </div>
@@ -127,40 +127,40 @@ export function LeaveConfirmationModal({
           </div>
 
           {/* Balance Impact */}
-          <div className="rounded-xl border border-white/20 bg-white/50 dark:bg-slate-800/50 p-4 backdrop-blur-sm">
-            <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-3">
+          <div className="rounded-xl border border-bg-primary/20 bg-bg-primary/50 dark:bg-bg-secondary/50 p-4 backdrop-blur-sm">
+            <h4 className="text-sm font-semibold text-text-secondary dark:text-text-secondary mb-3">
               Balance Impact
             </h4>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600 dark:text-slate-400">
+                <span className="text-text-secondary dark:text-text-secondary">
                   Current Balance
                 </span>
-                <span className="font-medium text-slate-900 dark:text-slate-100">
+                <span className="font-medium text-text-secondary dark:text-text-secondary">
                   {currentBalance} days
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600 dark:text-slate-400">
+                <span className="text-text-secondary dark:text-text-secondary">
                   After This Leave
                 </span>
                 <span
                   className={`font-semibold ${
                     isInsufficientBalance
-                      ? "text-red-600 dark:text-red-400"
+                      ? "text-data-error dark:text-data-error"
                       : projectedBalance < 2
-                      ? "text-amber-600 dark:text-amber-400"
-                      : "text-emerald-600 dark:text-emerald-400"
+                      ? "text-data-warning dark:text-data-warning"
+                      : "text-data-success dark:text-data-success"
                   }`}
                 >
                   {projectedBalance >= 0 ? projectedBalance : 0} days
                 </span>
               </div>
-              <div className="flex items-center justify-between text-sm border-t border-slate-200 dark:border-slate-700 pt-2 mt-2">
-                <span className="text-slate-600 dark:text-slate-400">
+              <div className="flex items-center justify-between text-sm border-t border-border-strong dark:border-border-strong pt-2 mt-2">
+                <span className="text-text-secondary dark:text-text-secondary">
                   Days Deducted
                 </span>
-                <span className="font-medium text-red-600 dark:text-red-400">
+                <span className="font-medium text-data-error dark:text-data-error">
                   -{Math.abs(balanceChange)} days
                 </span>
               </div>
@@ -168,24 +168,24 @@ export function LeaveConfirmationModal({
           </div>
 
           {/* Reason */}
-          <div className="rounded-xl border border-white/20 bg-white/50 dark:bg-slate-800/50 p-4 backdrop-blur-sm">
-            <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-2">
+          <div className="rounded-xl border border-bg-primary/20 bg-bg-primary/50 dark:bg-bg-secondary/50 p-4 backdrop-blur-sm">
+            <h4 className="text-sm font-semibold text-text-secondary dark:text-text-secondary mb-2">
               Reason
             </h4>
-            <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
+            <p className="text-sm text-text-secondary dark:text-text-secondary whitespace-pre-wrap">
               {reason}
             </p>
           </div>
 
           {/* Attached File */}
           {fileName && (
-            <div className="rounded-xl border border-white/20 bg-white/50 dark:bg-slate-800/50 p-4 backdrop-blur-sm">
-              <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-2">
+            <div className="rounded-xl border border-bg-primary/20 bg-bg-primary/50 dark:bg-bg-secondary/50 p-4 backdrop-blur-sm">
+              <h4 className="text-sm font-semibold text-text-secondary dark:text-text-secondary mb-2">
                 Attached Document
               </h4>
               <div className="flex items-center gap-2 text-sm">
-                <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                <span className="text-slate-700 dark:text-slate-300 truncate">
+                <FileText className="h-4 w-4 text-data-info dark:text-data-info" />
+                <span className="text-text-secondary dark:text-text-secondary truncate">
                   {fileName}
                 </span>
               </div>
@@ -194,18 +194,18 @@ export function LeaveConfirmationModal({
 
           {/* Warnings */}
           {warnings.length > 0 && (
-            <div className="rounded-xl border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 p-4">
+            <div className="rounded-xl border border-data-warning dark:border-data-warning bg-data-warning dark:bg-data-warning/20 p-4">
               <div className="flex items-start gap-2">
-                <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />
+                <AlertCircle className="h-5 w-5 text-data-warning dark:text-data-warning shrink-0" />
                 <div className="space-y-1">
-                  <h4 className="text-sm font-semibold text-amber-900 dark:text-amber-100">
+                  <h4 className="text-sm font-semibold text-data-warning dark:text-data-warning">
                     Important Notice
                   </h4>
                   <ul className="space-y-1">
                     {warnings.map((warning, idx) => (
                       <li
                         key={idx}
-                        className="text-sm text-amber-700 dark:text-amber-200"
+                        className="text-sm text-data-warning dark:text-data-warning"
                       >
                         • {warning}
                       </li>
@@ -222,14 +222,14 @@ export function LeaveConfirmationModal({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={submitting}
-            className="dark:border-slate-700"
+            className="dark:border-border-strong"
           >
             Go Back
           </Button>
           <Button
             onClick={onConfirm}
             disabled={submitting}
-            className="bg-indigo-600 hover:bg-indigo-700"
+            className="bg-card-action hover:bg-card-action"
           >
             {submitting ? "Submitting..." : "Confirm & Submit"}
           </Button>

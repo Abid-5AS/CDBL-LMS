@@ -81,34 +81,84 @@ export function ApplyLeaveForm() {
   } = useApplyLeaveForm();
   const router = useRouter();
 
+  const heroStats = [
+    {
+      label: "Current Balance",
+      value:
+        typeof balanceForType === "number" ? `${balanceForType} days` : "—",
+    },
+    {
+      label: "Requested",
+      value: requestedDays > 0 ? `${requestedDays} days` : "—",
+    },
+    {
+      label: "Projected Balance",
+      value:
+        remainingBalance || remainingBalance === 0
+          ? `${Math.max(remainingBalance, 0)} days`
+          : "—",
+      state:
+        remainingBalance < 0
+          ? "text-destructive"
+          : remainingBalance < 2
+          ? "text-data-warning"
+          : "text-data-success",
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-muted/30 py-12">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/40 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 py-12">
+      <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10 space-y-10">
         {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-2xl font-semibold text-text-primary">
-            Apply for Leave
-          </h1>
-          <p className="text-sm text-muted-foreground leading-6">
-            Fill out the details below and submit your request for review.
-          </p>
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h1 className="text-3xl font-semibold text-foreground">
+              Apply for Leave
+            </h1>
+            <p className="text-sm text-muted-foreground leading-6 max-w-2xl">
+              Share your leave details, attach supporting documents, and track
+              balances in real time before submitting.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-3 w-full lg:w-auto">
+            {heroStats.map((stat) => (
+              <Card
+                key={stat.label}
+                className="rounded-2xl border border-border bg-card/90 shadow-sm"
+              >
+                <CardContent className="p-4">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    {stat.label}
+                  </p>
+                  <p
+                    className={cn(
+                      "text-lg font-semibold text-foreground",
+                      stat.state
+                    )}
+                  >
+                    {stat.value}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
 
         {/* Two-column responsive layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* LEFT: Form Section (8 columns) */}
           <div className="lg:col-span-8 space-y-8">
-            <Card className="bg-bg-primary border border-bg-muted shadow-sm hover:shadow-md transition-all duration-300 rounded-xl">
+            <Card className="bg-card border border-border shadow-lg shadow-black/5 dark:shadow-black/30 rounded-3xl">
               <CardHeader className="p-6">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2 text-base font-semibold text-text-primary leading-6">
-                    <Calendar className="w-4 h-4 text-indigo-500" />
+                  <CardTitle className="flex items-center gap-2 text-base font-semibold text-foreground leading-6">
+                    <Calendar className="w-4 h-4 text-primary" />
                     Leave Details
                   </CardTitle>
                   {lastSavedTime && (
                     <Badge
                       variant="secondary"
-                      className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800"
+                      className="bg-data-success/15 text-data-success border border-data-success/40 dark:bg-data-success/20 dark:text-data-success"
                     >
                       <CheckCircle2 className="w-3 h-3 mr-1" />
                       Saved just now
@@ -194,7 +244,7 @@ export function ApplyLeaveForm() {
                 </CardContent>
 
                 {/* Actions inside form */}
-                <div className="flex justify-end gap-4 pt-4 border-t border-muted mt-10 px-6 pb-6">
+                <div className="flex flex-wrap justify-end gap-3 pt-6 border-t border-muted mt-6 px-6 pb-6">
                   <Button
                     type="button"
                     variant="outline"
@@ -207,7 +257,7 @@ export function ApplyLeaveForm() {
                   <Button
                     type="submit"
                     disabled={submitting}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white transition-all hover:scale-[1.02] hover:shadow-md"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all hover:scale-[1.01] hover:shadow-md rounded-full px-6"
                   >
                     <Send className="w-4 h-4 mr-2" />
                     {submitting ? "Submitting..." : "Submit Request"}
@@ -218,7 +268,7 @@ export function ApplyLeaveForm() {
           </div>
 
           {/* RIGHT: Unified Guidance Panel (4 columns) */}
-          <aside className="lg:col-span-4">
+          <aside className="lg:col-span-4 space-y-6">
             <LeaveSummarySidebar
               type={type}
               dateRange={dateRange}
@@ -229,6 +279,35 @@ export function ApplyLeaveForm() {
               warnings={warnings}
               projectedBalancePercent={projectedBalancePercent}
             />
+
+            <Card className="rounded-2xl border border-border bg-card shadow-sm p-5 space-y-3">
+              <div className="flex items-center gap-2">
+                <HelpCircle className="w-4 h-4 text-primary" />
+                <p className="text-sm font-semibold text-foreground">
+                  Need a hand?
+                </p>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Check your policy rules or chat with HR before submitting to
+                avoid rework.
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => router.push("/policies")}
+                >
+                  View Policies
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="flex-1"
+                  onClick={() => router.push("/help")}
+                >
+                  Contact HR
+                </Button>
+              </div>
+            </Card>
           </aside>
         </div>
       </div>
@@ -243,7 +322,7 @@ export function ApplyLeaveForm() {
             }}
             disabled={submitting}
             size="lg"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg transition-all hover:scale-[1.02]"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg transition-all hover:scale-[1.02]"
           >
             <Send className="w-4 h-4 mr-2" />
             {submitting ? "Submitting..." : "Submit Request"}

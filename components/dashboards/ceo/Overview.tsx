@@ -19,11 +19,11 @@ export function SuperAdminDashboard({ username }: SuperAdminDashboardProps) {
     <div className="space-y-6">
       {/* Header */}
       <section
-        className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm md:flex-row md:items-center md:justify-between"
+        className="flex flex-col gap-3 rounded-xl border border-border-strong bg-bg-primary p-4 sm:p-6 shadow-sm md:flex-row md:items-center md:justify-between"
         aria-label="Super Admin Dashboard Header"
       >
         <div>
-          <h2 className="text-2xl font-semibold text-slate-900">
+          <h2 className="text-2xl font-semibold text-text-secondary">
             Super Admin Dashboard
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
@@ -37,7 +37,7 @@ export function SuperAdminDashboard({ username }: SuperAdminDashboardProps) {
 
       {/* System Overview */}
       <section className="space-y-4">
-        <h3 className="text-lg font-semibold text-slate-900">
+        <h3 className="text-lg font-semibold text-text-secondary">
           System Overview
         </h3>
         <Suspense fallback={<OverviewCardsSkeleton />}>
@@ -47,7 +47,7 @@ export function SuperAdminDashboard({ username }: SuperAdminDashboardProps) {
                 <CardTitle className="text-sm">System Status</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-2xl font-bold text-green-600">Healthy</p>
+                <p className="text-2xl font-bold text-data-success">Healthy</p>
               </CardContent>
             </Card>
           </div>
@@ -57,14 +57,14 @@ export function SuperAdminDashboard({ username }: SuperAdminDashboardProps) {
       {/* Recent Audit Logs */}
       <section className="space-y-4" aria-label="Recent audit logs">
         <div className="flex items-center justify-between flex-col sm:flex-row gap-2 sm:gap-0">
-          <h3 className="text-lg font-semibold text-slate-900">
+          <h3 className="text-lg font-semibold text-text-secondary">
             Recent Audit Logs
           </h3>
-          <Button asChild variant="ghost" className="text-blue-600">
+          <Button asChild variant="ghost" className="text-data-info">
             <Link href="/admin">View all</Link>
           </Button>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
           <Suspense fallback={<TableSkeleton />}>
             <RecentAuditLogs />
           </Suspense>

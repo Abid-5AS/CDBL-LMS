@@ -112,10 +112,10 @@ export default function AdminDashboard({ initialUsers, initialPolicies, initialL
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col gap-2 border-b border-slate-200 dark:border-slate-700 pb-4 sm:flex-row sm:items-center sm:justify-between">
+      <header className="flex flex-col gap-2 border-b border-border-strong dark:border-border-strong pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Super Admin Console</h1>
-          <p className="text-sm text-muted-foreground dark:text-slate-300">
+          <h1 className="text-2xl font-semibold text-text-secondary dark:text-text-secondary">Super Admin Console</h1>
+          <p className="text-sm text-muted-foreground dark:text-text-secondary">
             Configure policies, manage user access, and monitor system activity.
           </p>
         </div>
@@ -142,7 +142,7 @@ export default function AdminDashboard({ initialUsers, initialPolicies, initialL
         })}
       </nav>
 
-      <section className="rounded-xl border border-slate-200/50 dark:border-slate-800/50 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 p-6 shadow-sm">
+      <section className="rounded-xl border border-border-strong/50 dark:border-border-strong/50 backdrop-blur-xl bg-bg-primary/70 dark:bg-bg-secondary/70 p-6 shadow-sm">
         <p className="mb-6 text-sm text-muted-foreground">{TABS.find((tab) => tab.id === activeTab)?.description}</p>
         {activeTab === "users" ? (
           <UserManagement

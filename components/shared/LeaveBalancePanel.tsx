@@ -50,29 +50,29 @@ const TYPE_CONFIG: Record<
   EARNED: {
     label: "Earned Leave",
     icon: Umbrella,
-    gradient: "from-amber-500 to-orange-600",
+    gradient: "from-data-warning to-data-warning",
     bgGradient:
-      "from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30",
-    borderColor: "border-amber-200 dark:border-amber-800",
-    colorClass: "bg-amber-500",
+      "from-data-warning to-data-warning dark:from-data-warning/30 dark:to-data-warning/30",
+    borderColor: "border-data-warning dark:border-data-warning",
+    colorClass: "bg-data-warning",
   },
   CASUAL: {
     label: "Casual Leave",
     icon: Zap,
-    gradient: "from-blue-500 to-cyan-600",
+    gradient: "from-data-info to-data-info",
     bgGradient:
-      "from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30",
-    borderColor: "border-blue-200 dark:border-blue-800",
-    colorClass: "bg-blue-500",
+      "from-data-info to-data-info dark:from-data-info/30 dark:to-data-info/30",
+    borderColor: "border-data-info dark:border-data-info",
+    colorClass: "bg-data-info",
   },
   MEDICAL: {
     label: "Medical Leave",
     icon: HeartPulse,
-    gradient: "from-green-500 to-emerald-600",
+    gradient: "from-data-success to-data-success",
     bgGradient:
-      "from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30",
-    borderColor: "border-green-200 dark:border-green-800",
-    colorClass: "bg-green-500",
+      "from-data-success to-data-success dark:from-data-success/30 dark:to-data-success/30",
+    borderColor: "border-data-success dark:border-data-success",
+    colorClass: "bg-data-success",
   },
 };
 
@@ -94,9 +94,9 @@ function ProgressBar({
 
   return (
     <div className={cn("space-y-1", className)}>
-      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-text-secondary dark:text-text-secondary">
         <span>{label}</span>
-        <span className="text-slate-700 dark:text-slate-300">
+        <span className="text-text-secondary dark:text-text-secondary">
           {Math.round(clampedPercent)}%
         </span>
       </div>
@@ -179,10 +179,10 @@ export function LeaveBalancePanel({
       <div className={cn("space-y-2", className)}>
         {/* Total Remaining */}
         <div className="flex items-center justify-center md:justify-end gap-2 px-2">
-          <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <span className="text-2xl font-bold text-text-secondary dark:text-text-secondary">
             {totalRemaining}
           </span>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-text-secondary dark:text-text-secondary">
             Days Remaining
           </span>
         </div>
@@ -226,7 +226,7 @@ export function LeaveBalancePanel({
                         fill="none"
                         stroke="currentColor"
                         strokeWidth="2"
-                        className="text-slate-200 dark:text-slate-700"
+                        className="text-text-secondary dark:text-text-secondary"
                       />
                       <circle
                         cx="18"
@@ -241,17 +241,17 @@ export function LeaveBalancePanel({
                       />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-xs font-bold text-gray-900 dark:text-gray-100">
+                      <span className="text-xs font-bold text-text-secondary dark:text-text-secondary">
                         {remaining}
                       </span>
                     </div>
                   </div>
                 )}
                 <div className="text-center mt-1">
-                  <p className="text-xs font-semibold text-gray-900 dark:text-gray-100">
+                  <p className="text-xs font-semibold text-text-secondary dark:text-text-secondary">
                     {config.label.split(" ")[0]}
                   </p>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400">
+                  <p className="text-[10px] text-text-secondary dark:text-text-secondary">
                     {remaining}/{balance.total}
                   </p>
                 </div>
@@ -303,16 +303,16 @@ export function LeaveBalancePanel({
                       className={cn(
                         "p-2 rounded-lg bg-gradient-to-br",
                         config.gradient,
-                        "text-white"
+                        "text-text-inverted"
                       )}
                     >
                       <Icon className="size-5" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900 dark:text-gray-100">
+                      <p className="font-semibold text-text-secondary dark:text-text-secondary">
                         {config.label}
                       </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                      <p className="text-xs text-text-secondary dark:text-text-secondary">
                         {remaining}/{balance.total} days
                       </p>
                     </div>
@@ -321,10 +321,10 @@ export function LeaveBalancePanel({
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                    <p className="text-3xl font-bold text-text-secondary dark:text-text-secondary">
                       {remaining}
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-text-secondary dark:text-text-secondary">
                       {Math.round(percentRemaining)}% remaining
                     </p>
                     {balance.projected !== undefined && (
@@ -346,7 +346,7 @@ export function LeaveBalancePanel({
                           fill="none"
                           stroke="currentColor"
                           strokeWidth="2"
-                          className="text-slate-200 dark:text-slate-700"
+                          className="text-text-secondary dark:text-text-secondary"
                         />
                         <circle
                           cx="18"
@@ -356,7 +356,7 @@ export function LeaveBalancePanel({
                           stroke="currentColor"
                           strokeWidth="2"
                           strokeDasharray={`${percentRemaining * 0.9}, 100`}
-                          className={cn(config.colorClass, "text-white")}
+                          className={cn(config.colorClass, "text-text-inverted")}
                           strokeLinecap="round"
                         />
                       </svg>
@@ -381,16 +381,16 @@ export function LeaveBalancePanel({
 
       {/* Policy hints footer */}
       {showPolicyHints && (
-        <div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20 p-4">
+        <div className="rounded-lg border border-data-warning dark:border-data-warning bg-data-warning/50 dark:bg-data-warning/20 p-4">
           <div className="flex items-start gap-2">
-            <Info className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-            <div className="flex-1 text-sm text-amber-800 dark:text-amber-200">
+            <Info className="h-4 w-4 text-data-warning dark:text-data-warning mt-0.5 shrink-0" />
+            <div className="flex-1 text-sm text-data-warning dark:text-data-warning">
               <p className="font-medium mb-1">Earned Leave Carry Forward</p>
               <p>
                 Earned leave carries forward up to 60 days.{" "}
                 <Link
                   href="/policies#earned-leave"
-                  className="underline hover:text-amber-900 dark:hover:text-amber-100 font-medium"
+                  className="underline hover:text-data-warning dark:hover:text-data-warning font-medium"
                 >
                   See Policy
                 </Link>

@@ -40,11 +40,11 @@ function ApplyLeaveFallback() {
         <div className="h-4 bg-muted/40 rounded-lg w-64" />
         <div className="grid gap-6 lg:grid-cols-12">
           <div className="lg:col-span-8 space-y-6">
-            <div className="h-96 bg-white/60 dark:bg-neutral-900/40 border border-neutral-200/70 dark:border-neutral-800/70 rounded-xl backdrop-blur-sm" />
+            <div className="h-96 bg-bg-primary/60 dark:bg-bg-secondary/40 border border-border-strong/70 dark:border-border-strong/70 rounded-xl backdrop-blur-sm" />
           </div>
           <div className="lg:col-span-4 space-y-4">
-            <div className="h-64 bg-white/60 dark:bg-neutral-900/40 border border-neutral-200/70 dark:border-neutral-800/70 rounded-xl backdrop-blur-sm" />
-            <div className="h-48 bg-white/60 dark:bg-neutral-900/40 border border-neutral-200/70 dark:border-neutral-800/70 rounded-xl backdrop-blur-sm" />
+            <div className="h-64 bg-bg-primary/60 dark:bg-bg-secondary/40 border border-border-strong/70 dark:border-border-strong/70 rounded-xl backdrop-blur-sm" />
+            <div className="h-48 bg-bg-primary/60 dark:bg-bg-secondary/40 border border-border-strong/70 dark:border-border-strong/70 rounded-xl backdrop-blur-sm" />
           </div>
         </div>
       </div>

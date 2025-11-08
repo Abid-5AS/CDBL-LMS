@@ -47,7 +47,7 @@ export function CancellationRequestsPanel() {
 
   if (error) {
     return (
-      <div className="glass-card rounded-2xl p-12 text-center text-sm text-red-600">
+      <div className="glass-card rounded-2xl p-12 text-center text-sm text-data-error">
         Failed to load cancellation requests
       </div>
     );
@@ -75,7 +75,7 @@ export function CancellationRequestsPanel() {
     <div className="glass-card rounded-2xl overflow-hidden">
       <div className="px-6 pt-6">
         <div className="flex items-center gap-2">
-          <AlertCircle className="h-5 w-5 text-amber-600" />
+          <AlertCircle className="h-5 w-5 text-data-warning" />
           <h3 className="text-lg font-semibold">Cancellation Requests</h3>
         </div>
       </div>
@@ -99,17 +99,17 @@ export function CancellationRequestsPanel() {
                   <TableCell>
                     <Link
                       href={`/employees/${leave.requester.id}`}
-                      className="text-blue-600 hover:underline font-medium"
+                      className="text-data-info hover:underline font-medium"
                     >
                       {leave.requester.name}
                     </Link>
                     <div className="text-xs text-muted-foreground">{leave.requester.email}</div>
                   </TableCell>
                   <TableCell className="font-medium">{leaveTypeLabel[leave.type] ?? leave.type}</TableCell>
-                  <TableCell className="hidden sm:table-cell text-slate-600">
+                  <TableCell className="hidden sm:table-cell text-text-secondary">
                     {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell text-slate-600">{leave.workingDays}</TableCell>
+                  <TableCell className="hidden md:table-cell text-text-secondary">{leave.workingDays}</TableCell>
                   <TableCell>
                     <StatusBadge status={leave.status as any} />
                   </TableCell>

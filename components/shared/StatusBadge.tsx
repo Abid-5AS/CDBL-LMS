@@ -30,25 +30,25 @@ const STATUS_CONFIG: Record<
   SUBMITTED: {
     label: "Submitted",
     className:
-      "bg-status-submitted text-blue-700 border-blue-200 dark:text-blue-300 dark:border-blue-800",
+      "bg-status-submitted/10 text-status-submitted border-status-submitted/20",
     icon: getIcon(leaveStatusIcons.SUBMITTED),
   },
   PENDING: {
     label: "Pending",
     className:
-      "bg-amber-50/80 text-amber-800 border-amber-200 dark:bg-amber-900/40 dark:text-amber-100 dark:border-amber-800",
+      "bg-data-warning/15 text-data-warning border-data-warning/30",
     icon: getIcon(leaveStatusIcons.PENDING),
   },
   APPROVED: {
     label: "Approved",
     className:
-      "bg-status-approved text-emerald-700 border-emerald-200 dark:text-emerald-300 dark:border-emerald-800",
+      "bg-status-approved/10 text-status-approved border-status-approved/20",
     icon: getIcon(leaveStatusIcons.APPROVED),
   },
   REJECTED: {
     label: "Rejected",
     className:
-      "bg-status-rejected text-red-700 border-red-200 dark:text-red-300 dark:border-red-800",
+      "bg-status-rejected/10 text-status-rejected border-status-rejected/20",
     icon: getIcon(leaveStatusIcons.REJECTED),
   },
   CANCELLED: {
@@ -60,7 +60,7 @@ const STATUS_CONFIG: Record<
   RETURNED: {
     label: "Returned",
     className:
-      "bg-status-returned text-yellow-800 border-yellow-300 dark:bg-yellow-900/40 dark:text-yellow-200 dark:border-yellow-800",
+      "bg-status-returned/10 text-status-returned border-status-returned/20",
     icon: getIcon(leaveStatusIcons.PENDING),
     tooltip:
       "Returned to employee for modification. Please update and resubmit.",
@@ -68,14 +68,14 @@ const STATUS_CONFIG: Record<
   CANCELLATION_REQUESTED: {
     label: "Cancellation Requested",
     className:
-      "bg-orange-50/80 text-orange-800 border-orange-300 dark:bg-orange-900/40 dark:text-orange-200 dark:border-orange-800",
+      "bg-data-warning/15 text-data-warning border-data-warning/30",
     icon: getIcon(leaveStatusIcons.PENDING),
     tooltip: "Cancellation request submitted and pending HR approval.",
   },
   RECALLED: {
     label: "Recalled",
     className:
-      "bg-purple-50/80 text-purple-800 border-purple-300 dark:bg-purple-900/40 dark:text-purple-200 dark:border-purple-800",
+      "bg-card-summary-soft text-card-summary border-card-summary-soft",
     icon: getIcon(leaveStatusIcons.PENDING),
     tooltip: "Employee recalled from leave by HR. Remaining balance restored.",
   },

@@ -23,10 +23,10 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="h-9 w-9 rounded-full transition-colors hover:bg-white/50 dark:hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40"
+          className="h-9 w-9 rounded-full transition-colors hover:bg-bg-primary/50 dark:hover:bg-bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-card-action/40"
           aria-label="User profile"
         >
-          <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 text-white font-bold text-xs">
+          <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-card-action to-card-summary text-text-inverted font-bold text-xs">
             {user.name?.[0]?.toUpperCase() ?? "U"}
           </div>
         </button>
@@ -54,7 +54,7 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={onLogout}
-          className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
+          className="text-data-error focus:text-data-error dark:text-data-error dark:focus:text-data-error"
         >
           <LogOut className="mr-2 h-4 w-4" />
           Logout

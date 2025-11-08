@@ -51,9 +51,9 @@ function TooltipContent({
           // High contrast backgrounds for accessibility (≥4.5:1 contrast ratio)
           "bg-[rgba(30,30,30,0.95)] dark:bg-[rgba(255,255,255,0.15)]",
           // White text for maximum readability
-          "text-white dark:text-[#fefefe]",
+          "text-text-inverted dark:text-[#fefefe]",
           // Subtle border with glass effect
-          "border border-white/20 dark:border-white/10",
+          "border border-bg-primary/20 dark:border-bg-primary/10",
           // Backdrop blur for glassmorphism
           "backdrop-blur-md",
           // Material 3 elevation shadow
@@ -77,7 +77,7 @@ function TooltipContent({
             // Match tooltip background
             "fill-[rgba(30,30,30,0.95)] dark:fill-[rgba(255,255,255,0.15)]",
             // Match border color
-            "stroke-white/20 dark:stroke-white/10",
+            "text-text-inverted/20 dark:text-text-inverted/10",
             "stroke-[0.5]"
           )}
         />

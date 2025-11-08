@@ -16,8 +16,8 @@ type LeaveStatsChartProps = {
 
 export function LeaveStatsChart({ data }: LeaveStatsChartProps) {
   return (
-    <div className="rounded-lg border border-slate-200 p-4 shadow-sm">
-      <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-600">
+    <div className="rounded-lg border border-border-strong p-4 shadow-sm">
+      <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-text-secondary">
         Monthly Leave Trend
       </h3>
       <div className="h-[180px]">

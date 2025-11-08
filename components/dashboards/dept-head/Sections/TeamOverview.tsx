@@ -86,21 +86,21 @@ export function DeptHeadTeamOverview() {
         <div className="grid grid-cols-2 gap-3">
           <div className="p-3 rounded-lg bg-muted/50">
             <div className="flex items-center gap-2 mb-1">
-              <Users className="h-4 w-4 text-blue-600" />
+              <Users className="h-4 w-4 text-data-info" />
               <p className="text-xs text-muted-foreground">Total Employees</p>
             </div>
             <p className="text-2xl font-bold">{data.totalEmployees}</p>
           </div>
           <div className="p-3 rounded-lg bg-muted/50">
             <div className="flex items-center gap-2 mb-1">
-              <Calendar className="h-4 w-4 text-amber-600" />
+              <Calendar className="h-4 w-4 text-data-warning" />
               <p className="text-xs text-muted-foreground">On Leave Today</p>
             </div>
             <p className="text-2xl font-bold">{data.onLeaveToday}</p>
           </div>
           <div className="p-3 rounded-lg bg-muted/50">
             <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="h-4 w-4 text-green-600" />
+              <TrendingUp className="h-4 w-4 text-data-success" />
               <p className="text-xs text-muted-foreground">Top Leave Type</p>
             </div>
             <p className="text-lg font-semibold">
@@ -109,7 +109,7 @@ export function DeptHeadTeamOverview() {
           </div>
           <div className="p-3 rounded-lg bg-muted/50">
             <div className="flex items-center gap-2 mb-1">
-              <Clock className="h-4 w-4 text-purple-600" />
+              <Clock className="h-4 w-4 text-card-summary" />
               <p className="text-xs text-muted-foreground">Avg Approval Time</p>
             </div>
             <p className="text-lg font-semibold">

@@ -37,8 +37,8 @@ export function NextHoliday() {
       <Card>
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-              <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 rounded-lg bg-data-info dark:bg-data-info/30">
+              <Calendar className="h-4 w-4 text-data-info dark:text-data-info" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-xs text-muted-foreground mb-0.5">
@@ -63,8 +63,8 @@ export function NextHoliday() {
     <Card>
       <CardContent className="p-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-            <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          <div className="p-2 rounded-lg bg-data-info dark:bg-data-info/30">
+            <Calendar className="h-4 w-4 text-data-info dark:text-data-info" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-xs text-muted-foreground mb-0.5">
@@ -76,7 +76,7 @@ export function NextHoliday() {
             <div className="text-xs text-muted-foreground mt-0.5">
               {formatDate(nextHoliday.date)}
               {daysUntil >= 0 && (
-                <span className="ml-2 text-blue-600 dark:text-blue-400 font-medium">
+                <span className="ml-2 text-data-info dark:text-data-info font-medium">
                   {daysUntil === 0
                     ? "Today"
                     : daysUntil === 1

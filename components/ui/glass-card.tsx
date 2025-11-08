@@ -15,13 +15,13 @@ const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
   ({ variant = "medium", shine, interactive, className, children, ...props }, ref) => {
     // Map variant to backdrop blur and background opacity
     const blurClass = variant === "light" ? "backdrop-blur-md" : variant === "strong" ? "backdrop-blur-2xl" : "backdrop-blur-xl";
-    const bgClass = variant === "light" ? "bg-white/60 dark:bg-[var(--bg-glass)]" : variant === "strong" ? "bg-white/80 dark:bg-[var(--bg-glass)]" : "bg-white/70 dark:bg-[var(--bg-glass)]";
+    const bgClass = variant === "light" ? "bg-bg-primary/60 dark:bg-[var(--bg-glass)]" : variant === "strong" ? "bg-bg-primary/80 dark:bg-[var(--bg-glass)]" : "bg-bg-primary/70 dark:bg-[var(--bg-glass)]";
 
     const baseStyles = cn(
       "rounded-lg transition-all duration-300",
       blurClass,
       bgClass,
-      "border border-white/30 dark:border-white/10",
+      "border border-bg-primary/30 dark:border-bg-primary/10",
       interactive && "hover:scale-[1.02] cursor-pointer",
       shine && "relative overflow-hidden",
       className
@@ -31,7 +31,7 @@ const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
       <>
         {shine && (
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -z-0"
+            className="absolute inset-0 bg-gradient-to-r from-transparent bg-bg-primary/10 to-transparent -z-0"
             initial={{ x: "-100%" }}
             animate={{ x: "200%" }}
             transition={{

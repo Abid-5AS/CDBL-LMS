@@ -63,7 +63,7 @@ export function RequestsCardView({
 
   if (error) {
     return (
-      <div className="text-center text-sm text-red-600 py-12" role="alert">
+      <div className="text-center text-sm text-data-error py-12" role="alert">
         Failed to load
       </div>
     );
@@ -109,9 +109,9 @@ export function RequestsCardView({
             key={row.id}
             className={clsx(
               "rounded-lg border border-border bg-card p-4 space-y-3 cursor-pointer",
-              "hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors",
+              "hover:border-card-action dark:hover:border-card-action transition-colors",
               isSelected &&
-                "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20"
+                "border-card-action bg-card-action dark:bg-card-action/20"
             )}
             onClick={(e) => onRowClick(row, e)}
             role="button"

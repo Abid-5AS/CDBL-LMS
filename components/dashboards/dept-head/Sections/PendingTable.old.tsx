@@ -316,7 +316,7 @@ export function DeptHeadPendingTable({
         </CardHeader>
         <CardContent className="py-12">
           <div className="text-center space-y-4">
-            <div className="text-sm font-semibold text-red-600">
+            <div className="text-sm font-semibold text-data-error">
               Failed to load requests
             </div>
             <p className="text-xs text-muted-foreground">
@@ -346,7 +346,7 @@ export function DeptHeadPendingTable({
         </CardHeader>
         <CardContent className="p-0">
           <div className="p-12 text-center bg-gradient-to-br from-muted/30 to-muted/10 rounded-lg border border-muted/60">
-            <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-green-600" />
+            <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-data-success" />
             <h3 className="text-lg font-semibold mb-2">All clear!</h3>
             <p className="text-sm text-muted-foreground">
               No pending approvals at the moment.
@@ -503,7 +503,7 @@ export function DeptHeadPendingTable({
                           <TableCell>
                             <Link
                               href={`/leaves/${leave.id}`}
-                              className="text-blue-600 hover:underline font-medium cursor-pointer"
+                              className="text-data-info hover:underline font-medium cursor-pointer"
                             >
                               {leave.requester.name}
                             </Link>
@@ -514,10 +514,10 @@ export function DeptHeadPendingTable({
                           <TableCell className="font-medium">
                             {leaveTypeLabel[leave.type] ?? leave.type}
                           </TableCell>
-                          <TableCell className="hidden sm:table-cell text-slate-600">
+                          <TableCell className="hidden sm:table-cell text-text-secondary">
                             {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
                           </TableCell>
-                          <TableCell className="hidden md:table-cell text-slate-600">
+                          <TableCell className="hidden md:table-cell text-text-secondary">
                             {leave.workingDays}
                           </TableCell>
                           <TableCell className="hidden lg:table-cell max-w-xs">
@@ -525,7 +525,7 @@ export function DeptHeadPendingTable({
                               <TooltipProvider>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <div className="truncate text-slate-600 cursor-help">
+                                    <div className="truncate text-text-secondary cursor-help">
                                       {leave.reason}
                                     </div>
                                   </TooltipTrigger>
@@ -535,14 +535,14 @@ export function DeptHeadPendingTable({
                                 </Tooltip>
                               </TooltipProvider>
                             ) : (
-                              <div className="text-slate-600">{leave.reason}</div>
+                              <div className="text-text-secondary">{leave.reason}</div>
                             )}
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <StatusBadge status={leave.status} />
                               {(leave as any).isModified && (
-                                <Badge variant="outline" className="text-xs text-blue-600 border-blue-300">
+                                <Badge variant="outline" className="text-xs text-data-info border-data-info">
                                   Modified
                                 </Badge>
                               )}
@@ -559,7 +559,7 @@ export function DeptHeadPendingTable({
                                         <Button
                                           size="icon"
                                           variant="default"
-                                          className="h-8 w-8 text-green-600 hover:bg-green-50 hover:text-green-700"
+                                          className="h-8 w-8 text-data-success hover:bg-data-success hover:text-data-success"
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             openActionDialog(leave.id, "approve", leave.type, leave.requester.name);
@@ -585,7 +585,7 @@ export function DeptHeadPendingTable({
                                         <Button
                                           size="icon"
                                           variant="outline"
-                                          className="h-8 w-8 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                                          className="h-8 w-8 text-data-info hover:bg-data-info hover:text-data-info"
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             setActionDialog({
@@ -618,7 +618,7 @@ export function DeptHeadPendingTable({
                                         <Button
                                           size="icon"
                                           variant="outline"
-                                          className="h-8 w-8 text-red-600 hover:bg-red-50 hover:text-red-700"
+                                          className="h-8 w-8 text-data-error hover:bg-data-error hover:text-data-error"
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             setActionDialog({
@@ -651,7 +651,7 @@ export function DeptHeadPendingTable({
                                       <Button
                                         size="icon"
                                         variant="ghost"
-                                        className="h-8 w-8 text-gray-600 hover:text-red-600 hover:bg-red-50"
+                                        className="h-8 w-8 text-text-secondary hover:text-data-error hover:bg-data-error"
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           setActionDialog({
@@ -913,7 +913,7 @@ export function DeptHeadPendingTable({
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="return-comment">Return Reason <span className="text-red-500">*</span></Label>
+              <Label htmlFor="return-comment">Return Reason <span className="text-data-error">*</span></Label>
               <Textarea
                 id="return-comment"
                 placeholder="e.g., Please attach medical certificate for leaves longer than 3 days"

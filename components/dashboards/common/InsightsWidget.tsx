@@ -36,24 +36,24 @@ function getSeverityConfig(kind: string) {
   ) {
     return {
       icon: AlertTriangle,
-      color: "text-yellow-600 dark:text-yellow-400",
-      bg: "bg-yellow-50 dark:bg-yellow-950/30",
-      border: "border-yellow-200 dark:border-yellow-800",
+      color: "text-data-warning dark:text-data-warning",
+      bg: "bg-data-warning dark:bg-data-warning/30",
+      border: "border-data-warning dark:border-data-warning",
     };
   }
   if (kind.includes("ERROR") || kind.includes("ACTION")) {
     return {
       icon: XCircle,
-      color: "text-red-600 dark:text-red-400",
-      bg: "bg-red-50 dark:bg-red-950/30",
-      border: "border-red-200 dark:border-red-800",
+      color: "text-data-error dark:text-data-error",
+      bg: "bg-data-error dark:bg-data-error/30",
+      border: "border-data-error dark:border-data-error",
     };
   }
   return {
     icon: Info,
-    color: "text-blue-600 dark:text-blue-400",
-    bg: "bg-blue-50 dark:bg-blue-950/30",
-    border: "border-blue-200 dark:border-blue-800",
+    color: "text-data-info dark:text-data-info",
+    bg: "bg-data-info dark:bg-data-info/30",
+    border: "border-data-info dark:border-data-info",
   };
 }
 

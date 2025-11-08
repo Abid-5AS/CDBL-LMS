@@ -117,9 +117,9 @@ export function LeaveDetailsModal({
           {/* Header Row 1: Title + Status + Close Button */}
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              <FileText className="h-5 w-5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <FileText className="h-5 w-5 text-card-action dark:text-card-action shrink-0" />
               <div className="flex items-center gap-2 min-w-0">
-                <GlassModalTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100 truncate">
+                <GlassModalTitle className="text-lg font-semibold text-text-secondary dark:text-text-secondary truncate">
                   {leaveTypeLabel[leave.type] || leave.type}
                 </GlassModalTitle>
                 <StatusBadge status={leave.status} />
@@ -149,20 +149,20 @@ export function LeaveDetailsModal({
               {currentIndex < 4 ? (
                 <>
                   Next:{" "}
-                  <span className="font-semibold text-slate-900 dark:text-slate-100">
+                  <span className="font-semibold text-text-secondary dark:text-text-secondary">
                     {nextApprover}
                   </span>
                 </>
               ) : leave.status === "APPROVED" ? (
-                <span className="text-green-600 dark:text-green-500 font-semibold">
+                <span className="text-data-success dark:text-data-success font-semibold">
                   Approved
                 </span>
               ) : leave.status === "REJECTED" ? (
-                <span className="text-red-600 dark:text-red-500 font-semibold">
+                <span className="text-data-error dark:text-data-error font-semibold">
                   Rejected
                 </span>
               ) : (
-                <span className="font-semibold text-slate-900 dark:text-slate-100">
+                <span className="font-semibold text-text-secondary dark:text-text-secondary">
                   Completed
                 </span>
               )}
@@ -182,34 +182,34 @@ export function LeaveDetailsModal({
           {/* Dates and Duration */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-start gap-2">
-              <Calendar className="h-4 w-4 text-slate-500 dark:text-slate-400 mt-0.5 shrink-0" />
+              <Calendar className="h-4 w-4 text-text-secondary dark:text-text-secondary mt-0.5 shrink-0" />
               <div>
-                <p className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+                <p className="text-xs font-medium text-text-secondary dark:text-text-secondary mb-1">
                   Start Date
                 </p>
-                <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                <p className="text-sm font-semibold text-text-secondary dark:text-text-secondary">
                   {formatDate(leave.startDate)}
                 </p>
               </div>
             </div>
             <div className="flex items-start gap-2">
-              <Calendar className="h-4 w-4 text-slate-500 dark:text-slate-400 mt-0.5 shrink-0" />
+              <Calendar className="h-4 w-4 text-text-secondary dark:text-text-secondary mt-0.5 shrink-0" />
               <div>
-                <p className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+                <p className="text-xs font-medium text-text-secondary dark:text-text-secondary mb-1">
                   End Date
                 </p>
-                <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                <p className="text-sm font-semibold text-text-secondary dark:text-text-secondary">
                   {formatDate(leave.endDate)}
                 </p>
               </div>
             </div>
             <div className="flex items-start gap-2">
-              <Clock className="h-4 w-4 text-slate-500 dark:text-slate-400 mt-0.5 shrink-0" />
+              <Clock className="h-4 w-4 text-text-secondary dark:text-text-secondary mt-0.5 shrink-0" />
               <div>
-                <p className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+                <p className="text-xs font-medium text-text-secondary dark:text-text-secondary mb-1">
                   Duration
                 </p>
-                <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                <p className="text-sm font-semibold text-text-secondary dark:text-text-secondary">
                   {leave.workingDays} {leave.workingDays === 1 ? "day" : "days"}
                 </p>
               </div>
@@ -219,11 +219,11 @@ export function LeaveDetailsModal({
           {/* Reason */}
           {leave.reason && (
             <div>
-              <p className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
+              <p className="text-xs font-medium text-text-secondary dark:text-text-secondary mb-2">
                 Reason
               </p>
-              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
-                <p className="text-sm text-slate-900 dark:text-slate-100 leading-relaxed whitespace-pre-wrap">
+              <div className="bg-bg-secondary dark:bg-bg-secondary/50 rounded-lg p-3 border border-border-strong dark:border-border-strong">
+                <p className="text-sm text-text-secondary dark:text-text-secondary leading-relaxed whitespace-pre-wrap">
                   {leave.reason}
                 </p>
               </div>
@@ -234,9 +234,9 @@ export function LeaveDetailsModal({
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem
               value="history"
-              className="border-slate-200 dark:border-slate-700"
+              className="border-border-strong dark:border-border-strong"
             >
-              <AccordionTrigger className="text-xs font-medium text-slate-700 dark:text-slate-300 py-2 hover:no-underline">
+              <AccordionTrigger className="text-xs font-medium text-text-secondary dark:text-text-secondary py-2 hover:no-underline">
                 <div className="flex items-center gap-2">
                   <User className="h-3.5 w-3.5" />
                   <span>History</span>
@@ -274,7 +274,7 @@ export function LeaveDetailsModal({
         </div>
 
         {/* Footer with Actions */}
-        <GlassModalFooter className="flex justify-between items-center pt-4 border-t border-slate-200 dark:border-slate-700 mt-4">
+        <GlassModalFooter className="flex justify-between items-center pt-4 border-t border-border-strong dark:border-border-strong mt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Close
           </Button>

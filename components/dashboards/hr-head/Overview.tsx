@@ -62,7 +62,7 @@ export function HRDashboard({ username }: HRDashboardProps) {
           <h3 className="text-lg font-semibold text-foreground">
             Pending Leave Requests
           </h3>
-          <Button asChild variant="ghost" className="text-blue-600">
+          <Button asChild variant="ghost" className="text-data-info">
             <Link href="/approvals">View all</Link>
           </Button>
         </div>

@@ -26,9 +26,9 @@ async function LoginGate() {
   }
 
   return (
-    <div className="min-h-screen w-full flex bg-white">
+    <div className="min-h-screen w-full flex bg-bg-primary">
       {/* Left Panel (40%) - Illustration */}
-      <div className="hidden lg:flex lg:w-2/5 bg-gray-50/70 p-12 relative items-center justify-center overflow-hidden">
+      <div className="hidden lg:flex lg:w-2/5 bg-bg-secondary/70 p-12 relative items-center justify-center overflow-hidden">
         <LoginIllustration />
       </div>
 
@@ -39,7 +39,7 @@ async function LoginGate() {
         </div>
         {/* Footer */}
         <div className="mt-8 text-center">
-          <p className="text-gray-500 text-xs">
+          <p className="text-text-secondary text-xs">
             v2.0 © CDBL HRD
           </p>
         </div>
@@ -49,7 +49,7 @@ async function LoginGate() {
 }
 
 function LoginFallback() {
-  return <div className="min-h-screen w-full bg-white" />;
+  return <div className="min-h-screen w-full bg-bg-primary" />;
 }
 
 // Styles component for animations and gradients

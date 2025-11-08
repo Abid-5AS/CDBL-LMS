@@ -98,18 +98,18 @@ export function MiniCalendar() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-blue-600" />
+            <Calendar className="h-5 w-5 text-data-info" />
             {monthNames[currentMonth]} {currentYear}
           </CardTitle>
         </div>
       </CardHeader>
       <CardContent>
         {/* Current date display */}
-        <div className="mb-4 p-3 rounded-lg bg-blue-50 border border-blue-200">
-          <div className="text-xs font-medium text-blue-600 uppercase tracking-wide mb-1">
+        <div className="mb-4 p-3 rounded-lg bg-data-info border border-data-info">
+          <div className="text-xs font-medium text-data-info uppercase tracking-wide mb-1">
             Today
           </div>
-          <div className="text-lg font-bold text-blue-900">
+          <div className="text-lg font-bold text-data-info">
             {new Date().toLocaleDateString("en-GB", { weekday: "long" })}{" "}
             {formatDate(new Date())}
           </div>
@@ -122,7 +122,7 @@ export function MiniCalendar() {
             {weekDays.map((day) => (
               <div
                 key={day}
-                className="text-xs font-medium text-center text-slate-600 py-1"
+                className="text-xs font-medium text-center text-text-secondary py-1"
               >
                 {day}
               </div>
@@ -148,21 +148,21 @@ export function MiniCalendar() {
                   key={index}
                   className={`aspect-square flex flex-col items-center justify-start p-1 rounded-md ${
                     isToday
-                      ? "bg-blue-600 text-white font-bold"
+                      ? "bg-data-info text-text-inverted font-bold"
                       : hasLeave
-                      ? "bg-emerald-50 border border-emerald-200"
-                      : "hover:bg-slate-50"
+                      ? "bg-data-success border border-data-success"
+                      : "hover:bg-bg-secondary"
                   }`}
                 >
                   <span
                     className={`text-xs ${
-                      isToday ? "text-white" : "text-slate-900"
+                      isToday ? "text-text-inverted" : "text-text-secondary"
                     }`}
                   >
                     {day}
                   </span>
                   {hasLeave && !isToday && (
-                    <div className="w-full h-1 bg-emerald-600 rounded-full mt-0.5" />
+                    <div className="w-full h-1 bg-data-success rounded-full mt-0.5" />
                   )}
                 </div>
               );
@@ -172,16 +172,16 @@ export function MiniCalendar() {
 
         {/* Legend */}
         {approvedLeaves.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-slate-200">
-            <div className="text-xs text-slate-600 mb-2">Legend:</div>
+          <div className="mt-4 pt-4 border-t border-border-strong">
+            <div className="text-xs text-text-secondary mb-2">Legend:</div>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded bg-emerald-100 border border-emerald-300" />
-                <span className="text-xs text-slate-600">Approved Leave</span>
+                <div className="w-3 h-3 rounded bg-data-success border border-data-success" />
+                <span className="text-xs text-text-secondary">Approved Leave</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded bg-blue-600" />
-                <span className="text-xs text-slate-600">Today</span>
+                <div className="w-3 h-3 rounded bg-data-info" />
+                <span className="text-xs text-text-secondary">Today</span>
               </div>
             </div>
           </div>

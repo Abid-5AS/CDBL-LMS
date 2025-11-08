@@ -35,13 +35,13 @@ export function EmptyState({
       aria-live="polite"
     >
       {Icon && (
-        <div className="flex items-center justify-center h-16 w-16 rounded-full bg-indigo-100 mb-4" aria-hidden="true">
-          <Icon className="h-8 w-8 text-indigo-600" />
+        <div className="flex items-center justify-center h-16 w-16 rounded-full bg-card-action mb-4" aria-hidden="true">
+          <Icon className="h-8 w-8 text-card-action" />
         </div>
       )}
-      <h3 className="text-lg font-semibold text-gray-900 mb-1">{title}</h3>
+      <h3 className="text-lg font-semibold text-text-secondary mb-1">{title}</h3>
       {description && (
-        <p className="text-sm text-gray-600 max-w-md mb-4">{description}</p>
+        <p className="text-sm text-text-secondary max-w-md mb-4">{description}</p>
       )}
       {action && (
         <div className="flex flex-col gap-2 items-center">
@@ -57,7 +57,7 @@ export function EmptyState({
             </Button>
           ) : null}
           {helpText && (
-            <Link href="/help" className="text-xs text-indigo-600 hover:text-indigo-700 hover:underline">
+            <Link href="/help" className="text-xs text-card-action hover:text-card-action hover:underline">
               {helpText}
             </Link>
           )}

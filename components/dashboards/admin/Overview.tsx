@@ -90,8 +90,8 @@ export function SystemAdminDashboard({ username }: SystemAdminDashboardProps) {
               value="Healthy"
               subtext="All systems operational"
               icon={Activity}
-              iconColor="text-green-600"
-              accentColor="bg-green-600"
+              iconColor="text-data-success"
+              accentColor="bg-data-success"
             />
           </div>
         </Suspense>
@@ -105,16 +105,16 @@ export function SystemAdminDashboard({ username }: SystemAdminDashboardProps) {
             value={systemStats.totalUsers.toString()}
             subtext="All system users"
             icon={Users}
-            iconColor="text-blue-600"
-            accentColor="bg-blue-600"
+            iconColor="text-data-info"
+            accentColor="bg-data-info"
           />
           <KPICard
             title="Active Admins"
             value={systemStats.activeAdmins.toString()}
             subtext="HR Admins + System Admins"
             icon={Shield}
-            iconColor="text-purple-600"
-            accentColor="bg-purple-600"
+            iconColor="text-card-summary"
+            accentColor="bg-card-summary"
           />
           <KPICard
             title="System Health"
@@ -125,13 +125,13 @@ export function SystemAdminDashboard({ username }: SystemAdminDashboardProps) {
             icon={Activity}
             iconColor={
               systemStats.systemHealth === "healthy"
-                ? "text-green-600"
-                : "text-amber-600"
+                ? "text-data-success"
+                : "text-data-warning"
             }
             accentColor={
               systemStats.systemHealth === "healthy"
-                ? "bg-green-600"
-                : "bg-amber-600"
+                ? "bg-data-success"
+                : "bg-data-warning"
             }
             status={systemStats.systemHealth === "healthy" ? "healthy" : "low"}
           />

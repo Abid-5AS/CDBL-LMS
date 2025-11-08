@@ -25,7 +25,7 @@ export function DashboardHeader({ username, role }: DashboardHeaderProps) {
   }
 
   return (
-    <header className="flex items-center justify-between px-8 py-4 border-b bg-white">
+    <header className="flex items-center justify-between px-8 py-4 border-b bg-bg-primary">
       <div className="flex flex-col">
         <h1 className="text-xl font-semibold text-[#0F172A]">Dashboard</h1>
         <span className="text-sm text-muted-foreground">Welcome, {name}</span>

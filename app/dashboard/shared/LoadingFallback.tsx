@@ -7,10 +7,10 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 export function DashboardLoadingFallback() {
   return (
     <div className="space-y-6">
-      <div className="h-36 rounded-xl border border-slate-200 bg-white p-6 shadow-sm animate-pulse" />
+      <div className="h-36 rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm animate-pulse" />
       <div className="grid gap-6 md:grid-cols-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="h-32 rounded-xl border border-slate-200 bg-white shadow-sm animate-pulse" />
+          <div key={i} className="h-32 rounded-xl border border-border-strong bg-bg-primary shadow-sm animate-pulse" />
         ))}
       </div>
     </div>

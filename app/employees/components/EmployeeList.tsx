@@ -150,7 +150,7 @@ export function EmployeeList() {
   if (error) {
     return (
       <Card>
-        <CardContent className="py-12 text-center text-sm text-red-600">
+        <CardContent className="py-12 text-center text-sm text-data-error">
           Failed to load employees. Please try again.
         </CardContent>
       </Card>
@@ -220,7 +220,7 @@ export function EmployeeList() {
                 {filteredEmployees.map((employee) => (
                   <TableRow
                     key={employee.id}
-                    className="hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                    className="hover:bg-bg-secondary dark:hover:bg-bg-secondary/50"
                   >
                     <TableCell className="font-medium text-text-primary">
                       {employee.name}
@@ -239,13 +239,13 @@ export function EmployeeList() {
                         variant="outline"
                         className={
                           employee.role === "CEO"
-                            ? "bg-purple-50 text-purple-700 border-purple-200"
+                            ? "bg-card-summary text-card-summary border-card-summary"
                             : employee.role === "HR_HEAD"
-                            ? "bg-blue-50 text-blue-700 border-blue-200"
+                            ? "bg-data-info text-data-info border-data-info"
                             : employee.role === "HR_ADMIN"
-                            ? "bg-cyan-50 text-cyan-700 border-cyan-200"
+                            ? "bg-data-info text-data-info border-data-info"
                             : employee.role === "DEPT_HEAD"
-                            ? "bg-green-50 text-green-700 border-green-200"
+                            ? "bg-data-success text-data-success border-data-success"
                             : "bg-bg-secondary text-text-secondary border-bg-muted"
                         }
                       >

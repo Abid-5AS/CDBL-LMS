@@ -55,19 +55,19 @@ export function PolicyAlerts() {
         return {
           variant: "destructive" as const,
           icon: AlertCircle,
-          className: "border-red-200 bg-red-50",
+          className: "border-data-error bg-data-error",
         };
       case "warning":
         return {
           variant: "destructive" as const,
           icon: AlertTriangle,
-          className: "border-amber-200 bg-amber-50",
+          className: "border-data-warning bg-data-warning",
         };
       default:
         return {
           variant: "default" as const,
           icon: Info,
-          className: "border-blue-200 bg-blue-50",
+          className: "border-data-info bg-data-info",
         };
     }
   };
@@ -84,7 +84,7 @@ export function PolicyAlerts() {
             <AlertTitle className="text-sm font-semibold">
               {alert.title}
             </AlertTitle>
-            <AlertDescription className="text-sm text-slate-700 mt-1">
+            <AlertDescription className="text-sm text-text-secondary mt-1">
               {alert.message}
               {alert.action && (
                 <div className="mt-3">

@@ -235,7 +235,7 @@ export function HistoryAnalyticsCard({
   ];
 
   return (
-    <Card className="bg-white/60 dark:bg-neutral-900/40 backdrop-blur-sm border border-neutral-200/70 dark:border-neutral-800/70 shadow-sm animate-fade-in-up">
+    <Card className="bg-bg-primary/60 dark:bg-bg-secondary/40 backdrop-blur-sm border border-border-strong/70 dark:border-border-strong/70 shadow-sm animate-fade-in-up">
       <CardHeader className="p-4 sm:p-5 space-y-4">
         {/* Title */}
         <CardTitle className="text-lg font-semibold text-text-primary">
@@ -250,7 +250,7 @@ export function HistoryAnalyticsCard({
               onClick={() => setActiveTab(tab.value as typeof activeTab)}
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 activeTab === tab.value
-                  ? "bg-indigo-600 text-white dark:bg-indigo-500"
+                  ? "bg-card-action text-text-inverted dark:bg-card-action"
                   : "bg-muted text-muted-foreground hover:bg-muted/80 dark:bg-muted/60"
               }`}
             >
@@ -268,7 +268,7 @@ export function HistoryAnalyticsCard({
                 onClick={() => setFilter(option.value)}
                 className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
                   filter === option.value
-                    ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-800/40 dark:text-indigo-300"
+                    ? "bg-card-action text-card-action dark:bg-card-action/40 dark:text-card-action"
                     : "bg-muted text-muted-foreground hover:bg-muted/70 dark:bg-muted/60"
                 }`}
               >
@@ -280,39 +280,39 @@ export function HistoryAnalyticsCard({
 
         {/* Compact Analytics Bar - Show when on Usage tab */}
         {activeTab === "usage" && (
-          <div className="space-y-3 pt-3 border-t border-neutral-200/70 dark:border-neutral-800/70">
+          <div className="space-y-3 pt-3 border-t border-border-strong/70 dark:border-border-strong/70">
             {/* Compact Metrics Bar */}
             <div className="grid grid-cols-3 gap-3 text-center">
-              <div className="bg-muted/40 dark:bg-muted/20 rounded-lg p-3 border border-neutral-200/50 dark:border-neutral-800/50">
-                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+              <div className="bg-muted/40 dark:bg-muted/20 rounded-lg p-3 border border-border-strong/50 dark:border-border-strong/50">
+                <p className="text-xs text-text-secondary dark:text-text-secondary mb-1">
                   Days Used
                 </p>
-                <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-lg font-bold text-text-secondary dark:text-text-secondary">
                   {summary?.periodTotal ?? 0}
                 </p>
-                <p className="text-[10px] text-gray-500 dark:text-gray-500 mt-0.5">
+                <p className="text-[10px] text-text-secondary dark:text-text-secondary mt-0.5">
                   {summary?.periodLabel ?? "This Year"}
                 </p>
               </div>
-              <div className="bg-muted/40 dark:bg-muted/20 rounded-lg p-3 border border-neutral-200/50 dark:border-neutral-800/50">
-                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+              <div className="bg-muted/40 dark:bg-muted/20 rounded-lg p-3 border border-border-strong/50 dark:border-border-strong/50">
+                <p className="text-xs text-text-secondary dark:text-text-secondary mb-1">
                   Remaining
                 </p>
-                <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-lg font-bold text-text-secondary dark:text-text-secondary">
                   {summary?.remaining ?? 0}
                 </p>
-                <p className="text-[10px] text-gray-500 dark:text-gray-500 mt-0.5">
+                <p className="text-[10px] text-text-secondary dark:text-text-secondary mt-0.5">
                   All Types
                 </p>
               </div>
-              <div className="bg-muted/40 dark:bg-muted/20 rounded-lg p-3 border border-neutral-200/50 dark:border-neutral-800/50">
-                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+              <div className="bg-muted/40 dark:bg-muted/20 rounded-lg p-3 border border-border-strong/50 dark:border-border-strong/50">
+                <p className="text-xs text-text-secondary dark:text-text-secondary mb-1">
                   Top Type
                 </p>
-                <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-lg font-bold text-text-secondary dark:text-text-secondary">
                   {summary?.topType ?? "N/A"}
                 </p>
-                <p className="text-[10px] text-gray-500 dark:text-gray-500 mt-0.5">
+                <p className="text-[10px] text-text-secondary dark:text-text-secondary mt-0.5">
                   Most Used
                 </p>
               </div>
@@ -320,7 +320,7 @@ export function HistoryAnalyticsCard({
 
             {/* Period Filter */}
             <div className="flex flex-wrap items-center justify-center gap-2">
-              <span className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
+              <span className="text-xs text-text-secondary dark:text-text-secondary whitespace-nowrap">
                 View:
               </span>
               <div className="flex flex-wrap gap-1">
@@ -368,8 +368,8 @@ export function HistoryAnalyticsCard({
         {activeTab === "usage" && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Left: Pie Chart (Leave Type Distribution) */}
-            <div className="bg-muted/20 dark:bg-muted/10 rounded-lg p-4 border border-neutral-200/50 dark:border-neutral-800/50">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+            <div className="bg-muted/20 dark:bg-muted/10 rounded-lg p-4 border border-border-strong/50 dark:border-border-strong/50">
+              <h3 className="text-sm font-semibold text-text-secondary dark:text-text-secondary mb-3">
                 By Leave Type
               </h3>
               {(() => {
@@ -383,8 +383,8 @@ export function HistoryAnalyticsCard({
               })()}
             </div>
             {/* Right: Heatmap (Day Frequency) */}
-            <div className="bg-muted/20 dark:bg-muted/10 rounded-lg p-4 border border-neutral-200/50 dark:border-neutral-800/50">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+            <div className="bg-muted/20 dark:bg-muted/10 rounded-lg p-4 border border-border-strong/50 dark:border-border-strong/50">
+              <h3 className="text-sm font-semibold text-text-secondary dark:text-text-secondary mb-3">
                 Day Frequency
               </h3>
               <LeaveHeatmap defaultScope="me" defaultRange="year" />

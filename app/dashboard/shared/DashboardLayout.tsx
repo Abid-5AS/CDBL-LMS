@@ -43,24 +43,8 @@ export function DashboardLayout({
   role,
   actions,
 }: DashboardLayoutProps) {
-  // Role-specific styling classes
-  const roleClasses = {
-    EMPLOYEE: "bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20",
-    DEPT_HEAD: "bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20",
-    HR_ADMIN: "bg-gradient-to-br from-emerald-50/50 to-teal-50/50 dark:from-emerald-950/20 dark:to-teal-950/20",
-    HR_HEAD: "bg-gradient-to-br from-purple-50/50 to-pink-50/50 dark:from-purple-950/20 dark:to-pink-950/20",
-    CEO: "bg-gradient-to-br from-rose-50/50 to-red-50/50 dark:from-rose-950/20 dark:to-red-950/20",
-    SYSTEM_ADMIN: "bg-gradient-to-br from-slate-50/50 to-gray-50/50 dark:from-slate-950/20 dark:to-gray-950/20",
-  };
-
   return (
-    <div
-      className={cn(
-        "w-full min-h-screen",
-        role && roleClasses[role],
-        className
-      )}
-    >
+    <div className={cn("w-full min-h-screen", className)}>
       <div
         className={cn(
           fullWidth ? "px-0" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
@@ -68,7 +52,12 @@ export function DashboardLayout({
         )}
       >
         {(title || description || actions) && (
-          <div className={cn("mb-6", actions && "flex items-start justify-between gap-4")}>
+          <div
+            className={cn(
+              "mb-6",
+              actions && "flex items-start justify-between gap-4"
+            )}
+          >
             <div className="flex-1">
               {title && (
                 <h1 className="text-2xl font-semibold tracking-tight text-foreground">
@@ -76,7 +65,9 @@ export function DashboardLayout({
                 </h1>
               )}
               {description && (
-                <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {description}
+                </p>
               )}
             </div>
             {actions && <div className="flex-shrink-0">{actions}</div>}
@@ -92,11 +83,11 @@ export function DashboardLayout({
  * Responsive grid container for dashboard cards
  * Material 3 style: 1 column (mobile) → 2 columns (tablet) → 3 columns (desktop)
  */
-export function DashboardGrid({ 
-  children, 
-  className 
-}: { 
-  children: ReactNode; 
+export function DashboardGrid({
+  children,
+  className,
+}: {
+  children: ReactNode;
   className?: string;
 }) {
   return (
@@ -139,7 +130,9 @@ export function DashboardSection({
               <h2 className="text-lg font-semibold text-foreground">{title}</h2>
             )}
             {description && (
-              <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {description}
+              </p>
             )}
           </div>
           {action && <div>{action}</div>}
@@ -149,4 +142,3 @@ export function DashboardSection({
     </section>
   );
 }
-

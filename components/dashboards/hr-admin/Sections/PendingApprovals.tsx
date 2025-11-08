@@ -65,11 +65,11 @@ const STATUS_TABS = [
 const getLeaveTypeColor = (type: string): string => {
   switch (type) {
     case "CASUAL":
-      return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/50";
+      return "bg-data-info text-data-info border-data-info dark:bg-data-info/40 dark:text-data-info dark:border-data-info/50";
     case "EARNED":
-      return "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/50";
+      return "bg-data-success text-data-success border-data-success dark:bg-data-success/40 dark:text-data-success dark:border-data-success/50";
     case "MEDICAL":
-      return "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/50";
+      return "bg-data-error text-data-error border-data-error dark:bg-data-error/40 dark:text-data-error dark:border-data-error/50";
     default:
       return "bg-bg-secondary text-text-secondary border-bg-muted";
   }
@@ -226,7 +226,7 @@ export function PendingLeaveRequestsTable({
   // Error state
   if (error) {
     return (
-      <div className="glass-card rounded-2xl p-12 text-center text-sm text-red-600">
+      <div className="glass-card rounded-2xl p-12 text-center text-sm text-data-error">
         Failed to load requests
       </div>
     );
@@ -261,7 +261,7 @@ export function PendingLeaveRequestsTable({
                 className={cn(
                   "px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
                   statusTab === tab.value
-                    ? "bg-indigo-600 text-white"
+                    ? "bg-card-action text-text-inverted"
                     : "bg-muted text-muted-foreground hover:bg-muted/80"
                 )}
               >
@@ -349,8 +349,8 @@ export function PendingLeaveRequestsTable({
                           >
                             <TableCell className="py-4">
                               <div className="flex items-center gap-3">
-                                <div className="rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 p-2">
-                                  <User className="h-4 w-4 text-white" />
+                                <div className="rounded-full bg-gradient-to-br from-card-action to-card-summary p-2">
+                                  <User className="h-4 w-4 text-text-inverted" />
                                 </div>
                                 <div className="min-w-0 flex-1">
                                   <p className="truncate font-medium text-sm">
@@ -406,7 +406,7 @@ export function PendingLeaveRequestsTable({
                                         <Button
                                           size="icon"
                                           variant="ghost"
-                                          className="h-8 w-8 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                                          className="h-8 w-8 text-data-info hover:bg-data-info hover:text-data-info"
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             handleForward(leave);
@@ -427,7 +427,7 @@ export function PendingLeaveRequestsTable({
                                         <Button
                                           size="icon"
                                           variant="ghost"
-                                          className="h-8 w-8 text-orange-600 hover:bg-orange-50 hover:text-orange-700"
+                                          className="h-8 w-8 text-data-warning hover:bg-data-warning hover:text-data-warning"
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             handleQuickAction(leave, "return");
@@ -464,13 +464,13 @@ export function PendingLeaveRequestsTable({
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, x: -20 }}
                         transition={{ duration: 0.2, delay: index * 0.03 }}
-                        className="glass-card p-4 rounded-xl border border-neutral-200/50 dark:border-neutral-800/50 cursor-pointer hover:shadow-md transition-all"
+                        className="glass-card p-4 rounded-xl border border-border-strong/50 dark:border-border-strong/50 cursor-pointer hover:shadow-md transition-all"
                         onClick={() => handleRowClick(leave)}
                       >
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-3">
-                            <div className="rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 p-2">
-                              <User className="h-4 w-4 text-white" />
+                            <div className="rounded-full bg-gradient-to-br from-card-action to-card-summary p-2">
+                              <User className="h-4 w-4 text-text-inverted" />
                             </div>
                             <div>
                               <p className="font-medium text-sm">
@@ -513,13 +513,13 @@ export function PendingLeaveRequestsTable({
                         {(leave.status === "PENDING" ||
                           leave.status === "SUBMITTED") && (
                           <div
-                            className="flex gap-2 pt-3 border-t border-neutral-200/50 dark:border-neutral-800/50"
+                            className="flex gap-2 pt-3 border-t border-border-strong/50 dark:border-border-strong/50"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <Button
                               size="sm"
                               variant="outline"
-                              className="flex-1 text-blue-600 border-blue-200 hover:bg-blue-50"
+                              className="flex-1 text-data-info border-data-info hover:bg-data-info"
                               onClick={() => handleForward(leave)}
                               disabled={isProcessingThis}
                             >
@@ -533,7 +533,7 @@ export function PendingLeaveRequestsTable({
                             <Button
                               size="sm"
                               variant="outline"
-                              className="flex-1 text-orange-600 border-orange-200 hover:bg-orange-50"
+                              className="flex-1 text-data-warning border-data-warning hover:bg-data-warning"
                               onClick={() => handleQuickAction(leave, "return")}
                             >
                               <RotateCcw className="h-4 w-4 mr-2" />
@@ -549,7 +549,7 @@ export function PendingLeaveRequestsTable({
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-between pt-4 border-t border-neutral-200/50 dark:border-neutral-800/50">
+                <div className="flex items-center justify-between pt-4 border-t border-border-strong/50 dark:border-border-strong/50">
                   <div className="text-sm text-muted-foreground">
                     Page {currentPage} of {totalPages}
                   </div>

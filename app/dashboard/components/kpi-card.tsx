@@ -37,13 +37,13 @@ export function KPICard({
   const getProgressColor = (status?: string) => {
     switch (status) {
       case "healthy":
-        return "bg-emerald-500";
+        return "bg-data-success";
       case "low":
-        return "bg-amber-500";
+        return "bg-data-warning";
       case "critical":
-        return "bg-red-500";
+        return "bg-data-error";
       default:
-        return "bg-blue-600";
+        return "bg-data-info";
     }
   };
 

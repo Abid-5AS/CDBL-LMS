@@ -33,11 +33,11 @@ interface LeaveHeatmapProps {
 }
 
 function getIntensityColor(count: number): string {
-  if (count === 0) return "bg-gray-100 dark:bg-gray-800";
-  if (count === 1) return "bg-green-200 dark:bg-green-900";
-  if (count === 2) return "bg-green-400 dark:bg-green-700";
-  if (count === 3) return "bg-green-600 dark:bg-green-600";
-  return "bg-green-800 dark:bg-green-500"; // 4+ days
+  if (count === 0) return "bg-bg-secondary dark:bg-bg-secondary";
+  if (count === 1) return "bg-data-success dark:bg-data-success";
+  if (count === 2) return "bg-data-success dark:bg-data-success";
+  if (count === 3) return "bg-data-success dark:bg-data-success";
+  return "bg-data-success dark:bg-data-success"; // 4+ days
 }
 
 function getDayOfWeek(date: Date): number {
@@ -160,7 +160,7 @@ export function LeaveHeatmap({
 
   if (grid.length === 0 || buckets.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+      <div className="text-center py-8 text-text-secondary dark:text-text-secondary">
         <p className="text-sm mb-4">
           {scope === "me"
             ? "No leave days in this period."
@@ -213,13 +213,13 @@ export function LeaveHeatmap({
         <div className="flex gap-1">
           {/* Day labels */}
           <div className="flex flex-col gap-1 mr-2 pt-7">
-            <div className="text-[10px] text-gray-500 dark:text-gray-400 h-3">
+            <div className="text-[10px] text-text-secondary dark:text-text-secondary h-3">
               Mon
             </div>
-            <div className="text-[10px] text-gray-500 dark:text-gray-400 h-3">
+            <div className="text-[10px] text-text-secondary dark:text-text-secondary h-3">
               Wed
             </div>
-            <div className="text-[10px] text-gray-500 dark:text-gray-400 h-3">
+            <div className="text-[10px] text-text-secondary dark:text-text-secondary h-3">
               Fri
             </div>
           </div>
@@ -242,10 +242,10 @@ export function LeaveHeatmap({
                         <TooltipTrigger asChild>
                           <div
                             className={cn(
-                              "w-3 h-3 rounded-sm cursor-pointer transition-all hover:scale-125 hover:ring-2 hover:ring-gray-400 dark:hover:ring-gray-600",
+                              "w-3 h-3 rounded-sm cursor-pointer transition-all hover:scale-125 hover:ring-2 hover:ring-border-strong dark:hover:ring-border-strong",
                               isInRange || range === "rolling12"
                                 ? getIntensityColor(count)
-                                : "bg-gray-50 dark:bg-gray-900"
+                                : "bg-bg-secondary dark:bg-bg-secondary"
                             )}
                             title={
                               count > 0
@@ -262,9 +262,9 @@ export function LeaveHeatmap({
                               <p className="font-semibold">
                                 {count} day{count > 1 ? "s" : ""} on leave
                               </p>
-                              <p className="text-gray-400 mt-1">{dateStr}</p>
+                              <p className="text-text-secondary mt-1">{dateStr}</p>
                               {dayTypes.length > 0 && (
-                                <p className="text-gray-400">
+                                <p className="text-text-secondary">
                                   {dayTypes.join(", ")}
                                 </p>
                               )}
@@ -281,14 +281,14 @@ export function LeaveHeatmap({
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-2 mt-4 text-xs text-gray-600 dark:text-gray-400">
+        <div className="flex items-center gap-2 mt-4 text-xs text-text-secondary dark:text-text-secondary">
           <span>Less</span>
           <div className="flex gap-1">
-            <div className="w-3 h-3 rounded-sm bg-gray-100 dark:bg-gray-800" />
-            <div className="w-3 h-3 rounded-sm bg-green-200 dark:bg-green-900" />
-            <div className="w-3 h-3 rounded-sm bg-green-400 dark:bg-green-700" />
-            <div className="w-3 h-3 rounded-sm bg-green-600 dark:bg-green-600" />
-            <div className="w-3 h-3 rounded-sm bg-green-800 dark:bg-green-500" />
+            <div className="w-3 h-3 rounded-sm bg-bg-secondary dark:bg-bg-secondary" />
+            <div className="w-3 h-3 rounded-sm bg-data-success dark:bg-data-success" />
+            <div className="w-3 h-3 rounded-sm bg-data-success dark:bg-data-success" />
+            <div className="w-3 h-3 rounded-sm bg-data-success dark:bg-data-success" />
+            <div className="w-3 h-3 rounded-sm bg-data-success dark:bg-data-success" />
           </div>
           <span>More</span>
         </div>

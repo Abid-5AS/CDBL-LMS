@@ -88,7 +88,7 @@ export function PendingRequestRow({
       <TableCell>
         <Link
           href={`/leaves/${request.id}`}
-          className="font-medium text-blue-600 hover:underline"
+          className="font-medium text-data-info hover:underline"
         >
           {request.requester.name}
         </Link>

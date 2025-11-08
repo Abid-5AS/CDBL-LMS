@@ -208,6 +208,14 @@ export function useApplyLeaveForm() {
     return list;
   }, [type, requestedDays, requiresCertificate, file, dateRange, holidays]);
 
+  useEffect(() => {
+    if (!dateRange.start) return;
+    if (minSelectableDate && dateRange.start < minSelectableDate) {
+      setDateRange({ start: undefined, end: undefined });
+      toast.warning("Those dates are not allowed for this leave type. Please pick a new range.");
+    }
+  }, [type, minSelectableDate, dateRange.start]);
+
   const handleFileError = (error: string) => {
     setErrors((prev) => ({ ...prev, file: error }));
     toast.error(error);

@@ -215,7 +215,7 @@ export function LeaveComparisonModal({
                       <p
                         className={`text-sm ${
                           oldVersion.data.type !== currentLeave.type
-                            ? "bg-yellow-100 dark:bg-yellow-900/30 px-2 py-1 rounded"
+                            ? "bg-data-warning dark:bg-data-warning/30 px-2 py-1 rounded"
                             : ""
                         }`}
                       >
@@ -231,7 +231,7 @@ export function LeaveComparisonModal({
                           oldVersion.data.startDate !==
                             currentLeave.startDate ||
                           oldVersion.data.endDate !== currentLeave.endDate
-                            ? "bg-yellow-100 dark:bg-yellow-900/30 px-2 py-1 rounded"
+                            ? "bg-data-warning dark:bg-data-warning/30 px-2 py-1 rounded"
                             : ""
                         }`}
                       >
@@ -247,7 +247,7 @@ export function LeaveComparisonModal({
                         className={`text-sm ${
                           oldVersion.data.workingDays !==
                           currentLeave.workingDays
-                            ? "bg-yellow-100 dark:bg-yellow-900/30 px-2 py-1 rounded"
+                            ? "bg-data-warning dark:bg-data-warning/30 px-2 py-1 rounded"
                             : ""
                         }`}
                       >
@@ -261,7 +261,7 @@ export function LeaveComparisonModal({
                       <p
                         className={`text-sm whitespace-pre-wrap ${
                           oldVersion.data.reason !== currentLeave.reason
-                            ? "bg-yellow-100 dark:bg-yellow-900/30 px-2 py-1 rounded"
+                            ? "bg-data-warning dark:bg-data-warning/30 px-2 py-1 rounded"
                             : ""
                         }`}
                       >
