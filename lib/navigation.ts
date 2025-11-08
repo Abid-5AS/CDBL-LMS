@@ -35,24 +35,24 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
 
   DEPT_HEAD: [
     { icon: Home, label: "Home", href: "/dashboard/dept-head" },
-    { icon: ClipboardList, label: "Approvals", href: "/approvals" },
+    { icon: ClipboardList, label: "Requests", href: "/approvals" },
     { icon: Users, label: "Team", href: "/employees" },
-    { icon: FileText, label: "My Leaves", href: "/leaves" },
   ],
 
   HR_ADMIN: [
     { icon: Home, label: "Home", href: "/dashboard/hr-admin" },
+    { icon: ClipboardList, label: "Requests", href: "/approvals" },
+    { icon: Users, label: "Employees", href: "/employees" },
     { icon: ChartBar, label: "Reports", href: "/reports" },
     { icon: BookOpen, label: "Policies", href: "/policies" },
   ],
 
   HR_HEAD: [
     { icon: Home, label: "Home", href: "/dashboard/hr-head" },
-    { icon: UserCheck, label: "HR Dashboard", href: "/dashboard/hr-head" },
-    { icon: ChartBar, label: "Reports", href: "/reports" },
     { icon: ClipboardList, label: "Approvals", href: "/approvals" },
+    { icon: Users, label: "Employees", href: "/employees" },
+    { icon: ChartBar, label: "Reports", href: "/reports" },
     { icon: Activity, label: "Audit", href: "/admin/audit" },
-    { icon: Shield, label: "Admin", href: "/admin" },
   ],
 
   CEO: [
