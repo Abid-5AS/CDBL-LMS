@@ -226,27 +226,6 @@ export function ModernEmployeeDashboard({
       accent: "bg-gradient-to-br from-indigo-500 to-purple-500 text-white",
       onClick: () => router.push("/leaves/apply"),
     },
-    {
-      label: "View Calendar",
-      description: "See upcoming leaves",
-      icon: Calendar,
-      accent: "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300",
-      onClick: () => router.push("/leaves"),
-    },
-    {
-      label: "Reports",
-      description: "Track your leave trends",
-      icon: BarChart3,
-      accent: "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300",
-      onClick: () => router.push("/reports"),
-    },
-    {
-      label: "Team Status",
-      description: "Check team availability",
-      icon: Users,
-      accent: "bg-slate-100 text-slate-600 dark:bg-slate-800/60 dark:text-slate-200",
-      onClick: () => router.push("/team"),
-    },
   ];
 
   return (
@@ -268,7 +247,7 @@ export function ModernEmployeeDashboard({
       >
         {/* Quick Stats Grid */}
         <ResponsiveDashboardGrid
-          columns="2:2:4:4"
+          columns="2:2:3:3"
           gap="md"
           animate={true}
           staggerChildren={0.1}
@@ -281,24 +260,6 @@ export function ModernEmployeeDashboard({
             icon={Clock}
             role="EMPLOYEE"
             animate={true}
-          />
-
-          <RoleKPICard
-            title="Returned Requests"
-            value={dashboardData.returnedCount}
-            subtitle="Need revision"
-            icon={AlertCircle}
-            role="EMPLOYEE"
-            animate={true}
-            trend={
-              dashboardData.returnedCount > 0
-                ? {
-                    value: dashboardData.returnedCount,
-                    label: "Action required",
-                    direction: "down" as const,
-                  }
-                : undefined
-            }
           />
 
           <RoleKPICard

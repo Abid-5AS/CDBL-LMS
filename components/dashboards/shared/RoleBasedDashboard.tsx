@@ -172,15 +172,14 @@ export function RoleBasedDashboard({
   );
 
   const content = (
-    <div className={containerClasses}>
-      {/* Role-specific CSS custom properties */}
-      <style jsx global>{`
-        :global(:root) {
-          --dashboard-accent: ${config.accent};
-          --dashboard-accent-soft: ${config.accentSoft};
-        }
-      `}</style>
-
+    <div 
+      className={containerClasses}
+      style={{
+        // @ts-ignore - CSS custom properties
+        '--dashboard-accent': config.accent,
+        '--dashboard-accent-soft': config.accentSoft,
+      } as React.CSSProperties}
+    >
       <div className={contentClasses}>
         {/* Header Section */}
         {(title || description || actions) && (
