@@ -40,7 +40,9 @@ async function testHRAdminAPI() {
   const items = await prisma.leaveRequest.findMany({
     where: whereClause,
     include: {
-      requester: { select: { id: true, name: true, email: true, deptHeadId: true } },
+      requester: {
+        select: { id: true, name: true, email: true, deptHeadId: true },
+      },
       approvals: {
         include: {
           approver: { select: { name: true, role: true } },
@@ -61,11 +63,17 @@ async function testHRAdminAPI() {
       console.log(`${i + 1}. Leave #${item.id}:`);
       console.log(`   Type: ${item.type}`);
       console.log(`   Status: ${item.status}`);
-      console.log(`   Requester: ${item.requester.name} (${item.requester.email})`);
-      console.log(`   Start Date: ${item.startDate.toISOString().split('T')[0]}`);
+      console.log(
+        `   Requester: ${item.requester.name} (${item.requester.email})`
+      );
+      console.log(
+        `   Start Date: ${item.startDate.toISOString().split("T")[0]}`
+      );
       console.log(`   Approvals: ${item.approvals.length} records`);
-      item.approvals.forEach(app => {
-        console.log(`     - Step ${app.step}: ${app.decision} by ${app.approver?.name} (${app.approver?.role})`);
+      item.approvals.forEach((app) => {
+        console.log(
+          `     - Step ${app.step}: ${app.decision} by ${app.approver?.name} (${app.approver?.role})`
+        );
       });
       console.log("");
     });
@@ -84,7 +92,9 @@ async function testHRAdminAPI() {
     },
   });
 
-  console.log(`\n📊 Total SUBMITTED/PENDING requests in database: ${totalCount}`);
+  console.log(
+    `\n📊 Total SUBMITTED/PENDING requests in database: ${totalCount}`
+  );
   console.log(`📊 Requests HR_ADMIN can see: ${items.length}`);
   console.log(`📊 Filtered out: ${totalCount - items.length}\n`);
 
@@ -92,7 +102,9 @@ async function testHRAdminAPI() {
   const filteredOut = totalCount - items.length;
   if (filteredOut > 0) {
     console.log(`ℹ️  ${filteredOut} requests were filtered out because:`);
-    console.log(`   - HR_ADMIN already has FORWARDED/APPROVED/REJECTED decision on them\n`);
+    console.log(
+      `   - HR_ADMIN already has FORWARDED/APPROVED/REJECTED decision on them\n`
+    );
   }
 
   await prisma.$disconnect();

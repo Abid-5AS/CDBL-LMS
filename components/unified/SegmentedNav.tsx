@@ -14,16 +14,26 @@ import { getNavItemsForRole, type UserRole } from "@/lib/navigation";
 export function SegmentedNav({ role }: { role: "EMPLOYEE" | "HR_ADMIN" }) {
   const pathname = usePathname();
   const navItems = getNavItemsForRole(role as UserRole);
-  const links = navItems.map(item => ({ href: item.href, label: item.label }));
+  const links = navItems.map((item) => ({
+    href: item.href,
+    label: item.label,
+  }));
 
   return (
-    <nav className="flex items-center gap-1 rounded-full bg-bg-secondary p-1" role="navigation" aria-label="Main navigation">
+    <nav
+      className="flex items-center gap-1 rounded-full bg-bg-secondary p-1"
+      role="navigation"
+      aria-label="Main navigation"
+    >
       {links.map((link) => {
         // Dashboard routes should match both /dashboard and /dashboard/{role}
-        const isActive = link.href === "/dashboard" 
-          ? (pathname === "/dashboard" || pathname.startsWith("/dashboard/"))
-          : (pathname === link.href || (link.href !== "/dashboard" && pathname.startsWith(`${link.href}/`)));
-        
+        const isActive =
+          link.href === "/dashboard"
+            ? pathname === "/dashboard" || pathname.startsWith("/dashboard/")
+            : pathname === link.href ||
+              (link.href !== "/dashboard" &&
+                pathname.startsWith(`${link.href}/`));
+
         return (
           <Link
             key={link.href}
@@ -45,4 +55,3 @@ export function SegmentedNav({ role }: { role: "EMPLOYEE" | "HR_ADMIN" }) {
     </nav>
   );
 }
-

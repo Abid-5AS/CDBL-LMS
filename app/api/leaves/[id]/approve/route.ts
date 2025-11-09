@@ -86,17 +86,37 @@ export async function POST(
   const step = getStepForRole(userRole, leave.type);
   const newStatus = getStatusAfterAction(leave.status as LeaveStatus, "APPROVE");
 
-  // Create approval record
-  await prisma.approval.create({
-    data: {
+  // Update existing PENDING approval to APPROVED, or create new one
+  const existingApproval = await prisma.approval.findFirst({
+    where: {
       leaveId,
-      step,
       approverId: user.id,
-      decision: "APPROVED",
-      decidedAt: new Date(),
-      comment: parsed.data.comment,
+      decision: "PENDING",
     },
   });
+
+  if (existingApproval) {
+    await prisma.approval.update({
+      where: { id: existingApproval.id },
+      data: {
+        decision: "APPROVED",
+        decidedAt: new Date(),
+        comment: parsed.data.comment,
+      },
+    });
+  } else {
+    // Fallback: create new approval record
+    await prisma.approval.create({
+      data: {
+        leaveId,
+        step,
+        approverId: user.id,
+        decision: "APPROVED",
+        decidedAt: new Date(),
+        comment: parsed.data.comment,
+      },
+    });
+  }
 
   // Update leave status
   await prisma.leaveRequest.update({

@@ -7,7 +7,7 @@ export const cache = "no-store";
 
 export async function GET() {
   const me = await getCurrentUser();
-  
+
   if (!me) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
@@ -62,12 +62,12 @@ export async function GET() {
       email: me.email,
       role: me.role,
     },
-    allLeaves: allLeaves.map(leave => ({
+    allLeaves: allLeaves.map((leave) => ({
       id: leave.id,
       type: leave.type,
       status: leave.status,
       requester: leave.requester,
-      approvals: leave.approvals.map(app => ({
+      approvals: leave.approvals.map((app) => ({
         step: app.step,
         decision: app.decision,
         toRole: app.toRole,
@@ -77,12 +77,12 @@ export async function GET() {
       })),
       createdAt: leave.createdAt,
     })),
-    hrAdminFilteredLeaves: hrAdminFilteredLeaves.map(leave => ({
+    hrAdminFilteredLeaves: hrAdminFilteredLeaves.map((leave) => ({
       id: leave.id,
       type: leave.type,
       status: leave.status,
       requester: leave.requester,
-      approvals: leave.approvals.map(app => ({
+      approvals: leave.approvals.map((app) => ({
         step: app.step,
         decision: app.decision,
         toRole: app.toRole,

@@ -84,16 +84,51 @@ export async function POST(
   const step = getStepForRole(userRole, leave.type);
   const newStatus = getStatusAfterAction(leave.status as LeaveStatus, "FORWARD", nextRole);
 
-  // Create approval record with FORWARDED decision
-  await prisma.approval.create({
-    data: {
+  // Update current user's approval to FORWARDED
+  await prisma.approval.updateMany({
+    where: {
       leaveId,
-      step,
       approverId: user.id,
+      decision: "PENDING",
+    },
+    data: {
       decision: "FORWARDED",
       toRole: nextRole,
       decidedAt: new Date(),
       comment: `Forwarded to ${nextRole}`,
+    },
+  });
+
+  // Get the next approver user
+  const nextApprover = await prisma.user.findFirst({
+    where: { 
+      role: nextRole,
+      // For DEPT_HEAD, find the one that manages this employee
+      ...(nextRole === "DEPT_HEAD" ? { 
+        teamMembers: { 
+          some: { id: leave.requesterId } 
+        } 
+      } : {})
+    },
+    orderBy: { id: "asc" },
+  });
+
+  if (!nextApprover) {
+    return NextResponse.json(
+      error("no_approver_found", `No ${nextRole} found to forward to`, traceId),
+      { status: 500 }
+    );
+  }
+
+  // Create PENDING approval for next role
+  const nextStep = getStepForRole(nextRole, leave.type);
+  await prisma.approval.create({
+    data: {
+      leaveId,
+      step: nextStep,
+      approverId: nextApprover.id,
+      decision: "PENDING",
+      comment: null,
     },
   });
 

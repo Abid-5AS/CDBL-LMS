@@ -2,12 +2,7 @@ import path from "path";
 import { promises as fs } from "fs";
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
-import {
-  ApprovalDecision,
-  LeaveStatus,
-  LeaveType,
-  Role,
-} from "@prisma/client";
+import { ApprovalDecision, LeaveStatus, LeaveType, Role } from "@prisma/client";
 
 import { prisma } from "../lib/prisma";
 import { initDefaultOrgSettings } from "../lib/org-settings";
@@ -52,9 +47,17 @@ const featuredEmployees: Array<{
   department: (typeof departments)[number];
 }> = [
   { name: "Employee One", email: "employee1@demo.local", department: "IT" },
-  { name: "Employee Two", email: "employee2@demo.local", department: "Finance" },
+  {
+    name: "Employee Two",
+    email: "employee2@demo.local",
+    department: "Finance",
+  },
   { name: "Employee Three", email: "employee3@demo.local", department: "HR" },
-  { name: "Employee Four", email: "employee4@demo.local", department: "Finance" },
+  {
+    name: "Employee Four",
+    email: "employee4@demo.local",
+    department: "Finance",
+  },
 ];
 
 async function main() {
@@ -239,9 +242,7 @@ async function createUsers(): Promise<SeedUser[]> {
       });
     }
 
-    while (
-      (deptEmployeeCounters.get(dept) ?? 1) <= EMPLOYEES_PER_DEPT
-    ) {
+    while ((deptEmployeeCounters.get(dept) ?? 1) <= EMPLOYEES_PER_DEPT) {
       await createEmployee({
         name: generateBangladeshiName(nameRng),
         email: buildEmployeeEmail(dept, deptEmployeeCounters.get(dept) ?? 1),
@@ -291,7 +292,11 @@ async function createEmployee(params: {
   let empCode = makeEmpCode(Role.EMPLOYEE, department, currentIndex);
   let safeguard = 0;
   while (usedEmpCodes.has(empCode) && safeguard < 5) {
-    empCode = makeEmpCode(Role.EMPLOYEE, department, currentIndex + safeguard + 1);
+    empCode = makeEmpCode(
+      Role.EMPLOYEE,
+      department,
+      currentIndex + safeguard + 1
+    );
     safeguard++;
   }
   await params.upsertUser({
@@ -309,13 +314,13 @@ async function createEmployee(params: {
 async function createBalances(users: SeedUser[]) {
   const balances = [];
   for (const user of users) {
-    for (const type of [LeaveType.EARNED, LeaveType.CASUAL, LeaveType.MEDICAL]) {
+    for (const type of [
+      LeaveType.EARNED,
+      LeaveType.CASUAL,
+      LeaveType.MEDICAL,
+    ]) {
       const accrued =
-        type === LeaveType.EARNED
-          ? 24
-          : type === LeaveType.CASUAL
-          ? 10
-          : 14;
+        type === LeaveType.EARNED ? 24 : type === LeaveType.CASUAL ? 10 : 14;
 
       const used =
         user.role === Role.EMPLOYEE
@@ -382,7 +387,10 @@ async function createHolidays(): Promise<SeedHoliday[]> {
 
   const nextYearExtras = [
     { date: `${YEAR + 1}-01-01`, name: "New Year's Day" },
-    { date: `${YEAR + 1}-02-21`, name: "Shaheed Day & Intl. Mother Language Day" },
+    {
+      date: `${YEAR + 1}-02-21`,
+      name: "Shaheed Day & Intl. Mother Language Day",
+    },
     { date: `${YEAR + 1}-03-26`, name: "Independence & National Day" },
   ];
 
@@ -398,22 +406,82 @@ async function createHolidays(): Promise<SeedHoliday[]> {
     });
   }
 
-  console.log(`✅ Holidays created: ${yearHolidays.length + nextYearExtras.length}`);
+  console.log(
+    `✅ Holidays created: ${yearHolidays.length + nextYearExtras.length}`
+  );
   return yearHolidays;
 }
 
 async function createPolicyConfigs() {
-  const defaults: Record<LeaveType, { maxDays?: number; minDays?: number; noticeDays?: number; carryLimit?: number | null }> = {
-    [LeaveType.EARNED]: { maxDays: 30, minDays: 1, noticeDays: 7, carryLimit: 15 },
-    [LeaveType.CASUAL]: { maxDays: 3, minDays: 1, noticeDays: 1, carryLimit: 0 },
-    [LeaveType.MEDICAL]: { maxDays: 14, minDays: 1, noticeDays: 0, carryLimit: 0 },
-    [LeaveType.EXTRAWITHPAY]: { maxDays: 10, minDays: 1, noticeDays: 3, carryLimit: null },
-    [LeaveType.EXTRAWITHOUTPAY]: { maxDays: 30, minDays: 1, noticeDays: 5, carryLimit: null },
-    [LeaveType.MATERNITY]: { maxDays: 112, minDays: 30, noticeDays: 30, carryLimit: null },
-    [LeaveType.PATERNITY]: { maxDays: 10, minDays: 3, noticeDays: 7, carryLimit: null },
-    [LeaveType.STUDY]: { maxDays: 60, minDays: 7, noticeDays: 30, carryLimit: null },
-    [LeaveType.SPECIAL_DISABILITY]: { maxDays: 30, minDays: 5, noticeDays: 10, carryLimit: null },
-    [LeaveType.QUARANTINE]: { maxDays: 14, minDays: 3, noticeDays: 0, carryLimit: null },
+  const defaults: Record<
+    LeaveType,
+    {
+      maxDays?: number;
+      minDays?: number;
+      noticeDays?: number;
+      carryLimit?: number | null;
+    }
+  > = {
+    [LeaveType.EARNED]: {
+      maxDays: 30,
+      minDays: 1,
+      noticeDays: 7,
+      carryLimit: 15,
+    },
+    [LeaveType.CASUAL]: {
+      maxDays: 3,
+      minDays: 1,
+      noticeDays: 1,
+      carryLimit: 0,
+    },
+    [LeaveType.MEDICAL]: {
+      maxDays: 14,
+      minDays: 1,
+      noticeDays: 0,
+      carryLimit: 0,
+    },
+    [LeaveType.EXTRAWITHPAY]: {
+      maxDays: 10,
+      minDays: 1,
+      noticeDays: 3,
+      carryLimit: null,
+    },
+    [LeaveType.EXTRAWITHOUTPAY]: {
+      maxDays: 30,
+      minDays: 1,
+      noticeDays: 5,
+      carryLimit: null,
+    },
+    [LeaveType.MATERNITY]: {
+      maxDays: 112,
+      minDays: 30,
+      noticeDays: 30,
+      carryLimit: null,
+    },
+    [LeaveType.PATERNITY]: {
+      maxDays: 10,
+      minDays: 3,
+      noticeDays: 7,
+      carryLimit: null,
+    },
+    [LeaveType.STUDY]: {
+      maxDays: 60,
+      minDays: 7,
+      noticeDays: 30,
+      carryLimit: null,
+    },
+    [LeaveType.SPECIAL_DISABILITY]: {
+      maxDays: 30,
+      minDays: 5,
+      noticeDays: 10,
+      carryLimit: null,
+    },
+    [LeaveType.QUARANTINE]: {
+      maxDays: 14,
+      minDays: 3,
+      noticeDays: 0,
+      carryLimit: null,
+    },
   };
 
   for (const leaveType of Object.values(LeaveType)) {
@@ -427,10 +495,7 @@ async function createPolicyConfigs() {
   console.log("✅ Policy configurations upserted");
 }
 
-async function createLeaveRequests(
-  users: SeedUser[],
-  holidays: SeedHoliday[]
-) {
+async function createLeaveRequests(users: SeedUser[], holidays: SeedHoliday[]) {
   const employees = users.filter((user) => user.role === Role.EMPLOYEE);
   const deptHeads = new Map(
     users
@@ -448,8 +513,7 @@ async function createLeaveRequests(
 
   let leaveCount = 0;
   for (const employee of employees) {
-    const deptHead =
-      employee.department && deptHeads.get(employee.department);
+    const deptHead = employee.department && deptHeads.get(employee.department);
     if (!deptHead) continue;
 
     const numRequests = leaveRng.nextInt(6, 10);
@@ -470,7 +534,8 @@ async function createLeaveRequests(
 
       let certificateUrl: string | null = null;
       let fitnessCertificateUrl: string | null = null;
-      const needsCertificate = leaveType === LeaveType.MEDICAL && workingDays > 3;
+      const needsCertificate =
+        leaveType === LeaveType.MEDICAL && workingDays > 3;
       if (needsCertificate && status === LeaveStatus.APPROVED) {
         certificateUrl = await createCertificateFile();
         if (workingDays > 7 && leaveRng.next() > 0.4) {
@@ -508,9 +573,11 @@ async function createLeaveRequests(
       });
 
       if (
-        [LeaveStatus.APPROVED, LeaveStatus.REJECTED, LeaveStatus.PENDING].includes(
-          status
-        ) ||
+        [
+          LeaveStatus.APPROVED,
+          LeaveStatus.REJECTED,
+          LeaveStatus.PENDING,
+        ].includes(status) ||
         status === LeaveStatus.RETURNED ||
         status === LeaveStatus.CANCELLATION_REQUESTED
       ) {
@@ -640,7 +707,9 @@ async function createApprovalTrail(params: {
         comment: isLast
           ? `${decision} by ${actor.role}`
           : `Forwarded to ${sequence[i + 1]?.role ?? "next approver"}`,
-        decidedAt: new Date(Date.now() - (sequence.length - i) * 24 * 60 * 60 * 1000),
+        decidedAt: new Date(
+          Date.now() - (sequence.length - i) * 24 * 60 * 60 * 1000
+        ),
       },
     });
 
@@ -686,7 +755,9 @@ async function createPendingRequestsForITDeptHead(
   );
   const hrAdmin = users.find((user) => user.role === Role.HR_ADMIN);
   if (!itDeptHead || !hrAdmin) {
-    console.warn("⚠️  Missing IT Dept Head or HR Admin; skipping targeted pending requests");
+    console.warn(
+      "⚠️  Missing IT Dept Head or HR Admin; skipping targeted pending requests"
+    );
     return;
   }
 
@@ -702,7 +773,9 @@ async function createPendingRequestsForITDeptHead(
     );
     const endDate = addWorkingDays(
       startDate,
-      leaveType === LeaveType.EARNED ? pendingRng.nextInt(4, 7) : pendingRng.nextInt(2, 4),
+      leaveType === LeaveType.EARNED
+        ? pendingRng.nextInt(4, 7)
+        : pendingRng.nextInt(2, 4),
       holidays
     );
     const workingDays = countWorkingDaysSync(startDate, endDate, holidays);
@@ -757,7 +830,11 @@ function buildDateRange(
   const today = normalizeToDhakaMidnight(new Date());
   let startDate = new Date(today);
   let endDate = new Date(today);
-  const futureStatuses = [LeaveStatus.APPROVED, LeaveStatus.PENDING, LeaveStatus.SUBMITTED];
+  const futureStatuses = [
+    LeaveStatus.APPROVED,
+    LeaveStatus.PENDING,
+    LeaveStatus.SUBMITTED,
+  ];
   const isFuture = futureStatuses.includes(status);
 
   if (isFuture) {
@@ -787,7 +864,11 @@ function ensureWorkingDay(date: Date, holidays: SeedHoliday[]) {
   return normalizeToDhakaMidnight(current);
 }
 
-function addWorkingDays(start: Date, duration: number, holidays: SeedHoliday[]) {
+function addWorkingDays(
+  start: Date,
+  duration: number,
+  holidays: SeedHoliday[]
+) {
   let daysAdded = 1;
   let current = new Date(start);
   while (daysAdded < Math.max(duration, 1)) {
@@ -886,7 +967,9 @@ function printSummary(users: SeedUser[]) {
   console.log("\n👥 User distribution");
   for (const role of Object.values(Role)) {
     const count = roleCounts[role] ?? 0;
-    console.log(`   - ${role.padEnd(12, " ")} ${count.toString().padStart(2, " ")}`);
+    console.log(
+      `   - ${role.padEnd(12, " ")} ${count.toString().padStart(2, " ")}`
+    );
   }
   console.log("\n✅ Seed completed successfully!");
 }
