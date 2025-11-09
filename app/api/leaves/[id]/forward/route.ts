@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { canForwardTo, getStepForRole, getNextRoleInChain, getStatusAfterAction, getChainFor, type ApprovalAction } from "@/lib/workflow";
+import {
+  canForwardTo,
+  getStepForRole,
+  getNextRoleInChain,
+  getStatusAfterAction,
+  getChainFor,
+  type ApprovalAction,
+} from "@/lib/workflow";
 import { canPerformAction } from "@/lib/workflow";
 import type { AppRole } from "@/lib/rbac";
 import { LeaveStatus } from "@prisma/client";
@@ -17,13 +24,17 @@ export async function POST(
   const traceId = getTraceId(request as any);
   const user = await getCurrentUser();
   if (!user) {
-    return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
+    return NextResponse.json(error("unauthorized", undefined, traceId), {
+      status: 401,
+    });
   }
 
   const { id } = await params;
   const leaveId = Number(id);
   if (Number.isNaN(leaveId)) {
-    return NextResponse.json(error("invalid_id", undefined, traceId), { status: 400 });
+    return NextResponse.json(error("invalid_id", undefined, traceId), {
+      status: 400,
+    });
   }
 
   const userRole = user.role as AppRole;
@@ -38,21 +49,28 @@ export async function POST(
   });
 
   if (!leave) {
-    return NextResponse.json(error("not_found", undefined, traceId), { status: 404 });
+    return NextResponse.json(error("not_found", undefined, traceId), {
+      status: 404,
+    });
   }
 
   // HR_ADMIN can forward (operational role) - allow without strict chain check
   // For other roles, check if they can forward for this leave type (per-type chain logic)
   if (userRole !== "HR_ADMIN") {
     if (!canPerformAction(userRole, "FORWARD", leave.type)) {
-      return NextResponse.json(error("forbidden", "You cannot forward leave requests", traceId), { status: 403 });
+      return NextResponse.json(
+        error("forbidden", "You cannot forward leave requests", traceId),
+        { status: 403 }
+      );
     }
   }
 
   // Check if leave is in a forwardable state
   if (!["SUBMITTED", "PENDING"].includes(leave.status)) {
     return NextResponse.json(
-      error("invalid_status", undefined, traceId, { currentStatus: leave.status }),
+      error("invalid_status", undefined, traceId, {
+        currentStatus: leave.status,
+      }),
       { status: 400 }
     );
   }
@@ -74,7 +92,10 @@ export async function POST(
 
   // Validate forward target (using per-type chain)
   // HR_ADMIN can forward to any role in the chain (operational role)
-  if (userRole !== "HR_ADMIN" && !canForwardTo(userRole, nextRole, leave.type)) {
+  if (
+    userRole !== "HR_ADMIN" &&
+    !canForwardTo(userRole, nextRole, leave.type)
+  ) {
     return NextResponse.json(
       error("invalid_forward_target", `Cannot forward to ${nextRole}`, traceId),
       { status: 400 }
@@ -82,7 +103,11 @@ export async function POST(
   }
 
   const step = getStepForRole(userRole, leave.type);
-  const newStatus = getStatusAfterAction(leave.status as LeaveStatus, "FORWARD", nextRole);
+  const newStatus = getStatusAfterAction(
+    leave.status as LeaveStatus,
+    "FORWARD",
+    nextRole
+  );
 
   // Update current user's approval to FORWARDED
   await prisma.approval.updateMany({
@@ -101,14 +126,16 @@ export async function POST(
 
   // Get the next approver user
   const nextApprover = await prisma.user.findFirst({
-    where: { 
+    where: {
       role: nextRole,
       // For DEPT_HEAD, find the one that manages this employee
-      ...(nextRole === "DEPT_HEAD" ? { 
-        teamMembers: { 
-          some: { id: leave.requesterId } 
-        } 
-      } : {})
+      ...(nextRole === "DEPT_HEAD"
+        ? {
+            teamMembers: {
+              some: { id: leave.requesterId },
+            },
+          }
+        : {}),
     },
     orderBy: { id: "asc" },
   });

@@ -63,7 +63,9 @@ async function simulateCompleteFlow() {
     },
   });
 
-  console.log(`✅ Leave request #${leaveRequest.id} created with status: ${leaveRequest.status}`);
+  console.log(
+    `✅ Leave request #${leaveRequest.id} created with status: ${leaveRequest.status}`
+  );
   console.log("");
 
   // Step 2: HR Admin forwards to Dept Head
@@ -191,7 +193,11 @@ async function simulateCompleteFlow() {
   console.log(`Leave Request #${finalLeave!.id}: ${finalLeave!.status}`);
   console.log("\nApproval Chain:");
   finalLeave!.approvals.forEach((app, idx) => {
-    console.log(`  ${idx + 1}. Step ${app.step}: ${app.decision} by ${app.approver?.name} (${app.approver?.role})`);
+    console.log(
+      `  ${idx + 1}. Step ${app.step}: ${app.decision} by ${
+        app.approver?.name
+      } (${app.approver?.role})`
+    );
   });
 
   console.log("\n✅ APPROVAL FLOW COMPLETE!");

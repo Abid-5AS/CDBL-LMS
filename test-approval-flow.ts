@@ -56,7 +56,9 @@ async function testApprovalFlow() {
 
   if (!testLeave) {
     console.log("❌ No SUBMITTED leave request found for testing");
-    console.log("   Please create a leave request as employee1@demo.local first");
+    console.log(
+      "   Please create a leave request as employee1@demo.local first"
+    );
     return;
   }
 
@@ -66,9 +68,15 @@ async function testApprovalFlow() {
   console.log(`   Created: ${testLeave.createdAt}`);
   console.log("");
 
-  console.log(`📊 Current Approval Chain (${testLeave.approvals.length} records):`);
+  console.log(
+    `📊 Current Approval Chain (${testLeave.approvals.length} records):`
+  );
   testLeave.approvals.forEach((app, idx) => {
-    console.log(`   ${idx + 1}. Step ${app.step}: ${app.decision} by ${app.approver?.name} (${app.approver?.role})`);
+    console.log(
+      `   ${idx + 1}. Step ${app.step}: ${app.decision} by ${
+        app.approver?.name
+      } (${app.approver?.role})`
+    );
   });
   console.log("");
 
@@ -83,7 +91,7 @@ async function testApprovalFlow() {
 
   // Verify initial state
   console.log("✓ VERIFICATION:");
-  
+
   // Step 1: Employee submission
   if (testLeave.status === "SUBMITTED") {
     console.log("   ✅ Step 1: Leave request is SUBMITTED by employee");
@@ -96,11 +104,17 @@ async function testApprovalFlow() {
     (app) => app.approverId === hrAdmin.id
   );
   if (hrAdminApproval && hrAdminApproval.decision === "PENDING") {
-    console.log("   ✅ Step 2: HR Admin has PENDING approval (ready to forward)");
+    console.log(
+      "   ✅ Step 2: HR Admin has PENDING approval (ready to forward)"
+    );
   } else if (hrAdminApproval && hrAdminApproval.decision === "FORWARDED") {
     console.log("   ℹ️  Step 2: HR Admin already forwarded to Dept Head");
   } else {
-    console.log(`   ❌ Step 2: HR Admin approval issue - ${hrAdminApproval?.decision || "missing"}`);
+    console.log(
+      `   ❌ Step 2: HR Admin approval issue - ${
+        hrAdminApproval?.decision || "missing"
+      }`
+    );
   }
 
   // Check if forwarded to Dept Head
@@ -109,7 +123,9 @@ async function testApprovalFlow() {
   );
   if (deptHeadApproval) {
     if (deptHeadApproval.decision === "PENDING") {
-      console.log("   ✅ Step 3: Dept Head has PENDING approval (ready to forward)");
+      console.log(
+        "   ✅ Step 3: Dept Head has PENDING approval (ready to forward)"
+      );
     } else if (deptHeadApproval.decision === "FORWARDED") {
       console.log("   ℹ️  Step 3: Dept Head already forwarded to HR Head");
     }
@@ -123,7 +139,9 @@ async function testApprovalFlow() {
   );
   if (hrHeadApproval) {
     if (hrHeadApproval.decision === "PENDING") {
-      console.log("   ✅ Step 4: HR Head has PENDING approval (ready to forward)");
+      console.log(
+        "   ✅ Step 4: HR Head has PENDING approval (ready to forward)"
+      );
     } else if (hrHeadApproval.decision === "FORWARDED") {
       console.log("   ℹ️  Step 4: HR Head already forwarded to CEO");
     }
@@ -149,27 +167,43 @@ async function testApprovalFlow() {
 
   // Show who can see this request
   console.log("👁️  WHO CAN SEE THIS REQUEST:");
-  
+
   // HR Admin can see if status is SUBMITTED/PENDING and they haven't acted
-  const hrAdminCanSee = 
+  const hrAdminCanSee =
     (testLeave.status === "SUBMITTED" || testLeave.status === "PENDING") &&
-    (!hrAdminApproval || !["FORWARDED", "APPROVED", "REJECTED"].includes(hrAdminApproval.decision));
-  console.log(`   ${hrAdminCanSee ? "✅" : "❌"} HR Admin can see it: ${hrAdminCanSee}`);
+    (!hrAdminApproval ||
+      !["FORWARDED", "APPROVED", "REJECTED"].includes(
+        hrAdminApproval.decision
+      ));
+  console.log(
+    `   ${hrAdminCanSee ? "✅" : "❌"} HR Admin can see it: ${hrAdminCanSee}`
+  );
 
   // Dept Head can see if forwarded to them and they haven't acted
   const deptHeadCanSee =
-    testLeave.approvals.some(app => app.decision === "FORWARDED" && app.toRole === "DEPT_HEAD") &&
-    (!deptHeadApproval || !["FORWARDED", "APPROVED", "REJECTED"].includes(deptHeadApproval.decision));
-  console.log(`   ${deptHeadCanSee ? "✅" : "❌"} Dept Head can see it: ${deptHeadCanSee}`);
+    testLeave.approvals.some(
+      (app) => app.decision === "FORWARDED" && app.toRole === "DEPT_HEAD"
+    ) &&
+    (!deptHeadApproval ||
+      !["FORWARDED", "APPROVED", "REJECTED"].includes(
+        deptHeadApproval.decision
+      ));
+  console.log(
+    `   ${deptHeadCanSee ? "✅" : "❌"} Dept Head can see it: ${deptHeadCanSee}`
+  );
 
   // HR Head can see if forwarded to them
-  const hrHeadCanSee =
-    testLeave.approvals.some(app => app.decision === "FORWARDED" && app.toRole === "HR_HEAD");
-  console.log(`   ${hrHeadCanSee ? "✅" : "❌"} HR Head can see it: ${hrHeadCanSee}`);
+  const hrHeadCanSee = testLeave.approvals.some(
+    (app) => app.decision === "FORWARDED" && app.toRole === "HR_HEAD"
+  );
+  console.log(
+    `   ${hrHeadCanSee ? "✅" : "❌"} HR Head can see it: ${hrHeadCanSee}`
+  );
 
   // CEO can see if forwarded to them
-  const ceoCanSee =
-    testLeave.approvals.some(app => app.decision === "FORWARDED" && app.toRole === "CEO");
+  const ceoCanSee = testLeave.approvals.some(
+    (app) => app.decision === "FORWARDED" && app.toRole === "CEO"
+  );
   console.log(`   ${ceoCanSee ? "✅" : "❌"} CEO can see it: ${ceoCanSee}`);
 
   await prisma.$disconnect();

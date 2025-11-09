@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { canPerformAction, getStepForRole, getStatusAfterAction, isFinalApprover, type ApprovalAction } from "@/lib/workflow";
+import {
+  canPerformAction,
+  getStepForRole,
+  getStatusAfterAction,
+  isFinalApprover,
+  type ApprovalAction,
+} from "@/lib/workflow";
 import type { AppRole } from "@/lib/rbac";
 import { LeaveStatus } from "@prisma/client";
 import { z } from "zod";
@@ -21,13 +27,17 @@ export async function POST(
   const traceId = getTraceId(request as any);
   const user = await getCurrentUser();
   if (!user) {
-    return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
+    return NextResponse.json(error("unauthorized", undefined, traceId), {
+      status: 401,
+    });
   }
 
   const { id } = await params;
   const leaveId = Number(id);
   if (Number.isNaN(leaveId)) {
-    return NextResponse.json(error("invalid_id", undefined, traceId), { status: 400 });
+    return NextResponse.json(error("invalid_id", undefined, traceId), {
+      status: 400,
+    });
   }
 
   const userRole = user.role as AppRole;
@@ -39,26 +49,39 @@ export async function POST(
   });
 
   if (!leave) {
-    return NextResponse.json(error("not_found", undefined, traceId), { status: 404 });
+    return NextResponse.json(error("not_found", undefined, traceId), {
+      status: 404,
+    });
   }
 
   // Explicitly exclude HR_ADMIN from approval (operational role only)
   if (userRole === "HR_ADMIN") {
     return NextResponse.json(
-      error("forbidden", "HR Admin cannot approve requests. Only HR Head, CEO, or System Admin can approve.", traceId),
+      error(
+        "forbidden",
+        "HR Admin cannot approve requests. Only HR Head, CEO, or System Admin can approve.",
+        traceId
+      ),
       { status: 403 }
     );
   }
 
   // Check if user can approve for this leave type (per-type chain logic)
   if (!canPerformAction(userRole, "APPROVE", leave.type)) {
-    return NextResponse.json(error("forbidden", "You cannot approve leave requests", traceId), { status: 403 });
+    return NextResponse.json(
+      error("forbidden", "You cannot approve leave requests", traceId),
+      { status: 403 }
+    );
   }
 
   // Verify user is final approver for this leave type
   if (!isFinalApprover(userRole, leave.type)) {
     return NextResponse.json(
-      error("forbidden", "Only the final approver can approve leave requests", traceId),
+      error(
+        "forbidden",
+        "Only the final approver can approve leave requests",
+        traceId
+      ),
       { status: 403 }
     );
   }
@@ -67,24 +90,34 @@ export async function POST(
   const body = await request.json().catch(() => ({}));
   const parsed = ApproveSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(error("invalid_input", undefined, traceId), { status: 400 });
+    return NextResponse.json(error("invalid_input", undefined, traceId), {
+      status: 400,
+    });
   }
 
   // Prevent self-approval
   if (leave.requesterId === user.id) {
-    return NextResponse.json(error("self_approval_disallowed", undefined, traceId), { status: 403 });
+    return NextResponse.json(
+      error("self_approval_disallowed", undefined, traceId),
+      { status: 403 }
+    );
   }
 
   // Check if leave is in an approvable state
   if (!["SUBMITTED", "PENDING"].includes(leave.status)) {
     return NextResponse.json(
-      error("invalid_status", undefined, traceId, { currentStatus: leave.status }),
+      error("invalid_status", undefined, traceId, {
+        currentStatus: leave.status,
+      }),
       { status: 400 }
     );
   }
 
   const step = getStepForRole(userRole, leave.type);
-  const newStatus = getStatusAfterAction(leave.status as LeaveStatus, "APPROVE");
+  const newStatus = getStatusAfterAction(
+    leave.status as LeaveStatus,
+    "APPROVE"
+  );
 
   // Update existing PENDING approval to APPROVED, or create new one
   const existingApproval = await prisma.approval.findFirst({
@@ -138,7 +171,10 @@ export async function POST(
 
   if (balance) {
     const newUsed = (balance.used || 0) + leave.workingDays;
-    const newClosing = Math.max((balance.opening || 0) + (balance.accrued || 0) - newUsed, 0);
+    const newClosing = Math.max(
+      (balance.opening || 0) + (balance.accrued || 0) - newUsed,
+      0
+    );
 
     await prisma.balance.update({
       where: {
@@ -174,4 +210,3 @@ export async function POST(
     status: newStatus,
   });
 }
-
