@@ -42,8 +42,8 @@ type UsePendingRequestsOptions = {
  * Handles filtering, search, pagination, and bulk actions
  */
 export function usePendingRequests(options: UsePendingRequestsOptions = {}) {
-  const { autoFetch = true, initialFilters } = options;
-  const { user } = useUser();
+  const { autoFetch = true } = options;
+  const user = useUser();
 
   // URL filters
   const { state: urlFilters, set: setUrlFilters } = useFilterFromUrl();
@@ -93,7 +93,7 @@ export function usePendingRequests(options: UsePendingRequestsOptions = {}) {
 
   // Fetch data
   const { data, error, isLoading, mutate } = useSWR(
-    autoFetch && user ? `/api/approvals/pending?${queryParams}` : null,
+    autoFetch && user ? `/api/approvals?${queryParams}` : null,
     fetcher,
     {
       revalidateOnFocus: false,
@@ -101,9 +101,13 @@ export function usePendingRequests(options: UsePendingRequestsOptions = {}) {
     }
   );
 
-  const requests: LeaveRequest[] = data?.requests || [];
+  const requests: LeaveRequest[] = Array.isArray(data?.requests)
+    ? data.requests
+    : Array.isArray(data?.items)
+    ? data.items
+    : [];
   const totalPages = data?.totalPages || 1;
-  const totalRequests = data?.total || 0;
+  const totalRequests = data?.total ?? requests.length;
 
   // Filtered and sorted requests
   const filteredRequests = useMemo(() => {

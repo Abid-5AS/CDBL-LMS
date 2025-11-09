@@ -239,13 +239,13 @@ export function EmployeeList() {
                         variant="outline"
                         className={
                           employee.role === "CEO"
-                            ? "bg-card-summary text-card-summary border-card-summary"
+                            ? "bg-card-summary/10 text-card-summary border-card-summary/20"
                             : employee.role === "HR_HEAD"
-                            ? "bg-data-info text-data-info border-data-info"
+                            ? "bg-data-info/10 text-data-info border-data-info/20"
                             : employee.role === "HR_ADMIN"
-                            ? "bg-data-info text-data-info border-data-info"
+                            ? "bg-data-info/10 text-data-info border-data-info/20"
                             : employee.role === "DEPT_HEAD"
-                            ? "bg-data-success text-data-success border-data-success"
+                            ? "bg-data-success/10 text-data-success border-data-success/20"
                             : "bg-bg-secondary text-text-secondary border-bg-muted"
                         }
                       >

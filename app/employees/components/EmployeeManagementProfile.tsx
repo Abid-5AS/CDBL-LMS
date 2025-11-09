@@ -34,13 +34,13 @@ type EmployeeManagementProfileProps = {
 const getRoleBadgeVariant = (role: AppRole) => {
   switch (role) {
     case "CEO":
-      return "bg-card-summary text-card-summary border-card-summary";
+      return "bg-card-summary/10 text-card-summary border-card-summary/20";
     case "HR_HEAD":
-      return "bg-data-info text-data-info border-data-info";
+      return "bg-data-info/10 text-data-info border-data-info/20";
     case "HR_ADMIN":
-      return "bg-data-info text-data-info border-data-info";
+      return "bg-data-info/10 text-data-info border-data-info/20";
     case "DEPT_HEAD":
-      return "bg-data-success text-data-success border-data-success";
+      return "bg-data-success/10 text-data-success border-data-success/20";
     case "EMPLOYEE":
       return "bg-bg-secondary text-text-secondary border-border-strong";
   }

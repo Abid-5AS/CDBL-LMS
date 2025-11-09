@@ -30,9 +30,9 @@ export function SuperAdminDashboard({ username }: SuperAdminDashboardProps) {
             Welcome back, {username}
           </p>
         </div>
-        <Button asChild variant="outline">
-          <Link href="/admin">Open Admin Console</Link>
-        </Button>
+        <Link href="/admin">
+          <Button variant="outline">Open Admin Console</Button>
+        </Link>
       </section>
 
       {/* System Overview */}
@@ -60,9 +60,11 @@ export function SuperAdminDashboard({ username }: SuperAdminDashboardProps) {
           <h3 className="text-lg font-semibold text-text-secondary">
             Recent Audit Logs
           </h3>
-          <Button asChild variant="ghost" className="text-data-info">
-            <Link href="/admin">View all</Link>
-          </Button>
+          <Link href="/admin">
+            <Button variant="ghost" className="text-data-info">
+              View all
+            </Button>
+          </Link>
         </div>
         <div className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
           <Suspense fallback={<TableSkeleton />}>

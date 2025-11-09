@@ -19,7 +19,8 @@ const STATUS_VARIANTS: Record<string, string> = {
   PENDING: "bg-data-warning/10 text-data-warning border-data-warning/20",
   SUBMITTED: "bg-data-info/10 text-data-info border-data-info/20",
   REJECTED: "bg-data-error/10 text-data-error border-data-error/20",
-  CANCELLED: "bg-status-cancelled/10 text-status-cancelled border-status-cancelled/20",
+  CANCELLED:
+    "bg-status-cancelled/10 text-status-cancelled border-status-cancelled/20",
 };
 
 export function LeaveHistoryTable({ history }: LeaveHistoryTableProps) {

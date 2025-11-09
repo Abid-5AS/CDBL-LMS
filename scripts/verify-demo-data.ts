@@ -30,14 +30,14 @@ async function checkUsers() {
   const users = await prisma.user.findMany();
   
   // Check count
-  if (users.length !== 8) {
-    addCheck("user_count", "fail", `Expected 8 users, found ${users.length}`);
+  if (users.length !== 19) {
+    addCheck("user_count", "fail", `Expected 19 users, found ${users.length}`);
     return;
   }
 
   // Check roles exist
   const roles = users.map(u => u.role);
-  const requiredRoles: Role[] = [Role.EMPLOYEE, Role.DEPT_HEAD, Role.HR_ADMIN, Role.HR_HEAD, Role.CEO];
+  const requiredRoles: Role[] = [Role.EMPLOYEE, Role.DEPT_HEAD, Role.HR_ADMIN, Role.HR_HEAD, Role.CEO, Role.SYSTEM_ADMIN];
   const missingRoles = requiredRoles.filter(r => !roles.includes(r));
   
   if (missingRoles.length > 0) {
@@ -46,41 +46,72 @@ async function checkUsers() {
   }
 
   // Check specific users
-  const employee1 = users.find(u => u.email === "employee1@demo.local");
-  const employee4 = users.find(u => u.email === "employee4@demo.local");
   const ceo = users.find(u => u.email === "ceo@demo.local");
+  const hrHead = users.find(u => u.email === "hrhead@demo.local");
+  const hrAdmin = users.find(u => u.email === "hradmin@demo.local");
+  const manager = users.find(u => u.email === "manager@demo.local");
+  const employee1 = users.find(u => u.email === "employee1@demo.local");
+  const employee3 = users.find(u => u.email === "employee3@demo.local");
 
-  if (!employee1 || employee1.department !== "Engineering") {
-    addCheck("employee1_department", "fail", "Employee1 should be in Engineering department");
+  if (!ceo || ceo.role !== Role.CEO) {
+    addCheck("ceo_account", "fail", "CEO account missing");
   }
-  if (!employee4 || employee4.department !== "Finance") {
-    addCheck("employee4_department", "fail", "Employee4 should be in Finance department");
+  if (!hrHead || hrHead.role !== Role.HR_HEAD) {
+    addCheck("hr_head_account", "fail", "HR Head account missing");
   }
-  if (!ceo || ceo.name !== "CEO One") {
-    addCheck("ceo_name", "fail", "CEO should be named 'CEO One'");
+  if (!hrAdmin || hrAdmin.role !== Role.HR_ADMIN) {
+    addCheck("hr_admin_account", "fail", "HR Admin account missing");
+  }
+  if (!manager || manager.role !== Role.DEPT_HEAD || manager.department !== "IT") {
+    addCheck("dept_head_it", "fail", "IT Dept Head (manager@demo.local) missing or misconfigured");
+  }
+  if (!employee1 || employee1.department !== "IT") {
+    addCheck("employee1_department", "fail", "Employee One should belong to IT");
+  }
+  if (!employee3 || employee3.department !== "HR") {
+    addCheck("employee3_department", "fail", "Employee Three should belong to HR");
   }
 
-  addCheck("users", "pass", `8 users OK with correct roles and departments`);
+  const deptHeadCount = users.filter(u => u.role === Role.DEPT_HEAD).length;
+  const employeeCount = users.filter(u => u.role === Role.EMPLOYEE).length;
+
+  if (deptHeadCount !== 3 || employeeCount !== 12) {
+    addCheck(
+      "user_distribution",
+      "fail",
+      `Expected 3 dept heads & 12 employees; found ${deptHeadCount} dept heads and ${employeeCount} employees`
+    );
+  } else {
+    addCheck("users", "pass", "User roster matches expected distribution (19 total)");
+  }
 }
 
 async function checkLeaves() {
   const leaves = await prisma.leaveRequest.findMany();
-  
-  if (leaves.length < 10 || leaves.length > 12) {
-    addCheck("leave_count", "warning", `Expected 10-12 leaves, found ${leaves.length}`);
+  const minExpected = 60;
+  const maxExpected = 140;
+
+  if (leaves.length < minExpected || leaves.length > maxExpected) {
+    addCheck("leave_count", "warning", `Expected ${minExpected}-${maxExpected} leaves, found ${leaves.length}`);
   } else {
     addCheck("leave_count", "pass", `${leaves.length} leave requests found`);
   }
 
   // Check statuses
   const statuses = leaves.map(l => l.status);
-  const requiredStatuses: LeaveStatus[] = ["PENDING", "APPROVED", "REJECTED", "CANCELLED", "SUBMITTED"];
-  const foundStatuses = requiredStatuses.filter(s => statuses.includes(s));
+  const requiredStatuses: LeaveStatus[] = [
+    LeaveStatus.APPROVED,
+    LeaveStatus.PENDING,
+    LeaveStatus.REJECTED,
+    LeaveStatus.RETURNED,
+    LeaveStatus.CANCELLATION_REQUESTED,
+  ];
+  const missingStatuses = requiredStatuses.filter(status => !statuses.includes(status));
   
-  if (foundStatuses.length < 4) {
-    addCheck("leave_statuses", "warning", `Missing some statuses. Found: ${foundStatuses.join(", ")}`);
+  if (missingStatuses.length > 0) {
+    addCheck("leave_statuses", "warning", `Missing statuses: ${missingStatuses.join(", ")}`);
   } else {
-    addCheck("leave_statuses", "pass", `All required statuses present: ${foundStatuses.join(", ")}`);
+    addCheck("leave_statuses", "pass", "All key statuses present");
   }
 
   // Policy compliance checks
@@ -226,8 +257,8 @@ async function checkBalances() {
 async function checkAuditLogs() {
   const logs = await prisma.auditLog.findMany();
   
-  if (logs.length < 20) {
-    addCheck("audit_count", "warning", `Expected 20+ audit logs, found ${logs.length}`);
+  if (logs.length < 50) {
+    addCheck("audit_count", "warning", `Expected 50+ audit logs, found ${logs.length}`);
   } else {
     addCheck("audit_count", "pass", `${logs.length} audit log entries found`);
   }

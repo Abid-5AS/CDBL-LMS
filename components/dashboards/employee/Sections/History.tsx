@@ -268,7 +268,7 @@ export function HistoryAnalyticsCard({
                 onClick={() => setFilter(option.value)}
                 className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
                   filter === option.value
-                    ? "bg-card-action text-card-action dark:bg-card-action/40 dark:text-card-action"
+                    ? "bg-card-action/10 text-card-action border border-card-action/20"
                     : "bg-muted text-muted-foreground hover:bg-muted/70 dark:bg-muted/60"
                 }`}
               >

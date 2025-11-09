@@ -129,8 +129,8 @@ export function DashboardErrorBoundary({
       </div>
       <div>
         <p className="text-sm text-muted-foreground mb-4">
-          Unable to load the {role ? `${role} ` : ""}dashboard. Please
-          refresh the page or contact support if the problem persists.
+          Unable to load the {role ? `${role} ` : ""}dashboard. Please refresh
+          the page or contact support if the problem persists.
         </p>
         <Button onClick={() => window.location.reload()} variant="default">
           Refresh Page

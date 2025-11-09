@@ -18,4 +18,3 @@ export function ManagerView({ employee, viewerRole }: ManagerViewProps) {
     />
   );
 }
-

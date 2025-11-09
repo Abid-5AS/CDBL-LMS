@@ -4,7 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 import type { Prisma } from "@prisma/client";
 
-const SECRET = process.env.JWT_SECRET || process.env.AUTH_SECRET || "dev-secret";
+const SECRET =
+  process.env.JWT_SECRET || process.env.AUTH_SECRET || "dev-secret";
 const JWT_COOKIE = "session_token";
 
 const encoder = new TextEncoder();
@@ -26,7 +27,9 @@ export async function signJwt(claims: JwtClaims, maxAgeSeconds = 60 * 60 * 8) {
 }
 
 export async function verifyJwt(token: string) {
-  const { payload } = await jwtVerify(token, SECRET_KEY, { algorithms: ["HS256"] });
+  const { payload } = await jwtVerify(token, SECRET_KEY, {
+    algorithms: ["HS256"],
+  });
   return payload as JwtClaims;
 }
 

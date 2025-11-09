@@ -5,13 +5,16 @@ import { Clock, Users, TrendingUp, Calendar } from "lucide-react";
 import { PendingLeaveRequestsTable } from "@/components/dashboards/hr-admin/Sections/PendingApprovals";
 import { ReturnedRequestsPanel } from "@/components/dashboards/hr-head/Sections/ReturnedRequests";
 import { CancellationRequestsPanel } from "@/components/dashboards/hr-admin/Sections/CancellationRequests";
-import { DashboardLoadingFallback, DashboardCardSkeleton } from "../shared/LoadingFallback";
+import {
+  DashboardLoadingFallback,
+  DashboardCardSkeleton,
+} from "../shared/LoadingFallback";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { RoleBasedDashboard } from "@/components/dashboards/shared/RoleBasedDashboard";
 
 async function HRHeadDashboardContent() {
   const user = await getCurrentUser();
-  
+
   if (!user) {
     redirect("/login");
   }
@@ -134,14 +137,16 @@ async function HRHeadDashboardContent() {
         <Suspense fallback={<DashboardCardSkeleton />}>
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Returned for Modification</CardTitle>
+              <CardTitle className="text-base">
+                Returned for Modification
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <ReturnedRequestsPanel />
             </CardContent>
           </Card>
         </Suspense>
-        
+
         <Suspense fallback={<DashboardCardSkeleton />}>
           <Card>
             <CardHeader>
@@ -164,4 +169,3 @@ export default function HRHeadDashboardPage() {
     </Suspense>
   );
 }
-

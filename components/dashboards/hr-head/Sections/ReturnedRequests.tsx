@@ -140,11 +140,11 @@ export function ReturnedRequestsPanel() {
                     <StatusBadge status={leave.status as any} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button asChild size="sm" variant="outline">
-                      <Link href={`/leaves?highlight=${leave.id}`}>
+                    <Link href={`/leaves?highlight=${leave.id}`}>
+                      <Button size="sm" variant="outline">
                         View Details
-                      </Link>
-                    </Button>
+                      </Button>
+                    </Link>
                   </TableCell>
                 </TableRow>
               );
@@ -153,11 +153,11 @@ export function ReturnedRequestsPanel() {
         </Table>
         {returnedRequests.length > 5 && (
           <div className="p-4 text-center border-t">
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/approvals?status=RETURNED">
+            <Link href="/approvals?status=RETURNED">
+              <Button variant="ghost" size="sm">
                 View all ({returnedRequests.length})
-              </Link>
-            </Button>
+              </Button>
+            </Link>
           </div>
         )}
       </CardContent>

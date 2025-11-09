@@ -62,9 +62,11 @@ export function HRDashboard({ username }: HRDashboardProps) {
           <h3 className="text-lg font-semibold text-foreground">
             Pending Leave Requests
           </h3>
-          <Button asChild variant="ghost" className="text-data-info">
-            <Link href="/approvals">View all</Link>
-          </Button>
+          <Link href="/approvals">
+            <Button variant="ghost" className="text-data-info">
+              View all
+            </Button>
+          </Link>
         </div>
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
           <Suspense fallback={<TableSkeleton />}>

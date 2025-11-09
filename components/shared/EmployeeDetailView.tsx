@@ -63,13 +63,18 @@ export function EmployeeDetailView({
 }: EmployeeDetailViewProps) {
   const router = useRouter();
   const canEdit = canEditEmployee(viewerRole, employee.role as AppRole);
-  const showStats = ["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"].includes(viewerRole);
+  const showStats = ["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"].includes(
+    viewerRole
+  );
 
   return (
     <div className="space-y-6">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/employees" className="hover:text-foreground transition-colors">
+        <Link
+          href="/employees"
+          className="hover:text-foreground transition-colors"
+        >
           {breadcrumbLabel}
         </Link>
         <span>/</span>
@@ -80,14 +85,24 @@ export function EmployeeDetailView({
       <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
         <div className="flex items-start justify-between flex-col sm:flex-row gap-4">
           <div className="flex-1">
-            <h1 className="text-2xl font-semibold text-foreground">{employee.name}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{employee.email}</p>
+            <h1 className="text-2xl font-semibold text-foreground">
+              {employee.name}
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {employee.email}
+            </p>
             <div className="mt-3 flex items-center gap-3 flex-wrap">
-              <Badge variant="outline" className={getRoleBadgeVariant(employee.role as AppRole)}>
+              <Badge
+                variant="outline"
+                className={getRoleBadgeVariant(employee.role as AppRole)}
+              >
                 {roleLabel(employee.role)}
               </Badge>
               {employee.department && (
-                <Badge variant="outline" className="bg-muted text-muted-foreground">
+                <Badge
+                  variant="outline"
+                  className="bg-muted text-muted-foreground"
+                >
                   {employee.department}
                 </Badge>
               )}
@@ -113,7 +128,9 @@ export function EmployeeDetailView({
 
       {/* Employee Information Card */}
       <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-foreground mb-4">Employee Information</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-4">
+          Employee Information
+        </h2>
         <EmployeeProfileCard
           name={employee.name}
           email={employee.email}
@@ -128,7 +145,9 @@ export function EmployeeDetailView({
       {/* Leave Statistics Summary - Only for HR roles */}
       {showStats && employee.stats && (
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Leave Statistics</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-4">
+            Leave Statistics
+          </h2>
           <HRStatCards stats={employee.stats} />
         </div>
       )}

@@ -33,7 +33,7 @@ export function SegmentedNav({ role }: { role: "EMPLOYEE" | "HR_ADMIN" }) {
               "focus:outline-none focus:ring-2 focus:ring-card-action focus:ring-offset-2",
               "hover:bg-bg-primary/50",
               isActive
-                ? "bg-card-action text-card-action shadow-sm"
+                ? "bg-card-action text-text-inverted shadow-sm"
                 : "text-text-secondary hover:text-text-secondary"
             )}
             aria-current={isActive ? "page" : undefined}

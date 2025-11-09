@@ -21,6 +21,7 @@ import { countWorkingDays } from "@/lib/working-days";
 import { normalizeToDhakaMidnight } from "@/lib/date-utils";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
+import { getStepForRole } from "@/lib/workflow";
 
 const ApplySchema = z.object({
   type: z.enum([
@@ -431,9 +432,29 @@ export async function POST(req: Request) {
       needsCertificate,
       certificateUrl,
       policyVersion: policy.version,
-      status: "PENDING",
+      status: "SUBMITTED",
     },
   });
+
+  // Create initial pending approval entry for HR Admin (step 1 in chain)
+  const hrAdmin = await prisma.user.findFirst({
+    where: { role: "HR_ADMIN" },
+    orderBy: { id: "asc" },
+    select: { id: true },
+  });
+
+  if (hrAdmin) {
+    const initialStep = Math.max(getStepForRole("HR_ADMIN", t), 1);
+    await prisma.approval.create({
+      data: {
+        leaveId: created.id,
+        step: initialStep,
+        approverId: hrAdmin.id,
+        decision: "PENDING",
+        comment: null,
+      },
+    });
+  }
 
   return NextResponse.json({ ok: true, id: created.id, warnings });
 }

@@ -52,7 +52,11 @@ import {
 } from "@/components/ui";
 
 // Shared Components (barrel export)
-import { StatusBadge, LeaveComparisonModal, ApprovalActionButtons } from "@/components/shared";
+import {
+  StatusBadge,
+  LeaveComparisonModal,
+  ApprovalActionButtons,
+} from "@/components/shared";
 
 // Lib utilities (barrel export)
 import { formatDate, leaveTypeLabel, canPerformAction } from "@/lib";

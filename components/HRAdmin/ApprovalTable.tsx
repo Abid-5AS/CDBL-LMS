@@ -299,7 +299,9 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                       }
                       aria-label="Select all rows"
                       className={
-                        someSelected ? "data-[state=checked]:bg-card-action" : ""
+                        someSelected
+                          ? "data-[state=checked]:bg-card-action"
+                          : ""
                       }
                     />
                   </TableHead>
@@ -380,7 +382,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                         {stage.toLowerCase()}
                       </TableCell>
                       <TableCell className="text-right">
-                        <div 
+                        <div
                           className="flex justify-end"
                           onClick={(e) => e.stopPropagation()}
                         >
@@ -406,7 +408,10 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                             loading={processingId !== null}
                             loadingAction={
                               processingId?.startsWith(item.id)
-                                ? (processingId.replace(item.id, "") as ApprovalAction)
+                                ? (processingId.replace(
+                                    item.id,
+                                    ""
+                                  ) as ApprovalAction)
                                 : null
                             }
                           />

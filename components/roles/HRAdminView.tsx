@@ -18,4 +18,3 @@ export function HRAdminView({ employee, viewerRole }: HRAdminViewProps) {
     />
   );
 }
-

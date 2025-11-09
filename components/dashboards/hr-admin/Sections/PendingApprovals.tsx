@@ -32,7 +32,11 @@ import {
 } from "@/components/ui";
 
 // Shared Components (barrel export)
-import { StatusBadge, ReviewModal, ApprovalActionButtons } from "@/components/shared";
+import {
+  StatusBadge,
+  ReviewModal,
+  ApprovalActionButtons,
+} from "@/components/shared";
 
 // Lib utilities (barrel export)
 import { cn, formatDate, leaveTypeLabel } from "@/lib";
@@ -65,11 +69,11 @@ const STATUS_TABS = [
 const getLeaveTypeColor = (type: string): string => {
   switch (type) {
     case "CASUAL":
-      return "bg-data-info text-data-info border-data-info dark:bg-data-info/40 dark:text-data-info dark:border-data-info/50";
+      return "bg-data-info/10 text-data-info border-data-info/20";
     case "EARNED":
-      return "bg-data-success text-data-success border-data-success dark:bg-data-success/40 dark:text-data-success dark:border-data-success/50";
+      return "bg-data-success/10 text-data-success border-data-success/20";
     case "MEDICAL":
-      return "bg-data-error text-data-error border-data-error dark:bg-data-error/40 dark:text-data-error dark:border-data-error/50";
+      return "bg-data-error/10 text-data-error border-data-error/20";
     default:
       return "bg-bg-secondary text-text-secondary border-bg-muted";
   }
@@ -100,6 +104,9 @@ export function PendingLeaveRequestsTable({
     handleSingleAction,
     isProcessing,
     refresh,
+    requests,
+    isLoading: hookIsLoading,
+    error: hookError,
   } = usePendingRequests();
 
   // Local state
@@ -113,13 +120,15 @@ export function PendingLeaveRequestsTable({
   const [processingId, setProcessingId] = useState<number | null>(null);
 
   // Use external data if provided
-  const allLeaves: LeaveRequest[] = useMemo(
-    () => (Array.isArray(externalData?.items) ? externalData.items : []),
-    [externalData?.items]
-  );
+  const allLeaves: LeaveRequest[] = useMemo(() => {
+    if (Array.isArray(externalData?.items)) {
+      return externalData.items;
+    }
+    return requests;
+  }, [externalData?.items, requests]);
 
-  const isLoading = externalIsLoading || false;
-  const error = externalError;
+  const isLoading = externalIsLoading ?? hookIsLoading;
+  const error = externalError ?? hookError;
 
   // Filter by status tab and search
   const filteredLeaves = useMemo(() => {
@@ -402,11 +411,17 @@ export function PendingLeaveRequestsTable({
                                   leave.status === "SUBMITTED") && (
                                   <ApprovalActionButtons
                                     onForward={() => handleForward(leave)}
-                                    onReturn={() => handleQuickAction(leave, "return")}
-                                    onCancel={() => handleQuickAction(leave, "reject")}
+                                    onReturn={() =>
+                                      handleQuickAction(leave, "return")
+                                    }
+                                    onCancel={() =>
+                                      handleQuickAction(leave, "reject")
+                                    }
                                     disabled={isProcessingThis}
                                     loading={isProcessingThis}
-                                    loadingAction={isProcessingThis ? "forward" : null}
+                                    loadingAction={
+                                      isProcessingThis ? "forward" : null
+                                    }
                                   />
                                 )}
                               </div>

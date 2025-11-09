@@ -91,4 +91,3 @@ export function getNavItemsForRole(role: UserRole): NavItem[] {
 export function getHomePageForRole(role: UserRole): string {
   return roleHomePages[role] || "/dashboard";
 }
-

@@ -7,7 +7,7 @@ import { DashboardLayout } from "../shared/DashboardLayout";
 
 async function DeptHeadDashboardContent() {
   const user = await getCurrentUser();
-  
+
   if (!user) {
     redirect("/login");
   }
@@ -37,4 +37,3 @@ export default function DeptHeadDashboardPage() {
     </Suspense>
   );
 }
-

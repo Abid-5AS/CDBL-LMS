@@ -18,4 +18,3 @@ export function ExecutiveView({ employee, viewerRole }: ExecutiveViewProps) {
     />
   );
 }
-

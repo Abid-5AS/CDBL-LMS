@@ -213,7 +213,7 @@ function ReturnedRequestRow({
         ) : returnInfo ? (
           <div className="flex items-center gap-2">
             <Avatar className="h-6 w-6">
-              <AvatarFallback className="bg-card-action text-card-action dark:bg-card-action/30 dark:text-card-action text-xs">
+              <AvatarFallback className="bg-card-action/10 text-card-action text-xs">
                 {initials}
               </AvatarFallback>
             </Avatar>

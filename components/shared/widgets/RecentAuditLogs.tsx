@@ -75,7 +75,7 @@ export async function RecentAuditLogs() {
                 </TableCell>
                 <TableCell className="text-sm">{log.actorEmail}</TableCell>
                 <TableCell>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-data-info text-data-info">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-data-info/10 text-data-info border border-data-info/20">
                     {log.action}
                   </span>
                 </TableCell>
