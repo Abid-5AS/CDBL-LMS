@@ -3,8 +3,6 @@
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Upload,
-  File,
   X,
   CheckCircle2,
   AlertCircle,
@@ -19,7 +17,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
 import { Progress } from "./progress";
-import { Badge } from "./badge";
+import KokonutFileUpload from "@/components/kokonutui/file-upload";
+import Image from 'next/image';
 
 export interface UploadedFile {
   file: File;
@@ -155,7 +154,7 @@ export function DragDropUpload({
         id: Math.random().toString(36).substr(2, 9),
         progress: 0,
         status: error ? "error" : "uploading",
-        error,
+        error: error || undefined,
         preview,
       };
 
@@ -227,45 +226,6 @@ export function DragDropUpload({
     onFilesChange(updatedFiles);
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    if (!disabled) {
-      setIsDragOver(true);
-    }
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-
-    if (disabled) return;
-
-    const droppedFiles = e.dataTransfer.files;
-    if (droppedFiles.length > 0) {
-      processFiles(droppedFiles);
-    }
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = e.target.files;
-    if (selectedFiles && selectedFiles.length > 0) {
-      processFiles(selectedFiles);
-    }
-    // Reset input value to allow selecting the same file again
-    e.target.value = "";
-  };
-
-  const openFileDialog = () => {
-    if (!disabled && fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
   return (
     <div className={cn("space-y-4", className)}>
       {label && (
@@ -276,64 +236,28 @@ export function DragDropUpload({
       )}
 
       {/* Drop Zone */}
-      <motion.div
-        className={cn(
-          "relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200",
-          isDragOver && !disabled && "border-primary bg-primary/5 scale-[1.02]",
-          !isDragOver &&
-            "border-muted-foreground/25 hover:border-muted-foreground/50",
-          disabled && "opacity-50 cursor-not-allowed",
-          error && "border-destructive",
-          "cursor-pointer"
-        )}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={openFileDialog}
-        whileHover={!disabled ? { scale: 1.01 } : {}}
-        whileTap={!disabled ? { scale: 0.99 } : {}}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple={multiple}
-          accept={acceptedTypes.join(",")}
-          onChange={handleFileSelect}
-          className="hidden"
-          disabled={disabled}
+      {files.length === 0 && (
+        <KokonutFileUpload
+          onUploadSuccess={(file: File) => {
+            const newFile: UploadedFile = {
+              file,
+              id: Math.random().toString(36).substr(2, 9),
+              progress: 100,
+              status: "success",
+            };
+            const updatedFiles = [...files, newFile];
+            setFiles(updatedFiles);
+            onFilesChange(updatedFiles);
+          }}
+          onUploadError={(error: { message: string; code: string }) => {
+            console.error("Upload error:", error);
+          }}
+          acceptedFileTypes={acceptedTypes}
+          maxFileSize={maxSize}
+          uploadDelay={0} // No simulation
+          className="w-full max-w-none"
         />
-
-        <motion.div
-          animate={isDragOver ? { scale: 1.1 } : { scale: 1 }}
-          transition={{ duration: 0.2 }}
-        >
-          <Upload
-            className={cn(
-              "mx-auto h-12 w-12 mb-4",
-              isDragOver ? "text-primary" : "text-muted-foreground"
-            )}
-          />
-        </motion.div>
-
-        <div className="space-y-2">
-          <p className="text-lg font-medium text-foreground">
-            {isDragOver ? "Drop files here" : "Drag & drop files here"}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            or click to browse files
-          </p>
-
-          {(maxFiles > 1 || acceptedTypes.length > 0 || maxSize) && (
-            <div className="text-xs text-muted-foreground space-y-1">
-              {maxFiles > 1 && <p>Maximum {maxFiles} files</p>}
-              {maxSize && <p>Maximum size: {formatFileSize(maxSize)}</p>}
-              {acceptedTypes.length > 0 && (
-                <p>Accepted types: {acceptedTypes.join(", ")}</p>
-              )}
-            </div>
-          )}
-        </div>
-      </motion.div>
+      )}
 
       {/* File List */}
       <AnimatePresence>
@@ -356,16 +280,18 @@ export function DragDropUpload({
                   className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg border"
                 >
                   {/* File Preview/Icon */}
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     {uploadedFile.preview ? (
-                      <img
+                      <Image
                         src={uploadedFile.preview}
                         alt={uploadedFile.file.name}
                         className="w-10 h-10 object-cover rounded"
+                        width={40}
+                        height={40}
                       />
                     ) : (
                       <div className="w-10 h-10 bg-muted rounded flex items-center justify-center">
-                        <FileIcon className="w-5 h-5 text-muted-foreground" />
+                        <FileText className="w-5 h-5 text-muted-foreground" />
                       </div>
                     )}
                   </div>
@@ -396,7 +322,7 @@ export function DragDropUpload({
                   </div>
 
                   {/* Status Icon */}
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     {uploadedFile.status === "uploading" && (
                       <Loader2 className="w-4 h-4 text-primary animate-spin" />
                     )}
