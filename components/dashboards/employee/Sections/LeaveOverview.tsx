@@ -10,6 +10,10 @@ import {
 } from "@/components/ui";
 import { SegmentedControlGlider } from "@/components/shared/widgets/SegmentedControlGlider";
 import { LeaveBalancePanel } from "@/components/shared/LeaveBalancePanel";
+import {
+  LeaveActivityCard,
+  createLeaveActivityData,
+} from "@/components/shared";
 import { fromDashboardSummary } from "@/components/shared/balance-adapters";
 import { TeamOnLeaveWidget } from "@/components/shared/widgets/TeamOnLeaveWidget";
 import { InsightsWidget } from "@/components/dashboards/common/InsightsWidget";
@@ -27,11 +31,12 @@ export function LeaveOverviewCard({
   isLoadingBalance,
   isLoadingLeaves,
 }: LeaveOverviewCardProps) {
-  const [activeTab, setActiveTab] = useState<"balance" | "team" | "insights">(
-    "balance"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "balance" | "activity" | "team" | "insights"
+  >("activity");
 
   const tabOptions = [
+    { value: "activity", label: "Activity" },
     { value: "balance", label: "Balance" },
     { value: "team", label: "Team" },
     { value: "insights", label: "Insights" },
@@ -49,13 +54,37 @@ export function LeaveOverviewCard({
               options={tabOptions}
               selected={activeTab}
               onChange={(value) =>
-                setActiveTab(value as "balance" | "team" | "insights")
+                setActiveTab(
+                  value as "balance" | "activity" | "team" | "insights"
+                )
               }
             />
           </div>
         </div>
       </CardHeader>
       <CardContent>
+        {activeTab === "activity" && (
+          <div className="py-2">
+            {isLoadingBalance ? (
+              <div className="flex items-center justify-center py-8">
+                <Skeleton className="w-80 h-64 rounded-2xl" />
+              </div>
+            ) : (
+              <LeaveActivityCard
+                title="My Leave Balance"
+                activities={createLeaveActivityData({
+                  earnedUsed: balanceData?.earned?.used || 0,
+                  earnedTotal: balanceData?.earned?.total || 20,
+                  casualUsed: balanceData?.casual?.used || 0,
+                  casualTotal: balanceData?.casual?.total || 10,
+                  medicalUsed: balanceData?.medical?.used || 0,
+                  medicalTotal: balanceData?.medical?.total || 14,
+                })}
+                className="border-0 shadow-none bg-transparent"
+              />
+            )}
+          </div>
+        )}
         {activeTab === "balance" && (
           <LeaveBalancePanel
             balances={fromDashboardSummary(balanceData)}

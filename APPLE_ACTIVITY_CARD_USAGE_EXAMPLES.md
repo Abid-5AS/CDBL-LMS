@@ -5,9 +5,10 @@
 ### **1. Employee Dashboard - Leave Balance Replacement**
 
 **Before (Current):**
+
 ```tsx
 // Current LeaveOverviewCard with tabs and multiple sections
-<LeaveOverviewCard 
+<LeaveOverviewCard
   balanceData={balanceData}
   leavesData={leavesData}
   isLoadingBalance={isLoadingBalance}
@@ -16,8 +17,12 @@
 ```
 
 **After (With Apple Activity Card):**
+
 ```tsx
-import { LeaveActivityCard, createLeaveActivityData } from "@/components/shared";
+import {
+  LeaveActivityCard,
+  createLeaveActivityData,
+} from "@/components/shared";
 
 // In your component
 const activityData = createLeaveActivityData({
@@ -29,11 +34,11 @@ const activityData = createLeaveActivityData({
   medicalTotal: 14,
 });
 
-<LeaveActivityCard 
+<LeaveActivityCard
   title="My Leave Balance"
   activities={activityData}
   className="max-w-md"
-/>
+/>;
 ```
 
 **Space Saved:** ~60% less vertical space while showing same information more visually
@@ -43,6 +48,7 @@ const activityData = createLeaveActivityData({
 ### **2. HR Admin Dashboard - Analytics Overview**
 
 **Before (Multiple separate cards):**
+
 ```tsx
 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
   <KPICard title="Pending Approvals" value={25} />
@@ -53,6 +59,7 @@ const activityData = createLeaveActivityData({
 ```
 
 **After (Single Activity Card):**
+
 ```tsx
 import { HRAnalyticsCard, createHRAnalyticsData } from "@/components/shared";
 
@@ -67,14 +74,15 @@ const analyticsData = createHRAnalyticsData({
   complianceTarget: 100,
 });
 
-<HRAnalyticsCard 
+<HRAnalyticsCard
   title="HR Dashboard"
   subtitle="Real-time metrics overview"
   metrics={analyticsData}
-/>
+/>;
 ```
 
-**Benefits:** 
+**Benefits:**
+
 - 75% less horizontal space
 - Better visual correlation between metrics
 - Animated progress indicators
@@ -94,16 +102,16 @@ const teamMetrics = [
     color: "#22C55E",
     size: 100,
     unit: "members",
-    trend: "stable" as const
+    trend: "stable" as const,
   },
   {
     label: "On Leave",
     current: 3,
     target: 5,
-    color: "#F59E0B", 
+    color: "#F59E0B",
     size: 80,
     unit: "members",
-    trend: "down" as const
+    trend: "down" as const,
   },
   {
     label: "Pending Reviews",
@@ -112,16 +120,16 @@ const teamMetrics = [
     color: "#EF4444",
     size: 70,
     unit: "requests",
-    trend: "up" as const
-  }
+    trend: "up" as const,
+  },
 ];
 
-<HRAnalyticsCard 
+<HRAnalyticsCard
   title="Team Status"
   subtitle="Department overview"
   metrics={teamMetrics}
   className="max-w-lg"
-/>
+/>;
 ```
 
 ---
@@ -140,12 +148,12 @@ const companyMetrics = createHRAnalyticsData({
   complianceTarget: 100,
 });
 
-<HRAnalyticsCard 
+<HRAnalyticsCard
   title="Company Overview"
   subtitle="Enterprise-wide leave metrics"
   metrics={companyMetrics}
   className="max-w-2xl"
-/>
+/>;
 ```
 
 ---
@@ -162,7 +170,7 @@ const monthlyData = [
     color: "#8B5CF6",
     size: 90,
     unit: "days used",
-    trend: "up" as const
+    trend: "up" as const,
   },
   {
     label: "Finance",
@@ -170,8 +178,8 @@ const monthlyData = [
     target: 45,
     color: "#06B6D4",
     size: 90,
-    unit: "days used", 
-    trend: "stable" as const
+    unit: "days used",
+    trend: "stable" as const,
   },
   {
     label: "Operations",
@@ -180,15 +188,15 @@ const monthlyData = [
     color: "#10B981",
     size: 90,
     unit: "days used",
-    trend: "down" as const
-  }
+    trend: "down" as const,
+  },
 ];
 
-<HRAnalyticsCard 
+<HRAnalyticsCard
   title="Department Utilization"
   subtitle="Monthly leave usage by department"
   metrics={monthlyData}
-/>
+/>;
 ```
 
 ---
@@ -196,21 +204,25 @@ const monthlyData = [
 ## **Implementation Plan**
 
 ### **Phase 1: Employee Dashboard**
+
 1. Replace `LeaveBalancePanel` with `LeaveActivityCard`
 2. Update employee overview sections
 3. Test responsiveness and animations
 
-### **Phase 2: HR Dashboards** 
+### **Phase 2: HR Dashboards**
+
 1. Replace multiple KPI cards with `HRAnalyticsCard`
 2. Consolidate dashboard metrics
 3. Add trend indicators
 
 ### **Phase 3: Management Dashboards**
+
 1. Update Department Head dashboard
 2. Enhance CEO overview
 3. Improve reports visualization
 
 ### **Benefits Summary**
+
 - **Space Efficiency**: 50-75% less screen real estate
 - **Visual Appeal**: Beautiful circular progress animations
 - **Better UX**: Cleaner, more focused interface
