@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "./button";
 import { Progress } from "./progress";
 import KokonutFileUpload from "@/components/kokonutui/file-upload";
-import Image from 'next/image';
+import Image from "next/image";
 
 export interface UploadedFile {
   file: File;

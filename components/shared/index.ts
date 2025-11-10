@@ -19,6 +19,8 @@ export { EmployeeProfileCard } from "./EmployeeProfileCard";
 export { LeaveHistoryTable } from "./LeaveHistoryTable";
 export { DateRangePicker } from "./DateRangePicker";
 export { FileUploadSection } from "./FileUploadSection";
+export { LeaveActivityCard } from "./LeaveActivityCard";
+export { HRAnalyticsCard } from "./HRAnalyticsCard";
 
 // Re-export all modals
 export * from "./modals";

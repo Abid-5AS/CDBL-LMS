@@ -8,7 +8,12 @@ import { cn } from "@/lib/utils";
 import FileUpload from "@/components/kokonutui/file-upload";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ACCEPTED_FILE_TYPES = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
+const ACCEPTED_FILE_TYPES = [
+  "application/pdf",
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+];
 
 interface FileUploadSectionProps {
   value: File | null;
@@ -72,7 +77,9 @@ export function FileUploadSection({
         ) : (
           "Supporting Document"
         )}
-        <span className="text-xs font-normal text-muted-foreground ml-1">(PDF, JPG, PNG, max 5MB)</span>
+        <span className="text-xs font-normal text-muted-foreground ml-1">
+          (PDF, JPG, PNG, max 5MB)
+        </span>
       </Label>
 
       {!value ? (
@@ -100,7 +107,9 @@ export function FileUploadSection({
             <FileText className="h-5 w-5 text-data-info" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-text-secondary truncate">{value.name}</p>
+            <p className="text-sm font-medium text-text-secondary truncate">
+              {value.name}
+            </p>
             <p className="text-xs text-muted-foreground">
               {(value.size / 1024).toFixed(1)} KB
             </p>
@@ -120,7 +129,10 @@ export function FileUploadSection({
       )}
 
       {displayError && (
-        <p className="text-sm text-data-error flex items-center gap-1" role="alert">
+        <p
+          className="text-sm text-data-error flex items-center gap-1"
+          role="alert"
+        >
           <AlertCircle className="h-3 w-3" aria-hidden="true" />
           {displayError}
         </p>
