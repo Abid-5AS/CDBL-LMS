@@ -7,7 +7,7 @@ import { DeptHeadQuickActions } from "./Sections/QuickActions";
 import { Card, CardContent } from "@/components/ui";
 import { useApiQueryWithParams } from "@/lib/apiClient";
 import { useFilterFromUrl } from "@/lib/url-filters";
-import { KPIGrid, KPICard } from "@/components/cards/KPICard";
+import { KPIGrid, KPICard } from "@/components/cards";
 import { ClipboardList, CheckCircle, RotateCcw, XCircle } from "lucide-react";
 
 function CardSkeleton() {
@@ -53,6 +53,8 @@ export function DeptHeadDashboardWrapper() {
     returned: 0,
     cancelled: 0,
   };
+
+  const tableData = data ? { rows: data.items, total: data.items.length, counts: data.counts } : undefined;
 
   return (
     <div className="space-y-6">
@@ -126,7 +128,7 @@ export function DeptHeadDashboardWrapper() {
       {/* Main Content */}
       <div id="pending-requests-table">
         <DeptHeadPendingTable
-          data={data}
+          data={tableData}
           isLoading={isLoading}
           error={error}
           onMutate={mutate}

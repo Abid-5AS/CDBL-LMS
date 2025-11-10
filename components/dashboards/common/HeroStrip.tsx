@@ -8,7 +8,7 @@ import { SharedTimeline } from "@/components/shared/SharedTimeline";
 import { ApprovalTimelineAdapter } from "@/components/shared/timeline-adapters";
 import { cn } from "@/lib/utils";
 import useSWR from "swr";
-import { useLeaveData } from "@/components/providers/LeaveDataProvider";
+import { useLeaveData } from "@/components/providers";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -185,7 +185,8 @@ export function HeroStrip({ name }: HeroStripProps) {
         {/* Approval Timeline for pending requests */}
         {firstPendingLeave && (
           <div className="mt-2 pt-3 border-t border-border/40">
-            <LeaveTimeline requestId={firstPendingLeave.id} variant="compact" />
+            {/* TODO: Uncomment this when LeaveTimeline component is available */}
+{/* <LeaveTimeline requestId={firstPendingLeave.id} variant="compact" /> */}
           </div>
         )}
 

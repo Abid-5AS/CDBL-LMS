@@ -48,10 +48,12 @@ type LeaveRow = {
   status: LeaveStatus;
   updatedAt: string;
   approvals?: Array<{
-    step: number;
-    decision: "PENDING" | "FORWARDED" | "APPROVED" | "REJECTED" | "RETURNED";
+    step?: number;
+    decision: string;
     approver?: { name: string | null } | null;
     toRole?: string | null;
+    comment?: string | null;
+    decidedAt?: string | null;
   }>;
 };
 

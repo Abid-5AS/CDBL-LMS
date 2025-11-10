@@ -123,7 +123,7 @@ export async function GET(req: NextRequest) {
     const holidays = await prisma.holiday.findMany({
       where: {
         OR: [
-          { name: { contains: query, mode: "insensitive" as const } },
+          { name: { contains: query } },
         ],
       },
       take: 10,

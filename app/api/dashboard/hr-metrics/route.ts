@@ -26,7 +26,7 @@ export async function GET() {
   try {
     const [
       departmentHeadcount,
-      employeesOnLeaveToday,
+      employeesOnLeaveTodayRaw,
       pendingRequests,
       cancellationRequests,
     ] = await Promise.all([
@@ -35,13 +35,13 @@ export async function GET() {
         where: { role: Role.EMPLOYEE },
       }),
       // Employees on leave today
-      prisma.leaveRequest.count({
+      prisma.leaveRequest.groupBy({
+        by: ["requesterId"],
         where: {
           status: LeaveStatus.APPROVED,
           startDate: { lte: today },
           endDate: { gte: today },
         },
-        distinct: ["requesterId"],
       }),
       // Pending leave requests
       prisma.leaveRequest.count({
@@ -57,6 +57,8 @@ export async function GET() {
       }),
     ]);
 
+    const employeesOnLeaveToday = employeesOnLeaveTodayRaw.length;
+
     return NextResponse.json({
       departmentHeadcount,
       employeesOnLeaveToday,
@@ -71,6 +73,9 @@ export async function GET() {
     );
   }
 }
+
+
+
 
 
 

@@ -6,9 +6,9 @@ import {
   TooltipTrigger,
   Separator,
 } from "@/components/ui";
+import { DateRangePicker } from "@/components/shared/DateRangePicker";
 import { HelpCircle, AlertCircle, Info } from "lucide-react";
-import { DateRangePicker } from "../date-range-picker";
-import { fmtDDMMYYYY } from "@/lib/date-utils";
+import { fmtDDMMYYYY, type Holiday } from "@/lib/date-utils";
 import { cn } from "@/lib";
 import React from "react";
 
@@ -56,9 +56,9 @@ export function DateRangeField({
         </TooltipProvider>
       </div>
       <DateRangePicker
-        value={dateRange}
-        onChange={setDateRange}
-        holidays={holidays}
+        value={{ start: dateRange.start, end: dateRange.end }}
+        onChange={(range) => setDateRange({ start: range.start, end: range.end })}
+        holidays={holidays.map((d) => ({ date: d.toISOString().split('T')[0], name: 'Holiday' }))}
         disabled={submitting}
         minDate={minSelectableDate}
         showQuickSelect={false}

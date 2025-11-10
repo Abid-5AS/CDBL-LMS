@@ -33,8 +33,7 @@ import { fmtDDMMYYYY } from "@/lib/date-utils";
 
 // Local components
 import { LeaveConfirmationModal } from "./leave-confirmation-modal";
-import { FileUploadSection } from "./file-upload-section";
-import { DateRangePicker } from "./date-range-picker";
+import { DateRangePicker, FileUploadSection } from "@/components/shared";
 import {
   LEAVE_OPTIONS,
   POLICY_TOOLTIPS,

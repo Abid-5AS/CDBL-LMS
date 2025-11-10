@@ -15,9 +15,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui";
-import { EmployeeProfileCard } from "./EmployeeProfileCard";
+import { EmployeeProfileCard, LeaveHistoryTable } from "@/components/shared";
 import { HRStatCards } from "@/components/HRStatCards";
-import { LeaveHistoryTable } from "./LeaveHistoryTable";
 import { Pencil, Ban } from "lucide-react";
 import {
   Tooltip,
@@ -71,19 +70,15 @@ export function EmployeeManagementProfile({
   return (
     <div className="space-y-6">
       {/* Breadcrumb */}
-      <Breadcrumb>
-        <BreadcrumbList>
+      <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="/employees">Employee Directory</Link>
-            </BreadcrumbLink>
+            <BreadcrumbLink href="/employees">Employee Directory</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbPage>{employee.name}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
-      </Breadcrumb>
 
       {/* Header with employee info */}
       <div className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">

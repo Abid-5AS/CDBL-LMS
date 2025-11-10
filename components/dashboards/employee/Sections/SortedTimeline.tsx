@@ -21,7 +21,8 @@ import { formatDate } from "@/lib/utils";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { SharedTimeline } from "@/components/shared/SharedTimeline";
 import { SortedTimelineAdapter } from "@/components/shared/timeline-adapters";
-import { getChainFor, type LeaveType } from "@/lib/workflow";
+import { getChainFor } from "@/lib/workflow";
+import { type LeaveType } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/ui-state";
 
@@ -36,10 +37,12 @@ type LeaveStatus =
   | "RECALLED";
 
 type ApprovalRecord = {
-  step: number;
-  decision: "PENDING" | "FORWARDED" | "APPROVED" | "REJECTED" | "RETURNED";
+  step?: number;
+  decision: string;
   approver?: { name: string | null } | null;
   toRole?: string | null;
+  comment?: string | null;
+  decidedAt?: string | null;
 };
 
 type LeaveRequest = {
@@ -50,7 +53,7 @@ type LeaveRequest = {
   workingDays: number;
   status: LeaveStatus;
   updatedAt: string;
-  approvals: ApprovalRecord[];
+  approvals?: ApprovalRecord[];
 };
 
 interface SortedTimelineProps {

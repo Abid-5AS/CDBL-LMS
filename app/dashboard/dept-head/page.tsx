@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { DeptHeadDashboardWrapper } from "@/components/dashboards/dept-head/Overview";
+import { DeptHeadDashboardWrapper } from "@/components/dashboards";
 import { DashboardLoadingFallback } from "../shared/LoadingFallback";
 import { DashboardLayout } from "../shared/DashboardLayout";
 

@@ -11,10 +11,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui";
-import { EmployeeProfileCard } from "./EmployeeProfileCard";
+import { EmployeeProfileCard, LeaveHistoryTable } from "@/components/shared";
 import { LeaveBalanceCard } from "./LeaveBalanceCard";
 import ChartsSection from "./ChartsSection";
-import { LeaveHistoryTable } from "./LeaveHistoryTable";
 
 type EmployeeSelfProfileProps = {
   employee: EmployeeDashboardData;
@@ -24,19 +23,15 @@ export function EmployeeSelfProfile({ employee }: EmployeeSelfProfileProps) {
   return (
     <div className="space-y-6">
       {/* Breadcrumb */}
-      <Breadcrumb>
-        <BreadcrumbList>
+      <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="/dashboard">Dashboard</Link>
-            </BreadcrumbLink>
+            <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbPage>Your Profile</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
-      </Breadcrumb>
 
       {/* Header with personal greeting */}
       <div className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { Calendar, Star, Clock, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui";
 import { formatDate, cn } from "@/lib/utils";
@@ -10,14 +10,13 @@ type HolidaysListProps = {
   holidays: Holiday[];
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, x: -20 },
   visible: {
     opacity: 1,
     x: 0,
     transition: {
       duration: 0.4,
-      ease: [0.22, 1, 0.36, 1],
     },
   },
 };

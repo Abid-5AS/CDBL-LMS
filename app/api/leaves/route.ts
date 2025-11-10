@@ -22,6 +22,8 @@ import { normalizeToDhakaMidnight } from "@/lib/date-utils";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
 import { getStepForRole } from "@/lib/workflow";
+import { violatesCasualLeaveSideTouch } from "@/lib/leave-validation";
+import { generateSignedUrl } from "@/lib/storage";
 
 const ApplySchema = z.object({
   type: z.enum([
@@ -129,35 +131,6 @@ async function getAvailableDays(userId: number, type: LeaveType, year: number) {
   return (bal.opening ?? 0) + (bal.accrued ?? 0) - (bal.used ?? 0);
 }
 
-/**
- * Check if a date touches a holiday or weekend
- * Uses Dhaka timezone normalization for consistent comparison
- */
-async function touchesHolidayOrWeekend(date: Date): Promise<boolean> {
-  const normalized = normalizeToDhakaMidnight(date);
-  const day = normalized.getDay();
-  // Weekends: Friday (5) or Saturday (6)
-  if (day === 5 || day === 6) return true;
-  
-  // Check if date is a holiday (normalized to Dhaka midnight)
-  const holiday = await prisma.holiday.findUnique({
-    where: { date: normalized },
-  });
-  return !!holiday;
-}
-
-/**
- * Check if date range touches holidays/weekends on either side
- * Uses Dhaka timezone normalization for consistent comparison
- */
-async function touchesHolidayOrWeekendOnSides(start: Date, end: Date): Promise<boolean> {
-  const normalizedStart = normalizeToDhakaMidnight(start);
-  const normalizedEnd = normalizeToDhakaMidnight(end);
-  const startTouches = await touchesHolidayOrWeekend(normalizedStart);
-  const endTouches = await touchesHolidayOrWeekend(normalizedEnd);
-  return startTouches || endTouches;
-}
-
 export async function POST(req: Request) {
   const traceId = getTraceId(req as any);
   const me = await getCurrentUser();
@@ -211,10 +184,10 @@ export async function POST(req: Request) {
     const buffer = Buffer.from(arrayBuffer);
     const safeName = certificateFile.name.replace(/[^\w.\-]/g, "_");
     const finalName = `${randomUUID()}-${safeName}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    const uploadDir = path.join(process.cwd(), "private", "uploads");
     await fs.mkdir(uploadDir, { recursive: true });
     await fs.writeFile(path.join(uploadDir, finalName), buffer);
-    certificateUrl = `/uploads/${finalName}`;
+    certificateUrl = generateSignedUrl(finalName);
   }
 
   const workingDays = daysInclusive(new Date(start), new Date(end));
@@ -301,8 +274,11 @@ export async function POST(req: Request) {
 
   // CL: Cannot be adjacent to holidays/weekends (hard block)
   if (t === "CASUAL") {
-    const touchesHoliday = await touchesHolidayOrWeekendOnSides(startDateOnly, endDateOnly);
-    if (touchesHoliday) {
+    const clViolatesSideTouch = await violatesCasualLeaveSideTouch(
+      startDateOnly,
+      endDateOnly
+    );
+    if (clViolatesSideTouch) {
       return NextResponse.json(
         error(
           "cl_cannot_touch_holiday",

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 const DRAFT_STORAGE_KEY = "leave-application-draft";
 const AUTOSAVE_INTERVAL = 30000; // 30 seconds
 
-type LeaveType = "CASUAL" | "MEDICAL" | "EARNED";
+type LeaveType = string;
 
 export interface DraftData {
   timestamp: number;

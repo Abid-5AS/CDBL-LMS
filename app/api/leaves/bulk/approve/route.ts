@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
 
         // Update balance
         const year = new Date(leave.startDate).getFullYear();
-        await prisma.balance.upsert({
+        const existingBalance = await prisma.balance.findUnique({
           where: {
             userId_type_year: {
               userId: leave.requesterId,
@@ -89,18 +89,42 @@ export async function POST(req: NextRequest) {
               year,
             },
           },
-          update: {
-            used: { increment: leave.workingDays },
-            closing: { increment: leave.workingDays },
-          },
-          create: {
-            userId: leave.requesterId,
-            type: leave.type,
-            year,
-            used: leave.workingDays,
-            closing: leave.workingDays,
-          },
         });
+
+        if (existingBalance) {
+          const newUsed = (existingBalance.used || 0) + leave.workingDays;
+          const newClosing = Math.max(
+            (existingBalance.opening || 0) + (existingBalance.accrued || 0) - newUsed,
+            0
+          );
+
+          await prisma.balance.update({
+            where: {
+              userId_type_year: {
+                userId: leave.requesterId,
+                type: leave.type,
+                year,
+              },
+            },
+            data: {
+              used: newUsed,
+              closing: newClosing,
+            },
+          });
+        } else {
+          // Create new balance with default values
+          await prisma.balance.create({
+            data: {
+              userId: leave.requesterId,
+              type: leave.type,
+              year,
+              opening: 0,
+              accrued: 0,
+              used: leave.workingDays,
+              closing: Math.max(0 + 0 - leave.workingDays, 0),
+            },
+          });
+        }
 
         // Log audit
         await prisma.auditLog.create({

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui";
 import { Calendar } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { useLeaveData } from "@/components/providers/LeaveDataProvider";
+import { useLeaveData } from "@/components/providers";
 
 export function MiniCalendar() {
   const { data: leavesData, isLoading: leavesLoading } = useLeaveData();

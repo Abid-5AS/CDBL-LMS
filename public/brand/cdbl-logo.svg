@@ -1,0 +1,39 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- CDBL Logo with Calendar Icon -->
+  <g id="cdbl-logo">
+    <!-- Circular orbits background -->
+    <ellipse cx="40" cy="60" rx="35" ry="20" stroke="#00A651" stroke-width="2" fill="none" transform="rotate(-30 40 60)"/>
+    <ellipse cx="40" cy="60" rx="35" ry="20" stroke="#0066B2" stroke-width="2" fill="none" transform="rotate(30 40 60)"/>
+    <ellipse cx="40" cy="60" rx="35" ry="20" stroke="#ED1C24" stroke-width="2" fill="none" transform="rotate(90 40 60)"/>
+    
+    <!-- Bangladesh map in center -->
+    <g transform="translate(30, 50)">
+      <path d="M10,5 L15,3 L18,6 L20,12 L18,18 L15,20 L10,18 L7,15 L5,10 L7,7 Z" 
+            fill="#00A651" stroke="#00A651" stroke-width="1"/>
+      <circle cx="12" cy="11" r="1" fill="white"/>
+    </g>
+    
+    <!-- Calendar icon -->
+    <g transform="translate(75, 30)">
+      <rect x="0" y="5" width="35" height="40" rx="4" fill="#0066B2" stroke="#0066B2" stroke-width="2"/>
+      <rect x="0" y="5" width="35" height="10" rx="4" fill="#0066B2"/>
+      <rect x="2" y="17" width="7" height="6" rx="1" fill="white"/>
+      <rect x="11" y="17" width="7" height="6" rx="1" fill="white"/>
+      <rect x="20" y="17" width="7" height="6" rx="1" fill="white"/>
+      <rect x="2" y="25" width="7" height="6" rx="1" fill="white"/>
+      <rect x="11" y="25" width="7" height="6" rx="1" fill="white"/>
+      <rect x="20" y="25" width="7" height="6" rx="1" fill="white"/>
+      <rect x="2" y="33" width="7" height="6" rx="1" fill="white"/>
+      <rect x="11" y="33" width="7" height="6" rx="1" fill="white"/>
+      <rect x="20" y="33" width="7" height="6" rx="1" fill="white"/>
+      <circle cx="6" cy="3" r="2" fill="#0066B2"/>
+      <circle cx="29" cy="3" r="2" fill="#0066B2"/>
+    </g>
+    
+    <!-- Dividing line -->
+    <line x1="62" y1="20" x2="62" y2="100" stroke="#CCCCCC" stroke-width="2"/>
+    
+    <!-- LMS text -->
+    <text x="80" y="95" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#0066B2">LMS</text>
+  </g>
+</svg>

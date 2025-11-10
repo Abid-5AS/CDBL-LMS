@@ -56,19 +56,25 @@ type LeaveRow = {
   type: string;
   status: LeaveStatusType;
   workingDays?: number;
+  startDate?: string;
   endDate?: string;
+  reason?: string;
+  updatedAt?: string;
   fitnessCertificateUrl?: string | null;
+  approvals?: Approval[];
+  comments?: LeaveComment[];
 };
 
 type Approval = {
-  step: number;
-  decision: "PENDING" | "FORWARDED" | "APPROVED" | "REJECTED" | "RETURNED";
-  comment: string | null;
-  decidedAt: string | null;
+  step?: number;
+  decision: string;
+  comment?: string | null;
+  decidedAt?: string | null;
   approver?: {
     name: string | null;
     role?: string | null;
   } | null;
+  toRole?: string | null;
 };
 
 type LeaveComment = {
@@ -282,18 +288,18 @@ export function ActionCenterCard({ leaves, isLoading }: ActionCenterCardProps) {
 
   const returnedLeaves = useMemo<ReturnedLeave[]>(() => {
     return leaves
-      .filter((leave) => leave.status === "RETURNED")
+      .filter((leave) => leave.status === "RETURNED" && leave.endDate && leave.startDate && leave.updatedAt)
       .map((leave) => ({
         id: leave.id,
         type: leave.type,
-        startDate: leave.startDate,
-        endDate: leave.endDate,
+        startDate: leave.startDate!,
+        endDate: leave.endDate!,
         workingDays: leave.workingDays ?? 0,
         reason: leave.reason ?? "",
         status: leave.status as LeaveStatus,
-        updatedAt: leave.updatedAt,
-        approvals: (leave as ReturnedLeave).approvals,
-        comments: (leave as ReturnedLeave).comments,
+        updatedAt: leave.updatedAt!,
+        approvals: leave.approvals,
+        comments: leave.comments,
       }));
   }, [leaves]);
 

@@ -82,7 +82,7 @@ export function BarChartCard({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.3 }}
     >
       <Card className={cn("rounded-2xl border border-border/50 bg-card shadow-sm", className)}>
         {(title || description) && (
@@ -149,7 +149,7 @@ export function LineChartCard({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.3 }}
     >
       <Card className={cn("rounded-2xl border border-border/50 bg-card shadow-sm", className)}>
         {(title || description) && (
@@ -219,7 +219,7 @@ export function PieChartCard({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.3 }}
     >
       <Card className={cn("rounded-2xl border border-border/50 bg-card shadow-sm", className)}>
         {(title || description) && (
@@ -240,7 +240,13 @@ export function PieChartCard({
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={(props: any) => {
+                  const percent = props.percent as number | undefined;
+                  const name = props.name as string | undefined;
+                  return percent !== undefined && name !== undefined 
+                    ? `${name} ${(percent * 100).toFixed(0)}%` 
+                    : '';
+                }}
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"
@@ -266,6 +272,8 @@ export function PieChartCard({
     </motion.div>
   );
 }
+
+
 
 
 

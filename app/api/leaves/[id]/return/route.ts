@@ -79,7 +79,7 @@ export async function POST(
   const parsed = ReturnSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      error("invalid_input", parsed.error.errors[0]?.message || "Comment is required", traceId),
+      error("invalid_input", parsed.error.flatten().formErrors[0] || "Comment is required", traceId),
       { status: 400 }
     );
   }

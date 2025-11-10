@@ -140,7 +140,7 @@ export async function GET(req: NextRequest) {
     const approvalTimes = approvedLeaves.map((leave) => {
       const firstApproval = leave.approvals[0];
       const lastApproval = leave.approvals[leave.approvals.length - 1];
-      if (firstApproval && lastApproval) {
+      if (firstApproval && lastApproval && lastApproval.decidedAt) {
         const diff = lastApproval.decidedAt.getTime() - new Date(leave.startDate).getTime();
         return Math.ceil(diff / (1000 * 60 * 60 * 24));
       }

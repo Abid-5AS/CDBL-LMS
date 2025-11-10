@@ -1,10 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { KpiCards } from "@/components/reports/KpiCards";
-import { FilterBar } from "@/components/reports/FilterBar";
-import { ChartsSection } from "@/components/reports/ChartsSection";
-import { ExportSection } from "@/components/shared/ExportSection";
+import { KpiCards, FilterBar, ChartsSection } from "@/components/reports";
+import { ExportSection } from "@/components/shared";
 import useSWR from "swr";
 import { Card, CardContent } from "@/components/ui";
 

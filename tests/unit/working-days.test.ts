@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { countWorkingDaysSync } from "@/lib/working-days";
-import { normalizeToDhakaMidnight } from "@/lib/date-utils";
+import { normalizeToDhakaMidnight, isWeekendBD } from "@/lib/date-utils";
 import type { Holiday } from "@/lib/date-utils";
+import { violatesCasualLeaveSideTouch } from "@/lib/leave-validation";
 
 describe("lib/working-days", () => {
   describe("countWorkingDaysSync()", () => {
@@ -54,29 +55,50 @@ describe("lib/working-days", () => {
 
     it("should use Dhaka timezone normalization", () => {
       // Test that dates are normalized to Dhaka midnight
-      const start = new Date("2024-01-08T10:00:00Z"); // 10 AM UTC
-      const end = new Date("2024-01-08T20:00:00Z"); // 8 PM UTC
+      const start = new Date("2024-01-08T00:30:00+06:00");
+      const end = new Date("2024-01-08T23:30:00+06:00");
       // Should normalize to same day in Dhaka timezone
       expect(countWorkingDaysSync(start, end)).toBe(1);
     });
   });
 
-  describe("CL side-touch validation (conceptual)", () => {
-    it("should detect if start date touches Friday/Saturday/holiday", () => {
-      const friday = normalizeToDhakaMidnight(new Date("2024-01-05")); // Friday
-      const saturday = normalizeToDhakaMidnight(new Date("2024-01-06")); // Saturday
-      const holiday: Holiday = { date: "2024-01-08", name: "Test" };
-      
-      // These should be invalid for CL start/end
-      expect(friday.getDay()).toBe(5); // Friday
-      expect(saturday.getDay()).toBe(6); // Saturday
-      expect(holiday.date).toBeDefined();
+  describe("isWeekendBD timezone handling", () => {
+    it("should treat Dhaka Friday correctly regardless of system timezone", () => {
+      const dhakaFriday = new Date("2025-01-02T18:00:00.000Z"); // 00:00 Friday in Dhaka
+      expect(isWeekendBD(dhakaFriday)).toBe(true);
+    });
+  });
+
+  describe("Casual Leave side-touch enforcement", () => {
+    it("flags when start date falls on a Friday", async () => {
+      const start = new Date("2025-01-03T09:00:00+06:00"); // Friday
+      const end = new Date("2025-01-05T09:00:00+06:00"); // Sunday
+
+      await expect(
+        violatesCasualLeaveSideTouch(start, end, { holidays: [] })
+      ).resolves.toBe(true);
     });
 
-    it("should detect if end date touches Friday/Saturday/holiday", () => {
-      // Same logic as start date
-      const friday = normalizeToDhakaMidnight(new Date("2024-01-05"));
-      expect(friday.getDay()).toBe(5);
+    it("flags when range touches holiday on adjacent day", async () => {
+      const start = new Date("2025-02-18T09:00:00+06:00"); // Tuesday
+      const end = new Date("2025-02-19T09:00:00+06:00"); // Wednesday
+
+      await expect(
+        violatesCasualLeaveSideTouch(start, end, {
+          holidays: [
+            { date: "2025-02-17", name: "Mock Holiday" },
+          ],
+        })
+      ).resolves.toBe(true);
+    });
+
+    it("allows range with no adjacent weekends or holidays", async () => {
+      const start = new Date("2025-03-03T09:00:00+06:00"); // Monday
+      const end = new Date("2025-03-04T09:00:00+06:00"); // Tuesday
+
+      await expect(
+        violatesCasualLeaveSideTouch(start, end, { holidays: [] })
+      ).resolves.toBe(false);
     });
   });
 });

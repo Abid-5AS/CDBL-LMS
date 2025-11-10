@@ -94,7 +94,7 @@ export async function POST(
   const parsed = CancelSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      error("invalid_input", parsed.error.errors[0]?.message || "Invalid input", traceId),
+      error("invalid_input", parsed.error.flatten().formErrors[0] || "Invalid input", traceId),
       { status: 400 }
     );
   }

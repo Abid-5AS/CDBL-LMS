@@ -2,15 +2,17 @@ import { Suspense } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Clock, Users, TrendingUp, Calendar } from "lucide-react";
-import { PendingLeaveRequestsTable } from "@/components/dashboards/hr-admin/Sections/PendingApprovals";
-import { ReturnedRequestsPanel } from "@/components/dashboards/hr-head/Sections/ReturnedRequests";
-import { CancellationRequestsPanel } from "@/components/dashboards/hr-admin/Sections/CancellationRequests";
+import {
+  PendingApprovals as PendingLeaveRequestsTable,
+  CancellationRequests as CancellationRequestsPanel,
+} from "@/components/dashboards";
+import { ReturnedRequests as ReturnedRequestsPanel } from "@/components/dashboards";
 import {
   DashboardLoadingFallback,
   DashboardCardSkeleton,
 } from "../shared/LoadingFallback";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
-import { RoleBasedDashboard } from "@/components/dashboards/shared/RoleBasedDashboard";
+import { RoleBasedDashboard } from "@/components/dashboards";
 
 async function HRHeadDashboardContent() {
   const user = await getCurrentUser();

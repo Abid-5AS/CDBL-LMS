@@ -1,6 +1,6 @@
 import { Label } from "@/components/ui";
+import { FileUploadSection } from "@/components/shared";
 import { Paperclip } from "lucide-react";
-import { FileUploadSection } from "../file-upload-section";
 import React from "react";
 
 interface FileUploadFieldProps {

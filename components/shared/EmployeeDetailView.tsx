@@ -5,11 +5,9 @@ import { useRouter } from "next/navigation";
 import type { EmployeeDashboardData } from "@/lib/employee";
 import type { AppRole } from "@/lib/rbac";
 import { canEditEmployee } from "@/lib/rbac";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { EmployeeProfileCard } from "@/app/employees/components/EmployeeProfileCard";
-import { HRStatCards } from "@/components/HRStatCards";
-import { LeaveHistoryTable } from "@/app/employees/components/LeaveHistoryTable";
+import { Button, Badge } from "@/components/ui";
+import { EmployeeProfileCard, LeaveHistoryTable } from "@/components/shared";
+import { HRStatCards } from "@/components";
 import { Pencil } from "lucide-react";
 
 type EmployeeDetailViewProps = {

@@ -5,7 +5,7 @@ import useSWR from "swr";
 import { toast } from "sonner";
 import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/toast-messages";
 import { useSelectionContext } from "@/lib/selection-context";
-import { useLeaveDataContext, type LeaveResponse } from "@/components/providers/LeaveDataProvider";
+import { useLeaveDataContext, type LeaveResponse } from "@/components/providers";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 

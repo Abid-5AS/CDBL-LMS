@@ -15,6 +15,7 @@ import {
   randomDuration,
   randomReason,
 } from "../lib/seed-utils";
+import { generateSignedUrl } from "../lib/storage";
 
 type SeedUser = {
   id: number;
@@ -929,7 +930,7 @@ startxref
 %%EOF`
   );
   await fs.writeFile(filePath, pdfContent);
-  return filename;
+  return generateSignedUrl(filename);
 }
 
 function makeEmpCode(role: Role, dept?: string, seq: number = 1) {

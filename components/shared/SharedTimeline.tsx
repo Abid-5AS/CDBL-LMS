@@ -4,7 +4,7 @@ import { ReactNode, useMemo } from "react";
 import { formatDate } from "@/lib/utils";
 import { StatusBadge } from "./StatusBadge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui";
 import { EmptyState } from "./EmptyState";
 import { Clock, CheckCircle2, XCircle, Circle, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";

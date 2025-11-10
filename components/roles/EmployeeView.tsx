@@ -2,7 +2,7 @@
 
 import type { EmployeeDashboardData } from "@/lib/employee";
 import type { AppRole } from "@/lib/rbac";
-import { EmployeeDetailView } from "@/components/shared/EmployeeDetailView";
+import { EmployeeDetailView } from "@/components/shared";
 
 type EmployeeViewProps = {
   employee: EmployeeDashboardData;

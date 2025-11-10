@@ -16,8 +16,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CDBL Leave Management",
-  description: "CDBL Leave Management System",
+  title: "CDBL LMS - Leave Management System",
+  description:
+    "Central Depository Bangladesh Limited - Leave Management System",
+  icons: {
+    icon: "/brand/cdbl-lms.png",
+    apple: "/brand/cdbl-lms.png",
+  },
 };
 
 export default function RootLayout({

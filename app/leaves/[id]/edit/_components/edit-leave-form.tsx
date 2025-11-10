@@ -24,8 +24,7 @@ import {
 import { AlertCircle, Info, RotateCcw, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/toast-messages";
-import { DateRangePicker } from "../../../apply/_components/date-range-picker";
-import { FileUploadSection } from "../../../apply/_components/file-upload-section";
+import { DateRangePicker, FileUploadSection } from "@/components/shared";
 import { LeaveRequest, LeaveComment } from "@prisma/client";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
@@ -62,8 +61,11 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
 
   // Fetch holidays for date picker
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
-  const { data: holidaysData } = useSWR<{ items: Array<{ date: string }> }>("/api/holidays", fetcher);
-  const holidays = holidaysData?.items?.map((h) => ({ date: new Date(h.date) })) || [];
+  const { data: holidaysData } = useSWR<{ items: Array<{ date: string; name: string }> }>("/api/holidays", fetcher);
+  const holidays = holidaysData?.items?.map((h) => ({ 
+    date: h.date.split('T')[0], // Convert ISO to YYYY-MM-DD format
+    name: h.name 
+  })) || [];
 
   // Get return comment (most recent non-employee comment)
   const returnComment = comments.find((c) => c.authorRole !== "EMPLOYEE") || comments[0];
@@ -165,25 +167,19 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       {/* Breadcrumb */}
-      <Breadcrumb>
-        <BreadcrumbList>
+      <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="/dashboard">Dashboard</Link>
-            </BreadcrumbLink>
+            <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="/leaves">My Leaves</Link>
-            </BreadcrumbLink>
+            <BreadcrumbLink href="/leaves">My Leaves</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbPage>Edit & Resubmit</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
-      </Breadcrumb>
 
       {/* Return Comment Alert */}
       {returnComment && (

@@ -370,7 +370,7 @@ This document provides a comprehensive list of all features and functionalities 
 - File upload for medical certificates
 - File type validation (PDF, JPG, PNG)
 - File size validation (5 MB max)
-- File storage (`public/uploads/`)
+- File storage (`private/uploads/`) via signed URLs
 - Secure file naming (UUID-based)
 - Certificate URL storage
 

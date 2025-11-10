@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { Calendar as CalendarIcon, Grid3X3, List } from "lucide-react";
 import { HolidaysFilters } from "./HolidaysFilters";
 import { HolidaysGrid } from "./HolidaysGrid";
@@ -24,14 +24,13 @@ type HolidaysMainContentProps = {
   availableYears: number[];
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
       duration: 0.4,
-      ease: [0.22, 1, 0.36, 1],
     },
   },
 };

@@ -7,7 +7,8 @@ const DHAKA_TZ = "Asia/Dhaka"; // Bangladesh timezone
 
 // Bangladesh weekends: Friday (5) and Saturday (6)
 export const isWeekendBD = (d: Date) => {
-  const dow = d.getDay();
+  const zoned = toZonedTime(d, DHAKA_TZ);
+  const dow = zoned.getDay();
   return dow === 5 || dow === 6;
 };
 

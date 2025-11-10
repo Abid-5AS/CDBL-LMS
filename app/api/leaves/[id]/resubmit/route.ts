@@ -11,6 +11,8 @@ import { getChainFor } from "@/lib/workflow";
 import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
+import { generateSignedUrl } from "@/lib/storage";
+import { violatesCasualLeaveSideTouch } from "@/lib/leave-validation";
 
 export const cache = "no-store";
 
@@ -104,12 +106,28 @@ export async function POST(
   }
 
   // Get holidays for working days calculation
-  const holidays = await prisma.holiday.findMany({
-    select: { date: true },
+  const holidaysRaw = await prisma.holiday.findMany({
+    select: { date: true, name: true },
   });
+  const holidays = holidaysRaw.map(h => ({ ...h, date: h.date.toISOString().slice(0, 10) }));
 
   // Calculate working days
-  const workingDays = await countWorkingDays(startDate, endDate, holidays.map((h) => h.date));
+  const workingDays = await countWorkingDays(startDate, endDate, holidays);
+
+  // Enforce CL side-touch rule
+  if (body.type === "CASUAL") {
+    const violates = await violatesCasualLeaveSideTouch(startDate, endDate);
+    if (violates) {
+      return NextResponse.json(
+        error(
+          "cl_cannot_touch_holiday",
+          "Casual Leave cannot be adjacent to holidays or weekends. Please use Earned Leave instead.",
+          traceId
+        ),
+        { status: 400 }
+      );
+    }
+  }
 
   // Handle file upload if provided
   let certificateUrl = body.certificateUrl || leave.certificateUrl;
@@ -124,7 +142,7 @@ export async function POST(
     const bytes = await body.certificateFile.arrayBuffer();
     await fs.writeFile(filePath, Buffer.from(bytes));
     
-    certificateUrl = `/api/uploads/${filename}`;
+    certificateUrl = generateSignedUrl(filename);
   }
 
   // Get the workflow chain for this leave type

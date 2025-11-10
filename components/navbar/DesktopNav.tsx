@@ -4,8 +4,8 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Search, Command } from "lucide-react";
 
-import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { NotificationDropdown } from "@/components/navbar";
+import { ThemeToggle } from "../theme-toggle";
 import { cn } from "@/lib/utils";
 import { useSearch } from "@/hooks/use-search";
 

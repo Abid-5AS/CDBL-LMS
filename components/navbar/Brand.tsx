@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 
-export function Brand({ compact = false }: { compact?: boolean }) {
+export function Brand({ compact = false }: { compact?: boolean }) {th
   return (
     <Link
       href="/dashboard"
@@ -19,58 +20,37 @@ export function Brand({ compact = false }: { compact?: boolean }) {
     >
       {/* Logo */}
       <motion.div
-        whileHover={{ scale: 1.05, rotate: 2 }}
+        whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         className={cn(
-          "flex items-center justify-center bg-gradient-to-br from-primary via-primary/90 to-accent text-primary-foreground font-bold shadow-lg transition-all duration-200",
-          compact
-            ? "h-8 w-8 rounded-lg text-sm"
-            : "h-10 w-10 rounded-xl text-base"
+          "flex items-center justify-center transition-all duration-200 relative bg-white rounded-lg p-1.5 shadow-sm",
+          compact ? "h-10 w-auto" : "h-12 w-auto"
         )}
       >
-        <motion.span
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-        >
-          CDBL
-        </motion.span>
+        <Image
+          src="/brand/cdbl-lms.png"
+          alt="CDBL LMS Logo"
+          width={compact ? 150 : 180}
+          height={compact ? 100 : 120}
+          className="object-contain h-full w-auto"
+          priority
+          unoptimized
+        />
       </motion.div>
 
-      {/* Brand Text */}
-      <div className="flex flex-col">
-        {!compact && (
-          <motion.span
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
-            className="text-lg font-bold text-foreground transition-colors group-hover:text-primary"
-          >
-            CDBL LMS
-          </motion.span>
-        )}
-        {compact && (
-          <motion.span
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
-            className="text-base font-semibold text-foreground transition-colors group-hover:text-primary"
-          >
-            CDBL Leave
-          </motion.span>
-        )}
-
-        {!compact && (
-          <motion.span
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3, delay: 0.3 }}
-            className="text-xs text-muted-foreground font-medium"
-          >
-            Leave Management
-          </motion.span>
-        )}
-      </div>
+      {/* Subtitle for non-compact mode */}
+      {!compact && (
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+          className="flex flex-col"
+        >
+          <span className="text-xs text-muted-foreground font-medium">
+            Leave Management System
+          </span>
+        </motion.div>
+      )}
 
       {/* Hover effect */}
       <motion.div

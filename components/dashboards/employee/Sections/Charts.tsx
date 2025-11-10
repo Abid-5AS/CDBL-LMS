@@ -14,7 +14,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui";
 import { TrendingUp, Calendar, BarChart3, Info } from "lucide-react";
-import { LeaveHeatmap } from "./LeaveHeatmap";
+import { LeaveHeatmap } from "@/components/shared/widgets/LeaveHeatmap";
 import { TypePie } from "@/components/shared/LeaveCharts";
 import { fromDashboardAgg } from "@/components/shared/LeaveCharts/adapters";
 import useSWR from "swr";

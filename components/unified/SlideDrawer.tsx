@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { useUIStore } from "@/lib/ui-state";
 import { LeaveDetailsModal } from "@/components/shared/modals/LeaveDetailsModal";
-import { useLeaveData } from "@/components/providers/LeaveDataProvider";
+import { useLeaveData } from "@/components/providers";
 
 export function SlideDrawer() {
   const { drawerOpen, closeDrawer, selectedRequestId } = useUIStore();

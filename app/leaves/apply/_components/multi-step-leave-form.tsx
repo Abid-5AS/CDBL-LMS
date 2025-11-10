@@ -21,7 +21,7 @@ import {
 } from "@/components/ui";
 
 import { useApplyLeaveForm } from "./use-apply-leave-form";
-import { LEAVE_OPTIONS, type LeaveType } from "./leave-constants";
+import { LEAVE_OPTIONS, POLICY_TOOLTIPS, type LeaveType } from "./leave-constants";
 import { LeaveSummarySidebar } from "./leave-summary-sidebar";
 
 const steps = [
@@ -149,13 +149,8 @@ export function MultiStepLeaveForm() {
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {option.description}
+                      {POLICY_TOOLTIPS[option.value]}
                     </p>
-                    {option.maxDays && (
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Maximum: {option.maxDays} days
-                      </p>
-                    )}
                   </motion.button>
                 ))}
               </div>

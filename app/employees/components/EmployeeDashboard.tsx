@@ -5,13 +5,11 @@ import {
   useDashboardLayout,
   type DashboardSectionId,
 } from "@/hooks/useDashboardLayout";
-import { DashboardContainer } from "@/components/DashboardContainer";
-import { SectionHeader } from "@/components/SectionHeader";
-import { LeaveHistoryTable } from "./LeaveHistoryTable";
-import { EmployeeProfileCard } from "./EmployeeProfileCard";
+import { DashboardContainer, SectionHeader } from "@/components";
+import { EmployeeProfileCard, LeaveHistoryTable } from "@/components/shared";
 import { LeaveBalanceCard } from "./LeaveBalanceCard";
 import ChartsSection from "./ChartsSection";
-import { HRStatCards } from "@/components/HRStatCards";
+import { HRStatCards } from "@/components";
 import { ApprovalActions } from "./ApprovalActions";
 import { canEditEmployee, type AppRole } from "@/lib/rbac";
 import Link from "next/link";

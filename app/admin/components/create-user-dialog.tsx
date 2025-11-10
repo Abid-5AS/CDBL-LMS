@@ -24,7 +24,7 @@ const FormSchema = z.object({
   email: z.string().email("Valid email required"),
   empCode: z.string().min(2, "Employee code required"),
   department: z.string().optional(),
-  role: z.enum(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"] as const),
+  role: z.enum(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"] as const),
 });
 
 type CreateUserDialogProps = {

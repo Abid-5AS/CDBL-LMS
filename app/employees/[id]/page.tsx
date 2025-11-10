@@ -5,11 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { canViewAllRequests, canViewEmployee, canEditEmployee, type AppRole } from "@/lib/rbac";
 import { getEmployeeDashboardData } from "@/lib/employee";
 import { EmployeeEditForm } from "../components/EmployeeEditForm";
-import { EmployeeView } from "@/components/roles/EmployeeView";
-import { ManagerView } from "@/components/roles/ManagerView";
-import { HRAdminView } from "@/components/roles/HRAdminView";
-import { HRHeadView } from "@/components/roles/HRHeadView";
-import { ExecutiveView } from "@/components/roles/ExecutiveView";
+import { EmployeeView, ManagerView, HRAdminView, HRHeadView, ExecutiveView } from "@/components/roles";
 import { prisma } from "@/lib/prisma";
 
 // Note: dynamic export removed - incompatible with Next.js 16 cacheComponents

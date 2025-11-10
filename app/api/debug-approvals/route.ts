@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus, ApprovalDecision } from "@prisma/client";
 
 export const cache = "no-store";
 
@@ -36,7 +36,7 @@ export async function GET() {
       none: {
         approverId: me.id,
         decision: {
-          in: ["FORWARDED", "APPROVED", "REJECTED"],
+          in: [ApprovalDecision.FORWARDED, ApprovalDecision.APPROVED, ApprovalDecision.REJECTED],
         },
       },
     },

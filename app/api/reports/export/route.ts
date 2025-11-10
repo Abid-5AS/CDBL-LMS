@@ -156,13 +156,28 @@ export async function GET(req: NextRequest) {
     selectFields.createdAt = true;
   }
 
-  const leaves = await prisma.leaveRequest.findMany({
+  const leaves = (await prisma.leaveRequest.findMany({
     where: whereClause,
     select: selectFields,
     orderBy: {
       startDate: "desc",
     },
-  });
+  })) as unknown as Array<{
+    id: number;
+    type: string;
+    startDate: Date;
+    endDate: Date;
+    workingDays: number;
+    status: string;
+    requester: {
+      name: string;
+      email: string;
+      department: string | null;
+      empCode?: string;
+    };
+    reason?: string;
+    createdAt?: Date;
+  }>;
 
   // Get analytics data for PDF
   const pendingCount = leaves.filter((l) => ["PENDING", "SUBMITTED"].includes(l.status)).length;
@@ -391,7 +406,7 @@ export async function GET(req: NextRequest) {
         throw new Error("Generated PDF buffer is empty");
       }
 
-      return new NextResponse(pdfBuffer, {
+      return new NextResponse(new Uint8Array(pdfBuffer), {
         headers: {
           "Content-Type": "application/pdf",
           "Content-Disposition": `attachment; filename="leave-report-${duration}-${new Date().toISOString().split("T")[0]}.pdf"`,

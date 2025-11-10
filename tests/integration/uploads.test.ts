@@ -31,7 +31,8 @@ describe("File Upload Integration", () => {
         endDate: new Date(),
         workingDays: 5,
         reason: "Test medical leave",
-        status: "APPROVED",
+          status: "APPROVED",
+          policyVersion: "v2.0",
       },
     });
     leaveId = leave.id;
@@ -95,10 +96,22 @@ describe("File Upload Integration", () => {
       expect(signedUrl).toContain("sig=");
     });
 
+    it("should use private signed file route", () => {
+      const filename = "secure-cert.pdf";
+      const signedUrl = generateSignedUrl(filename);
+
+      expect(signedUrl.startsWith("/api/files/signed/")).toBe(true);
+      expect(signedUrl.includes("/public/")).toBe(false);
+    });
+
     it("should verify valid signed URL", () => {
       const filename = "test-certificate.pdf";
       const signedUrl = generateSignedUrl(filename);
-      const isValid = verifySignedUrl(signedUrl);
+      const url = new URL(`https://example.com${signedUrl}`);
+      const extractedFilename = url.pathname.replace("/api/files/signed/", "");
+      const expires = url.searchParams.get("expires")!;
+      const sig = url.searchParams.get("sig")!;
+      const isValid = verifySignedUrl(extractedFilename, expires, sig);
 
       expect(isValid).toBe(true);
     });
@@ -107,18 +120,24 @@ describe("File Upload Integration", () => {
       // In real test, would create URL with past expiry
       const filename = "test-certificate.pdf";
       const signedUrl = generateSignedUrl(filename);
-      
-      // Modify URL to have past expiry (would need to parse and modify)
-      // For now, just test that verification function exists
-      expect(verifySignedUrl).toBeDefined();
+      const url = new URL(`https://example.com${signedUrl}`);
+      const extractedFilename = url.pathname.replace("/api/files/signed/", "");
+      const sig = url.searchParams.get("sig")!;
+      const expired = (Date.now() - 60_000).toString();
+
+      const isValid = verifySignedUrl(extractedFilename, expired, sig);
+      expect(isValid).toBe(false);
     });
 
     it("should reject tampered signed URL", () => {
       const filename = "test-certificate.pdf";
       const signedUrl = generateSignedUrl(filename);
-      const tamperedUrl = signedUrl.replace("sig=", "sig=tampered");
+      const url = new URL(`https://example.com${signedUrl}`);
+      const extractedFilename = url.pathname.replace("/api/files/signed/", "");
+      const expires = url.searchParams.get("expires")!;
+      const tamperedSig = url.searchParams.get("sig")!.replace(/.$/, "x");
 
-      const isValid = verifySignedUrl(tamperedUrl);
+      const isValid = verifySignedUrl(extractedFilename, expires, tamperedSig);
       expect(isValid).toBe(false);
     });
   });
@@ -134,6 +153,7 @@ describe("File Upload Integration", () => {
           workingDays: 8, // > 7 days
           reason: "Extended medical leave",
           status: "APPROVED",
+          policyVersion: "v2.0",
         },
       });
 
@@ -152,6 +172,7 @@ describe("File Upload Integration", () => {
           workingDays: 7,
           reason: "Medical leave",
           status: "APPROVED",
+          policyVersion: "v2.0",
         },
       });
 

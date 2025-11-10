@@ -103,7 +103,7 @@ export function useApplyLeaveForm() {
         action: {
           label: "Restore",
           onClick: () => {
-            setType(draft.type);
+            setType(draft.type as LeaveType);
             setDateRange({
               start: draft.startDate ? new Date(draft.startDate) : undefined,
               end: draft.endDate ? new Date(draft.endDate) : undefined,

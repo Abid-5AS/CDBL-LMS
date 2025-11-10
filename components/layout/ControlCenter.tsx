@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Plane, Clock, LogOut, FileText, User, Calendar, CheckCircle2, AlertCircle, XCircle } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
-import { useLeaveData } from "@/components/providers/LeaveDataProvider";
+import { useLeaveData } from "@/components/providers";
 
 type BalanceData = {
   earned?: number;

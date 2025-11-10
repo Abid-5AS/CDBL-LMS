@@ -65,7 +65,8 @@ describe("QuickActions Component", () => {
       status: "APPROVED" as const,
       workingDays: 8,
       endDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-      fitnessCertificateUrl: "/uploads/fitness-cert.pdf",
+      fitnessCertificateUrl:
+        "/api/files/signed/fitness-cert.pdf?expires=123&sig=abc",
     };
 
     const { container } = render(<QuickActions leaves={[medicalLeaveWithCert]} isLoading={false} />);

@@ -18,7 +18,7 @@ import { RotateCcw, FileEdit } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
 import Link from "next/link";
-import { StatusBadge } from "@/components/shared/StatusBadge";
+import { StatusBadge } from "@/components/shared";
 import useSWR from "swr";
 
 type LeaveRequest = {

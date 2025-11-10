@@ -5,8 +5,8 @@ import { Navbar } from "@/components/Navbar";
 import { useUser } from "@/lib/user-context";
 import { SelectionProvider } from "@/lib/selection-context";
 import { cn } from "@/lib/utils";
-import { SlideDrawer } from "@/components/unified/SlideDrawer";
-import { LeaveDataProvider } from "@/components/providers/LeaveDataProvider";
+import { SlideDrawer } from "@/components/unified";
+import { LeaveDataProvider } from "@/components/providers";
 import { FloatingActionButton } from "@/components/ui/floating-action-button";
 import { SearchProvider } from "@/hooks/use-search";
 

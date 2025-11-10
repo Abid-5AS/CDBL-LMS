@@ -36,12 +36,10 @@ import {
 
 // Shared Components (barrel export)
 import { StatusBadge, LeaveDetailsModal } from "@/components/shared";
+import { useLeaveData } from "@/components/providers";
 
 // Lib utilities (barrel export)
 import { cn, formatDate, leaveTypeLabel } from "@/lib";
-
-// Local imports
-import { useLeaveData } from "@/components/providers/LeaveDataProvider";
 import { CANCELABLE_STATUSES } from "@/hooks/useLeaveRequests";
 
 type LeaveRow = {

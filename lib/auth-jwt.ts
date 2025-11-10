@@ -15,7 +15,7 @@ type JwtClaims = {
   sub: string;
   email?: string;
   name?: string;
-  role?: "EMPLOYEE" | "DEPT_HEAD" | "HR_ADMIN" | "HR_HEAD" | "CEO";
+  role?: "EMPLOYEE" | "DEPT_HEAD" | "HR_ADMIN" | "HR_HEAD" | "CEO" | "SYSTEM_ADMIN";
 };
 
 export async function signJwt(claims: JwtClaims, maxAgeSeconds = 60 * 60 * 8) {

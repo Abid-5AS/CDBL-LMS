@@ -10,7 +10,7 @@ import { Shield, Users, Activity, Settings } from "lucide-react";
 import { Button } from "@/components/ui";
 
 // Shared Components (barrel export)
-import { KPICard } from "@/components/cards/KPICard";
+import { KPICard } from "@/components/cards";
 import { QuickActions } from "@/components/shared";
 import { RecentAuditLogs } from "@/components/shared/widgets/RecentAuditLogs";
 
@@ -76,7 +76,9 @@ export function SystemAdminDashboard({ username }: SystemAdminDashboardProps) {
         title="Admin Console"
         description={`Welcome back, ${username}. Manage system configuration and users.`}
         action={<QuickActions actions={quickActions} />}
-      />
+      >
+        <div />
+      </DashboardSection>
 
       {/* System Overview Cards */}
       <DashboardSection

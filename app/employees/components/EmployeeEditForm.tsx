@@ -27,7 +27,6 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
@@ -35,13 +34,12 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui";
 import { canAssignRole, type AppRole } from "@/lib/rbac";
-import Link from "next/link";
 
 const employeeEditSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
   department: z.string().min(1, "Department is required"),
-  role: z.enum(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"]),
+  role: z.enum(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"]),
   empCode: z.string().optional(),
 });
 
@@ -143,25 +141,19 @@ export function EmployeeEditForm({
   return (
     <div className="space-y-6 pb-24">
       {/* Breadcrumb */}
-      <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="/employees">Employee Directory</Link>
-            </BreadcrumbLink>
+            <BreadcrumbLink href="/employees">Employee Directory</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href={`/employees/${employee.id}`}>{employee.name}</Link>
-            </BreadcrumbLink>
+            <BreadcrumbLink href={`/employees/${employee.id}`}>{employee.name}</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbPage>Edit</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
-      </Breadcrumb>
 
       {/* Edit Form */}
       <Card>
