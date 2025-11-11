@@ -54,6 +54,7 @@ export function ApplyLeaveForm() {
     showOptionalUpload,
     showStickyButton,
     errors,
+    balances,
     balancesError,
     balancesLoading,
     requestedDays,
@@ -277,6 +278,11 @@ export function ApplyLeaveForm() {
               balancesError={Boolean(balancesError)}
               warnings={warnings}
               projectedBalancePercent={projectedBalancePercent}
+              allBalances={balances ? {
+                EARNED: balances.EARNED,
+                CASUAL: balances.CASUAL,
+                MEDICAL: balances.MEDICAL,
+              } : undefined}
             />
 
             <Card className="rounded-2xl border border-border bg-card shadow-sm p-5 space-y-3">

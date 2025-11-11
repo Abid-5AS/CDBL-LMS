@@ -223,6 +223,91 @@ export function ModernEmployeeDashboard({
         )}`,
       })) || [];
 
+    // Find next scheduled leave (approved leave with start date in future)
+    const now = new Date();
+    const upcomingApprovedLeaves = approvedLeaves
+      .filter((l) => new Date(l.startDate) > now)
+      .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+
+    const nextScheduledLeave = upcomingApprovedLeaves[0] || null;
+    const daysUntilNextLeave = nextScheduledLeave
+      ? Math.ceil((new Date(nextScheduledLeave.startDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+      : null;
+
+    // Calculate action items for Action Center
+    const actionItems: Array<{
+      type: "returned" | "certificate" | "cancelable" | "expiring";
+      title: string;
+      description: string;
+      action: string;
+      actionLink: string;
+      variant: "destructive" | "warning" | "info";
+      data?: any;
+    }> = [];
+
+    // 1. Returned requests
+    returnedLeaves.forEach((leave) => {
+      actionItems.push({
+        type: "returned",
+        title: `${leaveTypeLabel[leave.type] || leave.type} Leave - Returned`,
+        description: `${formatDate(leave.startDate)} - ${formatDate(leave.endDate)} (${leave.workingDays} days)`,
+        action: "Edit & Resubmit",
+        actionLink: `/leaves/${leave.id}/edit`,
+        variant: "destructive",
+        data: leave,
+      });
+    });
+
+    // 2. Medical leave requiring certificate (approved medical leave > 3 days without certificate uploaded)
+    const medicalLeavesNeedingCert = approvedLeaves.filter(
+      (l) => l.type === "MEDICAL" && l.workingDays > 3 && new Date(l.endDate) < now
+    );
+    medicalLeavesNeedingCert.forEach((leave) => {
+      actionItems.push({
+        type: "certificate",
+        title: "Medical Certificate Required",
+        description: `${formatDate(leave.startDate)} - ${formatDate(leave.endDate)} (${leave.workingDays} days)`,
+        action: "Upload Certificate",
+        actionLink: `/leaves/${leave.id}`,
+        variant: "warning",
+        data: leave,
+      });
+    });
+
+    // 3. Upcoming leaves that can be cancelled (within cancellation window)
+    const cancelableLeaves = upcomingApprovedLeaves.filter((l) => {
+      const daysUntil = Math.ceil((new Date(l.startDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      return daysUntil <= 14 && daysUntil > 0; // Show if within 2 weeks
+    }).slice(0, 2); // Limit to 2
+
+    cancelableLeaves.forEach((leave) => {
+      const daysUntil = Math.ceil((new Date(leave.startDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      actionItems.push({
+        type: "cancelable",
+        title: `Upcoming ${leaveTypeLabel[leave.type] || leave.type} Leave`,
+        description: `Starts ${daysUntil === 1 ? "tomorrow" : `in ${daysUntil} days`} - ${formatDate(leave.startDate)} (${leave.workingDays} days)`,
+        action: "Cancel if needed",
+        actionLink: `/leaves?filter=approved`,
+        variant: "info",
+        data: leave,
+      });
+    });
+
+    // 4. Casual leave expiring soon (year-end)
+    const currentMonth = now.getMonth();
+    const isYearEnd = currentMonth >= 10; // November or December
+    const casualBalance = normalizedBalanceData.CASUAL || 0;
+    if (isYearEnd && casualBalance > 0) {
+      actionItems.push({
+        type: "expiring",
+        title: "Casual Leave Expiring",
+        description: `${casualBalance} days will expire on Dec 31`,
+        action: "Apply Now",
+        actionLink: "/leaves/apply",
+        variant: "warning",
+      });
+    }
+
     return {
       pendingCount: pendingLeaves.length,
       returnedCount: returnedLeaves.length,
@@ -233,6 +318,9 @@ export function ModernEmployeeDashboard({
       recentLeaves,
       pendingLeaves,
       returnedLeaves,
+      nextScheduledLeave,
+      daysUntilNextLeave,
+      actionItems,
     };
   }, [leaves, balanceData]);
 
@@ -278,7 +366,7 @@ export function ModernEmployeeDashboard({
         >
           {/* Quick Stats Grid */}
           <ResponsiveDashboardGrid
-            columns="2:2:3:3"
+            columns="2:2:4:4"
             gap="md"
             animate={true}
             staggerChildren={0.1}
@@ -310,93 +398,120 @@ export function ModernEmployeeDashboard({
               role="EMPLOYEE"
               animate={true}
             />
+
+            <RoleKPICard
+              title={dashboardData.nextScheduledLeave ? "Next Leave" : "No Upcoming Leave"}
+              value={
+                dashboardData.daysUntilNextLeave !== null
+                  ? dashboardData.daysUntilNextLeave === 0
+                    ? "Today"
+                    : dashboardData.daysUntilNextLeave === 1
+                    ? "Tomorrow"
+                    : `${dashboardData.daysUntilNextLeave} days`
+                  : "—"
+              }
+              subtitle={
+                dashboardData.nextScheduledLeave
+                  ? `${leaveTypeLabel[dashboardData.nextScheduledLeave.type] || dashboardData.nextScheduledLeave.type} (${dashboardData.nextScheduledLeave.workingDays || 0} days)`
+                  : "Plan your next vacation"
+              }
+              icon={TrendingUp}
+              role="EMPLOYEE"
+              animate={true}
+            />
           </ResponsiveDashboardGrid>
 
-          {/* Action Center - Show if there are returned requests */}
-          {dashboardData.returnedCount > 0 && (
-            <motion.div variants={itemVariants}>
-              <Card className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl border-l-4 border-l-red-500">
-                <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <CardTitle className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 dark:text-red-400" />
-                      <span className="hidden sm:inline">Action Required</span>
-                      <span className="sm:hidden">Action Needed</span>
-                    </CardTitle>
+          {/* Action Center - Always show with dynamic content */}
+          <motion.div variants={itemVariants}>
+            <Card className={cn(
+              "bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl border-l-4",
+              dashboardData.actionItems.length > 0
+                ? "border-l-primary"
+                : "border-l-slate-300 dark:border-l-slate-600"
+            )}>
+              <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <CardTitle className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                    <span>Action Center</span>
+                  </CardTitle>
+                  {dashboardData.actionItems.length > 0 && (
                     <Badge
-                      variant="destructive"
-                      className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 text-xs"
+                      variant="default"
+                      className="bg-primary/10 text-primary dark:bg-primary/20 text-xs"
                     >
-                      <span className="hidden sm:inline">
-                        {dashboardData.returnedCount} Returned
-                      </span>
-                      <span className="sm:hidden">
-                        {dashboardData.returnedCount}
-                      </span>
+                      {dashboardData.actionItems.length} {dashboardData.actionItems.length === 1 ? "item" : "items"}
                     </Badge>
+                  )}
+                </div>
+                <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm">
+                  {dashboardData.actionItems.length > 0
+                    ? "Recommended actions and reminders"
+                    : "You're all caught up! No pending actions."}
+                </p>
+              </CardHeader>
+              <CardContent>
+                {dashboardData.actionItems.length === 0 ? (
+                  <div className="text-center py-8">
+                    <CheckCircle2 className="w-12 h-12 mx-auto text-green-500 mb-3" />
+                    <p className="text-sm font-medium text-slate-900 dark:text-white mb-1">
+                      All Clear!
+                    </p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">
+                      No action items at this time. Enjoy your day!
+                    </p>
                   </div>
-                  <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm">
-                    <span className="hidden sm:inline">
-                      You have leave requests that need to be revised and
-                      resubmitted
-                    </span>
-                    <span className="sm:hidden">Requests need revision</span>
-                  </p>
-                </CardHeader>
-                <CardContent>
+                ) : (
                   <div className="space-y-3">
-                    {dashboardData.returnedLeaves
-                      .slice(0, 3)
-                      .map((leave, index) => (
+                    {dashboardData.actionItems.slice(0, 5).map((item, index) => {
+                      const bgColor =
+                        item.variant === "destructive"
+                          ? "bg-red-50/50 dark:bg-red-900/10 border-red-200/50 dark:border-red-800/30"
+                          : item.variant === "warning"
+                          ? "bg-amber-50/50 dark:bg-amber-900/10 border-amber-200/50 dark:border-amber-800/30"
+                          : "bg-blue-50/50 dark:bg-blue-900/10 border-blue-200/50 dark:border-blue-800/30";
+
+                      const buttonColor =
+                        item.variant === "destructive"
+                          ? "bg-red-600 hover:bg-red-700"
+                          : item.variant === "warning"
+                          ? "bg-amber-600 hover:bg-amber-700"
+                          : "bg-blue-600 hover:bg-blue-700";
+
+                      return (
                         <motion.div
-                          key={leave.id}
+                          key={`${item.type}-${index}`}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.1 }}
-                          className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-xl bg-red-50/50 dark:bg-red-900/10 border border-red-200/50 dark:border-red-800/30 gap-3 sm:gap-2"
+                          className={cn(
+                            "flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-xl border gap-3 sm:gap-2",
+                            bgColor
+                          )}
                         >
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-slate-900 dark:text-white text-sm">
-                              {leaveTypeLabel[leave.type] || leave.type} Leave
+                              {item.title}
                             </p>
                             <p className="text-xs text-slate-600 dark:text-slate-400">
-                              {formatDate(leave.startDate)} -{" "}
-                              {formatDate(leave.endDate)} ({leave.workingDays}{" "}
-                              days)
+                              {item.description}
                             </p>
                           </div>
-                          <div className="flex items-center gap-2 sm:flex-shrink-0">
-                            <StatusBadge status={leave.status} />
-                            <Button
-                              size="sm"
-                              className="bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm h-8 sm:h-9"
-                              onClick={() =>
-                                router.push(`/leaves/${leave.id}/edit`)
-                              }
-                            >
-                              <span className="hidden sm:inline">
-                                Edit & Resubmit
-                              </span>
-                              <span className="sm:hidden">Edit</span>
-                            </Button>
-                          </div>
+                          <Button
+                            size="sm"
+                            className={cn("text-white text-xs sm:text-sm h-8 sm:h-9", buttonColor)}
+                            onClick={() => router.push(item.actionLink)}
+                          >
+                            {item.action}
+                          </Button>
                         </motion.div>
-                      ))}
+                      );
+                    })}
                   </div>
-                  {dashboardData.returnedCount > 3 && (
-                    <Button
-                      variant="outline"
-                      className="w-full mt-4 border-red-200 text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-900/20"
-                      onClick={() => router.push("/leaves?filter=returned")}
-                    >
-                      View All {dashboardData.returnedCount} Returned Requests
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
 
           {/* Main Content with Sidebar */}
           <DashboardWithSidebar

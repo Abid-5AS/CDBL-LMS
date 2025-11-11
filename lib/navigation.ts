@@ -10,6 +10,7 @@ import {
   Activity,
   UserCheck,
   Calendar,
+  Wallet,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { Role } from "@prisma/client";
@@ -29,6 +30,7 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
     { icon: Home, label: "Home", href: "/dashboard/employee" },
     { icon: FileText, label: "Apply", href: "/leaves/apply" },
     { icon: ClipboardList, label: "My Leaves", href: "/leaves" },
+    { icon: Wallet, label: "Balance", href: "/balance" },
     { icon: BookOpen, label: "Policies", href: "/policies" },
     { icon: Calendar, label: "Holidays", href: "/holidays" },
   ],
