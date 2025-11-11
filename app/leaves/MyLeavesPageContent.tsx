@@ -42,6 +42,10 @@ import { useLeaveData } from "@/components/providers";
 // Lib utilities (barrel export)
 import { cn, formatDate, leaveTypeLabel } from "@/lib";
 import { CANCELABLE_STATUSES } from "@/hooks/useLeaveRequests";
+import useSWR from "swr";
+import { apiFetcher } from "@/lib/apiClient";
+import Link from "next/link";
+import { Wallet, ArrowRight } from "lucide-react";
 
 type LeaveRow = {
   id: number;
@@ -235,6 +239,13 @@ export function MyLeavesPageContent() {
     }
   };
 
+  // Fetch balance data for the strip
+  const { data: balanceData, isLoading: balanceLoading } = useSWR(
+    "/api/balance/mine",
+    apiFetcher,
+    { revalidateOnFocus: false }
+  );
+
   return (
     <div className="max-w-6xl mx-auto space-y-6 py-8">
       {/* Header */}
@@ -248,6 +259,42 @@ export function MyLeavesPageContent() {
           </p>
         </div>
       </header>
+
+      {/* Balance Strip */}
+      {!balanceLoading && balanceData && (
+        <Card className="bg-gradient-to-r from-primary/5 via-primary/3 to-transparent border-primary/20">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Wallet className="w-4 h-4 text-primary" />
+                </div>
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Earned:</span>
+                    <span className="font-semibold text-text-primary">{balanceData.EARNED || 0}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Casual:</span>
+                    <span className="font-semibold text-text-primary">{balanceData.CASUAL || 0}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Medical:</span>
+                    <span className="font-semibold text-text-primary">{balanceData.MEDICAL || 0}</span>
+                  </div>
+                </div>
+              </div>
+              <Link
+                href="/balance"
+                className="text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
+              >
+                View Details
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Status Filter Tabs */}
       <div className="flex justify-center mb-6">

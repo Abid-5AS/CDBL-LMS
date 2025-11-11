@@ -25,6 +25,12 @@ type SystemAdminDashboardProps = {
   username: string;
 };
 
+type SystemStats = {
+  totalUsers: number;
+  activeAdmins: number;
+  systemHealth: string;
+};
+
 import { apiFetcher } from "@/lib/apiClient";
 
 /**
@@ -35,11 +41,11 @@ export function SystemAdminDashboard({ username }: SystemAdminDashboardProps) {
   const router = useRouter();
 
   // Fetch system stats
-  const { data: systemData } = useSWR("/api/admin/system-stats", apiFetcher, {
+  const { data: systemData } = useSWR<SystemStats>("/api/admin/system-stats", apiFetcher, {
     revalidateOnFocus: false,
   });
 
-  const systemStats = systemData || {
+  const systemStats: SystemStats = systemData || {
     totalUsers: 0,
     activeAdmins: 0,
     systemHealth: "healthy",

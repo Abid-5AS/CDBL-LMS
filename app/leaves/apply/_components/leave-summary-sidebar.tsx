@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ClipboardList, BookOpenText, Info } from "lucide-react";
+import { ClipboardList, BookOpenText, Info, Wallet } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,11 @@ type LeaveSummarySidebarProps = {
   balancesError: boolean;
   warnings: string[];
   projectedBalancePercent: number;
+  allBalances?: {
+    EARNED: number;
+    CASUAL: number;
+    MEDICAL: number;
+  };
 };
 
 export function LeaveSummarySidebar({
@@ -29,6 +34,7 @@ export function LeaveSummarySidebar({
   balancesError,
   warnings,
   projectedBalancePercent,
+  allBalances,
 }: LeaveSummarySidebarProps) {
   const typeLabel = LEAVE_OPTIONS.find((o) => o.value === type)?.label ?? "—";
   const durationLabel =
@@ -96,6 +102,54 @@ export function LeaveSummarySidebar({
       </div>
 
       <Separator />
+
+      {allBalances && !balancesError && (
+        <>
+          <div>
+            <h4 className="flex items-center gap-2 text-base font-semibold text-foreground mb-4 leading-6">
+              <Wallet className="w-4 h-4 text-primary" />
+              Current Balances
+            </h4>
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Earned Leave:</span>
+                <span className={cn(
+                  "font-semibold",
+                  type === "EARNED" && "text-primary"
+                )}>
+                  {balancesLoading ? "..." : `${allBalances.EARNED} days`}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Casual Leave:</span>
+                <span className={cn(
+                  "font-semibold",
+                  type === "CASUAL" && "text-primary"
+                )}>
+                  {balancesLoading ? "..." : `${allBalances.CASUAL} days`}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Medical Leave:</span>
+                <span className={cn(
+                  "font-semibold",
+                  type === "MEDICAL" && "text-primary"
+                )}>
+                  {balancesLoading ? "..." : `${allBalances.MEDICAL} days`}
+                </span>
+              </div>
+            </div>
+            <Link
+              href="/balance"
+              className="text-primary text-xs font-semibold hover:text-primary/80 mt-3 inline-flex items-center gap-1 leading-6 transition-colors"
+            >
+              View Details →
+            </Link>
+          </div>
+
+          <Separator />
+        </>
+      )}
 
       <div>
         <h4 className="flex items-center gap-2 text-base font-semibold text-foreground mb-3 leading-6">

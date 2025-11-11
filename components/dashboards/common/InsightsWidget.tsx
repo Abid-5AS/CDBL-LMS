@@ -61,7 +61,7 @@ export function InsightsWidget() {
   const [isExpanded, setIsExpanded] = useState(true);
   const { data, isLoading, error } = useSWR<{ insights: Insight[] }>(
     "/api/dashboard/insights",
-    fetcher,
+    apiFetcher,
     {
       revalidateOnFocus: true,
       refreshInterval: 300000, // Refresh every 5 minutes
