@@ -81,7 +81,7 @@ export function EmployeeDashboardUnified({ username }: EmployeeDashboardUnifiedP
 
 function HeroSkeleton() {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white/80 p-4">
+    <div className="rounded-2xl border border-border bg-white/80 p-4">
       <Skeleton className="h-12 w-full" />
     </div>
   );
@@ -89,7 +89,7 @@ function HeroSkeleton() {
 
 function BannerSkeleton() {
   return (
-    <div className="rounded-2xl border-2 p-4 bg-gray-100">
+    <div className="rounded-2xl border-2 p-4 bg-accent">
       <Skeleton className="h-16 w-full" />
     </div>
   );
@@ -120,7 +120,7 @@ function BalanceSkeleton() {
 
 function NextHolidaySkeleton() {
   return (
-    <Card className="bg-slate-50 border-slate-200">
+    <Card className="bg-accent border-border">
       <CardContent className="p-4">
         <Skeleton className="h-16 w-full" />
       </CardContent>

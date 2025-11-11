@@ -216,15 +216,15 @@ export function PendingLeaveRequestsTable() {
                         <div className="text-xs text-muted-foreground">{leave.requester.email}</div>
                       </TableCell>
                       <TableCell className="font-medium">{leaveTypeLabel[leave.type] ?? leave.type}</TableCell>
-                      <TableCell className="hidden sm:table-cell text-slate-600">
+                      <TableCell className="hidden sm:table-cell text-muted-foreground">
                         <span className="sr-only">Dates: </span>
                         {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell text-slate-600">
+                      <TableCell className="hidden md:table-cell text-muted-foreground">
                         <span className="sr-only">Working days: </span>
                         {leave.workingDays}
                       </TableCell>
-                      <TableCell className="hidden lg:table-cell max-w-xs truncate text-slate-600">
+                      <TableCell className="hidden lg:table-cell max-w-xs truncate text-muted-foreground">
                         <span className="sr-only">Reason: </span>
                         {leave.reason}
                       </TableCell>

@@ -31,7 +31,7 @@ export function HRAdminStats({ items, loading }: HRAdminStatsProps) {
             <CardTitle className="text-xs font-medium uppercase text-muted-foreground">{card.title}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold text-slate-900">{loading ? "…" : card.value}</p>
+            <p className="text-2xl font-semibold text-foreground">{loading ? "…" : card.value}</p>
           </CardContent>
         </Card>
       ))}

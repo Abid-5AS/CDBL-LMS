@@ -95,7 +95,7 @@ export function QuickActionFAB() {
                 key={action.href}
                 href={action.href}
                 className={clsx(
-                  "flex items-center gap-3 px-4 py-3 bg-white rounded-full shadow-lg border border-gray-200",
+                  "flex items-center gap-3 px-4 py-3 bg-card rounded-full shadow-lg border border-border",
                   "hover:scale-105 transition-all duration-200",
                   "focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2",
                   "opacity-0 animate-in fade-in slide-in-from-bottom-2"

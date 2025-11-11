@@ -109,17 +109,17 @@ export async function Sidebar({ pathname }: { pathname: string }) {
   const links = resolveLinks(user?.role);
 
   return (
-    <aside className="hidden lg:flex h-screen w-60 shrink-0 flex-col border-r border-slate-200 bg-white shadow-sm" aria-label="Main navigation">
+    <aside className="hidden lg:flex h-screen w-60 shrink-0 flex-col border-r border-border bg-card shadow-sm" aria-label="Main navigation">
       {/* Logo/Brand */}
-      <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-200">
+      <div className="flex items-center gap-2 px-5 py-4 border-b border-border">
         <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-600">
           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
         </div>
         <div>
-          <div className="text-sm font-semibold text-slate-900">CDBL</div>
-          <div className="text-xs text-slate-500">Leave Management</div>
+          <div className="text-sm font-semibold text-foreground">CDBL</div>
+          <div className="text-xs text-muted-foreground">Leave Management</div>
         </div>
       </div>
 
@@ -138,7 +138,7 @@ export async function Sidebar({ pathname }: { pathname: string }) {
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
                 active
                   ? "bg-blue-50 text-blue-700 shadow-sm border border-blue-100"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground",
               )}
             >
               <Icon className={clsx("h-4 w-4 flex-shrink-0", active && "text-blue-600")} aria-hidden="true" />
@@ -149,7 +149,7 @@ export async function Sidebar({ pathname }: { pathname: string }) {
       </nav>
 
       {/* User Section */}
-      <div className="border-t border-slate-200 px-3 py-4 bg-slate-50/50">
+      <div className="border-t border-border px-3 py-4 bg-accent/50">
         <div className="flex items-center gap-2 mb-3">
           <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
             <span className="text-xs font-semibold text-blue-700">
@@ -157,15 +157,15 @@ export async function Sidebar({ pathname }: { pathname: string }) {
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-xs font-medium text-slate-900 truncate">
+            <div className="text-xs font-medium text-foreground truncate">
               {user?.name ?? "Employee"}
             </div>
-            <div className="text-xs text-slate-500 truncate">
+            <div className="text-xs text-muted-foreground truncate">
               {getRoleLabel(user?.role)}
             </div>
           </div>
         </div>
-        <LogoutButton className="w-full justify-start px-2 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100" />
+        <LogoutButton className="w-full justify-start px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-accent" />
       </div>
     </aside>
   );

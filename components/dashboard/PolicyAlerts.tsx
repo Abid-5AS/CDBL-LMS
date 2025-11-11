@@ -74,7 +74,7 @@ export function PolicyAlerts() {
           <Alert key={index} className={config.className}>
             <Icon className="h-4 w-4" />
             <AlertTitle className="text-sm font-semibold">{alert.title}</AlertTitle>
-            <AlertDescription className="text-sm text-slate-700 mt-1">
+            <AlertDescription className="text-sm text-foreground mt-1">
               {alert.message}
               {alert.action && (
                 <div className="mt-3">

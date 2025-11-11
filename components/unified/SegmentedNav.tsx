@@ -44,7 +44,7 @@ export function SegmentedNav({ role }: { role: "EMPLOYEE" | "HR_ADMIN" }) {
               "hover:bg-white/50",
               isActive
                 ? "bg-indigo-100 text-indigo-700 shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
+                : "text-muted-foreground hover:text-gray-900"
             )}
             aria-current={isActive ? "page" : undefined}
           >

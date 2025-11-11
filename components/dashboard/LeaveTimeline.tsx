@@ -52,7 +52,7 @@ const getStageColor = (status: string) => {
     case "rejected":
       return "text-red-600 bg-red-100";
     default:
-      return "text-gray-400 bg-gray-100";
+      return "text-muted-foreground bg-accent";
   }
 };
 
@@ -117,9 +117,9 @@ function StageItem({
       {showTooltip && stage.approver && variant === "compact" && (
         <div className="absolute left-1/2 transform -translate-x-1/2 -top-12 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg whitespace-nowrap z-20">
           <div className="font-medium">Approved by</div>
-          <div className="text-gray-300">{stage.approver}</div>
+          <div className="text-muted-foreground">{stage.approver}</div>
           {stage.completedAt && (
-            <div className="text-gray-400 mt-1">
+            <div className="text-muted-foreground mt-1">
               {new Date(stage.completedAt).toLocaleDateString()}
             </div>
           )}

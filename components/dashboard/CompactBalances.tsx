@@ -68,7 +68,7 @@ export function CompactBalances() {
         return (
           <div key={balance.type} className="space-y-1">
             <div className="flex items-center justify-between text-sm">
-              <span className="font-medium text-slate-900">
+              <span className="font-medium text-foreground">
                 {LEAVE_LABELS[balance.type]}
               </span>
               <span className={`font-semibold ${statusColor}`}>

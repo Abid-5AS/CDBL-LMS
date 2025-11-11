@@ -46,7 +46,7 @@ export function NotificationDropdown() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative h-9 w-9 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+          className="relative h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           aria-label="Notifications"
         >
           <Bell className="h-5 w-5" />
@@ -84,7 +84,7 @@ export function NotificationDropdown() {
                 {notification.link ? (
                   <Link href={notification.link} className="flex flex-col gap-1 w-full p-2">
                     <div className="flex items-start justify-between">
-                      <p className="text-sm font-medium text-slate-900">{notification.title}</p>
+                      <p className="text-sm font-medium text-foreground">{notification.title}</p>
                       {!notification.read && (
                         <span className="h-2 w-2 bg-blue-600 rounded-full mt-1" />
                       )}
@@ -95,7 +95,7 @@ export function NotificationDropdown() {
                 ) : (
                   <div className="flex flex-col gap-1 w-full p-2">
                     <div className="flex items-start justify-between">
-                      <p className="text-sm font-medium text-slate-900">{notification.title}</p>
+                      <p className="text-sm font-medium text-foreground">{notification.title}</p>
                       {!notification.read && (
                         <span className="h-2 w-2 bg-blue-600 rounded-full mt-1" />
                       )}

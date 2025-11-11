@@ -33,11 +33,11 @@ async function HolidaysContent() {
   
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-sm p-6 shadow-sm">
+      <section className="rounded-2xl border border-border bg-white/80 backdrop-blur-sm p-6 shadow-sm">
         <div className="flex items-start justify-between mb-4">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">Company Holidays</h1>
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-muted-foreground">
               View upcoming holidays and calendar for {currentYear}
             </p>
           </div>
@@ -62,9 +62,9 @@ export default function HolidaysPage() {
 function HolidaysPageFallback() {
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="h-8 w-64 bg-slate-200 rounded animate-pulse" />
-        <div className="mt-2 h-4 w-96 bg-slate-100 rounded animate-pulse" />
+      <section className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="h-8 w-64 bg-muted rounded animate-pulse" />
+        <div className="mt-2 h-4 w-96 bg-accent rounded animate-pulse" />
       </section>
       <HolidaysListSkeleton />
     </div>
@@ -73,11 +73,11 @@ function HolidaysPageFallback() {
 
 function HolidaysListSkeleton() {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
       <div className="space-y-4">
-        <div className="h-6 w-48 bg-slate-200 rounded animate-pulse" />
+        <div className="h-6 w-48 bg-muted rounded animate-pulse" />
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-16 w-full bg-slate-100 rounded-lg animate-pulse" />
+          <div key={i} className="h-16 w-full bg-accent rounded-lg animate-pulse" />
         ))}
       </div>
     </div>

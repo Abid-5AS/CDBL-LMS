@@ -72,14 +72,14 @@ export function HeroStrip({ name }: HeroStripProps) {
   }, [leavesData, holidaysData, name]);
 
   return (
-    <div className="flex items-center justify-between gap-4 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/30 dark:border-white/10 rounded-2xl p-4 shadow-sm">
+    <div className="flex items-center justify-between gap-4 backdrop-blur-xl bg-white/70 dark:bg-card/70 border border-white/30 dark:border-white/10 rounded-2xl p-4 shadow-sm">
       <div className="flex-1 min-w-0">
         <p className="text-base font-medium text-gray-900 dark:text-gray-100">{message}</p>
         {nextHoliday && (
-          <p className="flex items-start gap-1.5 text-xs text-gray-600 dark:text-gray-300 mt-1.5">
+          <p className="flex items-start gap-1.5 text-xs text-muted-foreground dark:text-muted-foreground mt-1.5">
             <Calendar className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" strokeWidth={2} />
             <span className="leading-relaxed">
-              Next holiday: <span className="font-medium text-gray-700 dark:text-gray-200">{nextHoliday.name}</span> on {new Date(nextHoliday.date).toLocaleDateString()}
+              Next holiday: <span className="font-medium text-foreground dark:text-gray-200">{nextHoliday.name}</span> on {new Date(nextHoliday.date).toLocaleDateString()}
             </span>
           </p>
         )}

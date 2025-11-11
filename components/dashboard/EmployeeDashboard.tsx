@@ -30,11 +30,11 @@ export function EmployeeDashboard({ username }: EmployeeDashboardProps) {
   return (
     <div className="space-y-4">
       {/* Header with Tabs */}
-      <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
+      <section className="rounded-xl border border-border bg-card p-4 sm:p-6 shadow-sm">
         <div className="flex flex-col gap-4">
           <div>
-            <h2 className="text-2xl font-semibold text-slate-900">Welcome back, {username}</h2>
-            <p className="text-sm text-slate-600 mt-0.5">Manage your leave requests and track your balance</p>
+            <h2 className="text-2xl font-semibold text-foreground">Welcome back, {username}</h2>
+            <p className="text-sm text-muted-foreground mt-0.5">Manage your leave requests and track your balance</p>
           </div>
           
           {/* iOS-style Segmented Control */}
@@ -50,7 +50,7 @@ export function EmployeeDashboard({ username }: EmployeeDashboardProps) {
       {activeTab === "Overview" && (
         <div className="space-y-4">
           {/* Quick Actions */}
-          <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <section className="rounded-xl border border-border bg-card p-4 shadow-sm">
             <Suspense fallback={<div className="h-9 w-full" />}>
               <QuickActionsCard />
             </Suspense>
@@ -153,7 +153,7 @@ function BalanceSkeleton() {
 
 function NextHolidaySkeleton() {
   return (
-    <Card className="bg-slate-50 border-slate-200">
+    <Card className="bg-accent border-border">
       <CardContent className="p-4">
         <Skeleton className="h-16 w-full" />
       </CardContent>

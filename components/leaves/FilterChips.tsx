@@ -28,7 +28,7 @@ export function FilterChips({ options, selectedValue, onChange }: FilterChipsPro
               "hover:scale-105",
               isSelected
                 ? "bg-indigo-600 text-white shadow-sm"
-                : "bg-white border border-gray-200 text-gray-700 hover:border-gray-300"
+                : "bg-card border border-border text-foreground hover:border-border"
             )}
             aria-current={isSelected ? "page" : undefined}
           >

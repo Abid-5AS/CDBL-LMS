@@ -24,11 +24,11 @@ export function PoliciesContent() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-sm p-6 shadow-sm">
+      <section className="rounded-2xl border border-border bg-white/80 backdrop-blur-sm p-6 shadow-sm">
         <div className="flex items-start justify-between mb-4">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">Leave Policy Overview</h1>
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-muted-foreground">
               Summary of entitlements and rules based on the CDBL Leave Management policy.
             </p>
           </div>
@@ -45,11 +45,11 @@ export function PoliciesContent() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-sm p-6 shadow-sm">
+      <section className="rounded-2xl border border-border bg-white/80 backdrop-blur-sm p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900">Annual Entitlements</h2>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+            <thead className="bg-accent text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th className="px-4 py-2">Leave Type</th>
                 <th className="px-4 py-2">Entitlement</th>
@@ -58,10 +58,10 @@ export function PoliciesContent() {
             </thead>
             <tbody>
               {ENTITLEMENTS.map((item) => (
-                <tr key={item.type} className="border-t border-gray-100 hover:bg-gray-50 transition-colors">
+                <tr key={item.type} className="border-t border-gray-100 hover:bg-accent transition-colors">
                   <td className="px-4 py-2 font-medium text-gray-900">{item.type}</td>
                   <td className="px-4 py-2 text-gray-700">{item.entitlement}</td>
-                  <td className="px-4 py-2 text-gray-600">{item.notes}</td>
+                  <td className="px-4 py-2 text-muted-foreground">{item.notes}</td>
                 </tr>
               ))}
             </tbody>
@@ -69,7 +69,7 @@ export function PoliciesContent() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-sm p-6 shadow-sm">
+      <section className="rounded-2xl border border-border bg-white/80 backdrop-blur-sm p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900">Key Rules</h2>
         <ul className="mt-3 list-disc space-y-2 pl-6 text-sm text-gray-700">
           {POLICY_POINTS.map((point) => (
@@ -77,7 +77,7 @@ export function PoliciesContent() {
           ))}
         </ul>
         <div className="mt-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             For the complete policy document, please contact HR or refer to the internal documentation portal.
           </p>
         </div>

@@ -32,7 +32,7 @@ export function FilterChips({ options, selected, onChange, allowMultiple = true,
               "h-8 rounded-full text-xs font-medium transition-all",
               isSelected
                 ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600 shadow-sm"
-                : "bg-white hover:bg-slate-50 text-slate-700 border-slate-200"
+                : "bg-card hover:bg-accent text-foreground border-border"
             )}
           >
             {option.label}
@@ -46,7 +46,7 @@ export function FilterChips({ options, selected, onChange, allowMultiple = true,
           onClick={() => {
             selected.forEach((value) => onChange(value));
           }}
-          className="h-8 rounded-full text-xs text-muted-foreground hover:text-slate-900"
+          className="h-8 rounded-full text-xs text-muted-foreground hover:text-foreground"
         >
           <X className="h-3 w-3 mr-1" />
           Clear

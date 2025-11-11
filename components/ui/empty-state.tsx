@@ -41,7 +41,7 @@ export function EmptyState({
       )}
       <h3 className="text-lg font-semibold text-gray-900 mb-1">{title}</h3>
       {description && (
-        <p className="text-sm text-gray-600 max-w-md mb-4">{description}</p>
+        <p className="text-sm text-muted-foreground max-w-md mb-4">{description}</p>
       )}
       {action && (
         <div className="flex flex-col gap-2 items-center">

@@ -18,7 +18,7 @@ export async function RecentAuditLogs() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Activity className="h-5 w-5 text-slate-400" />
+            <Activity className="h-5 w-5 text-muted-foreground" />
             <CardTitle>Recent Activity</CardTitle>
           </div>
           <CardDescription>System audit logs and activity history</CardDescription>

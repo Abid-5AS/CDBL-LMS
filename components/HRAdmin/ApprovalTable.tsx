@@ -25,7 +25,7 @@ function statusStyle(status: string) {
   const normalized = status.toUpperCase();
   if (normalized === "APPROVED") return "bg-emerald-50";
   if (normalized === "REJECTED") return "bg-rose-50";
-  return "hover:bg-slate-50";
+  return "hover:bg-accent";
 }
 
 const STATUS_OPTIONS = [
@@ -190,19 +190,19 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                   onClick={() => onSelect?.(item)}
                 >
                   <TableCell>
-                    <div className="font-medium text-slate-900">{item.requestedByName ?? "Unknown"}</div>
+                    <div className="font-medium text-foreground">{item.requestedByName ?? "Unknown"}</div>
                     <div className="text-xs text-muted-foreground">{item.requestedByEmail ?? "—"}</div>
                   </TableCell>
-                  <TableCell className="text-sm text-slate-600">{leaveTypeLabel[item.type] ?? item.type}</TableCell>
-                  <TableCell className="text-sm text-slate-600">
+                  <TableCell className="text-sm text-muted-foreground">{leaveTypeLabel[item.type] ?? item.type}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
                     <div>{start}</div>
                     {start !== end && <div className="text-xs text-muted-foreground">to {end}</div>}
                   </TableCell>
-                  <TableCell className="text-sm text-slate-600">{item.requestedDays}</TableCell>
-                  <TableCell className="max-w-xs text-sm text-slate-600">
+                  <TableCell className="text-sm text-muted-foreground">{item.requestedDays}</TableCell>
+                  <TableCell className="max-w-xs text-sm text-muted-foreground">
                     <p className="whitespace-pre-wrap break-words">{item.reason}</p>
                   </TableCell>
-                  <TableCell className="text-sm font-medium capitalize text-slate-700">{stage.toLowerCase()}</TableCell>
+                  <TableCell className="text-sm font-medium capitalize text-foreground">{stage.toLowerCase()}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button

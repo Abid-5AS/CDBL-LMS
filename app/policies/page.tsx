@@ -28,9 +28,9 @@ async function PoliciesPageWrapper() {
 function PoliciesFallback() {
   return (
     <div className="space-y-6">
-      <div className="h-32 rounded-2xl border border-gray-200 bg-white p-6" />
-      <div className="h-64 rounded-2xl border border-gray-200 bg-white p-6" />
-      <div className="h-64 rounded-2xl border border-gray-200 bg-white p-6" />
+      <div className="h-32 rounded-2xl border border-border bg-card p-6" />
+      <div className="h-64 rounded-2xl border border-border bg-card p-6" />
+      <div className="h-64 rounded-2xl border border-border bg-card p-6" />
     </div>
   );
 }

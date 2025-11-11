@@ -39,10 +39,10 @@ export function EmployeeView({ employee }: EmployeeViewProps) {
       </Breadcrumb>
 
       {/* Header with personal greeting */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Your Profile</h1>
+            <h1 className="text-2xl font-semibold text-foreground">Your Profile</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               Welcome back, {employee.name}! 👋
             </p>
@@ -73,14 +73,14 @@ export function EmployeeView({ employee }: EmployeeViewProps) {
       </div>
 
       {/* Analytics Charts */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-slate-900 mb-4">Your Leave Analytics</h2>
+      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-foreground mb-4">Your Leave Analytics</h2>
         <ChartsSection trend={employee.monthlyTrend} distribution={employee.distribution} />
       </div>
 
       {/* Leave History Table */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-slate-900 mb-4">Leave History</h2>
+      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-foreground mb-4">Leave History</h2>
         <LeaveHistoryTable history={employee.history} />
       </div>
     </div>

@@ -51,7 +51,7 @@ export function SlideDrawer() {
       {/* Drawer */}
       <div
         className={clsx(
-          "fixed right-0 top-0 bottom-0 w-full max-w-2xl bg-white shadow-2xl z-50",
+          "fixed right-0 top-0 bottom-0 w-full max-w-2xl bg-card shadow-2xl z-50",
           "transform transition-transform duration-300 ease-out overflow-hidden",
           drawerOpen ? "translate-x-0" : "translate-x-full"
         )}
@@ -60,7 +60,7 @@ export function SlideDrawer() {
         aria-labelledby="drawer-title"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-border">
           <h2 id="drawer-title" className="text-xl font-semibold text-gray-900">
             Leave Request Details
           </h2>
@@ -91,7 +91,7 @@ function DrawerContent({ requestId }: { requestId: number | null }) {
   );
 
   if (!requestId || isLoading) {
-    return <div className="text-gray-600">Loading details...</div>;
+    return <div className="text-muted-foreground">Loading details...</div>;
   }
 
   if (error) {
@@ -103,7 +103,7 @@ function DrawerContent({ requestId }: { requestId: number | null }) {
     : null;
 
   if (!leave) {
-    return <div className="text-gray-600">Leave not found</div>;
+    return <div className="text-muted-foreground">Leave not found</div>;
   }
 
   return (
@@ -111,40 +111,40 @@ function DrawerContent({ requestId }: { requestId: number | null }) {
       {/* Basic Info */}
       <div className="space-y-4">
         <div>
-          <h3 className="text-sm font-medium text-gray-500 mb-1">Leave Type</h3>
+          <h3 className="text-sm font-medium text-muted-foreground mb-1">Leave Type</h3>
           <p className="text-base font-semibold text-gray-900">
             {leaveTypeLabel[leave.type] ?? leave.type}
           </p>
         </div>
         
         <div>
-          <h3 className="text-sm font-medium text-gray-500 mb-1">Status</h3>
+          <h3 className="text-sm font-medium text-muted-foreground mb-1">Status</h3>
           <StatusBadge status={leave.status} />
         </div>
 
         <div>
-          <h3 className="text-sm font-medium text-gray-500 mb-1">Dates</h3>
+          <h3 className="text-sm font-medium text-muted-foreground mb-1">Dates</h3>
           <p className="text-base text-gray-900">
             {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
           </p>
         </div>
 
         <div>
-          <h3 className="text-sm font-medium text-gray-500 mb-1">Duration</h3>
+          <h3 className="text-sm font-medium text-muted-foreground mb-1">Duration</h3>
           <p className="text-base text-gray-900">{leave.workingDays} working days</p>
         </div>
 
         {leave.reason && (
           <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-1">Reason</h3>
+            <h3 className="text-sm font-medium text-muted-foreground mb-1">Reason</h3>
             <p className="text-base text-gray-900 whitespace-pre-wrap">{leave.reason}</p>
           </div>
         )}
       </div>
 
       {/* Approval Timeline */}
-      <div className="border-t border-gray-200 pt-6">
-        <h3 className="text-sm font-medium text-gray-500 mb-4">Approval Status</h3>
+      <div className="border-t border-border pt-6">
+        <h3 className="text-sm font-medium text-muted-foreground mb-4">Approval Status</h3>
         <LeaveTimeline requestId={requestId} variant="detailed" />
       </div>
     </div>

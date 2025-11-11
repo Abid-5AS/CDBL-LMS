@@ -65,7 +65,7 @@ export function ActiveRequestsTimeline() {
     <Card className="border-2 border-blue-100 bg-blue-50/30">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-bold text-slate-900">Active Requests</CardTitle>
+          <CardTitle className="text-lg font-bold text-foreground">Active Requests</CardTitle>
           <Button asChild variant="ghost" size="sm" className="text-blue-600 font-medium">
             <Link href="/leaves">View All</Link>
           </Button>
@@ -84,16 +84,16 @@ export function ActiveRequestsTimeline() {
             return (
               <div
                 key={leave.id}
-                className="flex items-center justify-between gap-4 p-4 rounded-lg bg-white border-2 border-slate-200 hover:border-blue-300 hover:shadow-sm transition-all"
+                className="flex items-center justify-between gap-4 p-4 rounded-lg bg-card border-2 border-border hover:border-blue-300 hover:shadow-sm transition-all"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-2">
                     <StatusBadge status={leave.status} />
-                    <span className="text-base font-bold text-slate-900 capitalize">
+                    <span className="text-base font-bold text-foreground capitalize">
                       {leave.type} Leave
                     </span>
                   </div>
-                  <div className="text-sm font-semibold text-slate-700 mb-1">
+                  <div className="text-sm font-semibold text-foreground mb-1">
                     {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
                   </div>
                   {daysUntil !== null && (

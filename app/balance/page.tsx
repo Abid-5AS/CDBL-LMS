@@ -9,8 +9,8 @@ async function BalanceContent() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold text-slate-900">Leave Balance</h1>
+      <section className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <h1 className="text-2xl font-semibold text-foreground">Leave Balance</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           View your current leave balances and accrual information for {currentYear}
         </p>
@@ -25,7 +25,7 @@ async function BalanceContent() {
             <CardDescription>Available casual leave days</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold text-slate-900">—</p>
+            <p className="text-3xl font-semibold text-foreground">—</p>
             <p className="mt-1 text-sm text-muted-foreground">Loading balance...</p>
           </CardContent>
         </Card>
@@ -38,7 +38,7 @@ async function BalanceContent() {
             <CardDescription>Available sick leave days</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold text-slate-900">—</p>
+            <p className="text-3xl font-semibold text-foreground">—</p>
             <p className="mt-1 text-sm text-muted-foreground">Loading balance...</p>
           </CardContent>
         </Card>
@@ -51,7 +51,7 @@ async function BalanceContent() {
             <CardDescription>Accrued earned leave days</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold text-slate-900">—</p>
+            <p className="text-3xl font-semibold text-foreground">—</p>
             <p className="mt-1 text-sm text-muted-foreground">Loading balance...</p>
           </CardContent>
         </Card>
@@ -71,20 +71,20 @@ export default function BalancePage() {
 function BalanceFallback() {
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="h-8 w-48 bg-slate-200 rounded animate-pulse" />
-        <div className="mt-2 h-4 w-64 bg-slate-100 rounded animate-pulse" />
+      <section className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="h-8 w-48 bg-muted rounded animate-pulse" />
+        <div className="mt-2 h-4 w-64 bg-accent rounded animate-pulse" />
       </section>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 3 }).map((_, i) => (
           <Card key={i}>
             <CardHeader>
-              <div className="h-6 w-32 bg-slate-200 rounded animate-pulse" />
-              <div className="h-4 w-40 bg-slate-100 rounded animate-pulse mt-2" />
+              <div className="h-6 w-32 bg-muted rounded animate-pulse" />
+              <div className="h-4 w-40 bg-accent rounded animate-pulse mt-2" />
             </CardHeader>
             <CardContent>
-              <div className="h-10 w-20 bg-slate-200 rounded animate-pulse" />
-              <div className="h-4 w-32 bg-slate-100 rounded animate-pulse mt-2" />
+              <div className="h-10 w-20 bg-muted rounded animate-pulse" />
+              <div className="h-4 w-32 bg-accent rounded animate-pulse mt-2" />
             </CardContent>
           </Card>
         ))}

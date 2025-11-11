@@ -101,7 +101,7 @@ export function MiniCalendar() {
           {/* Week day headers */}
           <div className="grid grid-cols-7 gap-1 mb-2">
             {weekDays.map((day) => (
-              <div key={day} className="text-xs font-medium text-center text-slate-600 py-1">
+              <div key={day} className="text-xs font-medium text-center text-muted-foreground py-1">
                 {day}
               </div>
             ))}
@@ -127,10 +127,10 @@ export function MiniCalendar() {
                       ? "bg-blue-600 text-white font-bold"
                       : hasLeave
                       ? "bg-emerald-50 border border-emerald-200"
-                      : "hover:bg-slate-50"
+                      : "hover:bg-accent"
                   }`}
                 >
-                  <span className={`text-xs ${isToday ? "text-white" : "text-slate-900"}`}>
+                  <span className={`text-xs ${isToday ? "text-white" : "text-foreground"}`}>
                     {day}
                   </span>
                   {hasLeave && !isToday && (
@@ -144,16 +144,16 @@ export function MiniCalendar() {
 
         {/* Legend */}
         {approvedLeaves.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-slate-200">
-            <div className="text-xs text-slate-600 mb-2">Legend:</div>
+          <div className="mt-4 pt-4 border-t border-border">
+            <div className="text-xs text-muted-foreground mb-2">Legend:</div>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded bg-emerald-100 border border-emerald-300" />
-                <span className="text-xs text-slate-600">Approved Leave</span>
+                <span className="text-xs text-muted-foreground">Approved Leave</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded bg-blue-600" />
-                <span className="text-xs text-slate-600">Today</span>
+                <span className="text-xs text-muted-foreground">Today</span>
               </div>
             </div>
           </div>

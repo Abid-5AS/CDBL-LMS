@@ -19,7 +19,7 @@ export default async function DashboardContent() {
 
   return (
     <div className="space-y-8">
-      <section className="flex flex-col gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-card p-6 shadow-sm md:flex-row md:items-center md:justify-between">
+      <section className="flex flex-col gap-3 rounded-xl border border-border dark:border-slate-700 bg-card p-6 shadow-sm md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-sm text-muted-foreground">Welcome back, {username}</p>
           <h2 className="text-2xl font-semibold text-foreground">Your leave snapshot</h2>
@@ -51,7 +51,7 @@ export default async function DashboardContent() {
         {approver ? (
           <PendingApprovalsCard />
         ) : (
-          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-card p-6 shadow-sm">
+          <div className="rounded-xl border border-border dark:border-slate-700 bg-card p-6 shadow-sm">
             <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Upcoming Holiday</h3>
             <p className="mt-2 text-lg font-semibold text-foreground">Victory Day</p>
             <p className="text-sm text-muted-foreground">16 December • Click to view all holidays</p>
@@ -73,20 +73,20 @@ export default async function DashboardContent() {
               <Link href="/leaves">View all</Link>
             </Button>
           </div>
-          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-card p-4 shadow-sm">
+          <div className="rounded-xl border border-border dark:border-slate-700 bg-card p-4 shadow-sm">
             <RequestsTable />
           </div>
         </div>
         <div className="space-y-4">
           {approver && user ? (
-            <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-card p-4 shadow-sm">
+            <div className="rounded-xl border border-border dark:border-slate-700 bg-card p-4 shadow-sm">
               <PendingApprovals role={approverStage} />
             </div>
           ) : null}
-          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-card p-4 shadow-sm">
+          <div className="rounded-xl border border-border dark:border-slate-700 bg-card p-4 shadow-sm">
             <ActivityPanel />
           </div>
-          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-card p-4 shadow-sm">
+          <div className="rounded-xl border border-border dark:border-slate-700 bg-card p-4 shadow-sm">
             <PolicyReminders />
           </div>
         </div>

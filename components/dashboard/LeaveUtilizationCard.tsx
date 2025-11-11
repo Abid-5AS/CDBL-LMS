@@ -49,25 +49,25 @@ export function LeaveUtilizationCard() {
       <CardContent>
         <div className="space-y-6">
           {/* Projected Annual Usage */}
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <div className="rounded-lg border border-border bg-accent p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-slate-700">Projected Annual Usage</span>
-              <span className="text-sm font-bold text-slate-900">{summary.projectedAnnualUsage} days</span>
+              <span className="text-sm font-medium text-foreground">Projected Annual Usage</span>
+              <span className="text-sm font-bold text-foreground">{summary.projectedAnnualUsage} days</span>
             </div>
-            <div className="text-xs text-slate-600">
+            <div className="text-xs text-muted-foreground">
               Based on {summary.totalUsed} days used so far this year
             </div>
           </div>
 
           {/* Usage by Type */}
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-slate-900">Usage by Leave Type</h4>
+            <h4 className="text-sm font-semibold text-foreground">Usage by Leave Type</h4>
             
             {/* Earned Leave */}
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-slate-700">Earned Leave</span>
-                <span className="font-medium text-slate-900">
+                <span className="text-foreground">Earned Leave</span>
+                <span className="font-medium text-foreground">
                   {summary.breakdown.earned} days ({summary.utilization.earned}%)
                 </span>
               </div>
@@ -87,8 +87,8 @@ export function LeaveUtilizationCard() {
             {/* Casual Leave */}
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-slate-700">Casual Leave</span>
-                <span className="font-medium text-slate-900">
+                <span className="text-foreground">Casual Leave</span>
+                <span className="font-medium text-foreground">
                   {summary.breakdown.casual} days ({summary.utilization.casual}%)
                 </span>
               </div>
@@ -108,8 +108,8 @@ export function LeaveUtilizationCard() {
             {/* Medical Leave */}
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-slate-700">Medical Leave</span>
-                <span className="font-medium text-slate-900">
+                <span className="text-foreground">Medical Leave</span>
+                <span className="font-medium text-foreground">
                   {summary.breakdown.medical} days ({summary.utilization.medical}%)
                 </span>
               </div>
@@ -129,42 +129,42 @@ export function LeaveUtilizationCard() {
 
           {/* Monthly Trend (Simple Bar Chart) */}
           {thisMonthData && (
-            <div className="space-y-3 pt-4 border-t border-slate-200">
-              <h4 className="text-sm font-semibold text-slate-900">This Month Usage</h4>
+            <div className="space-y-3 pt-4 border-t border-border">
+              <h4 className="text-sm font-semibold text-foreground">This Month Usage</h4>
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-600 w-20">Earned</span>
+                  <span className="text-xs text-muted-foreground w-20">Earned</span>
                   <div className="flex-1 h-4 bg-slate-200 rounded overflow-hidden">
                     <div
                       className="h-full bg-blue-600 rounded"
                       style={{ width: `${Math.min((thisMonthData.earned / 10) * 100, 100)}%` }}
                     />
                   </div>
-                  <span className="text-xs font-medium text-slate-900 w-10 text-right">
+                  <span className="text-xs font-medium text-foreground w-10 text-right">
                     {thisMonthData.earned}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-600 w-20">Casual</span>
+                  <span className="text-xs text-muted-foreground w-20">Casual</span>
                   <div className="flex-1 h-4 bg-slate-200 rounded overflow-hidden">
                     <div
                       className="h-full bg-green-600 rounded"
                       style={{ width: `${Math.min((thisMonthData.casual / 5) * 100, 100)}%` }}
                     />
                   </div>
-                  <span className="text-xs font-medium text-slate-900 w-10 text-right">
+                  <span className="text-xs font-medium text-foreground w-10 text-right">
                     {thisMonthData.casual}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-600 w-20">Medical</span>
+                  <span className="text-xs text-muted-foreground w-20">Medical</span>
                   <div className="flex-1 h-4 bg-slate-200 rounded overflow-hidden">
                     <div
                       className="h-full bg-purple-600 rounded"
                       style={{ width: `${Math.min((thisMonthData.medical / 5) * 100, 100)}%` }}
                     />
                   </div>
-                  <span className="text-xs font-medium text-slate-900 w-10 text-right">
+                  <span className="text-xs font-medium text-foreground w-10 text-right">
                     {thisMonthData.medical}
                   </span>
                 </div>

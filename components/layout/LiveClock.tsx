@@ -32,7 +32,7 @@ export function LiveClock() {
       </div>
       <span className="text-muted-foreground/50">|</span>
       <div className="flex items-center gap-1.5">
-        <CalendarIcon className="h-3.5 w-3.5 text-slate-600 dark:text-slate-400" />
+        <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground" />
         <span className="font-medium">{formattedDate}</span>
       </div>
     </div>

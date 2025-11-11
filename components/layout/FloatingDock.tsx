@@ -83,7 +83,7 @@ export default function FloatingDock({ pageContext }: FloatingDockProps) {
                     "hover:scale-[1.05] active:scale-[0.95]",
                     isActive
                       ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/40 shadow-lg ring-2 ring-indigo-500/20 dark:ring-indigo-400/30"
-                      : "text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white/20 dark:hover:bg-white/5"
+                      : "text-foreground dark:text-muted-foreground hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white/20 dark:hover:bg-white/5"
                   )}
                   style={
                     isActive
@@ -113,7 +113,7 @@ export default function FloatingDock({ pageContext }: FloatingDockProps) {
               >
                 <p className="text-xs font-semibold">{action.label}</p>
                 {selectionCount > 0 && (
-                  <p className="text-[10px] text-slate-400 dark:text-slate-300 mt-0.5">
+                  <p className="text-[10px] text-muted-foreground dark:text-slate-300 mt-0.5">
                     {selectionCount} row{selectionCount !== 1 ? "s" : ""}{" "}
                     selected
                   </p>

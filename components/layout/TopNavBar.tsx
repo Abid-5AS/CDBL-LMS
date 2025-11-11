@@ -166,7 +166,7 @@ export default function TopNavBar() {
         {/* Left Section: Breadcrumbs */}
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <nav
-            className="flex items-center gap-1.5 text-sm text-slate-700 dark:text-slate-300 shrink-0"
+            className="flex items-center gap-1.5 text-sm text-foreground dark:text-slate-300 shrink-0"
             aria-label="Breadcrumb"
           >
             {breadcrumbs.map((crumb, index) => (
@@ -175,14 +175,14 @@ export default function TopNavBar() {
                 className="flex items-center gap-1.5"
               >
                 {index > 0 && (
-                  <ChevronRight className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground dark:text-muted-foreground" />
                 )}
                 <Link
                   href={crumb.href}
                   className={clsx(
                     "transition-colors truncate hover:text-indigo-600 dark:hover:text-indigo-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 rounded",
                     index === breadcrumbs.length - 1
-                      ? "font-semibold text-slate-900 dark:text-slate-100"
+                      ? "font-semibold text-foreground"
                       : "hover:underline"
                   )}
                 >
@@ -212,7 +212,7 @@ export default function TopNavBar() {
           {/* Expand/Collapse Button (visible on <1024px) */}
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="lg:hidden glass-light p-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-white/80 dark:hover:bg-white/5 transition-all"
+            className="lg:hidden glass-light p-2 rounded-lg text-foreground dark:text-slate-300 hover:bg-white/80 dark:hover:bg-white/5 transition-all"
             aria-label={
               isExpanded ? "Collapse navigation" : "Expand navigation"
             }
@@ -250,9 +250,9 @@ export default function TopNavBar() {
 
           {/* Greeting & Clock */}
           {isExpanded && (
-            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 glass-light rounded-lg text-xs text-slate-700 dark:text-slate-300">
+            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 glass-light rounded-lg text-xs text-foreground dark:text-slate-300">
               <span className="font-medium">{greeting},</span>
-              <span className="text-slate-600 dark:text-slate-400 truncate max-w-[100px]">
+              <span className="text-muted-foreground truncate max-w-[100px]">
                 {user.name.split(' ')[0]}
               </span>
             </div>

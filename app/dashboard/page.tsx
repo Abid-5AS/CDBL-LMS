@@ -45,10 +45,10 @@ export default function DashboardPage() {
 function DashboardFallback() {
   return (
     <div className="space-y-6">
-      <div className="h-36 rounded-xl border border-slate-200 bg-white p-6 shadow-sm animate-pulse" />
+      <div className="h-36 rounded-xl border border-border bg-card p-6 shadow-sm animate-pulse" />
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 3 }).map((_, index) => (
-          <div key={index} className="h-28 rounded-xl border border-slate-200 bg-white shadow-sm animate-pulse" />
+          <div key={index} className="h-28 rounded-xl border border-border bg-card shadow-sm animate-pulse" />
         ))}
       </div>
     </div>

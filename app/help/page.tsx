@@ -14,8 +14,8 @@ const KEYBOARD_SHORTCUTS = [
 export default function HelpPage() {
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Help Center</h1>
+      <section className="rounded-xl border border-border dark:border-slate-800 bg-card dark:bg-card p-6 shadow-sm">
+        <h1 className="text-2xl font-semibold text-foreground">Help Center</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Find answers to common questions and get support for using the leave management system
         </p>
@@ -53,7 +53,7 @@ export default function HelpPage() {
               {KEYBOARD_SHORTCUTS.map((shortcut, idx) => (
                 <div key={idx} className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">{shortcut.description}</span>
-                  <kbd className="px-2 py-1 text-xs font-semibold bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded">
+                  <kbd className="px-2 py-1 text-xs font-semibold bg-accent dark:bg-card border border-border dark:border-slate-700 rounded">
                     {shortcut.key}
                   </kbd>
                 </div>

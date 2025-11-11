@@ -66,15 +66,15 @@ export function LeaveConfirmationModal({
 
         <div className="space-y-4 py-4">
           {/* Leave Summary Card */}
-          <div className="rounded-xl border border-white/20 bg-white/50 dark:bg-slate-800/50 p-4 backdrop-blur-sm">
+          <div className="rounded-xl border border-white/20 bg-card/50 p-4 backdrop-blur-sm">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="flex items-start gap-3">
                 <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/30">
                   <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-slate-600 dark:text-slate-400">Leave Type</p>
-                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{LEAVE_TYPE_LABELS[type]}</p>
+                  <p className="text-xs font-medium text-muted-foreground">Leave Type</p>
+                  <p className="text-sm font-semibold text-foreground">{LEAVE_TYPE_LABELS[type]}</p>
                 </div>
               </div>
 
@@ -83,34 +83,34 @@ export function LeaveConfirmationModal({
                   <Clock className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-slate-600 dark:text-slate-400">Duration</p>
-                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{duration} day(s)</p>
+                  <p className="text-xs font-medium text-muted-foreground">Duration</p>
+                  <p className="text-sm font-semibold text-foreground">{duration} day(s)</p>
                 </div>
               </div>
             </div>
 
-            <div className="mt-4 space-y-2 border-t border-slate-200 dark:border-slate-700 pt-4">
+            <div className="mt-4 space-y-2 border-t border-border pt-4">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600 dark:text-slate-400">Start Date</span>
-                <span className="font-medium text-slate-900 dark:text-slate-100">{formatDate(startDate)}</span>
+                <span className="text-muted-foreground">Start Date</span>
+                <span className="font-medium text-foreground">{formatDate(startDate)}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600 dark:text-slate-400">End Date</span>
-                <span className="font-medium text-slate-900 dark:text-slate-100">{formatDate(endDate)}</span>
+                <span className="text-muted-foreground">End Date</span>
+                <span className="font-medium text-foreground">{formatDate(endDate)}</span>
               </div>
             </div>
           </div>
 
           {/* Balance Impact */}
-          <div className="rounded-xl border border-white/20 bg-white/50 dark:bg-slate-800/50 p-4 backdrop-blur-sm">
-            <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-3">Balance Impact</h4>
+          <div className="rounded-xl border border-white/20 bg-card/50 p-4 backdrop-blur-sm">
+            <h4 className="text-sm font-semibold text-foreground mb-3">Balance Impact</h4>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600 dark:text-slate-400">Current Balance</span>
-                <span className="font-medium text-slate-900 dark:text-slate-100">{currentBalance} days</span>
+                <span className="text-muted-foreground">Current Balance</span>
+                <span className="font-medium text-foreground">{currentBalance} days</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-600 dark:text-slate-400">After This Leave</span>
+                <span className="text-muted-foreground">After This Leave</span>
                 <span
                   className={`font-semibold ${
                     isInsufficientBalance
@@ -123,26 +123,26 @@ export function LeaveConfirmationModal({
                   {projectedBalance >= 0 ? projectedBalance : 0} days
                 </span>
               </div>
-              <div className="flex items-center justify-between text-sm border-t border-slate-200 dark:border-slate-700 pt-2 mt-2">
-                <span className="text-slate-600 dark:text-slate-400">Days Deducted</span>
+              <div className="flex items-center justify-between text-sm border-t border-border pt-2 mt-2">
+                <span className="text-muted-foreground">Days Deducted</span>
                 <span className="font-medium text-red-600 dark:text-red-400">-{Math.abs(balanceChange)} days</span>
               </div>
             </div>
           </div>
 
           {/* Reason */}
-          <div className="rounded-xl border border-white/20 bg-white/50 dark:bg-slate-800/50 p-4 backdrop-blur-sm">
-            <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-2">Reason</h4>
-            <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{reason}</p>
+          <div className="rounded-xl border border-white/20 bg-card/50 p-4 backdrop-blur-sm">
+            <h4 className="text-sm font-semibold text-foreground mb-2">Reason</h4>
+            <p className="text-sm text-foreground whitespace-pre-wrap">{reason}</p>
           </div>
 
           {/* Attached File */}
           {fileName && (
-            <div className="rounded-xl border border-white/20 bg-white/50 dark:bg-slate-800/50 p-4 backdrop-blur-sm">
-              <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-2">Attached Document</h4>
+            <div className="rounded-xl border border-white/20 bg-card/50 p-4 backdrop-blur-sm">
+              <h4 className="text-sm font-semibold text-foreground mb-2">Attached Document</h4>
               <div className="flex items-center gap-2 text-sm">
                 <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                <span className="text-slate-700 dark:text-slate-300 truncate">{fileName}</span>
+                <span className="text-foreground truncate">{fileName}</span>
               </div>
             </div>
           )}
@@ -172,7 +172,6 @@ export function LeaveConfirmationModal({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={submitting}
-            className="dark:border-slate-700"
           >
             Go Back
           </Button>

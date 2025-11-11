@@ -39,7 +39,7 @@ export function UpcomingHolidays() {
       <Card className="h-auto min-h-[140px] hover:shadow-md transition-shadow">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wide text-slate-600">
+            <CardTitle className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Upcoming Holidays
             </CardTitle>
             <div className="bg-green-50 text-green-600 p-2 rounded-lg">
@@ -71,7 +71,7 @@ export function UpcomingHolidays() {
     <Card className="h-auto min-h-[140px] hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-xs font-semibold uppercase tracking-wide text-slate-600">
+          <CardTitle className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Upcoming Holidays
           </CardTitle>
           <div className="bg-green-50 text-green-600 p-2 rounded-lg">
@@ -81,7 +81,7 @@ export function UpcomingHolidays() {
       </CardHeader>
       <CardContent className="space-y-3">
         <div>
-          <p className="text-lg font-bold text-slate-900 mb-1">{nextHoliday.name}</p>
+          <p className="text-lg font-bold text-foreground mb-1">{nextHoliday.name}</p>
           <div className="flex items-center gap-2 text-sm">
             <p className="text-muted-foreground">{dateStr}</p>
             {daysUntil >= 0 && (

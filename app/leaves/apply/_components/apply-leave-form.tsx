@@ -302,9 +302,9 @@ export function ApplyLeaveForm() {
       <form onSubmit={handleReviewClick} noValidate aria-label="Leave application form">
         <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
           <div className="space-y-6">
-            <div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/30 dark:border-white/10 rounded-xl p-6 shadow-sm">
+            <div className="backdrop-blur-xl bg-card/70 border border-white/30 dark:border-white/10 rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">New Leave Application</h2>
+                <h2 className="text-xl font-semibold text-foreground">New Leave Application</h2>
               </div>
               <p className="text-sm text-muted-foreground">
                 Select leave type, duration, and add a short reason. Attach supporting documents when necessary.
@@ -317,9 +317,9 @@ export function ApplyLeaveForm() {
               )}
             </div>
 
-            <div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/30 dark:border-white/10 rounded-xl p-6 shadow-sm space-y-5">
+            <div className="backdrop-blur-xl bg-card/70 border border-white/30 dark:border-white/10 rounded-xl p-6 shadow-sm space-y-5">
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-900 dark:text-slate-50">
+                <Label className="text-sm font-medium text-foreground">
                   Leave Type <span className="text-red-500">*</span>
                 </Label>
                 <Select
@@ -355,7 +355,7 @@ export function ApplyLeaveForm() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-900 dark:text-slate-50">
+                <Label className="text-sm font-medium text-foreground">
                   Leave Dates <span className="text-red-500">*</span>
                 </Label>
 
@@ -370,11 +370,11 @@ export function ApplyLeaveForm() {
                 {/* Duration feedback */}
                 {dateRange.start && dateRange.end && (
                   <div className="mt-2 text-sm flex items-center gap-2" aria-live="polite">
-                    <span className="text-slate-600 dark:text-slate-400">Selected:</span>
-                    <span className="font-semibold text-slate-900 dark:text-slate-100">
+                    <span className="text-muted-foreground">Selected:</span>
+                    <span className="font-semibold text-foreground">
                       {requestedDays} day{requestedDays !== 1 ? 's' : ''}
                     </span>
-                    <span className="text-slate-500 dark:text-slate-400">
+                    <span className="text-muted-foreground">
                       ({fmtDDMMYYYY(dateRange.start)} → {fmtDDMMYYYY(dateRange.end)})
                     </span>
                   </div>
@@ -411,7 +411,7 @@ export function ApplyLeaveForm() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-900 dark:text-slate-50">
+                <Label className="text-sm font-medium text-foreground">
                   Reason <span className="text-red-500">*</span>
                 </Label>
                 <Textarea
@@ -489,24 +489,24 @@ export function ApplyLeaveForm() {
           </div>
 
           <aside className="space-y-4">
-            <div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/30 dark:border-white/10 rounded-xl p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">Leave Summary</h3>
-              
+            <div className="backdrop-blur-xl bg-card/70 border border-white/30 dark:border-white/10 rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Leave Summary</h3>
+
               <div className="space-y-3 mb-6">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500 dark:text-slate-400">Type</span>
-                  <span className="font-medium text-slate-900 dark:text-slate-100">
+                  <span className="text-muted-foreground">Type</span>
+                  <span className="font-medium text-foreground">
                     {LEAVE_OPTIONS.find((o) => o.value === type)?.label ?? "—"}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500 dark:text-slate-400">Duration</span>
-                  <span className="font-medium text-slate-900 dark:text-slate-100">
+                  <span className="text-muted-foreground">Duration</span>
+                  <span className="font-medium text-foreground">
                     {requestedDays > 0 ? `${requestedDays} day(s)` : "Select dates"}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm" aria-live="polite">
-                  <span className="text-slate-500 dark:text-slate-400">Projected Balance</span>
+                  <span className="text-muted-foreground">Projected Balance</span>
                   <span
                     className={cn(
                       "font-semibold",
@@ -522,12 +522,12 @@ export function ApplyLeaveForm() {
                 </div>
               </div>
 
-              <hr className="my-4 border-slate-200 dark:border-slate-700" />
-              
+              <hr className="my-4 border-border" />
+
               <div className="space-y-2 text-sm mb-4">
-                <h4 className="font-semibold text-slate-700 dark:text-slate-300">Rules</h4>
+                <h4 className="font-semibold text-foreground">Rules</h4>
                 {RULE_TIPS[type].map((tip) => (
-                  <p key={tip} className="flex items-start gap-2 text-slate-600 dark:text-slate-400">
+                  <p key={tip} className="flex items-start gap-2 text-muted-foreground">
                     <span className="text-blue-600 dark:text-blue-400">•</span>
                     {tip}
                   </p>
@@ -550,15 +550,15 @@ export function ApplyLeaveForm() {
               </Link>
             </div>
 
-            <div className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border border-white/30 dark:border-white/10 rounded-xl p-6 shadow-sm">
-              <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-4">
+            <div className="backdrop-blur-xl bg-card/70 border border-white/30 dark:border-white/10 rounded-xl p-6 shadow-sm">
+              <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-4">
                 Current Balances
               </h4>
               {balancesLoading ? (
                 <div className="space-y-2">
-                  <div className="h-3 w-3/4 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
-                  <div className="h-3 w-2/3 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
-                  <div className="h-3 w-1/2 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
+                  <div className="h-3 w-3/4 animate-pulse rounded bg-muted" />
+                  <div className="h-3 w-2/3 animate-pulse rounded bg-muted" />
+                  <div className="h-3 w-1/2 animate-pulse rounded bg-muted" />
                 </div>
               ) : balancesError ? (
                 <p className="text-sm text-amber-600 dark:text-amber-400">
@@ -567,16 +567,16 @@ export function ApplyLeaveForm() {
               ) : (
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-center justify-between">
-                    <span className="text-slate-600 dark:text-slate-400">Casual</span>
-                    <span className="font-semibold text-slate-900 dark:text-slate-100">{balances?.CASUAL ?? "—"} days</span>
+                    <span className="text-muted-foreground">Casual</span>
+                    <span className="font-semibold text-foreground">{balances?.CASUAL ?? "—"} days</span>
                   </li>
                   <li className="flex items-center justify-between">
-                    <span className="text-slate-600 dark:text-slate-400">Sick</span>
-                    <span className="font-semibold text-slate-900 dark:text-slate-100">{balances?.MEDICAL ?? "—"} days</span>
+                    <span className="text-muted-foreground">Sick</span>
+                    <span className="font-semibold text-foreground">{balances?.MEDICAL ?? "—"} days</span>
                   </li>
                   <li className="flex items-center justify-between">
-                    <span className="text-slate-600 dark:text-slate-400">Earned</span>
-                    <span className="font-semibold text-slate-900 dark:text-slate-100">{balances?.EARNED ?? "—"} days</span>
+                    <span className="text-muted-foreground">Earned</span>
+                    <span className="font-semibold text-foreground">{balances?.EARNED ?? "—"} days</span>
                   </li>
                 </ul>
               )}

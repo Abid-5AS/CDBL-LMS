@@ -68,7 +68,7 @@ export function SmartRecommendations() {
               <div className="flex items-start gap-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <h4 className="text-sm font-semibold text-slate-900">{rec.title}</h4>
+                    <h4 className="text-sm font-semibold text-foreground">{rec.title}</h4>
                     <Badge
                       variant={rec.severity === "warning" ? "destructive" : "secondary"}
                       className="text-xs"
@@ -76,7 +76,7 @@ export function SmartRecommendations() {
                       {rec.severity === "warning" ? "Important" : "Suggested"}
                     </Badge>
                   </div>
-                  <p className="text-sm text-slate-700">{rec.message}</p>
+                  <p className="text-sm text-foreground">{rec.message}</p>
                 </div>
               </div>
               {rec.action && (

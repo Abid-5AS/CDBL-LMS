@@ -27,7 +27,7 @@ async function TopbarContent({
   const user = await getCurrentUser();
   
   return (
-    <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur-sm" role="banner">
+    <header className="sticky top-0 z-20 border-b border-border bg-white/95 backdrop-blur-sm" role="banner">
       <div className="mx-auto flex h-full w-full max-w-[1400px] items-center justify-between px-4 py-3">
         <div className="flex flex-col gap-1 min-w-0 flex-1">
           {breadcrumbs && breadcrumbs.length > 0 && (
@@ -48,12 +48,12 @@ async function TopbarContent({
               </BreadcrumbList>
             </Breadcrumb>
           )}
-          <h1 className="text-lg font-semibold text-slate-900 truncate">{title}</h1>
+          <h1 className="text-lg font-semibold text-foreground truncate">{title}</h1>
         </div>
         <div className="flex items-center gap-2 sm:gap-3 ml-2 sm:ml-4">
           <NotificationDropdown />
           <div 
-            className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-slate-50 border border-slate-200"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-accent border border-border"
             role="region"
             aria-label="User profile"
           >
@@ -61,10 +61,10 @@ async function TopbarContent({
               <User className="h-4 w-4 text-blue-600" />
             </div>
             <div className="hidden sm:block text-left min-w-0">
-              <div className="text-sm font-medium text-slate-900 truncate max-w-[120px]" aria-label="User name">
+              <div className="text-sm font-medium text-foreground truncate max-w-[120px]" aria-label="User name">
                 {user?.name ?? "User"}
               </div>
-              <div className="text-xs text-slate-500 truncate max-w-[120px]" aria-label="User email">
+              <div className="text-xs text-muted-foreground truncate max-w-[120px]" aria-label="User email">
                 {user?.email ?? ""}
               </div>
             </div>
@@ -84,10 +84,10 @@ export function Topbar({
 }) {
   return (
     <Suspense fallback={
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur-sm">
+      <header className="sticky top-0 z-20 border-b border-border bg-white/95 backdrop-blur-sm">
         <div className="mx-auto flex h-full w-full max-w-[1400px] items-center justify-between px-4 py-3">
-          <div className="h-6 w-32 bg-slate-200 rounded animate-pulse" />
-          <div className="h-8 w-24 bg-slate-200 rounded animate-pulse" />
+          <div className="h-6 w-32 bg-muted rounded animate-pulse" />
+          <div className="h-8 w-24 bg-muted rounded animate-pulse" />
         </div>
       </header>
     }>
@@ -119,7 +119,7 @@ export default async function AppShell({
 
   // Super Admin or legacy layout: use sidebar
   return (
-    <div className="fixed inset-0 flex bg-slate-50">
+    <div className="fixed inset-0 flex bg-accent">
       <Suspense fallback={<SidebarFallback />}>
         <Sidebar pathname={pathname} />
       </Suspense>
@@ -135,17 +135,17 @@ export default async function AppShell({
 
 function SidebarFallback() {
   return (
-    <aside className="flex h-screen w-60 shrink-0 flex-col border-r border-slate-200 bg-white shadow-sm">
-      <div className="h-16 border-b border-slate-200 px-5 py-4">
+    <aside className="flex h-screen w-60 shrink-0 flex-col border-r border-border bg-card shadow-sm">
+      <div className="h-16 border-b border-border px-5 py-4">
         <div className="h-8 w-32 rounded bg-slate-200 animate-pulse" />
       </div>
       <div className="flex-1 px-3 py-4 space-y-2">
-        <div className="h-10 rounded-lg bg-slate-100 animate-pulse" />
-        <div className="h-10 rounded-lg bg-slate-100 animate-pulse" />
-        <div className="h-10 rounded-lg bg-slate-100 animate-pulse" />
+        <div className="h-10 rounded-lg bg-accent animate-pulse" />
+        <div className="h-10 rounded-lg bg-accent animate-pulse" />
+        <div className="h-10 rounded-lg bg-accent animate-pulse" />
       </div>
-      <div className="border-t border-slate-200 px-3 py-4 bg-slate-50/50">
-        <div className="h-12 rounded bg-slate-100 animate-pulse" />
+      <div className="border-t border-border px-3 py-4 bg-accent/50">
+        <div className="h-12 rounded bg-accent animate-pulse" />
       </div>
     </aside>
   );
