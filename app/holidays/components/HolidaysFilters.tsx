@@ -36,8 +36,8 @@ export function HolidaysFilters({
     !filters.showOptional;
 
   const content = (
-    <div className="flex flex-col gap-4">
-      {/* Search and Year Filter */}
+    <div className="flex flex-col gap-3">
+      {/* Primary Controls: Search and Year */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -67,59 +67,51 @@ export function HolidaysFilters({
         </Select>
       </div>
 
-      {/* Toggle Filters */}
-      <div className="flex flex-wrap items-center gap-2">
-        <Button
-          variant={filters.showPast ? "default" : "outline"}
-          size="sm"
-          onClick={() => onFiltersChange({ showPast: !filters.showPast })}
-          className="gap-2"
-        >
-          <Calendar className="w-4 h-4" />
-          {filters.showPast ? "All Holidays" : "Upcoming Only"}
-        </Button>
+      {/* Secondary Controls: Toggle Filters */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Button
+            variant={filters.showPast ? "default" : "outline"}
+            size="sm"
+            onClick={() => onFiltersChange({ showPast: !filters.showPast })}
+            className={`gap-2 ${filters.showPast ? 'bg-primary text-primary-foreground shadow-md' : ''}`}
+          >
+            <Calendar className="w-4 h-4" />
+            <span className="hidden sm:inline">
+              {filters.showPast ? "All Dates" : "Upcoming"}
+            </span>
+            <span className="sm:hidden">
+              {filters.showPast ? "All" : "Upcoming"}
+            </span>
+          </Button>
 
-        <Button
-          variant={filters.showOptional ? "default" : "outline"}
-          size="sm"
-          onClick={() =>
-            onFiltersChange({ showOptional: !filters.showOptional })
-          }
-          className="gap-2"
-        >
-          {filters.showOptional ? (
-            <Eye className="w-4 h-4" />
-          ) : (
-            <EyeOff className="w-4 h-4" />
-          )}
-          Optional Holidays
-        </Button>
+          <Button
+            variant={filters.showOptional ? "default" : "outline"}
+            size="sm"
+            onClick={() =>
+              onFiltersChange({ showOptional: !filters.showOptional })
+            }
+            className={`gap-2 ${filters.showOptional ? 'bg-primary text-primary-foreground shadow-md' : ''}`}
+          >
+            {filters.showOptional ? (
+              <Eye className="w-4 h-4" />
+            ) : (
+              <EyeOff className="w-4 h-4" />
+            )}
+            <span className="hidden sm:inline">Optional</span>
+          </Button>
+        </div>
 
         {hasActiveFilters && (
-          <>
-            <div className="h-4 w-px bg-border mx-1" />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClearFilters}
-              className="gap-2 text-muted-foreground hover:text-foreground"
-            >
-              <X className="w-4 h-4" />
-              Clear Filters
-            </Button>
-            <Badge variant="secondary" className="text-xs">
-              {
-                [
-                  filters.searchQuery && "Search",
-                  filters.yearFilter !== new Date().getFullYear().toString() &&
-                    "Year",
-                  filters.showPast && "Past",
-                  !filters.showOptional && "No Optional",
-                ].filter(Boolean).length
-              }{" "}
-              active
-            </Badge>
-          </>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClearFilters}
+            className="gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <X className="w-4 h-4" />
+            <span className="hidden sm:inline">Clear</span>
+          </Button>
         )}
       </div>
     </div>

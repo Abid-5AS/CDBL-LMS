@@ -45,6 +45,7 @@ interface EnhancedSmoothTabProps {
     activeColor?: string;
     onChange?: (tabId: string) => void;
     onDirectionChange?: (direction: number) => void; // New prop to notify parent of direction
+    showCardContent?: boolean; // Show/hide the card content area above tabs
 }
 
 const slideVariants = {
@@ -84,6 +85,7 @@ export default function EnhancedSmoothTab({
     activeColor = "bg-[#1F9CFE]",
     onChange,
     onDirectionChange,
+    showCardContent = true,
 }: EnhancedSmoothTabProps) {
     const [internalSelected, setInternalSelected] = React.useState<string>(
         value || defaultTabId || items[0]?.id || ""
@@ -171,34 +173,36 @@ export default function EnhancedSmoothTab({
     return (
         <div className="flex flex-col h-full">
             {/* Card Content Area */}
-            <div className="flex-1 mb-4 relative">
-                <div className="bg-card border rounded-lg h-[200px] w-full relative">
-                    <div className="absolute inset-0 overflow-hidden rounded-lg">
-                        <AnimatePresence
-                            initial={false}
-                            mode="popLayout"
-                            custom={direction}
-                        >
-                            <motion.div
-                                key={`card-${selected}`}
+            {showCardContent && (
+                <div className="flex-1 mb-4 relative">
+                    <div className="bg-card border rounded-lg h-[200px] w-full relative">
+                        <div className="absolute inset-0 overflow-hidden rounded-lg">
+                            <AnimatePresence
+                                initial={false}
+                                mode="popLayout"
                                 custom={direction}
-                                variants={slideVariants as any}
-                                initial="enter"
-                                animate="center"
-                                exit="exit"
-                                transition={transition as any}
-                                className="absolute inset-0 w-full h-full will-change-transform bg-card"
-                                style={{
-                                    backfaceVisibility: "hidden",
-                                    WebkitBackfaceVisibility: "hidden",
-                                }}
                             >
-                                {selectedItem?.cardContent}
-                            </motion.div>
-                        </AnimatePresence>
+                                <motion.div
+                                    key={`card-${selected}`}
+                                    custom={direction}
+                                    variants={slideVariants as any}
+                                    initial="enter"
+                                    animate="center"
+                                    exit="exit"
+                                    transition={transition as any}
+                                    className="absolute inset-0 w-full h-full will-change-transform bg-card"
+                                    style={{
+                                        backfaceVisibility: "hidden",
+                                        WebkitBackfaceVisibility: "hidden",
+                                    }}
+                                >
+                                    {selectedItem?.cardContent}
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* Bottom Toolbar */}
             <div
