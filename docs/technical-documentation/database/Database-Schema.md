@@ -1,8 +1,14 @@
 # CDBL Leave Management System - Database Schema Documentation
 
+**Version:** 2.0
+**Last Updated:** January 2025
+**Status:** Production Ready
+
 ## Overview
 
 The database schema is defined using Prisma ORM and uses MySQL as the database provider. This document provides complete documentation of all models, relationships, enums, indexes, and constraints.
+
+**Total Tables:** 9 tables (8 from v1.0 + 1 new in v2.0)
 
 ---
 
@@ -13,6 +19,7 @@ erDiagram
     User ||--o{ LeaveRequest : creates
     User ||--o{ Balance : has
     User ||--o{ Approval : approves
+    User ||--o{ OtpCode : "has"
     LeaveRequest ||--o{ Approval : has
     User {
         int id PK
@@ -24,6 +31,17 @@ erDiagram
         string department
         datetime createdAt
         datetime updatedAt
+    }
+    OtpCode {
+        int id PK
+        int userId FK
+        string email
+        string code
+        datetime expiresAt
+        boolean verified
+        int attempts
+        string ipAddress
+        datetime createdAt
     }
     LeaveRequest {
         int id PK
@@ -217,6 +235,7 @@ model User {
 - `leaves`: All leave requests created by this user
 - `balances`: All leave balances for this user
 - `approvals`: All approvals made by this user
+- `otpCodes`: All OTP codes for this user (new in v2.0)
 
 **Unique Constraints**:
 
@@ -228,6 +247,73 @@ model User {
 - Primary key on `id`
 - Unique index on `email`
 - Unique index on `empCode`
+
+---
+
+### OtpCode Model ✨ NEW in v2.0
+
+**Purpose**: Stores one-time password (OTP) codes for 2-factor authentication.
+
+```prisma
+model OtpCode {
+  id         Int       @id @default(autoincrement())
+  userId     Int
+  email      String
+  code       String    @db.VarChar(6)
+  expiresAt  DateTime
+  verified   Boolean   @default(false)
+  attempts   Int       @default(0)
+  ipAddress  String?   @db.VarChar(45)
+  createdAt  DateTime  @default(now())
+
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([email])
+}
+```
+
+**Fields**:
+
+- `id`: Primary key, auto-increment
+- `userId`: Foreign key to User (who owns this OTP)
+- `email`: Email address the OTP was sent to
+- `code`: 6-digit OTP code (string, VarChar(6))
+- `expiresAt`: OTP expiration timestamp (10 minutes from creation)
+- `verified`: Boolean flag indicating if OTP was successfully verified
+- `attempts`: Number of verification attempts (max 3)
+- `ipAddress`: IP address from which OTP was requested (VarChar(45) for IPv6)
+- `createdAt`: OTP generation timestamp
+
+**Relations**:
+
+- `user`: User who owns this OTP code
+
+**Indexes**:
+
+- Primary key on `id`
+- Index on `userId` for efficient queries
+- Index on `email` for efficient lookups
+
+**Foreign Key Behavior**:
+
+- `onDelete: Cascade` - OTP codes are deleted when user is deleted
+
+**Business Rules**:
+
+- OTP codes expire after 10 minutes
+- Maximum 3 verification attempts per code
+- Rate limiting: Max 3 OTP requests per hour per user
+- Codes are marked as verified after successful authentication
+- Old/expired codes are automatically cleaned up (not yet implemented)
+
+**Security Features**:
+
+- IP address tracking for audit trail
+- Attempt counting to prevent brute force
+- Time-based expiration
+- Single-use verification
+- Database-backed (not in-memory) for reliability
 
 ---
 
@@ -554,7 +640,8 @@ model OrgSettings {
 1. **User → LeaveRequest**: One user can create many leave requests
 2. **User → Balance**: One user can have many balances (different types/years)
 3. **User → Approval**: One user can make many approvals
-4. **LeaveRequest → Approval**: One leave request can have many approval steps
+4. **User → OtpCode**: One user can have many OTP codes (v2.0) ✨
+5. **LeaveRequest → Approval**: One leave request can have many approval steps
 
 ### Foreign Key Constraints
 
@@ -564,6 +651,7 @@ All foreign keys have referential integrity:
 - `Approval.leaveId` → `LeaveRequest.id`
 - `Approval.approverId` → `User.id`
 - `Balance.userId` → `User.id`
+- `OtpCode.userId` → `User.id` (CASCADE on delete) ✨ NEW in v2.0
 
 ---
 
@@ -587,6 +675,8 @@ All foreign keys have referential integrity:
 
 - `Approval.leaveId`: Indexed for efficient queries
 - `AuditLog.createdAt`: Indexed for time-based queries
+- `OtpCode.userId`: Indexed for efficient user lookups ✨ NEW in v2.0
+- `OtpCode.email`: Indexed for efficient email lookups ✨ NEW in v2.0
 
 ### Foreign Key Constraints
 
@@ -755,7 +845,9 @@ Prisma handles connection pooling automatically. Configure pool size via connect
 
 ---
 
-**Document Version**: 1.0  
-**Last Updated**: Current  
-**Database Version**: MySQL 8.0+  
+**Document Version**: 2.0
+**Last Updated**: January 2025
+**Database Version**: MySQL 8.0+
 **Prisma Version**: 6.17.1
+**Total Tables**: 9 tables (User, LeaveRequest, Approval, Balance, Holiday, PolicyConfig, AuditLog, OrgSettings, OtpCode)
+**New in v2.0**: OtpCode table for 2-Factor Authentication
