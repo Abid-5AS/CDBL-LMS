@@ -35,11 +35,11 @@ import {
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
 import useSWR from "swr";
+import { apiFetcher } from "@/lib/apiClient";
 import { LeaveStatus } from "@prisma/client";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { cn } from "@/lib/utils";
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 type LeaveStatusType =
   | "SUBMITTED"

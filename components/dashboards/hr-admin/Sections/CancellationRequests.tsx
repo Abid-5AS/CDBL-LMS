@@ -8,6 +8,7 @@ import { leaveTypeLabel } from "@/lib/ui";
 import Link from "next/link";
 import { StatusBadge } from "@/components/shared";
 import useSWR from "swr";
+import { apiFetcher } from "@/lib/apiClient";
 
 type LeaveRequest = {
   id: number;
@@ -24,7 +25,6 @@ type LeaveRequest = {
   };
 };
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export function CancellationRequestsPanel() {
   const { data, isLoading, error } = useSWR<{ items: LeaveRequest[] }>(

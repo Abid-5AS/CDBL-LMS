@@ -9,8 +9,7 @@ import { ApprovalTimelineAdapter } from "@/components/shared/timeline-adapters";
 import { cn } from "@/lib/utils";
 import useSWR from "swr";
 import { useLeaveData } from "@/components/providers";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { apiFetcher } from "@/lib/apiClient";
 
 type HeroStripProps = {
   name: string;
@@ -34,7 +33,7 @@ export function HeroStrip({ name }: HeroStripProps) {
   
   const { data: leavesData } = useLeaveData();
   
-  const { data: holidaysData } = useSWR("/api/holidays?upcoming=true", fetcher, {
+  const { data: holidaysData } = useSWR("/api/holidays?upcoming=true", apiFetcher, {
     revalidateOnFocus: false,
   });
 

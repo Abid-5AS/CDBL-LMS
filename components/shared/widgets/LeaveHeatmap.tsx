@@ -12,8 +12,7 @@ import {
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import useSWR from "swr";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { apiFetcher } from "@/lib/apiClient";
 
 interface HeatmapData {
   date: string;

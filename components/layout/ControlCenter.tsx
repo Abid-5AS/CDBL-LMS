@@ -15,6 +15,7 @@ import { Plane, Clock, LogOut, FileText, User, Calendar, CheckCircle2, AlertCirc
 import { formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { useLeaveData } from "@/components/providers";
+import { apiGet } from "@/lib/apiClient";
 
 type BalanceData = {
   earned?: number;
@@ -61,11 +62,8 @@ export default function ControlCenter({ onClose }: { onClose: () => void }) {
       try {
         // Fetch balances (only for non-executive roles)
         if (user?.role && user.role !== "CEO" && user.role !== "HR_HEAD") {
-          const balanceRes = await fetch("/api/balance/mine");
-          if (balanceRes.ok) {
-            const balanceData = await balanceRes.json();
-            setBalances(balanceData);
-          }
+          const balanceData = await apiGet<BalanceData>("/api/balance/mine");
+          setBalances(balanceData);
         }
       } catch (error) {
         console.error("Failed to fetch ControlCenter data:", error);

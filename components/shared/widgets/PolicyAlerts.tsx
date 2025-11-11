@@ -10,8 +10,7 @@ import {
 } from "@/components/ui";
 import { AlertCircle, Info, AlertTriangle } from "lucide-react";
 import Link from "next/link";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { apiFetcher } from "@/lib/apiClient";
 
 interface Alert {
   type:
@@ -29,7 +28,7 @@ interface Alert {
 }
 
 export function PolicyAlerts() {
-  const { data, error, isLoading } = useSWR("/api/dashboard/alerts", fetcher, {
+  const { data, error, isLoading } = useSWR("/api/dashboard/alerts", apiFetcher, {
     revalidateOnFocus: true,
     refreshInterval: 300000, // Refresh every 5 minutes
   });

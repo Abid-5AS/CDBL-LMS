@@ -15,8 +15,7 @@ import { Users, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { formatDate } from "@/lib/utils";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { apiFetcher } from "@/lib/apiClient";
 
 interface Colleague {
   id: number;

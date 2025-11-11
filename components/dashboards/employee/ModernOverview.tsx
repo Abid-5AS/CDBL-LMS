@@ -44,8 +44,8 @@ import {
 } from "../shared/ResponsiveDashboardGrid";
 import { TabbedContent, ExpandableCard } from "../shared/ProgressiveDisclosure";
 import useSWR from "swr";
+import { apiFetcher } from "@/lib/apiClient";
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const LEAVE_BALANCE_KEYS = [
   "EARNED",

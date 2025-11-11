@@ -18,9 +18,9 @@ import { LeaveHeatmap } from "@/components/shared/widgets/LeaveHeatmap";
 import { TypePie } from "@/components/shared/LeaveCharts";
 import { fromDashboardAgg } from "@/components/shared/LeaveCharts/adapters";
 import useSWR from "swr";
+import { apiFetcher } from "@/lib/apiClient";
 import { cn } from "@/lib/utils";
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 type FilterPeriod = "month" | "quarter" | "year";
 
