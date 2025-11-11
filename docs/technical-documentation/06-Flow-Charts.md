@@ -1,6 +1,10 @@
 # CDBL Leave Management System - Flow Charts
 
-This document contains visual flow charts for all major workflows in the system, using Mermaid diagrams.
+**Version:** 2.0
+**Last Updated:** January 2025
+**Status:** Production Ready
+
+This document contains visual flow charts for all major workflows in the system, using Mermaid diagrams. Version 2.0 includes updated authentication flow with 2-Factor Authentication (2FA).
 
 ---
 
@@ -100,7 +104,7 @@ flowchart LR
 
 ---
 
-## 4. Authentication Flow
+## 4. Authentication Flow (with 2FA) ✨ Updated in v2.0
 
 ```mermaid
 sequenceDiagram
@@ -108,20 +112,112 @@ sequenceDiagram
     participant C as Client
     participant A as API
     participant D as Database
-    
+    participant E as Email Service
+
     U->>C: Enter Email/Password
     C->>A: POST /api/login
     A->>D: Validate Credentials
     D-->>A: User Data
-    A->>A: Generate JWT
-    A-->>C: Set HTTP-only Cookies
-    C->>C: Store User Info in Cookies
-    C->>C: Redirect to Dashboard
-    C->>A: GET /api/auth/me (validate)
-    A->>A: Verify JWT
-    A-->>C: User Data
-    C->>C: Update UI
+
+    alt Credentials Valid
+        A->>A: Generate OTP Code (6-digit)
+        A->>D: Store OTP (10 min expiry)
+        A->>E: Send OTP Email
+        E-->>U: Email with OTP Code
+        A-->>C: {requiresOtp: true, userId}
+        C->>C: Show OTP Input Form
+
+        U->>C: Enter OTP Code
+        C->>A: POST /api/auth/verify-otp
+        A->>D: Verify OTP Code
+
+        alt OTP Valid
+            A->>D: Mark OTP as Verified
+            A->>A: Generate JWT Token
+            A-->>C: Set HTTP-only Cookies
+            C->>C: Redirect to Dashboard
+            C->>A: GET /api/auth/me
+            A->>A: Verify JWT
+            A-->>C: User Data
+            C->>C: Update UI
+        else OTP Invalid
+            A-->>C: {error: "Invalid OTP"}
+            C->>C: Show Error (3 attempts max)
+        end
+
+    else Credentials Invalid
+        A-->>C: {error: "Invalid credentials"}
+        C->>C: Show Error
+    end
 ```
+
+---
+
+## 4a. 2FA OTP Verification Flow ✨ NEW in v2.0
+
+```mermaid
+flowchart TD
+    A[User Enters Email/Password] --> B{Credentials Valid?}
+    B -->|No| C[Error: Invalid Credentials]
+    B -->|Yes| D[Generate 6-Digit OTP]
+    D --> E[Store OTP in Database]
+    E --> F[Set Expiry: Now + 10 min]
+    F --> G[Send Email via SMTP]
+    G --> H{Email Sent?}
+    H -->|No| I[Error: Email Failed]
+    H -->|Yes| J[Show OTP Input Form]
+
+    J --> K[User Enters OTP]
+    K --> L{OTP Exists?}
+    L -->|No| M[Error: Invalid OTP]
+    L -->|Yes| N{OTP Expired?}
+    N -->|Yes| O[Error: OTP Expired]
+    N -->|No| P{Code Matches?}
+    P -->|No| Q{Attempts < 3?}
+    Q -->|Yes| R[Increment Attempts]
+    R --> M
+    Q -->|No| S[Error: Max Attempts]
+    P -->|Yes| T{Already Verified?}
+    T -->|Yes| U[Error: OTP Already Used]
+    T -->|No| V[Mark OTP as Verified]
+    V --> W[Generate JWT Token]
+    W --> X[Set HTTP-only Cookies]
+    X --> Y[Redirect to Dashboard]
+
+    J --> Z[Resend OTP Button]
+    Z --> AA{Rate Limit OK?}
+    AA -->|No| AB[Error: Too Many Requests]
+    AA -->|Yes| AC{Last OTP > 60s ago?}
+    AC -->|No| AD[Error: Wait 60 seconds]
+    AC -->|Yes| D
+
+    style C fill:#ffcccc
+    style I fill:#ffcccc
+    style M fill:#ffcccc
+    style O fill:#ffcccc
+    style S fill:#ffcccc
+    style U fill:#ffcccc
+    style AB fill:#ffcccc
+    style AD fill:#ffcccc
+    style Y fill:#ccffcc
+```
+
+**Key Features:**
+- **OTP Generation**: 6-digit random code
+- **Expiration**: 10-minute validity window
+- **Attempt Limiting**: Maximum 3 verification attempts per code
+- **Rate Limiting**: Maximum 3 OTP requests per hour
+- **Resend Cooldown**: 60-second cooldown between resend requests
+- **Single-Use**: OTP can only be verified once
+- **IP Tracking**: IP address logged for security audit
+
+**Security Measures:**
+- Database-backed (not in-memory) for reliability
+- Automatic expiry enforcement
+- Brute force protection via attempt limiting
+- Rate limiting to prevent spam
+- IP address logging for audit trail
+- Single-use verification to prevent replay attacks
 
 ---
 
@@ -362,7 +458,8 @@ flowchart TD
 
 ---
 
-**Document Version**: 1.0  
-**Last Updated**: Current  
-**Total Flow Charts**: 12 diagrams
+**Document Version**: 2.0
+**Last Updated**: January 2025
+**Total Flow Charts**: 13 diagrams (12 from v1.0 + 1 new 2FA/OTP flow)
+**New in v2.0**: Updated Authentication Flow with 2FA, New OTP Verification Flow Chart
 

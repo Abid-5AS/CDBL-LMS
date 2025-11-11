@@ -1,8 +1,12 @@
 # CDBL Leave Management System - System Functionality
 
+**Version:** 2.0
+**Last Updated:** January 2025
+**Status:** Production Ready
+
 ## Overview
 
-This document provides a comprehensive list of all features and functionalities organized by functional module. The system is built as a modular Next.js application with role-based access control.
+This document provides a comprehensive list of all features and functionalities organized by functional module. The system is built as a modular Next.js application with role-based access control and enhanced security features.
 
 ---
 
@@ -17,19 +21,44 @@ This document provides a comprehensive list of all features and functionalities 
    - Automatic session validation
    - Logout functionality
 
-2. **Session Management**
+2. **2-Factor Authentication (2FA)** ✨ NEW in v2.0
+   - Email-based OTP verification
+   - 6-digit OTP codes
+   - 10-minute expiration
+   - 3-attempt limit per code
+   - Resend OTP functionality with cooldown
+   - Rate limiting (3 OTP requests per hour)
+   - Professional HTML email templates
+   - Countdown timer in UI
+   - IP address tracking for security
+   - Comprehensive audit logging
+
+   **OTP Flow:**
+   1. User submits email/password
+   2. Credentials verified
+   3. OTP generated and stored in database
+   4. Email sent with 6-digit code
+   5. User enters OTP code
+   6. OTP verified (max 3 attempts)
+   7. JWT token issued on success
+   8. OTP marked as used
+
+3. **Session Management**
    - Persistent sessions via cookies
    - Automatic token refresh
    - Session validation on protected routes
    - User context available throughout app
+   - Session timeout after 7 days
 
-3. **Role-Based Access Control (RBAC)**
+4. **Role-Based Access Control (RBAC)**
    - 5-tier role hierarchy
    - Route-level protection
    - Component-level permission checks
    - API-level authorization
 
-**Location**: `app/login/`, `app/api/auth/`, `lib/auth.ts`, `lib/rbac.ts`
+**Location**: `app/login/`, `app/api/auth/`, `lib/auth.ts`, `lib/rbac.ts`, `lib/otp.ts`, `lib/email.ts`
+
+**Database Tables**: `User`, `OtpCode` (new in v2.0)
 
 ---
 
@@ -236,7 +265,19 @@ This document provides a comprehensive list of all features and functionalities 
 - Today's status
 - Activity panel
 
-**Location**: `app/dashboard/`
+**Enhanced KPIs** ✨ NEW in v2.0:
+- **Approval Stage Tracking**: Shows current stage in approval workflow
+- **Role-based Icons**: Dynamic icons based on current approver (HR Admin, Manager, HR Head, CEO)
+- **Average Wait Time**: Displays average waiting time for pending requests
+- **Stage Visibility**: Clear indication of where requests are in the approval chain
+
+**Example KPI Display**:
+```
+Pending Requests: 3
+With HR Head • 2d avg wait
+```
+
+**Location**: `app/dashboard/`, `components/dashboards/employee/ModernOverview.tsx`
 
 ---
 
@@ -501,10 +542,12 @@ This document provides a comprehensive list of all features and functionalities 
 
 ### 17.1 Authentication APIs
 
-- `POST /api/login` - User login
+- `POST /api/login` - User login (returns OTP requirement in v2.0)
 - `POST /api/logout` - User logout
 - `GET /api/auth/me` - Get current user
 - `GET /api/auth/users` - List users (admin)
+- `POST /api/auth/verify-otp` - Verify OTP code ✨ NEW in v2.0
+- `POST /api/auth/resend-otp` - Resend OTP code ✨ NEW in v2.0
 
 ---
 
@@ -577,9 +620,156 @@ This document provides a comprehensive list of all features and functionalities 
 
 ---
 
-## Module 18: Data Validation
+## Module 18: UI/UX Enhancements ✨ NEW in v2.0
 
-### 18.1 Client-Side Validation
+### 18.1 Interface Improvements
+
+**My Leaves Page**:
+- Removed redundant animated card above tabs
+- 200px of vertical space reclaimed
+- More room for leave request list
+- Cleaner, more focused interface
+
+**Navbar**:
+- Fixed text wrapping issue in "My Leaves" menu item
+- Added `whitespace-nowrap` to all navigation links
+- Consistent appearance at all screen widths
+- Better mobile responsiveness
+
+**Upcoming Holidays Widget**:
+- Fixed "No upcoming holidays" display bug
+- Server-side filtering with `?upcoming=true` parameter
+- Correct upcoming holidays displayed
+- Improved data fetching logic
+
+**Company Holidays Page**:
+- Simplified filter controls with shorter labels
+- Enhanced active state visibility with shadow effects
+- Responsive icon-only mode on mobile devices
+- Removed redundant active filter badge
+- Cleaner, more intuitive filtering
+
+**Location**: Various components throughout application
+
+---
+
+### 18.2 Accessibility Features (WCAG 2.1 AA Compliant)
+
+**Multi-Modal Status Indicators**:
+- **Icon Encoding**: Unique icon for each status
+- **Color Encoding**: Distinct colors (accessibility-safe)
+- **Text Encoding**: Clear status labels
+- **Pattern Encoding**: Visual patterns for color-blind users
+
+**Status Encoding System**:
+- ✅ **APPROVED**: Green + Checkmark + Solid fill
+- ⏱️ **PENDING**: Yellow + Clock + Dotted border
+- ❌ **REJECTED**: Red + X + Diagonal stripes
+- 🚫 **CANCELLED**: Gray + Ban + Solid fill
+
+**Accessibility Features**:
+- Sufficient contrast ratios (4.5:1 minimum)
+- Screen reader friendly labels
+- Keyboard navigation support
+- Focus indicators on interactive elements
+- ARIA labels for assistive technologies
+
+**Benefits**:
+- Accessible to users with protanopia, deuteranopia, tritanopia
+- Better usability for all users
+- Legal compliance with accessibility standards
+- Professional, inclusive design
+
+**Location**: `components/ui/status-badge.tsx`, `lib/accessibility.ts`
+
+---
+
+### 18.3 Design System Improvements
+
+**Typography**:
+- Consistent font hierarchy
+- Readable font sizes
+- Proper line heights
+- Mobile-optimized text scaling
+
+**Color System**:
+- Accessible color palette
+- Dark mode support
+- High contrast ratios
+- Color-blind safe combinations
+
+**Spacing & Layout**:
+- Consistent spacing scale
+- Responsive grid system
+- Mobile-first design approach
+- Reduced visual clutter
+
+**Animation & Feedback**:
+- Smooth transitions
+- Loading states
+- Success/error feedback
+- Micro-interactions
+
+**Location**: `tailwind.config.ts`, component styles
+
+---
+
+## Module 19: API Client Architecture ✨ NEW in v2.0
+
+### 19.1 Centralized API Client
+
+**Features**:
+- Unified API client replacing native `fetch` calls
+- Automatic JWT token handling
+- Centralized error handling
+- Type-safe API calls
+- Consistent response format
+- Retry logic for network failures
+
+**Benefits**:
+- 21 files migrated to API client
+- Reduced code duplication
+- Easier maintenance
+- Better error handling
+- Type safety across application
+
+**Client Functions**:
+- `apiClient.get(url, options)` - GET requests
+- `apiClient.post(url, data, options)` - POST requests
+- `apiClient.patch(url, data, options)` - PATCH requests
+- `apiClient.delete(url, options)` - DELETE requests
+
+**Example Usage**:
+```typescript
+import { apiClient } from '@/lib/apiClient';
+
+// Before (deprecated)
+const response = await fetch('/api/leaves');
+const data = await response.json();
+
+// After (recommended)
+const data = await apiClient.get('/api/leaves');
+```
+
+**Error Handling**:
+- Automatic error parsing
+- User-friendly error messages
+- HTTP status code handling
+- Network error recovery
+
+**Location**: `lib/apiClient.ts`
+
+**Files Migrated**: 21 component files including:
+- All dashboard components
+- All approval components
+- Leave request components
+- User management components
+
+---
+
+## Module 20: Data Validation
+
+### 20.1 Client-Side Validation
 
 **Features**:
 - Form field validation (React Hook Form + Zod)
@@ -605,6 +795,7 @@ This document provides a comprehensive list of all features and functionalities 
 
 ### Implemented Features ✅
 
+**Core Features (v1.0)**:
 - ✅ User authentication & authorization
 - ✅ Leave application with validation
 - ✅ Approval workflow (4-step chain)
@@ -617,22 +808,40 @@ This document provides a comprehensive list of all features and functionalities 
 - ✅ File upload (medical certificates)
 - ✅ Leave cancellation
 
+**Enhanced Features (v2.0)** ✨:
+- ✅ 2-Factor Authentication (2FA) with email OTP
+- ✅ Enhanced dashboard KPIs with approval stage tracking
+- ✅ UI/UX improvements (cleaner interface, fixed navigation)
+- ✅ Color-blind accessibility (WCAG 2.1 AA compliant)
+- ✅ Multi-modal status indicators
+- ✅ Centralized API client architecture
+- ✅ Improved mobile responsiveness
+- ✅ Professional documentation suite
+
 ### Partially Implemented ⚠️
 
 - ⚠️ Balance updates (on approval - logic missing)
 - ⚠️ Balance restoration (on cancellation - not implemented)
-- ⚠️ Email notifications (planned)
+- ⚠️ Email notifications (2FA OTP only, leave events planned)
 - ⚠️ Advanced reporting (basic included)
 
-### Not Implemented ❌
+### Planned for Future Releases 📋
 
-- ❌ Automatic EL accrual (monthly job)
-- ❌ Year transition automation (carry-forward, CL lapse)
-- ❌ Leave modification (must cancel and recreate)
-- ❌ Return-to-duty workflow
-- ❌ Overstay detection
-- ❌ Email/Teams notifications
-- ❌ Advanced analytics dashboards
+**v2.1 (Q2 2025)**:
+- 📋 Automatic EL accrual (monthly job)
+- 📋 Year transition automation (carry-forward, CL lapse)
+- 📋 Balance automation (auto-deduction on approval)
+- 📋 Email notifications for leave events
+- 📋 Leave modification capability
+- 📋 Advanced analytics dashboards
+
+**v3.0 (Future)**:
+- 📋 Return-to-duty workflow
+- 📋 Overstay detection
+- 📋 Bulk operations for admins
+- 📋 Calendar integrations (Outlook, Google)
+- 📋 Mobile app (PWA)
+- 📋 AI-powered insights
 
 ---
 
@@ -645,7 +854,8 @@ This document provides a comprehensive list of all features and functionalities 
 
 ---
 
-**Document Version**: 1.0  
-**Last Updated**: Current  
-**Total Modules**: 18  
-**Total Features**: 100+ individual features
+**Document Version**: 2.0
+**Last Updated**: January 2025
+**Total Modules**: 20 modules
+**Total Features**: 120+ individual features (including v2.0 enhancements)
+**Current System Version**: v2.0 (Production Ready)

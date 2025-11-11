@@ -1,5 +1,15 @@
 # CDBL Leave Management System - User Roles & Permissions
 
+**Version:** 2.0
+**Last Updated:** January 2025
+**Status:** Production Ready
+
+## Overview
+
+This document defines the role hierarchy, permission matrix, and access control implementation for the CDBL Leave Management System. All roles benefit from system-wide enhancements including 2-Factor Authentication (2FA), improved UI/UX, and accessibility features introduced in v2.0.
+
+---
+
 ## Role Hierarchy
 
 The system implements a 5-tier role hierarchy with distinct permissions and access levels:
@@ -94,6 +104,12 @@ CEO (Highest Authority)
 - Leave type distribution chart
 - Policy reminders
 - Today's status
+
+**Enhanced Features (v2.0)** ✨:
+- **Approval Stage Tracking**: KPIs now show which role is currently reviewing pending requests
+- **Average Wait Time**: Displays average waiting time for pending requests
+- **Dynamic Icons**: Role-specific icons (HR Admin, Manager, HR Head, CEO) in KPI cards
+- **Improved Accessibility**: Color-blind friendly status indicators with multi-modal encoding
 
 **Access**: Own data only
 
@@ -488,8 +504,9 @@ Function: `getVisibleRoles(role)` in `lib/rbac.ts`
 
 ---
 
-**Document Version**: 1.0  
-**Last Updated**: Current  
-**Role Count**: 5 roles  
+**Document Version**: 2.0
+**Last Updated**: January 2025
+**Role Count**: 5 roles (unchanged from v1.0)
 **Permission Functions**: 6 core functions in `lib/rbac.ts`
+**System-Wide Enhancements (v2.0)**: 2FA for all roles, Enhanced dashboard KPIs, Improved accessibility
 
