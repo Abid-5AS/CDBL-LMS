@@ -71,7 +71,9 @@ async function verifySeed() {
 
   sampleUsers.forEach((user) => {
     console.log(
-      `   ${user.empCode} - ${user.name} (${user.email}) - ${user.role} - ${user.department || "N/A"}`
+      `   ${user.empCode} - ${user.name} (${user.email}) - ${user.role} - ${
+        user.department || "N/A"
+      }`
     );
   });
 
@@ -124,9 +126,7 @@ async function verifySeed() {
       },
     });
 
-    console.log(
-      `\n⏳ Pending Requests for IT Dept Head (${itDeptHead.name}):`
-    );
+    console.log(`\n⏳ Pending Requests for IT Dept Head (${itDeptHead.name}):`);
     if (pendingForDeptHead.length === 0) {
       console.log("   No pending requests");
     } else {

@@ -356,4 +356,3 @@ export const designTokens = {
 };
 
 export type RoleTheme = ReturnType<typeof getRoleTheme>;
-

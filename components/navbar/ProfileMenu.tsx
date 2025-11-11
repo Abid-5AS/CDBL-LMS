@@ -39,12 +39,36 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
   // Role-based badge
   const getRoleBadge = (role: string) => {
     const badges: Record<string, { label: string; color: string }> = {
-      CEO: { label: "CEO", color: "text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-500/10 border-amber-500/10" },
-      HR_HEAD: { label: "HR Head", color: "text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-500/10 border-orange-500/10" },
-      HR_ADMIN: { label: "HR Admin", color: "text-purple-600 bg-purple-50 dark:text-purple-400 dark:bg-purple-500/10 border-purple-500/10" },
-      DEPT_HEAD: { label: "Manager", color: "text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-500/10 border-emerald-500/10" },
-      SYSTEM_ADMIN: { label: "Admin", color: "text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-500/10 border-red-500/10" },
-      EMPLOYEE: { label: "Employee", color: "text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-500/10 border-blue-500/10" },
+      CEO: {
+        label: "CEO",
+        color:
+          "text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-500/10 border-amber-500/10",
+      },
+      HR_HEAD: {
+        label: "HR Head",
+        color:
+          "text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-500/10 border-orange-500/10",
+      },
+      HR_ADMIN: {
+        label: "HR Admin",
+        color:
+          "text-purple-600 bg-purple-50 dark:text-purple-400 dark:bg-purple-500/10 border-purple-500/10",
+      },
+      DEPT_HEAD: {
+        label: "Manager",
+        color:
+          "text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-500/10 border-emerald-500/10",
+      },
+      SYSTEM_ADMIN: {
+        label: "Admin",
+        color:
+          "text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-500/10 border-red-500/10",
+      },
+      EMPLOYEE: {
+        label: "Employee",
+        color:
+          "text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-500/10 border-blue-500/10",
+      },
     };
     return badges[role] || badges.EMPLOYEE;
   };
@@ -80,12 +104,13 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
   ];
 
   // Get user initials for avatar
-  const initials = user.name
-    ?.split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2) ?? "U";
+  const initials =
+    user.name
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2) ?? "U";
 
   return (
     <div className="relative">

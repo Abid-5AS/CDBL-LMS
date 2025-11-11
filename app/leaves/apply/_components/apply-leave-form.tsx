@@ -106,7 +106,7 @@ export function ApplyLeaveForm() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/40 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/40 py-12">
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10 space-y-10">
         {/* Header */}
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -151,7 +151,7 @@ export function ApplyLeaveForm() {
               <CardHeader className="p-6">
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2 text-base font-semibold text-foreground leading-6">
-                    <Calendar className="w-4 h-4 text-primary" />
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
                     Leave Details
                   </CardTitle>
                   {lastSavedTime && (
@@ -281,7 +281,7 @@ export function ApplyLeaveForm() {
 
             <Card className="rounded-2xl border border-border bg-card shadow-sm p-5 space-y-3">
               <div className="flex items-center gap-2">
-                <HelpCircle className="w-4 h-4 text-primary" />
+                <HelpCircle className="w-4 h-4 text-muted-foreground" />
                 <p className="text-sm font-semibold text-foreground">
                   Need a hand?
                 </p>
