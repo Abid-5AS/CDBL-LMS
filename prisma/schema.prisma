@@ -205,4 +205,5 @@ model OtpCode {
 
   @@index([email, verified])
   @@index([expiresAt])
+  @@map("OtpCode")
 }
