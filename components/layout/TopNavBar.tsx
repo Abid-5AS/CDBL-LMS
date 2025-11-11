@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
-import { GlassButton } from "@/components/ui/glass-button";
 import { LiveClock } from "./LiveClock";
 import { Button } from "@/components/ui/button";
 
@@ -227,17 +226,17 @@ export default function TopNavBar() {
           </button>
 
           {/* Search */}
-          <GlassButton
-            variant="ghost"
+          <Button
+            variant="glass-ghost"
             size="icon"
             onClick={() => setSearchOpen(true)}
             aria-label="Search"
             aria-keyshortcuts="Meta+K Ctrl+K"
-            className="glass-light hover:bg-white/80 dark:hover:bg-white/5 transition-all hover:scale-105"
+            className="hover:bg-white/80 dark:hover:bg-white/5 transition-all hover:scale-105"
             title="Search (⌘K / Ctrl+K)"
           >
             <Search className="h-4 w-4" />
-          </GlassButton>
+          </Button>
 
           {/* Theme Toggle */}
           <div className="glass-light rounded-lg p-1">
