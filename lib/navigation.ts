@@ -10,6 +10,7 @@ import {
   Activity,
   UserCheck,
   Calendar,
+  PieChart,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { Role } from "@prisma/client";
