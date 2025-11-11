@@ -190,3 +190,19 @@ model OrgSettings {
   updatedAt   DateTime @updatedAt
   updatedBy   Int? // User ID
 }
+
+// 2FA OTP (One-Time Password) Model
+model OtpCode {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  email        String
+  code         String // 6-digit code
+  expiresAt    DateTime
+  verified     Boolean  @default(false)
+  attempts     Int      @default(0) // Track verification attempts
+  ipAddress    String? // Track IP for security
+  createdAt    DateTime @default(now())
+
+  @@index([email, verified])
+  @@index([expiresAt])
+}
