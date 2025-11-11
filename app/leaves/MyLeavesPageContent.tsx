@@ -16,11 +16,11 @@ import {
   Card,
   CardContent,
   Table,
-  TableBody,
-  TableCell,
-  TableHead,
   TableHeader,
+  TableBody,
+  TableHead,
   TableRow,
+  TableCell,
   EmptyState,
   Button,
   AlertDialog,
@@ -32,6 +32,7 @@ import {
   AlertDialogDescription,
   AlertDialogTitle,
   AlertDialogTrigger,
+  EnhancedSmoothTab,
 } from "@/components/ui";
 
 // Shared Components (barrel export)
@@ -70,6 +71,70 @@ const FILTER_OPTIONS = [
   { value: "cancelled", label: "Cancelled" },
 ];
 
+// Tab items for SmoothTab
+const LEAVE_TAB_ITEMS = [
+  {
+    id: "all",
+    title: "All",
+    color: "bg-slate-500 hover:bg-slate-600",
+    cardContent: (
+      <div className="p-6 h-full flex flex-col justify-center">
+        <div className="space-y-2">
+          <h3 className="text-xl font-semibold text-text-primary">All Requests</h3>
+          <p className="text-sm text-muted-foreground">
+            View all your leave requests across all statuses
+          </p>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "pending",
+    title: "Pending",
+    color: "bg-amber-500 hover:bg-amber-600",
+    cardContent: (
+      <div className="p-6 h-full flex flex-col justify-center">
+        <div className="space-y-2">
+          <h3 className="text-xl font-semibold text-text-primary">Pending Approval</h3>
+          <p className="text-sm text-muted-foreground">
+            Requests awaiting manager or HR approval
+          </p>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "approved",
+    title: "Approved",
+    color: "bg-emerald-500 hover:bg-emerald-600",
+    cardContent: (
+      <div className="p-6 h-full flex flex-col justify-center">
+        <div className="space-y-2">
+          <h3 className="text-xl font-semibold text-text-primary">Approved Leaves</h3>
+          <p className="text-sm text-muted-foreground">
+            Successfully approved leave requests
+          </p>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "rejected",
+    title: "Rejected",
+    color: "bg-red-500 hover:bg-red-600",
+    cardContent: (
+      <div className="p-6 h-full flex flex-col justify-center">
+        <div className="space-y-2">
+          <h3 className="text-xl font-semibold text-text-primary">Rejected Requests</h3>
+          <p className="text-sm text-muted-foreground">
+            Requests that were not approved
+          </p>
+        </div>
+      </div>
+    ),
+  },
+];
+
 const ITEMS_PER_PAGE = 5;
 
 export function MyLeavesPageContent() {
@@ -78,6 +143,7 @@ export function MyLeavesPageContent() {
   const [selectedLeave, setSelectedLeave] = useState<LeaveRow | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [animationDirection, setAnimationDirection] = useState(0);
 
   // Fetch data first
   const { data, isLoading, error, mutate } = useLeaveData();
@@ -183,30 +249,16 @@ export function MyLeavesPageContent() {
         </div>
       </header>
 
-      {/* Status Filter Pills */}
-      <Card className="bg-bg-primary/70 border border-bg-muted backdrop-blur-sm">
-        <CardContent className="p-4">
-          <div className="flex flex-wrap gap-2 justify-center">
-            {FILTER_OPTIONS.map((option) => {
-              const isActive = selectedFilter === option.value;
-              return (
-                <button
-                  key={option.value}
-                  onClick={() => handleFilterChange(option.value)}
-                  className={cn(
-                    "px-4 py-1.5 rounded-full border text-sm font-medium transition-all duration-200",
-                    isActive
-                      ? "bg-card-action text-text-inverted border-card-action shadow-sm hover:bg-card-action"
-                      : "bg-bg-primary border-bg-muted text-text-secondary hover:bg-bg-secondary hover:border-bg-muted"
-                  )}
-                >
-                  {option.label}
-                </button>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Status Filter Tabs */}
+      <div className="flex justify-center mb-6">
+        <EnhancedSmoothTab
+          items={LEAVE_TAB_ITEMS}
+          value={selectedFilter}
+          onChange={handleFilterChange}
+          onDirectionChange={setAnimationDirection}
+          className="bg-bg-primary/70 border border-bg-muted backdrop-blur-sm"
+        />
+      </div>
 
       {/* Requests Table */}
       <AnimatePresence mode="wait">
@@ -242,38 +294,48 @@ export function MyLeavesPageContent() {
         ) : (
           <motion.div
             key={selectedFilter}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
+            initial={{ 
+              opacity: 0, 
+              x: animationDirection > 0 ? 100 : -100
+            }}
+            animate={{ 
+              opacity: 1, 
+              x: 0
+            }}
+            exit={{ 
+              opacity: 0, 
+              x: animationDirection < 0 ? 100 : -100
+            }}
+            transition={{ 
+              duration: 0.4,
+              ease: [0.32, 0.72, 0, 1]
+            }}
           >
-            <Card className="overflow-hidden">
-              <CardContent className="p-0">
-                <div className="overflow-x-auto md:overflow-x-visible overflow-y-auto max-h-[450px]">
-                  <Table className="[&_[data-slot=table-container]]:overflow-visible [&_[data-slot=table-container]]:relative">
-                    <TableHeader className="[&_tr]:sticky [&_tr]:top-0 [&_tr]:z-10 [&_tr]:bg-bg-primary [&_tr]:backdrop-blur-sm">
-                      <TableRow className="bg-bg-muted/30 hover:bg-bg-muted/30 border-b border-bg-muted">
-                        <TableHead className="text-xs font-medium text-text-secondary dark:text-text-secondary">
-                          Type
-                        </TableHead>
-                        <TableHead className="hidden sm:table-cell text-xs font-medium text-text-secondary dark:text-text-secondary">
-                          Dates
-                        </TableHead>
-                        <TableHead className="hidden md:table-cell text-xs font-medium text-text-secondary dark:text-text-secondary">
-                          Days
-                        </TableHead>
-                        <TableHead className="text-xs font-medium text-text-secondary dark:text-text-secondary">
-                          Status
-                        </TableHead>
-                        <TableHead className="hidden lg:table-cell text-xs font-medium text-text-secondary dark:text-text-secondary">
-                          Updated
-                        </TableHead>
-                        <TableHead className="text-right text-xs font-medium text-text-secondary dark:text-text-secondary">
-                          Action
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
+            <div className="max-h-[450px] overflow-y-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs font-medium">
+                      Type
+                    </TableHead>
+                    <TableHead className="hidden sm:table-cell text-xs font-medium">
+                      Dates
+                    </TableHead>
+                    <TableHead className="hidden md:table-cell text-xs font-medium">
+                      Days
+                    </TableHead>
+                    <TableHead className="text-xs font-medium">
+                      Status
+                    </TableHead>
+                    <TableHead className="hidden lg:table-cell text-xs font-medium">
+                      Updated
+                    </TableHead>
+                    <TableHead className="text-right text-xs font-medium">
+                      Action
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                       {paginatedRows.map((row, index) => (
                         <TableRow
                           key={row.id}
@@ -346,11 +408,9 @@ export function MyLeavesPageContent() {
                           </TableCell>
                         </TableRow>
                       ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
+                </TableBody>
+              </Table>
+            </div>
 
             {/* Pagination */}
             {totalPages > 1 && (

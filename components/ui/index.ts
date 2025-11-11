@@ -63,6 +63,16 @@ export {
   TableCell,
   TableCaption,
 } from "./table";
+export {
+  EnhancedTable,
+  EnhancedTableHeader,
+  EnhancedTableBody,
+  EnhancedTableFooter,
+  EnhancedTableHead,
+  EnhancedTableRow,
+  EnhancedTableCell,
+  EnhancedTableCaption,
+} from "./enhanced-table";
 export { Calendar } from "./calendar";
 export {
   Popover,
@@ -177,3 +187,6 @@ export {
   dateRangeUtils,
 } from "./date-range-picker";
 export { SmartInput, validationRules } from "./smart-input";
+export { ModernTable, ModernTableCard } from "./modern-table";
+export { default as SmoothTab } from "../kokonutui/smooth-tab";
+export { default as EnhancedSmoothTab } from "./enhanced-smooth-tab";

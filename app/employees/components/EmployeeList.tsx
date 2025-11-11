@@ -9,12 +9,12 @@ import { Users, User, Pencil } from "lucide-react";
 import {
   Card,
   CardContent,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  EnhancedTable,
+  EnhancedTableHeader,
+  EnhancedTableBody,
+  EnhancedTableHead,
+  EnhancedTableRow,
+  EnhancedTableCell,
   EmptyState,
   Button,
   Badge,
@@ -199,42 +199,41 @@ export function EmployeeList() {
           </CardContent>
         </Card>
       ) : (
-        <Card>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead className="hidden sm:table-cell">Email</TableHead>
-                  <TableHead className="hidden md:table-cell">
-                    Employee Code
-                  </TableHead>
-                  <TableHead className="hidden lg:table-cell">
-                    Department
-                  </TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+        <div className="max-h-[70vh] overflow-y-auto">
+          <EnhancedTable>
+            <EnhancedTableHeader>
+              <EnhancedTableRow>
+                <EnhancedTableHead>Name</EnhancedTableHead>
+                <EnhancedTableHead className="hidden sm:table-cell">Email</EnhancedTableHead>
+                <EnhancedTableHead className="hidden md:table-cell">
+                  Employee Code
+                </EnhancedTableHead>
+                <EnhancedTableHead className="hidden lg:table-cell">
+                  Department
+                </EnhancedTableHead>
+                <EnhancedTableHead>Role</EnhancedTableHead>
+                <EnhancedTableHead className="text-right">Actions</EnhancedTableHead>
+              </EnhancedTableRow>
+            </EnhancedTableHeader>
+            <EnhancedTableBody>
                 {filteredEmployees.map((employee) => (
-                  <TableRow
+                  <EnhancedTableRow
                     key={employee.id}
                     className="hover:bg-bg-secondary dark:hover:bg-bg-secondary/50"
                   >
-                    <TableCell className="font-medium text-text-primary">
+                    <EnhancedTableCell className="font-medium text-text-primary">
                       {employee.name}
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell text-muted-foreground">
+                    </EnhancedTableCell>
+                    <EnhancedTableCell className="hidden sm:table-cell text-muted-foreground">
                       {employee.email}
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell text-muted-foreground">
+                    </EnhancedTableCell>
+                    <EnhancedTableCell className="hidden md:table-cell text-muted-foreground">
                       {employee.empCode || "—"}
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell text-muted-foreground">
+                    </EnhancedTableCell>
+                    <EnhancedTableCell className="hidden lg:table-cell text-muted-foreground">
                       {employee.department || "—"}
-                    </TableCell>
-                    <TableCell>
+                    </EnhancedTableCell>
+                    <EnhancedTableCell>
                       <Badge
                         variant="outline"
                         className={
@@ -251,8 +250,8 @@ export function EmployeeList() {
                       >
                         {roleLabel(employee.role)}
                       </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
+                    </EnhancedTableCell>
+                    <EnhancedTableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <TooltipProvider>
                           <Tooltip>
@@ -289,13 +288,12 @@ export function EmployeeList() {
                             </TooltipProvider>
                           )}
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </EnhancedTableCell>
+                  </EnhancedTableRow>
                 ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+            </EnhancedTableBody>
+          </EnhancedTable>
+        </div>
       )}
 
       {filteredEmployees.length !== allEmployees.length && (

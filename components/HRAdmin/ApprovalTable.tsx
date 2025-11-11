@@ -9,12 +9,7 @@ import clsx from "clsx";
 import {
   Card,
   CardContent,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  ModernTable,
   Checkbox,
 } from "@/components/ui";
 
@@ -286,12 +281,9 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
           </CardContent>
         </Card>
       ) : (
-        <Card className="overflow-hidden border">
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12">
+            <ModernTable>
+                <ModernTable.Row>
+                  <ModernTable.Header className="w-12">
                     <Checkbox
                       checked={allSelected}
                       onCheckedChange={(checked) =>
@@ -304,17 +296,16 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                           : ""
                       }
                     />
-                  </TableHead>
-                  <TableHead>Employee</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Dates</TableHead>
-                  <TableHead>Days</TableHead>
-                  <TableHead>Reason</TableHead>
-                  <TableHead>Stage</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+                  </ModernTable.Header>
+                  <ModernTable.Header>Employee</ModernTable.Header>
+                  <ModernTable.Header>Type</ModernTable.Header>
+                  <ModernTable.Header>Dates</ModernTable.Header>
+                  <ModernTable.Header>Days</ModernTable.Header>
+                  <ModernTable.Header>Reason</ModernTable.Header>
+                  <ModernTable.Header>Stage</ModernTable.Header>
+                  <ModernTable.Header className="text-right">Actions</ModernTable.Header>
+                </ModernTable.Row>
+              <ModernTable.Body>
                 {items.map((item) => {
                   const start = formatDate(item.start);
                   const end = formatDate(item.end);
@@ -322,7 +313,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                     item.approvals?.[item.currentStageIndex]?.status ??
                     item.status;
                   return (
-                    <TableRow
+                    <ModernTable.Row
                       key={item.id}
                       className={clsx(
                         "cursor-pointer transition",
@@ -341,7 +332,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                         }
                       }}
                     >
-                      <TableCell>
+                      <ModernTable.Cell>
                         <Checkbox
                           checked={selectedIds.has(item.id)}
                           onCheckedChange={(checked) =>
@@ -350,38 +341,38 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                           onClick={(e) => e.stopPropagation()}
                           aria-label={`Select row ${item.id}`}
                         />
-                      </TableCell>
-                      <TableCell>
+                      </ModernTable.Cell>
+                      <ModernTable.Cell>
                         <div className="font-medium text-text-primary">
                           {item.requestedByName}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {item.requestedByEmail ?? "—"}
                         </div>
-                      </TableCell>
-                      <TableCell className="text-sm text-text-secondary">
+                      </ModernTable.Cell>
+                      <ModernTable.Cell className="text-sm text-text-secondary">
                         {leaveTypeLabel[item.type] ?? item.type}
-                      </TableCell>
-                      <TableCell className="text-sm text-text-secondary">
+                      </ModernTable.Cell>
+                      <ModernTable.Cell className="text-sm text-text-secondary">
                         <div>{start}</div>
                         {start !== end && (
                           <div className="text-xs text-muted-foreground">
                             to {end}
                           </div>
                         )}
-                      </TableCell>
-                      <TableCell className="text-sm text-text-secondary">
+                      </ModernTable.Cell>
+                      <ModernTable.Cell className="text-sm text-text-secondary">
                         {item.requestedDays}
-                      </TableCell>
-                      <TableCell className="max-w-xs text-sm text-text-secondary">
-                        <p className="whitespace-pre-wrap break-words">
+                      </ModernTable.Cell>
+                      <ModernTable.Cell className="max-w-xs text-sm text-text-secondary">
+                        <p className="whitespace-pre-wrap wrap-break-word">
                           {item.reason}
                         </p>
-                      </TableCell>
-                      <TableCell className="text-sm font-medium capitalize text-text-secondary">
+                      </ModernTable.Cell>
+                      <ModernTable.Cell className="text-sm font-medium capitalize text-text-secondary">
                         {stage.toLowerCase()}
-                      </TableCell>
-                      <TableCell className="text-right">
+                      </ModernTable.Cell>
+                      <ModernTable.Cell className="text-right">
                         <div
                           className="flex justify-end"
                           onClick={(e) => e.stopPropagation()}
@@ -416,14 +407,12 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                             }
                           />
                         </div>
-                      </TableCell>
-                    </TableRow>
+                      </ModernTable.Cell>
+                    </ModernTable.Row>
                   );
                 })}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+              </ModernTable.Body>
+            </ModernTable>
       )}
       {items.length !== allItems.length && allItems.length > 0 && (
         <p className="text-sm text-muted-foreground text-center">

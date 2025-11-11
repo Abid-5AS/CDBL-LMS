@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ModernTable } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -141,7 +141,7 @@ export function DeptHeadPendingTable({
     if (state.q !== searchInput) {
       setSearchInput(state.q);
     }
-  }, [state.q]);
+  }, [state.q, searchInput]);
 
   const [actionDialog, setActionDialog] = useState<{
     open: boolean;
@@ -375,11 +375,12 @@ export function DeptHeadPendingTable({
 
   return (
     <>
-      <Card className="rounded-2xl border-muted/60 shadow-sm">
-        <CardHeader>
-          <CardTitle>Pending Requests</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <ModernTable.Card.Root>
+        <ModernTable.Card.Header
+          title="Pending Requests"
+          description="Review and manage team leave requests"
+        />
+        <div className="p-6 space-y-4">
           {/* Search Bar with Clear Filters */}
           <div className="flex gap-2 items-center">
             <div className="relative flex-1">
@@ -419,8 +420,7 @@ export function DeptHeadPendingTable({
 
           {/* Sticky Filter Section - Stacked Status + Type */}
           <div 
-            className="sticky top-0 z-20 bg-card/95 backdrop-blur-sm border-b border-muted/60 pb-4 -mx-6 px-6 mb-4 shadow-sm"
-            style={{ marginTop: "-1rem" }}
+            className="sticky top-0 z-20 bg-card/95 backdrop-blur-sm border-b border-muted/60 pb-4 -mx-6 px-6 mb-4 shadow-sm -mt-4"
           >
             <div className="flex flex-col gap-3 pt-2">
               {/* Status Filter */}
@@ -477,7 +477,7 @@ export function DeptHeadPendingTable({
             </div>
           </div>
 
-          {/* Table */}
+          {/* Modern Table */}
           {rows.length === 0 ? (
             <Card className="py-12">
               <CardContent className="text-center">
@@ -490,33 +490,31 @@ export function DeptHeadPendingTable({
             </Card>
           ) : (
             <div className="space-y-4">
-              <div className="border rounded-lg overflow-x-auto max-h-[70vh] overflow-y-auto">
-                <Table className="min-w-full text-sm">
-                  <TableHeader className="sticky top-0 bg-card z-10">
-                    <TableRow className="bg-muted/40">
-                      <TableHead>Employee</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead className="hidden sm:table-cell">Dates</TableHead>
-                      <TableHead className="hidden md:table-cell">Days</TableHead>
-                      <TableHead className="hidden lg:table-cell">Reason</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {rows.map((leave: any) => {
-                    if (!leave.requester) return null;
+              <ModernTable.Card.Root>
+                <div className="max-h-[70vh] overflow-y-auto">
+                  <ModernTable size="md">
+                    <ModernTable.Header bordered={true}>
+                      <ModernTable.Head>Employee</ModernTable.Head>
+                      <ModernTable.Head>Type</ModernTable.Head>
+                      <ModernTable.Head className="hidden sm:table-cell">Dates</ModernTable.Head>
+                      <ModernTable.Head className="hidden md:table-cell">Days</ModernTable.Head>
+                      <ModernTable.Head className="hidden lg:table-cell">Reason</ModernTable.Head>
+                      <ModernTable.Head>Status</ModernTable.Head>
+                      <ModernTable.Head className="text-right">Actions</ModernTable.Head>
+                    </ModernTable.Header>
+                    <ModernTable.Body>
+                      {rows.map((leave: any) => {
+                      if (!leave.requester) return null;
                     
                       const availableActions = getAvailableActions(leave.type as LeaveType);
                       const isPending = leave.status === "PENDING" || leave.status === "SUBMITTED";
                       const isProcessing = processingIds.has(leave.id);
                       
                       return (
-                        <TableRow 
-                          key={leave.id} 
-                          className="odd:bg-muted/40 hover:bg-muted/60 transition-colors"
+                        <ModernTable.Row 
+                          key={leave.id}
                         >
-                          <TableCell>
+                          <ModernTable.Cell>
                             <Link
                               href={`/leaves/${leave.id}`}
                               className="text-data-info hover:underline font-medium cursor-pointer"
@@ -526,17 +524,17 @@ export function DeptHeadPendingTable({
                             <div className="text-xs text-muted-foreground truncate max-w-[200px]">
                               {leave.requester.email}
                             </div>
-                          </TableCell>
-                          <TableCell className="font-medium">
+                          </ModernTable.Cell>
+                          <ModernTable.Cell className="font-medium">
                             {leaveTypeLabel[leave.type] ?? leave.type}
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell text-text-secondary">
+                          </ModernTable.Cell>
+                          <ModernTable.Cell className="hidden sm:table-cell text-text-secondary">
                             {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell text-text-secondary">
+                          </ModernTable.Cell>
+                          <ModernTable.Cell className="hidden md:table-cell text-text-secondary">
                             {leave.workingDays}
-                          </TableCell>
-                          <TableCell className="hidden lg:table-cell max-w-xs">
+                          </ModernTable.Cell>
+                          <ModernTable.Cell className="hidden lg:table-cell max-w-xs">
                             {leave.reason && leave.reason.length > 50 ? (
                               <TooltipProvider>
                                 <Tooltip>
@@ -553,8 +551,8 @@ export function DeptHeadPendingTable({
                             ) : (
                               <div className="text-text-secondary">{leave.reason}</div>
                             )}
-                          </TableCell>
-                          <TableCell>
+                          </ModernTable.Cell>
+                          <ModernTable.Cell>
                             <div className="flex items-center gap-2">
                               <StatusBadge status={leave.status} />
                               {(leave as any).isModified && (
@@ -563,8 +561,8 @@ export function DeptHeadPendingTable({
                                 </Badge>
                               )}
                             </div>
-                          </TableCell>
-                          <TableCell className="text-right">
+                          </ModernTable.Cell>
+                          <ModernTable.Cell className="text-right">
                             <div className="flex items-center justify-end gap-2 flex-nowrap">
                             {isPending && (
                               <>
@@ -742,13 +740,14 @@ export function DeptHeadPendingTable({
                               </TooltipProvider>
                             )}
                           </div>
-                        </TableCell>
-                      </TableRow>
+                        </ModernTable.Cell>
+                      </ModernTable.Row>
                     );
                     })}
-                  </TableBody>
-                </Table>
-              </div>
+                    </ModernTable.Body>
+                  </ModernTable>
+                </div>
+              </ModernTable.Card.Root>
 
               {/* Pagination Controls */}
               {totalPages > 1 && (
@@ -835,8 +834,8 @@ export function DeptHeadPendingTable({
               )}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </ModernTable.Card.Root>
 
       {/* Action Confirmation Dialog (for Approve/Reject) */}
       <AlertDialog open={actionDialog.open && actionDialog.action !== "return" && actionDialog.action !== "forward" && actionDialog.action !== "cancel"} onOpenChange={(open) => !open && setActionDialog({ open: false, leaveId: null, action: null, leaveType: "", employeeName: "" })}>
