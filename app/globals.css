@@ -822,7 +822,7 @@
   }
 
   .dark .glass-base {
-    background-color: rgba(26, 31, 46, 0.7);
+    background-color: rgba(24, 24, 27, 0.7);
     border-color: rgba(255, 255, 255, 0.1);
     box-shadow: var(--shadow-md);
   }
@@ -843,7 +843,7 @@
   }
 
   .dark .glass-card {
-    background-color: rgba(26, 31, 46, 0.7);
+    background-color: rgba(24, 24, 27, 0.7);
     border-color: rgba(255, 255, 255, 0.1);
     box-shadow: var(--shadow-md);
   }
@@ -867,7 +867,7 @@
   }
 
   .dark .glass-card:has(form) {
-    background-color: rgba(26, 31, 46, 0.95);
+    background-color: rgba(24, 24, 27, 0.95);
     border-color: rgba(255, 255, 255, 0.1);
   }
 
@@ -895,7 +895,7 @@
   }
 
   .dark .glass-nav {
-    background-color: rgba(26, 31, 46, 0.72);
+    background-color: rgba(24, 24, 27, 0.72);
     border-color: rgba(255, 255, 255, 0.08);
     box-shadow: var(--shadow-lg);
   }
@@ -911,7 +911,7 @@
   }
 
   .dark .glass-medium {
-    background-color: rgba(26, 31, 46, 0.7);
+    background-color: rgba(24, 24, 27, 0.7);
     border-color: rgba(255, 255, 255, 0.12);
     box-shadow: var(--shadow-lg);
   }
@@ -936,7 +936,7 @@
   }
 
   .dark .glass-modal {
-    background-color: rgba(26, 31, 46, 0.7);
+    background-color: rgba(24, 24, 27, 0.7);
     border-color: rgba(255, 255, 255, 0.12);
     box-shadow: var(--shadow-lg);
   }
@@ -1617,7 +1617,7 @@
 
 .dark .glass-pill {
   /* Dark mode glass color */
-  background-color: rgba(26, 31, 46, 0.7);
+  background-color: rgba(24, 24, 27, 0.7);
   border-color: rgba(255, 255, 255, 0.1);
 }
 
