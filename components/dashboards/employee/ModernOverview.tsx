@@ -17,6 +17,8 @@ import {
   PieChart,
   Activity,
   Settings,
+  UserCheck,
+  Shield,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -45,7 +47,6 @@ import {
 import { TabbedContent, ExpandableCard } from "../shared/ProgressiveDisclosure";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
-
 
 const LEAVE_BALANCE_KEYS = [
   "EARNED",
@@ -76,13 +77,16 @@ function getCurrentApprovalStage(approvals: any[] | undefined) {
   // Find the first pending approval or the last approval
   const pendingApproval = approvals.find((a) => a.decision === "PENDING");
   if (pendingApproval && pendingApproval.step) {
-    const stageInfo = APPROVAL_STAGES[pendingApproval.step as keyof typeof APPROVAL_STAGES];
+    const stageInfo =
+      APPROVAL_STAGES[pendingApproval.step as keyof typeof APPROVAL_STAGES];
     return { stage: pendingApproval.step, ...stageInfo };
   }
 
   // If all forwarded, find the highest step
   const maxStep = Math.max(...approvals.map((a) => a.step || 1));
-  const stageInfo = APPROVAL_STAGES[Math.min(maxStep + 1, 4) as keyof typeof APPROVAL_STAGES] || APPROVAL_STAGES[1];
+  const stageInfo =
+    APPROVAL_STAGES[Math.min(maxStep + 1, 4) as keyof typeof APPROVAL_STAGES] ||
+    APPROVAL_STAGES[1];
   return { stage: maxStep + 1, ...stageInfo };
 }
 
@@ -222,20 +226,28 @@ export function ModernEmployeeDashboard({
     const approvedLeaves = leaves?.filter((l) => l.status === "APPROVED") || [];
 
     // Calculate pending request details
-    const pendingDetails = pendingLeaves.length > 0 ? {
-      oldestRequest: pendingLeaves.reduce((oldest, current) =>
-        new Date(current.createdAt || current.updatedAt) < new Date(oldest.createdAt || oldest.updatedAt)
-          ? current
-          : oldest
-      ),
-      averageWaitDays: Math.round(
-        pendingLeaves.reduce((sum, leave) =>
-          sum + getDaysWaiting(leave.createdAt || leave.updatedAt), 0
-        ) / pendingLeaves.length
-      ),
-    } : null;
+    const pendingDetails =
+      pendingLeaves.length > 0
+        ? {
+            oldestRequest: pendingLeaves.reduce((oldest, current) =>
+              new Date(current.createdAt || current.updatedAt) <
+              new Date(oldest.createdAt || oldest.updatedAt)
+                ? current
+                : oldest
+            ),
+            averageWaitDays: Math.round(
+              pendingLeaves.reduce(
+                (sum, leave) =>
+                  sum + getDaysWaiting(leave.createdAt || leave.updatedAt),
+                0
+              ) / pendingLeaves.length
+            ),
+          }
+        : null;
 
-    const pendingStageInfo = pendingDetails ? getCurrentApprovalStage(pendingDetails.oldestRequest.approvals) : null;
+    const pendingStageInfo = pendingDetails
+      ? getCurrentApprovalStage(pendingDetails.oldestRequest.approvals)
+      : null;
 
     const normalizedBalanceData = balanceData
       ? Object.entries(balanceData).reduce<Record<string, number>>(
@@ -277,11 +289,17 @@ export function ModernEmployeeDashboard({
     const now = new Date();
     const upcomingApprovedLeaves = approvedLeaves
       .filter((l) => new Date(l.startDate) > now)
-      .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+      .sort(
+        (a, b) =>
+          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+      );
 
     const nextScheduledLeave = upcomingApprovedLeaves[0] || null;
     const daysUntilNextLeave = nextScheduledLeave
-      ? Math.ceil((new Date(nextScheduledLeave.startDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+      ? Math.ceil(
+          (new Date(nextScheduledLeave.startDate).getTime() - now.getTime()) /
+            (1000 * 60 * 60 * 24)
+        )
       : null;
 
     // Calculate action items for Action Center
@@ -300,7 +318,9 @@ export function ModernEmployeeDashboard({
       actionItems.push({
         type: "returned",
         title: `${leaveTypeLabel[leave.type] || leave.type} Leave - Returned`,
-        description: `${formatDate(leave.startDate)} - ${formatDate(leave.endDate)} (${leave.workingDays} days)`,
+        description: `${formatDate(leave.startDate)} - ${formatDate(
+          leave.endDate
+        )} (${leave.workingDays} days)`,
         action: "Edit & Resubmit",
         actionLink: `/leaves/${leave.id}/edit`,
         variant: "destructive",
@@ -310,13 +330,16 @@ export function ModernEmployeeDashboard({
 
     // 2. Medical leave requiring certificate (approved medical leave > 3 days without certificate uploaded)
     const medicalLeavesNeedingCert = approvedLeaves.filter(
-      (l) => l.type === "MEDICAL" && l.workingDays > 3 && new Date(l.endDate) < now
+      (l) =>
+        l.type === "MEDICAL" && l.workingDays > 3 && new Date(l.endDate) < now
     );
     medicalLeavesNeedingCert.forEach((leave) => {
       actionItems.push({
         type: "certificate",
         title: "Medical Certificate Required",
-        description: `${formatDate(leave.startDate)} - ${formatDate(leave.endDate)} (${leave.workingDays} days)`,
+        description: `${formatDate(leave.startDate)} - ${formatDate(
+          leave.endDate
+        )} (${leave.workingDays} days)`,
         action: "Upload Certificate",
         actionLink: `/leaves/${leave.id}`,
         variant: "warning",
@@ -325,17 +348,27 @@ export function ModernEmployeeDashboard({
     });
 
     // 3. Upcoming leaves that can be cancelled (within cancellation window)
-    const cancelableLeaves = upcomingApprovedLeaves.filter((l) => {
-      const daysUntil = Math.ceil((new Date(l.startDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      return daysUntil <= 14 && daysUntil > 0; // Show if within 2 weeks
-    }).slice(0, 2); // Limit to 2
+    const cancelableLeaves = upcomingApprovedLeaves
+      .filter((l) => {
+        const daysUntil = Math.ceil(
+          (new Date(l.startDate).getTime() - now.getTime()) /
+            (1000 * 60 * 60 * 24)
+        );
+        return daysUntil <= 14 && daysUntil > 0; // Show if within 2 weeks
+      })
+      .slice(0, 2); // Limit to 2
 
     cancelableLeaves.forEach((leave) => {
-      const daysUntil = Math.ceil((new Date(leave.startDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      const daysUntil = Math.ceil(
+        (new Date(leave.startDate).getTime() - now.getTime()) /
+          (1000 * 60 * 60 * 24)
+      );
       actionItems.push({
         type: "cancelable",
         title: `Upcoming ${leaveTypeLabel[leave.type] || leave.type} Leave`,
-        description: `Starts ${daysUntil === 1 ? "tomorrow" : `in ${daysUntil} days`} - ${formatDate(leave.startDate)} (${leave.workingDays} days)`,
+        description: `Starts ${
+          daysUntil === 1 ? "tomorrow" : `in ${daysUntil} days`
+        } - ${formatDate(leave.startDate)} (${leave.workingDays} days)`,
         action: "Cancel if needed",
         actionLink: `/leaves?filter=approved`,
         variant: "info",
@@ -456,7 +489,11 @@ export function ModernEmployeeDashboard({
             />
 
             <RoleKPICard
-              title={dashboardData.nextScheduledLeave ? "Next Leave" : "No Upcoming Leave"}
+              title={
+                dashboardData.nextScheduledLeave
+                  ? "Next Leave"
+                  : "No Upcoming Leave"
+              }
               value={
                 dashboardData.daysUntilNextLeave !== null
                   ? dashboardData.daysUntilNextLeave === 0
@@ -468,7 +505,12 @@ export function ModernEmployeeDashboard({
               }
               subtitle={
                 dashboardData.nextScheduledLeave
-                  ? `${leaveTypeLabel[dashboardData.nextScheduledLeave.type] || dashboardData.nextScheduledLeave.type} (${dashboardData.nextScheduledLeave.workingDays || 0} days)`
+                  ? `${
+                      leaveTypeLabel[dashboardData.nextScheduledLeave.type] ||
+                      dashboardData.nextScheduledLeave.type
+                    } (${
+                      dashboardData.nextScheduledLeave.workingDays || 0
+                    } days)`
                   : "Plan your next vacation"
               }
               icon={TrendingUp}
@@ -479,12 +521,14 @@ export function ModernEmployeeDashboard({
 
           {/* Action Center - Always show with dynamic content */}
           <motion.div variants={itemVariants}>
-            <Card className={cn(
-              "bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl border-l-4",
-              dashboardData.actionItems.length > 0
-                ? "border-l-primary"
-                : "border-l-slate-300 dark:border-l-slate-600"
-            )}>
+            <Card
+              className={cn(
+                "bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl border-l-4",
+                dashboardData.actionItems.length > 0
+                  ? "border-l-primary"
+                  : "border-l-slate-300 dark:border-l-slate-600"
+              )}
+            >
               <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <CardTitle className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white flex items-center gap-2">
@@ -496,7 +540,10 @@ export function ModernEmployeeDashboard({
                       variant="default"
                       className="bg-primary/10 text-primary dark:bg-primary/20 text-xs"
                     >
-                      {dashboardData.actionItems.length} {dashboardData.actionItems.length === 1 ? "item" : "items"}
+                      {dashboardData.actionItems.length}{" "}
+                      {dashboardData.actionItems.length === 1
+                        ? "item"
+                        : "items"}
                     </Badge>
                   )}
                 </div>
@@ -519,50 +566,55 @@ export function ModernEmployeeDashboard({
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {dashboardData.actionItems.slice(0, 5).map((item, index) => {
-                      const bgColor =
-                        item.variant === "destructive"
-                          ? "bg-red-50/50 dark:bg-red-900/10 border-red-200/50 dark:border-red-800/30"
-                          : item.variant === "warning"
-                          ? "bg-amber-50/50 dark:bg-amber-900/10 border-amber-200/50 dark:border-amber-800/30"
-                          : "bg-blue-50/50 dark:bg-blue-900/10 border-blue-200/50 dark:border-blue-800/30";
+                    {dashboardData.actionItems
+                      .slice(0, 5)
+                      .map((item, index) => {
+                        const bgColor =
+                          item.variant === "destructive"
+                            ? "bg-red-50/50 dark:bg-red-900/10 border-red-200/50 dark:border-red-800/30"
+                            : item.variant === "warning"
+                            ? "bg-amber-50/50 dark:bg-amber-900/10 border-amber-200/50 dark:border-amber-800/30"
+                            : "bg-blue-50/50 dark:bg-blue-900/10 border-blue-200/50 dark:border-blue-800/30";
 
-                      const buttonColor =
-                        item.variant === "destructive"
-                          ? "bg-red-600 hover:bg-red-700"
-                          : item.variant === "warning"
-                          ? "bg-amber-600 hover:bg-amber-700"
-                          : "bg-blue-600 hover:bg-blue-700";
+                        const buttonColor =
+                          item.variant === "destructive"
+                            ? "bg-red-600 hover:bg-red-700"
+                            : item.variant === "warning"
+                            ? "bg-amber-600 hover:bg-amber-700"
+                            : "bg-blue-600 hover:bg-blue-700";
 
-                      return (
-                        <motion.div
-                          key={`${item.type}-${index}`}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          className={cn(
-                            "flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-xl border gap-3 sm:gap-2",
-                            bgColor
-                          )}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-slate-900 dark:text-white text-sm">
-                              {item.title}
-                            </p>
-                            <p className="text-xs text-slate-600 dark:text-slate-400">
-                              {item.description}
-                            </p>
-                          </div>
-                          <Button
-                            size="sm"
-                            className={cn("text-white text-xs sm:text-sm h-8 sm:h-9", buttonColor)}
-                            onClick={() => router.push(item.actionLink)}
+                        return (
+                          <motion.div
+                            key={`${item.type}-${index}`}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className={cn(
+                              "flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-xl border gap-3 sm:gap-2",
+                              bgColor
+                            )}
                           >
-                            {item.action}
-                          </Button>
-                        </motion.div>
-                      );
-                    })}
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-slate-900 dark:text-white text-sm">
+                                {item.title}
+                              </p>
+                              <p className="text-xs text-slate-600 dark:text-slate-400">
+                                {item.description}
+                              </p>
+                            </div>
+                            <Button
+                              size="sm"
+                              className={cn(
+                                "text-white text-xs sm:text-sm h-8 sm:h-9",
+                                buttonColor
+                              )}
+                              onClick={() => router.push(item.actionLink)}
+                            >
+                              {item.action}
+                            </Button>
+                          </motion.div>
+                        );
+                      })}
                   </div>
                 )}
               </CardContent>
