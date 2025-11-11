@@ -60,6 +60,40 @@ const LEAVE_BALANCE_KEYS = [
   "QUARANTINE",
 ] as const;
 
+// Helper to determine current approval stage
+const APPROVAL_STAGES = {
+  1: { role: "HR Admin", icon: UserCheck },
+  2: { role: "Manager", icon: Users },
+  3: { role: "HR Head", icon: Shield },
+  4: { role: "CEO", icon: Activity },
+};
+
+function getCurrentApprovalStage(approvals: any[] | undefined) {
+  if (!approvals || approvals.length === 0) {
+    return { stage: 1, role: "HR Admin", icon: UserCheck };
+  }
+
+  // Find the first pending approval or the last approval
+  const pendingApproval = approvals.find((a) => a.decision === "PENDING");
+  if (pendingApproval && pendingApproval.step) {
+    const stageInfo = APPROVAL_STAGES[pendingApproval.step as keyof typeof APPROVAL_STAGES];
+    return { stage: pendingApproval.step, ...stageInfo };
+  }
+
+  // If all forwarded, find the highest step
+  const maxStep = Math.max(...approvals.map((a) => a.step || 1));
+  const stageInfo = APPROVAL_STAGES[Math.min(maxStep + 1, 4) as keyof typeof APPROVAL_STAGES] || APPROVAL_STAGES[1];
+  return { stage: maxStep + 1, ...stageInfo };
+}
+
+function getDaysWaiting(createdAt: string) {
+  const created = new Date(createdAt);
+  const now = new Date();
+  const diffTime = Math.abs(now.getTime() - created.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
+}
+
 type EmployeeDashboardContentProps = {
   username: string;
 };
@@ -186,6 +220,22 @@ export function ModernEmployeeDashboard({
       ) || [];
     const returnedLeaves = leaves?.filter((l) => l.status === "RETURNED") || [];
     const approvedLeaves = leaves?.filter((l) => l.status === "APPROVED") || [];
+
+    // Calculate pending request details
+    const pendingDetails = pendingLeaves.length > 0 ? {
+      oldestRequest: pendingLeaves.reduce((oldest, current) =>
+        new Date(current.createdAt || current.updatedAt) < new Date(oldest.createdAt || oldest.updatedAt)
+          ? current
+          : oldest
+      ),
+      averageWaitDays: Math.round(
+        pendingLeaves.reduce((sum, leave) =>
+          sum + getDaysWaiting(leave.createdAt || leave.updatedAt), 0
+        ) / pendingLeaves.length
+      ),
+    } : null;
+
+    const pendingStageInfo = pendingDetails ? getCurrentApprovalStage(pendingDetails.oldestRequest.approvals) : null;
 
     const normalizedBalanceData = balanceData
       ? Object.entries(balanceData).reduce<Record<string, number>>(
@@ -321,6 +371,8 @@ export function ModernEmployeeDashboard({
       nextScheduledLeave,
       daysUntilNextLeave,
       actionItems,
+      pendingStageInfo,
+      pendingAverageWait: pendingDetails?.averageWaitDays || 0,
     };
   }, [leaves, balanceData]);
 
@@ -375,8 +427,12 @@ export function ModernEmployeeDashboard({
             <RoleKPICard
               title="Pending Requests"
               value={dashboardData.pendingCount}
-              subtitle="Awaiting approval"
-              icon={Clock}
+              subtitle={
+                dashboardData.pendingStageInfo
+                  ? `With ${dashboardData.pendingStageInfo.role} • ${dashboardData.pendingAverageWait}d avg wait`
+                  : "Awaiting approval"
+              }
+              icon={dashboardData.pendingStageInfo?.icon || Clock}
               role="EMPLOYEE"
               animate={true}
             />
