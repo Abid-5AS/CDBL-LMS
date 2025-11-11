@@ -67,14 +67,14 @@ export function DesktopNav({
                     href={link.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "group relative flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-all duration-200 focus-ring hover-lift",
+                      "group relative flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-all duration-200 focus-ring hover-lift whitespace-nowrap",
                       active
                         ? "bg-primary/90 text-primary-foreground shadow-md"
                         : "text-foreground/80 hover:text-foreground hover:bg-white/60 dark:hover:bg-white/10"
                     )}
                   >
                     <Icon className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                    <span className="font-medium">{link.label}</span>
+                    <span className="font-medium whitespace-nowrap">{link.label}</span>
 
                     {/* Active indicator */}
                     {active && (

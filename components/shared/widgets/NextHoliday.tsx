@@ -7,7 +7,7 @@ import { formatDate } from "@/lib/utils";
 import { apiFetcher } from "@/lib/apiClient";
 
 export function NextHoliday() {
-  const { data, error, isLoading } = useSWR("/api/holidays", apiFetcher, {
+  const { data, error, isLoading } = useSWR("/api/holidays?upcoming=true", apiFetcher, {
     revalidateOnFocus: false,
   });
 

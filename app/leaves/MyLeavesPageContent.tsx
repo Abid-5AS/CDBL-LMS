@@ -304,6 +304,7 @@ export function MyLeavesPageContent() {
           onChange={handleFilterChange}
           onDirectionChange={setAnimationDirection}
           className="bg-bg-primary/70 border border-bg-muted backdrop-blur-sm"
+          showCardContent={false}
         />
       </div>
 

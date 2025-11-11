@@ -81,31 +81,33 @@ export function HolidaysMainContent({
             <div className="flex flex-wrap items-center justify-between gap-3 pb-4">
               <TabsList className="flex h-auto rounded-full bg-muted/70 p-1 text-xs sm:text-sm">
                 {[
-                  { id: "grid", label: "Grid View", icon: Grid3X3 },
-                  { id: "list", label: "List View", icon: List },
+                  { id: "grid", label: "Grid", icon: Grid3X3 },
+                  { id: "list", label: "List", icon: List },
                   { id: "calendar", label: "Calendar", icon: CalendarIcon },
                 ].map((tab) => {
                   const Icon = tab.icon;
+                  const isActive = filters.viewMode === tab.id;
                   return (
                     <TabsTrigger
                       key={tab.id}
                       value={tab.id}
-                      className="flex items-center gap-2 px-3 py-2 rounded-full data-[state=active]:bg-background data-[state=active]:text-foreground"
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-full transition-all ${
+                        isActive
+                          ? 'bg-primary text-primary-foreground shadow-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground'
+                          : 'data-[state=active]:bg-background data-[state=active]:text-foreground'
+                      }`}
                     >
                       <Icon className="w-4 h-4" />
-                      <span>{tab.label}</span>
-                      {tab.id === "grid" && (
-                        <Badge
-                          variant="secondary"
-                          className="text-[10px] font-medium"
-                        >
-                          {holidays.length}
-                        </Badge>
-                      )}
+                      <span className="hidden sm:inline">{tab.label}</span>
                     </TabsTrigger>
                   );
                 })}
               </TabsList>
+              {holidays.length > 0 && (
+                <Badge variant="secondary" className="text-xs font-medium">
+                  {holidays.length} {holidays.length === 1 ? 'holiday' : 'holidays'}
+                </Badge>
+              )}
             </div>
 
             <TabsContent value="grid" className="mt-0">
