@@ -208,6 +208,30 @@ export function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // OTP Step State
+  const [showOtpStep, setShowOtpStep] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [otpExpiry, setOtpExpiry] = useState<number>(600); // 10 minutes in seconds
+  const [resendingOtp, setResendingOtp] = useState(false);
+
+  // Countdown timer for OTP expiry
+  React.useEffect(() => {
+    if (!showOtpStep || otpExpiry <= 0) return;
+
+    const timer = setInterval(() => {
+      setOtpExpiry((prev) => Math.max(0, prev - 1));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [showOtpStep, otpExpiry]);
+
+  // Format countdown timer
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
@@ -228,9 +252,65 @@ export function LoginForm() {
         setError(errorMessage);
         toast.error(errorMessage);
         setLoading(false);
-        
+
         // Add shake animation
-        // In a form submit handler, currentTarget is the form element
+        const form = e.currentTarget;
+        if (form && form instanceof HTMLFormElement) {
+          form.classList.add("animate-shake-x", "animate-duration-500ms");
+          setTimeout(() => {
+            form.classList.remove("animate-shake-x", "animate-duration-500ms");
+          }, 500);
+        }
+        return;
+      }
+
+      // Check if OTP is required
+      if (data.requiresOtp) {
+        setShowOtpStep(true);
+        setOtpExpiry(data.expiresIn || 600);
+        toast.success("Verification code sent to your email!");
+        setLoading(false);
+        return;
+      }
+
+      // Old flow (shouldn't happen with 2FA enabled)
+      toast.success("Login successful!");
+      const role = data?.user?.role;
+      if (typeof window !== "undefined") {
+        const destination = getHomePageForRole(role as any) || "/dashboard";
+        window.location.assign(destination);
+      }
+    } catch (err) {
+      console.error(err);
+      const errorMessage = "Network error. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      setLoading(false);
+    }
+  }
+
+  async function onVerifyOtp(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code: otp }),
+        credentials: "same-origin",
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        const errorMessage = data.error || "Invalid verification code";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        setLoading(false);
+
+        // Add shake animation
         const form = e.currentTarget;
         if (form && form instanceof HTMLFormElement) {
           form.classList.add("animate-shake-x", "animate-duration-500ms");
@@ -242,14 +322,13 @@ export function LoginForm() {
       }
 
       toast.success("Login successful!");
-      
-      // Role-based redirect using hard navigation for server re-hydration
+
+      // Role-based redirect
       const role = data?.user?.role;
       if (typeof window !== "undefined") {
         const destination = getHomePageForRole(role as any) || "/dashboard";
         window.location.assign(destination);
       } else {
-        // Fallback for SSR (shouldn't happen, but safe guard)
         const destination = "/dashboard";
         router.replace(destination);
       }
@@ -259,6 +338,36 @@ export function LoginForm() {
       setError(errorMessage);
       toast.error(errorMessage);
       setLoading(false);
+    }
+  }
+
+  async function onResendOtp() {
+    setResendingOtp(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/auth/resend-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        toast.error(data.error || "Failed to resend code");
+        setResendingOtp(false);
+        return;
+      }
+
+      setOtpExpiry(data.expiresIn || 600);
+      setOtp(""); // Clear the OTP input
+      toast.success("New verification code sent!");
+      setResendingOtp(false);
+    } catch (err) {
+      console.error(err);
+      toast.error("Network error. Please try again.");
+      setResendingOtp(false);
     }
   }
 
@@ -284,103 +393,182 @@ export function LoginForm() {
         </div>
 
         {/* Form */}
-        <form onSubmit={onSubmit} className="space-y-6">
-          <div
-            className="space-y-2 animate-fade-in-up animate-duration-500ms"
-            style={getAnimationDelay(2)}
-          >
-            <Label htmlFor="email">Email</Label>
-            <div className="relative">
-              <Mail
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-text-secondary"
-                aria-hidden="true"
-              />
-              <Input
-                id="email"
-                type="email"
-                placeholder="your.name@cdbl.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
-                hasIcon
-                aria-invalid={!!error}
-              />
+        {!showOtpStep ? (
+          // Email & Password Step
+          <form onSubmit={onSubmit} className="space-y-6">
+            <div
+              className="space-y-2 animate-fade-in-up animate-duration-500ms"
+              style={getAnimationDelay(2)}
+            >
+              <Label htmlFor="email">Email</Label>
+              <div className="relative">
+                <Mail
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-text-secondary"
+                  aria-hidden="true"
+                />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="your.name@cdbl.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading}
+                  hasIcon
+                  aria-invalid={!!error}
+                />
+              </div>
             </div>
-          </div>
 
-          <div
-            className="space-y-2 animate-fade-in-up animate-duration-500ms"
-            style={getAnimationDelay(3)}
-          >
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
-              <Button
-                type="button"
-                variant="link"
-                className="text-sm font-medium"
-              >
-                Forgot password?
+            <div
+              className="space-y-2 animate-fade-in-up animate-duration-500ms"
+              style={getAnimationDelay(3)}
+            >
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Button
+                  type="button"
+                  variant="link"
+                  className="text-sm font-medium"
+                >
+                  Forgot password?
+                </Button>
+              </div>
+              <div className="relative">
+                <Lock
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-text-secondary"
+                  aria-hidden="true"
+                />
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                  hasIcon
+                  aria-invalid={!!error}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-text-secondary hover:text-text-secondary transition-colors"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="size-5" />
+                  ) : (
+                    <Eye className="size-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  className="flex items-center gap-2 text-sm text-data-error bg-data-error/10 border border-data-error p-3 rounded-lg"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                >
+                  <AlertCircle className="size-4 flex-shrink-0" />
+                  <span>{error}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div
+              className="animate-fade-in-up animate-duration-500ms"
+              style={getAnimationDelay(4)}
+            >
+              <Button type="submit" className="w-full" size="lg" disabled={loading}>
+                {loading && <Loader2 className="size-5 animate-spin" />}
+                {loading ? "Signing in..." : "Sign In"}
+                {!loading && <ArrowRight className="size-5" />}
               </Button>
             </div>
-            <div className="relative">
-              <Lock
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 size-5 text-text-secondary"
-                aria-hidden="true"
-              />
+          </form>
+        ) : (
+          // OTP Verification Step
+          <motion.form
+            onSubmit={onVerifyOtp}
+            className="space-y-6"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="space-y-2">
+              <Label htmlFor="otp">Verification Code</Label>
+              <p className="text-sm text-text-secondary">
+                Enter the 6-digit code sent to <strong>{email}</strong>
+              </p>
               <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                id="otp"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={6}
+                placeholder="000000"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                 required
                 disabled={loading}
-                hasIcon
+                className="text-center text-2xl tracking-widest font-bold"
                 aria-invalid={!!error}
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-text-secondary hover:text-text-secondary transition-colors"
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? (
-                  <EyeOff className="size-5" />
-                ) : (
-                  <Eye className="size-5" />
-                )}
-              </button>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-text-secondary">
+                  Code expires in: <strong className={otpExpiry < 60 ? "text-data-error" : "text-data-success"}>{formatTime(otpExpiry)}</strong>
+                </span>
+                <Button
+                  type="button"
+                  variant="link"
+                  className="text-sm font-medium"
+                  onClick={onResendOtp}
+                  disabled={resendingOtp || otpExpiry > 540} // Allow resend after 1 minute
+                >
+                  {resendingOtp ? "Sending..." : "Resend Code"}
+                </Button>
+              </div>
             </div>
-          </div>
 
-          <AnimatePresence>
-            {error && (
-              <motion.div
-                className="flex items-center gap-2 text-sm text-data-error bg-data-error border border-data-error p-3 rounded-lg"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-              >
-                <AlertCircle className="size-4 flex-shrink-0" />
-                <span>{error}</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <div
-            className="animate-fade-in-up animate-duration-500ms"
-            style={getAnimationDelay(4)}
-          >
-            <Button type="submit" className="w-full" size="lg" disabled={loading}>
-              {loading && (
-                <Loader2 className="size-5 animate-spin" />
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  className="flex items-center gap-2 text-sm text-data-error bg-data-error/10 border border-data-error p-3 rounded-lg"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                >
+                  <AlertCircle className="size-4 flex-shrink-0" />
+                  <span>{error}</span>
+                </motion.div>
               )}
-              {loading ? "Signing in..." : "Sign In"}
-              {!loading && <ArrowRight className="size-5" />}
-            </Button>
-          </div>
-        </form>
+            </AnimatePresence>
+
+            <div className="space-y-3">
+              <Button type="submit" className="w-full" size="lg" disabled={loading || otp.length !== 6}>
+                {loading && <Loader2 className="size-5 animate-spin" />}
+                {loading ? "Verifying..." : "Verify & Login"}
+                {!loading && <ArrowRight className="size-5" />}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full"
+                onClick={() => {
+                  setShowOtpStep(false);
+                  setOtp("");
+                  setError(null);
+                }}
+              >
+                Back to Login
+              </Button>
+            </div>
+          </motion.form>
+        )}
       </div>
     </div>
   );
