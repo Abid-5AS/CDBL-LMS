@@ -181,6 +181,7 @@ export function RoleBasedDashboard({
           "--dashboard-accent-soft": config.accentSoft,
         } as React.CSSProperties
       }
+      suppressHydrationWarning
     >
       <div className={contentClasses}>
         {/* Header Section */}
@@ -268,7 +269,11 @@ export function RoleDashboardCard({
     className
   );
 
-  const content = <div className={cardClasses}>{children}</div>;
+  const content = (
+    <div className={cardClasses} suppressHydrationWarning>
+      {children}
+    </div>
+  );
 
   if (animate) {
     return (
@@ -276,6 +281,7 @@ export function RoleDashboardCard({
         variants={itemVariants}
         whileHover={{ scale: 1.02 }}
         transition={{ duration: 0.2 }}
+        suppressHydrationWarning
       >
         {content}
       </motion.div>
@@ -364,11 +370,15 @@ export function RoleKPICard({
             style={{
               backgroundColor: config.accentSoft,
             }}
+            suppressHydrationWarning
           >
-            <Icon
-              className="w-5 h-5 sm:w-6 sm:h-6"
+            <span
               style={{ color: config.accent }}
-            />
+              suppressHydrationWarning
+              className="inline-flex"
+            >
+              <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+            </span>
           </div>
         )}
       </div>

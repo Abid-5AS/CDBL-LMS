@@ -75,7 +75,10 @@ export function FloatingActionButton({
   if (!user) return null;
 
   return (
-    <div className={cn("fixed bottom-6 right-6 z-40 md:hidden", className)}>
+    <div
+      className={cn("fixed bottom-6 right-6 z-40 md:hidden", className)}
+      suppressHydrationWarning
+    >
       {/* Action Items */}
       <AnimatePresence>
         {isOpen && (
@@ -84,6 +87,7 @@ export function FloatingActionButton({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="absolute bottom-16 right-0 flex flex-col gap-3"
+            suppressHydrationWarning
           >
             {actions.map((action, index) => {
               const Icon = action.icon;
