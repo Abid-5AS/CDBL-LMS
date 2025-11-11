@@ -12,6 +12,7 @@ import type { AppRole } from "@/lib/rbac";
 import { LeaveStatus } from "@prisma/client";
 import { UnifiedModal } from "./UnifiedModal";
 import { apiPost } from "@/lib/apiClient";
+import { SUCCESS_MESSAGES } from "@/lib/toast-messages";
 
 type LeaveRequest = {
   id: number;
@@ -78,7 +79,9 @@ export function ReviewModal({
     try {
       setSubmitting(true);
       await apiPost(`/api/leaves/${leaveRequest.id}/forward`, {});
-      toast.success("Request forwarded successfully");
+      toast.success(SUCCESS_MESSAGES.leave_forwarded, {
+        description: `Leave request #${leaveRequest.id} has been forwarded to HR Head for final approval.`,
+      });
       await onActionComplete?.();
       onOpenChange(false);
     } catch (err) {
@@ -102,7 +105,9 @@ export function ReviewModal({
       await apiPost(`/api/leaves/${leaveRequest.id}/reject`, {
         comment: note.trim(),
       });
-      toast.success("Request rejected");
+      toast.success(SUCCESS_MESSAGES.leave_rejected, {
+        description: `Leave request #${leaveRequest.id} has been rejected. The employee has been notified.`,
+      });
       await onActionComplete?.();
       onOpenChange(false);
       setAction(null);
@@ -128,7 +133,9 @@ export function ReviewModal({
       await apiPost(`/api/leaves/${leaveRequest.id}/return`, {
         comment: note.trim(),
       });
-      toast.success("Request returned for modification");
+      toast.success(SUCCESS_MESSAGES.returned_for_modification, {
+        description: `Leave request #${leaveRequest.id} has been returned to the employee for revision.`,
+      });
       await onActionComplete?.();
       onOpenChange(false);
       setAction(null);

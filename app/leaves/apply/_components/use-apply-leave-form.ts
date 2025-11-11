@@ -332,8 +332,20 @@ export function useApplyLeaveForm() {
       }
 
       clearDraft();
-      toast.success(SUCCESS_MESSAGES.leave_submitted);
-      router.push("/leaves");
+
+      // Show success message with request ID if available
+      const requestId = data?.id || data?.leaveId;
+      if (requestId) {
+        toast.success(SUCCESS_MESSAGES.leave_submitted, {
+          description: `Request ID: #${requestId}. You can track its status in your leave history.`,
+          duration: 5000,
+        });
+        // Redirect to the specific leave request details page
+        router.push(`/leaves/${requestId}`);
+      } else {
+        toast.success(SUCCESS_MESSAGES.leave_submitted);
+        router.push("/leaves");
+      }
     } catch (error) {
       console.error(error);
       toast.error(getToastMessage("network_error", "Network error. Please try again."));
