@@ -43,7 +43,6 @@ export function PolicyPanel({ policies, onUpdatePolicy, busyPolicyId }: PolicyPa
       setVersion(new Date().toISOString());
       toast.success("Policy updated");
     } catch (error) {
-      console.error(error);
       toast.error("Unable to update policy rule.");
     }
   };

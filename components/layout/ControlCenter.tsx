@@ -50,7 +50,6 @@ export default function ControlCenter({ onClose }: { onClose: () => void }) {
           setNotes(Array.isArray(notesData) ? notesData : []);
         }
       } catch (error) {
-        console.error("Failed to fetch ControlCenter data:", error);
       } finally {
         setLoading(false);
       }
@@ -89,7 +88,6 @@ export default function ControlCenter({ onClose }: { onClose: () => void }) {
     try {
       await fetch("/api/logout", { method: "POST" });
     } catch (error) {
-      console.error("Logout error:", error);
     }
     window.location.assign("/login");
   };

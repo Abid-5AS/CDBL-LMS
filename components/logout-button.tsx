@@ -30,7 +30,6 @@ export function LogoutButton({ className }: LogoutButtonProps) {
         router.refresh();
       });
     } catch (error) {
-      console.error(error);
       toast.error("Unable to log out. Please try again.");
     } finally {
       setLoading(false);

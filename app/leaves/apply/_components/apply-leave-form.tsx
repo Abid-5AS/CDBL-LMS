@@ -284,7 +284,6 @@ export function ApplyLeaveForm() {
       toast.success("Leave request submitted successfully");
       router.push("/leaves");
     } catch (error) {
-      console.error(error);
       toast.error("Network error. Please try again.");
     } finally {
       setSubmitting(false);

@@ -80,7 +80,6 @@ export function MyLeavesPageContent() {
       toast.success("Request cancelled");
       mutate();
     } catch (err) {
-      console.error(err);
       toast.error("Couldn't cancel request", {
         description: "Network error. Please try again.",
       });

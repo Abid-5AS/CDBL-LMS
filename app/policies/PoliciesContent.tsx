@@ -27,7 +27,7 @@ export function PoliciesContent() {
       <section className="rounded-2xl border border-border bg-white/80 backdrop-blur-sm p-6 shadow-sm">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Leave Policy Overview</h1>
+            <h1 className="text-2xl font-semibold text-foreground">Leave Policy Overview</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               Summary of entitlements and rules based on the CDBL Leave Management policy.
             </p>

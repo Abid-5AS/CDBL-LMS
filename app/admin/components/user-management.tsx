@@ -92,7 +92,6 @@ export function UserManagement({ users, onRoleChange, onCreate, busyUserId }: Us
                           await onRoleChange(user.id, nextRole);
                           toast.success(`Updated role for ${user.name} to ${nextRole}`);
                         } catch (error) {
-                          console.error(error);
                           toast.error("Unable to update role.");
                         }
                       }}

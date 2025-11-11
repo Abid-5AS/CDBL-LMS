@@ -82,7 +82,6 @@ export function CreateUserDialog({ onCreated }: CreateUserDialogProps) {
       resetForm();
       setOpen(false);
     } catch (error) {
-      console.error(error);
       toast.error(error instanceof Error ? error.message : "Unable to create user");
     } finally {
       setSubmitting(false);

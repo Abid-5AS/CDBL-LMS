@@ -112,7 +112,6 @@ export function EmployeeEditForm({ employee, viewerRole }: EmployeeEditFormProps
       router.push(`/employees/${employee.id}`);
       router.refresh();
     } catch (error) {
-      console.error("Error updating employee:", error);
       toast.error("An error occurred while updating the employee");
     } finally {
       setIsSubmitting(false);
