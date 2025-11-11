@@ -90,17 +90,34 @@ export async function PATCH(req: NextRequest) {
 
           // Restore balance if it was already deducted
           const year = new Date(leave.startDate).getFullYear();
-          await prisma.balance.updateMany({
+          const balance = await prisma.balance.findUnique({
             where: {
-              userId: leave.requesterId,
-              type: leave.type,
-              year,
-            },
-            data: {
-              used: { decrement: leave.workingDays },
-              closing: { decrement: leave.workingDays },
+              userId_type_year: {
+                userId: leave.requesterId,
+                type: leave.type,
+                year,
+              },
             },
           });
+
+          if (balance) {
+            const newUsed = Math.max((balance.used || 0) - leave.workingDays, 0);
+            const newClosing = (balance.opening || 0) + (balance.accrued || 0) - newUsed;
+
+            await prisma.balance.update({
+              where: {
+                userId_type_year: {
+                  userId: leave.requesterId,
+                  type: leave.type,
+                  year,
+                },
+              },
+              data: {
+                used: newUsed,
+                closing: newClosing,
+              },
+            });
+          }
         }
 
         // Update status

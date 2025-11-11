@@ -3,7 +3,7 @@
  * Handles sending emails via NodeMailer
  */
 
-import nodemailer from "nodemailer";
+import * as nodemailer from "nodemailer";
 
 // Email configuration from environment variables
 const EMAIL_HOST = process.env.EMAIL_HOST || "smtp.gmail.com";
@@ -12,8 +12,11 @@ const EMAIL_USER = process.env.EMAIL_USER || "";
 const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD || "";
 const EMAIL_FROM = process.env.EMAIL_FROM || "CDBL LMS <noreply@cdbl.com>";
 
+// Development email override - route all emails to this address for testing
+const DEV_EMAIL_OVERRIDE = process.env.DEV_EMAIL_OVERRIDE || "";
+
 // Create reusable transporter
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
   host: EMAIL_HOST,
   port: EMAIL_PORT,
   secure: EMAIL_PORT === 465, // true for port 465, false for other ports
@@ -32,12 +35,20 @@ export async function sendOtpEmail(
   recipientName: string
 ): Promise<boolean> {
   try {
+    // In development, override the recipient email if DEV_EMAIL_OVERRIDE is set
+    const actualRecipient = DEV_EMAIL_OVERRIDE || to;
+    const isOverridden = DEV_EMAIL_OVERRIDE && DEV_EMAIL_OVERRIDE !== to;
+
     const mailOptions = {
       from: EMAIL_FROM,
-      to,
-      subject: "CDBL LMS - Your Login Verification Code",
-      html: getOtpEmailTemplate(code, recipientName),
-      text: `Your CDBL LMS verification code is: ${code}. This code will expire in 10 minutes. If you didn't request this code, please ignore this email.`,
+      to: actualRecipient,
+      subject: isOverridden
+        ? `CDBL LMS - OTP for ${to}`
+        : "CDBL LMS - Your Login Verification Code",
+      html: getOtpEmailTemplate(code, recipientName, isOverridden ? to : undefined),
+      text: isOverridden
+        ? `Login attempt for: ${to}\n\nYour CDBL LMS verification code is: ${code}. This code will expire in 10 minutes. If you didn't request this code, please ignore this email.`
+        : `Your CDBL LMS verification code is: ${code}. This code will expire in 10 minutes. If you didn't request this code, please ignore this email.`,
     };
 
     await transporter.sendMail(mailOptions);
@@ -51,7 +62,11 @@ export async function sendOtpEmail(
 /**
  * HTML email template for OTP
  */
-function getOtpEmailTemplate(code: string, recipientName: string): string {
+function getOtpEmailTemplate(
+  code: string,
+  recipientName: string,
+  originalEmail?: string
+): string {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -77,6 +92,16 @@ function getOtpEmailTemplate(code: string, recipientName: string): string {
           <!-- Content -->
           <tr>
             <td style="padding: 40px;">
+              ${
+                originalEmail
+                  ? `<div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 16px; margin: 0 0 24px;">
+                <p style="margin: 0 0 8px; color: #78350f; font-size: 14px; font-weight: 600;">🔐 Development Mode:</p>
+                <p style="margin: 0; color: #78350f; font-size: 14px; line-height: 1.5;">
+                  Login attempt for: <strong>${originalEmail}</strong>
+                </p>
+              </div>`
+                  : ""
+              }
               <h2 style="margin: 0 0 16px; color: #0f172a; font-size: 24px; font-weight: 600;">Welcome back, ${recipientName}!</h2>
               <p style="margin: 0 0 24px; color: #475569; font-size: 16px; line-height: 1.6;">
                 You're almost there! Use the verification code below to complete your login to CDBL Leave Management System.

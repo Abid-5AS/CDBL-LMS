@@ -385,6 +385,78 @@ export async function POST(req: Request) {
     }
   }
 
+  // Check for team overlap - prevent too many team members on leave simultaneously
+  const currentUser = await prisma.user.findUnique({
+    where: { id: me.id },
+    select: { deptHeadId: true, department: true },
+  });
+
+  if (currentUser?.department) {
+    // Find all team members in the same department
+    const teamMembers = await prisma.user.findMany({
+      where: {
+        department: currentUser.department,
+        id: { not: me.id }, // Exclude current user
+      },
+      select: { id: true },
+    });
+
+    if (teamMembers.length > 0) {
+      // Check how many team members have approved/pending leaves during this period
+      const overlappingLeaves = await prisma.leaveRequest.findMany({
+        where: {
+          requesterId: { in: teamMembers.map((m) => m.id) },
+          status: { in: ["APPROVED", "PENDING", "SUBMITTED"] },
+          OR: [
+            {
+              // Leave starts during requested period
+              AND: [
+                { startDate: { lte: end } },
+                { endDate: { gte: start } },
+              ],
+            },
+          ],
+        },
+        select: {
+          requesterId: true,
+          requester: { select: { name: true } },
+          startDate: true,
+          endDate: true,
+        },
+      });
+
+      const uniqueEmployeesOnLeave = new Set(overlappingLeaves.map((l) => l.requesterId));
+      const teamSize = teamMembers.length + 1; // Include current user
+      const employeesOnLeaveCount = uniqueEmployeesOnLeave.size + 1; // Include current request
+      const percentageOnLeave = (employeesOnLeaveCount / teamSize) * 100;
+
+      // Warn if >30% of team will be on leave
+      const TEAM_CAPACITY_THRESHOLD = 30;
+      if (percentageOnLeave > TEAM_CAPACITY_THRESHOLD) {
+        const overlappingNames = overlappingLeaves
+          .slice(0, 3)
+          .map((l) => l.requester.name)
+          .join(", ");
+        const additionalCount = overlappingLeaves.length > 3 ? ` and ${overlappingLeaves.length - 3} more` : "";
+
+        return NextResponse.json(
+          error(
+            "team_capacity_exceeded",
+            `Too many team members on leave during this period. ${overlappingNames}${additionalCount} will also be on leave. Please coordinate with your team or manager.`,
+            traceId,
+            {
+              teamSize,
+              onLeaveCount: employeesOnLeaveCount,
+              percentageOnLeave: Math.round(percentageOnLeave),
+              threshold: TEAM_CAPACITY_THRESHOLD,
+            }
+          ),
+          { status: 400 }
+        );
+      }
+    }
+  }
+
   const available = await getAvailableDays(me.id, t, year);
   if (available < workingDays) {
     return NextResponse.json(

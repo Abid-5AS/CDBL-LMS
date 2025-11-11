@@ -107,6 +107,41 @@ export async function POST(
     data: { status: LeaveStatus.CANCELLED },
   });
 
+  // Restore balance if leave was pending/submitted (not yet approved)
+  // This allows the employee to reapply immediately
+  const currentYear = new Date().getFullYear();
+  const balance = await prisma.balance.findUnique({
+    where: {
+      userId_type_year: {
+        userId: leave.requesterId,
+        type: leave.type,
+        year: currentYear,
+      },
+    },
+  });
+
+  if (balance) {
+    // Since the leave was never approved, we don't need to restore "used" balance
+    // The balance was already available, this is just a cleanup/confirmation
+    // However, if the balance was temporarily reserved, we restore it here
+    const newUsed = Math.max((balance.used || 0) - leave.workingDays, 0);
+    const newClosing = (balance.opening || 0) + (balance.accrued || 0) - newUsed;
+
+    await prisma.balance.update({
+      where: {
+        userId_type_year: {
+          userId: leave.requesterId,
+          type: leave.type,
+          year: currentYear,
+        },
+      },
+      data: {
+        used: newUsed,
+        closing: newClosing,
+      },
+    });
+  }
+
   // Create audit log
   await prisma.auditLog.create({
     data: {

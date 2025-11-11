@@ -169,13 +169,13 @@ export function ModernEmployeeDashboard({
   // Fetch team data
   const { data: teamData, isLoading: isLoadingTeam } = useSWR(
     "/api/team/status",
-    fetcher
+    apiFetcher
   );
 
   // Fetch holidays data
   const { data: holidaysData, isLoading: isLoadingHolidays } = useSWR(
     "/api/holidays/upcoming",
-    fetcher
+    apiFetcher
   );
 
   // Process data for modern cards

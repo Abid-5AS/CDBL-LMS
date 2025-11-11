@@ -28,12 +28,19 @@ type LeaveItem = {
   status: string;
 };
 
+type HolidaysData = {
+  items: Array<{
+    date: string;
+    name: string;
+  }>;
+};
+
 export function HeroStrip({ name }: HeroStripProps) {
   const router = useRouter();
   
   const { data: leavesData } = useLeaveData();
   
-  const { data: holidaysData } = useSWR("/api/holidays?upcoming=true", apiFetcher, {
+  const { data: holidaysData } = useSWR<HolidaysData>("/api/holidays?upcoming=true", apiFetcher, {
     revalidateOnFocus: false,
   });
 

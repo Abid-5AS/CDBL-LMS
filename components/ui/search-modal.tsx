@@ -21,6 +21,11 @@ import { cn } from "@/lib/utils";
 import { useUser } from "@/lib/user-context";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import useSWR from "swr";
+import { useDebounce } from "@/lib/use-debounce";
+
+// Simple fetcher for API calls
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 interface SearchResult {
   id: string;
@@ -38,8 +43,8 @@ interface SearchModalProps {
   onClose: () => void;
 }
 
-// Mock search results - in real app, this would come from API
-const searchResults: SearchResult[] = [
+// Static navigation results
+const staticResults: SearchResult[] = [
   {
     id: "apply-leave",
     title: "Apply for Leave",
@@ -113,29 +118,90 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const user = useUser();
 
-  // Filter results based on query
+  // Debounce the query to avoid too many API calls
+  const debouncedQuery = useDebounce(query, 300);
+
+  // Fetch leave requests when searching
+  const { data: leavesData, isLoading: isLoadingLeaves } = useSWR(
+    debouncedQuery.trim() && isOpen
+      ? `/api/leaves?mine=1&limit=5`
+      : null,
+    fetcher
+  );
+
+  // Fetch employees when searching (if admin/manager)
+  const { data: employeesData, isLoading: isLoadingEmployees } = useSWR(
+    debouncedQuery.trim() && isOpen && (user?.role === "SYSTEM_ADMIN" || user?.role === "HR_ADMIN" || user?.role === "DEPT_HEAD")
+      ? `/api/employees?limit=5`
+      : null,
+    fetcher
+  );
+
+  // Combine static navigation results with dynamic API results
   React.useEffect(() => {
-    if (!query.trim()) {
+    if (!debouncedQuery.trim()) {
       setFilteredResults([]);
       setSelectedIndex(0);
       return;
     }
 
-    const filtered = searchResults.filter((result) => {
-      const searchText = query.toLowerCase();
-      return (
-        result.title.toLowerCase().includes(searchText) ||
-        result.description?.toLowerCase().includes(searchText) ||
-        result.category.toLowerCase().includes(searchText) ||
-        result.keywords?.some((keyword) =>
-          keyword.toLowerCase().includes(searchText)
-        )
-      );
-    });
+    const results: SearchResult[] = [];
+    const searchText = debouncedQuery.toLowerCase();
 
-    setFilteredResults(filtered);
+    // Add filtered static navigation results
+    const filteredStatic = staticResults.filter((result) =>
+      result.title.toLowerCase().includes(searchText) ||
+      result.description?.toLowerCase().includes(searchText) ||
+      result.category.toLowerCase().includes(searchText) ||
+      result.keywords?.some((keyword) =>
+        keyword.toLowerCase().includes(searchText)
+      )
+    );
+    results.push(...filteredStatic);
+
+    // Add leave requests from API
+    if (leavesData?.leaves && Array.isArray(leavesData.leaves)) {
+      const leaveResults = leavesData.leaves
+        .filter((leave: any) => {
+          const leaveSearchText = `${leave.id} ${leave.type} ${leave.status} ${leave.requester?.name || ""}`.toLowerCase();
+          return leaveSearchText.includes(searchText);
+        })
+        .slice(0, 5)
+        .map((leave: any) => ({
+          id: `leave-${leave.id}`,
+          title: `Leave Request #${leave.id}`,
+          description: `${leave.type} - ${leave.status} (${new Date(leave.startDate).toLocaleDateString()} to ${new Date(leave.endDate).toLocaleDateString()})`,
+          href: `/leaves/${leave.id}`,
+          icon: Calendar,
+          category: "Leaves",
+          badge: leave.status,
+        }));
+      results.push(...leaveResults);
+    }
+
+    // Add employees from API (for admins/managers)
+    if (employeesData?.employees && Array.isArray(employeesData.employees)) {
+      const employeeResults = employeesData.employees
+        .filter((emp: any) => {
+          const empSearchText = `${emp.name} ${emp.email} ${emp.department || ""}`.toLowerCase();
+          return empSearchText.includes(searchText);
+        })
+        .slice(0, 5)
+        .map((emp: any) => ({
+          id: `employee-${emp.id}`,
+          title: emp.name,
+          description: `${emp.email}${emp.department ? ` - ${emp.department}` : ""}`,
+          href: `/employees/${emp.id}`,
+          icon: Users,
+          category: "Employees",
+          badge: emp.role,
+        }));
+      results.push(...employeeResults);
+    }
+
+    setFilteredResults(results);
     setSelectedIndex(0);
-  }, [query]);
+  }, [debouncedQuery, leavesData, employeesData]);
 
   // Handle keyboard navigation
   React.useEffect(() => {
@@ -259,7 +325,14 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
               {query.trim() ? (
                 // Search Results
                 <div className="p-4">
-                  {filteredResults.length > 0 ? (
+                  {isLoadingLeaves || isLoadingEmployees ? (
+                    <div className="text-center py-12">
+                      <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent mb-4" />
+                      <p className="text-sm text-muted-foreground">
+                        Searching...
+                      </p>
+                    </div>
+                  ) : filteredResults.length > 0 ? (
                     <div className="space-y-2">
                       <p className="text-sm text-muted-foreground px-3 py-2">
                         {filteredResults.length} result

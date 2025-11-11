@@ -163,6 +163,15 @@ async function createUsers(): Promise<SeedUser[]> {
     empCode: makeEmpCode(Role.SYSTEM_ADMIN),
   });
 
+  // Real user for development/testing
+  await upsertUser({
+    name: "Abid Shahriar",
+    email: "abidshahriar@iut-dhaka.edu",
+    role: Role.SYSTEM_ADMIN,
+    department: "IT",
+    empCode: "SYS-002",
+  });
+
   await upsertUser({
     name: "CEO One",
     email: "ceo@demo.local",
