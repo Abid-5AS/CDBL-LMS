@@ -11,8 +11,7 @@ import {
 } from "@/components/ui";
 import { Filter } from "lucide-react";
 import useSWR from "swr";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { apiFetcher } from "@/lib/apiClient";
 
 type FilterBarProps = {
   duration: string;
@@ -42,7 +41,7 @@ export function FilterBar({
   onDepartmentChange,
   onLeaveTypeChange,
 }: FilterBarProps) {
-  const { data: departmentsData } = useSWR("/api/departments", fetcher);
+  const { data: departmentsData } = useSWR("/api/departments", apiFetcher);
   const departments = departmentsData?.departments || [];
 
   return (

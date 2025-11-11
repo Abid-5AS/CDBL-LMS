@@ -13,6 +13,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
+import { apiGet } from "@/lib/apiClient";
 
 type SearchResult = {
   id: number;
@@ -44,13 +45,10 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
     const timeoutId = setTimeout(async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-        if (res.ok) {
-          const data = await res.json();
-          setResults(data);
-        } else {
-          setResults({ leaves: [], employees: [], holidays: [] });
-        }
+        const data = await apiGet<{ leaves: SearchResult[]; employees: SearchResult[]; holidays: SearchResult[] }>(
+          `/api/search?q=${encodeURIComponent(query)}`
+        );
+        setResults(data);
       } catch (error) {
         console.error("Search error:", error);
         setResults({ leaves: [], employees: [], holidays: [] });

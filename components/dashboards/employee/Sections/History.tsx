@@ -22,10 +22,10 @@ import {
 } from "@/components/ui/tooltip";
 import { TrendingUp, Calendar, BarChart3, Info, Inbox } from "lucide-react";
 import useSWR from "swr";
+import { apiFetcher } from "@/lib/apiClient";
 import { useUIStore } from "@/lib/ui-state";
 import { formatDate } from "@/lib/utils";
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 type FilterPeriod = "month" | "quarter" | "year";
 

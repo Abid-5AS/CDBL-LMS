@@ -2,8 +2,7 @@
 
 import { createContext, useContext, type ReactNode } from "react";
 import useSWR, { type KeyedMutator } from "swr";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { apiFetcher } from "@/lib/apiClient";
 
 export type LeaveResponse = {
   items?: any[];
@@ -19,7 +18,7 @@ type LeaveDataContextValue = {
 const LeaveDataContext = createContext<LeaveDataContextValue | null>(null);
 
 export function LeaveDataProvider({ children }: { children: ReactNode }) {
-  const swrState = useSWR<LeaveResponse>("/api/leaves?mine=1", fetcher, {
+  const swrState = useSWR<LeaveResponse>("/api/leaves?mine=1", apiFetcher, {
     revalidateOnFocus: false,
   });
 
@@ -34,7 +33,7 @@ export function useLeaveData() {
   const context = useLeaveDataContext();
   const fallback = useSWR<LeaveResponse>(
     context ? null : "/api/leaves?mine=1",
-    fetcher,
+    apiFetcher,
     { revalidateOnFocus: false },
   );
   return context ?? fallback;

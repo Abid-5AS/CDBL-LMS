@@ -2,6 +2,7 @@
 
 import { Users, Calendar, TrendingUp, Clock } from "lucide-react";
 import useSWR from "swr";
+import { apiFetcher } from "@/lib/apiClient";
 
 // UI Components (barrel export)
 import {
@@ -15,7 +16,6 @@ import {
 // Lib utilities
 import { formatDate } from "@/lib";
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 type TeamOverviewData = {
   totalEmployees: number;

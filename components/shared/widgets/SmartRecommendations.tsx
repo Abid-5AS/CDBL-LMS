@@ -12,8 +12,7 @@ import {
 } from "@/components/ui";
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { apiFetcher } from "@/lib/apiClient";
 
 interface Recommendation {
   type:

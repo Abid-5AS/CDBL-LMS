@@ -4,11 +4,10 @@ import useSWR from "swr";
 import { Card, CardContent, Skeleton } from "@/components/ui";
 import { Calendar } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { apiFetcher } from "@/lib/apiClient";
 
 export function NextHoliday() {
-  const { data, error, isLoading } = useSWR("/api/holidays", fetcher, {
+  const { data, error, isLoading } = useSWR("/api/holidays", apiFetcher, {
     revalidateOnFocus: false,
   });
 

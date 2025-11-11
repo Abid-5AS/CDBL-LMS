@@ -1,12 +1,11 @@
 "use client";
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { getAccessibleFill, ChartPatternDefs } from "@/lib/chart-patterns";
 
 type LeaveDistributionChartProps = {
   data: { type: string; value: number }[];
 };
-
-const COLORS = ["#2563eb", "#f59e0b", "#10b981", "#ec4899", "#9333ea"];
 
 export function LeaveDistributionChart({ data }: LeaveDistributionChartProps) {
   const total = data.reduce((acc, slice) => acc + slice.value, 0);
@@ -22,6 +21,7 @@ export function LeaveDistributionChart({ data }: LeaveDistributionChartProps) {
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
+              <ChartPatternDefs />
               <Pie
                 data={data}
                 dataKey="value"
@@ -34,7 +34,12 @@ export function LeaveDistributionChart({ data }: LeaveDistributionChartProps) {
                 }
               >
                 {data.map((entry, index) => (
-                  <Cell key={entry.type} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={entry.type}
+                    fill={getAccessibleFill(index)}
+                    stroke={getAccessibleFill(index)}
+                    strokeWidth={2}
+                  />
                 ))}
               </Pie>
               <Tooltip />

@@ -25,7 +25,7 @@ type SystemAdminDashboardProps = {
   username: string;
 };
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { apiFetcher } from "@/lib/apiClient";
 
 /**
  * System Admin Dashboard - System-Level Configuration
@@ -35,7 +35,7 @@ export function SystemAdminDashboard({ username }: SystemAdminDashboardProps) {
   const router = useRouter();
 
   // Fetch system stats
-  const { data: systemData } = useSWR("/api/admin/system-stats", fetcher, {
+  const { data: systemData } = useSWR("/api/admin/system-stats", apiFetcher, {
     revalidateOnFocus: false,
   });
 

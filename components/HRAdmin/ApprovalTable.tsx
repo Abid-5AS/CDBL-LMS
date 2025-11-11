@@ -28,9 +28,9 @@ import {
 import type { AppRole } from "@/lib/rbac";
 
 // Local imports
-import { submitApprovalDecision } from "@/lib/api";
 import { HRApprovalItem } from "./types";
 import { useSelectionContext } from "@/lib/selection-context";
+import { apiFetcher, apiPost } from "@/lib/apiClient";
 
 type ApprovalsResponse = { items: HRApprovalItem[] };
 
@@ -38,8 +38,6 @@ type ApprovalTableProps = {
   onSelect?: (item: HRApprovalItem) => void;
   onDataChange?: (items: HRApprovalItem[]) => void;
 };
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 function statusStyle(status: string) {
   const normalized = status.toUpperCase();
@@ -85,7 +83,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
   const { data, error, isLoading, mutate } = useSWR<ApprovalsResponse>(
     "/api/approvals",
-    fetcher,
+    apiFetcher,
     {
       revalidateOnFocus: true,
     }
@@ -147,14 +145,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
       setProcessingId(id + action);
 
       if (action === "forward") {
-        const res = await fetch(`/api/leaves/${id}/forward`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        });
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
-          throw new Error(data.error || "Failed to forward request");
-        }
+        await apiPost(`/api/leaves/${id}/forward`, {});
         toast.success("Request forwarded successfully");
       } else if (action === "return") {
         const comment = prompt(
@@ -165,18 +156,14 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
           setProcessingId(null);
           return;
         }
-        const res = await fetch(`/api/leaves/${id}/return`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ comment }),
-        });
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
-          throw new Error(data.error || "Failed to return request");
-        }
+        await apiPost(`/api/leaves/${id}/return`, { comment });
         toast.success("Request returned for modification");
       } else {
-        await submitApprovalDecision(id, action);
+        // approve or reject
+        await apiPost<{ ok: boolean; status: string }>(
+          `/api/approvals/${id}/decision`,
+          { action, comment: undefined }
+        );
         toast.success(
           action === "approve"
             ? SUCCESS_MESSAGES.leave_approved
@@ -378,20 +365,20 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                           onClick={(e) => e.stopPropagation()}
                         >
                           <ApprovalActionButtons
-                            ceoMode={userRole === "CEO"}
+                            ceoMode={userRole === "CEO" || userRole === "HR_HEAD"}
                             onForward={
-                              userRole !== "CEO"
+                              userRole === "HR_ADMIN" || userRole === "DEPT_HEAD"
                                 ? () => handleDecision(item.id, "forward")
                                 : undefined
                             }
                             onReturn={
-                              userRole !== "CEO"
+                              userRole === "HR_ADMIN" || userRole === "DEPT_HEAD"
                                 ? () => handleDecision(item.id, "return")
                                 : undefined
                             }
                             onCancel={() => handleDecision(item.id, "reject")}
                             onApprove={
-                              userRole === "CEO"
+                              userRole === "CEO" || userRole === "HR_HEAD"
                                 ? () => handleDecision(item.id, "approve")
                                 : undefined
                             }

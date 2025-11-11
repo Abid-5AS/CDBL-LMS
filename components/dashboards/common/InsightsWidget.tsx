@@ -18,9 +18,9 @@ import {
   XCircle,
 } from "lucide-react";
 import useSWR from "swr";
+import { apiFetcher } from "@/lib/apiClient";
 import { cn } from "@/lib/utils";
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 interface Insight {
   kind: string;
