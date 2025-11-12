@@ -11,7 +11,18 @@ import {
   CardContent,
   ModernTable,
   Checkbox,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  Textarea,
+  EmptyState,
 } from "@/components/ui";
+import { CheckCircle, FilterX, Loader2 } from "lucide-react";
 
 // Shared Components (barrel export)
 import { FilterBar, ApprovalActionButtons } from "@/components/shared";
@@ -70,6 +81,15 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // Dialog state management
+  const [dialogState, setDialogState] = useState<{
+    type: "reject" | "return" | null;
+    itemId: string | null;
+    employeeName: string | null;
+  }>({ type: null, itemId: null, employeeName: null });
+  const [returnComment, setReturnComment] = useState("");
+
   const { setSelection } = useSelectionContext();
   const user = useUser();
   const userRole = (user?.role as AppRole) || "EMPLOYEE";
@@ -137,9 +157,29 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     }
   }, [items, onDataChange]);
 
-  async function handleDecision(
+  // Open confirmation dialog for destructive actions
+  function openConfirmDialog(
     id: string,
-    action: "approve" | "reject" | "forward" | "return"
+    action: "reject" | "return",
+    employeeName: string
+  ) {
+    setDialogState({ type: action, itemId: id, employeeName });
+    if (action === "return") {
+      setReturnComment(""); // Reset comment field
+    }
+  }
+
+  // Close dialog and reset state
+  function closeDialog() {
+    setDialogState({ type: null, itemId: null, employeeName: null });
+    setReturnComment("");
+  }
+
+  // Execute decision after confirmation
+  async function executeDecision(
+    id: string,
+    action: "approve" | "reject" | "forward" | "return",
+    comment?: string
   ) {
     try {
       setProcessingId(id + action);
@@ -148,9 +188,6 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         await apiPost(`/api/leaves/${id}/forward`, {});
         toast.success("Request forwarded successfully");
       } else if (action === "return") {
-        const comment = prompt(
-          "Please provide a reason for returning this request (minimum 5 characters):"
-        );
         if (!comment || comment.length < 5) {
           toast.error("Comment must be at least 5 characters");
           setProcessingId(null);
@@ -177,6 +214,10 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         next.delete(id);
         return next;
       });
+
+      // Close dialog after success
+      closeDialog();
+
       await mutate();
     } catch (err) {
       const message =
@@ -187,6 +228,22 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     } finally {
       setProcessingId(null);
     }
+  }
+
+  // Handle decision routing - open dialog for destructive actions
+  async function handleDecision(
+    id: string,
+    action: "approve" | "reject" | "forward" | "return",
+    employeeName: string = "this employee"
+  ) {
+    // Destructive actions require confirmation
+    if (action === "reject" || action === "return") {
+      openConfirmDialog(id, action, employeeName);
+      return;
+    }
+
+    // Non-destructive actions execute immediately
+    await executeDecision(id, action);
   }
 
   const handleSelectRow = (itemId: string, checked: boolean) => {
@@ -215,8 +272,14 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="py-12 text-center text-sm text-muted-foreground">
-          Loading approvals…
+        <CardContent>
+          <EmptyState
+            icon={Loader2}
+            iconClassName="animate-spin"
+            title="Loading approval queue..."
+            description="Fetching pending leave requests"
+            className="py-8"
+          />
         </CardContent>
       </Card>
     );
@@ -225,18 +288,31 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   if (error) {
     return (
       <Card>
-        <CardContent className="py-12 text-center text-sm text-data-error">
-          Unable to load approval queue. Please try again.
+        <CardContent>
+          <EmptyState
+            title="Unable to load approvals"
+            description="There was an error loading the approval queue. Please refresh the page or try again later."
+            action={{
+              label: "Refresh Page",
+              onClick: () => window.location.reload(),
+            }}
+            className="py-8"
+          />
         </CardContent>
       </Card>
     );
   }
 
-  if (!items.length) {
+  if (!items.length && allItems.length === 0) {
     return (
       <Card>
-        <CardContent className="py-12 text-center text-sm text-muted-foreground">
-          No pending requests. You are all caught up!
+        <CardContent>
+          <EmptyState
+            icon={CheckCircle}
+            title="No pending requests"
+            description="You are all caught up! There are currently no leave requests awaiting approval."
+            className="py-8"
+          />
         </CardContent>
       </Card>
     );
@@ -263,8 +339,17 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
       {items.length === 0 && allItems.length > 0 ? (
         <Card>
-          <CardContent className="py-12 text-center text-sm text-muted-foreground">
-            No requests match your filters. Try adjusting your search criteria.
+          <CardContent>
+            <EmptyState
+              icon={FilterX}
+              title="No matching requests"
+              description="No leave requests match your current filter criteria. Try adjusting your search or clearing filters."
+              action={{
+                label: "Clear All Filters",
+                onClick: clearFilters,
+              }}
+              className="py-8"
+            />
           </CardContent>
         </Card>
       ) : (
@@ -370,18 +455,18 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                             ceoMode={userRole === "CEO" || userRole === "HR_HEAD"}
                             onForward={
                               userRole === "HR_ADMIN" || userRole === "DEPT_HEAD"
-                                ? () => handleDecision(item.id, "forward")
+                                ? () => handleDecision(item.id, "forward", item.requestedByName)
                                 : undefined
                             }
                             onReturn={
                               userRole === "HR_ADMIN" || userRole === "DEPT_HEAD"
-                                ? () => handleDecision(item.id, "return")
+                                ? () => handleDecision(item.id, "return", item.requestedByName)
                                 : undefined
                             }
-                            onCancel={() => handleDecision(item.id, "reject")}
+                            onCancel={() => handleDecision(item.id, "reject", item.requestedByName)}
                             onApprove={
                               userRole === "CEO" || userRole === "HR_HEAD"
-                                ? () => handleDecision(item.id, "approve")
+                                ? () => handleDecision(item.id, "approve", item.requestedByName)
                                 : undefined
                             }
                             disabled={processingId !== null}
@@ -408,6 +493,93 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
           Showing {items.length} of {allItems.length} requests
         </p>
       )}
+
+      {/* Reject Confirmation Dialog */}
+      <AlertDialog
+        open={dialogState.type === "reject"}
+        onOpenChange={(open) => !open && closeDialog()}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reject Leave Request?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to reject the leave request from{" "}
+              <strong>{dialogState.employeeName}</strong>? This action cannot be undone,
+              and the employee will be notified of the rejection.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={closeDialog}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (dialogState.itemId) {
+                  executeDecision(dialogState.itemId, "reject");
+                }
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Reject Request
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Return for Modification Dialog */}
+      <AlertDialog
+        open={dialogState.type === "return"}
+        onOpenChange={(open) => !open && closeDialog()}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Return for Modification</AlertDialogTitle>
+            <AlertDialogDescription>
+              Return the leave request from{" "}
+              <strong>{dialogState.employeeName}</strong> for revision. The
+              employee will be able to resubmit after making changes.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <label
+              htmlFor="return-comment"
+              className="text-sm font-medium text-foreground mb-2 block"
+            >
+              Reason for Return <span className="text-destructive">*</span>
+            </label>
+            <Textarea
+              id="return-comment"
+              value={returnComment}
+              onChange={(e) => setReturnComment(e.target.value)}
+              placeholder="Please provide a clear reason for returning this request (minimum 5 characters)..."
+              className="min-h-[100px]"
+              aria-required="true"
+              aria-describedby="return-comment-error"
+            />
+            {returnComment.length > 0 && returnComment.length < 5 && (
+              <p
+                id="return-comment-error"
+                className="text-xs text-destructive mt-1"
+                role="alert"
+              >
+                Comment must be at least 5 characters
+              </p>
+            )}
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={closeDialog}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (dialogState.itemId && returnComment.length >= 5) {
+                  executeDecision(dialogState.itemId, "return", returnComment);
+                }
+              }}
+              disabled={returnComment.length < 5}
+              className="bg-warning text-warning-foreground hover:bg-warning/90"
+            >
+              Return Request
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
