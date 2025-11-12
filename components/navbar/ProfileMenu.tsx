@@ -79,27 +79,27 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
     {
       label: "Profile",
       href: "/settings",
-      icon: <User className="w-4 h-4" />,
+      icon: <User className="size-4" aria-hidden="true" />,
     },
     {
       label: "My Leaves",
       href: "/leaves/my",
-      icon: <Calendar className="w-4 h-4" />,
+      icon: <Calendar className="size-4" aria-hidden="true" />,
     },
     {
       label: "Leave Balance",
       href: "/balance",
-      icon: <BarChart3 className="w-4 h-4" />,
+      icon: <BarChart3 className="size-4" aria-hidden="true" />,
     },
     {
       label: "Settings",
       href: "/settings",
-      icon: <Settings className="w-4 h-4" />,
+      icon: <Settings className="size-4" aria-hidden="true" />,
     },
     {
       label: "Policies",
       href: "/policies",
-      icon: <FileText className="w-4 h-4" />,
+      icon: <FileText className="size-4" aria-hidden="true" />,
     },
   ];
 
@@ -230,7 +230,7 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
                 onClick={onLogout}
                 className="w-full flex items-center gap-3 p-3 duration-200 bg-red-500/10 rounded-xl hover:bg-red-500/20 cursor-pointer border border-transparent hover:border-red-500/30 hover:shadow-sm transition-all group"
               >
-                <LogOut className="w-4 h-4 text-red-500 group-hover:text-red-600 transition-colors" />
+                <LogOut className="size-4 text-red-500 group-hover:text-red-600 transition-colors" aria-hidden="true" />
                 <span className="text-sm font-medium text-red-500 group-hover:text-red-600 transition-colors">
                   Sign Out
                 </span>

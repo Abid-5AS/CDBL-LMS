@@ -417,7 +417,7 @@ export function ModernEmployeeDashboard({
       onClick={() => setShowCustomization(true)}
       className="gap-2"
     >
-      <Settings className="w-4 h-4" />
+      <Settings className="size-4" aria-hidden="true" />
       <span className="hidden sm:inline">Customize</span>
     </Button>
   );
@@ -532,7 +532,7 @@ export function ModernEmployeeDashboard({
               <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <CardTitle className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                    <Sparkles className="size-4 sm:size-5 text-primary" aria-hidden="true" />
                     <span>Action Center</span>
                   </CardTitle>
                   {dashboardData.actionItems.length > 0 && (
@@ -638,7 +638,7 @@ export function ModernEmployeeDashboard({
                       onClick={() => router.push("/team")}
                     >
                       View All Team Members
-                      <ArrowRight className="w-4 h-4 ml-2" />
+                      <ArrowRight className="size-4 ml-2" aria-hidden="true" />
                     </Button>
                   }
                   className="rounded-2xl border border-border bg-card shadow-sm"
@@ -713,7 +713,7 @@ export function ModernEmployeeDashboard({
                         ))
                     ) : (
                       <div className="text-center py-4">
-                        <Users className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                        <Users className="size-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" aria-hidden="true" />
                         <p className="text-sm text-slate-600 dark:text-slate-400">
                           No team data available
                         </p>
@@ -773,7 +773,7 @@ export function ModernEmployeeDashboard({
                         ))
                     ) : (
                       <div className="text-center py-4">
-                        <Sparkles className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                        <Sparkles className="size-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" aria-hidden="true" />
                         <p className="text-sm text-slate-600 dark:text-slate-400">
                           No upcoming holidays
                         </p>
@@ -794,7 +794,7 @@ export function ModernEmployeeDashboard({
                     className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg"
                     onClick={() => router.push("/leaves/apply")}
                   >
-                    <Plus className="w-4 h-4 mr-2" />
+                    <Plus className="size-4 mr-2" aria-hidden="true" />
                     Apply Leave
                   </Button>
                 }
@@ -934,7 +934,7 @@ export function ModernEmployeeDashboard({
                             </div>
                             <div className="flex items-center space-x-2">
                               <StatusBadge status={leave.status} />
-                              <ArrowRight className="w-4 h-4 text-slate-400" />
+                              <ArrowRight className="size-4 text-slate-400" aria-hidden="true" />
                             </div>
                           </motion.div>
                         ))}
@@ -944,12 +944,12 @@ export function ModernEmployeeDashboard({
                           onClick={() => router.push("/leaves")}
                         >
                           View All Leave Requests
-                          <ArrowRight className="w-4 h-4 ml-2" />
+                          <ArrowRight className="size-4 ml-2" aria-hidden="true" />
                         </Button>
                       </div>
                     ) : (
                       <div className="text-center py-8">
-                        <Calendar className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+                        <Calendar className="size-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" aria-hidden="true" />
                         <p className="text-slate-600 dark:text-slate-400">
                           No recent activity
                         </p>
