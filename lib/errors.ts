@@ -1,11 +1,9 @@
 /**
  * Centralized Error Handling for CDBL Leave Management
- * 
+ *
  * Maps all error codes to user-friendly messages and standardizes API error responses.
  * Implements Policy v2.0 error handling requirements from §10.
  */
-
-import { randomUUID } from "crypto";
 
 export type ApiError = {
   error: string;
@@ -112,9 +110,20 @@ export function error(
 
 /**
  * Create a trace ID generator (useful for middleware)
+ * Edge-compatible version using Web Crypto API
  */
 export function generateTraceId(): string {
-  return randomUUID();
+  // Use Web Crypto API which is available in Edge runtime
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+
+  // Fallback: Generate a simple UUID v4
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
 }
 
 /**

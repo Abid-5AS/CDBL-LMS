@@ -1,14 +1,17 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
-import { canApprove, type AppRole } from "@/lib/rbac";
+import { canApprove, canReturn, type AppRole } from "@/lib/rbac";
 import { ApprovalsContent } from "./components/approvals-content";
 
 export default async function ApprovalsGate() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const approver = canApprove(user.role as AppRole);
-  if (!approver) {
+  // Allow access if user can approve OR return requests
+  // HR_ADMIN can forward/return but not approve
+  // HR_HEAD, CEO, DEPT_HEAD can both approve and return
+  const canAccessApprovals = canApprove(user.role as AppRole) || canReturn(user.role as AppRole);
+  if (!canAccessApprovals) {
     redirect("/dashboard");
   }
 
