@@ -153,9 +153,11 @@ export async function GET(req: NextRequest) {
     );
     const avgLeaveDaysPerEmployee =
       totalEmployees > 0 ? totalLeaveDays / totalEmployees : 0;
-    const teamUtilization = Math.min(
-      Math.round((avgLeaveDaysPerEmployee / 24) * 100),
-      100
+    // Fixed: Team utilization should be inverse of leave usage
+    // Higher leave usage = lower team availability
+    const teamUtilization = Math.max(
+      100 - Math.min(Math.round((avgLeaveDaysPerEmployee / 24) * 100), 100),
+      0
     ); // Assuming 24 days per year average
 
     // Daily target (assuming 10 requests per day target)
