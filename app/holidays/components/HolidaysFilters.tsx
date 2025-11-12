@@ -40,7 +40,7 @@ export function HolidaysFilters({
       {/* Primary Controls: Search and Year */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-muted-foreground" aria-hidden="true" />
           <Input
             placeholder="Search holidays..."
             value={filters.searchQuery}
@@ -76,7 +76,7 @@ export function HolidaysFilters({
             onClick={() => onFiltersChange({ showPast: !filters.showPast })}
             className={`gap-2 ${filters.showPast ? 'bg-primary text-primary-foreground shadow-md' : ''}`}
           >
-            <Calendar className="w-4 h-4" />
+            <Calendar className="size-4" aria-hidden="true" />
             <span className="hidden sm:inline">
               {filters.showPast ? "All Dates" : "Upcoming"}
             </span>
@@ -94,9 +94,9 @@ export function HolidaysFilters({
             className={`gap-2 ${filters.showOptional ? 'bg-primary text-primary-foreground shadow-md' : ''}`}
           >
             {filters.showOptional ? (
-              <Eye className="w-4 h-4" />
+              <Eye className="size-4" aria-hidden="true" />
             ) : (
-              <EyeOff className="w-4 h-4" />
+              <EyeOff className="size-4" aria-hidden="true" />
             )}
             <span className="hidden sm:inline">Optional</span>
           </Button>
@@ -109,7 +109,7 @@ export function HolidaysFilters({
             onClick={onClearFilters}
             className="gap-2 text-muted-foreground hover:text-foreground"
           >
-            <X className="w-4 h-4" />
+            <X className="size-4" aria-hidden="true" />
             <span className="hidden sm:inline">Clear</span>
           </Button>
         )}

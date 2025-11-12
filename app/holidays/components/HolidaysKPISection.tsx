@@ -50,25 +50,25 @@ export function HolidaysKPISection({ stats }: HolidaysKPISectionProps) {
       label: "Total Holidays",
       value: stats.total,
       helper: "This year",
-      icon: <Calendar className="w-4 h-4" />,
+      icon: <Calendar className="size-4" aria-hidden="true" />,
     },
     {
       label: "Upcoming",
       value: stats.upcoming,
       helper: "Holidays ahead",
-      icon: <CalendarDays className="w-4 h-4" />,
+      icon: <CalendarDays className="size-4" aria-hidden="true" />,
     },
     {
       label: "Mandatory",
       value: stats.mandatory,
       helper: "Required holidays",
-      icon: <Clock className="w-4 h-4" />,
+      icon: <Clock className="size-4" aria-hidden="true" />,
     },
     {
       label: "Optional",
       value: stats.optional,
       helper: "Choose to observe",
-      icon: <Star className="w-4 h-4" />,
+      icon: <Star className="size-4" aria-hidden="true" />,
     },
   ];
 
