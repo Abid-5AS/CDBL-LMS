@@ -18,7 +18,7 @@ type EmptyStateProps = {
   className?: string;
 };
 
-export function EmptyState({
+export const EmptyState = React.memo(function EmptyState({
   icon: Icon,
   iconClassName,
   title,
@@ -70,5 +70,5 @@ export function EmptyState({
       )}
     </div>
   );
-}
+});
 
