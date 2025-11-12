@@ -17,6 +17,8 @@ interface ApprovalActionButtonsProps {
   ceoMode?: boolean;
   /** Show employee mode (cancel only) */
   employeeMode?: boolean;
+  /** Button size variant */
+  size?: "default" | "sm";
   className?: string;
 }
 
@@ -30,22 +32,26 @@ export function ApprovalActionButtons({
   loadingAction = null,
   ceoMode = false,
   employeeMode = false,
+  size = "default",
   className = "",
 }: ApprovalActionButtonsProps) {
+  const buttonSize = size === "sm" ? "h-9 w-9" : "h-12 w-12";
+  const iconSize = size === "sm" ? "h-4 w-4" : "h-5 w-5";
+  const gap = size === "sm" ? "gap-1.5" : "gap-2";
   // Employee: Only cancel
   if (employeeMode) {
     return (
-      <div className={`flex items-center gap-2 ${className}`}>
+      <div className={`flex items-center ${gap} ${className}`}>
         {onCancel && (
           <Button
             size="icon"
             variant="ghost"
             onClick={onCancel}
             disabled={disabled || loading}
-            className="group h-12 w-12 rounded-2xl border border-border hover:border-destructive transition-colors"
+            className={`group ${buttonSize} rounded-2xl border border-border hover:border-destructive transition-colors`}
             title="Cancel Request"
           >
-            <X className="h-5 w-5 text-destructive group-hover:text-destructive transition-colors" />
+            <X className={`${iconSize} text-destructive group-hover:text-destructive transition-colors`} />
           </Button>
         )}
       </div>
@@ -55,17 +61,17 @@ export function ApprovalActionButtons({
   // CEO: Approve + Cancel
   if (ceoMode) {
     return (
-      <div className={`flex items-center gap-2 ${className}`}>
+      <div className={`flex items-center ${gap} ${className}`}>
         {onApprove && (
           <Button
             size="icon"
             variant="ghost"
             onClick={onApprove}
             disabled={disabled || loading}
-            className="group h-12 w-12 rounded-2xl border border-border hover:border-success transition-colors"
+            className={`group ${buttonSize} rounded-2xl border border-border hover:border-success transition-colors`}
             title="Approve"
           >
-            <Check className="h-5 w-5 text-success group-hover:text-success transition-colors" />
+            <Check className={`${iconSize} text-success group-hover:text-success transition-colors`} />
           </Button>
         )}
         {onCancel && (
@@ -74,10 +80,10 @@ export function ApprovalActionButtons({
             variant="ghost"
             onClick={onCancel}
             disabled={disabled || loading}
-            className="group h-12 w-12 rounded-2xl border border-border hover:border-destructive transition-colors"
+            className={`group ${buttonSize} rounded-2xl border border-border hover:border-destructive transition-colors`}
             title="Cancel Request"
           >
-            <X className="h-5 w-5 text-destructive group-hover:text-destructive transition-colors" />
+            <X className={`${iconSize} text-destructive group-hover:text-destructive transition-colors`} />
           </Button>
         )}
       </div>
@@ -86,20 +92,20 @@ export function ApprovalActionButtons({
 
   // All other roles (DEPT_HEAD, HR_ADMIN, HR_HEAD): Forward, Return, Cancel
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
+    <div className={`flex items-center ${gap} ${className}`}>
       {onForward && (
         <Button
           size="icon"
           variant="ghost"
           onClick={onForward}
           disabled={disabled || loading}
-          className="group h-12 w-12 rounded-2xl border border-border hover:border-primary transition-colors"
+          className={`group ${buttonSize} rounded-2xl border border-border hover:border-primary transition-colors`}
           title="Forward to Next Stage"
         >
           {loadingAction === "forward" ? (
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            <div className={`${iconSize} animate-spin rounded-full border-2 border-primary border-t-transparent`} />
           ) : (
-            <ArrowRight className="h-5 w-5 text-primary group-hover:text-primary transition-colors" />
+            <ArrowRight className={`${iconSize} text-primary group-hover:text-primary transition-colors`} />
           )}
         </Button>
       )}
@@ -109,13 +115,13 @@ export function ApprovalActionButtons({
           variant="ghost"
           onClick={onReturn}
           disabled={disabled || loading}
-          className="group h-12 w-12 rounded-2xl border border-border hover:border-warning transition-colors"
+          className={`group ${buttonSize} rounded-2xl border border-border hover:border-warning transition-colors`}
           title="Return for Modification"
         >
           {loadingAction === "return" ? (
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-warning border-t-transparent" />
+            <div className={`${iconSize} animate-spin rounded-full border-2 border-warning border-t-transparent`} />
           ) : (
-            <RotateCcw className="h-5 w-5 text-warning group-hover:text-warning transition-colors" />
+            <RotateCcw className={`${iconSize} text-warning group-hover:text-warning transition-colors`} />
           )}
         </Button>
       )}
@@ -125,13 +131,13 @@ export function ApprovalActionButtons({
           variant="ghost"
           onClick={onCancel}
           disabled={disabled || loading}
-          className="group h-12 w-12 rounded-2xl border border-border hover:border-destructive transition-colors"
+          className={`group ${buttonSize} rounded-2xl border border-border hover:border-destructive transition-colors`}
           title="Cancel Request"
         >
           {loadingAction === "cancel" ? (
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-destructive border-t-transparent" />
+            <div className={`${iconSize} animate-spin rounded-full border-2 border-destructive border-t-transparent`} />
           ) : (
-            <X className="h-5 w-5 text-destructive group-hover:text-destructive transition-colors" />
+            <X className={`${iconSize} text-destructive group-hover:text-destructive transition-colors`} />
           )}
         </Button>
       )}

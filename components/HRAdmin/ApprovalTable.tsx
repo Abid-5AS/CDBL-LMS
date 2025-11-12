@@ -269,8 +269,9 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         </Card>
       ) : (
             <ModernTable>
+              <ModernTable.Header>
                 <ModernTable.Row>
-                  <ModernTable.Header className="w-12">
+                  <ModernTable.Head className="w-12">
                     <Checkbox
                       checked={allSelected}
                       onCheckedChange={(checked) =>
@@ -283,15 +284,16 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                           : ""
                       }
                     />
-                  </ModernTable.Header>
-                  <ModernTable.Header>Employee</ModernTable.Header>
-                  <ModernTable.Header>Type</ModernTable.Header>
-                  <ModernTable.Header>Dates</ModernTable.Header>
-                  <ModernTable.Header>Days</ModernTable.Header>
-                  <ModernTable.Header>Reason</ModernTable.Header>
-                  <ModernTable.Header>Stage</ModernTable.Header>
-                  <ModernTable.Header className="text-right">Actions</ModernTable.Header>
+                  </ModernTable.Head>
+                  <ModernTable.Head>Employee</ModernTable.Head>
+                  <ModernTable.Head>Type</ModernTable.Head>
+                  <ModernTable.Head>Dates</ModernTable.Head>
+                  <ModernTable.Head>Days</ModernTable.Head>
+                  <ModernTable.Head>Reason</ModernTable.Head>
+                  <ModernTable.Head>Stage</ModernTable.Head>
+                  <ModernTable.Head className="text-right">Actions</ModernTable.Head>
                 </ModernTable.Row>
+              </ModernTable.Header>
               <ModernTable.Body>
                 {items.map((item) => {
                   const start = formatDate(item.start);

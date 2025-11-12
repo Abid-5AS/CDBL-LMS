@@ -261,6 +261,10 @@ export function PendingLeaveRequestsTable({
     <TooltipProvider>
       <div className="glass-card rounded-2xl overflow-hidden backdrop-blur-lg bg-bg-primary/60 border border-bg-muted shadow-lg">
         <div className="space-y-4 p-6">
+          {/* Header with Title and Export Button */}
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">Pending Leave Requests</h3>
+          </div>
           {/* Tab Chips */}
           <div className="flex gap-2 overflow-x-auto scrollbar-hide">
             {STATUS_TABS.map((tab) => (
@@ -313,29 +317,29 @@ export function PendingLeaveRequestsTable({
           ) : (
             <>
               {/* Desktop Table View */}
-              <div className="hidden md:block relative overflow-y-auto overflow-x-hidden max-h-[450px] border border-bg-muted rounded-xl nice-scrollbars">
+              <div className="hidden md:block relative overflow-y-auto max-h-[600px] nice-scrollbars">
                 <Table
                   aria-label="Pending leave requests table"
-                  className="w-full table-fixed"
+                  className="w-full table-auto"
                 >
                   <TableHeader className="sticky top-0 z-10 bg-bg-primary/80 backdrop-blur-sm border-b border-bg-muted">
                     <TableRow className="hover:bg-transparent">
-                      <TableHead className="w-[25%] font-semibold text-xs text-muted-foreground uppercase tracking-wider">
+                      <TableHead className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">
                         Employee
                       </TableHead>
-                      <TableHead className="w-[15%] font-semibold text-xs text-muted-foreground uppercase tracking-wider">
+                      <TableHead className="hidden sm:table-cell font-semibold text-xs text-muted-foreground uppercase tracking-wider">
                         Type
                       </TableHead>
-                      <TableHead className="w-[20%] font-semibold text-xs text-muted-foreground uppercase tracking-wider">
+                      <TableHead className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">
                         Dates
                       </TableHead>
-                      <TableHead className="w-[10%] font-semibold text-xs text-muted-foreground uppercase tracking-wider">
+                      <TableHead className="hidden lg:table-cell font-semibold text-xs text-muted-foreground uppercase tracking-wider">
                         Days
                       </TableHead>
-                      <TableHead className="w-[15%] font-semibold text-xs text-muted-foreground uppercase tracking-wider">
+                      <TableHead className="hidden xl:table-cell font-semibold text-xs text-muted-foreground uppercase tracking-wider">
                         Status
                       </TableHead>
-                      <TableHead className="w-[15%] text-right font-semibold text-xs text-muted-foreground uppercase tracking-wider">
+                      <TableHead className="w-[140px] text-right font-semibold text-xs text-muted-foreground uppercase tracking-wider">
                         Actions
                       </TableHead>
                     </TableRow>
@@ -362,16 +366,27 @@ export function PendingLeaveRequestsTable({
                                   <User className="h-4 w-4 text-text-inverted" />
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                  <p className="truncate font-medium text-sm">
-                                    {leave.requester.name}
-                                  </p>
+                                  <div className="flex items-center gap-2">
+                                    <p className="truncate font-medium text-sm">
+                                      {leave.requester.name}
+                                    </p>
+                                    <Badge
+                                      variant="outline"
+                                      className={cn(
+                                        "sm:hidden font-medium text-xs whitespace-nowrap",
+                                        getLeaveTypeColor(leave.type)
+                                      )}
+                                    >
+                                      {leaveTypeLabel[leave.type] ?? leave.type}
+                                    </Badge>
+                                  </div>
                                   <p className="truncate text-xs text-muted-foreground">
                                     {leave.requester.email}
                                   </p>
                                 </div>
                               </div>
                             </TableCell>
-                            <TableCell className="py-4">
+                            <TableCell className="hidden sm:table-cell py-4">
                               <Badge
                                 variant="outline"
                                 className={cn(
@@ -385,13 +400,21 @@ export function PendingLeaveRequestsTable({
                             <TableCell className="py-4">
                               <div className="flex items-center gap-2 text-sm">
                                 <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                                <span className="text-xs text-muted-foreground truncate">
-                                  {formatDate(leave.startDate)} →{" "}
-                                  {formatDate(leave.endDate)}
-                                </span>
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-1">
+                                  <span className="text-xs text-muted-foreground">
+                                    {formatDate(leave.startDate)}
+                                  </span>
+                                  <span className="hidden sm:inline text-muted-foreground">→</span>
+                                  <span className="text-xs text-muted-foreground">
+                                    {formatDate(leave.endDate)}
+                                  </span>
+                                  <span className="sm:hidden text-xs font-medium text-foreground">
+                                    ({leave.workingDays}d)
+                                  </span>
+                                </div>
                               </div>
                             </TableCell>
-                            <TableCell className="py-4">
+                            <TableCell className="hidden lg:table-cell py-4">
                               <div className="flex items-center gap-2">
                                 <Clock className="h-3.5 w-3.5 text-muted-foreground" />
                                 <span className="text-sm font-medium">
@@ -399,7 +422,7 @@ export function PendingLeaveRequestsTable({
                                 </span>
                               </div>
                             </TableCell>
-                            <TableCell className="py-4">
+                            <TableCell className="hidden xl:table-cell py-4">
                               <StatusBadge status={leave.status} />
                             </TableCell>
                             <TableCell className="py-4">
@@ -410,6 +433,7 @@ export function PendingLeaveRequestsTable({
                                 {(leave.status === "PENDING" ||
                                   leave.status === "SUBMITTED") && (
                                   <ApprovalActionButtons
+                                    size="sm"
                                     onForward={() => handleForward(leave)}
                                     onReturn={() =>
                                       handleQuickAction(leave, "return")
