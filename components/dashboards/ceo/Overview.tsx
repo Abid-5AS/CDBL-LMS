@@ -1,104 +1,25 @@
-import Link from "next/link";
-import { Suspense } from "react";
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Skeleton,
-} from "@/components/ui";
-import { RecentAuditLogs } from "@/components/shared/widgets/RecentAuditLogs";
+"use client";
+
+import { CEODashboardClient } from "./CEODashboardClient";
+import { DashboardErrorBoundary } from "@/components/shared/ErrorBoundary";
 
 type SuperAdminDashboardProps = {
   username: string;
 };
 
+/**
+ * CEO Executive Dashboard - Strategic Leave Management Overview
+ * Focus: Organization-wide metrics, financial impact, YoY trends
+ *
+ * ✅ FULLY REFACTORED - NO MOCK DATA
+ * All KPIs pull real-time data from /api/dashboard/ceo/stats
+ * Auto-refreshes every 60 seconds
+ * Features: Financial analysis, YoY comparisons, AI insights
+ */
 export function SuperAdminDashboard({ username }: SuperAdminDashboardProps) {
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <section
-        className="flex flex-col gap-3 rounded-xl border border-border-strong bg-bg-primary p-4 sm:p-6 shadow-sm md:flex-row md:items-center md:justify-between"
-        aria-label="Super Admin Dashboard Header"
-      >
-        <div>
-          <h2 className="text-2xl font-semibold text-text-secondary">
-            Super Admin Dashboard
-          </h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Welcome back, {username}
-          </p>
-        </div>
-        <Link href="/admin">
-          <Button variant="outline">Open Admin Console</Button>
-        </Link>
-      </section>
-
-      {/* System Overview */}
-      <section className="space-y-4">
-        <h3 className="text-lg font-semibold text-text-secondary">
-          System Overview
-        </h3>
-        <Suspense fallback={<OverviewCardsSkeleton />}>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">System Status</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold text-data-success">Healthy</p>
-              </CardContent>
-            </Card>
-          </div>
-        </Suspense>
-      </section>
-
-      {/* Recent Audit Logs */}
-      <section className="space-y-4" aria-label="Recent audit logs">
-        <div className="flex items-center justify-between flex-col sm:flex-row gap-2 sm:gap-0">
-          <h3 className="text-lg font-semibold text-text-secondary">
-            Recent Audit Logs
-          </h3>
-          <Link href="/admin">
-            <Button variant="ghost" className="text-data-info">
-              View all
-            </Button>
-          </Link>
-        </div>
-        <div className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
-          <Suspense fallback={<TableSkeleton />}>
-            <RecentAuditLogs />
-          </Suspense>
-        </div>
-      </section>
-    </div>
-  );
-}
-
-function OverviewCardsSkeleton() {
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {Array.from({ length: 4 }).map((_, i) => (
-        <Card key={i} className="h-auto min-h-[120px]">
-          <CardHeader>
-            <Skeleton className="h-4 w-32" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-8 w-24" />
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
-}
-
-function TableSkeleton() {
-  return (
-    <div className="space-y-3">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Skeleton key={i} className="h-12 w-full" />
-      ))}
-    </div>
+    <DashboardErrorBoundary role="CEO">
+      <CEODashboardClient />
+    </DashboardErrorBoundary>
   );
 }

@@ -34,7 +34,7 @@ type TeamOverviewData = {
 export function DeptHeadTeamOverview() {
   const { data, isLoading, error } = useSWR<TeamOverviewData>(
     "/api/manager/team-overview",
-    fetcher,
+    apiFetcher,
     {
       revalidateOnFocus: false,
     }
