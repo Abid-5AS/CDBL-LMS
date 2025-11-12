@@ -62,7 +62,7 @@ export function DeptHeadDashboardWrapper() {
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center shrink-0">
-                <ClipboardList className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                <ClipboardList className="size-5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
               </div>
               <div className="min-w-0">
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">
@@ -78,7 +78,7 @@ export function DeptHeadDashboardWrapper() {
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/20 flex items-center justify-center shrink-0">
-                <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                <CheckCircle className="size-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
               </div>
               <div className="min-w-0">
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">
@@ -94,7 +94,7 @@ export function DeptHeadDashboardWrapper() {
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center shrink-0">
-                <RotateCcw className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                <RotateCcw className="size-5 text-purple-600 dark:text-purple-400" aria-hidden="true" />
               </div>
               <div className="min-w-0">
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">
@@ -110,7 +110,7 @@ export function DeptHeadDashboardWrapper() {
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-slate-100 dark:bg-slate-900/20 flex items-center justify-center shrink-0">
-                <XCircle className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                <XCircle className="size-5 text-slate-600 dark:text-slate-400" aria-hidden="true" />
               </div>
               <div className="min-w-0">
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">

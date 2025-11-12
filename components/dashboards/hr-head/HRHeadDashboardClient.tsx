@@ -69,7 +69,7 @@ export function HRHeadDashboardClient() {
   if (error) {
     return (
       <div className="rounded-2xl border border-data-error/20 bg-data-error/5 p-6 text-center">
-        <AlertCircle className="h-12 w-12 mx-auto mb-3 text-data-error" />
+        <AlertCircle className="size-12 mx-auto mb-3 text-data-error" aria-hidden="true" />
         <p className="text-sm text-data-error font-medium">
           Failed to load dashboard statistics
         </p>
@@ -214,7 +214,7 @@ export function HRHeadDashboardClient() {
           <Card className="rounded-2xl">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" />
+                <TrendingUp className="size-4" aria-hidden="true" />
                 Organization Metrics
               </CardTitle>
             </CardHeader>
@@ -255,7 +255,7 @@ export function HRHeadDashboardClient() {
           <Card className="rounded-2xl">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Activity className="h-4 w-4" />
+                <Activity className="size-4" aria-hidden="true" />
                 Recent Activity
               </CardTitle>
             </CardHeader>

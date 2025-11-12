@@ -109,7 +109,7 @@ export function CEODashboardClient() {
   if (error) {
     return (
       <div className="rounded-2xl border border-data-error/20 bg-data-error/5 p-6 text-center">
-        <AlertCircle className="h-12 w-12 mx-auto mb-3 text-data-error" />
+        <AlertCircle className="size-12 mx-auto mb-3 text-data-error" aria-hidden="true" />
         <p className="text-sm text-data-error font-medium">
           Failed to load executive dashboard
         </p>
@@ -199,7 +199,7 @@ export function CEODashboardClient() {
             <Card className="rounded-2xl">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
+                  <DollarSign className="size-4" aria-hidden="true" />
                   Financial Impact
                 </CardTitle>
               </CardHeader>
@@ -232,7 +232,7 @@ export function CEODashboardClient() {
             <Card className="rounded-2xl">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
+                  <TrendingUp className="size-4" aria-hidden="true" />
                   Year-over-Year Growth
                 </CardTitle>
               </CardHeader>
@@ -276,7 +276,7 @@ export function CEODashboardClient() {
             <Card className="rounded-2xl">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Target className="h-4 w-4" />
+                  <Target className="size-4" aria-hidden="true" />
                   System Health
                 </CardTitle>
               </CardHeader>
@@ -402,7 +402,7 @@ export function CEODashboardClient() {
             <Card className="rounded-2xl">
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-data-info" />
+                  <Sparkles className="size-4 text-data-info" aria-hidden="true" />
                   AI Insights
                 </CardTitle>
               </CardHeader>
@@ -421,13 +421,13 @@ export function CEODashboardClient() {
                   >
                     <div className="flex gap-2">
                       {insight.type === "warning" && (
-                        <AlertCircle className="h-4 w-4 text-data-warning flex-shrink-0 mt-0.5" />
+                        <AlertCircle className="size-4 text-data-warning flex-shrink-0 mt-0.5" aria-hidden="true" />
                       )}
                       {insight.type === "success" && (
-                        <CheckCircle2 className="h-4 w-4 text-data-success flex-shrink-0 mt-0.5" />
+                        <CheckCircle2 className="size-4 text-data-success flex-shrink-0 mt-0.5" aria-hidden="true" />
                       )}
                       {insight.type === "info" && (
-                        <Sparkles className="h-4 w-4 text-data-info flex-shrink-0 mt-0.5" />
+                        <Sparkles className="size-4 text-data-info flex-shrink-0 mt-0.5" aria-hidden="true" />
                       )}
                       <p className="text-xs leading-relaxed">{insight.message}</p>
                     </div>
@@ -441,7 +441,7 @@ export function CEODashboardClient() {
           <Card className="rounded-2xl">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Briefcase className="h-4 w-4" />
+                <Briefcase className="size-4" aria-hidden="true" />
                 Executive Summary
               </CardTitle>
             </CardHeader>

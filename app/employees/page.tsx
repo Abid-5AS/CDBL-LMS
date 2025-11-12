@@ -36,7 +36,7 @@ async function EmployeesPageContent() {
           {canCreate && (
             <Button asChild>
               <Link href="/admin">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="size-4 mr-2" aria-hidden="true" />
                 Add Employee
               </Link>
             </Button>
