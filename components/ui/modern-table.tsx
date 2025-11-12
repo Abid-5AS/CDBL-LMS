@@ -24,20 +24,20 @@ export const TableRowActionsDropdown = () => (
     <DropdownMenuTrigger asChild>
       <Button variant="ghost" className="h-8 w-8 p-0">
         <span className="sr-only">Open menu</span>
-        <MoreHorizontal className="h-4 w-4" />
+        <MoreHorizontal className="size-4" aria-hidden="true" />
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end">
       <DropdownMenuItem>
-        <Edit className="mr-2 h-4 w-4" />
+        <Edit className="mr-2 size-4" aria-hidden="true" />
         <span>Edit</span>
       </DropdownMenuItem>
       <DropdownMenuItem>
-        <Copy className="mr-2 h-4 w-4" />
+        <Copy className="mr-2 size-4" aria-hidden="true" />
         <span>Copy link</span>
       </DropdownMenuItem>
       <DropdownMenuItem className="text-destructive">
-        <Trash2 className="mr-2 h-4 w-4" />
+        <Trash2 className="mr-2 size-4" aria-hidden="true" />
         <span>Delete</span>
       </DropdownMenuItem>
     </DropdownMenuContent>
@@ -202,18 +202,22 @@ const ModernTableHeader = ({
     >
       {enableSelection ? (
         <tr>
-          <th className={cn(
-            "relative py-2 pr-0 pl-4",
-            size === "sm" ? "w-9 md:pl-5" : "w-11 md:pl-6"
-          )}>
+          <th
+            scope="col"
+            className={cn(
+              "relative py-2 pr-0 pl-4",
+              size === "sm" ? "w-9 md:pl-5" : "w-11 md:pl-6"
+            )}
+          >
             <div className="flex items-start">
-              <Checkbox 
+              <Checkbox
                 checked={isAllSelected}
                 // @ts-ignore - Radix checkbox supports indeterminate
                 ref={(el: any) => {
                   if (el) el.indeterminate = isIndeterminate;
                 }}
                 onCheckedChange={onSelectAll}
+                aria-label="Select all rows"
               />
             </div>
           </th>
@@ -235,19 +239,20 @@ interface ModernTableHeadProps extends ThHTMLAttributes<HTMLTableCellElement> {
   onSort?: () => void;
 }
 
-const ModernTableHead = ({ 
-  className, 
-  tooltip, 
-  label, 
+const ModernTableHead = ({
+  className,
+  tooltip,
+  label,
   sortable = false,
   sortDirection = null,
   onSort,
-  children, 
-  ...props 
+  children,
+  ...props
 }: ModernTableHeadProps) => {
   return (
     <th
       {...props}
+      scope="col"
       className={cn(
         "relative p-0 px-6 py-2 text-left outline-none",
         sortable && "cursor-pointer hover:bg-bg-tertiary/50",
@@ -268,7 +273,7 @@ const ModernTableHead = ({
         {tooltip && (
           <Tooltip>
             <TooltipTrigger className="cursor-pointer text-text-quaternary transition duration-100 ease-linear hover:text-text-primary">
-              <HelpCircle className="size-4" />
+              <HelpCircle className="size-4" aria-hidden="true" />
             </TooltipTrigger>
             <TooltipContent>
               {tooltip}
@@ -278,11 +283,11 @@ const ModernTableHead = ({
 
         {sortable && (
           sortDirection === 'asc' ? (
-            <ArrowDown className="size-3 stroke-[3px] text-text-quaternary rotate-180" />
+            <ArrowDown className="size-3 stroke-[3px] text-text-quaternary rotate-180" aria-hidden="true" />
           ) : sortDirection === 'desc' ? (
-            <ArrowDown className="size-3 stroke-[3px] text-text-quaternary" />
+            <ArrowDown className="size-3 stroke-[3px] text-text-quaternary" aria-hidden="true" />
           ) : (
-            <ChevronUp className="size-3 stroke-[3px] text-text-quaternary" />
+            <ChevronUp className="size-3 stroke-[3px] text-text-quaternary" aria-hidden="true" />
           )
         )}
       </div>
@@ -329,11 +334,12 @@ const ModernTableRow = ({
           size === "sm" ? "md:pl-5" : "md:pl-6"
         )}>
           <div className="flex items-center">
-            <Checkbox 
+            <Checkbox
               checked={isSelected}
-              onCheckedChange={(checked) => 
+              onCheckedChange={(checked) =>
                 onSelectionChange?.(rowId, !!checked)
               }
+              aria-label={`Select row ${rowId}`}
             />
           </div>
         </td>
