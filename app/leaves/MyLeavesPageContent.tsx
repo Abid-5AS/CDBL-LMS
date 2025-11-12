@@ -80,7 +80,7 @@ const LEAVE_TAB_ITEMS = [
   {
     id: "all",
     title: "All",
-    color: "bg-slate-500 hover:bg-slate-600",
+    color: "bg-slate-500 hover:bg-slate-600 dark:bg-slate-600 dark:hover:bg-slate-500",
     cardContent: (
       <div className="p-6 h-full flex flex-col justify-center">
         <div className="space-y-2">
@@ -95,7 +95,7 @@ const LEAVE_TAB_ITEMS = [
   {
     id: "pending",
     title: "Pending",
-    color: "bg-amber-500 hover:bg-amber-600",
+    color: "bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600",
     cardContent: (
       <div className="p-6 h-full flex flex-col justify-center">
         <div className="space-y-2">
@@ -110,7 +110,7 @@ const LEAVE_TAB_ITEMS = [
   {
     id: "approved",
     title: "Approved",
-    color: "bg-emerald-500 hover:bg-emerald-600",
+    color: "bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600",
     cardContent: (
       <div className="p-6 h-full flex flex-col justify-center">
         <div className="space-y-2">
@@ -125,7 +125,7 @@ const LEAVE_TAB_ITEMS = [
   {
     id: "rejected",
     title: "Rejected",
-    color: "bg-red-500 hover:bg-red-600",
+    color: "bg-rose-600 hover:bg-rose-700 dark:bg-rose-500 dark:hover:bg-rose-600",
     cardContent: (
       <div className="p-6 h-full flex flex-col justify-center">
         <div className="space-y-2">
