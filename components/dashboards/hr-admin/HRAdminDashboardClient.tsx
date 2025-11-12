@@ -73,7 +73,7 @@ export function HRAdminDashboardClient() {
   if (error) {
     return (
       <div className="rounded-2xl border border-data-error/20 bg-data-error/5 p-6 text-center">
-        <AlertCircle className="h-12 w-12 mx-auto mb-3 text-data-error" />
+        <AlertCircle className="size-12 mx-auto mb-3 text-data-error" aria-hidden="true" />
         <p className="text-sm text-data-error font-medium">
           Failed to load dashboard statistics
         </p>
@@ -142,7 +142,7 @@ export function HRAdminDashboardClient() {
             <Card className="rounded-2xl">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Target className="h-4 w-4" />
+                  <Target className="size-4" aria-hidden="true" />
                   Daily Processing
                 </CardTitle>
               </CardHeader>
@@ -165,7 +165,7 @@ export function HRAdminDashboardClient() {
                 <Progress value={stats?.dailyProgress || 0} className="h-2" />
                 {stats && stats.dailyProgress >= 100 && (
                   <p className="text-xs text-data-success flex items-center gap-1">
-                    <CheckCircle2 className="h-3 w-3" />
+                    <CheckCircle2 className="size-3" aria-hidden="true" />
                     Target achieved!
                   </p>
                 )}
@@ -239,7 +239,7 @@ export function HRAdminDashboardClient() {
           <Card className="rounded-2xl">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <FileText className="h-4 w-4" />
+                <FileText className="size-4" aria-hidden="true" />
                 Quick Stats
               </CardTitle>
             </CardHeader>

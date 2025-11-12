@@ -226,7 +226,7 @@ export function PendingLeaveRequestsTable({
   if (isLoading) {
     return (
       <div className="glass-card rounded-2xl p-12 text-center text-sm text-muted-foreground">
-        <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        <div className="inline-block size-6 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden="true" />
         <p className="mt-2">Loading requests...</p>
       </div>
     );
@@ -285,7 +285,7 @@ export function PendingLeaveRequestsTable({
 
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" aria-hidden="true" />
             <Input
               type="search"
               placeholder="Search by employee, type, or reason..."
@@ -297,8 +297,9 @@ export function PendingLeaveRequestsTable({
               <button
                 onClick={() => setSearchInput("")}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                aria-label="Clear search"
               >
-                <X className="h-4 w-4" />
+                <X className="size-4" aria-hidden="true" />
               </button>
             )}
           </div>
@@ -363,7 +364,7 @@ export function PendingLeaveRequestsTable({
                             <TableCell className="py-4">
                               <div className="flex items-center gap-3">
                                 <div className="rounded-full bg-gradient-to-br from-card-action to-card-summary p-2">
-                                  <User className="h-4 w-4 text-text-inverted" />
+                                  <User className="size-4 text-text-inverted" aria-hidden="true" />
                                 </div>
                                 <div className="min-w-0 flex-1">
                                   <div className="flex items-center gap-2">
@@ -399,7 +400,7 @@ export function PendingLeaveRequestsTable({
                             </TableCell>
                             <TableCell className="py-4">
                               <div className="flex items-center gap-2 text-sm">
-                                <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                                <Calendar className="size-3.5 text-muted-foreground shrink-0" aria-hidden="true" />
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:gap-1">
                                   <span className="text-xs text-muted-foreground">
                                     {formatDate(leave.startDate)}
@@ -416,7 +417,7 @@ export function PendingLeaveRequestsTable({
                             </TableCell>
                             <TableCell className="hidden lg:table-cell py-4">
                               <div className="flex items-center gap-2">
-                                <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                                <Clock className="size-3.5 text-muted-foreground" aria-hidden="true" />
                                 <span className="text-sm font-medium">
                                   {leave.workingDays}
                                 </span>
@@ -478,7 +479,7 @@ export function PendingLeaveRequestsTable({
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-3">
                             <div className="rounded-full bg-gradient-to-br from-card-action to-card-summary p-2">
-                              <User className="h-4 w-4 text-text-inverted" />
+                              <User className="size-4 text-text-inverted" aria-hidden="true" />
                             </div>
                             <div>
                               <p className="font-medium text-sm">
@@ -504,13 +505,13 @@ export function PendingLeaveRequestsTable({
                               {leaveTypeLabel[leave.type] ?? leave.type}
                             </Badge>
                             <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                              <Clock className="h-3 w-3" />
+                              <Clock className="size-3" aria-hidden="true" />
                               <span>{leave.workingDays} days</span>
                             </div>
                           </div>
 
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <Calendar className="h-3 w-3 shrink-0" />
+                            <Calendar className="size-3 shrink-0" aria-hidden="true" />
                             <span className="truncate">
                               {formatDate(leave.startDate)} →{" "}
                               {formatDate(leave.endDate)}
@@ -532,9 +533,9 @@ export function PendingLeaveRequestsTable({
                               disabled={isProcessingThis}
                             >
                               {isProcessingThis ? (
-                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                <Loader2 className="size-4 mr-2 animate-spin" aria-hidden="true" />
                               ) : (
-                                <ArrowRight className="h-4 w-4 mr-2" />
+                                <ArrowRight className="size-4 mr-2" aria-hidden="true" />
                               )}
                               Forward
                             </Button>
@@ -544,7 +545,7 @@ export function PendingLeaveRequestsTable({
                               className="flex-1 text-data-warning border-data-warning hover:bg-data-warning"
                               onClick={() => handleQuickAction(leave, "return")}
                             >
-                              <RotateCcw className="h-4 w-4 mr-2" />
+                              <RotateCcw className="size-4 mr-2" aria-hidden="true" />
                               Return
                             </Button>
                           </div>

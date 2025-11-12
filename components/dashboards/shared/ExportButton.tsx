@@ -204,9 +204,9 @@ export function ExportButton({
           disabled={isExporting || data.length === 0}
         >
           {isExporting ? (
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            <Loader2 className="size-4 mr-2 animate-spin" aria-hidden="true" />
           ) : (
-            <Download className="h-4 w-4 mr-2" />
+            <Download className="size-4 mr-2" aria-hidden="true" />
           )}
           Export
         </Button>
@@ -220,7 +220,7 @@ export function ExportButton({
             onClick={() => handleExport("csv")}
             disabled={isExporting}
           >
-            <FileSpreadsheet className="h-4 w-4 mr-2" />
+            <FileSpreadsheet className="size-4 mr-2" aria-hidden="true" />
             Export as CSV
           </DropdownMenuItem>
         )}
@@ -230,7 +230,7 @@ export function ExportButton({
             onClick={() => handleExport("pdf")}
             disabled={isExporting}
           >
-            <FileText className="h-4 w-4 mr-2" />
+            <FileText className="size-4 mr-2" aria-hidden="true" />
             Export as PDF
           </DropdownMenuItem>
         )}
@@ -240,7 +240,7 @@ export function ExportButton({
             onClick={() => handleExport("json")}
             disabled={isExporting}
           >
-            <FileText className="h-4 w-4 mr-2" />
+            <FileText className="size-4 mr-2" aria-hidden="true" />
             Export as JSON
           </DropdownMenuItem>
         )}
@@ -308,9 +308,9 @@ export function ExportCSVButton({
       disabled={isExporting || data.length === 0}
     >
       {isExporting ? (
-        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+        <Loader2 className="size-4 mr-2 animate-spin" aria-hidden="true" />
       ) : (
-        <FileSpreadsheet className="h-4 w-4 mr-2" />
+        <FileSpreadsheet className="size-4 mr-2" aria-hidden="true" />
       )}
       Export CSV
     </Button>

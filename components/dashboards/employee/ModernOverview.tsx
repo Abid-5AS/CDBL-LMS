@@ -153,7 +153,7 @@ function FloatingQuickActions({ actions }: { actions: FloatingAction[] }) {
                   action.accent
                 )}
               >
-                <Icon className="h-5 w-5" />
+                <Icon className="size-5" aria-hidden="true" />
               </span>
               <div className="pointer-events-none absolute right-full mr-3 hidden min-w-[180px] rounded-2xl border border-border bg-card/95 px-3 py-2 text-left text-xs text-muted-foreground shadow-lg group-hover:block">
                 <p className="font-semibold text-foreground">{action.label}</p>
@@ -180,7 +180,7 @@ function FloatingQuickActions({ actions }: { actions: FloatingAction[] }) {
                     action.accent
                   )}
                 >
-                  <Icon className="h-3.5 w-3.5" />
+                  <Icon className="size-3.5" aria-hidden="true" />
                 </span>
                 <span>{action.label}</span>
               </button>
@@ -556,7 +556,7 @@ export function ModernEmployeeDashboard({
               <CardContent>
                 {dashboardData.actionItems.length === 0 ? (
                   <div className="text-center py-8">
-                    <CheckCircle2 className="w-12 h-12 mx-auto text-green-500 mb-3" />
+                    <CheckCircle2 className="size-12 mx-auto text-green-500 mb-3" aria-hidden="true" />
                     <p className="text-sm font-medium text-slate-900 dark:text-white mb-1">
                       All Clear!
                     </p>
