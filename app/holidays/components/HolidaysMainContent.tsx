@@ -97,7 +97,7 @@ export function HolidaysMainContent({
                           : 'data-[state=active]:bg-background data-[state=active]:text-foreground'
                       }`}
                     >
-                      <Icon className="w-4 h-4" />
+                      <Icon className="size-4" aria-hidden="true" />
                       <span className="hidden sm:inline">{tab.label}</span>
                     </TabsTrigger>
                   );

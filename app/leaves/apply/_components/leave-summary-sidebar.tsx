@@ -52,7 +52,7 @@ export function LeaveSummarySidebar({
     <Card className="rounded-2xl border border-border bg-card shadow-lg shadow-black/5 dark:shadow-black/20 p-6 space-y-6 lg:sticky lg:top-24">
       <div>
         <h4 className="flex items-center gap-2 text-base font-semibold text-foreground mb-4 leading-6">
-          <ClipboardList className="w-4 h-4 text-primary" />
+          <ClipboardList className="size-4 text-primary" aria-hidden="true" />
           Leave Summary
         </h4>
         <div className="text-sm text-muted-foreground space-y-3 leading-6">
@@ -107,7 +107,7 @@ export function LeaveSummarySidebar({
         <>
           <div>
             <h4 className="flex items-center gap-2 text-base font-semibold text-foreground mb-4 leading-6">
-              <Wallet className="w-4 h-4 text-primary" />
+              <Wallet className="size-4 text-primary" aria-hidden="true" />
               Current Balances
             </h4>
             <div className="space-y-3 text-sm">
@@ -153,7 +153,7 @@ export function LeaveSummarySidebar({
 
       <div>
         <h4 className="flex items-center gap-2 text-base font-semibold text-foreground mb-3 leading-6">
-          <BookOpenText className="w-4 h-4 text-primary" />
+          <BookOpenText className="size-4 text-primary" aria-hidden="true" />
           Policy Highlights
         </h4>
         <ul className="list-disc pl-4 text-sm text-muted-foreground space-y-1 leading-6">

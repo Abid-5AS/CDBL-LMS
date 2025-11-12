@@ -166,8 +166,9 @@ export function HeroStrip({ name }: HeroStripProps) {
               />
             ) : (
               <ClockIcon
-                className="w-5 h-5 text-muted-foreground flex-shrink-0"
+                className="size-5 text-muted-foreground flex-shrink-0"
                 strokeWidth={2}
+                aria-hidden="true"
               />
             )}
           </div>
