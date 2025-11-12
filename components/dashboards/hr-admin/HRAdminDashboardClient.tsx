@@ -210,32 +210,14 @@ export function HRAdminDashboardClient() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Main Content - Left Side (8 columns) */}
-        <div className="lg:col-span-8 space-y-6">
-          {/* Pending Requests Table */}
-          <Card className="rounded-2xl">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Pending Leave Requests</CardTitle>
-                {!isLoading && stats && stats.pendingRequests > 0 && (
-                  <ExportButton
-                    data={[]} // Would need full data from table
-                    filename="pending-hr-requests"
-                    title="Pending Leave Requests"
-                    formats={["csv", "pdf"]}
-                    size="sm"
-                  />
-                )}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Suspense fallback={<DashboardCardSkeleton />}>
-                <PendingLeaveRequestsTable />
-              </Suspense>
-            </CardContent>
-          </Card>
+      {/* Pending Requests Table - Full Width */}
+      <Suspense fallback={<DashboardCardSkeleton />}>
+        <PendingLeaveRequestsTable />
+      </Suspense>
 
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Charts - Left Side (8 columns) */}
+        <div className="lg:col-span-8 space-y-6">
           {/* Monthly Trend Chart */}
           {!isLoading && stats && stats.monthlyTrend && stats.monthlyTrend.length > 0 && (
             <AnalyticsLineChart

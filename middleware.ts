@@ -7,7 +7,7 @@ const SECRET = process.env.JWT_SECRET || process.env.AUTH_SECRET || "dev-secret"
 const SECRET_KEY = new TextEncoder().encode(SECRET);
 
 export async function middleware(req: NextRequest) {
-  // Attach trace ID to request for error tracking (Next.js 16 middleware pattern)
+  // Attach trace ID to request for error tracking (Next.js middleware pattern)
   attachTraceId(req);
   
   const token = req.cookies.get("session_token")?.value;
