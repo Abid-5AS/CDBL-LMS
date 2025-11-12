@@ -1,6 +1,13 @@
 "use client";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { AlertCircle } from "lucide-react";
 import { formatDate } from "@/lib/utils";
@@ -25,7 +32,6 @@ type LeaveRequest = {
   };
 };
 
-
 export function CancellationRequestsPanel() {
   const { data, isLoading, error } = useSWR<{ items: LeaveRequest[] }>(
     "/api/leaves?status=CANCELLATION_REQUESTED",
@@ -35,7 +41,9 @@ export function CancellationRequestsPanel() {
     }
   );
 
-  const cancellationRequests: LeaveRequest[] = Array.isArray(data?.items) ? data.items : [];
+  const cancellationRequests: LeaveRequest[] = Array.isArray(data?.items)
+    ? data.items
+    : [];
 
   if (isLoading) {
     return (
@@ -64,7 +72,9 @@ export function CancellationRequestsPanel() {
         </div>
         <div className="p-6">
           <div className="py-8 text-center">
-            <p className="text-sm text-muted-foreground">No cancellation requests</p>
+            <p className="text-sm text-muted-foreground">
+              No cancellation requests
+            </p>
           </div>
         </div>
       </div>
@@ -103,13 +113,19 @@ export function CancellationRequestsPanel() {
                     >
                       {leave.requester.name}
                     </Link>
-                    <div className="text-xs text-muted-foreground">{leave.requester.email}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {leave.requester.email}
+                    </div>
                   </TableCell>
-                  <TableCell className="font-medium">{leaveTypeLabel[leave.type] ?? leave.type}</TableCell>
+                  <TableCell className="font-medium">
+                    {leaveTypeLabel[leave.type] ?? leave.type}
+                  </TableCell>
                   <TableCell className="hidden sm:table-cell text-text-secondary">
                     {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell text-text-secondary">{leave.workingDays}</TableCell>
+                  <TableCell className="hidden md:table-cell text-text-secondary">
+                    {leave.workingDays}
+                  </TableCell>
                   <TableCell>
                     <StatusBadge status={leave.status as any} />
                   </TableCell>
@@ -127,4 +143,3 @@ export function CancellationRequestsPanel() {
     </div>
   );
 }
-
