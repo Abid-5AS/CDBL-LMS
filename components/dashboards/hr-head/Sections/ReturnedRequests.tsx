@@ -36,7 +36,7 @@ type LeaveRequest = {
 export function ReturnedRequestsPanel() {
   const { data, isLoading, error } = useSWR<{ items: LeaveRequest[] }>(
     "/api/leaves?status=RETURNED",
-    fetcher,
+    apiFetcher,
     {
       revalidateOnFocus: true,
     }
