@@ -26,7 +26,7 @@ export function ReasonField({
         htmlFor="reason"
         className="flex items-center gap-2 text-sm font-medium leading-6"
       >
-        <MessageSquare className="w-4 h-4 text-card-action" />
+        <MessageSquare className="size-4 text-card-action" aria-hidden="true" />
         Reason <span className="text-destructive">*</span>
       </Label>
       <Textarea
@@ -57,7 +57,7 @@ export function ReasonField({
             className="text-sm text-destructive flex items-center gap-1.5"
             role="alert"
           >
-            <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            <AlertCircle className="size-3.5 shrink-0" aria-hidden="true" />
             {error}
           </p>
         ) : (

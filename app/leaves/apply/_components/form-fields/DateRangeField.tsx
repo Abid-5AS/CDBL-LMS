@@ -43,7 +43,7 @@ export function DateRangeField({
           <Tooltip>
             <TooltipTrigger asChild>
               <button type="button" className="inline-flex items-center">
-                <HelpCircle className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground transition-colors" />
+                <HelpCircle className="size-3.5 text-muted-foreground hover:text-foreground transition-colors" aria-hidden="true" />
               </button>
             </TooltipTrigger>
             <TooltipContent side="right" className="max-w-xs">
@@ -85,7 +85,7 @@ export function DateRangeField({
           role="alert"
         >
           <AlertCircle
-            className="h-3.5 w-3.5 flex-shrink-0"
+            className="size-3.5 flex-shrink-0"
             aria-hidden="true"
           />
           {rangeValidation.message}
@@ -94,7 +94,7 @@ export function DateRangeField({
       {rangeValidation?.containsNonWorking && rangeValidation.valid && (
         <div className="mt-2 rounded-lg border border-data-warning/40 bg-data-warning/10 dark:bg-data-warning/20 px-3 py-2">
           <p className="text-xs text-data-warning font-medium flex items-center gap-1.5">
-            <Info className="h-3.5 w-3.5 flex-shrink-0" />
+            <Info className="size-3.5 flex-shrink-0" aria-hidden="true" />
             {rangeValidation.message}
           </p>
         </div>
@@ -105,7 +105,7 @@ export function DateRangeField({
           role="alert"
         >
           <AlertCircle
-            className="h-3.5 w-3.5 flex-shrink-0"
+            className="size-3.5 flex-shrink-0"
             aria-hidden="true"
           />
           {errors.start || errors.end}

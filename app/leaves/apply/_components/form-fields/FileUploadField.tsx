@@ -34,13 +34,13 @@ export function FileUploadField({
           onClick={() => setShowOptionalUpload(true)}
           className="text-sm text-card-action dark:text-card-action hover:text-card-action dark:hover:text-card-action flex items-center gap-1.5 transition-colors font-medium"
         >
-          <Paperclip className="h-4 w-4" />
+          <Paperclip className="size-4" aria-hidden="true" />
           Add supporting document (optional)
         </button>
       ) : (
         <>
           <Label className="flex items-center gap-2 text-sm font-medium leading-6">
-            <Paperclip className="w-4 h-4 text-card-action" />
+            <Paperclip className="size-4 text-card-action" aria-hidden="true" />
             Supporting Document{" "}
             {requiresCertificate && <span className="text-destructive">*</span>}
           </Label>

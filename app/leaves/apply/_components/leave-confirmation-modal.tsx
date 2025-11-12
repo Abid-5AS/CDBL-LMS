@@ -79,7 +79,7 @@ export function LeaveConfirmationModal({
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="flex items-start gap-3">
                 <div className="rounded-lg bg-data-info p-2 dark:bg-data-info/30">
-                  <Calendar className="h-4 w-4 text-data-info dark:text-data-info" />
+                  <Calendar className="size-4 text-data-info dark:text-data-info" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-xs font-medium text-text-secondary dark:text-text-secondary">
@@ -93,7 +93,7 @@ export function LeaveConfirmationModal({
 
               <div className="flex items-start gap-3">
                 <div className="rounded-lg bg-data-success p-2 dark:bg-data-success/30">
-                  <Clock className="h-4 w-4 text-data-success dark:text-data-success" />
+                  <Clock className="size-4 text-data-success dark:text-data-success" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-xs font-medium text-text-secondary dark:text-text-secondary">
@@ -184,7 +184,7 @@ export function LeaveConfirmationModal({
                 Attached Document
               </h4>
               <div className="flex items-center gap-2 text-sm">
-                <FileText className="h-4 w-4 text-data-info dark:text-data-info" />
+                <FileText className="size-4 text-data-info dark:text-data-info" aria-hidden="true" />
                 <span className="text-text-secondary dark:text-text-secondary truncate">
                   {fileName}
                 </span>
@@ -196,7 +196,7 @@ export function LeaveConfirmationModal({
           {warnings.length > 0 && (
             <div className="rounded-xl border border-data-warning dark:border-data-warning bg-data-warning dark:bg-data-warning/20 p-4">
               <div className="flex items-start gap-2">
-                <AlertCircle className="h-5 w-5 text-data-warning dark:text-data-warning shrink-0" />
+                <AlertCircle className="size-5 text-data-warning dark:text-data-warning shrink-0" aria-hidden="true" />
                 <div className="space-y-1">
                   <h4 className="text-sm font-semibold text-data-warning dark:text-data-warning">
                     Important Notice

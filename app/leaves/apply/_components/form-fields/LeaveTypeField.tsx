@@ -39,7 +39,7 @@ export function LeaveTypeField({
           <Tooltip>
             <TooltipTrigger asChild>
               <button type="button" className="inline-flex items-center">
-                <HelpCircle className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground transition-colors" />
+                <HelpCircle className="size-3.5 text-muted-foreground hover:text-foreground transition-colors" aria-hidden="true" />
               </button>
             </TooltipTrigger>
             <TooltipContent side="right" className="max-w-xs">
@@ -79,7 +79,7 @@ export function LeaveTypeField({
           className="text-sm text-destructive flex items-center gap-1.5"
           role="alert"
         >
-          <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />
+          <AlertCircle className="size-3.5" aria-hidden="true" />
           {error}
         </p>
       )}

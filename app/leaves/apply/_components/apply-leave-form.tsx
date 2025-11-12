@@ -152,7 +152,7 @@ export function ApplyLeaveForm() {
               <CardHeader className="p-6">
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2 text-base font-semibold text-foreground leading-6">
-                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    <Calendar className="size-4 text-muted-foreground" aria-hidden="true" />
                     Leave Details
                   </CardTitle>
                   {lastSavedTime && (
@@ -160,7 +160,7 @@ export function ApplyLeaveForm() {
                       variant="secondary"
                       className="bg-data-success/15 text-data-success border border-data-success/40 dark:bg-data-success/20 dark:text-data-success"
                     >
-                      <CheckCircle2 className="w-3 h-3 mr-1" />
+                      <CheckCircle2 className="size-3 mr-1" aria-hidden="true" />
                       Saved just now
                     </Badge>
                   )}
@@ -230,7 +230,7 @@ export function ApplyLeaveForm() {
                   {/* General errors */}
                   {errors.general && (
                     <div className="rounded-lg border border-destructive/50 bg-destructive/10 dark:bg-destructive/20 p-3 flex items-start gap-2">
-                      <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                      <AlertCircle className="size-5 text-destructive shrink-0 mt-0.5" aria-hidden="true" />
                       <div className="flex-1">
                         <p className="text-sm font-medium text-destructive">
                           Validation Error
@@ -288,7 +288,7 @@ export function ApplyLeaveForm() {
 
             <Card className="rounded-2xl border border-border bg-card shadow-sm p-5 space-y-3">
               <div className="flex items-center gap-2">
-                <HelpCircle className="w-4 h-4 text-muted-foreground" />
+                <HelpCircle className="size-4 text-muted-foreground" aria-hidden="true" />
                 <p className="text-sm font-semibold text-foreground">
                   Need a hand?
                 </p>
@@ -330,7 +330,7 @@ export function ApplyLeaveForm() {
             size="lg"
             className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg transition-all hover:scale-[1.02]"
           >
-            <Send className="w-4 h-4 mr-2" />
+            <Send className="size-4 mr-2" aria-hidden="true" />
             {submitting ? "Submitting..." : "Submit Request"}
           </Button>
         </div>

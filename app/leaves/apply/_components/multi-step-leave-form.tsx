@@ -124,7 +124,7 @@ export function MultiStepLeaveForm() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <User className="w-5 h-5" />
+                <User className="size-5" aria-hidden="true" />
                 Select Leave Type
               </CardTitle>
             </CardHeader>
@@ -166,7 +166,7 @@ export function MultiStepLeaveForm() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
+                <Calendar className="size-5" aria-hidden="true" />
                 Select Dates
               </CardTitle>
             </CardHeader>
@@ -245,7 +245,7 @@ export function MultiStepLeaveForm() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <FileText className="w-5 h-5" />
+                <FileText className="size-5" aria-hidden="true" />
                 Leave Details
               </CardTitle>
             </CardHeader>
@@ -268,7 +268,7 @@ export function MultiStepLeaveForm() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Clock className="w-5 h-5" />
+                <Clock className="size-5" aria-hidden="true" />
                 Supporting Documents
               </CardTitle>
             </CardHeader>
@@ -307,7 +307,7 @@ export function MultiStepLeaveForm() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5" />
+                <CheckCircle className="size-5" aria-hidden="true" />
                 Review Your Application
               </CardTitle>
             </CardHeader>
