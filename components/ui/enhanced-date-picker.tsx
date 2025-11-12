@@ -257,7 +257,7 @@ export function EnhancedDatePicker({
             {showHolidayNames && monthHolidays.length > 0 && (
               <div className="border-t pt-4">
                 <h4 className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1">
-                  <Info className="w-3 h-3" />
+                  <Info className="size-3" aria-hidden="true" />
                   Holidays this month
                 </h4>
                 <div className="space-y-1 max-h-32 overflow-y-auto">
@@ -316,7 +316,7 @@ export function EnhancedDatePicker({
       {/* Error Message */}
       {error && (
         <div className="flex items-center gap-1 text-sm text-destructive">
-          <AlertCircle className="w-4 h-4" />
+          <AlertCircle className="size-4" aria-hidden="true" />
           {error}
         </div>
       )}
