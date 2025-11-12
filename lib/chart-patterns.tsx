@@ -3,9 +3,24 @@
  *
  * Provides SVG pattern definitions and utilities to make charts accessible
  * to users with color vision deficiencies by combining colors with patterns.
+ *
+ * Updated: Now uses CSS custom properties from theme.css for consistent colors
  */
 
+// Use CSS custom properties for theme-aware colors
 export const CHART_COLORS = [
+  "hsl(var(--primary))", // Primary blue
+  "hsl(var(--chart-1))", // Amber/Orange
+  "hsl(var(--chart-2))", // Emerald/Green
+  "hsl(var(--chart-3))", // Pink
+  "hsl(var(--chart-4))", // Purple
+  "hsl(var(--chart-5))", // Cyan
+  "hsl(var(--destructive))", // Red
+  "hsl(var(--chart-6))", // Lime
+];
+
+// Fallback hex colors for contexts where CSS vars aren't available (e.g., PDF generation)
+export const CHART_COLORS_HEX = [
   "#2563eb", // Blue
   "#f59e0b", // Amber
   "#10b981", // Emerald

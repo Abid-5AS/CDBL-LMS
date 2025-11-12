@@ -80,7 +80,7 @@ const LEAVE_TAB_ITEMS = [
   {
     id: "all",
     title: "All",
-    color: "bg-slate-500 hover:bg-slate-600",
+    color: "bg-slate-500 hover:bg-slate-600 dark:bg-slate-600 dark:hover:bg-slate-500",
     cardContent: (
       <div className="p-6 h-full flex flex-col justify-center">
         <div className="space-y-2">
@@ -95,7 +95,7 @@ const LEAVE_TAB_ITEMS = [
   {
     id: "pending",
     title: "Pending",
-    color: "bg-amber-500 hover:bg-amber-600",
+    color: "bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600",
     cardContent: (
       <div className="p-6 h-full flex flex-col justify-center">
         <div className="space-y-2">
@@ -110,7 +110,7 @@ const LEAVE_TAB_ITEMS = [
   {
     id: "approved",
     title: "Approved",
-    color: "bg-emerald-500 hover:bg-emerald-600",
+    color: "bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600",
     cardContent: (
       <div className="p-6 h-full flex flex-col justify-center">
         <div className="space-y-2">
@@ -125,7 +125,7 @@ const LEAVE_TAB_ITEMS = [
   {
     id: "rejected",
     title: "Rejected",
-    color: "bg-red-500 hover:bg-red-600",
+    color: "bg-rose-600 hover:bg-rose-700 dark:bg-rose-500 dark:hover:bg-rose-600",
     cardContent: (
       <div className="p-6 h-full flex flex-col justify-center">
         <div className="space-y-2">
@@ -267,7 +267,7 @@ export function MyLeavesPageContent() {
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-primary/10">
-                  <Wallet className="w-4 h-4 text-primary" />
+                  <Wallet className="size-4 text-primary" aria-hidden="true" />
                 </div>
                 <div className="flex items-center gap-6">
                   <div className="flex items-center gap-2">
@@ -289,7 +289,7 @@ export function MyLeavesPageContent() {
                 className="text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
               >
                 View Details
-                <ArrowRight className="w-3 h-3" />
+                <ArrowRight className="size-3" aria-hidden="true" />
               </Link>
             </div>
           </CardContent>
@@ -425,7 +425,7 @@ export function MyLeavesPageContent() {
                                     className="h-8 w-8 p-0 text-data-error hover:bg-data-error dark:hover:bg-data-error/20"
                                     aria-label="Cancel request"
                                   >
-                                    <XCircle className="w-4 h-4" />
+                                    <XCircle className="size-4" aria-hidden="true" />
                                   </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
@@ -470,7 +470,7 @@ export function MyLeavesPageContent() {
                   disabled={currentPage === 1}
                   className="gap-1"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeft className="size-4" aria-hidden="true" />
                   Previous
                 </Button>
                 <div className="flex items-center gap-1">
@@ -514,7 +514,7 @@ export function MyLeavesPageContent() {
                   className="gap-1"
                 >
                   Next
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="size-4" aria-hidden="true" />
                 </Button>
                 <span className="text-xs text-muted-foreground ml-2">
                   Page {currentPage} of {totalPages}

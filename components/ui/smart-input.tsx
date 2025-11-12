@@ -334,8 +334,8 @@ export function SmartInput({
             {helpText && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
-                    <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                  <Button variant="ghost" size="sm" className="h-4 w-4 p-0" aria-label="Help">
+                    <HelpCircle className="size-3 text-muted-foreground" aria-hidden="true" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -367,7 +367,7 @@ export function SmartInput({
           >
             {/* Left Icon */}
             {LeftIcon && (
-              <LeftIcon className="h-4 w-4 text-muted-foreground mr-2 flex-shrink-0" />
+              <LeftIcon className="size-4 text-muted-foreground mr-2 flex-shrink-0" aria-hidden="true" />
             )}
 
             {/* Input */}
@@ -395,8 +395,9 @@ export function SmartInput({
                   className="h-4 w-4 p-0 hover:bg-transparent"
                   onClick={handleClear}
                   tabIndex={-1}
+                  aria-label="Clear input"
                 >
-                  <X className="h-3 w-3" />
+                  <X className="size-3" aria-hidden="true" />
                 </Button>
               )}
 
@@ -407,8 +408,9 @@ export function SmartInput({
                   className="h-4 w-4 p-0 hover:bg-transparent"
                   onClick={handleCopy}
                   tabIndex={-1}
+                  aria-label="Copy to clipboard"
                 >
-                  <Copy className="h-3 w-3" />
+                  <Copy className="size-3" aria-hidden="true" />
                 </Button>
               )}
 
@@ -420,8 +422,9 @@ export function SmartInput({
                   onClick={onRegenerate}
                   disabled={loading}
                   tabIndex={-1}
+                  aria-label="Regenerate value"
                 >
-                  <Zap className="h-3 w-3" />
+                  <Zap className="size-3" aria-hidden="true" />
                 </Button>
               )}
 
@@ -440,8 +443,9 @@ export function SmartInput({
                   onClick={handleRightIconClick}
                   disabled={disabled}
                   tabIndex={-1}
+                  aria-label={isPassword ? (showPassword ? "Hide password" : "Show password") : "Toggle"}
                 >
-                  <FinalRightIcon className="h-3 w-3" />
+                  <FinalRightIcon className="size-3" aria-hidden="true" />
                 </Button>
               )}
             </div>
@@ -484,7 +488,7 @@ export function SmartInput({
             >
               {error && (
                 <div className="flex items-center gap-1 text-sm text-destructive">
-                  <AlertCircle className="w-4 h-4" />
+                  <AlertCircle className="size-4" aria-hidden="true" />
                   {error}
                 </div>
               )}
@@ -494,7 +498,7 @@ export function SmartInput({
                   key={index}
                   className="flex items-center gap-1 text-sm text-destructive"
                 >
-                  <AlertCircle className="w-4 h-4" />
+                  <AlertCircle className="size-4" aria-hidden="true" />
                   {validationError}
                 </div>
               ))}
@@ -511,7 +515,7 @@ export function SmartInput({
               exit={{ opacity: 0, y: -10 }}
               className="flex items-center gap-1 text-sm text-green-600"
             >
-              <CheckCircle2 className="w-4 h-4" />
+              <CheckCircle2 className="size-4" aria-hidden="true" />
               Input is valid
             </motion.div>
           )}

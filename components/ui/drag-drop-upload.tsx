@@ -291,7 +291,7 @@ export function DragDropUpload({
                       />
                     ) : (
                       <div className="w-10 h-10 bg-muted rounded flex items-center justify-center">
-                        <FileText className="w-5 h-5 text-muted-foreground" />
+                        <FileText className="size-5 text-muted-foreground" aria-hidden="true" />
                       </div>
                     )}
                   </div>
@@ -324,13 +324,13 @@ export function DragDropUpload({
                   {/* Status Icon */}
                   <div className="shrink-0">
                     {uploadedFile.status === "uploading" && (
-                      <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                      <Loader2 className="size-4 text-primary animate-spin" aria-hidden="true" />
                     )}
                     {uploadedFile.status === "success" && (
-                      <CheckCircle2 className="w-4 h-4 text-green-500" />
+                      <CheckCircle2 className="size-4 text-green-500" aria-hidden="true" />
                     )}
                     {uploadedFile.status === "error" && (
-                      <AlertCircle className="w-4 h-4 text-destructive" />
+                      <AlertCircle className="size-4 text-destructive" aria-hidden="true" />
                     )}
                   </div>
 
@@ -343,8 +343,9 @@ export function DragDropUpload({
                       removeFile(uploadedFile.id);
                     }}
                     className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
+                    aria-label={`Remove ${uploadedFile.file.name}`}
                   >
-                    <X className="w-4 h-4" />
+                    <X className="size-4" aria-hidden="true" />
                   </Button>
                 </motion.div>
               );
@@ -356,7 +357,7 @@ export function DragDropUpload({
       {/* Error Message */}
       {error && (
         <div className="flex items-center gap-1 text-sm text-destructive">
-          <AlertCircle className="w-4 h-4" />
+          <AlertCircle className="size-4" aria-hidden="true" />
           {error}
         </div>
       )}

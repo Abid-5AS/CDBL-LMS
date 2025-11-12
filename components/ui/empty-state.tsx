@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 
 type EmptyStateProps = {
   icon?: LucideIcon;
+  iconClassName?: string;
   title: string;
   description?: string;
   action?: {
@@ -17,8 +18,9 @@ type EmptyStateProps = {
   className?: string;
 };
 
-export function EmptyState({
+export const EmptyState = React.memo(function EmptyState({
   icon: Icon,
+  iconClassName,
   title,
   description,
   action,
@@ -36,7 +38,10 @@ export function EmptyState({
     >
       {Icon && (
         <div className="flex items-center justify-center h-16 w-16 rounded-full bg-card-action mb-4" aria-hidden="true">
-          <Icon className="h-8 w-8 text-card-action" />
+          <Icon
+            className={cn("h-8 w-8 text-card-action", iconClassName)}
+            aria-hidden="true"
+          />
         </div>
       )}
       <h3 className="text-lg font-semibold text-text-secondary mb-1">{title}</h3>
@@ -65,5 +70,5 @@ export function EmptyState({
       )}
     </div>
   );
-}
+});
 

@@ -28,11 +28,19 @@ export type TypePieProps = {
   className?: string;
 };
 
-// Color tokens from leave type palette (matches LeaveBalancePanel)
-const TYPE_COLORS: Record<Slice["type"], string> = {
-  EARNED: "rgb(245, 158, 11)", // amber-500
-  CASUAL: "rgb(37, 99, 235)", // blue-600
-  MEDICAL: "rgb(34, 197, 94)", // green-500
+// Color tokens from leave type palette (synced with theme.css design tokens)
+// Light mode colors - matches --color-leave-* in theme.css
+const TYPE_COLORS_LIGHT: Record<Slice["type"], string> = {
+  EARNED: "#16a34a", // emerald-600 (matches --color-leave-earned)
+  CASUAL: "#2563eb", // blue-600 (matches --color-leave-casual)
+  MEDICAL: "#0ea5e9", // cyan-600 (matches --color-leave-medical)
+};
+
+// Dark mode colors - matches dark theme in theme.css
+const TYPE_COLORS_DARK: Record<Slice["type"], string> = {
+  EARNED: "#34d399", // emerald-400
+  CASUAL: "#60a5fa", // blue-400
+  MEDICAL: "#22d3ee", // cyan-400
 };
 
 /**
@@ -63,6 +71,7 @@ export function TypePie({
   }, [data]);
 
   const isDark = theme === "dark";
+  const TYPE_COLORS = isDark ? TYPE_COLORS_DARK : TYPE_COLORS_LIGHT;
 
   if (chartData.length === 0) {
     return null; // Empty state handled by ChartContainer

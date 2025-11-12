@@ -105,7 +105,7 @@ export const FloatingLabelInput = React.forwardRef<
           {/* Left Icon */}
           {LeftIcon && (
             <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
-              <LeftIcon className="h-4 w-4 text-muted-foreground" />
+              <LeftIcon className="size-4 text-muted-foreground" aria-hidden="true" />
             </div>
           )}
 
@@ -171,8 +171,9 @@ export const FloatingLabelInput = React.forwardRef<
               onClick={handleRightIconClick}
               disabled={disabled}
               tabIndex={-1}
+              aria-label={isPassword ? (showPassword ? "Hide password" : "Show password") : error ? "Error" : success ? "Valid" : "Toggle"}
             >
-              <FinalRightIcon className="h-4 w-4" />
+              <FinalRightIcon className="size-4" aria-hidden="true" />
             </button>
           )}
 
@@ -203,7 +204,7 @@ export const FloatingLabelInput = React.forwardRef<
               exit={{ opacity: 0, y: -10 }}
               className="flex items-center gap-1 text-sm text-destructive"
             >
-              <AlertCircle className="w-4 h-4" />
+              <AlertCircle className="size-4" aria-hidden="true" />
               {error}
             </motion.div>
           )}
@@ -345,7 +346,7 @@ export const FloatingLabelTextarea = React.forwardRef<
               exit={{ opacity: 0, y: -10 }}
               className="flex items-center gap-1 text-sm text-destructive"
             >
-              <AlertCircle className="w-4 h-4" />
+              <AlertCircle className="size-4" aria-hidden="true" />
               {error}
             </motion.div>
           )}

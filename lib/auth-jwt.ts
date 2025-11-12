@@ -6,6 +6,15 @@ import type { Prisma } from "@prisma/client";
 
 const SECRET =
   process.env.JWT_SECRET || process.env.AUTH_SECRET || "dev-secret";
+
+// Security: Ensure strong secret in production
+if (process.env.NODE_ENV === "production" && (!SECRET || SECRET === "dev-secret" || SECRET.length < 32)) {
+  throw new Error(
+    "JWT_SECRET must be set to a strong secret (minimum 32 characters) in production environment. " +
+    "Generate a secure secret using: openssl rand -base64 32"
+  );
+}
+
 const JWT_COOKIE = "session_token";
 
 const encoder = new TextEncoder();

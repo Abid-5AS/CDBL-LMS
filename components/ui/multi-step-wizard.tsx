@@ -183,9 +183,9 @@ export function MultiStepWizard({
                 )}
               >
                 {isCompleted && !isActive ? (
-                  <Check className="w-5 h-5" />
+                  <Check className="size-5" aria-hidden="true" />
                 ) : Icon ? (
-                  <Icon className="w-5 h-5" />
+                  <Icon className="size-5" aria-hidden="true" />
                 ) : showStepNumbers ? (
                   <span className="text-sm font-medium">{index + 1}</span>
                 ) : null}
@@ -266,7 +266,7 @@ export function MultiStepWizard({
           disabled={isFirstStep || isLoading || !canGoPrevious}
           className="flex items-center gap-2"
         >
-          <ChevronLeft className="w-4 h-4" />
+          <ChevronLeft className="size-4" aria-hidden="true" />
           {previousButtonText}
         </Button>
 
@@ -291,11 +291,11 @@ export function MultiStepWizard({
             className="flex items-center gap-2"
           >
             {isLoading ? (
-              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" aria-hidden="true" />
             ) : isLastStep ? (
-              <Check className="w-4 h-4" />
+              <Check className="size-4" aria-hidden="true" />
             ) : (
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="size-4" aria-hidden="true" />
             )}
             {isLastStep ? completeButtonText : nextButtonText}
           </Button>

@@ -188,8 +188,9 @@ export function DashboardCustomization({
                   size="sm"
                   onClick={onClose}
                   className="shrink-0"
+                  aria-label="Close customization panel"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="size-4" aria-hidden="true" />
                 </Button>
               </div>
 
@@ -204,7 +205,7 @@ export function DashboardCustomization({
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <Layout className="w-4 h-4 inline mr-2" />
+                  <Layout className="size-4 inline mr-2" aria-hidden="true" />
                   Widgets
                 </button>
                 <button
@@ -216,7 +217,7 @@ export function DashboardCustomization({
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <Settings className="w-4 h-4 inline mr-2" />
+                  <Settings className="size-4 inline mr-2" aria-hidden="true" />
                   Layout
                 </button>
               </div>
@@ -238,11 +239,11 @@ export function DashboardCustomization({
                       </div>
                       <div className="flex gap-2">
                         <Badge variant="secondary" className="text-xs">
-                          <Eye className="w-3 h-3 mr-1" />
+                          <Eye className="size-3 mr-1" aria-hidden="true" />
                           {visibleWidgets.length}
                         </Badge>
                         <Badge variant="outline" className="text-xs">
-                          <EyeOff className="w-3 h-3 mr-1" />
+                          <EyeOff className="size-3 mr-1" aria-hidden="true" />
                           {hiddenWidgets.length}
                         </Badge>
                       </div>
@@ -257,7 +258,10 @@ export function DashboardCustomization({
                         return (
                           <div key={category} className="space-y-3">
                             <div className="flex items-center gap-2">
-                              <CategoryIcon className="w-4 h-4 text-muted-foreground" />
+                              <CategoryIcon
+                                className="size-4 text-muted-foreground"
+                                aria-hidden="true"
+                              />
                               <h3 className="text-sm font-medium text-foreground capitalize">
                                 {category}
                               </h3>
@@ -347,19 +351,19 @@ export function DashboardCustomization({
                         <SelectContent>
                           <SelectItem value="compact">
                             <div className="flex items-center gap-2">
-                              <Smartphone className="w-4 h-4" />
+                              <Smartphone className="size-4" aria-hidden="true" />
                               Compact
                             </div>
                           </SelectItem>
                           <SelectItem value="comfortable">
                             <div className="flex items-center gap-2">
-                              <Tablet className="w-4 h-4" />
+                              <Tablet className="size-4" aria-hidden="true" />
                               Comfortable
                             </div>
                           </SelectItem>
                           <SelectItem value="spacious">
                             <div className="flex items-center gap-2">
-                              <Monitor className="w-4 h-4" />
+                              <Monitor className="size-4" aria-hidden="true" />
                               Spacious
                             </div>
                           </SelectItem>
@@ -447,7 +451,7 @@ export function DashboardCustomization({
                     onClick={handleReset}
                     className="flex-1 sm:flex-none"
                   >
-                    <RotateCcw className="w-4 h-4 mr-2" />
+                    <RotateCcw className="size-4 mr-2" aria-hidden="true" />
                     Reset
                   </Button>
                   <Button
@@ -455,7 +459,7 @@ export function DashboardCustomization({
                     disabled={!hasUnsavedChanges}
                     className="flex-1"
                   >
-                    <Save className="w-4 h-4 mr-2" />
+                    <Save className="size-4 mr-2" aria-hidden="true" />
                     Save Changes
                   </Button>
                 </div>

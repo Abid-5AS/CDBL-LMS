@@ -22,13 +22,13 @@ async function EmployeesPageContent() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-border-strong/50 dark:border-border-strong/50 backdrop-blur-xl bg-bg-primary/70 dark:bg-bg-secondary/70 p-6 shadow-sm">
+      <section className="rounded-2xl border border-border backdrop-blur-xl bg-card/90 p-6 shadow-sm">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-text-secondary dark:text-text-secondary">
+            <h1 className="text-2xl font-semibold">
               Employee Directory
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground dark:text-text-secondary">
+            <p className="mt-1 text-sm text-muted-foreground">
               Browse and search employee profiles, view leave histories, and
               manage employee information
             </p>

@@ -1,0 +1,23 @@
+# CDBL Leave Management System - robots.txt
+# This is an internal application - search engines should not index private pages
+
+User-agent: *
+
+# Block all dashboard and admin routes
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /api/
+Disallow: /approvals/
+Disallow: /employees/
+Disallow: /reports/
+Disallow: /leaves/
+
+# Allow public policy pages
+Allow: /policies
+Allow: /login
+
+# Block all by default for internal application
+Disallow: /
+
+# Sitemap (if applicable in future)
+# Sitemap: https://yourdom.com/sitemap.xml

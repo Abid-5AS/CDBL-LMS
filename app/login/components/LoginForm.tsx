@@ -416,6 +416,8 @@ export function LoginForm() {
                   disabled={loading}
                   hasIcon
                   aria-invalid={!!error}
+                  aria-describedby={error ? "login-error" : undefined}
+                  aria-required="true"
                 />
               </div>
             </div>
@@ -449,6 +451,8 @@ export function LoginForm() {
                   disabled={loading}
                   hasIcon
                   aria-invalid={!!error}
+                  aria-describedby={error ? "login-error" : undefined}
+                  aria-required="true"
                 />
                 <button
                   type="button"
@@ -468,12 +472,15 @@ export function LoginForm() {
             <AnimatePresence>
               {error && (
                 <motion.div
+                  id="login-error"
+                  role="alert"
+                  aria-live="polite"
                   className="flex items-center gap-2 text-sm text-data-error bg-data-error/10 border border-data-error p-3 rounded-lg"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                 >
-                  <AlertCircle className="size-4 flex-shrink-0" />
+                  <AlertCircle className="size-4 flex-shrink-0" aria-hidden="true" />
                   <span>{error}</span>
                 </motion.div>
               )}
@@ -483,10 +490,16 @@ export function LoginForm() {
               className="animate-fade-in-up animate-duration-500ms"
               style={getAnimationDelay(4)}
             >
-              <Button type="submit" className="w-full" size="lg" disabled={loading}>
-                {loading && <Loader2 className="size-5 animate-spin" />}
+              <Button
+                type="submit"
+                className="w-full"
+                size="lg"
+                disabled={loading}
+                aria-busy={loading}
+              >
+                {loading && <Loader2 className="size-5 animate-spin" aria-hidden="true" />}
                 {loading ? "Signing in..." : "Sign In"}
-                {!loading && <ArrowRight className="size-5" />}
+                {!loading && <ArrowRight className="size-5" aria-hidden="true" />}
               </Button>
             </div>
           </form>

@@ -87,7 +87,7 @@ export function HolidaysSidebar({
           <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-indigo-500/10 rounded-lg">
-                <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <Calendar className="size-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
               </div>
               <div className="flex-1">
                 <p className="font-semibold text-slate-900 dark:text-white">
@@ -119,7 +119,7 @@ export function HolidaysSidebar({
             className="w-full justify-start"
             onClick={onExportPDF}
           >
-            <Download className="w-4 h-4 mr-2" />
+            <Download className="size-4 mr-2" aria-hidden="true" />
             Export Calendar
           </Button>
           <Button
@@ -127,7 +127,7 @@ export function HolidaysSidebar({
             className="w-full justify-start"
             onClick={() => window.open("/leaves/apply", "_blank")}
           >
-            <Calendar className="w-4 h-4 mr-2" />
+            <Calendar className="size-4 mr-2" aria-hidden="true" />
             Plan Leave
           </Button>
         </div>
