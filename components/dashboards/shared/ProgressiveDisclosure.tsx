@@ -113,7 +113,7 @@ export function ExpandableCard({
           <div className="flex items-start gap-3 flex-1 min-w-0">
             {Icon && (
               <div className="p-2 bg-muted/50 rounded-lg shrink-0">
-                <Icon className="w-4 h-4 text-muted-foreground" />
+                <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
               </div>
             )}
             <div className="flex-1 min-w-0">
@@ -143,12 +143,13 @@ export function ExpandableCard({
                 size="sm"
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="p-1 h-auto"
+                aria-label={isExpanded ? "Collapse" : "Expand"}
               >
                 <motion.div
                   animate={{ rotate: isExpanded ? 180 : 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <ChevronDown className="w-4 h-4" />
+                  <ChevronDown className="size-4" aria-hidden="true" />
                 </motion.div>
               </Button>
             )}
@@ -237,7 +238,7 @@ export function TabbedContent({
                   value={tab.id}
                   className="flex items-center gap-1.5 px-2 py-2 text-xs sm:text-sm data-[state=active]:bg-background"
                 >
-                  {TabIcon && <TabIcon className="w-3 h-3 sm:w-4 sm:h-4" />}
+                  {TabIcon && <TabIcon className="size-3 sm:size-4" aria-hidden="true" />}
                   <span className="truncate">{tab.label}</span>
                   {tab.badge && (
                     <Badge variant="secondary" className="text-xs ml-1">
@@ -303,7 +304,7 @@ export function CollapsibleSection({
                 animate={{ rotate: isOpen ? 90 : 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
               </motion.div>
               <div className="flex-1 text-left">
                 <h3 className="text-sm font-medium text-foreground">{title}</h3>
@@ -398,7 +399,7 @@ export function DataDrillDown({
                         animate={{ rotate: isExpanded ? 90 : 0 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                        <ChevronRight className="size-4 text-muted-foreground shrink-0" aria-hidden="true" />
                       </motion.div>
                       <span className="font-medium text-sm truncate">
                         {item.title}
@@ -435,7 +436,7 @@ export function DataDrillDown({
                         {item.content}
                         {item.metadata?.lastUpdated && (
                           <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
+                            <Clock className="size-3" aria-hidden="true" />
                             Last updated: {item.metadata.lastUpdated}
                           </p>
                         )}
