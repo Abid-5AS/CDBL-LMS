@@ -26,7 +26,7 @@ export function HolidaysGrid({ holidays }: HolidaysGridProps) {
   if (holidays.length === 0) {
     return (
       <div className="text-center py-12">
-        <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+        <Calendar className="size-12 text-muted-foreground mx-auto mb-4" aria-hidden="true" />
         <p className="text-muted-foreground">No holidays found</p>
         <p className="text-sm text-muted-foreground mt-1">
           Try adjusting your filters to see more holidays
@@ -65,12 +65,12 @@ export function HolidaysGrid({ holidays }: HolidaysGridProps) {
                 {/* Header */}
                 <div className="flex items-start justify-between mb-3">
                   <div className="p-2 bg-indigo-500/10 rounded-lg">
-                    <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                    <Calendar className="size-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                   </div>
                   <div className="flex flex-col gap-1">
                     {holiday.isOptional && (
                       <Badge variant="outline" className="text-xs">
-                        <Star className="w-3 h-3 mr-1" />
+                        <Star className="size-3 mr-1" aria-hidden="true" />
                         Optional
                       </Badge>
                     )}
@@ -84,7 +84,7 @@ export function HolidaysGrid({ holidays }: HolidaysGridProps) {
                         variant="default"
                         className="text-xs bg-orange-500"
                       >
-                        <Clock className="w-3 h-3 mr-1" />
+                        <Clock className="size-3 mr-1" aria-hidden="true" />
                         {daysUntil}d
                       </Badge>
                     )}

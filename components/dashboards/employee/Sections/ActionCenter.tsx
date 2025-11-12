@@ -265,7 +265,7 @@ function ReturnedRequestRow({
             size="sm"
             className="text-card-action hover:bg-card-action/10 border-card-action/20"
           >
-            <Edit3 className="w-4 h-4 mr-1" />
+            <Edit3 className="size-4 mr-1" aria-hidden="true" />
             Edit
           </Button>
           <Button
@@ -274,7 +274,7 @@ function ReturnedRequestRow({
             size="sm"
             className="bg-card-action hover:bg-card-action/90 text-text-inverted"
           >
-            <Send className="w-4 h-4 mr-1" />
+            <Send className="size-4 mr-1" aria-hidden="true" />
             Resubmit
           </Button>
         </div>

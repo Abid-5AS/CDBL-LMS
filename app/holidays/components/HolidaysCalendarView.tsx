@@ -50,7 +50,7 @@ export function HolidaysCalendarView({ holidays }: HolidaysCalendarViewProps) {
   if (holidays.length === 0) {
     return (
       <div className="text-center py-12">
-        <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+        <Calendar className="size-12 text-muted-foreground mx-auto mb-4" aria-hidden="true" />
         <p className="text-muted-foreground">No holidays found</p>
         <p className="text-sm text-muted-foreground mt-1">
           Try adjusting your filters to see more holidays
@@ -72,7 +72,7 @@ export function HolidaysCalendarView({ holidays }: HolidaysCalendarViewProps) {
           <Card className="border border-border bg-card shadow-sm">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <Calendar className="size-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                 {monthData.name}
                 <Badge variant="secondary" className="text-xs">
                   {monthData.holidays.length} holiday
@@ -110,7 +110,7 @@ export function HolidaysCalendarView({ holidays }: HolidaysCalendarViewProps) {
                           </div>
                           {holiday.isOptional && (
                             <Badge variant="outline" className="text-xs">
-                              <Star className="w-3 h-3 mr-1" />
+                              <Star className="size-3 mr-1" aria-hidden="true" />
                               Optional
                             </Badge>
                           )}
