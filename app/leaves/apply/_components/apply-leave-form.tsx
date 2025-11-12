@@ -259,7 +259,7 @@ export function ApplyLeaveForm() {
                     loading={submitting}
                     loadingText="Submitting Request..."
                     className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all hover:scale-[1.01] hover:shadow-md rounded-full px-6"
-                    leftIcon={<Send className="w-4 h-4" aria-hidden="true" />}
+                    leftIcon={<Send className="size-4" aria-hidden="true" />}
                   >
                     Submit Request
                   </Button>
