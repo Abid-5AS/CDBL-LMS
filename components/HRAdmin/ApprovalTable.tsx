@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 import { toast } from "sonner";
 import clsx from "clsx";
@@ -145,11 +145,11 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     return filtered;
   }, [allItems, searchQuery, statusFilter, typeFilter]);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSearchQuery("");
     setStatusFilter("all");
     setTypeFilter("all");
-  };
+  }, []);
 
   useEffect(() => {
     if (onDataChange) {
@@ -158,29 +158,29 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   }, [items, onDataChange]);
 
   // Open confirmation dialog for destructive actions
-  function openConfirmDialog(
+  const openConfirmDialog = useCallback((
     id: string,
     action: "reject" | "return",
     employeeName: string
-  ) {
+  ) => {
     setDialogState({ type: action, itemId: id, employeeName });
     if (action === "return") {
       setReturnComment(""); // Reset comment field
     }
-  }
+  }, []);
 
   // Close dialog and reset state
-  function closeDialog() {
+  const closeDialog = useCallback(() => {
     setDialogState({ type: null, itemId: null, employeeName: null });
     setReturnComment("");
-  }
+  }, []);
 
   // Execute decision after confirmation
-  async function executeDecision(
+  const executeDecision = useCallback(async (
     id: string,
     action: "approve" | "reject" | "forward" | "return",
     comment?: string
-  ) {
+  ) => {
     try {
       setProcessingId(id + action);
 
@@ -228,14 +228,14 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     } finally {
       setProcessingId(null);
     }
-  }
+  }, [mutate, closeDialog]);
 
   // Handle decision routing - open dialog for destructive actions
-  async function handleDecision(
+  const handleDecision = useCallback(async (
     id: string,
     action: "approve" | "reject" | "forward" | "return",
     employeeName: string = "this employee"
-  ) {
+  ) => {
     // Destructive actions require confirmation
     if (action === "reject" || action === "return") {
       openConfirmDialog(id, action, employeeName);
@@ -244,9 +244,9 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
     // Non-destructive actions execute immediately
     await executeDecision(id, action);
-  }
+  }, [openConfirmDialog, executeDecision]);
 
-  const handleSelectRow = (itemId: string, checked: boolean) => {
+  const handleSelectRow = useCallback((itemId: string, checked: boolean) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (checked) {
@@ -256,15 +256,15 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
       }
       return next;
     });
-  };
+  }, []);
 
-  const handleSelectAll = (checked: boolean) => {
+  const handleSelectAll = useCallback((checked: boolean) => {
     if (checked) {
       setSelectedIds(new Set(items.map((item) => item.id)));
     } else {
       setSelectedIds(new Set());
     }
-  };
+  }, [items]);
 
   const allSelected = items.length > 0 && selectedIds.size === items.length;
   const someSelected = selectedIds.size > 0 && selectedIds.size < items.length;
