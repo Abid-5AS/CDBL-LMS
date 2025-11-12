@@ -1,4 +1,14 @@
-export { DashboardCustomization } from "./DashboardCustomization";
-export { ProgressiveDisclosure } from "./ProgressiveDisclosure";
-export { ResponsiveDashboardGrid } from "./ResponsiveDashboardGrid";
-export { RoleBasedDashboard } from "./RoleBasedDashboard";
+// Shared dashboard components
+export { KPICard, KPICardSkeleton, KPIGrid } from "./KPICard";
+export type { KPICardProps } from "./KPICard";
+
+export {
+  AnalyticsLineChart,
+  AnalyticsBarChart,
+  AnalyticsAreaChart,
+  AnalyticsPieChart,
+  CHART_COLORS,
+  PIE_COLORS,
+} from "./AnalyticsChart";
+
+export { ExportButton, ExportCSVButton } from "./ExportButton";

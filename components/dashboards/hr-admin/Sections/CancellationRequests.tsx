@@ -29,7 +29,7 @@ type LeaveRequest = {
 export function CancellationRequestsPanel() {
   const { data, isLoading, error } = useSWR<{ items: LeaveRequest[] }>(
     "/api/leaves?status=CANCELLATION_REQUESTED",
-    fetcher,
+    apiFetcher,
     {
       revalidateOnFocus: true,
     }
