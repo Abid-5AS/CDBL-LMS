@@ -57,9 +57,9 @@ export function DeptHeadDashboardWrapper() {
   return (
     <div className="space-y-6">
       {/* Top Row - KPI Cards Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="rounded-xl border border-border">
-          <CardContent className="p-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="rounded-2xl border border-border">
+          <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center shrink-0">
                 <ClipboardList className="h-5 w-5 text-amber-600 dark:text-amber-400" />
@@ -74,8 +74,8 @@ export function DeptHeadDashboardWrapper() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border border-border">
-          <CardContent className="p-4">
+        <Card className="rounded-2xl border border-border">
+          <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/20 flex items-center justify-center shrink-0">
                 <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
@@ -90,8 +90,8 @@ export function DeptHeadDashboardWrapper() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border border-border">
-          <CardContent className="p-4">
+        <Card className="rounded-2xl border border-border">
+          <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center shrink-0">
                 <RotateCcw className="h-5 w-5 text-purple-600 dark:text-purple-400" />
@@ -106,8 +106,8 @@ export function DeptHeadDashboardWrapper() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-xl border border-border">
-          <CardContent className="p-4">
+        <Card className="rounded-2xl border border-border">
+          <CardContent className="p-6">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-slate-100 dark:bg-slate-900/20 flex items-center justify-center shrink-0">
                 <XCircle className="h-5 w-5 text-slate-600 dark:text-slate-400" />
