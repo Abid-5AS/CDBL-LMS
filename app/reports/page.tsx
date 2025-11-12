@@ -1,7 +1,20 @@
 import { Suspense } from "react";
+import { getCurrentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
 import { ReportsContent } from "./components/ReportsContent";
 
-export default function ReportsPage() {
+export default async function ReportsPage() {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  // Only allow HR_ADMIN, HR_HEAD, and CEO to access reports
+  if (!["HR_ADMIN", "HR_HEAD", "CEO"].includes(user.role)) {
+    redirect("/dashboard");
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-6 lg:px-8 mt-20 space-y-8">
       <section className="glass-card rounded-2xl p-6 backdrop-blur-lg bg-white/60 dark:bg-neutral-950/60 border border-neutral-200/70 dark:border-neutral-800/70 shadow-lg">

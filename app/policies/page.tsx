@@ -13,8 +13,9 @@ async function PoliciesPageWrapper() {
   const role = await getUserRole();
   const userData = { name: user.name, email: user.email };
 
-  // Both Employee and HR Admin use unified layout
-  if (role !== "EMPLOYEE" && role !== "HR_ADMIN") {
+  // All authenticated users can view policies
+  const allowedRoles = ["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"];
+  if (!allowedRoles.includes(role)) {
     redirect("/dashboard");
   }
 

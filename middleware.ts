@@ -6,8 +6,8 @@ import { attachTraceId } from "@/lib/trace";
 const SECRET = process.env.JWT_SECRET || process.env.AUTH_SECRET || "dev-secret";
 const SECRET_KEY = new TextEncoder().encode(SECRET);
 
-export async function proxy(req: NextRequest) {
-  // Attach trace ID to request for error tracking (Next.js 16 proxy pattern)
+export async function middleware(req: NextRequest) {
+  // Attach trace ID to request for error tracking (Next.js 16 middleware pattern)
   attachTraceId(req);
   
   const token = req.cookies.get("session_token")?.value;
@@ -83,6 +83,14 @@ export async function proxy(req: NextRequest) {
 
     // Approvals page: DEPT_HEAD, HR_ADMIN, HR_HEAD, CEO only
     if (pathname.startsWith("/approvals") && !["DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"].includes(role))
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+
+    // Reports page: HR_ADMIN, HR_HEAD, CEO only
+    if (pathname.startsWith("/reports") && !["HR_ADMIN", "HR_HEAD", "CEO"].includes(role))
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+
+    // Policies page: All authenticated users can view policies
+    if (pathname.startsWith("/policies") && !["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"].includes(role))
       return NextResponse.redirect(new URL("/dashboard", req.url));
 
     // ✅ Security + caching headers
