@@ -227,9 +227,8 @@ export function PoliciesContent() {
         >
           <div className="flex items-center gap-3">
             <ScrollText
-              className="w-8 h-8 text-primary shrink-0"
+              className="size-8 text-primary shrink-0"
               aria-hidden="true"
-              aria-label=""
             />
             <div>
               <h1 className="text-3xl font-semibold text-foreground flex items-center gap-2">
@@ -247,7 +246,7 @@ export function PoliciesContent() {
             onClick={handleExportPDF}
             className="rounded-full no-print px-8"
             aria-label="Export policies as PDF"
-            leftIcon={<Printer className="w-4 h-4" aria-hidden="true" />}
+            leftIcon={<Printer className="size-4" aria-hidden="true" />}
           >
             Export Policy as PDF
           </Button>
@@ -320,7 +319,7 @@ export function PoliciesContent() {
             id="rules-heading"
             className="text-2xl font-semibold flex items-center gap-2 text-foreground"
           >
-            <ShieldCheck className="w-6 h-6 text-primary" aria-hidden="true" />
+            <ShieldCheck className="size-6 text-primary" aria-hidden="true" />
             Key Rules
           </h2>
           <Card className="bg-card/50 backdrop-blur-sm rounded-2xl border border-border shadow-sm">
@@ -359,7 +358,7 @@ export function PoliciesContent() {
             id="faq-heading"
             className="text-2xl font-semibold flex items-center gap-2 text-foreground"
           >
-            <HelpCircle className="w-6 h-6 text-primary" aria-hidden="true" />
+            <HelpCircle className="size-6 text-primary" aria-hidden="true" />
             Frequently Asked Questions
           </h2>
           <Card className="bg-card/50 backdrop-blur-sm rounded-2xl border border-border shadow-sm">
