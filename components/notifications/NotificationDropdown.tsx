@@ -58,7 +58,7 @@ export function NotificationDropdown() {
           className="relative h-9 w-9 text-text-secondary hover:text-text-primary hover:bg-bg-secondary rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-card-action/40 bg-transparent border-0"
           aria-label="Notifications"
         >
-          <Bell className="h-5 w-5" />
+          <Bell className="size-5" aria-hidden="true" />
           {unreadCount > 0 && (
             <span
               className="absolute top-1 right-1 h-2 w-2 bg-data-error rounded-full"

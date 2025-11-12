@@ -99,7 +99,7 @@ export function BreadcrumbSeparator({
 }: React.ComponentProps<"li">) {
   return (
     <li aria-hidden="true" className={cn("", className)} {...props}>
-      <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+      <ChevronRight className="size-4 text-muted-foreground/60" aria-hidden="true" />
     </li>
   );
 }
@@ -114,7 +114,7 @@ export function BreadcrumbEllipsis({
       aria-hidden="true"
       {...props}
     >
-      <MoreHorizontal className="h-4 w-4" />
+      <MoreHorizontal className="size-4" aria-hidden="true" />
     </span>
   );
 }
@@ -162,7 +162,7 @@ export function Breadcrumb({
                 className="flex items-center gap-1 px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground rounded-lg transition-colors focus-ring"
                 aria-label="Go to dashboard"
               >
-                <Home className="h-4 w-4" />
+                <Home className="size-4" aria-hidden="true" />
               </Link>
             </li>
           )}
@@ -177,7 +177,7 @@ export function Breadcrumb({
                 {/* Separator */}
                 {(showHome || index > 0) && (
                   <li aria-hidden="true">
-                    <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+                    <ChevronRight className="size-4 text-muted-foreground/60" aria-hidden="true" />
                   </li>
                 )}
 
@@ -191,7 +191,7 @@ export function Breadcrumb({
                           size="sm"
                           className="h-auto px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground"
                         >
-                          <MoreHorizontal className="h-4 w-4" />
+                          <MoreHorizontal className="size-4" aria-hidden="true" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start" className="w-56">
