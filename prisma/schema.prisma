@@ -42,16 +42,17 @@ enum LeaveStatus {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   name       String
-  email      String   @unique
+  email      String    @unique
   password   String?
-  empCode    String?  @unique
-  role       Role     @default(EMPLOYEE)
+  empCode    String?   @unique
+  role       Role      @default(EMPLOYEE)
   department String?
   deptHeadId Int? // User ID of department head (self-relation)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  joinDate   DateTime? // Service start date for eligibility calculations (Policy 6.18)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   leaves      LeaveRequest[]
   balances    Balance[]

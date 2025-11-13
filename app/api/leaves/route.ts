@@ -11,6 +11,8 @@ import {
   canBackdate,
   withinBackdateLimit,
   makeWarnings,
+  checkLeaveEligibility,
+  calculateMaternityLeaveDays,
 } from "@/lib/policy";
 import { promises as fs } from "fs";
 import path from "path";
@@ -170,6 +172,30 @@ export async function POST(req: Request) {
     return NextResponse.json(error("invalid_dates", undefined, traceId), { status: 400 });
   }
 
+  // Check service eligibility per Policy 6.18
+  const requester = await prisma.user.findUnique({
+    where: { id: me.id },
+    select: { joinDate: true },
+  });
+
+  if (!requester || !requester.joinDate) {
+    return NextResponse.json(
+      error("user_join_date_missing", "Employee join date not found. Please contact HR.", traceId),
+      { status: 400 }
+    );
+  }
+
+  const eligibilityCheck = checkLeaveEligibility(parsedInput.type, requester.joinDate);
+  if (!eligibilityCheck.eligible) {
+    return NextResponse.json(
+      error("service_eligibility_not_met", eligibilityCheck.reason, traceId, {
+        leaveType: parsedInput.type,
+        requiredYears: eligibilityCheck.requiredYears,
+      }),
+      { status: 403 }
+    );
+  }
+
   let certificateUrl: string | undefined;
   if (certificateFile) {
     const ext = (certificateFile.name.split(".").pop() ?? "").toLowerCase();
@@ -220,6 +246,26 @@ export async function POST(req: Request) {
         error("cl_exceeds_consecutive_limit", undefined, traceId, {
           max: policy.clMaxConsecutiveDays,
           requested: workingDays,
+        }),
+        { status: 400 }
+      );
+    }
+  }
+
+  // Enforce maternity leave pro-rating for employees with <6 months service (Policy 6.23.c)
+  if (t === "MATERNITY") {
+    const maternityCalc = calculateMaternityLeaveDays(requester.joinDate);
+    if (workingDays > maternityCalc.days) {
+      const explanation = maternityCalc.isProrated
+        ? `Prorated to ${maternityCalc.days} days based on ${maternityCalc.serviceMonths.toFixed(1)} months of service (Policy 6.23.c)`
+        : `Maximum 56 days (8 weeks) per Policy 6.23.a`;
+
+      return NextResponse.json(
+        error("maternity_exceeds_entitlement", explanation, traceId, {
+          maxDays: maternityCalc.days,
+          requested: workingDays,
+          isProrated: maternityCalc.isProrated,
+          serviceMonths: maternityCalc.serviceMonths,
         }),
         { status: 400 }
       );

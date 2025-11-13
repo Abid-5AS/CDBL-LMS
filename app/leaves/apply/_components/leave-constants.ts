@@ -27,10 +27,10 @@ export const LEAVE_OPTIONS: { value: LeaveType; label: string }[] = [
 
 export const POLICY_TOOLTIPS: Record<LeaveType, string> = {
   EARNED: "Submit ≥ 5 working days before start. Accrues 2 days per month. Balance carries forward up to 60 days.",
-  CASUAL: "Max 3 consecutive days per spell. Cannot start/end on Friday, Saturday, or holidays. Must retain 5 days balance.",
+  CASUAL: "Max 3 consecutive days per spell. Cannot start/end on Friday, Saturday, or holidays. No advance notice required.",
   MEDICAL: "Attach certificate if > 3 days. Fitness certificate required to return if > 7 days. Backdating allowed up to 30 days.",
-  MATERNITY: "Requires medical certificate. Usually 16 weeks duration. Apply well in advance.",
-  PATERNITY: "Usually up to 14 days. Apply with sufficient notice. May require supporting documentation.",
+  MATERNITY: "Requires medical certificate. 8 weeks (56 days) paid leave. Apply well in advance.",
+  PATERNITY: "6 working days paid leave. Requires 1+ year service. Max 2 occasions with 36-month gap.",
   STUDY: "Requires approval from HR. Supporting documentation may be required. Apply in advance for planning.",
   SPECIAL_DISABILITY: "Medical certificate required. Subject to HR approval. Duration varies by case.",
   QUARANTINE: "Backdating allowed if applicable. Medical certificate may be required. Subject to HR verification.",
@@ -42,7 +42,7 @@ export const RULE_TIPS: Record<LeaveType, string[]> = {
   CASUAL: [
     "Max 3 consecutive days per spell",
     "Cannot start/end on Friday, Saturday, or holidays",
-    "Must retain 5 days balance",
+    "No advance notice required (exempt per policy)",
   ],
   EARNED: [
     "Submit at least 5 working days in advance",
@@ -56,13 +56,15 @@ export const RULE_TIPS: Record<LeaveType, string[]> = {
   ],
   MATERNITY: [
     "Requires medical certificate",
-    "Usually 16 weeks duration",
+    "8 weeks (56 days) paid leave",
+    "Pro-rated if less than 6 months service",
     "Apply well in advance",
   ],
   PATERNITY: [
-    "Usually up to 14 days",
-    "Apply with sufficient notice",
-    "May require supporting documentation",
+    "6 working days paid leave",
+    "Requires 1+ year service",
+    "Max 2 occasions during service",
+    "36-month minimum gap between occasions",
   ],
   STUDY: [
     "Requires approval from HR",
