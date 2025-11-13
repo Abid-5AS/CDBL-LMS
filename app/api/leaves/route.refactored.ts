@@ -161,7 +161,7 @@ export async function POST(req: Request) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(
         error("validation_error", "Invalid request data", traceId, {
-          errors: err.errors,
+          errors: err.format(),
         }),
         { status: 400 }
       );

@@ -20,12 +20,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   Textarea,
-  EmptyState,
 } from "@/components/ui";
 import { CheckCircle, FilterX, Loader2 } from "lucide-react";
 
 // Shared Components (barrel export)
-import { FilterBar, ApprovalActionButtons } from "@/components/shared";
+import { FilterBar, ApprovalActionButtons, EmptyState } from "@/components/shared";
 import type { ApprovalAction } from "@/components/shared";
 
 // Lib utilities (barrel export)

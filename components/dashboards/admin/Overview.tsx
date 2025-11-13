@@ -43,14 +43,19 @@ async function getSystemStats(): Promise<SystemStats> {
   };
 }
 
-export async function SystemAdminDashboard({ username }: SystemAdminDashboardProps) {
+export async function SystemAdminDashboard({
+  username,
+}: SystemAdminDashboardProps) {
   const systemStats = await getSystemStats();
 
   return (
     <div className="space-y-6">
       <SystemAdminHeader username={username} />
 
-      <DashboardSection title="System Overview" description="Key system metrics and status">
+      <DashboardSection
+        title="System Overview"
+        description="Key system metrics and status"
+      >
         <Suspense fallback={<DashboardCardSkeleton />}>
           <SystemOverviewCards />
         </Suspense>
@@ -74,7 +79,10 @@ export async function SystemAdminDashboard({ username }: SystemAdminDashboardPro
         </Suspense>
       </DashboardSection>
 
-      <DashboardSection title="Quick Access" description="Common administrative tasks">
+      <DashboardSection
+        title="Quick Access"
+        description="Common administrative tasks"
+      >
         <SystemQuickAccess />
       </DashboardSection>
     </div>

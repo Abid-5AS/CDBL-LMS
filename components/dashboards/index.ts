@@ -13,9 +13,11 @@ export { EmployeeDashboardContent as EmployeeDashboard } from "./employee/Overvi
 
 // HR Admin Dashboard
 export { HRAdminDashboard } from "./hr-admin/Overview";
+export { PendingApprovals, CancellationRequests } from "./hr-admin/sections";
 
 // HR Head Dashboard
-export { HRHeadDashboard } from "./hr-head/Overview";
+export { HRDashboard as HRHeadDashboard } from "./hr-head/Overview";
+export { ReturnedRequests } from "./hr-head/sections";
 
 // Shared Components
 export * from "./shared";

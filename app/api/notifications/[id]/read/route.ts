@@ -13,7 +13,7 @@ export const cache = "no-store";
  */
 export async function POST(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const traceId = getTraceId(req as any);
   const user = await getCurrentUser();
@@ -25,8 +25,10 @@ export async function POST(
     );
   }
 
+  const { id } = await params;
+
   try {
-    const notificationId = parseInt(params.id);
+    const notificationId = parseInt(id);
 
     if (isNaN(notificationId)) {
       return NextResponse.json(
@@ -49,7 +51,7 @@ export async function POST(
       notification: result.data,
     });
   } catch (err) {
-    console.error(`POST /api/notifications/${params.id}/read error:`, err);
+    console.error(`POST /api/notifications/${id}/read error:`, err);
     return NextResponse.json(
       error("internal_error", "Failed to mark notification as read", traceId),
       { status: 500 }

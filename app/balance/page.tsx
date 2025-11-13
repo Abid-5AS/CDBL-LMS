@@ -27,12 +27,14 @@ const LEAVE_TYPE_CONFIG = {
     icon: TrendingUp,
     color: "text-data-warning",
     maxCarryForward: 60,
+    expiresYearEnd: false,
   },
   CASUAL: {
     label: "Casual Leave",
     description: "Short-term leave for personal matters",
     icon: Clock,
     color: "text-data-info",
+    maxCarryForward: undefined,
     expiresYearEnd: true,
   },
   MEDICAL: {
@@ -40,6 +42,7 @@ const LEAVE_TYPE_CONFIG = {
     description: "Medical certificate required for > 3 days",
     icon: Calendar,
     color: "text-data-success",
+    maxCarryForward: undefined,
     expiresYearEnd: true,
   },
 };

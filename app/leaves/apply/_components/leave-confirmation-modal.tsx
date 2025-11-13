@@ -36,6 +36,7 @@ const LEAVE_TYPE_LABELS: Record<LeaveType, string> = {
   MATERNITY: "Maternity Leave",
   PATERNITY: "Paternity Leave",
   STUDY: "Study Leave",
+  SPECIAL: "Special Leave",
   SPECIAL_DISABILITY: "Special Disability Leave",
   QUARANTINE: "Quarantine Leave",
   EXTRAWITHPAY: "Extra With Pay",

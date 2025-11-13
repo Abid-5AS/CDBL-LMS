@@ -27,6 +27,7 @@ export type BalanceResponse = {
   MATERNITY?: number;
   PATERNITY?: number;
   STUDY?: number;
+  SPECIAL?: number;
   SPECIAL_DISABILITY?: number;
   QUARANTINE?: number;
   EXTRAWITHPAY?: number;

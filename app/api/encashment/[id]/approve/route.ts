@@ -18,8 +18,9 @@ const ApprovalSchema = z.object({
  */
 export async function POST(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const traceId = getTraceId(req as any);
   const me = await getCurrentUser();
   if (!me) return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
@@ -36,7 +37,7 @@ export async function POST(
     );
   }
 
-  const encashmentId = parseInt(params.id);
+  const encashmentId = parseInt(id);
   if (isNaN(encashmentId)) {
     return NextResponse.json(error("invalid_id", undefined, traceId), { status: 400 });
   }

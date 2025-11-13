@@ -40,6 +40,8 @@ import { LeaveStatus } from "@prisma/client";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { cn } from "@/lib/utils";
 
+const fetcher = apiFetcher;
+
 
 type LeaveStatusType =
   | "SUBMITTED"
@@ -350,7 +352,7 @@ export function ActionCenterCard({ leaves, isLoading }: ActionCenterCardProps) {
   const hasReturnedRequests = returnedLeaves.length > 0;
 
   return (
-    <Card className="solid-card animate-fade-in-up">
+    <Card className="animated-border-card animate-fade-in-up">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">

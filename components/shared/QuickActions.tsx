@@ -113,7 +113,7 @@ export function QuickActions({
           <div className={cn("flex flex-wrap gap-2", compact && "gap-1")}>
             {actions.map((action, index) => {
               const Icon = action.icon;
-              
+
               if (action.href) {
                 const button = (
                   <Button
@@ -203,7 +203,7 @@ export function QuickActions({
     <div className={cn("flex flex-wrap gap-3", className)}>
       {actions.map((action, index) => {
         const Icon = action.icon;
-        
+
         if (action.href) {
           const button = (
             <Button

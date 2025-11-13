@@ -2,7 +2,6 @@
 
 import {
   Skeleton,
-  EmptyState,
   Checkbox,
   Button,
   AlertDialog,
@@ -16,7 +15,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui";
 import { ClipboardCheck } from "lucide-react";
-import { StatusBadge } from "@/components/shared/StatusBadge";
+import { StatusBadge, EmptyState } from "@/components/shared";
 import { leaveTypeLabel } from "@/lib/ui";
 import { formatDate } from "@/lib/utils";
 import clsx from "clsx";

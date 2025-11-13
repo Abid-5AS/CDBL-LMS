@@ -541,7 +541,10 @@ async function createLeaveRequests(users: SeedUser[], holidays: SeedHoliday[]) {
     const today = normalizeToDhakaMidnight(new Date());
     const startDate = new Date(today);
     startDate.setDate(startDate.getDate() - leaveRng.nextInt(1, 3)); // Started 1-3 days ago
-    const duration = leaveType === LeaveType.EARNED ? leaveRng.nextInt(5, 10) : leaveRng.nextInt(2, 3);
+    const duration =
+      leaveType === LeaveType.EARNED
+        ? leaveRng.nextInt(5, 10)
+        : leaveRng.nextInt(2, 3);
     const endDate = addWorkingDays(startDate, duration, holidays);
     const workingDays = countWorkingDaysSync(startDate, endDate, holidays);
 
@@ -654,7 +657,9 @@ async function createLeaveRequests(users: SeedUser[], holidays: SeedHoliday[]) {
     }
   }
 
-  console.log(`✅ Leave requests created: ${leaveCount} (including ${employeesOnLeave.length} currently on leave)`);
+  console.log(
+    `✅ Leave requests created: ${leaveCount} (including ${employeesOnLeave.length} currently on leave)`
+  );
 }
 
 async function createApprovalTrail(params: {

@@ -2047,3 +2047,65 @@
   box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
   border-color: rgb(129, 140, 248);
 }
+
+/* Animated Gradient Border Card */
+@property --angle {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0turn;
+}
+
+.animated-border-card {
+  isolation: isolate;
+}
+
+.animated-border-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  border: 1px solid transparent;
+  background-image: conic-gradient(
+    from var(--angle),
+    #4f46e5 0%,
+    #818cf8 25%,
+    #c7d2fe 50%,
+    #818cf8 75%,
+    #4f46e5 100%
+  );
+  background-origin: border-box;
+  -webkit-mask:
+    linear-gradient(#fff, #fff) content-box,
+    linear-gradient(#fff, #fff);
+  mask:
+    linear-gradient(#fff, #fff) content-box,
+    linear-gradient(#fff, #fff);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: rotate-border 3s linear infinite;
+}
+
+.animated-border-card:hover::before {
+  animation-play-state: paused;
+}
+
+@keyframes rotate-border {
+  to {
+    --angle: 1turn;
+  }
+}
+
+.dark .animated-border-card {
+  position: relative;
+  background-color: rgb(var(--bg-secondary));
+  border-radius: 16px;
+  border: 1px solid transparent;
+  box-shadow: var(--shadow-md);
+  transition: transform 250ms ease-out, box-shadow 250ms ease-out;
+}
+
+.dark .animated-border-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}

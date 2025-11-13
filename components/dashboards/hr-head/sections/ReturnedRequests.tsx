@@ -7,13 +7,12 @@ import {
   CardTitle,
   ModernTable,
   Button,
-  EmptyState,
 } from "@/components/ui";
 import { RotateCcw, FileEdit } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
 import Link from "next/link";
-import { StatusBadge } from "@/components/shared";
+import { StatusBadge, EmptyState } from "@/components/shared";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
 

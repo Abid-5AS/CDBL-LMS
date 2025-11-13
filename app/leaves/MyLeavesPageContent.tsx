@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, type ReactNode } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,7 +21,6 @@ import {
   TableHead,
   TableRow,
   TableCell,
-  EmptyState,
   Button,
   AlertDialog,
   AlertDialogAction,
@@ -36,7 +35,7 @@ import {
 } from "@/components/ui";
 
 // Shared Components (barrel export)
-import { StatusBadge, LeaveDetailsModal } from "@/components/shared";
+import { StatusBadge, LeaveDetailsModal, EmptyState } from "@/components/shared";
 import { useLeaveData } from "@/components/providers";
 
 // Lib utilities (barrel export)
@@ -141,7 +140,7 @@ const LEAVE_TAB_ITEMS = [
 
 const ITEMS_PER_PAGE = 5;
 
-export function MyLeavesPageContent() {
+export function MyLeavesPageContent(): ReactNode {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [selectedLeave, setSelectedLeave] = useState<LeaveRow | null>(null);

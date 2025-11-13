@@ -130,7 +130,7 @@ export async function POST(req: Request) {
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(
-        error("validation_error", "Invalid request data", traceId, { errors: err.errors }),
+        error("validation_error", "Invalid request data", traceId, { errors: err.format() }),
         { status: 400 }
       );
     }
