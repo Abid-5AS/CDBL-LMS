@@ -1,13 +1,21 @@
+/**
+ * Leave API Route (Refactored)
+ * Thin controller that delegates to service layer
+ *
+ * BEFORE: 727 lines with business logic mixed in
+ * AFTER: ~100 lines, clean HTTP handling only
+ */
+
 import { NextResponse } from "next/server";
 import { z } from "zod";
-
-export const cache = "no-store";
 import { LeaveType } from "@prisma/client";
 import { getCurrentUser } from "@/lib/auth";
-import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
+import { error } from "@/lib/errors";
 import { LeaveService } from "@/lib/services/leave.service";
 import { LeaveRepository } from "@/lib/repositories/leave.repository";
+
+export const cache = "no-store";
 
 const ApplySchema = z.object({
   type: z.enum([
@@ -21,7 +29,7 @@ const ApplySchema = z.object({
     "STUDY",
     "SPECIAL_DISABILITY",
     "QUARANTINE",
-    "SPECIAL", // Can be used for medical or rest outside Bangladesh (Policy 6.19.c)
+    "SPECIAL",
   ]),
   startDate: z.string(),
   endDate: z.string(),
@@ -30,30 +38,36 @@ const ApplySchema = z.object({
   needsCertificate: z.boolean().optional(),
 });
 
+/**
+ * GET - Fetch leave requests
+ */
 export async function GET(req: Request) {
   const me = await getCurrentUser();
   const traceId = getTraceId(req as any);
-  if (!me) return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
 
-  // Parse query parameters
-  const url = new URL(req.url);
-  const statusFilter = url.searchParams.get("status");
-  const mine = url.searchParams.get("mine") === "1";
+  if (!me) {
+    return NextResponse.json(error("unauthorized", undefined, traceId), {
+      status: 401,
+    });
+  }
 
   try {
-    let items;
+    // Parse query parameters
+    const url = new URL(req.url);
+    const statusFilter = url.searchParams.get("status");
+    const mine = url.searchParams.get("mine") === "1";
 
+    // Fetch data using repository
+    let items;
     if (mine) {
-      // Use repository method for user-specific queries
-      if (statusFilter && statusFilter !== "all") {
-        items = await LeaveRepository.findByUserId(me.id, statusFilter as any);
-      } else {
-        items = await LeaveRepository.findByUserId(me.id);
-      }
+      items = await LeaveRepository.findByUserId(
+        me.id,
+        statusFilter as any
+      );
     } else {
-      // Use repository method for all queries
       items = await LeaveRepository.findAll({
-        status: statusFilter && statusFilter !== "all" ? statusFilter as any : undefined,
+        ...(statusFilter &&
+          statusFilter !== "all" && { status: statusFilter as any }),
       });
     }
 
@@ -67,18 +81,27 @@ export async function GET(req: Request) {
   }
 }
 
+/**
+ * POST - Create leave request
+ */
 export async function POST(req: Request) {
   const traceId = getTraceId(req as any);
   const me = await getCurrentUser();
-  if (!me) return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
+
+  if (!me) {
+    return NextResponse.json(error("unauthorized", undefined, traceId), {
+      status: 401,
+    });
+  }
 
   try {
-    // Parse request data (multipart form-data or JSON)
+    // Parse request data
     const contentType = req.headers.get("content-type") ?? "";
-    let certificateFile: File | undefined;
+    let certificateFile: File | null = null;
     let parsedInput: z.infer<typeof ApplySchema>;
 
     if (contentType.includes("multipart/form-data")) {
+      // Handle file upload
       const formData = await req.formData();
       const toBoolean = (value: FormDataEntryValue | null) => {
         if (typeof value !== "string") return undefined;
@@ -96,15 +119,18 @@ export async function POST(req: Request) {
         needsCertificate: toBoolean(formData.get("needsCertificate")),
       };
 
-      const cert = formData.get("certificate");
-      certificateFile = cert instanceof File ? cert : undefined;
+      certificateFile =
+        formData.get("certificate") instanceof File
+          ? (formData.get("certificate") as File)
+          : null;
       parsedInput = ApplySchema.parse(raw);
     } else {
+      // Handle JSON
       const json = await req.json();
       parsedInput = ApplySchema.parse(json);
     }
 
-    // Delegate all business logic to LeaveService
+    // Create leave request using service
     const result = await LeaveService.createLeaveRequest(me.id, {
       type: parsedInput.type as LeaveType,
       startDate: new Date(parsedInput.startDate),
@@ -112,28 +138,35 @@ export async function POST(req: Request) {
       reason: parsedInput.reason,
       workingDays: parsedInput.workingDays,
       needsCertificate: parsedInput.needsCertificate,
-      certificateFile,
+      certificateFile: certificateFile || undefined,
     });
 
     if (!result.success) {
       return NextResponse.json(
-        error(result.error!.code, result.error!.message, traceId, result.error!.details),
+        error(
+          result.error!.code,
+          result.error!.message,
+          traceId,
+          result.error!.details
+        ),
         { status: 400 }
       );
     }
 
     return NextResponse.json({
-      ok: true,
-      id: result.data.id,
-      warnings: result.data.warnings
+      success: true,
+      data: result.data,
     });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(
-        error("validation_error", "Invalid request data", traceId, { errors: err.errors }),
+        error("validation_error", "Invalid request data", traceId, {
+          errors: err.errors,
+        }),
         { status: 400 }
       );
     }
+
     console.error("POST /api/leaves error:", err);
     return NextResponse.json(
       error("internal_error", "Failed to create leave request", traceId),

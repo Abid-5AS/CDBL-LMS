@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ModernTable } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,27 +10,20 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Inbox, Loader2, ChevronLeft, ChevronRight, CheckCircle2, ArrowRight, RotateCcw, XCircle } from "lucide-react";
-import { SUCCESS_MESSAGES } from "@/lib";
-import { toast } from "sonner";
-import { getToastMessage } from "@/lib";
+import { Loader2, CheckCircle2, ArrowRight, RotateCcw, XCircle } from "lucide-react";
 import { DEFAULT_FILTER } from "@/types/filters";
-import { useDebounce } from "@/lib";
-import { useFilterFromUrl } from "@/lib";
-import { useUser } from "@/lib";
-import { formatDate, cn } from "@/lib/utils";
+import { useDebounce, useFilterFromUrl, useUser } from "@/lib";
+import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
 import Link from "next/link";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { LeaveType, LeaveStatus } from "@prisma/client";
-import { Skeleton } from "@/components/ui/skeleton";
+import { LeaveType } from "@prisma/client";
 import { LeaveComparisonModal } from "@/components/shared/modals";
 import { AppRole } from "@/lib";
 import { canPerformAction } from "@/lib/workflow";
 
 // Shared components
-import { SearchWithClear } from "@/components/shared/filters";
-import { CombinedFilterSection } from "@/components/shared/filters";
+import { SearchWithClear, CombinedFilterSection } from "@/components/shared/filters";
 import {
   ApprovalDialog,
   RejectDialog,
@@ -39,6 +31,17 @@ import {
   ForwardDialog,
   CancelDialog,
 } from "@/components/shared/modals";
+import { ScrollingPagination } from "@/components/shared/pagination";
+
+// Extracted hooks and components
+import { useLeaveActions } from "../hooks/useLeaveActions";
+import { useLeaveDialogs } from "../hooks/useLeaveDialogs";
+import {
+  PendingTableLoading,
+  PendingTableError,
+  PendingTableEmpty,
+  PendingTableNoResults,
+} from "../components/PendingTableStates";
 
 type DeptHeadPendingTableProps = {
   data?: {
@@ -69,6 +72,14 @@ export function DeptHeadPendingTable({
   const [searchInput, setSearchInput] = useState(state.q);
   const debouncedSearch = useDebounce(searchInput, 250);
 
+  // Custom hooks
+  const { handleAction, processingIds } = useLeaveActions(onMutate);
+  const { currentLeaveId, currentLeaveInfo, dialogs, openDialog, closeAllDialogs } = useLeaveDialogs();
+
+  // Comparison modal state
+  const [comparisonModalOpen, setComparisonModalOpen] = useState(false);
+  const [selectedLeaveForComparison, setSelectedLeaveForComparison] = useState<any | null>(null);
+
   // Update URL when debounced search changes
   useEffect(() => {
     if (debouncedSearch !== state.q) {
@@ -76,130 +87,23 @@ export function DeptHeadPendingTable({
     }
   }, [debouncedSearch, state.q, set]);
 
-  // Sync search input with URL state (when URL changes externally)
+  // Sync search input with URL state
   useEffect(() => {
     if (state.q !== searchInput) {
       setSearchInput(state.q);
     }
   }, [state.q, searchInput]);
 
-  // Dialog state
-  const [currentLeaveId, setCurrentLeaveId] = useState<number | null>(null);
-  const [currentLeaveInfo, setCurrentLeaveInfo] = useState({ type: "", name: "" });
-  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
-  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
-  const [returnDialogOpen, setReturnDialogOpen] = useState(false);
-  const [forwardDialogOpen, setForwardDialogOpen] = useState(false);
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [comparisonModalOpen, setComparisonModalOpen] = useState(false);
-  const [selectedLeaveForComparison, setSelectedLeaveForComparison] = useState<any | null>(null);
-  const [processingIds, setProcessingIds] = useState<Set<number>>(new Set());
-
   const rows = data?.rows || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / state.pageSize);
 
-  // Clear all filters
   const clearFilters = () => {
     set(DEFAULT_FILTER);
     setSearchInput("");
   };
 
   const hasActiveFilters = state.q || state.status !== "PENDING" || state.type !== "ALL";
-
-  // Generic action handler
-  const handleAction = async (
-    leaveId: number,
-    action: "approve" | "reject" | "forward" | "return" | "cancel",
-    comment?: string
-  ) => {
-    setProcessingIds((prev) => new Set(prev).add(leaveId));
-
-    try {
-      const endpoint = `/api/leaves/${leaveId}/${action}`;
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          comment: comment || "",
-          reason: comment || undefined,
-        }),
-      });
-
-      const payload = await res.json().catch(() => ({}));
-
-      if (!res.ok) {
-        const errorMessage = getToastMessage(
-          payload?.error || `Failed to ${action} request`,
-          payload?.message
-        );
-        toast.error(errorMessage);
-        return;
-      }
-
-      // Success messages
-      const successMessages = {
-        approve: SUCCESS_MESSAGES.leave_approved,
-        reject: SUCCESS_MESSAGES.leave_rejected,
-        return: SUCCESS_MESSAGES.returned_for_modification,
-        cancel: "Leave request cancelled successfully",
-        forward: SUCCESS_MESSAGES.leave_forwarded,
-      };
-      toast.success(successMessages[action]);
-
-      // Refresh data
-      if (onMutate) {
-        await onMutate();
-      } else if (typeof window !== "undefined") {
-        window.location.reload();
-      }
-
-      // Close dialogs
-      setApproveDialogOpen(false);
-      setRejectDialogOpen(false);
-      setReturnDialogOpen(false);
-      setForwardDialogOpen(false);
-      setCancelDialogOpen(false);
-      setCurrentLeaveId(null);
-    } catch (err) {
-      toast.error(getToastMessage("network_error", "Unable to update request"));
-    } finally {
-      setProcessingIds((prev) => {
-        const next = new Set(prev);
-        next.delete(leaveId);
-        return next;
-      });
-    }
-  };
-
-  // Helper to open specific dialog
-  const openDialog = (
-    leaveId: number,
-    action: "approve" | "reject" | "forward" | "return" | "cancel",
-    leaveType: string,
-    employeeName: string
-  ) => {
-    setCurrentLeaveId(leaveId);
-    setCurrentLeaveInfo({ type: leaveType, name: employeeName });
-
-    switch (action) {
-      case "approve":
-        setApproveDialogOpen(true);
-        break;
-      case "reject":
-        setRejectDialogOpen(true);
-        break;
-      case "forward":
-        setForwardDialogOpen(true);
-        break;
-      case "return":
-        setReturnDialogOpen(true);
-        break;
-      case "cancel":
-        setCancelDialogOpen(true);
-        break;
-    }
-  };
 
   // Helper to determine available actions based on user role and leave type
   const getAvailableActions = (leaveType: LeaveType): Array<"approve" | "forward" | "return" | "cancel"> => {
@@ -220,88 +124,32 @@ export function DeptHeadPendingTable({
     return actions;
   };
 
+  // Action handlers
+  const handleConfirmAction = async (action: "approve" | "reject" | "forward" | "return" | "cancel", comment?: string) => {
+    if (currentLeaveId) {
+      await handleAction(currentLeaveId, action, comment);
+      closeAllDialogs();
+    }
+  };
+
+  const handleRetry = () => {
+    if (onMutate) onMutate();
+    else window.location.reload();
+  };
+
   // Loading state
   if (isLoading) {
-    return (
-      <Card className="rounded-2xl border-muted/60 shadow-sm">
-        <CardHeader>
-          <Skeleton className="h-6 w-32" />
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Skeleton className="h-10 w-full" />
-          <div className="space-y-2">
-            <Skeleton className="h-6 w-20" />
-            <div className="flex gap-2 flex-wrap">
-              <Skeleton className="h-8 w-20" />
-              <Skeleton className="h-8 w-20" />
-              <Skeleton className="h-8 w-20" />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Skeleton className="h-6 w-20" />
-            <div className="flex gap-2 flex-wrap">
-              <Skeleton className="h-8 w-24" />
-              <Skeleton className="h-8 w-24" />
-              <Skeleton className="h-8 w-24" />
-            </div>
-          </div>
-          <div className="border rounded-lg">
-            <Skeleton className="h-64 w-full" />
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <PendingTableLoading />;
   }
 
   // Error state
   if (error) {
-    return (
-      <Card className="rounded-2xl border-muted/60 shadow-sm">
-        <CardHeader>
-          <CardTitle>Pending Requests</CardTitle>
-        </CardHeader>
-        <CardContent className="py-12">
-          <div className="text-center space-y-4">
-            <div className="text-sm font-semibold text-data-error">
-              Failed to load requests
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {error?.message || "Please refresh the page or try again later."}
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                if (onMutate) onMutate();
-                else window.location.reload();
-              }}
-            >
-              Retry
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <PendingTableError error={error} onRetry={handleRetry} />;
   }
 
   // Empty state (no data at all)
   if (!isLoading && rows.length === 0 && !hasActiveFilters) {
-    return (
-      <Card className="rounded-2xl border-muted/60 shadow-sm">
-        <CardHeader>
-          <CardTitle>Pending Requests</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="p-12 text-center bg-gradient-to-br from-muted/30 to-muted/10 rounded-lg border border-muted/60">
-            <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-data-success" />
-            <h3 className="text-lg font-semibold mb-2">All clear!</h3>
-            <p className="text-sm text-muted-foreground">
-              No pending approvals at the moment.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <PendingTableEmpty />;
   }
 
   return (
@@ -333,15 +181,7 @@ export function DeptHeadPendingTable({
 
           {/* Table or Empty State */}
           {rows.length === 0 ? (
-            <Card className="py-12">
-              <CardContent className="text-center">
-                <Inbox className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="font-semibold mb-2">No requests match your filters</p>
-                <p className="text-sm text-muted-foreground">
-                  Try adjusting filters or check approved requests.
-                </p>
-              </CardContent>
-            </Card>
+            <PendingTableNoResults />
           ) : (
             <div className="space-y-4">
               <ModernTable.Card.Root>
@@ -553,121 +393,56 @@ export function DeptHeadPendingTable({
               </ModernTable.Card.Root>
 
               {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      set({ page: Math.max(1, state.page - 1) });
-                      setTimeout(() => {
-                        const tableElement = document.getElementById("pending-requests-table");
-                        if (tableElement) {
-                          tableElement.scrollIntoView({ behavior: "smooth", block: "start" });
-                        }
-                      }, 100);
-                    }}
-                    disabled={state.page === 1}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                    Previous
-                  </Button>
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      let pageNum;
-                      if (totalPages <= 5) {
-                        pageNum = i + 1;
-                      } else if (state.page <= 3) {
-                        pageNum = i + 1;
-                      } else if (state.page >= totalPages - 2) {
-                        pageNum = totalPages - 4 + i;
-                      } else {
-                        pageNum = state.page - 2 + i;
-                      }
-
-                      return (
-                        <Button
-                          key={pageNum}
-                          variant={state.page === pageNum ? "default" : "outline"}
-                          size="sm"
-                          className="h-8 w-8 p-0"
-                          onClick={() => {
-                            set({ page: pageNum });
-                            setTimeout(() => {
-                              const tableElement = document.getElementById("pending-requests-table");
-                              if (tableElement) {
-                                tableElement.scrollIntoView({ behavior: "smooth", block: "start" });
-                              }
-                            }, 100);
-                          }}
-                        >
-                          {pageNum}
-                        </Button>
-                      );
-                    })}
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      set({ page: Math.min(totalPages, state.page + 1) });
-                      setTimeout(() => {
-                        const tableElement = document.getElementById("pending-requests-table");
-                        if (tableElement) {
-                          tableElement.scrollIntoView({ behavior: "smooth", block: "start" });
-                        }
-                      }, 100);
-                    }}
-                    disabled={state.page === totalPages}
-                  >
-                    Next
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
+              <ScrollingPagination
+                currentPage={state.page}
+                totalPages={totalPages}
+                onPageChange={(page) => set({ page })}
+                scrollToElementId="pending-requests-table"
+                className="mt-4"
+              />
             </div>
           )}
         </div>
       </ModernTable.Card.Root>
 
-      {/* Approval Dialogs - using shared components */}
+      {/* Approval Dialogs */}
       <ApprovalDialog
-        open={approveDialogOpen}
-        onOpenChange={setApproveDialogOpen}
-        onConfirm={() => currentLeaveId && handleAction(currentLeaveId, "approve")}
+        open={dialogs.approve.open}
+        onOpenChange={dialogs.approve.setOpen}
+        onConfirm={() => handleConfirmAction("approve")}
         leaveType={currentLeaveInfo.type}
         employeeName={currentLeaveInfo.name}
         isLoading={currentLeaveId ? processingIds.has(currentLeaveId) : false}
       />
 
       <RejectDialog
-        open={rejectDialogOpen}
-        onOpenChange={setRejectDialogOpen}
-        onConfirm={() => currentLeaveId && handleAction(currentLeaveId, "reject")}
+        open={dialogs.reject.open}
+        onOpenChange={dialogs.reject.setOpen}
+        onConfirm={() => handleConfirmAction("reject")}
         leaveType={currentLeaveInfo.type}
         employeeName={currentLeaveInfo.name}
         isLoading={currentLeaveId ? processingIds.has(currentLeaveId) : false}
       />
 
       <ReturnDialog
-        open={returnDialogOpen}
-        onOpenChange={setReturnDialogOpen}
-        onConfirm={(comment) => currentLeaveId && handleAction(currentLeaveId, "return", comment)}
+        open={dialogs.return.open}
+        onOpenChange={dialogs.return.setOpen}
+        onConfirm={(comment) => handleConfirmAction("return", comment)}
         isLoading={currentLeaveId ? processingIds.has(currentLeaveId) : false}
       />
 
       <ForwardDialog
-        open={forwardDialogOpen}
-        onOpenChange={setForwardDialogOpen}
-        onConfirm={(comment) => currentLeaveId && handleAction(currentLeaveId, "forward", comment)}
+        open={dialogs.forward.open}
+        onOpenChange={dialogs.forward.setOpen}
+        onConfirm={(comment) => handleConfirmAction("forward", comment)}
         nextApprover="HR Head"
         isLoading={currentLeaveId ? processingIds.has(currentLeaveId) : false}
       />
 
       <CancelDialog
-        open={cancelDialogOpen}
-        onOpenChange={setCancelDialogOpen}
-        onConfirm={(reason) => currentLeaveId && handleAction(currentLeaveId, "cancel", reason)}
+        open={dialogs.cancel.open}
+        onOpenChange={dialogs.cancel.setOpen}
+        onConfirm={(reason) => handleConfirmAction("cancel", reason)}
         isLoading={currentLeaveId ? processingIds.has(currentLeaveId) : false}
       />
 
