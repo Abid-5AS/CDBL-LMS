@@ -4,6 +4,7 @@ import { Bell, Inbox } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 import useSWR from "swr";
+import { motion } from "framer-motion";
 
 // UI Components (barrel export)
 import {
@@ -52,20 +53,24 @@ export function NotificationDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative h-9 w-9 text-text-secondary hover:text-text-primary hover:bg-bg-secondary rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-card-action/40 bg-transparent border-0"
-          aria-label="Notifications"
-        >
-          <Bell className="h-5 w-5" />
-          {unreadCount > 0 && (
-            <span
-              className="absolute top-1 right-1 h-2 w-2 bg-data-error rounded-full"
-              aria-label={`${unreadCount} unread notifications`}
-            />
-          )}
-        </Button>
+        <motion.div whileHover={{ scale: 1.05, y: -1 }} whileTap={{ scale: 0.95 }}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative h-9 w-9 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-white/80 dark:hover:bg-zinc-800/60 rounded-xl transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 bg-transparent border-0"
+            aria-label="Notifications"
+          >
+            <Bell className="h-[18px] w-[18px] transition-transform duration-300" />
+            {unreadCount > 0 && (
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.6)]"
+                aria-label={`${unreadCount} unread notifications`}
+              />
+            )}
+          </Button>
+        </motion.div>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"

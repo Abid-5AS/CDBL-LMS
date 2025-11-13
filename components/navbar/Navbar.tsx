@@ -26,29 +26,29 @@ export function Navbar() {
         animate={{
           y: 0,
           opacity: 1,
-          height: state.scrolled ? 60 : 72,
+          height: state.scrolled ? 72 : 84,
         }}
         transition={{
           duration: 0.4,
           ease: [0.22, 1, 0.36, 1],
           height: { duration: 0.3, ease: "easeInOut" },
         }}
-        className="fixed top-0 z-50 w-full"
+        className="fixed top-0 z-50 w-full backdrop-blur-md bg-white/40 dark:bg-black/40"
         role="navigation"
         aria-label="Main navigation"
       >
         {/* Content container */}
-        <div className="relative mx-auto flex max-w-7xl flex-col px-4 py-4">
+        <div className="relative mx-auto flex max-w-7xl flex-col px-6 py-4">
           <DesktopNav {...state} />
           <MobileBar {...state} />
         </div>
 
-        {/* Bottom border with gradient - only visible on mobile */}
+        {/* Bottom border with gradient */}
         <motion.div
           key="border"
-          className="absolute bottom-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-border to-transparent lg:hidden"
+          className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-zinc-200/50 dark:via-white/10 to-transparent"
           animate={{
-            opacity: state.scrolled ? 1 : 0.6,
+            opacity: state.scrolled ? 1 : 0.5,
           }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
         />

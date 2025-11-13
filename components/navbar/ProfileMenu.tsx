@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
   LogOut,
@@ -117,12 +118,14 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
       <DropdownMenu onOpenChange={setIsOpen}>
         <div className="group relative">
           <DropdownMenuTrigger asChild>
-            <button
+            <motion.button
               type="button"
-              className="flex items-center gap-3 px-3 py-2 rounded-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/60 dark:border-zinc-800/60 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40 hover:shadow-sm transition-all duration-200 focus:outline-none focus-ring"
+              whileHover={{ scale: 1.02, y: -1 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl bg-white/80 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-700/60 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-white dark:hover:bg-zinc-800 hover:shadow-md transition-all duration-300 focus:outline-none focus-ring"
             >
               <div className="text-left hidden sm:block">
-                <div className="text-xs font-medium text-zinc-900 dark:text-zinc-100 tracking-tight leading-tight">
+                <div className="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight leading-tight">
                   {user.name}
                 </div>
                 <div className="text-[10px] text-zinc-500 dark:text-zinc-400 tracking-tight leading-tight">
@@ -130,13 +133,16 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
                 </div>
               </div>
               <div className="relative">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 p-0.5">
+                <motion.div
+                  whileHover={{ rotate: 5 }}
+                  className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 p-0.5 shadow-md"
+                >
                   <div className="w-full h-full rounded-full flex items-center justify-center bg-white dark:bg-zinc-900 text-xs font-bold text-zinc-900 dark:text-zinc-100">
                     {initials}
                   </div>
-                </div>
+                </motion.div>
               </div>
-            </button>
+            </motion.button>
           </DropdownMenuTrigger>
 
           {/* Bending line indicator */}
