@@ -615,6 +615,319 @@ export class LeaveService {
     });
   }
 
+  /**
+   * Get team leave requests for department head with filters and pagination
+   */
+  static async getTeamLeaveRequests(
+    deptHeadId: number,
+    filters: {
+      search?: string;
+      status?: string;
+      type?: string;
+      page?: number;
+      pageSize?: number;
+    }
+  ): Promise<ServiceResult<{
+    rows: any[];
+    total: number;
+    counts: {
+      pending: number;
+      forwarded: number;
+      returned: number;
+      cancelled: number;
+    };
+  }>> {
+    try {
+      const {
+        search = "",
+        status = "PENDING",
+        type = "ALL",
+        page = 1,
+        pageSize = 10,
+      } = filters;
+
+      // Get team members
+      const teamMembers = await prisma.user.findMany({
+        where: { deptHeadId },
+        select: { id: true },
+      });
+      const teamMemberIds = teamMembers.map((m) => m.id);
+
+      // If no team members, return empty results
+      if (teamMemberIds.length === 0) {
+        return {
+          success: true,
+          data: {
+            rows: [],
+            total: 0,
+            counts: {
+              pending: 0,
+              forwarded: 0,
+              returned: 0,
+              cancelled: 0,
+            },
+          },
+        };
+      }
+
+      // Build where clause
+      const where = this.buildTeamLeaveWhere(
+        deptHeadId,
+        search,
+        status,
+        type,
+        teamMemberIds
+      );
+
+      // Fetch all rows matching the filter (for deduplication)
+      const rowsRaw = await prisma.leaveRequest.findMany({
+        where,
+        include: {
+          requester: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              deptHeadId: true,
+            },
+          },
+          approvals: {
+            include: {
+              approver: {
+                select: { name: true, role: true },
+              },
+            },
+            orderBy: { step: "asc" },
+          },
+        },
+        orderBy: [{ startDate: "asc" }, { id: "asc" }],
+      });
+
+      // Deduplicate (same requester + dates)
+      const key = (r: any) =>
+        `${r.requesterId}-${r.startDate.toISOString()}-${r.endDate.toISOString()}`;
+      const seen = new Set<string>();
+      const uniqueRows = rowsRaw.filter((r) =>
+        seen.has(key(r)) ? false : seen.add(key(r))
+      );
+
+      // Calculate total after deduplication
+      const total = uniqueRows.length;
+
+      // Apply pagination AFTER deduplication
+      const rows = uniqueRows.slice(
+        (page - 1) * pageSize,
+        page * pageSize
+      );
+
+      // Calculate status counts
+      const counts = await this.getTeamLeaveCounts(deptHeadId, teamMemberIds);
+
+      // Serialize rows
+      const serializedRows = rows.map((r) => ({
+        id: r.id,
+        type: r.type,
+        startDate: r.startDate.toISOString(),
+        endDate: r.endDate.toISOString(),
+        workingDays: r.workingDays,
+        reason: r.reason,
+        status: r.status,
+        isModified: (r as any).isModified ?? false,
+        requester: r.requester,
+        approvals: r.approvals.map((a) => ({
+          id: a.id,
+          decision: a.decision,
+          toRole: a.toRole,
+          approverId: a.approverId,
+          approver: a.approver,
+          decidedAt: a.decidedAt?.toISOString() || null,
+          comment: a.comment,
+        })),
+      }));
+
+      return {
+        success: true,
+        data: {
+          rows: serializedRows,
+          total,
+          counts,
+        },
+      };
+    } catch (error) {
+      console.error("LeaveService.getTeamLeaveRequests error:", error);
+      return {
+        success: false,
+        error: {
+          code: "fetch_error",
+          message: "Failed to fetch team leave requests",
+        },
+      };
+    }
+  }
+
+  /**
+   * Build where clause for team leave requests
+   */
+  private static buildTeamLeaveWhere(
+    deptHeadId: number,
+    search: string,
+    status: string,
+    type: string,
+    teamMemberIds: number[]
+  ): any {
+    const base: any = {
+      requesterId: { in: teamMemberIds },
+    };
+
+    // Type filter
+    if (type && type !== "ALL") {
+      base.type = type as LeaveType;
+    }
+
+    // Search filter
+    if (search) {
+      base.OR = [
+        { requester: { name: { contains: search, mode: "insensitive" } } },
+        { requester: { email: { contains: search, mode: "insensitive" } } },
+        { reason: { contains: search, mode: "insensitive" } },
+      ];
+    }
+
+    // Status scope for Dept Head
+    if (status === "PENDING") {
+      base.status = { in: [LeaveStatus.PENDING, LeaveStatus.SUBMITTED] };
+      base.AND = [
+        {
+          approvals: {
+            some: {
+              decision: "FORWARDED",
+              toRole: "DEPT_HEAD",
+            },
+          },
+        },
+        {
+          approvals: {
+            none: {
+              approverId: deptHeadId,
+              decision: {
+                in: ["FORWARDED", "APPROVED", "REJECTED"],
+              },
+            },
+          },
+        },
+      ];
+    } else if (status === "FORWARDED") {
+      base.status = LeaveStatus.PENDING;
+      base.approvals = {
+        some: {
+          decision: "FORWARDED",
+          approverId: deptHeadId,
+          toRole: { not: null },
+        },
+      };
+    } else if (status === "RETURNED") {
+      base.status = LeaveStatus.RETURNED;
+      base.approvals = {
+        some: {
+          approverId: deptHeadId,
+          decision: "FORWARDED",
+          toRole: null,
+        },
+      };
+    } else if (status === "CANCELLED") {
+      base.status = LeaveStatus.CANCELLED;
+    } else if (status === "ALL") {
+      base.status = {
+        in: [
+          LeaveStatus.PENDING,
+          LeaveStatus.SUBMITTED,
+          LeaveStatus.RETURNED,
+          LeaveStatus.CANCELLED,
+        ],
+      };
+    }
+
+    return base;
+  }
+
+  /**
+   * Get status counts for team leave requests
+   */
+  private static async getTeamLeaveCounts(
+    deptHeadId: number,
+    teamMemberIds: number[]
+  ): Promise<{
+    pending: number;
+    forwarded: number;
+    returned: number;
+    cancelled: number;
+  }> {
+    const baseDept = { requesterId: { in: teamMemberIds } };
+
+    const [pending, forwarded, returned, cancelled] = await Promise.all([
+      prisma.leaveRequest.count({
+        where: {
+          ...baseDept,
+          status: { in: [LeaveStatus.PENDING, LeaveStatus.SUBMITTED] },
+          AND: [
+            {
+              approvals: {
+                some: {
+                  decision: "FORWARDED",
+                  toRole: "DEPT_HEAD",
+                },
+              },
+            },
+            {
+              approvals: {
+                none: {
+                  approverId: deptHeadId,
+                  decision: {
+                    in: ["FORWARDED", "APPROVED", "REJECTED"],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      }),
+      prisma.leaveRequest.count({
+        where: {
+          ...baseDept,
+          status: LeaveStatus.PENDING,
+          approvals: {
+            some: {
+              decision: "FORWARDED",
+              approverId: deptHeadId,
+              toRole: { not: null },
+            },
+          },
+        },
+      }),
+      prisma.leaveRequest.count({
+        where: {
+          ...baseDept,
+          status: LeaveStatus.RETURNED,
+          approvals: {
+            some: {
+              approverId: deptHeadId,
+              decision: "FORWARDED",
+              toRole: null,
+            },
+          },
+        },
+      }),
+      prisma.leaveRequest.count({
+        where: {
+          ...baseDept,
+          status: LeaveStatus.CANCELLED,
+        },
+      }),
+    ]);
+
+    return { pending, forwarded, returned, cancelled };
+  }
+
   private static async logAction(
     actor: string,
     action: string,

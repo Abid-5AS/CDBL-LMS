@@ -5,6 +5,12 @@ import {
 } from "@/lib/repositories/notification.repository";
 import { LeaveType, LeaveStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import {
+  sendLeaveSubmittedEmail,
+  sendLeaveApprovedEmail,
+  sendLeaveRejectedEmail,
+  sendLeaveReturnedEmail,
+} from "@/lib/email";
 
 export type ServiceResult<T> = {
   success: boolean;
@@ -236,6 +242,34 @@ export class NotificationService {
       });
 
       const count = await NotificationRepository.createMany(notifications);
+
+      // Send emails to all approvers
+      const emailPromises = leave.approvals.map(async (approval) => {
+        const approver = await prisma.user.findUnique({
+          where: { id: approval.approver.id },
+          select: { email: true, name: true },
+        });
+
+        if (approver) {
+          await sendLeaveSubmittedEmail(
+            approver.email,
+            approver.name,
+            leave.requester.name,
+            leave.type,
+            leave.startDate.toLocaleDateString(),
+            leave.endDate.toLocaleDateString(),
+            leave.workingDays,
+            leaveId
+          );
+        }
+      });
+
+      // Send emails asynchronously (don't block notification creation)
+      Promise.all(emailPromises).catch((err) => {
+        console.error("Failed to send leave submitted emails:", err);
+        // Don't fail the notification if email fails
+      });
+
       return { success: true, data: count };
     } catch (error) {
       console.error("NotificationService.notifyLeaveSubmitted error:", error);
@@ -256,7 +290,7 @@ export class NotificationService {
     try {
       const leave = await prisma.leaveRequest.findUnique({
         where: { id: leaveId },
-        include: { requester: { select: { id: true, name: true } } },
+        include: { requester: { select: { id: true, name: true, email: true } } },
       });
 
       if (!leave) {
@@ -273,6 +307,20 @@ export class NotificationService {
         message: `Your ${leave.type} leave request has been approved by ${approverName}`,
         link: `/leaves/${leaveId}`,
         leaveId: leaveId,
+      });
+
+      // Send email to requester
+      sendLeaveApprovedEmail(
+        leave.requester.email,
+        leave.requester.name,
+        leave.type,
+        leave.startDate.toLocaleDateString(),
+        leave.endDate.toLocaleDateString(),
+        approverName,
+        leaveId
+      ).catch((err) => {
+        console.error("Failed to send leave approved email:", err);
+        // Don't fail the notification if email fails
       });
 
       return { success: true };
@@ -295,7 +343,7 @@ export class NotificationService {
     try {
       const leave = await prisma.leaveRequest.findUnique({
         where: { id: leaveId },
-        include: { requester: { select: { id: true, name: true } } },
+        include: { requester: { select: { id: true, name: true, email: true } } },
       });
 
       if (!leave) {
@@ -318,6 +366,21 @@ export class NotificationService {
         leaveId: leaveId,
       });
 
+      // Send email to requester
+      sendLeaveRejectedEmail(
+        leave.requester.email,
+        leave.requester.name,
+        leave.type,
+        leave.startDate.toLocaleDateString(),
+        leave.endDate.toLocaleDateString(),
+        approverName,
+        reason || "No specific reason provided",
+        leaveId
+      ).catch((err) => {
+        console.error("Failed to send leave rejected email:", err);
+        // Don't fail the notification if email fails
+      });
+
       return { success: true };
     } catch (error) {
       console.error("NotificationService.notifyLeaveRejected error:", error);
@@ -338,7 +401,7 @@ export class NotificationService {
     try {
       const leave = await prisma.leaveRequest.findUnique({
         where: { id: leaveId },
-        include: { requester: { select: { id: true, name: true } } },
+        include: { requester: { select: { id: true, name: true, email: true } } },
       });
 
       if (!leave) {
@@ -355,6 +418,19 @@ export class NotificationService {
         message: `Your ${leave.type} leave request has been returned by ${approverName}. ${comment}`,
         link: `/leaves/${leaveId}`,
         leaveId: leaveId,
+      });
+
+      // Send email to requester
+      sendLeaveReturnedEmail(
+        leave.requester.email,
+        leave.requester.name,
+        leave.type,
+        approverName,
+        comment,
+        leaveId
+      ).catch((err) => {
+        console.error("Failed to send leave returned email:", err);
+        // Don't fail the notification if email fails
       });
 
       return { success: true };
