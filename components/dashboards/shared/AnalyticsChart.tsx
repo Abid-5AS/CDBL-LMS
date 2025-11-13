@@ -20,7 +20,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-// Color palette for charts
+// Modern color palette using CSS variables for consistency
 const CHART_COLORS = {
   primary: "hsl(var(--data-info))",
   success: "hsl(var(--data-success))",
@@ -30,16 +30,27 @@ const CHART_COLORS = {
   accent: "hsl(var(--accent))",
 };
 
+// Use standardized chart color variables
 const PIE_COLORS = [
-  "#3b82f6", // blue
-  "#10b981", // green
-  "#f59e0b", // amber
-  "#ef4444", // red
-  "#8b5cf6", // purple
-  "#ec4899", // pink
-  "#06b6d4", // cyan
-  "#84cc16", // lime
+  "hsl(var(--chart-1))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-3))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-5))",
+  "#ec4899", // pink fallback
+  "#06b6d4", // cyan fallback
+  "#84cc16", // lime fallback
 ];
+
+// Glass-styled tooltip configuration
+const glassTooltipStyle = {
+  backgroundColor: "hsl(var(--card))",
+  backdropFilter: "blur(12px)",
+  border: "1px solid hsl(var(--border))",
+  borderRadius: "12px",
+  padding: "12px",
+  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
+};
 
 interface BaseChartProps {
   title?: string;
@@ -86,7 +97,7 @@ export function AnalyticsLineChart({
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} vertical={false} />
             <XAxis
               dataKey={xAxisKey}
               className="text-xs"
@@ -96,13 +107,7 @@ export function AnalyticsLineChart({
               className="text-xs"
               tick={{ fill: "hsl(var(--muted-foreground))" }}
             />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "hsl(var(--card))",
-                border: "1px solid hsl(var(--border))",
-                borderRadius: "8px",
-              }}
-            />
+            <Tooltip contentStyle={glassTooltipStyle} />
             <Legend />
             {dataKeys.map((item, index) => (
               <Line
@@ -163,7 +168,7 @@ export function AnalyticsBarChart({
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} vertical={false} />
             <XAxis
               dataKey={xAxisKey}
               className="text-xs"
@@ -173,13 +178,7 @@ export function AnalyticsBarChart({
               className="text-xs"
               tick={{ fill: "hsl(var(--muted-foreground))" }}
             />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "hsl(var(--card))",
-                border: "1px solid hsl(var(--border))",
-                borderRadius: "8px",
-              }}
-            />
+            <Tooltip contentStyle={glassTooltipStyle} />
             <Legend />
             {dataKeys.map((item, index) => (
               <Bar
@@ -265,7 +264,7 @@ export function AnalyticsAreaChart({
                 </linearGradient>
               ))}
             </defs>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} vertical={false} />
             <XAxis
               dataKey={xAxisKey}
               className="text-xs"
@@ -275,13 +274,7 @@ export function AnalyticsAreaChart({
               className="text-xs"
               tick={{ fill: "hsl(var(--muted-foreground))" }}
             />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "hsl(var(--card))",
-                border: "1px solid hsl(var(--border))",
-                borderRadius: "8px",
-              }}
-            />
+            <Tooltip contentStyle={glassTooltipStyle} />
             <Legend />
             {dataKeys.map((item, index) => (
               <Area
@@ -364,13 +357,7 @@ export function AnalyticsPieChart({
                 />
               ))}
             </Pie>
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "hsl(var(--card))",
-                border: "1px solid hsl(var(--border))",
-                borderRadius: "8px",
-              }}
-            />
+            <Tooltip contentStyle={glassTooltipStyle} />
           </PieChart>
         </ResponsiveContainer>
       </CardContent>
