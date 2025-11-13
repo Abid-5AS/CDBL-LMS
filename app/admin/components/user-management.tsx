@@ -61,7 +61,7 @@ export function UserManagement({ users, onRoleChange, onCreate, busyUserId }: Us
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-text-secondary">User Management</h2>
+          <h2 className="text-xl font-semibold text-foreground">User Management</h2>
           <p className="text-sm text-muted-foreground">Assign roles and manage departments for each account.</p>
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
@@ -78,7 +78,7 @@ export function UserManagement({ users, onRoleChange, onCreate, busyUserId }: Us
 
       <div className="overflow-x-auto rounded-xl border border-border-strong bg-bg-primary shadow-sm">
         <table className="min-w-full divide-y divide-slate-200 text-sm">
-          <thead className="bg-bg-secondary text-left text-xs font-semibold uppercase tracking-wide text-text-secondary">
+          <thead className="bg-bg-secondary text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             <tr>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Email</th>
@@ -93,10 +93,10 @@ export function UserManagement({ users, onRoleChange, onCreate, busyUserId }: Us
               const updating = busyUserId === user.id;
               return (
                 <tr key={user.id} className="hover:bg-bg-secondary/60">
-                  <td className="px-4 py-3 font-medium text-text-secondary">{user.name}</td>
-                  <td className="px-4 py-3 text-text-secondary">{user.email}</td>
-                  <td className="px-4 py-3 text-text-secondary">{user.empCode ?? "—"}</td>
-                  <td className="px-4 py-3 text-text-secondary">{user.department ?? "—"}</td>
+                  <td className="px-4 py-3 font-medium text-foreground">{user.name}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{user.email}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{user.empCode ?? "—"}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{user.department ?? "—"}</td>
                   <td className="px-4 py-3">
                     <select
                       className="w-full rounded-md border border-border-strong bg-bg-primary px-2 py-1 text-sm"

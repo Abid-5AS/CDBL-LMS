@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { AlertCircle, XCircle } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
@@ -76,6 +76,7 @@ export function CancellationRequestsPanel() {
             icon={XCircle}
             title="No cancellation requests"
             description="There are currently no pending cancellation requests to review."
+            variant="minimal"
             action={{
               label: "View All Requests",
               href: "/approvals",

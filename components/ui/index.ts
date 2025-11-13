@@ -151,7 +151,6 @@ export {
 } from "./form";
 export { SegmentedControl } from "./segmented-control";
 export { Switch } from "./switch";
-export { EmptyState } from "./empty-state";
 export { GlassButton } from "./glass-button";
 export { GlassCard } from "./glass-card";
 export { GlassModal } from "./glass-modal";

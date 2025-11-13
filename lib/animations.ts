@@ -211,3 +211,18 @@ export const motionTokens = {
 export type MotionDurations = typeof DURATIONS;
 export type MotionEasings = typeof EASINGS;
 
+/**
+ * Simplified animation duration constants for quick access
+ * Maps to DURATIONS for backwards compatibility
+ */
+export const ANIMATION_DURATIONS = {
+  /** Fast animations for micro-interactions (hover, focus, ripple effects) */
+  fast: DURATIONS.micro,      // 0.15s
+
+  /** Normal animations for standard transitions (cards, modals, dropdowns) */
+  normal: DURATIONS.medium,   // 0.35s
+
+  /** Slow animations for page transitions and major layout changes */
+  slow: DURATIONS.large,      // 0.5s
+} as const;
+
