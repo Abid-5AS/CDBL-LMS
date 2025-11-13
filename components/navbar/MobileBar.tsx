@@ -31,9 +31,9 @@ export function MobileBar({
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
-        whileHover={{ scale: 1.05 }}
+        whileHover={{ scale: 1.05, y: -1 }}
         whileTap={{ scale: 0.95 }}
-        className="glass-pill p-2.5 shadow-md backdrop-blur-md border border-white/20 dark:border-white/10 rounded-xl focus-ring hover-lift active-press"
+        className="rounded-xl bg-zinc-100/50 dark:bg-zinc-900/40 p-2.5 shadow-[0_0_20px_rgba(0,0,0,0.03)] dark:shadow-[0_0_20px_rgba(255,255,255,0.02)] backdrop-blur-xl border border-zinc-200/50 dark:border-white/5 focus-ring transition-all duration-300"
         onClick={toggleMobileMenu}
         aria-label="Toggle menu"
         aria-expanded={isMobileMenuOpen}
@@ -47,7 +47,7 @@ export function MobileBar({
               exit={{ rotate: 90, opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <X size={20} className="text-foreground" />
+              <X size={20} className="text-zinc-900 dark:text-zinc-100" />
             </motion.div>
           ) : (
             <motion.div
@@ -57,7 +57,7 @@ export function MobileBar({
               exit={{ rotate: -90, opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <Menu size={20} className="text-foreground" />
+              <Menu size={20} className="text-zinc-900 dark:text-zinc-100" />
             </motion.div>
           )}
         </AnimatePresence>

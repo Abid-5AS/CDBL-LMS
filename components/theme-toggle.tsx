@@ -40,41 +40,43 @@ export function ThemeToggle() {
   }
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      aria-label={label}
-      className="relative h-9 w-9 rounded-full text-text-secondary hover:text-text-primary hover:bg-bg-secondary transition-colors bg-transparent border-0 focus-visible:ring-2 focus-visible:ring-card-action/40"
-      onClick={() => setTheme(isDark ? "light" : "dark")}
-    >
-      <span className="sr-only">{label}</span>
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.span
-          key={isDark ? "sun" : "moon"}
-          variants={scaleIn(
-            { duration: prefersReducedMotion ? 0 : 0.25 },
-            prefersReducedMotion ?? false
-          )}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          className="flex items-center justify-center"
-        >
-          {isDark ? (
-            <SunIcon
-              className="text-data-warning drop-shadow-[0_0_4px_rgba(250,204,21,0.55)]"
-              strokeWidth={1.8}
-              size={iconSizes.md}
-            />
-          ) : (
-            <MoonIcon
-              className="text-card-action dark:text-card-action drop-shadow-[0_0_6px_rgba(99,102,241,0.55)]"
-              strokeWidth={1.9}
-              size={iconSizes.md}
-            />
-          )}
-        </motion.span>
-      </AnimatePresence>
-    </Button>
+    <motion.div whileHover={{ scale: 1.05, y: -1 }} whileTap={{ scale: 0.95 }}>
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label={label}
+        className="relative h-9 w-9 rounded-xl text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-white/80 dark:hover:bg-zinc-800/60 transition-all duration-300 bg-transparent border-0 focus-visible:ring-2 focus-visible:ring-indigo-500/40"
+        onClick={() => setTheme(isDark ? "light" : "dark")}
+      >
+        <span className="sr-only">{label}</span>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={isDark ? "sun" : "moon"}
+            variants={scaleIn(
+              { duration: prefersReducedMotion ? 0 : 0.25 },
+              prefersReducedMotion ?? false
+            )}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="flex items-center justify-center"
+          >
+            {isDark ? (
+              <SunIcon
+                className="text-amber-500 drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]"
+                strokeWidth={1.8}
+                size={iconSizes.md}
+              />
+            ) : (
+              <MoonIcon
+                className="text-indigo-600 dark:text-indigo-400 drop-shadow-[0_0_6px_rgba(99,102,241,0.6)]"
+                strokeWidth={1.9}
+                size={iconSizes.md}
+              />
+            )}
+          </motion.span>
+        </AnimatePresence>
+      </Button>
+    </motion.div>
   );
 }
