@@ -522,6 +522,47 @@ async function createLeaveRequests(users: SeedUser[], holidays: SeedHoliday[]) {
   }
 
   let leaveCount = 0;
+
+  // Create currently active leaves for some employees (teammates on leave)
+  const employeesOnLeave = employees.slice(0, Math.min(3, employees.length));
+  for (const employee of employeesOnLeave) {
+    const deptHead = employee.department && deptHeads.get(employee.department);
+    if (!deptHead) continue;
+
+    const leaveType = leaveRng.pick([LeaveType.EARNED, LeaveType.CASUAL]);
+    const today = normalizeToDhakaMidnight(new Date());
+    const startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - leaveRng.nextInt(1, 3)); // Started 1-3 days ago
+    const duration = leaveType === LeaveType.EARNED ? leaveRng.nextInt(5, 10) : leaveRng.nextInt(2, 3);
+    const endDate = addWorkingDays(startDate, duration, holidays);
+    const workingDays = countWorkingDaysSync(startDate, endDate, holidays);
+
+    const leave = await prisma.leaveRequest.create({
+      data: {
+        requesterId: employee.id,
+        type: leaveType,
+        startDate: ensureWorkingDay(startDate, holidays),
+        endDate,
+        workingDays,
+        reason: randomReason(leaveType, leaveRng),
+        status: LeaveStatus.APPROVED,
+        policyVersion: "v2.0",
+        needsCertificate: false,
+      },
+    });
+
+    await createApprovalTrail({
+      leave,
+      employee,
+      approvers: { hrAdmin, deptHead, hrHead, ceo },
+      status: LeaveStatus.APPROVED,
+      leaveType,
+    });
+
+    leaveCount++;
+  }
+
+  // Create regular leave requests for all employees
   for (const employee of employees) {
     const deptHead = employee.department && deptHeads.get(employee.department);
     if (!deptHead) continue;
@@ -604,7 +645,7 @@ async function createLeaveRequests(users: SeedUser[], holidays: SeedHoliday[]) {
     }
   }
 
-  console.log(`✅ Leave requests created: ${leaveCount}`);
+  console.log(`✅ Leave requests created: ${leaveCount} (including ${employeesOnLeave.length} currently on leave)`);
 }
 
 async function createApprovalTrail(params: {

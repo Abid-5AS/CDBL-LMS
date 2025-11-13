@@ -43,6 +43,10 @@ export * from "./states";
 // Re-export pagination
 export * from "./pagination";
 
+// Developer Annotation Mode
+export { AnnotationModeToggle } from "./AnnotationModeToggle";
+export { AnnotationMarker } from "./AnnotationMarker";
+
 // Note: Adapters have name conflicts with LeaveCharts, import directly if needed
 // import { ... } from "@/components/shared/balance-adapters"
 // import { ... } from "@/components/shared/timeline-adapters"

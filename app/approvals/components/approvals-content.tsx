@@ -2,8 +2,8 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ApprovalTable, HRAdminStats } from "@/components/HRAdmin";
-import { HRApprovalItem } from "@/components/HRAdmin";
+import { ApprovalTable, HRAdminStats } from "@/components/hr-admin";
+import { HRApprovalItem } from "@/components/hr-admin";
 
 export function ApprovalsContent() {
   const router = useRouter();
