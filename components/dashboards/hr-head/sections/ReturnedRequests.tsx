@@ -80,6 +80,10 @@ export function ReturnedRequestsPanel() {
             icon={FileEdit}
             title="No returned requests"
             description="There are no leave requests currently returned for modification."
+            action={{
+              label: "View All Requests",
+              href: "/approvals",
+            }}
           />
         </CardContent>
       </Card>

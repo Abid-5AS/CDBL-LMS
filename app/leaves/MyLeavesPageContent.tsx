@@ -336,6 +336,14 @@ export function MyLeavesPageContent() {
                     ? "Start by applying for your first leave request."
                     : `No ${selectedFilter} requests found.`
                 }
+                action={
+                  selectedFilter === "all"
+                    ? {
+                        label: "Apply for Leave",
+                        href: "/apply",
+                      }
+                    : undefined
+                }
               />
             </CardContent>
           </Card>
