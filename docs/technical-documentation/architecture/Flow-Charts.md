@@ -56,25 +56,46 @@ flowchart TD
 stateDiagram-v2
     [*] --> DRAFT: Employee Creates
     DRAFT --> SUBMITTED: Employee Submits
-    SUBMITTED --> PENDING: Auto (to HR_ADMIN)
-    PENDING --> PENDING: HR_ADMIN Forwards to DEPT_HEAD
-    PENDING --> PENDING: DEPT_HEAD Forwards to HR_HEAD
-    PENDING --> PENDING: HR_HEAD Forwards to CEO
-    PENDING --> APPROVED: HR_HEAD or CEO Approves
-    PENDING --> REJECTED: HR_HEAD or CEO Rejects
-    PENDING --> CANCELLED: Employee Cancels
+    SUBMITTED --> PENDING: Auto (to first approver)
+    PENDING --> PENDING: Forward in chain
+    PENDING --> RETURNED: Approver returns for modification
+    PENDING --> APPROVED: Final Approver Approves
+    PENDING --> REJECTED: Final Approver or HR_ADMIN Rejects
+    PENDING --> CANCELLED: Employee Cancels (non-approved only)
+    SUBMITTED --> CANCELLED: Employee Cancels
+    APPROVED --> CANCELLATION_REQUESTED: Employee Requests Cancellation
+    CANCELLATION_REQUESTED --> CANCELLED: Admin Approves Cancellation
+    CANCELLATION_REQUESTED --> APPROVED: Admin Denies Cancellation
+    APPROVED --> RECALLED: Admin Recalls Employee
+    APPROVED --> OVERSTAY_PENDING: End Date Passed, No Return
+    RETURNED --> PENDING: Employee Resubmits
     APPROVED --> [*]
     REJECTED --> [*]
     CANCELLED --> [*]
-    
+    RECALLED --> [*]
+    OVERSTAY_PENDING --> [*]
+
     note right of DRAFT
         Employee can edit
         or delete draft
     end note
-    
+
     note right of PENDING
-        Multiple approval steps
-        can occur in sequence
+        DEFAULT chain: HR_ADMIN→DEPT_HEAD→HR_HEAD→CEO
+        CASUAL chain: DEPT_HEAD only
+        CEO is final approver for DEFAULT
+        DEPT_HEAD is final approver for CASUAL
+    end note
+
+    note right of APPROVED
+        Balance deducted
+        Employee can request cancellation
+        Admin can recall or cancel
+    end note
+
+    note right of CANCELLATION_REQUESTED
+        Employee requested cancellation
+        Awaits admin review
     end note
 ```
 
@@ -82,25 +103,51 @@ stateDiagram-v2
 
 ## 3. Approval Chain Flow
 
+### DEFAULT Chain (EL, ML, and most leave types)
+
 ```mermaid
 flowchart LR
-    A[Employee Submits] --> B[HR_ADMIN]
-    B -->|Forward| C[DEPT_HEAD]
-    B -->|Forward| D[HR_HEAD]
-    B -->|Forward| E[CEO]
-    C -->|Forward| D
-    C -->|Forward| E
-    D -->|Approve/Reject| F[Final Decision]
-    D -->|Forward| E
-    E -->|Approve/Reject| F
-    
+    A[Employee Submits] --> B[Step 1: HR_ADMIN]
+    B -->|Forward Only| C[Step 2: DEPT_HEAD]
+    C -->|Forward Only| D[Step 3: HR_HEAD]
+    D -->|Forward Only| E[Step 4: CEO]
+    E -->|Approve/Reject| F[Final Decision]
+
+    B -.->|Can Reject| G[REJECTED]
+
     style A fill:#e1f5ff
     style B fill:#fff4e1
     style C fill:#fff4e1
-    style D fill:#ffe1e1
+    style D fill:#fff4e1
     style E fill:#ffe1e1
-    style F fill:#e1ffe1
+    style F fill:#ccffcc
+    style G fill:#ffcccc
 ```
+
+**Notes:**
+- Chain must be followed **sequentially** - no skipping steps
+- HR_ADMIN, DEPT_HEAD, HR_HEAD can only **FORWARD** to next role or **RETURN** for modification
+- Only **CEO** (final approver) can **APPROVE**
+- HR_ADMIN can **REJECT** as operational role; other intermediate roles cannot
+- CEO can reject at any step when forwarded to them
+
+### CASUAL Leave Chain
+
+```mermaid
+flowchart LR
+    A[Employee Submits] --> B[Step 1: DEPT_HEAD]
+    B -->|Approve/Reject| C[Final Decision]
+
+    style A fill:#e1f5ff
+    style B fill:#ffe1e1
+    style C fill:#e1ffe1
+```
+
+**Notes:**
+- CASUAL leave uses **shortened chain** per Policy 6.10 exception
+- DEPT_HEAD is the **final approver** for CASUAL leave
+- HR_ADMIN is not in the CASUAL chain
+- DEPT_HEAD can **APPROVE** or **REJECT** directly
 
 ---
 
@@ -269,53 +316,97 @@ flowchart TD
     B -->|Pass| D{Date Validation}
     D -->|Invalid| E[Return Date Error]
     D -->|Valid| F{Type = EARNED?}
-    F -->|Yes| G{15 Days Notice?}
+    F -->|Yes| G{≥5 Working Days Notice?}
     G -->|No| H[Return Notice Error]
     G -->|Yes| I{Type = CASUAL?}
     F -->|No| I
     I -->|Yes| J{≤3 Consecutive?}
     J -->|No| K[Return Consecutive Error]
-    J -->|Yes| L{Type = MEDICAL?}
-    I -->|No| L
-    L -->|Yes| M{>3 Days?}
-    M -->|Yes| N{Certificate Provided?}
-    N -->|No| O[Return Certificate Error]
-    N -->|Yes| P[Continue]
-    M -->|No| P
-    L -->|No| P
-    P --> Q{Backdated?}
-    Q -->|Yes| R{Backdate Allowed?}
-    R -->|No| S[Return Backdate Error]
-    R -->|Yes| T{Within Window?}
-    T -->|No| U[Return Window Error]
-    T -->|Yes| V[Continue]
-    Q -->|No| V
-    V --> W[Check Annual Caps]
-    W --> X{Cap Exceeded?}
-    X -->|Yes| Y[Return Cap Error]
-    X -->|No| Z[Check Balance]
-    Z --> AA[Validation Complete]
+    J -->|Yes| L{Touches Holiday/Weekend?}
+    L -->|Yes| M[Return Holiday Touch Error]
+    L -->|No| N{Type = MEDICAL?}
+    I -->|No| N
+    N -->|Yes| O{>3 Days?}
+    O -->|Yes| P{Certificate Provided?}
+    P -->|No| Q[Return Certificate Error]
+    P -->|Yes| R[Continue]
+    O -->|No| R
+    N -->|No| R
+    R --> S{Backdated?}
+    S -->|Yes| T{Backdate Allowed?}
+    T -->|No| U[Return Backdate Error]
+    T -->|Yes| V{Within Window?}
+    V -->|No| W[Return Window Error]
+    V -->|Yes| X[Continue]
+    S -->|No| X
+    X --> Y[Check Annual Caps]
+    Y --> Z{Cap Exceeded?}
+    Z -->|Yes| AA[Return Cap Error]
+    Z -->|No| AB[Check Balance]
+    AB --> AC[Validation Complete]
 ```
+
+**Note:** Earned Leave requires **≥5 working days** notice per Policy 6.11 (not 15 days). Casual Leave and Quarantine Leave are exempt from advance notice requirements.
 
 ---
 
 ## 7. Cancellation Flow
 
+### Employee Self-Cancellation
+
 ```mermaid
 flowchart TD
     A[Employee Requests Cancel] --> B{Status Check}
-    B -->|Not PENDING/SUBMITTED| C[Error: Cannot Cancel]
-    B -->|PENDING/SUBMITTED| D{Was Approved?}
-    D -->|Yes| E[Restore Balance]
-    E --> F[Update Status: CANCELLED]
-    D -->|No| F
-    F --> G[Create Audit Log]
-    G --> H[Notify Approvers]
-    H --> I[Cancel Complete]
-    
-    style C fill:#ffcccc
-    style I fill:#ccffcc
+    B -->|SUBMITTED/PENDING| C[Direct Cancel]
+    C --> D[Update Status: CANCELLED]
+    D --> E[Create Audit Log]
+    E --> F[Cancel Complete - No balance change]
+
+    B -->|APPROVED| G[Create Cancellation Request]
+    G --> H[Update Status: CANCELLATION_REQUESTED]
+    H --> I[Notify Admin]
+    I --> J[Awaits Admin Review]
+
+    B -->|REJECTED/CANCELLED| K[Error: Cannot Cancel]
+
+    style F fill:#ccffcc
+    style J fill:#fff4e1
+    style K fill:#ffcccc
 ```
+
+### Admin Cancellation/Review
+
+```mermaid
+flowchart TD
+    A[Admin Reviews Request] --> B{Request Type}
+
+    B -->|CANCELLATION_REQUESTED| C[Review Employee Request]
+    B -->|Direct Admin Cancel| D[Cancel APPROVED Leave]
+
+    C --> E{Admin Decision}
+    E -->|Approve Cancel| F[Restore Balance]
+    E -->|Deny Cancel| G[Keep Status APPROVED]
+
+    D --> F
+
+    F --> H[Update Status: CANCELLED]
+    H --> I[Decrement Balance.used]
+    I --> J[Create Audit Log]
+    J --> K[Notify Employee]
+    K --> L[Cancel Complete]
+
+    G --> M[Notify Employee - Cancellation Denied]
+
+    style L fill:#ccffcc
+    style M fill:#fff4e1
+```
+
+**Notes:**
+- **Employee can self-cancel** SUBMITTED/PENDING requests → direct CANCELLED (no balance change)
+- **Employee cannot self-cancel** APPROVED requests → must create CANCELLATION_REQUESTED
+- **Admin roles** (HR_ADMIN, HR_HEAD, CEO) can cancel any APPROVED leave with balance restoration
+- **Balance restoration** decrements `Balance.used` and updates `Balance.closing`
+- Policy 6.8 and 6.9 allow management to cancel/recall leave for service exigencies
 
 ---
 
@@ -327,19 +418,33 @@ flowchart TD
     B -->|No| C[Error: Unsupported Type]
     B -->|Yes| D{File Size OK?}
     D -->|No| E[Error: File Too Large]
-    D -->|Yes| F[Generate UUID]
-    F --> G[Sanitize Filename]
-    G --> H[Save to public/uploads/]
-    H --> I{Save Success?}
-    I -->|No| J[Error: Upload Failed]
-    I -->|Yes| K[Store URL in DB]
-    K --> L[Upload Complete]
-    
+    D -->|Yes| F[Validate MIME Type]
+    F --> G{MIME Type OK?}
+    G -->|No| H[Error: Invalid File Content]
+    G -->|Yes| I[Generate UUID]
+    I --> J[Sanitize Filename]
+    J --> K[Save to private/uploads/]
+    K --> L{Save Success?}
+    L -->|No| M[Error: Upload Failed]
+    L -->|Yes| N[Store Path in DB]
+    N --> O[Generate Signed URL]
+    O --> P[Return Signed URL - 15 min expiry]
+    P --> Q[Upload Complete]
+
     style C fill:#ffcccc
     style E fill:#ffcccc
-    style J fill:#ffcccc
-    style L fill:#ccffcc
+    style H fill:#ffcccc
+    style M fill:#ffcccc
+    style Q fill:#ccffcc
 ```
+
+**Notes:**
+- Files stored in **private/uploads/** (not web-accessible)
+- **Signed URLs** generated with 15-minute expiry using HMAC signatures
+- **MIME type validation** using file-type library (prevents spoofed extensions)
+- **Download endpoint:** `GET /api/files/signed/[filename]` with signature verification
+- **Max file size:** 5 MB
+- **Allowed types:** PDF, JPG, JPEG, PNG
 
 ---
 
