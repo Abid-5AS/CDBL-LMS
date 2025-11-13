@@ -18,10 +18,9 @@ import {
   KPICard,
   KPICardSkeleton,
   KPIGrid,
-  AnalyticsLineChart,
-  AnalyticsPieChart,
   ExportButton,
 } from "@/components/dashboards/shared";
+import { ChartContainer, TrendChart, TypePie } from "@/components/shared/LeaveCharts";
 import { PendingLeaveRequestsTable } from "./sections/PendingApprovals";
 import { CancellationRequestsPanel } from "./sections/CancellationRequests";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -219,18 +218,22 @@ export function HRAdminDashboardClient() {
         {/* Charts - Left Side (8 columns) */}
         <div className="lg:col-span-8 space-y-6">
           {/* Monthly Trend Chart */}
-          {!isLoading && stats && stats.monthlyTrend && stats.monthlyTrend.length > 0 && (
-            <AnalyticsLineChart
-              title="Request Trend"
-              subtitle="Last 6 months submission pattern"
-              data={stats.monthlyTrend.map((item) => ({
-                name: item.month,
-                requests: item.count,
-              }))}
-              dataKeys={[{ key: "requests", name: "Requests", color: "#3b82f6" }]}
-              xAxisKey="name"
+          <ChartContainer
+            title="Request Trend"
+            subtitle="Last 6 months submission pattern"
+            loading={isLoading}
+            empty={!isLoading && (!stats?.monthlyTrend || stats.monthlyTrend.length === 0)}
+            height={350}
+          >
+            <TrendChart
+              data={stats?.monthlyTrend?.map((item) => ({
+                month: item.month,
+                leaves: item.count,
+              })) || []}
+              height={350}
+              dataKey="leaves"
             />
-          )}
+          </ChartContainer>
         </div>
 
         {/* Sidebar - Right Side (4 columns) */}
@@ -284,17 +287,21 @@ export function HRAdminDashboardClient() {
           </Card>
 
           {/* Leave Type Distribution */}
-          {!isLoading && stats && stats.leaveTypeBreakdown && stats.leaveTypeBreakdown.length > 0 && (
-            <AnalyticsPieChart
-              title="Leave Type Distribution"
-              subtitle="Current year breakdown"
-              data={stats.leaveTypeBreakdown.map((item) => ({
+          <ChartContainer
+            title="Leave Type Distribution"
+            subtitle="Current year breakdown"
+            loading={isLoading}
+            empty={!isLoading && (!stats?.leaveTypeBreakdown || stats.leaveTypeBreakdown.length === 0)}
+            height={300}
+          >
+            <TypePie
+              data={stats?.leaveTypeBreakdown?.map((item) => ({
                 name: item.type,
                 value: item.count,
-              }))}
-              showPercentage={true}
+              })) || []}
+              height={300}
             />
-          )}
+          </ChartContainer>
         </div>
       </div>
 
