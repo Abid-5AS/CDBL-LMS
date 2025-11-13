@@ -26,26 +26,26 @@ const STATUS_VARIANTS: Record<string, string> = {
 export function LeaveHistoryTable({ history }: LeaveHistoryTableProps) {
   return (
     <div className="rounded-lg border border-bg-muted backdrop-blur-xl bg-bg-primary/70 p-4 shadow-sm">
-      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-text-secondary">
+      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
         Recent Leave History
       </h3>
       <div className="max-h-[250px] overflow-y-auto rounded-lg border border-border-strong dark:border-border-strong">
         <Table>
           <TableHeader className="bg-bg-secondary dark:bg-bg-secondary/50">
             <TableRow>
-              <TableHead className="text-xs font-semibold uppercase text-text-secondary dark:text-text-secondary">
+              <TableHead className="text-xs font-semibold uppercase text-muted-foreground">
                 Type
               </TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-text-secondary dark:text-text-secondary">
+              <TableHead className="text-xs font-semibold uppercase text-muted-foreground">
                 Start
               </TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-text-secondary dark:text-text-secondary">
+              <TableHead className="text-xs font-semibold uppercase text-muted-foreground">
                 End
               </TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-text-secondary dark:text-text-secondary">
+              <TableHead className="text-xs font-semibold uppercase text-muted-foreground">
                 Days
               </TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-text-secondary dark:text-text-secondary">
+              <TableHead className="text-xs font-semibold uppercase text-muted-foreground">
                 Status
               </TableHead>
             </TableRow>

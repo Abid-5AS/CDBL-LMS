@@ -27,6 +27,7 @@ import {
   AnalyticsPieChart,
   ExportButton,
 } from "@/components/dashboards/shared";
+import { DashboardGridSkeleton } from "@/components/shared/skeletons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardCardSkeleton } from "@/app/dashboard/shared/LoadingFallback";
 import { Separator } from "@/components/ui/separator";
@@ -122,25 +123,11 @@ export function CEODashboardClient() {
   return (
     <div className="space-y-6">
       {/* Primary Executive KPIs */}
-      <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
-        {isLoading ? (
-          <>
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="glass-card rounded-2xl p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 space-y-3">
-                    <div className="h-4 w-24 bg-muted/50 animate-pulse rounded" />
-                    <div className="h-8 w-20 bg-muted/50 animate-pulse rounded" />
-                    <div className="h-4 w-32 bg-muted/50 animate-pulse rounded" />
-                  </div>
-                  <div className="h-12 w-12 bg-muted/50 animate-pulse rounded-xl" />
-                </div>
-              </div>
-            ))}
-          </>
-        ) : (
-          <>
-            <RoleKPICard
+      {isLoading ? (
+        <DashboardGridSkeleton cards={4} />
+      ) : (
+        <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
+          <RoleKPICard
               title="Total Workforce"
               value={stats?.totalEmployees || 0}
               subtitle={`${stats?.activeEmployees || 0} active`}
@@ -191,29 +178,14 @@ export function CEODashboardClient() {
                   : undefined
               }
             />
-          </>
-        )}
-      </ResponsiveDashboardGrid>
+        </ResponsiveDashboardGrid>
+      )}
 
       {/* Financial & YoY Metrics */}
-      <ResponsiveDashboardGrid columns="1:1:3:3" gap="md">
-        {isLoading ? (
-          <>
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="glass-card rounded-2xl p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 space-y-3">
-                    <div className="h-4 w-24 bg-muted/50 animate-pulse rounded" />
-                    <div className="h-8 w-20 bg-muted/50 animate-pulse rounded" />
-                    <div className="h-4 w-32 bg-muted/50 animate-pulse rounded" />
-                  </div>
-                  <div className="h-12 w-12 bg-muted/50 animate-pulse rounded-xl" />
-                </div>
-              </div>
-            ))}
-          </>
-        ) : (
-          <>
+      {isLoading ? (
+        <DashboardGridSkeleton cards={3} className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" />
+      ) : (
+        <ResponsiveDashboardGrid columns="1:1:3:3" gap="md">
             {/* Financial Impact Card */}
             <Card className="rounded-2xl">
               <CardHeader className="pb-3">
@@ -331,9 +303,8 @@ export function CEODashboardClient() {
                 </div>
               </CardContent>
             </Card>
-          </>
-        )}
-      </div>
+        </ResponsiveDashboardGrid>
+      )}
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
