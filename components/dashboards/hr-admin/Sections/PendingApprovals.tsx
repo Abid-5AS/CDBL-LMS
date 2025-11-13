@@ -36,6 +36,10 @@ import {
   StatusBadge,
   ReviewModal,
   ApprovalActionButtons,
+  SimplePagination,
+  LoadingSpinner,
+  ErrorState,
+  AllClearState,
 } from "@/components/shared";
 
 // Lib utilities (barrel export)
@@ -225,9 +229,8 @@ export function PendingLeaveRequestsTable({
   // Loading state
   if (isLoading) {
     return (
-      <div className="glass-card rounded-2xl p-12 text-center text-sm text-muted-foreground">
-        <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-current border-t-transparent" />
-        <p className="mt-2">Loading requests...</p>
+      <div className="glass-card rounded-2xl p-12">
+        <LoadingSpinner message="Loading requests..." />
       </div>
     );
   }
@@ -235,8 +238,11 @@ export function PendingLeaveRequestsTable({
   // Error state
   if (error) {
     return (
-      <div className="glass-card rounded-2xl p-12 text-center text-sm text-data-error">
-        Failed to load requests
+      <div className="glass-card rounded-2xl">
+        <ErrorState
+          title="Failed to load requests"
+          message="There was an error loading the approval queue. Please try again."
+        />
       </div>
     );
   }
@@ -245,14 +251,10 @@ export function PendingLeaveRequestsTable({
   if (allLeaves.length === 0 && !searchInput) {
     return (
       <div className="glass-card rounded-2xl overflow-hidden">
-        <div className="px-6 pt-6">
-          <h3 className="text-lg font-semibold">Pending Requests</h3>
-        </div>
-        <div className="p-6">
-          <div className="py-8 text-center">
-            <p className="text-sm text-muted-foreground">No pending requests</p>
-          </div>
-        </div>
+        <AllClearState
+          title="No pending requests"
+          description="All leave requests have been processed."
+        />
       </div>
     );
   }
@@ -556,33 +558,14 @@ export function PendingLeaveRequestsTable({
               </div>
 
               {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-between pt-4 border-t border-border-strong/50 dark:border-border-strong/50">
-                  <div className="text-sm text-muted-foreground">
-                    Page {currentPage} of {totalPages}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                      disabled={currentPage === 1}
-                    >
-                      Previous
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() =>
-                        setCurrentPage((p) => Math.min(totalPages, p + 1))
-                      }
-                      disabled={currentPage === totalPages}
-                    >
-                      Next
-                    </Button>
-                  </div>
-                </div>
-              )}
+              <div className="pt-4 border-t border-border-strong/50 dark:border-border-strong/50">
+                <SimplePagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                  showPageInfo={true}
+                />
+              </div>
             </>
           )}
         </div>
