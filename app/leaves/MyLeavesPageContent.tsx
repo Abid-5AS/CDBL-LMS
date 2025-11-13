@@ -319,7 +319,7 @@ export function MyLeavesPageContent() {
         ) : error ? (
           <Card>
             <CardContent
-              className="p-8 text-center text-sm text-data-error dark:text-data-error"
+              className="p-8 text-center text-sm text-data-error dark:text-data-error-strong"
               role="alert"
             >
               Failed to load requests
