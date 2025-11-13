@@ -330,3 +330,107 @@ export function validateELEncashment(
     remainingBalance,
   };
 }
+
+/**
+ * Validate study leave duration (Policy 6.25.b)
+ * Initial study leave: Maximum 1 year (365 days)
+ * Extension: Maximum 1 additional year (total 2 years/730 days)
+ * Extension requires Board of Directors approval
+ * @param requestedDays - Days requested for study leave
+ * @param previousStudyLeaveDays - Total days of previous study leave (if extension)
+ * @returns Validation result with duration limits
+ */
+export function validateStudyLeaveDuration(
+  requestedDays: number,
+  previousStudyLeaveDays?: number
+): {
+  valid: boolean;
+  reason?: string;
+  isExtension: boolean;
+  requiresBoardApproval: boolean;
+  totalDays: number;
+} {
+  const isExtension = !!previousStudyLeaveDays && previousStudyLeaveDays > 0;
+  const totalDays = isExtension ? (previousStudyLeaveDays ?? 0) + requestedDays : requestedDays;
+
+  if (!isExtension) {
+    // Initial study leave: Maximum 365 days (1 year)
+    if (requestedDays > 365) {
+      return {
+        valid: false,
+        reason: `Initial study leave cannot exceed 365 days (1 year). Requested: ${requestedDays} days.`,
+        isExtension: false,
+        requiresBoardApproval: false,
+        totalDays: requestedDays,
+      };
+    }
+
+    return {
+      valid: true,
+      isExtension: false,
+      requiresBoardApproval: false,
+      totalDays: requestedDays,
+    };
+  } else {
+    // Extension: Total cannot exceed 730 days (2 years)
+    if (totalDays > 730) {
+      return {
+        valid: false,
+        reason: `Total study leave including extension cannot exceed 730 days (2 years). Previous: ${previousStudyLeaveDays} days, Requested: ${requestedDays} days, Total: ${totalDays} days.`,
+        isExtension: true,
+        requiresBoardApproval: true,
+        totalDays,
+      };
+    }
+
+    return {
+      valid: true,
+      isExtension: true,
+      requiresBoardApproval: true, // All extensions require Board approval
+      totalDays,
+    };
+  }
+}
+
+/**
+ * Validate study leave retirement eligibility (Policy 6.25.a)
+ * Study leave may only be granted if employee has at least 5 years of service left before retirement
+ * @param retirementDate - Employee's expected retirement date
+ * @param studyLeaveEndDate - Expected end date of study leave
+ * @returns Validation result with years until retirement
+ */
+export function validateStudyLeaveRetirement(
+  retirementDate: Date | null,
+  studyLeaveEndDate: Date
+): {
+  valid: boolean;
+  reason?: string;
+  yearsUntilRetirement?: number;
+} {
+  if (!retirementDate) {
+    // If no retirement date is set, we cannot validate
+    // This could be either allowed (employee hasn't reached retirement age) or blocked
+    // For now, we'll return a warning but allow it
+    return {
+      valid: true,
+      reason: "Retirement date not set. Please ensure employee has at least 5 years until retirement per Policy 6.25.a",
+    };
+  }
+
+  // Calculate years between study leave end and retirement
+  const millisecondsPerYear = 1000 * 60 * 60 * 24 * 365.25;
+  const yearsUntilRetirement = (retirementDate.getTime() - studyLeaveEndDate.getTime()) / millisecondsPerYear;
+
+  if (yearsUntilRetirement < 5) {
+    return {
+      valid: false,
+      reason: `Study leave cannot be granted if less than 5 years until retirement. Retirement: ${retirementDate.toLocaleDateString()}, Study leave end: ${studyLeaveEndDate.toLocaleDateString()}, Years until retirement: ${yearsUntilRetirement.toFixed(1)} years (Policy 6.25.a)`,
+      yearsUntilRetirement,
+    };
+  }
+
+  return {
+    valid: true,
+    yearsUntilRetirement,
+  };
+}

@@ -17,6 +17,8 @@ import {
   validateSpecialDisabilityDuration,
   validateExtraordinaryLeaveDuration,
   checkMedicalLeaveAnnualLimit,
+  validateStudyLeaveDuration,
+  validateStudyLeaveRetirement,
 } from "@/lib/policy";
 import { promises as fs } from "fs";
 import path from "path";
@@ -180,7 +182,7 @@ export async function POST(req: Request) {
   // Check service eligibility per Policy 6.18
   const requester = await prisma.user.findUnique({
     where: { id: me.id },
-    select: { joinDate: true },
+    select: { joinDate: true, retirementDate: true },
   });
 
   if (!requester || !requester.joinDate) {
@@ -356,6 +358,89 @@ export async function POST(req: Request) {
         }),
         { status: 400 }
       );
+    }
+  }
+
+  // Enforce study leave duration limits (Policy 6.25.b)
+  if (t === "STUDY") {
+    // Check if user has previous approved study leave
+    const previousStudyLeaves = await prisma.leaveRequest.findMany({
+      where: {
+        requesterId: me.id,
+        type: "STUDY",
+        status: "APPROVED",
+      },
+      orderBy: { endDate: "desc" },
+    });
+
+    const previousTotalDays = previousStudyLeaves.reduce(
+      (sum, leave) => sum + leave.workingDays,
+      0
+    );
+
+    const studyCheck = validateStudyLeaveDuration(workingDays, previousTotalDays);
+
+    if (!studyCheck.valid) {
+      return NextResponse.json(
+        error("study_leave_duration_exceeded", studyCheck.reason, traceId, {
+          requested: workingDays,
+          previousDays: previousTotalDays,
+          totalDays: studyCheck.totalDays,
+          isExtension: studyCheck.isExtension,
+        }),
+        { status: 400 }
+      );
+    }
+
+    // Log if this is an extension requiring Board approval
+    if (studyCheck.requiresBoardApproval) {
+      await prisma.auditLog.create({
+        data: {
+          actorEmail: me.email,
+          action: "STUDY_LEAVE_EXTENSION_REQUESTED",
+          targetEmail: me.email,
+          details: {
+            requestedDays: workingDays,
+            previousDays: previousTotalDays,
+            totalDays: studyCheck.totalDays,
+            requiresBoardApproval: true,
+            message: "Study leave extension requires Board of Directors approval per Policy 6.25.b",
+          },
+        },
+      });
+    }
+
+    // Enforce study leave retirement eligibility (Policy 6.25.a)
+    // Employee must have at least 5 years until retirement after study leave ends
+    const retirementCheck = validateStudyLeaveRetirement(
+      requester.retirementDate,
+      end
+    );
+
+    if (!retirementCheck.valid) {
+      return NextResponse.json(
+        error("study_leave_retirement_insufficient", retirementCheck.reason, traceId, {
+          studyLeaveEnd: end.toISOString(),
+          retirementDate: requester.retirementDate?.toISOString(),
+          yearsUntilRetirement: retirementCheck.yearsUntilRetirement,
+        }),
+        { status: 400 }
+      );
+    }
+
+    // Log warning if retirement date not set
+    if (requester.retirementDate === null) {
+      await prisma.auditLog.create({
+        data: {
+          actorEmail: me.email,
+          action: "STUDY_LEAVE_NO_RETIREMENT_DATE",
+          targetEmail: me.email,
+          details: {
+            message: "Study leave requested without retirement date set. Cannot validate 5-year buffer requirement per Policy 6.25.a",
+            studyLeaveEnd: end.toISOString(),
+          },
+        },
+      });
     }
   }
 
