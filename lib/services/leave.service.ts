@@ -6,6 +6,7 @@
 import { LeaveType, LeaveStatus } from "@prisma/client";
 import { LeaveRepository } from "@/lib/repositories/leave.repository";
 import { LeaveValidator } from "./leave-validator";
+import { NotificationService } from "./notification.service";
 import { prisma } from "@/lib/prisma";
 import { daysInclusive } from "@/lib/policy";
 import { getStepForRole } from "@/lib/workflow";
@@ -135,6 +136,9 @@ export class LeaveService {
         { leaveRequestId: leaveRequest.id }
       );
 
+      // 8. Send notifications to approvers and requester
+      await NotificationService.notifyLeaveSubmitted(leaveRequest.id, userId);
+
       return {
         success: true,
         data: leaveRequest,
@@ -207,6 +211,17 @@ export class LeaveService {
         { leaveId, comment }
       );
 
+      // Send approval notification (only on final approval)
+      if (isFinalApproval) {
+        const approver = await prisma.user.findUnique({
+          where: { id: approverId },
+          select: { name: true },
+        });
+        if (approver) {
+          await NotificationService.notifyLeaveApproved(leaveId, approver.name);
+        }
+      }
+
       return {
         success: true,
         data: { approved: true, final: isFinalApproval },
@@ -256,6 +271,15 @@ export class LeaveService {
         `Rejected leave request ${leaveId}`,
         { leaveId, reason }
       );
+
+      // Send rejection notification
+      const approver = await prisma.user.findUnique({
+        where: { id: approverId },
+        select: { name: true },
+      });
+      if (approver) {
+        await NotificationService.notifyLeaveRejected(leaveId, approver.name, reason);
+      }
 
       return {
         success: true,
@@ -332,6 +356,17 @@ export class LeaveService {
         { leaveId, comment }
       );
 
+      // Send forward notification
+      if (nextApprover) {
+        const forwarder = await prisma.user.findUnique({
+          where: { id: currentApproverId },
+          select: { name: true },
+        });
+        if (forwarder) {
+          await NotificationService.notifyLeaveForwarded(leaveId, nextApprover.id, forwarder.name);
+        }
+      }
+
       return {
         success: true,
         data: { forwarded: true },
@@ -378,6 +413,15 @@ export class LeaveService {
         `Returned leave request ${leaveId} for modification`,
         { leaveId, reason }
       );
+
+      // Send return notification
+      const approver = await prisma.user.findUnique({
+        where: { id: approverId },
+        select: { name: true },
+      });
+      if (approver) {
+        await NotificationService.notifyLeaveReturned(leaveId, approver.name, reason);
+      }
 
       return {
         success: true,
@@ -434,6 +478,9 @@ export class LeaveService {
         `Cancelled leave request ${leaveId}`,
         { leaveId, reason }
       );
+
+      // Send cancellation notification to approvers
+      await NotificationService.notifyLeaveCancelled(leaveId);
 
       return {
         success: true,

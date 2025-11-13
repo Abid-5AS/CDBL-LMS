@@ -1,37 +1,13 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 export const cache = "no-store";
 import { LeaveType } from "@prisma/client";
-import {
-  policy,
-  daysInclusive,
-  needsMedicalCertificate,
-  canBackdate,
-  withinBackdateLimit,
-  makeWarnings,
-  checkLeaveEligibility,
-  calculateMaternityLeaveDays,
-  validateQuarantineLeaveDuration,
-  validateSpecialDisabilityDuration,
-  validateExtraordinaryLeaveDuration,
-  checkMedicalLeaveAnnualLimit,
-  validateStudyLeaveDuration,
-  validateStudyLeaveRetirement,
-} from "@/lib/policy";
-import { promises as fs } from "fs";
-import path from "path";
-import { randomUUID } from "crypto";
 import { getCurrentUser } from "@/lib/auth";
-import { getBackdateSettings, type BackdateSetting } from "@/lib/org-settings";
-import { countWorkingDays } from "@/lib/working-days";
-import { normalizeToDhakaMidnight } from "@/lib/date-utils";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
-import { getStepForRole } from "@/lib/workflow";
-import { violatesCasualLeaveSideTouch, violatesCasualLeaveCombination, validatePaternityLeaveEligibility } from "@/lib/leave-validation";
-import { generateSignedUrl } from "@/lib/storage";
+import { LeaveService } from "@/lib/services/leave.service";
+import { LeaveRepository } from "@/lib/repositories/leave.repository";
 
 const ApplySchema = z.object({
   type: z.enum([
@@ -64,80 +40,31 @@ export async function GET(req: Request) {
   const statusFilter = url.searchParams.get("status");
   const mine = url.searchParams.get("mine") === "1";
 
-  // Build where clause
-  const where: any = {};
-  
-  if (mine) {
-    where.requesterId = me.id;
+  try {
+    let items;
+
+    if (mine) {
+      // Use repository method for user-specific queries
+      if (statusFilter && statusFilter !== "all") {
+        items = await LeaveRepository.findByUserId(me.id, statusFilter as any);
+      } else {
+        items = await LeaveRepository.findByUserId(me.id);
+      }
+    } else {
+      // Use repository method for all queries
+      items = await LeaveRepository.findAll({
+        status: statusFilter && statusFilter !== "all" ? statusFilter as any : undefined,
+      });
+    }
+
+    return NextResponse.json({ items });
+  } catch (err) {
+    console.error("GET /api/leaves error:", err);
+    return NextResponse.json(
+      error("internal_error", "Failed to fetch leave requests", traceId),
+      { status: 500 }
+    );
   }
-
-  if (statusFilter && statusFilter !== "all") {
-    where.status = statusFilter;
-  }
-
-  const items = await prisma.leaveRequest.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-    include: {
-      approvals: {
-        include: {
-          approver: {
-            select: {
-              name: true,
-              role: true,
-            },
-          },
-        },
-        orderBy: {
-          step: "asc",
-        },
-      },
-      comments: {
-        orderBy: { createdAt: "asc" },
-      },
-    },
-  });
-
-  // Get author information for comments
-  const allCommentAuthorIds = [
-    ...new Set(
-      items.flatMap((item) => 
-        (item.comments || []).map((c: any) => c.authorId).filter(Boolean)
-      )
-    ),
-  ];
-
-  const commentAuthors = allCommentAuthorIds.length > 0
-    ? await prisma.user.findMany({
-        where: { id: { in: allCommentAuthorIds } },
-        select: { id: true, name: true, role: true },
-      })
-    : [];
-
-  const authorMap = new Map(commentAuthors.map((a) => [a.id, a]));
-
-  // Map items with author information for comments
-  const itemsWithAuthors = items.map((item) => ({
-    ...item,
-    comments: (item.comments || []).map((comment: any) => ({
-      ...comment,
-      authorName: authorMap.get(comment.authorId)?.name || "Unknown",
-    })),
-  }));
-
-  return NextResponse.json({ items: itemsWithAuthors });
-}
-
-function yearOf(d: Date) {
-  return d.getFullYear();
-}
-
-async function getAvailableDays(userId: number, type: LeaveType, year: number) {
-  const bal = await prisma.balance.findUnique({
-    where: { userId_type_year: { userId, type, year } },
-  });
-  if (!bal) return 0;
-  return (bal.opening ?? 0) + (bal.accrued ?? 0) - (bal.used ?? 0);
 }
 
 export async function POST(req: Request) {
@@ -145,583 +72,72 @@ export async function POST(req: Request) {
   const me = await getCurrentUser();
   if (!me) return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
 
-  const contentType = req.headers.get("content-type") ?? "";
-  let certificateFile: File | null = null;
-  let parsedInput: z.infer<typeof ApplySchema>;
+  try {
+    // Parse request data (multipart form-data or JSON)
+    const contentType = req.headers.get("content-type") ?? "";
+    let certificateFile: File | undefined;
+    let parsedInput: z.infer<typeof ApplySchema>;
 
-  if (contentType.includes("multipart/form-data")) {
-    const formData = await req.formData();
-    const toBoolean = (value: FormDataEntryValue | null) => {
-      if (typeof value !== "string") return undefined;
-      return value === "true";
-    };
-    const raw = {
-      type: String(formData.get("type") ?? ""),
-      startDate: String(formData.get("startDate") ?? ""),
-      endDate: String(formData.get("endDate") ?? ""),
-      reason: String(formData.get("reason") ?? ""),
-      workingDays: formData.get("workingDays")
-        ? Number(formData.get("workingDays"))
-        : undefined,
-      needsCertificate: toBoolean(formData.get("needsCertificate")),
-    };
+    if (contentType.includes("multipart/form-data")) {
+      const formData = await req.formData();
+      const toBoolean = (value: FormDataEntryValue | null) => {
+        if (typeof value !== "string") return undefined;
+        return value === "true";
+      };
 
-    certificateFile = formData.get("certificate") instanceof File ? (formData.get("certificate") as File) : null;
-    parsedInput = ApplySchema.parse(raw);
-  } else {
-    const json = await req.json();
-    parsedInput = ApplySchema.parse(json);
-  }
+      const raw = {
+        type: String(formData.get("type") ?? ""),
+        startDate: String(formData.get("startDate") ?? ""),
+        endDate: String(formData.get("endDate") ?? ""),
+        reason: String(formData.get("reason") ?? ""),
+        workingDays: formData.get("workingDays")
+          ? Number(formData.get("workingDays"))
+          : undefined,
+        needsCertificate: toBoolean(formData.get("needsCertificate")),
+      };
 
-  const start = new Date(parsedInput.startDate);
-  const end = new Date(parsedInput.endDate);
-  if (isNaN(start.getTime()) || isNaN(end.getTime()) || start > end) {
-    return NextResponse.json(error("invalid_dates", undefined, traceId), { status: 400 });
-  }
-
-  // Check service eligibility per Policy 6.18
-  const requester = await prisma.user.findUnique({
-    where: { id: me.id },
-    select: { joinDate: true, retirementDate: true },
-  });
-
-  if (!requester || !requester.joinDate) {
-    return NextResponse.json(
-      error("user_join_date_missing", "Employee join date not found. Please contact HR.", traceId),
-      { status: 400 }
-    );
-  }
-
-  const eligibilityCheck = checkLeaveEligibility(parsedInput.type, requester.joinDate);
-  if (!eligibilityCheck.eligible) {
-    return NextResponse.json(
-      error("service_eligibility_not_met", eligibilityCheck.reason, traceId, {
-        leaveType: parsedInput.type,
-        requiredYears: eligibilityCheck.requiredYears,
-      }),
-      { status: 403 }
-    );
-  }
-
-  let certificateUrl: string | undefined;
-  if (certificateFile) {
-    const ext = (certificateFile.name.split(".").pop() ?? "").toLowerCase();
-    const allowed = ["pdf", "jpg", "jpeg", "png"];
-    if (!allowed.includes(ext)) {
-      return NextResponse.json(error("unsupported_file_type", undefined, traceId), { status: 400 });
-    }
-    if (certificateFile.size > 5 * 1024 * 1024) {
-      return NextResponse.json(error("file_too_large", undefined, traceId), { status: 400 });
-    }
-    const arrayBuffer = await certificateFile.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const safeName = certificateFile.name.replace(/[^\w.\-]/g, "_");
-    const finalName = `${randomUUID()}-${safeName}`;
-    const uploadDir = path.join(process.cwd(), "private", "uploads");
-    await fs.mkdir(uploadDir, { recursive: true });
-    await fs.writeFile(path.join(uploadDir, finalName), buffer);
-    certificateUrl = generateSignedUrl(finalName);
-  }
-
-  const workingDays = daysInclusive(new Date(start), new Date(end));
-
-  // Normalize all dates to Dhaka midnight for consistent comparison
-  const today = normalizeToDhakaMidnight(new Date());
-  const startDateOnly = normalizeToDhakaMidnight(new Date(start));
-  const endDateOnly = normalizeToDhakaMidnight(new Date(end));
-  const isBackdated = startDateOnly < today;
-  const t = parsedInput.type as LeaveType;
-
-  // Enforce EL advance notice requirement (5 working days per Policy 6.11)
-  if (t === "EARNED") {
-    const workingDaysNotice = await countWorkingDays(today, startDateOnly);
-    if (workingDaysNotice < policy.elMinNoticeDays) {
-      return NextResponse.json(
-        error("el_insufficient_notice", undefined, traceId, {
-          required: policy.elMinNoticeDays,
-          provided: workingDaysNotice,
-        }),
-        { status: 400 }
-      );
-    }
-  }
-
-  // Enforce CL consecutive days limit
-  if (t === "CASUAL") {
-    if (workingDays > policy.clMaxConsecutiveDays) {
-      return NextResponse.json(
-        error("cl_exceeds_consecutive_limit", undefined, traceId, {
-          max: policy.clMaxConsecutiveDays,
-          requested: workingDays,
-        }),
-        { status: 400 }
-      );
+      const cert = formData.get("certificate");
+      certificateFile = cert instanceof File ? cert : undefined;
+      parsedInput = ApplySchema.parse(raw);
+    } else {
+      const json = await req.json();
+      parsedInput = ApplySchema.parse(json);
     }
 
-    // Enforce CL combination rule (Policy 6.20.e: cannot be combined with other leaves)
-    const combinationCheck = await violatesCasualLeaveCombination(
-      me.id,
-      startDateOnly,
-      endDateOnly
-    );
-
-    if (combinationCheck.violates && combinationCheck.conflictingLeave) {
-      const conflict = combinationCheck.conflictingLeave;
-      return NextResponse.json(
-        error(
-          "cl_cannot_combine_with_other_leave",
-          `Casual leave cannot be combined with or adjacent to other leaves (Policy 6.20.e). Conflicts with ${conflict.type} leave from ${conflict.startDate.toLocaleDateString()} to ${conflict.endDate.toLocaleDateString()}.`,
-          traceId,
-          {
-            conflictingLeaveId: conflict.id,
-            conflictingLeaveType: conflict.type,
-            conflictingStartDate: conflict.startDate,
-            conflictingEndDate: conflict.endDate,
-          }
-        ),
-        { status: 400 }
-      );
-    }
-  }
-
-  // Enforce maternity leave pro-rating for employees with <6 months service (Policy 6.23.c)
-  if (t === "MATERNITY") {
-    const maternityCalc = calculateMaternityLeaveDays(requester.joinDate);
-    if (workingDays > maternityCalc.days) {
-      const explanation = maternityCalc.isProrated
-        ? `Prorated to ${maternityCalc.days} days based on ${maternityCalc.serviceMonths.toFixed(1)} months of service (Policy 6.23.c)`
-        : `Maximum 56 days (8 weeks) per Policy 6.23.a`;
-
-      return NextResponse.json(
-        error("maternity_exceeds_entitlement", explanation, traceId, {
-          maxDays: maternityCalc.days,
-          requested: workingDays,
-          isProrated: maternityCalc.isProrated,
-          serviceMonths: maternityCalc.serviceMonths,
-        }),
-        { status: 400 }
-      );
-    }
-  }
-
-  // Enforce paternity leave occasion and interval limits (Policy 6.24.b)
-  if (t === "PATERNITY") {
-    const paternityCheck = await validatePaternityLeaveEligibility(me.id, startDateOnly);
-    if (!paternityCheck.valid) {
-      return NextResponse.json(
-        error("paternity_eligibility_not_met", paternityCheck.reason, traceId, {
-          previousLeaves: paternityCheck.previousLeaves,
-          monthsSinceFirst: paternityCheck.monthsSinceFirst,
-        }),
-        { status: 403 }
-      );
-    }
-  }
-
-  // Enforce quarantine leave duration limits (Policy 6.28.b)
-  if (t === "QUARANTINE") {
-    const quarantineCheck = validateQuarantineLeaveDuration(workingDays);
-    if (!quarantineCheck.valid) {
-      return NextResponse.json(
-        error("quarantine_exceeds_maximum", quarantineCheck.reason, traceId, {
-          requested: workingDays,
-          maximum: 30,
-        }),
-        { status: 400 }
-      );
-    }
-    // Note: Exceptional approval (21-30 days) is handled by workflow (CEO approval required)
-  }
-
-  // Enforce special disability leave duration limits (Policy 6.27.c)
-  if (t === "SPECIAL_DISABILITY") {
-    const disabilityCheck = validateSpecialDisabilityDuration(workingDays);
-    if (!disabilityCheck.valid) {
-      return NextResponse.json(
-        error("disability_exceeds_maximum", disabilityCheck.reason, traceId, {
-          requested: workingDays,
-          maximum: 180,
-        }),
-        { status: 400 }
-      );
-    }
-  }
-
-  // Enforce extraordinary leave duration limits (Policy 6.22.a, 6.22.b)
-  if (t === "EXTRAWITHPAY" || t === "EXTRAWITHOUTPAY") {
-    const extraordinaryCheck = validateExtraordinaryLeaveDuration(workingDays, requester.joinDate);
-    if (!extraordinaryCheck.valid) {
-      return NextResponse.json(
-        error("extraordinary_exceeds_maximum", extraordinaryCheck.reason, traceId, {
-          requested: workingDays,
-          maxAllowed: extraordinaryCheck.maxAllowed,
-        }),
-        { status: 400 }
-      );
-    }
-  }
-
-  // Enforce study leave duration limits (Policy 6.25.b)
-  if (t === "STUDY") {
-    // Check if user has previous approved study leave
-    const previousStudyLeaves = await prisma.leaveRequest.findMany({
-      where: {
-        requesterId: me.id,
-        type: "STUDY",
-        status: "APPROVED",
-      },
-      orderBy: { endDate: "desc" },
-    });
-
-    const previousTotalDays = previousStudyLeaves.reduce(
-      (sum, leave) => sum + leave.workingDays,
-      0
-    );
-
-    const studyCheck = validateStudyLeaveDuration(workingDays, previousTotalDays);
-
-    if (!studyCheck.valid) {
-      return NextResponse.json(
-        error("study_leave_duration_exceeded", studyCheck.reason, traceId, {
-          requested: workingDays,
-          previousDays: previousTotalDays,
-          totalDays: studyCheck.totalDays,
-          isExtension: studyCheck.isExtension,
-        }),
-        { status: 400 }
-      );
-    }
-
-    // Log if this is an extension requiring Board approval
-    if (studyCheck.requiresBoardApproval) {
-      await prisma.auditLog.create({
-        data: {
-          actorEmail: me.email,
-          action: "STUDY_LEAVE_EXTENSION_REQUESTED",
-          targetEmail: me.email,
-          details: {
-            requestedDays: workingDays,
-            previousDays: previousTotalDays,
-            totalDays: studyCheck.totalDays,
-            requiresBoardApproval: true,
-            message: "Study leave extension requires Board of Directors approval per Policy 6.25.b",
-          },
-        },
-      });
-    }
-
-    // Enforce study leave retirement eligibility (Policy 6.25.a)
-    // Employee must have at least 5 years until retirement after study leave ends
-    const retirementCheck = validateStudyLeaveRetirement(
-      requester.retirementDate,
-      end
-    );
-
-    if (!retirementCheck.valid) {
-      return NextResponse.json(
-        error("study_leave_retirement_insufficient", retirementCheck.reason, traceId, {
-          studyLeaveEnd: end.toISOString(),
-          retirementDate: requester.retirementDate?.toISOString(),
-          yearsUntilRetirement: retirementCheck.yearsUntilRetirement,
-        }),
-        { status: 400 }
-      );
-    }
-
-    // Log warning if retirement date not set
-    if (requester.retirementDate === null) {
-      await prisma.auditLog.create({
-        data: {
-          actorEmail: me.email,
-          action: "STUDY_LEAVE_NO_RETIREMENT_DATE",
-          targetEmail: me.email,
-          details: {
-            message: "Study leave requested without retirement date set. Cannot validate 5-year buffer requirement per Policy 6.25.a",
-            studyLeaveEnd: end.toISOString(),
-          },
-        },
-      });
-    }
-  }
-
-  // Hard block: ML >3 days requires medical certificate (check before backdate validation)
-  const mustCert = needsMedicalCertificate(parsedInput.type, workingDays);
-  if (mustCert && !certificateUrl && !parsedInput.needsCertificate) {
-    return NextResponse.json(
-      error("medical_certificate_required", undefined, traceId, {
-        days: workingDays,
-        requiredDays: 3,
-      }),
-      { status: 400 }
-    );
-  }
-
-  // Check backdate settings from orgSettings
-  if (isBackdated) {
-    const backdateSettings = await getBackdateSettings();
-    const leaveTypeKey = t === "EARNED" ? "EL" : t === "CASUAL" ? "CL" : "ML";
-    const setting = backdateSettings[leaveTypeKey as keyof typeof backdateSettings];
-    
-    if (setting === false) {
-      return NextResponse.json(
-        error("backdate_disallowed_by_policy", undefined, traceId, { type: leaveTypeKey }),
-        { status: 400 }
-      );
-    }
-    // If "ask", client should show confirmation modal - we'll allow it but log audit
-    if (setting === "ask") {
-      // Log audit note that backdate confirmation needed
-      await prisma.auditLog.create({
-        data: {
-          actorEmail: me.email,
-          action: "LEAVE_BACKDATE_ASK",
-          details: {
-            leaveType: leaveTypeKey,
-            startDate: start.toISOString(),
-            message: "Backdate confirmation required per orgSettings",
-          },
-        },
-      });
-    }
-    
-    // Still validate within backdate limit
-    if (!withinBackdateLimit(t, today, startDateOnly)) {
-      return NextResponse.json(error("backdate_window_exceeded", undefined, traceId, { type: t }), { status: 400 });
-    }
-  }
-
-  // CL: Cannot be adjacent to holidays/weekends (hard block)
-  if (t === "CASUAL") {
-    const clViolatesSideTouch = await violatesCasualLeaveSideTouch(
-      startDateOnly,
-      endDateOnly
-    );
-    if (clViolatesSideTouch) {
-      return NextResponse.json(
-        error(
-          "cl_cannot_touch_holiday",
-          "Casual Leave cannot be adjacent to holidays or weekends. Please use Earned Leave instead.",
-          traceId
-        ),
-        { status: 400 }
-      );
-    }
-  }
-
-  const warnings = makeWarnings(parsedInput.type, today, startDateOnly);
-
-  // Note: Casual leave is EXEMPT from notice requirements per Policy 6.11.a
-  // "All applications for leave... at least 5 working days ahead (with the exception of casual leave and quarantine leave)"
-
-  const needsCertificate = parsedInput.needsCertificate ?? mustCert;
-  if (mustCert && certificateUrl) {
-    // Certificate provided, no warning needed
-  } else if (mustCert) {
-    // This shouldn't happen due to hard block above, but keep for consistency
-    (warnings as Record<string, boolean>).mlNeedsCertificate = true;
-  }
-
-  // Add medical leave excess warning if applicable
-  if (mlExcessWarning) {
-    (warnings as Record<string, any>).mlExcessWarning = mlExcessWarning;
-  }
-
-  const year = yearOf(start);
-  
-  // Hard block: CL annual cap ≤10 days/year
-  if (t === "CASUAL") {
-    const yearStart = new Date(year, 0, 1);
-    const yearEnd = new Date(year + 1, 0, 1);
-    const usedThisYear = await prisma.leaveRequest.aggregate({
-      where: {
-        requesterId: me.id,
-        type: "CASUAL",
-        status: { in: ["APPROVED", "PENDING"] }, // Count approved and pending
-        startDate: { gte: yearStart, lt: yearEnd },
-      },
-      _sum: { workingDays: true },
-    });
-    const totalUsed = (usedThisYear._sum.workingDays ?? 0) + workingDays;
-    if (totalUsed > policy.accrual.CL_PER_YEAR) {
-      return NextResponse.json(
-        error("cl_annual_cap_exceeded", undefined, traceId, {
-          cap: policy.accrual.CL_PER_YEAR,
-          used: usedThisYear._sum.workingDays ?? 0,
-          requested: workingDays,
-        }),
-        { status: 400 }
-      );
-    }
-  }
-  
-  // Medical leave >14 days advisory (Policy 6.21.c)
-  // Note: This is a soft warning, not a hard block. Users can still apply but are advised to use EL/SPECIAL
-  let mlExcessWarning: string | undefined;
-  if (t === "MEDICAL") {
-    const yearStart = new Date(year, 0, 1);
-    const yearEnd = new Date(year + 1, 0, 1);
-    const usedThisYear = await prisma.leaveRequest.aggregate({
-      where: {
-        requesterId: me.id,
-        type: "MEDICAL",
-        status: { in: ["APPROVED", "PENDING"] }, // Count approved and pending
-        startDate: { gte: yearStart, lt: yearEnd },
-      },
-      _sum: { workingDays: true },
-    });
-
-    const mlCheck = checkMedicalLeaveAnnualLimit(
-      usedThisYear._sum.workingDays ?? 0,
-      workingDays
-    );
-
-    if (!mlCheck.withinLimit) {
-      mlExcessWarning = mlCheck.warning;
-    }
-  }
-  
-  // Hard block: EL max carry 60 - check if total (opening + accrued) exceeds carry cap
-  if (t === "EARNED") {
-    const elBalance = await prisma.balance.findUnique({
-      where: { userId_type_year: { userId: me.id, type: "EARNED", year } },
-    });
-    if (elBalance) {
-      const totalCarry = (elBalance.opening ?? 0) + (elBalance.accrued ?? 0);
-      if (totalCarry > policy.carryForwardCap.EL) {
-        // Check if this request would exceed carry cap
-        const afterRequest = totalCarry - (elBalance.used ?? 0) - workingDays;
-        if (afterRequest > policy.carryForwardCap.EL) {
-          return NextResponse.json(
-            error("el_carry_cap_exceeded", undefined, traceId, {
-              cap: policy.carryForwardCap.EL,
-              currentTotal: totalCarry,
-              requested: workingDays,
-            }),
-            { status: 400 }
-          );
-        }
-      }
-    }
-  }
-
-  // Check for team overlap - prevent too many team members on leave simultaneously
-  const currentUser = await prisma.user.findUnique({
-    where: { id: me.id },
-    select: { deptHeadId: true, department: true },
-  });
-
-  if (currentUser?.department) {
-    // Find all team members in the same department
-    const teamMembers = await prisma.user.findMany({
-      where: {
-        department: currentUser.department,
-        id: { not: me.id }, // Exclude current user
-      },
-      select: { id: true },
-    });
-
-    if (teamMembers.length > 0) {
-      // Check how many team members have approved/pending leaves during this period
-      const overlappingLeaves = await prisma.leaveRequest.findMany({
-        where: {
-          requesterId: { in: teamMembers.map((m) => m.id) },
-          status: { in: ["APPROVED", "PENDING", "SUBMITTED"] },
-          OR: [
-            {
-              // Leave starts during requested period
-              AND: [
-                { startDate: { lte: end } },
-                { endDate: { gte: start } },
-              ],
-            },
-          ],
-        },
-        select: {
-          requesterId: true,
-          requester: { select: { name: true } },
-          startDate: true,
-          endDate: true,
-        },
-      });
-
-      const uniqueEmployeesOnLeave = new Set(overlappingLeaves.map((l) => l.requesterId));
-      const teamSize = teamMembers.length + 1; // Include current user
-      const employeesOnLeaveCount = uniqueEmployeesOnLeave.size + 1; // Include current request
-      const percentageOnLeave = (employeesOnLeaveCount / teamSize) * 100;
-
-      // Warn if >30% of team will be on leave
-      const TEAM_CAPACITY_THRESHOLD = 30;
-      if (percentageOnLeave > TEAM_CAPACITY_THRESHOLD) {
-        const overlappingNames = overlappingLeaves
-          .slice(0, 3)
-          .map((l) => l.requester.name)
-          .join(", ");
-        const additionalCount = overlappingLeaves.length > 3 ? ` and ${overlappingLeaves.length - 3} more` : "";
-
-        return NextResponse.json(
-          error(
-            "team_capacity_exceeded",
-            `Too many team members on leave during this period. ${overlappingNames}${additionalCount} will also be on leave. Please coordinate with your team or manager.`,
-            traceId,
-            {
-              teamSize,
-              onLeaveCount: employeesOnLeaveCount,
-              percentageOnLeave: Math.round(percentageOnLeave),
-              threshold: TEAM_CAPACITY_THRESHOLD,
-            }
-          ),
-          { status: 400 }
-        );
-      }
-    }
-  }
-
-  const available = await getAvailableDays(me.id, t, year);
-  if (available < workingDays) {
-    return NextResponse.json(
-      error("insufficient_balance", undefined, traceId, {
-        available,
-        requested: workingDays,
-        type: t,
-      }),
-      { status: 400 }
-    );
-  }
-
-  const created = await prisma.leaveRequest.create({
-    data: {
-      requesterId: me.id,
-      type: t,
-      startDate: start,
-      endDate: end,
-      workingDays,
+    // Delegate all business logic to LeaveService
+    const result = await LeaveService.createLeaveRequest(me.id, {
+      type: parsedInput.type as LeaveType,
+      startDate: new Date(parsedInput.startDate),
+      endDate: new Date(parsedInput.endDate),
       reason: parsedInput.reason,
-      needsCertificate,
-      certificateUrl,
-      policyVersion: policy.version,
-      status: "SUBMITTED",
-    },
-  });
-
-  // Create initial pending approval entry for HR Admin (step 1 in chain)
-  const hrAdmin = await prisma.user.findFirst({
-    where: { role: "HR_ADMIN" },
-    orderBy: { id: "asc" },
-    select: { id: true },
-  });
-
-  if (hrAdmin) {
-    const initialStep = Math.max(getStepForRole("HR_ADMIN", t), 1);
-    await prisma.approval.create({
-      data: {
-        leaveId: created.id,
-        step: initialStep,
-        approverId: hrAdmin.id,
-        decision: "PENDING",
-        comment: null,
-      },
+      workingDays: parsedInput.workingDays,
+      needsCertificate: parsedInput.needsCertificate,
+      certificateFile,
     });
-  }
 
-  return NextResponse.json({ ok: true, id: created.id, warnings });
+    if (!result.success) {
+      return NextResponse.json(
+        error(result.error!.code, result.error!.message, traceId, result.error!.details),
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json({
+      ok: true,
+      id: result.data.id,
+      warnings: result.data.warnings
+    });
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        error("validation_error", "Invalid request data", traceId, { errors: err.errors }),
+        { status: 400 }
+      );
+    }
+    console.error("POST /api/leaves error:", err);
+    return NextResponse.json(
+      error("internal_error", "Failed to create leave request", traceId),
+      { status: 500 }
+    );
+  }
 }

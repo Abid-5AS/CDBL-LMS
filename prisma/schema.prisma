@@ -243,3 +243,37 @@ model OtpCode {
   @@index([expiresAt])
   @@map("OtpCode")
 }
+
+enum NotificationType {
+  LEAVE_SUBMITTED
+  LEAVE_APPROVED
+  LEAVE_REJECTED
+  LEAVE_RETURNED
+  LEAVE_FORWARDED
+  LEAVE_CANCELLED
+  LEAVE_CANCELLATION_REQUESTED
+  LEAVE_APPROACHING
+  APPROVAL_REQUIRED
+  ENCASHMENT_APPROVED
+  ENCASHMENT_REJECTED
+  SYSTEM_ANNOUNCEMENT
+}
+
+// Real-time notification system
+model Notification {
+  id         Int              @id @default(autoincrement())
+  userId     Int // Recipient user ID
+  type       NotificationType
+  title      String
+  message    String
+  link       String? // Optional link to related resource (e.g., /leaves/123)
+  leaveId    Int? // Related leave request ID
+  read       Boolean          @default(false)
+  readAt     DateTime?
+  createdAt  DateTime         @default(now())
+  expiresAt  DateTime? // Optional expiry for time-sensitive notifications
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+  @@index([createdAt])
+}
