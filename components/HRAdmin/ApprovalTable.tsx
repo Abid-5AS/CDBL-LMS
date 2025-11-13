@@ -37,6 +37,7 @@ import {
   useUser,
 } from "@/lib";
 import type { AppRole } from "@/lib/rbac";
+import { LEAVE_TYPE_OPTIONS } from "@/lib/constants";
 
 // Local imports
 import { HRApprovalItem } from "./types";
@@ -58,22 +59,13 @@ function statusStyle(status: string) {
 }
 
 const STATUS_OPTIONS = [
+  { value: "all", label: "All" },
   { value: "PENDING", label: "Pending" },
   { value: "SUBMITTED", label: "Submitted" },
 ];
 
-const TYPE_OPTIONS = [
-  { value: "EARNED", label: "Earned Leave" },
-  { value: "CASUAL", label: "Casual Leave" },
-  { value: "MEDICAL", label: "Medical Leave (Sick Leave)" },
-  { value: "EXTRAWITHPAY", label: "Extraordinary Leave (with pay)" },
-  { value: "EXTRAWITHOUTPAY", label: "Extraordinary Leave (without pay)" },
-  { value: "MATERNITY", label: "Maternity Leave" },
-  { value: "PATERNITY", label: "Paternity Leave" },
-  { value: "STUDY", label: "Study Leave" },
-  { value: "SPECIAL_DISABILITY", label: "Special Disability Leave" },
-  { value: "QUARANTINE", label: "Quarantine Leave" },
-];
+// Use shared TYPE_OPTIONS from constants
+const TYPE_OPTIONS = LEAVE_TYPE_OPTIONS;
 
 export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   const [processingId, setProcessingId] = useState<string | null>(null);
