@@ -15,9 +15,8 @@ import {
   Calendar,
 } from "lucide-react";
 import {
-  KPICard,
-  KPICardSkeleton,
-  KPIGrid,
+  RoleKPICard,
+  ResponsiveDashboardGrid,
   ExportButton,
 } from "@/components/dashboards/shared";
 import { ChartContainer, TrendChart, TypePie } from "@/components/shared/LeaveCharts";
@@ -86,59 +85,90 @@ export function HRAdminDashboardClient() {
   return (
     <div className="space-y-6">
       {/* Primary KPIs */}
-      <KPIGrid>
+      <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
         {isLoading ? (
           <>
-            <KPICardSkeleton />
-            <KPICardSkeleton />
-            <KPICardSkeleton />
-            <KPICardSkeleton />
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="glass-card rounded-2xl p-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 space-y-3">
+                    <div className="h-4 w-24 bg-muted/50 animate-pulse rounded" />
+                    <div className="h-8 w-20 bg-muted/50 animate-pulse rounded" />
+                    <div className="h-4 w-32 bg-muted/50 animate-pulse rounded" />
+                  </div>
+                  <div className="h-12 w-12 bg-muted/50 animate-pulse rounded-xl" />
+                </div>
+              </div>
+            ))}
           </>
         ) : (
           <>
-            <KPICard
+            <RoleKPICard
               title="Employees on Leave"
               value={stats?.employeesOnLeave || 0}
               subtitle="Currently absent"
               icon={Users}
-              variant="info"
+              role="HR_ADMIN"
             />
-            <KPICard
+            <RoleKPICard
               title="Pending Requests"
               value={stats?.pendingRequests || 0}
               subtitle="Awaiting action"
               icon={Clock}
-              variant={stats && stats.pendingRequests > 15 ? "warning" : "default"}
+              role="HR_ADMIN"
+              trend={stats && stats.pendingRequests > 15 ? {
+                value: stats.pendingRequests,
+                label: "needs attention",
+                direction: "up"
+              } : undefined}
             />
-            <KPICard
+            <RoleKPICard
               title="Avg Approval Time"
               value={`${stats?.avgApprovalTime?.toFixed(1) || 0}d`}
               subtitle="Processing speed"
               icon={TrendingUp}
-              variant={stats && stats.avgApprovalTime > 3 ? "warning" : "success"}
+              role="HR_ADMIN"
+              trend={stats && stats.avgApprovalTime > 3 ? {
+                value: Math.round((stats.avgApprovalTime - 3) * 10),
+                label: "vs 3d target",
+                direction: "down"
+              } : stats && stats.avgApprovalTime > 0 ? {
+                value: Math.round((3 - stats.avgApprovalTime) * 10),
+                label: "below target",
+                direction: "up"
+              } : undefined}
             />
-            <KPICard
+            <RoleKPICard
               title="Total Leaves (YTD)"
               value={stats?.totalLeavesThisYear || 0}
               subtitle="This year"
               icon={Calendar}
-              variant="default"
+              role="HR_ADMIN"
             />
           </>
         )}
-      </KPIGrid>
+      </ResponsiveDashboardGrid>
 
       {/* Performance Metrics */}
-      <div className="grid gap-6 md:grid-cols-3">
+      <ResponsiveDashboardGrid columns="1:1:3:3" gap="md">
         {isLoading ? (
           <>
-            <KPICardSkeleton />
-            <KPICardSkeleton />
-            <KPICardSkeleton />
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="glass-card rounded-2xl p-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 space-y-3">
+                    <div className="h-4 w-24 bg-muted/50 animate-pulse rounded" />
+                    <div className="h-8 w-20 bg-muted/50 animate-pulse rounded" />
+                    <div className="h-4 w-32 bg-muted/50 animate-pulse rounded" />
+                  </div>
+                  <div className="h-12 w-12 bg-muted/50 animate-pulse rounded-xl" />
+                </div>
+              </div>
+            ))}
           </>
         ) : (
           <>
-            <Card className="rounded-2xl">
+            <Card className="glass-card rounded-2xl border-border">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <Target className="h-4 w-4" />
@@ -156,12 +186,19 @@ export function HRAdminDashboardClient() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-semibold text-data-info">
+                    <p className="text-2xl font-semibold" style={{ color: "var(--role-hr-admin-accent, #7c3aed)" }}>
                       {stats?.dailyProgress || 0}%
                     </p>
                   </div>
                 </div>
-                <Progress value={stats?.dailyProgress || 0} className="h-2" />
+                <Progress
+                  value={stats?.dailyProgress || 0}
+                  className="h-2"
+                  style={{
+                    // @ts-ignore
+                    "--progress-background": "var(--role-hr-admin-accent, #7c3aed)"
+                  }}
+                />
                 {stats && stats.dailyProgress >= 100 && (
                   <p className="text-xs text-data-success flex items-center gap-1">
                     <CheckCircle2 className="h-3 w-3" />
@@ -171,43 +208,42 @@ export function HRAdminDashboardClient() {
               </CardContent>
             </Card>
 
-            <KPICard
+            <RoleKPICard
               title="Team Utilization"
               value={`${stats?.teamUtilization || 0}%`}
               subtitle="Workforce availability"
               icon={Activity}
-              variant={
-                stats && stats.teamUtilization < 80
-                  ? "warning"
-                  : stats && stats.teamUtilization >= 90
-                  ? "success"
-                  : "default"
-              }
+              role="HR_ADMIN"
               trend={
                 stats && stats.teamUtilization
                   ? {
-                      value: stats.teamUtilization >= 85 ? 2 : -3,
+                      value: stats.teamUtilization >= 85 ? 2 : 3,
                       label: "vs target",
+                      direction: stats.teamUtilization >= 85 ? "up" : "down"
                     }
                   : undefined
               }
             />
 
-            <KPICard
+            <RoleKPICard
               title="Compliance Score"
               value={`${stats?.complianceScore || 0}%`}
               subtitle="Policy adherence"
               icon={CheckCircle2}
-              variant={stats && stats.complianceScore >= 90 ? "success" : "warning"}
+              role="HR_ADMIN"
               trend={
                 stats && stats.complianceScore
-                  ? { value: stats.complianceScore >= 90 ? 1 : -2, label: "this month" }
+                  ? {
+                      value: stats.complianceScore >= 90 ? 1 : 2,
+                      label: "this month",
+                      direction: stats.complianceScore >= 90 ? "up" : "down"
+                    }
                   : undefined
               }
             />
           </>
         )}
-      </div>
+      </ResponsiveDashboardGrid>
 
       {/* Pending Requests Table - Full Width */}
       <Suspense fallback={<DashboardCardSkeleton />}>
@@ -239,7 +275,7 @@ export function HRAdminDashboardClient() {
         {/* Sidebar - Right Side (4 columns) */}
         <div className="lg:col-span-4 space-y-6">
           {/* Quick Stats Summary */}
-          <Card className="rounded-2xl">
+          <Card className="glass-card rounded-2xl border-border">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
                 <FileText className="h-4 w-4" />
