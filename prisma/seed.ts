@@ -492,15 +492,23 @@ async function createPolicyConfigs() {
       noticeDays: 0,
       carryLimit: null,
     },
+    [LeaveType.SPECIAL]: {
+      maxDays: 60,
+      minDays: 1,
+      noticeDays: 0,
+      carryLimit: null,
+    },
   };
 
   for (const leaveType of Object.values(LeaveType)) {
     const config = defaults[leaveType];
-    await prisma.policyConfig.upsert({
-      where: { leaveType },
-      update: config,
-      create: { leaveType, ...config },
-    });
+    if (config) {
+      await prisma.policyConfig.upsert({
+        where: { leaveType },
+        update: config,
+        create: { leaveType, ...config },
+      });
+    }
   }
   console.log("✅ Policy configurations upserted");
 }

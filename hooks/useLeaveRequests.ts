@@ -5,7 +5,10 @@ import useSWR from "swr";
 import { toast } from "sonner";
 import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/toast-messages";
 import { useSelectionContext } from "@/lib/selection-context";
-import { useLeaveDataContext, type LeaveResponse } from "@/components/providers";
+import {
+  useLeaveDataContext,
+  type LeaveResponse,
+} from "@/components/providers";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -41,7 +44,12 @@ export type LeaveRow = {
 
 export type FilterStatus = "all" | "pending" | "approved" | "cancelled";
 
-export const CANCELABLE_STATUSES = new Set<LeaveRow["status"]>(["SUBMITTED", "PENDING", "RETURNED", "APPROVED"]);
+export const CANCELABLE_STATUSES = new Set<LeaveRow["status"]>([
+  "SUBMITTED",
+  "PENDING",
+  "RETURNED",
+  "APPROVED",
+]);
 
 type UseLeaveRequestsOptions = {
   limit?: number;
@@ -63,8 +71,12 @@ export type LeaveModalState = {
   handleOpenChange: (open: boolean) => void;
 };
 
-export function useLeaveRequests({ limit, enableSelection }: UseLeaveRequestsOptions = {}) {
-  const selectionEnabled = enableSelection ?? (limit === undefined || limit === null);
+export function useLeaveRequests({
+  limit,
+  enableSelection,
+}: UseLeaveRequestsOptions = {}) {
+  const selectionEnabled =
+    enableSelection ?? (limit === undefined || limit === null);
   const { setSelection } = useSelectionContext();
   const contextValue = useLeaveDataContext();
   const fallback = useSWR<LeaveResponse>("/api/leaves?mine=1", fetcher, {
@@ -88,7 +100,10 @@ export function useLeaveRequests({ limit, enableSelection }: UseLeaveRequestsOpt
     };
   }, [selectionEnabled, selectedIds, setSelection]);
 
-  const allRows: LeaveRow[] = useMemo(() => (Array.isArray(data?.items) ? data.items : []), [data]);
+  const allRows: LeaveRow[] = useMemo(
+    () => (Array.isArray(data?.items) ? data.items : []),
+    [data]
+  );
 
   const filteredRows = useMemo(() => {
     let filtered: LeaveRow[] = [];
@@ -109,7 +124,8 @@ export function useLeaveRequests({ limit, enableSelection }: UseLeaveRequestsOpt
       });
     }
     const sorted = [...filtered].sort(
-      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );
     return limit ? sorted.slice(0, limit) : sorted;
   }, [allRows, filter, limit]);
@@ -121,7 +137,7 @@ export function useLeaveRequests({ limit, enableSelection }: UseLeaveRequestsOpt
         setSelectedIds(new Set());
       }
     },
-    [selectionEnabled],
+    [selectionEnabled]
   );
 
   const selectRow = useCallback(
@@ -137,21 +153,27 @@ export function useLeaveRequests({ limit, enableSelection }: UseLeaveRequestsOpt
         return next;
       });
     },
-    [selectionEnabled],
+    [selectionEnabled]
   );
 
   const selectAll = useCallback(
     (checked: boolean) => {
       if (!selectionEnabled) return;
-    setSelectedIds(checked ? new Set(filteredRows.map((row) => row.id)) : new Set());
-  },
-    [selectionEnabled, filteredRows],
+      setSelectedIds(
+        checked ? new Set(filteredRows.map((row) => row.id)) : new Set()
+      );
+    },
+    [selectionEnabled, filteredRows]
   );
 
   const allSelected =
-    selectionEnabled && filteredRows.length > 0 && selectedIds.size === filteredRows.length;
+    selectionEnabled &&
+    filteredRows.length > 0 &&
+    selectedIds.size === filteredRows.length;
   const someSelected =
-    selectionEnabled && selectedIds.size > 0 && selectedIds.size < filteredRows.length;
+    selectionEnabled &&
+    selectedIds.size > 0 &&
+    selectedIds.size < filteredRows.length;
 
   const selection: SelectionState = useMemo(() => {
     if (!selectionEnabled) {
@@ -170,7 +192,14 @@ export function useLeaveRequests({ limit, enableSelection }: UseLeaveRequestsOpt
       selectRow,
       selectAll,
     };
-  }, [selectionEnabled, allSelected, someSelected, selectedIds, selectRow, selectAll]);
+  }, [
+    selectionEnabled,
+    allSelected,
+    someSelected,
+    selectedIds,
+    selectRow,
+    selectAll,
+  ]);
 
   const openDetails = useCallback((leave: LeaveRow) => {
     setSelectedLeave(leave);
@@ -191,7 +220,7 @@ export function useLeaveRequests({ limit, enableSelection }: UseLeaveRequestsOpt
       openDetails,
       handleOpenChange,
     }),
-    [selectedLeave, modalOpen, openDetails, handleOpenChange],
+    [selectedLeave, modalOpen, openDetails, handleOpenChange]
   );
 
   const cancelRequest = useCallback(
@@ -202,7 +231,7 @@ export function useLeaveRequests({ limit, enableSelection }: UseLeaveRequestsOpt
           const body = await res.json().catch(() => ({}));
           const errorMessage = getToastMessage(
             body?.error || "Unable to cancel request",
-            body?.message,
+            body?.message
           );
           toast.error(errorMessage);
           return;
@@ -212,7 +241,7 @@ export function useLeaveRequests({ limit, enableSelection }: UseLeaveRequestsOpt
         toast.success(
           isImmediate
             ? SUCCESS_MESSAGES.cancellation_success
-            : SUCCESS_MESSAGES.cancellation_request_submitted,
+            : SUCCESS_MESSAGES.cancellation_request_submitted
         );
         if (selectionEnabled) {
           setSelectedIds((prev) => {
@@ -224,10 +253,12 @@ export function useLeaveRequests({ limit, enableSelection }: UseLeaveRequestsOpt
         mutate();
       } catch (err) {
         console.error(err);
-        toast.error(getToastMessage("network_error", "Network error. Please try again."));
+        toast.error(
+          getToastMessage("network_error", "Network error. Please try again.")
+        );
       }
     },
-    [selectionEnabled, mutate],
+    [selectionEnabled, mutate]
   );
 
   return {

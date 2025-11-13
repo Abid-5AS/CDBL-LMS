@@ -66,7 +66,7 @@ export function QuickActions({
             if (action.href) {
               return (
                 <DropdownMenuItem key={index} asChild>
-                  <Link href={action.href} className="flex items-center">
+                  <Link href={action.href}>
                     <Icon className="mr-2 h-4 w-4" />
                     {action.label}
                     {action.badge && (
@@ -113,19 +113,19 @@ export function QuickActions({
           <div className={cn("flex flex-wrap gap-2", compact && "gap-1")}>
             {actions.map((action, index) => {
               const Icon = action.icon;
-              const button = (
-                <Button
-                  key={index}
-                  variant={action.variant || "outline"}
-                  className={cn(
-                    compact ? "min-w-[120px]" : "flex-1 min-w-[140px]",
-                    "justify-start gap-2",
-                    action.className
-                  )}
-                  onClick={action.onClick}
-                  asChild={!!action.href}
-                >
-                  {action.href ? (
+              
+              if (action.href) {
+                const button = (
+                  <Button
+                    key={index}
+                    variant={action.variant || "outline"}
+                    className={cn(
+                      compact ? "min-w-[120px]" : "flex-1 min-w-[140px]",
+                      "justify-start gap-2",
+                      action.className
+                    )}
+                    asChild
+                  >
                     <Link href={action.href}>
                       <Icon className="h-4 w-4" />
                       {action.label}
@@ -138,35 +138,59 @@ export function QuickActions({
                         </Badge>
                       )}
                     </Link>
-                  ) : (
-                    <>
-                      <Icon className="h-4 w-4" />
-                      {action.label}
-                      {action.badge && (
-                        <Badge
-                          variant="destructive"
-                          className="ml-2 h-5 px-1.5 text-xs"
-                        >
-                          {action.badge}
-                        </Badge>
-                      )}
-                    </>
-                  )}
-                </Button>
-              );
-
-              if (action.tooltip) {
-                return (
-                  <TooltipProvider key={index}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>{button}</TooltipTrigger>
-                      <TooltipContent>{action.tooltip}</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  </Button>
                 );
-              }
 
-              return button;
+                if (action.tooltip) {
+                  return (
+                    <TooltipProvider key={index}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>{button}</TooltipTrigger>
+                        <TooltipContent>{action.tooltip}</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  );
+                }
+
+                return button;
+              } else {
+                const button = (
+                  <Button
+                    key={index}
+                    variant={action.variant || "outline"}
+                    className={cn(
+                      compact ? "min-w-[120px]" : "flex-1 min-w-[140px]",
+                      "justify-start gap-2",
+                      action.className
+                    )}
+                    onClick={action.onClick}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {action.label}
+                    {action.badge && (
+                      <Badge
+                        variant="destructive"
+                        className="ml-2 h-5 px-1.5 text-xs"
+                      >
+                        {action.badge}
+                      </Badge>
+                    )}
+                  </Button>
+                );
+
+                if (action.tooltip) {
+                  return (
+                    <TooltipProvider key={index}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>{button}</TooltipTrigger>
+                        <TooltipContent>{action.tooltip}</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  );
+                }
+
+                return button;
+              }
             })}
           </div>
         </CardContent>
@@ -179,20 +203,20 @@ export function QuickActions({
     <div className={cn("flex flex-wrap gap-3", className)}>
       {actions.map((action, index) => {
         const Icon = action.icon;
-        const button = (
-          <Button
-            key={index}
-            variant={action.variant || "default"}
-            className={cn(
-              "relative rounded-full px-4 py-2 font-medium transition-all ease-out duration-300",
-              action.className
-            )}
-            onClick={action.onClick}
-            asChild={!!action.href}
-          >
-            {action.href ? (
+        
+        if (action.href) {
+          const button = (
+            <Button
+              key={index}
+              variant={action.variant || "default"}
+              className={cn(
+                "relative rounded-full px-4 py-2 font-medium transition-all ease-out duration-300",
+                action.className
+              )}
+              asChild
+            >
               <Link href={action.href}>
-                <Icon className="h-4 w-4 mr-2" />
+                <Icon className="h-4 w-4" />
                 {action.label}
                 {action.badge && (
                   <Badge
@@ -203,35 +227,58 @@ export function QuickActions({
                   </Badge>
                 )}
               </Link>
-            ) : (
-              <>
-                <Icon className="h-4 w-4 mr-2" />
-                {action.label}
-                {action.badge && (
-                  <Badge
-                    variant="destructive"
-                    className="ml-2 h-5 px-1.5 text-xs"
-                  >
-                    {action.badge}
-                  </Badge>
-                )}
-              </>
-            )}
-          </Button>
-        );
-
-        if (action.tooltip) {
-          return (
-            <TooltipProvider key={index}>
-              <Tooltip>
-                <TooltipTrigger asChild>{button}</TooltipTrigger>
-                <TooltipContent>{action.tooltip}</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            </Button>
           );
-        }
 
-        return button;
+          if (action.tooltip) {
+            return (
+              <TooltipProvider key={index}>
+                <Tooltip>
+                  <TooltipTrigger asChild>{button}</TooltipTrigger>
+                  <TooltipContent>{action.tooltip}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            );
+          }
+
+          return button;
+        } else {
+          const button = (
+            <Button
+              key={index}
+              variant={action.variant || "default"}
+              className={cn(
+                "relative rounded-full px-4 py-2 font-medium transition-all ease-out duration-300",
+                action.className
+              )}
+              onClick={action.onClick}
+            >
+              <Icon className="h-4 w-4" />
+              {action.label}
+              {action.badge && (
+                <Badge
+                  variant="destructive"
+                  className="ml-2 h-5 px-1.5 text-xs"
+                >
+                  {action.badge}
+                </Badge>
+              )}
+            </Button>
+          );
+
+          if (action.tooltip) {
+            return (
+              <TooltipProvider key={index}>
+                <Tooltip>
+                  <TooltipTrigger asChild>{button}</TooltipTrigger>
+                  <TooltipContent>{action.tooltip}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            );
+          }
+
+          return button;
+        }
       })}
     </div>
   );

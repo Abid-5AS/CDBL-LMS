@@ -19,7 +19,7 @@ export function Navbar() {
   if (!state.user || !mounted) return null;
 
   return (
-    <>
+    <div>
       <motion.nav
         key="navbar"
         initial={{ y: -100, opacity: 0 }}
@@ -57,6 +57,6 @@ export function Navbar() {
       <AnimatePresence>
         {state.isMobileMenuOpen && <MobileMenu {...state} />}
       </AnimatePresence>
-    </>
+    </div>
   );
 }

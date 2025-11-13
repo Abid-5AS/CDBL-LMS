@@ -72,15 +72,8 @@ function Button({
 }: ButtonProps) {
   const Comp = asChild ? Slot : "button";
   const isDisabled = disabled || loading;
-
-  return (
-    <Comp
-      data-slot="button"
-      className={cn(buttonVariants({ variant, size, loading }), className)}
-      disabled={isDisabled}
-      aria-disabled={isDisabled}
-      {...props}
-    >
+  const buttonContent = (
+    <>
       {loading && (
         <svg
           className="animate-spin h-4 w-4 shrink-0"
@@ -117,6 +110,18 @@ function Button({
           {rightIcon}
         </span>
       )}
+    </>
+  );
+
+  return (
+    <Comp
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, loading }), className)}
+      disabled={isDisabled}
+      aria-disabled={isDisabled}
+      {...props}
+    >
+      {asChild ? children : buttonContent}
     </Comp>
   );
 }

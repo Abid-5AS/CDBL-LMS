@@ -103,8 +103,8 @@ export class ErrorBoundary extends Component<Props, State> {
       );
     }
 
-    // Return children directly
-    return this.props.children;
+    // Wrap children in a fragment to ensure a single element is returned
+    return <>{this.props.children}</>;
   }
 }
 

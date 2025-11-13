@@ -24,10 +24,5 @@ export * from "./shared";
 export { HeroStrip } from "./common/HeroStrip";
 export { InsightsWidget } from "./common/InsightsWidget";
 
-// Sections
-export * from "./hr-admin/Sections";
-export * from "./hr-head/Sections";
-export * from "./dept-head/Sections";
-
 // Hooks
 export * from "./dept-head/hooks";

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { ModernEmployeeDashboard } from "@/components/dashboards";
 import { DashboardLoadingFallback } from "../shared/LoadingFallback";
 import { DashboardLayout } from "../shared/DashboardLayout";
+import { SelectionProvider } from "@/lib/selection-context";
 
 async function EmployeeDashboardPageContent() {
   const user = await getCurrentUser();
@@ -19,7 +20,11 @@ async function EmployeeDashboardPageContent() {
 
   const username = user.name ?? "User";
 
-  return <ModernEmployeeDashboard username={username} />;
+  return (
+    <SelectionProvider>
+      <ModernEmployeeDashboard username={username} />
+    </SelectionProvider>
+  );
 }
 
 export default function EmployeeDashboardPage() {
