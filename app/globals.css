@@ -19,12 +19,12 @@
 
 /* Liquid Glass Utility Classes - Material You × iOS Glass */
 .glass-card {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(203, 213, 225, 0.5);
   border-radius: 1rem;
-  box-shadow: var(--elevation-2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: var(--elevation-2), inset 0 1px 0 rgba(255, 255, 255, 0.5);
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -35,8 +35,8 @@
 }
 
 .glass-card:hover {
-  background: rgba(255, 255, 255, 0.5);
-  box-shadow: var(--elevation-3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: var(--elevation-3), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   transform: translateY(-2px);
 }
 
@@ -385,7 +385,7 @@
   --transition-ease-in-out: var(--ease-in-out);
 
   /* Core semantic color tokens - Light */
-  --color-bg: #ffffff;
+  --color-bg: #f8fafc;
   --color-surface: #ffffff;
   --color-surface-muted: #f1f5f9;
   --color-popover: #ffffff;
@@ -435,7 +435,7 @@
   --sidebar-foreground: var(--color-foreground);
   --sidebar-primary: var(--color-primary);
   --sidebar-primary-foreground: #f8fafc;
-  --sidebar-accent: rgba(99, 102, 241, 0.08);
+  --sidebar-accent: rgba(99, 102, 241, 0.1);
   --sidebar-accent-foreground: var(--color-foreground);
   --sidebar-border: var(--color-border);
   --sidebar-ring: var(--color-ring);
@@ -811,9 +811,9 @@
     --glass-blur: 24px;
     backdrop-filter: blur(var(--glass-blur)) saturate(180%);
     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-    background-color: rgba(255, 255, 255, 0.55);
+    background-color: rgba(255, 255, 255, 0.85);
     border-radius: var(--radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(203, 213, 225, 0.5);
     box-shadow: var(--shadow-md);
     transition: background-color var(--transition-duration-medium)
         var(--transition-ease-out),
@@ -831,9 +831,9 @@
     --glass-blur: 24px;
     backdrop-filter: blur(var(--glass-blur)) saturate(180%);
     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-    background-color: rgba(255, 255, 255, 0.55);
+    background-color: rgba(255, 255, 255, 0.85);
     border-radius: var(--radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(203, 213, 225, 0.5);
     box-shadow: var(--shadow-md);
     transition: background-color var(--transition-duration-medium)
         var(--transition-ease-out),
@@ -851,6 +851,11 @@
   .glass-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
+    background-color: rgba(255, 255, 255, 0.95);
+  }
+
+  .dark .glass-card:hover {
+    background-color: rgba(24, 24, 27, 0.8);
   }
 
   /* Login page specific glass-card override - solid white background */
@@ -874,23 +879,15 @@
   .glass-nav {
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
-    background-color: color-mix(
-      in srgb,
-      rgb(var(--bg-primary)) 85%,
-      transparent
-    );
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(203, 213, 225, 0.5);
     box-shadow: var(--shadow-lg);
     transition: all var(--transition-duration-small)
       var(--transition-ease-in-out);
   }
 
   .glass-nav.scrolled {
-    background-color: color-mix(
-      in srgb,
-      rgb(var(--bg-primary)) 95%,
-      transparent
-    );
+    background-color: rgba(255, 255, 255, 0.95);
     box-shadow: var(--shadow-xl);
   }
 
@@ -903,9 +900,9 @@
   .glass-medium {
     backdrop-filter: blur(24px) saturate(200%);
     -webkit-backdrop-filter: blur(24px) saturate(200%);
-    background-color: rgba(255, 255, 255, 0.65);
+    background-color: rgba(255, 255, 255, 0.85);
     border-radius: var(--radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(203, 213, 225, 0.5);
     box-shadow: var(--shadow-lg);
     transition: all var(--transition-duration-small) var(--transition-ease-out);
   }
@@ -927,16 +924,16 @@
   .glass-modal {
     backdrop-filter: blur(24px) saturate(200%);
     -webkit-backdrop-filter: blur(24px) saturate(200%);
-    background-color: rgba(255, 255, 255, 0.65);
+    background-color: rgba(255, 255, 255, 0.95);
     border-radius: var(--radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(203, 213, 225, 0.5);
     box-shadow: var(--shadow-lg);
     transition: all var(--transition-duration-small) var(--transition-ease-out);
     padding: 1.75rem;
   }
 
   .dark .glass-modal {
-    background-color: rgba(24, 24, 27, 0.7);
+    background-color: rgba(24, 24, 27, 0.85);
     border-color: rgba(255, 255, 255, 0.12);
     box-shadow: var(--shadow-lg);
   }
@@ -1611,8 +1608,8 @@
   -webkit-backdrop-filter: blur(24px) saturate(180%);
 
   /* Light mode glass color */
-  background-color: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background-color: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(203, 213, 225, 0.5);
 }
 
 .dark .glass-pill {
@@ -1950,9 +1947,9 @@
 }
 /* Modern Dashboard Glass Effects */
 .glass-card {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(203, 213, 225, 0.5);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
@@ -2003,9 +2000,9 @@
 
 /* Modern card styles */
 .modern-card {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(203, 213, 225, 0.5);
   border-radius: 16px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
@@ -2020,6 +2017,7 @@
 .modern-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.95);
 }
 
 .dark .modern-card:hover {
