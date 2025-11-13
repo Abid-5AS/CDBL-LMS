@@ -5,34 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ModernTable } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Search, X, Inbox, Loader2, ChevronLeft, ChevronRight, CheckCircle2, ArrowRight, RotateCcw, XCircle } from "lucide-react";
+import { Inbox, Loader2, ChevronLeft, ChevronRight, CheckCircle2, ArrowRight, RotateCcw, XCircle } from "lucide-react";
 import { SUCCESS_MESSAGES } from "@/lib";
 import { toast } from "sonner";
 import { getToastMessage } from "@/lib";
@@ -47,56 +26,19 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LeaveType, LeaveStatus } from "@prisma/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LeaveComparisonModal } from "@/components/shared/modals";
-import { usePendingRequests } from "../hooks/usePendingRequests";
-import { PendingRequestRow } from "@/components/shared/tables/PendingRequestRow";
-import { AppRole, getStatusColors } from "@/lib";
+import { AppRole } from "@/lib";
 import { canPerformAction } from "@/lib/workflow";
-// Status options - role-aware (DEPT_HEAD sees "Forwarded" instead of "Approved")
-const getStatusOptions = (role: string) => {
-  if (role === "DEPT_HEAD") {
-    return [
-      { value: "all", label: "All" },
-      { value: "PENDING", label: "Pending" },
-      { value: "FORWARDED", label: "Forwarded" },
-      { value: "RETURNED", label: "Returned" },
-      { value: "CANCELLED", label: "Cancelled" },
-    ];
-  }
-  return [
-    { value: "all", label: "All" },
-    { value: "PENDING", label: "Pending" },
-    { value: "APPROVED", label: "Approved" },
-    { value: "RETURNED", label: "Returned" },
-    { value: "CANCELLED", label: "Cancelled" },
-  ];
-};
 
-// Type options - dynamically generated from LeaveType enum
-const TYPE_OPTIONS = [
-  { value: "all", label: "All" },
-  ...Object.values(LeaveType).map((type) => ({
-    value: type,
-    label: leaveTypeLabel[type] || type,
-  })),
-];
-
-
-type LeaveRequest = {
-  id: number;
-  type: string;
-  startDate: string;
-  endDate: string;
-  workingDays: number;
-  reason: string;
-  status: LeaveStatus;
-  requester: {
-    id: number;
-    name: string;
-    email: string;
-  };
-};
-
-// Will be defined after imports
+// Shared components
+import { SearchWithClear } from "@/components/shared/filters";
+import { CombinedFilterSection } from "@/components/shared/filters";
+import {
+  ApprovalDialog,
+  RejectDialog,
+  ReturnDialog,
+  ForwardDialog,
+  CancelDialog,
+} from "@/components/shared/modals";
 
 type DeptHeadPendingTableProps = {
   data?: {
@@ -122,12 +64,11 @@ export function DeptHeadPendingTable({
 }: DeptHeadPendingTableProps) {
   const user = useUser();
   const userRole = user?.role || "DEPT_HEAD";
-  const statusOptions = getStatusOptions(userRole);
-  
+
   const { state, set } = useFilterFromUrl();
   const [searchInput, setSearchInput] = useState(state.q);
   const debouncedSearch = useDebounce(searchInput, 250);
-  
+
   // Update URL when debounced search changes
   useEffect(() => {
     if (debouncedSearch !== state.q) {
@@ -142,25 +83,14 @@ export function DeptHeadPendingTable({
     }
   }, [state.q, searchInput]);
 
-  const [actionDialog, setActionDialog] = useState<{
-    open: boolean;
-    leaveId: number | null;
-    action: "approve" | "reject" | "forward" | "return" | "cancel" | null;
-    leaveType: string;
-    employeeName: string;
-  }>({
-    open: false,
-    leaveId: null,
-    action: null,
-    leaveType: "",
-    employeeName: "",
-  });
-
-  const [returnComment, setReturnComment] = useState("");
+  // Dialog state
+  const [currentLeaveId, setCurrentLeaveId] = useState<number | null>(null);
+  const [currentLeaveInfo, setCurrentLeaveInfo] = useState({ type: "", name: "" });
+  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [returnDialogOpen, setReturnDialogOpen] = useState(false);
   const [forwardDialogOpen, setForwardDialogOpen] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [cancelReason, setCancelReason] = useState("");
   const [comparisonModalOpen, setComparisonModalOpen] = useState(false);
   const [selectedLeaveForComparison, setSelectedLeaveForComparison] = useState<any | null>(null);
   const [processingIds, setProcessingIds] = useState<Set<number>>(new Set());
@@ -177,29 +107,20 @@ export function DeptHeadPendingTable({
 
   const hasActiveFilters = state.q || state.status !== "PENDING" || state.type !== "ALL";
 
-  const handleAction = async (leaveId: number, action: "approve" | "reject" | "forward" | "return" | "cancel", comment?: string) => {
-    // Add to processing set
+  // Generic action handler
+  const handleAction = async (
+    leaveId: number,
+    action: "approve" | "reject" | "forward" | "return" | "cancel",
+    comment?: string
+  ) => {
     setProcessingIds((prev) => new Set(prev).add(leaveId));
 
     try {
-      let endpoint = "";
-
-      if (action === "approve") {
-        endpoint = `/api/leaves/${leaveId}/approve`;
-      } else if (action === "return") {
-        endpoint = `/api/leaves/${leaveId}/return`;
-      } else if (action === "forward") {
-        endpoint = `/api/leaves/${leaveId}/forward`;
-      } else if (action === "reject") {
-        endpoint = `/api/leaves/${leaveId}/reject`;
-      } else if (action === "cancel") {
-        endpoint = `/api/leaves/${leaveId}/cancel`;
-      }
-
+      const endpoint = `/api/leaves/${leaveId}/${action}`;
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           comment: comment || "",
           reason: comment || undefined,
         }),
@@ -216,35 +137,33 @@ export function DeptHeadPendingTable({
         return;
       }
 
-      toast.success(
-        action === "approve"
-          ? SUCCESS_MESSAGES.leave_approved
-          : action === "reject"
-          ? SUCCESS_MESSAGES.leave_rejected
-          : action === "return"
-          ? SUCCESS_MESSAGES.returned_for_modification
-          : action === "cancel"
-          ? "Leave request cancelled successfully"
-          : SUCCESS_MESSAGES.leave_forwarded
-      );
-      
-      // Refresh data using SWR mutate
+      // Success messages
+      const successMessages = {
+        approve: SUCCESS_MESSAGES.leave_approved,
+        reject: SUCCESS_MESSAGES.leave_rejected,
+        return: SUCCESS_MESSAGES.returned_for_modification,
+        cancel: "Leave request cancelled successfully",
+        forward: SUCCESS_MESSAGES.leave_forwarded,
+      };
+      toast.success(successMessages[action]);
+
+      // Refresh data
       if (onMutate) {
         await onMutate();
       } else if (typeof window !== "undefined") {
         window.location.reload();
       }
-      
-      setActionDialog({ open: false, leaveId: null, action: null, leaveType: "", employeeName: "" });
+
+      // Close dialogs
+      setApproveDialogOpen(false);
+      setRejectDialogOpen(false);
       setReturnDialogOpen(false);
       setForwardDialogOpen(false);
       setCancelDialogOpen(false);
-      setReturnComment("");
-      setCancelReason("");
+      setCurrentLeaveId(null);
     } catch (err) {
       toast.error(getToastMessage("network_error", "Unable to update request"));
     } finally {
-      // Remove from processing set
       setProcessingIds((prev) => {
         const next = new Set(prev);
         next.delete(leaveId);
@@ -253,44 +172,55 @@ export function DeptHeadPendingTable({
     }
   };
 
-  const openActionDialog = (
+  // Helper to open specific dialog
+  const openDialog = (
     leaveId: number,
-    action: "approve" | "reject" | "forward" | "return",
+    action: "approve" | "reject" | "forward" | "return" | "cancel",
     leaveType: string,
     employeeName: string
   ) => {
-    setActionDialog({
-      open: true,
-      leaveId,
-      action,
-      leaveType,
-      employeeName,
-    });
+    setCurrentLeaveId(leaveId);
+    setCurrentLeaveInfo({ type: leaveType, name: employeeName });
+
+    switch (action) {
+      case "approve":
+        setApproveDialogOpen(true);
+        break;
+      case "reject":
+        setRejectDialogOpen(true);
+        break;
+      case "forward":
+        setForwardDialogOpen(true);
+        break;
+      case "return":
+        setReturnDialogOpen(true);
+        break;
+      case "cancel":
+        setCancelDialogOpen(true);
+        break;
+    }
   };
 
   // Helper to determine available actions based on user role and leave type
-  // For DEPT_HEAD: Only Forward, Return, Cancel (no Approve, even for CASUAL)
   const getAvailableActions = (leaveType: LeaveType): Array<"approve" | "forward" | "return" | "cancel"> => {
     const actions: Array<"approve" | "forward" | "return" | "cancel"> = [];
     const userRole = (user?.role || "DEPT_HEAD") as AppRole;
 
     // DEPT_HEAD never approves - they can only forward, return, or cancel
-    // Even though CASUAL has DEPT_HEAD as final approver, they should forward to HR_HEAD/CEO
-    // Only CEO and HR_HEAD can approve
-    
     if (canPerformAction(userRole, "FORWARD", leaveType)) {
       actions.push("forward");
     }
 
-    // Return is always available for supervisors (can return any pending request)
+    // Return is always available for supervisors
     actions.push("return");
 
-    // Cancel is available for supervisors (per-row action only, not in Quick Actions)
+    // Cancel is available for supervisors
     actions.push("cancel");
 
     return actions;
   };
 
+  // Loading state
   if (isLoading) {
     return (
       <Card className="rounded-2xl border-muted/60 shadow-sm">
@@ -323,6 +253,7 @@ export function DeptHeadPendingTable({
     );
   }
 
+  // Error state
   if (error) {
     return (
       <Card className="rounded-2xl border-muted/60 shadow-sm">
@@ -353,6 +284,7 @@ export function DeptHeadPendingTable({
     );
   }
 
+  // Empty state (no data at all)
   if (!isLoading && rows.length === 0 && !hasActiveFilters) {
     return (
       <Card className="rounded-2xl border-muted/60 shadow-sm">
@@ -381,102 +313,25 @@ export function DeptHeadPendingTable({
         />
         <div className="p-6 space-y-4">
           {/* Search Bar with Clear Filters */}
-          <div className="flex gap-2 items-center">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by employee, type, or reason..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="pl-10"
-              />
-              {searchInput && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-                  onClick={() => {
-                    setSearchInput("");
-                    set({ q: "" });
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-            {hasActiveFilters && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearFilters}
-                className="whitespace-nowrap"
-              >
-                <X className="h-4 w-4 mr-1" />
-                Clear Filters
-              </Button>
-            )}
-          </div>
+          <SearchWithClear
+            searchValue={searchInput}
+            onSearchChange={setSearchInput}
+            onClearFilters={clearFilters}
+            hasActiveFilters={hasActiveFilters}
+            placeholder="Search by employee, type, or reason..."
+          />
 
-          {/* Sticky Filter Section - Stacked Status + Type */}
-          <div 
-            className="sticky top-0 z-20 bg-card/95 backdrop-blur-sm border-b border-muted/60 pb-4 -mx-6 px-6 mb-4 shadow-sm -mt-4"
-          >
-            <div className="flex flex-col gap-3 pt-2">
-              {/* Status Filter */}
-              <div>
-                <Label className="text-sm font-medium text-muted-foreground mb-2 block">Status</Label>
-                <div className="flex flex-wrap gap-2">
-                  {statusOptions.map((option) => {
-                    const statusValue = option.value === "all" ? "ALL" : option.value.toUpperCase();
-                    const isSelected = state.status === statusValue;
-                    return (
-                      <Badge
-                        key={option.value}
-                        variant={isSelected ? "default" : "outline"}
-                        className={cn(
-                          "cursor-pointer rounded-full px-3 py-1 text-xs transition-colors whitespace-nowrap",
-                          isSelected 
-                            ? getStatusColors(option.value === "FORWARDED" ? "FORWARDED" : option.value.toUpperCase(), "chip")
-                            : "hover:bg-accent/20"
-                        )}
-                        onClick={() => set({ status: statusValue as any })}
-                      >
-                        {option.label}
-                      </Badge>
-                    );
-                  })}
-                </div>
-              </div>
+          {/* Filter Section */}
+          <CombinedFilterSection
+            selectedStatus={state.status}
+            selectedType={state.type}
+            onStatusChange={(status) => set({ status: status as any })}
+            onTypeChange={(type) => set({ type: type as any })}
+            userRole={userRole}
+            sticky={true}
+          />
 
-              {/* Type Filter - Wrapped */}
-              <div>
-                <Label className="text-sm font-medium text-muted-foreground mb-2 block">Leave Type</Label>
-                <div className="flex flex-wrap gap-2">
-                  {TYPE_OPTIONS.map((option) => {
-                    const typeValue = option.value === "all" ? "ALL" : option.value;
-                    const isSelected = state.type === typeValue;
-                    return (
-                      <Badge
-                        key={option.value}
-                        variant={isSelected ? "default" : "outline"}
-                        className={cn(
-                          "cursor-pointer rounded-full px-2 py-1 text-xs transition-colors whitespace-nowrap",
-                          isSelected 
-                            ? "bg-primary text-primary-foreground"
-                            : "hover:bg-accent/20"
-                        )}
-                        onClick={() => set({ type: typeValue as any })}
-                      >
-                        {option.label}
-                      </Badge>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Modern Table */}
+          {/* Table or Empty State */}
           {rows.length === 0 ? (
             <Card className="py-12">
               <CardContent className="text-center">
@@ -503,332 +358,271 @@ export function DeptHeadPendingTable({
                     </ModernTable.Header>
                     <ModernTable.Body>
                       {rows.map((leave: any) => {
-                      if (!leave.requester) return null;
-                    
-                      const availableActions = getAvailableActions(leave.type as LeaveType);
-                      const isPending = leave.status === "PENDING" || leave.status === "SUBMITTED";
-                      const isProcessing = processingIds.has(leave.id);
-                      
-                      return (
-                        <ModernTable.Row 
-                          key={leave.id}
-                        >
-                          <ModernTable.Cell>
-                            <Link
-                              href={`/leaves/${leave.id}`}
-                              className="text-data-info hover:underline font-medium cursor-pointer"
-                            >
-                              {leave.requester.name}
-                            </Link>
-                            <div className="text-xs text-muted-foreground truncate max-w-[200px]">
-                              {leave.requester.email}
-                            </div>
-                          </ModernTable.Cell>
-                          <ModernTable.Cell className="font-medium">
-                            {leaveTypeLabel[leave.type] ?? leave.type}
-                          </ModernTable.Cell>
-                          <ModernTable.Cell className="hidden sm:table-cell text-text-secondary">
-                            {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
-                          </ModernTable.Cell>
-                          <ModernTable.Cell className="hidden md:table-cell text-text-secondary">
-                            {leave.workingDays}
-                          </ModernTable.Cell>
-                          <ModernTable.Cell className="hidden lg:table-cell max-w-xs">
-                            {leave.reason && leave.reason.length > 50 ? (
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <div className="truncate text-text-secondary cursor-help">
-                                      {leave.reason}
-                                    </div>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="left" className="max-w-xs">
-                                    <p>{leave.reason}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            ) : (
-                              <div className="text-text-secondary">{leave.reason}</div>
-                            )}
-                          </ModernTable.Cell>
-                          <ModernTable.Cell>
-                            <div className="flex items-center gap-2">
-                              <StatusBadge status={leave.status} />
-                              {(leave as any).isModified && (
-                                <Badge variant="outline" className="text-xs text-data-info border-data-info">
-                                  Modified
-                                </Badge>
-                              )}
-                            </div>
-                          </ModernTable.Cell>
-                          <ModernTable.Cell className="text-right">
-                            <div className="flex items-center justify-end gap-2 flex-nowrap">
-                            {isPending && (
-                              <>
-                                {availableActions.includes("approve") && (
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Button
-                                          size="icon"
-                                          variant="default"
-                                          className="h-8 w-8 text-data-success hover:bg-data-success hover:text-data-success"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            openActionDialog(leave.id, "approve", leave.type, leave.requester.name);
-                                          }}
-                                          disabled={isProcessing}
-                                          aria-label="Approve leave request"
-                                        >
-                                          {isProcessing ? (
-                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                          ) : (
-                                            <CheckCircle2 className="h-4 w-4" />
-                                          )}
-                                        </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>Approve</TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
-                                )}
-                                {availableActions.includes("forward") && (
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Button
-                                          size="icon"
-                                          variant="outline"
-                                          className="h-8 w-8 text-data-info hover:bg-data-info hover:text-data-info"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setActionDialog({
-                                              open: false,
-                                              leaveId: leave.id,
-                                              action: "forward",
-                                              leaveType: leave.type,
-                                              employeeName: leave.requester.name,
-                                            });
-                                            setForwardDialogOpen(true);
-                                          }}
-                                          disabled={isProcessing}
-                                          aria-label="Forward to HR Head"
-                                        >
-                                          {isProcessing ? (
-                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                          ) : (
-                                            <ArrowRight className="h-4 w-4" />
-                                          )}
-                                        </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>Forward to HR Head</TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
-                                )}
-                                {availableActions.includes("return") && (
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Button
-                                          size="icon"
-                                          variant="outline"
-                                          className="h-8 w-8 text-data-error hover:bg-data-error hover:text-data-error"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setActionDialog({
-                                              open: false,
-                                              leaveId: leave.id,
-                                              action: "return",
-                                              leaveType: leave.type,
-                                              employeeName: leave.requester.name,
-                                            });
-                                            setReturnDialogOpen(true);
-                                          }}
-                                          disabled={isProcessing}
-                                          aria-label="Return for modification"
-                                        >
-                                          {isProcessing ? (
-                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                          ) : (
-                                            <RotateCcw className="h-4 w-4" />
-                                          )}
-                                        </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>Return for Modification</TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
-                                )}
-                                {/* Cancel action - available for all pending requests */}
+                        if (!leave.requester) return null;
+
+                        const availableActions = getAvailableActions(leave.type as LeaveType);
+                        const isPending = leave.status === "PENDING" || leave.status === "SUBMITTED";
+                        const isProcessing = processingIds.has(leave.id);
+
+                        return (
+                          <ModernTable.Row key={leave.id}>
+                            <ModernTable.Cell>
+                              <Link
+                                href={`/leaves/${leave.id}`}
+                                className="text-data-info hover:underline font-medium cursor-pointer"
+                              >
+                                {leave.requester.name}
+                              </Link>
+                              <div className="text-xs text-muted-foreground truncate max-w-[200px]">
+                                {leave.requester.email}
+                              </div>
+                            </ModernTable.Cell>
+                            <ModernTable.Cell className="font-medium">
+                              {leaveTypeLabel[leave.type] ?? leave.type}
+                            </ModernTable.Cell>
+                            <ModernTable.Cell className="hidden sm:table-cell text-text-secondary">
+                              {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
+                            </ModernTable.Cell>
+                            <ModernTable.Cell className="hidden md:table-cell text-text-secondary">
+                              {leave.workingDays}
+                            </ModernTable.Cell>
+                            <ModernTable.Cell className="hidden lg:table-cell max-w-xs">
+                              {leave.reason && leave.reason.length > 50 ? (
                                 <TooltipProvider>
                                   <Tooltip>
                                     <TooltipTrigger asChild>
-                                      <Button
-                                        size="icon"
-                                        variant="ghost"
-                                        className="h-8 w-8 text-text-secondary hover:text-data-error hover:bg-data-error"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          setActionDialog({
-                                            open: false,
-                                            leaveId: leave.id,
-                                            action: "cancel",
-                                            leaveType: leave.type,
-                                            employeeName: leave.requester.name,
-                                          });
-                                          setCancelDialogOpen(true);
-                                        }}
-                                        disabled={isProcessing}
-                                        aria-label="Cancel request"
-                                      >
-                                        {isProcessing ? (
-                                          <Loader2 className="h-4 w-4 animate-spin" />
-                                        ) : (
-                                          <XCircle className="h-4 w-4" />
-                                        )}
-                                      </Button>
+                                      <div className="truncate text-text-secondary cursor-help">
+                                        {leave.reason}
+                                      </div>
                                     </TooltipTrigger>
-                                    <TooltipContent>Cancel this request permanently</TooltipContent>
+                                    <TooltipContent side="left" className="max-w-xs">
+                                      <p>{leave.reason}</p>
+                                    </TooltipContent>
                                   </Tooltip>
                                 </TooltipProvider>
-                              </>
-                            )}
-                            {!isPending && (
-                              <>
-                                <Button asChild size="sm" variant="outline" className="h-7 text-xs">
-                                  <Link href={`/leaves/${leave.id}`}>Review</Link>
-                                </Button>
+                              ) : (
+                                <div className="text-text-secondary">{leave.reason}</div>
+                              )}
+                            </ModernTable.Cell>
+                            <ModernTable.Cell>
+                              <div className="flex items-center gap-2">
+                                <StatusBadge status={leave.status} />
                                 {(leave as any).isModified && (
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          className="h-7 text-xs"
-                                          onClick={() => {
-                                            setSelectedLeaveForComparison(leave);
-                                            setComparisonModalOpen(true);
-                                          }}
-                                        >
-                                          Compare
-                                        </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>Compare changes with previous version</TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
+                                  <Badge variant="outline" className="text-xs text-data-info border-data-info">
+                                    Modified
+                                  </Badge>
                                 )}
-                              </>
-                            )}
-                            {isPending && (leave as any).isModified && (
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      className="h-7 text-xs"
-                                      onClick={() => {
-                                        setSelectedLeaveForComparison(leave);
-                                        setComparisonModalOpen(true);
-                                      }}
-                                    >
-                                      Compare
+                              </div>
+                            </ModernTable.Cell>
+                            <ModernTable.Cell className="text-right">
+                              <div className="flex items-center justify-end gap-2 flex-nowrap">
+                                {isPending && (
+                                  <>
+                                    {availableActions.includes("approve") && (
+                                      <TooltipProvider>
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <Button
+                                              size="icon"
+                                              variant="default"
+                                              className="h-8 w-8 text-data-success hover:bg-data-success hover:text-data-success"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                openDialog(leave.id, "approve", leave.type, leave.requester.name);
+                                              }}
+                                              disabled={isProcessing}
+                                              aria-label="Approve leave request"
+                                            >
+                                              {isProcessing ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                              ) : (
+                                                <CheckCircle2 className="h-4 w-4" />
+                                              )}
+                                            </Button>
+                                          </TooltipTrigger>
+                                          <TooltipContent>Approve</TooltipContent>
+                                        </Tooltip>
+                                      </TooltipProvider>
+                                    )}
+                                    {availableActions.includes("forward") && (
+                                      <TooltipProvider>
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <Button
+                                              size="icon"
+                                              variant="outline"
+                                              className="h-8 w-8 text-data-info hover:bg-data-info hover:text-data-info"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                openDialog(leave.id, "forward", leave.type, leave.requester.name);
+                                              }}
+                                              disabled={isProcessing}
+                                              aria-label="Forward to HR Head"
+                                            >
+                                              {isProcessing ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                              ) : (
+                                                <ArrowRight className="h-4 w-4" />
+                                              )}
+                                            </Button>
+                                          </TooltipTrigger>
+                                          <TooltipContent>Forward to HR Head</TooltipContent>
+                                        </Tooltip>
+                                      </TooltipProvider>
+                                    )}
+                                    {availableActions.includes("return") && (
+                                      <TooltipProvider>
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <Button
+                                              size="icon"
+                                              variant="outline"
+                                              className="h-8 w-8 text-data-error hover:bg-data-error hover:text-data-error"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                openDialog(leave.id, "return", leave.type, leave.requester.name);
+                                              }}
+                                              disabled={isProcessing}
+                                              aria-label="Return for modification"
+                                            >
+                                              {isProcessing ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                              ) : (
+                                                <RotateCcw className="h-4 w-4" />
+                                              )}
+                                            </Button>
+                                          </TooltipTrigger>
+                                          <TooltipContent>Return for Modification</TooltipContent>
+                                        </Tooltip>
+                                      </TooltipProvider>
+                                    )}
+                                    <TooltipProvider>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <Button
+                                            size="icon"
+                                            variant="ghost"
+                                            className="h-8 w-8 text-text-secondary hover:text-data-error hover:bg-data-error"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              openDialog(leave.id, "cancel", leave.type, leave.requester.name);
+                                            }}
+                                            disabled={isProcessing}
+                                            aria-label="Cancel request"
+                                          >
+                                            {isProcessing ? (
+                                              <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                              <XCircle className="h-4 w-4" />
+                                            )}
+                                          </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>Cancel this request permanently</TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                  </>
+                                )}
+                                {!isPending && (
+                                  <>
+                                    <Button asChild size="sm" variant="outline" className="h-7 text-xs">
+                                      <Link href={`/leaves/${leave.id}`}>Review</Link>
                                     </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>Compare changes with previous version</TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            )}
-                          </div>
-                        </ModernTable.Cell>
-                      </ModernTable.Row>
-                    );
-                    })}
+                                    {(leave as any).isModified && (
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="h-7 text-xs text-data-info"
+                                        onClick={() => {
+                                          setSelectedLeaveForComparison(leave);
+                                          setComparisonModalOpen(true);
+                                        }}
+                                      >
+                                        Compare
+                                      </Button>
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            </ModernTable.Cell>
+                          </ModernTable.Row>
+                        );
+                      })}
                     </ModernTable.Body>
                   </ModernTable>
                 </div>
               </ModernTable.Card.Root>
 
-              {/* Pagination Controls */}
+              {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-2 px-2 py-2">
-                  <div className="text-sm text-muted-foreground">
-                    Page {state.page} of {totalPages} • {total} total
-                  </div>
-                  <div className="text-xs text-muted-foreground sm:hidden">
-                    Showing {(state.page - 1) * state.pageSize + 1}-{Math.min(state.page * state.pageSize, total)} of {total}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        set({ page: Math.max(1, state.page - 1) });
-                        // Smooth scroll to table top
-                        setTimeout(() => {
-                          const tableElement = document.getElementById("pending-requests-table");
-                          if (tableElement) {
-                            tableElement.scrollIntoView({ behavior: "smooth", block: "start" });
-                          }
-                        }, 100);
-                      }}
-                      disabled={state.page === 1}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                      Previous
-                    </Button>
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                        let pageNum: number;
-                        if (totalPages <= 5) {
-                          pageNum = i + 1;
-                        } else if (state.page <= 3) {
-                          pageNum = i + 1;
-                        } else if (state.page >= totalPages - 2) {
-                          pageNum = totalPages - 4 + i;
-                        } else {
-                          pageNum = state.page - 2 + i;
+                <div className="flex items-center justify-center gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      set({ page: Math.max(1, state.page - 1) });
+                      setTimeout(() => {
+                        const tableElement = document.getElementById("pending-requests-table");
+                        if (tableElement) {
+                          tableElement.scrollIntoView({ behavior: "smooth", block: "start" });
                         }
-                        return (
-                          <Button
-                            key={pageNum}
-                            variant={state.page === pageNum ? "default" : "outline"}
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                            onClick={() => {
-                              set({ page: pageNum });
-                              // Smooth scroll to table top
-                              setTimeout(() => {
-                                const tableElement = document.getElementById("pending-requests-table");
-                                if (tableElement) {
-                                  tableElement.scrollIntoView({ behavior: "smooth", block: "start" });
-                                }
-                              }, 100);
-                            }}
-                          >
-                            {pageNum}
-                          </Button>
-                        );
-                      })}
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        set({ page: Math.min(totalPages, state.page + 1) });
-                        // Smooth scroll to table top
-                        setTimeout(() => {
-                          const tableElement = document.getElementById("pending-requests-table");
-                          if (tableElement) {
-                            tableElement.scrollIntoView({ behavior: "smooth", block: "start" });
-                          }
-                        }, 100);
-                      }}
-                      disabled={state.page === totalPages}
-                    >
-                      Next
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
+                      }, 100);
+                    }}
+                    disabled={state.page === 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Previous
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (state.page <= 3) {
+                        pageNum = i + 1;
+                      } else if (state.page >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = state.page - 2 + i;
+                      }
+
+                      return (
+                        <Button
+                          key={pageNum}
+                          variant={state.page === pageNum ? "default" : "outline"}
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                          onClick={() => {
+                            set({ page: pageNum });
+                            setTimeout(() => {
+                              const tableElement = document.getElementById("pending-requests-table");
+                              if (tableElement) {
+                                tableElement.scrollIntoView({ behavior: "smooth", block: "start" });
+                              }
+                            }, 100);
+                          }}
+                        >
+                          {pageNum}
+                        </Button>
+                      );
+                    })}
                   </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      set({ page: Math.min(totalPages, state.page + 1) });
+                      setTimeout(() => {
+                        const tableElement = document.getElementById("pending-requests-table");
+                        if (tableElement) {
+                          tableElement.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }
+                      }, 100);
+                    }}
+                    disabled={state.page === totalPages}
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
                 </div>
               )}
             </div>
@@ -836,206 +630,46 @@ export function DeptHeadPendingTable({
         </div>
       </ModernTable.Card.Root>
 
-      {/* Action Confirmation Dialog (for Approve/Reject) */}
-      <AlertDialog open={actionDialog.open && actionDialog.action !== "return" && actionDialog.action !== "forward" && actionDialog.action !== "cancel"} onOpenChange={(open) => !open && setActionDialog({ open: false, leaveId: null, action: null, leaveType: "", employeeName: "" })}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {actionDialog.action === "approve" && "Approve Leave Request"}
-              {actionDialog.action === "reject" && "Reject Leave Request"}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {`Are you sure you want to ${actionDialog.action} the ${actionDialog.leaveType} leave request from ${actionDialog.employeeName}?`}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() =>
-                actionDialog.leaveId &&
-                actionDialog.action &&
-                handleAction(actionDialog.leaveId, actionDialog.action)
-              }
-            >
-              Confirm
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Approval Dialogs - using shared components */}
+      <ApprovalDialog
+        open={approveDialogOpen}
+        onOpenChange={setApproveDialogOpen}
+        onConfirm={() => currentLeaveId && handleAction(currentLeaveId, "approve")}
+        leaveType={currentLeaveInfo.type}
+        employeeName={currentLeaveInfo.name}
+        isLoading={currentLeaveId ? processingIds.has(currentLeaveId) : false}
+      />
 
-      {/* Forward Confirmation Dialog */}
-      <Dialog open={forwardDialogOpen} onOpenChange={(open) => {
-        setForwardDialogOpen(open);
-        if (!open) {
-          setActionDialog({ open: false, leaveId: null, action: null, leaveType: "", employeeName: "" });
-        }
-      }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Forward Leave Request</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to forward this {actionDialog.leaveType} leave request from {actionDialog.employeeName} to HR Head?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setForwardDialogOpen(false);
-                setActionDialog({ open: false, leaveId: null, action: null, leaveType: "", employeeName: "" });
-              }}
-              disabled={processingIds.has(actionDialog.leaveId || 0)}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => {
-                if (actionDialog.leaveId && actionDialog.action === "forward") {
-                  handleAction(actionDialog.leaveId, "forward");
-                }
-              }}
-              disabled={processingIds.has(actionDialog.leaveId || 0) || !actionDialog.leaveId}
-            >
-              {processingIds.has(actionDialog.leaveId || 0) ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Forwarding...
-                </>
-              ) : (
-                "Confirm Forward"
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <RejectDialog
+        open={rejectDialogOpen}
+        onOpenChange={setRejectDialogOpen}
+        onConfirm={() => currentLeaveId && handleAction(currentLeaveId, "reject")}
+        leaveType={currentLeaveInfo.type}
+        employeeName={currentLeaveInfo.name}
+        isLoading={currentLeaveId ? processingIds.has(currentLeaveId) : false}
+      />
 
-      {/* Return Comment Dialog - Comment is Required */}
-      <Dialog open={returnDialogOpen} onOpenChange={(open) => {
-        setReturnDialogOpen(open);
-        if (!open) {
-          setReturnComment("");
-          setActionDialog({ open: false, leaveId: null, action: null, leaveType: "", employeeName: "" });
-        }
-      }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Return Leave Request for Modification</DialogTitle>
-            <DialogDescription>
-              Please provide a clear reason for returning this {actionDialog.leaveType} leave request from {actionDialog.employeeName}. 
-              The employee will see this comment and can fix the issue before resubmitting.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="return-comment">Return Reason <span className="text-data-error">*</span></Label>
-              <Textarea
-                id="return-comment"
-                placeholder="e.g., Please attach medical certificate for leaves longer than 3 days"
-                value={returnComment}
-                onChange={(e) => setReturnComment(e.target.value)}
-                className="min-h-[100px]"
-                required
-              />
-              <p className="text-xs text-muted-foreground">
-                This comment will be visible to the employee and will help them understand what needs to be fixed.
-                <span className="block mt-1">Minimum 5 characters required.</span>
-              </p>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setReturnDialogOpen(false);
-                setReturnComment("");
-                setActionDialog({ open: false, leaveId: null, action: null, leaveType: "", employeeName: "" });
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                if (returnComment.trim().length < 5) {
-                  toast.error("Please provide a return reason (minimum 5 characters)");
-                  return;
-                }
-                if (actionDialog.leaveId && actionDialog.action === "return") {
-                  handleAction(actionDialog.leaveId, "return", returnComment.trim());
-                }
-              }}
-              disabled={returnComment.trim().length < 5}
-            >
-              Confirm Return
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ReturnDialog
+        open={returnDialogOpen}
+        onOpenChange={setReturnDialogOpen}
+        onConfirm={(comment) => currentLeaveId && handleAction(currentLeaveId, "return", comment)}
+        isLoading={currentLeaveId ? processingIds.has(currentLeaveId) : false}
+      />
 
-      {/* Cancel Request Dialog */}
-      <Dialog open={cancelDialogOpen} onOpenChange={(open) => {
-        setCancelDialogOpen(open);
-        if (!open) {
-          setCancelReason("");
-          setActionDialog({ open: false, leaveId: null, action: null, leaveType: "", employeeName: "" });
-        }
-      }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Cancel Leave Request</DialogTitle>
-            <DialogDescription>
-              This will permanently cancel the {actionDialog.leaveType} leave request from {actionDialog.employeeName}.
-              Are you sure you want to proceed?
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="cancel-reason">Cancellation Reason (Optional)</Label>
-              <Textarea
-                id="cancel-reason"
-                placeholder="e.g., Employee resigned, project deadline changed, etc."
-                value={cancelReason}
-                onChange={(e) => setCancelReason(e.target.value)}
-                className="min-h-[100px]"
-              />
-              <p className="text-xs text-muted-foreground">
-                This reason will be visible to the employee and recorded in the audit log.
-              </p>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setCancelDialogOpen(false);
-                setCancelReason("");
-                setActionDialog({ open: false, leaveId: null, action: null, leaveType: "", employeeName: "" });
-              }}
-              disabled={processingIds.has(actionDialog.leaveId || 0)}
-            >
-              Close
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                if (actionDialog.leaveId && actionDialog.action === "cancel") {
-                  handleAction(actionDialog.leaveId, "cancel", cancelReason.trim() || undefined);
-                }
-              }}
-              disabled={processingIds.has(actionDialog.leaveId || 0) || !actionDialog.leaveId}
-            >
-              {processingIds.has(actionDialog.leaveId || 0) ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Cancelling...
-                </>
-              ) : (
-                "Confirm Cancel"
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ForwardDialog
+        open={forwardDialogOpen}
+        onOpenChange={setForwardDialogOpen}
+        onConfirm={(comment) => currentLeaveId && handleAction(currentLeaveId, "forward", comment)}
+        nextApprover="HR Head"
+        isLoading={currentLeaveId ? processingIds.has(currentLeaveId) : false}
+      />
+
+      <CancelDialog
+        open={cancelDialogOpen}
+        onOpenChange={setCancelDialogOpen}
+        onConfirm={(reason) => currentLeaveId && handleAction(currentLeaveId, "cancel", reason)}
+        isLoading={currentLeaveId ? processingIds.has(currentLeaveId) : false}
+      />
 
       {/* Comparison Modal */}
       {selectedLeaveForComparison && (
@@ -1058,4 +692,3 @@ export function DeptHeadPendingTable({
     </>
   );
 }
-
