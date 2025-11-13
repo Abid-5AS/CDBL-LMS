@@ -9,8 +9,8 @@ import {
   CardTitle,
   Skeleton,
 } from "@/components/ui";
-import { PendingLeaveRequestsTable } from "../hr-admin/Sections/PendingApprovals";
-import { CancellationRequestsPanel } from "../hr-admin/Sections/CancellationRequests";
+import { PendingLeaveRequestsTable } from "../hr-admin/sections/PendingApprovals";
+import { CancellationRequestsPanel } from "../hr-admin/sections/CancellationRequests";
 import {
   ChartContainer,
   TrendChart,

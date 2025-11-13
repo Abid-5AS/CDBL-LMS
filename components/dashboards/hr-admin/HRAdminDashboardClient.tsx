@@ -22,8 +22,8 @@ import {
   AnalyticsPieChart,
   ExportButton,
 } from "@/components/dashboards/shared";
-import { PendingLeaveRequestsTable } from "./Sections/PendingApprovals";
-import { CancellationRequestsPanel } from "./Sections/CancellationRequests";
+import { PendingLeaveRequestsTable } from "./sections/PendingApprovals";
+import { CancellationRequestsPanel } from "./sections/CancellationRequests";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardCardSkeleton } from "@/app/dashboard/shared/LoadingFallback";
 import { Separator } from "@/components/ui/separator";
