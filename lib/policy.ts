@@ -163,3 +163,81 @@ export function calculateMaternityLeaveDays(joinDate: Date): {
     serviceMonths,
   };
 }
+
+/**
+ * Validate quarantine leave duration (Policy 6.28.b)
+ * - Standard: Up to 21 days
+ * - Exceptional: 21-30 days (requires CEO approval)
+ * - Maximum: 30 days
+ */
+export function validateQuarantineLeaveDuration(days: number): {
+  valid: boolean;
+  requiresExceptionalApproval: boolean;
+  reason?: string;
+} {
+  if (days <= 21) {
+    return { valid: true, requiresExceptionalApproval: false };
+  }
+
+  if (days <= 30) {
+    return {
+      valid: true,
+      requiresExceptionalApproval: true,
+      reason: "Quarantine leave exceeding 21 days requires exceptional approval from CEO (Policy 6.28.b)",
+    };
+  }
+
+  return {
+    valid: false,
+    requiresExceptionalApproval: false,
+    reason: "Quarantine leave cannot exceed 30 days per Policy 6.28.b",
+  };
+}
+
+/**
+ * Validate special disability leave duration (Policy 6.27.c)
+ * - Maximum: 6 months (180 days) per disability
+ */
+export function validateSpecialDisabilityDuration(days: number): {
+  valid: boolean;
+  reason?: string;
+} {
+  const MAX_DAYS = 180; // 6 months
+
+  if (days > MAX_DAYS) {
+    return {
+      valid: false,
+      reason: `Special disability leave cannot exceed ${MAX_DAYS} days (6 months) per Policy 6.27.c. Requested: ${days} days.`,
+    };
+  }
+
+  return { valid: true };
+}
+
+/**
+ * Validate extraordinary leave duration based on service years (Policy 6.22.a, 6.22.b)
+ * - <5 years service: Maximum 6 months (180 days)
+ * - >=5 years service: Maximum 12 months (365 days)
+ */
+export function validateExtraordinaryLeaveDuration(
+  days: number,
+  joinDate: Date
+): {
+  valid: boolean;
+  reason?: string;
+  maxAllowed: number;
+} {
+  const serviceYears = getServiceYears(joinDate);
+  const maxDays = serviceYears >= 5 ? 365 : 180; // 12 months or 6 months
+  const maxLabel = serviceYears >= 5 ? "12 months" : "6 months";
+
+  if (days > maxDays) {
+    return {
+      valid: false,
+      reason: `Extraordinary leave cannot exceed ${maxLabel} for employees with ${serviceYears.toFixed(1)} years of service (Policy 6.22). Requested: ${days} days.`,
+      maxAllowed: maxDays,
+    };
+  }
+
+  return { valid: true, maxAllowed: maxDays };
+}

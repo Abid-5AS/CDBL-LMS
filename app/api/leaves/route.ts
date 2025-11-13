@@ -13,6 +13,9 @@ import {
   makeWarnings,
   checkLeaveEligibility,
   calculateMaternityLeaveDays,
+  validateQuarantineLeaveDuration,
+  validateSpecialDisabilityDuration,
+  validateExtraordinaryLeaveDuration,
 } from "@/lib/policy";
 import { promises as fs } from "fs";
 import path from "path";
@@ -24,7 +27,7 @@ import { normalizeToDhakaMidnight } from "@/lib/date-utils";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
 import { getStepForRole } from "@/lib/workflow";
-import { violatesCasualLeaveSideTouch } from "@/lib/leave-validation";
+import { violatesCasualLeaveSideTouch, violatesCasualLeaveCombination, validatePaternityLeaveEligibility } from "@/lib/leave-validation";
 import { generateSignedUrl } from "@/lib/storage";
 
 const ApplySchema = z.object({
@@ -250,6 +253,31 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+
+    // Enforce CL combination rule (Policy 6.20.e: cannot be combined with other leaves)
+    const combinationCheck = await violatesCasualLeaveCombination(
+      me.id,
+      startDateOnly,
+      endDateOnly
+    );
+
+    if (combinationCheck.violates && combinationCheck.conflictingLeave) {
+      const conflict = combinationCheck.conflictingLeave;
+      return NextResponse.json(
+        error(
+          "cl_cannot_combine_with_other_leave",
+          `Casual leave cannot be combined with or adjacent to other leaves (Policy 6.20.e). Conflicts with ${conflict.type} leave from ${conflict.startDate.toLocaleDateString()} to ${conflict.endDate.toLocaleDateString()}.`,
+          traceId,
+          {
+            conflictingLeaveId: conflict.id,
+            conflictingLeaveType: conflict.type,
+            conflictingStartDate: conflict.startDate,
+            conflictingEndDate: conflict.endDate,
+          }
+        ),
+        { status: 400 }
+      );
+    }
   }
 
   // Enforce maternity leave pro-rating for employees with <6 months service (Policy 6.23.c)
@@ -266,6 +294,63 @@ export async function POST(req: Request) {
           requested: workingDays,
           isProrated: maternityCalc.isProrated,
           serviceMonths: maternityCalc.serviceMonths,
+        }),
+        { status: 400 }
+      );
+    }
+  }
+
+  // Enforce paternity leave occasion and interval limits (Policy 6.24.b)
+  if (t === "PATERNITY") {
+    const paternityCheck = await validatePaternityLeaveEligibility(me.id, startDateOnly);
+    if (!paternityCheck.valid) {
+      return NextResponse.json(
+        error("paternity_eligibility_not_met", paternityCheck.reason, traceId, {
+          previousLeaves: paternityCheck.previousLeaves,
+          monthsSinceFirst: paternityCheck.monthsSinceFirst,
+        }),
+        { status: 403 }
+      );
+    }
+  }
+
+  // Enforce quarantine leave duration limits (Policy 6.28.b)
+  if (t === "QUARANTINE") {
+    const quarantineCheck = validateQuarantineLeaveDuration(workingDays);
+    if (!quarantineCheck.valid) {
+      return NextResponse.json(
+        error("quarantine_exceeds_maximum", quarantineCheck.reason, traceId, {
+          requested: workingDays,
+          maximum: 30,
+        }),
+        { status: 400 }
+      );
+    }
+    // Note: Exceptional approval (21-30 days) is handled by workflow (CEO approval required)
+  }
+
+  // Enforce special disability leave duration limits (Policy 6.27.c)
+  if (t === "SPECIAL_DISABILITY") {
+    const disabilityCheck = validateSpecialDisabilityDuration(workingDays);
+    if (!disabilityCheck.valid) {
+      return NextResponse.json(
+        error("disability_exceeds_maximum", disabilityCheck.reason, traceId, {
+          requested: workingDays,
+          maximum: 180,
+        }),
+        { status: 400 }
+      );
+    }
+  }
+
+  // Enforce extraordinary leave duration limits (Policy 6.22.a, 6.22.b)
+  if (t === "EXTRAWITHPAY" || t === "EXTRAWITHOUTPAY") {
+    const extraordinaryCheck = validateExtraordinaryLeaveDuration(workingDays, requester.joinDate);
+    if (!extraordinaryCheck.valid) {
+      return NextResponse.json(
+        error("extraordinary_exceeds_maximum", extraordinaryCheck.reason, traceId, {
+          requested: workingDays,
+          maxAllowed: extraordinaryCheck.maxAllowed,
         }),
         { status: 400 }
       );
