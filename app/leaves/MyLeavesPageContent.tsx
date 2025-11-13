@@ -80,11 +80,11 @@ const LEAVE_TAB_ITEMS = [
   {
     id: "all",
     title: "All",
-    color: "bg-slate-500 hover:bg-slate-600 dark:bg-slate-600 dark:hover:bg-slate-500",
+    color: "bg-muted hover:bg-muted/80 dark:bg-muted dark:hover:bg-muted/90",
     cardContent: (
       <div className="p-6 h-full flex flex-col justify-center">
         <div className="space-y-2">
-          <h3 className="text-xl font-semibold text-text-primary">All Requests</h3>
+          <h3 className="text-xl font-semibold text-foreground">All Requests</h3>
           <p className="text-sm text-muted-foreground">
             View all your leave requests across all statuses
           </p>
@@ -95,11 +95,11 @@ const LEAVE_TAB_ITEMS = [
   {
     id: "pending",
     title: "Pending",
-    color: "bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600",
+    color: "bg-data-warning/80 hover:bg-data-warning dark:bg-data-warning/70 dark:hover:bg-data-warning/80",
     cardContent: (
       <div className="p-6 h-full flex flex-col justify-center">
         <div className="space-y-2">
-          <h3 className="text-xl font-semibold text-text-primary">Pending Approval</h3>
+          <h3 className="text-xl font-semibold text-foreground">Pending Approval</h3>
           <p className="text-sm text-muted-foreground">
             Requests awaiting manager or HR approval
           </p>
@@ -110,11 +110,11 @@ const LEAVE_TAB_ITEMS = [
   {
     id: "approved",
     title: "Approved",
-    color: "bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600",
+    color: "bg-data-success/80 hover:bg-data-success dark:bg-data-success/70 dark:hover:bg-data-success/80",
     cardContent: (
       <div className="p-6 h-full flex flex-col justify-center">
         <div className="space-y-2">
-          <h3 className="text-xl font-semibold text-text-primary">Approved Leaves</h3>
+          <h3 className="text-xl font-semibold text-foreground">Approved Leaves</h3>
           <p className="text-sm text-muted-foreground">
             Successfully approved leave requests
           </p>
@@ -125,11 +125,11 @@ const LEAVE_TAB_ITEMS = [
   {
     id: "rejected",
     title: "Rejected",
-    color: "bg-rose-600 hover:bg-rose-700 dark:bg-rose-500 dark:hover:bg-rose-600",
+    color: "bg-data-error/80 hover:bg-data-error dark:bg-data-error/70 dark:hover:bg-data-error/80",
     cardContent: (
       <div className="p-6 h-full flex flex-col justify-center">
         <div className="space-y-2">
-          <h3 className="text-xl font-semibold text-text-primary">Rejected Requests</h3>
+          <h3 className="text-xl font-semibold text-foreground">Rejected Requests</h3>
           <p className="text-sm text-muted-foreground">
             Requests that were not approved
           </p>

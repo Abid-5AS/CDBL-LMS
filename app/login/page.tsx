@@ -39,7 +39,7 @@ async function LoginGate() {
         </div>
         {/* Footer */}
         <div className="mt-8 text-center">
-          <p className="text-text-secondary text-xs">
+          <p className="text-muted-foreground text-xs">
             v2.0 © CDBL HRD
           </p>
         </div>
