@@ -242,3 +242,91 @@ export function validateExtraordinaryLeaveDuration(
 
   return { valid: true, maxAllowed: maxDays };
 }
+
+/**
+ * Check medical leave usage against annual limit (Policy 6.21.c)
+ * Medical leave in excess of 14 days shall be adjusted with EL/special leave
+ */
+export function checkMedicalLeaveAnnualLimit(
+  usedThisYear: number,
+  requestedDays: number
+): {
+  withinLimit: boolean;
+  totalUsage: number;
+  exceedsDays: number;
+  warning?: string;
+} {
+  const ML_ANNUAL_LIMIT = policy.accrual.ML_PER_YEAR; // 14 days
+  const totalUsage = usedThisYear + requestedDays;
+  const exceedsDays = Math.max(0, totalUsage - ML_ANNUAL_LIMIT);
+
+  if (exceedsDays > 0) {
+    return {
+      withinLimit: false,
+      totalUsage,
+      exceedsDays,
+      warning: `This request would exceed annual medical leave limit of ${ML_ANNUAL_LIMIT} days. You have used ${usedThisYear} days and are requesting ${requestedDays} days (total: ${totalUsage} days). Per Policy 6.21.c, medical leave beyond ${ML_ANNUAL_LIMIT} days should be deducted from Earned/Special leave. Consider applying for ${requestedDays - exceedsDays} days as Medical Leave and ${exceedsDays} days as Earned Leave instead.`,
+    };
+  }
+
+  return {
+    withinLimit: true,
+    totalUsage,
+    exceedsDays: 0,
+  };
+}
+
+/**
+ * Validate EL encashment eligibility and amount (Policy 6.19.f)
+ * Employees can encash EL balance exceeding 10 days
+ * @param currentBalance - Current EL balance (opening + accrued - used)
+ * @param requestedDays - Days employee wants to encash
+ * @returns Validation result with eligibility and max encashable days
+ */
+export function validateELEncashment(
+  currentBalance: number,
+  requestedDays: number
+): {
+  valid: boolean;
+  reason?: string;
+  maxEncashable: number;
+  remainingBalance: number;
+} {
+  const EL_MIN_RETAIN = 10; // Must keep at least 10 days per Policy 6.19.f
+  const maxEncashable = Math.max(0, currentBalance - EL_MIN_RETAIN);
+
+  if (currentBalance <= EL_MIN_RETAIN) {
+    return {
+      valid: false,
+      reason: `Encashment requires EL balance exceeding ${EL_MIN_RETAIN} days (Policy 6.19.f). Your current balance is ${currentBalance} days.`,
+      maxEncashable: 0,
+      remainingBalance: currentBalance,
+    };
+  }
+
+  if (requestedDays <= 0) {
+    return {
+      valid: false,
+      reason: "Requested days must be greater than 0.",
+      maxEncashable,
+      remainingBalance: currentBalance,
+    };
+  }
+
+  if (requestedDays > maxEncashable) {
+    return {
+      valid: false,
+      reason: `You can encash up to ${maxEncashable} days. Requested: ${requestedDays} days. You must retain at least ${EL_MIN_RETAIN} days EL balance per Policy 6.19.f.`,
+      maxEncashable,
+      remainingBalance: currentBalance,
+    };
+  }
+
+  const remainingBalance = currentBalance - requestedDays;
+
+  return {
+    valid: true,
+    maxEncashable,
+    remainingBalance,
+  };
+}

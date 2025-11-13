@@ -16,6 +16,7 @@ import {
   validateQuarantineLeaveDuration,
   validateSpecialDisabilityDuration,
   validateExtraordinaryLeaveDuration,
+  checkMedicalLeaveAnnualLimit,
 } from "@/lib/policy";
 import { promises as fs } from "fs";
 import path from "path";
@@ -440,6 +441,11 @@ export async function POST(req: Request) {
     (warnings as Record<string, boolean>).mlNeedsCertificate = true;
   }
 
+  // Add medical leave excess warning if applicable
+  if (mlExcessWarning) {
+    (warnings as Record<string, any>).mlExcessWarning = mlExcessWarning;
+  }
+
   const year = yearOf(start);
   
   // Hard block: CL annual cap ≤10 days/year
@@ -468,6 +474,9 @@ export async function POST(req: Request) {
     }
   }
   
+  // Medical leave >14 days advisory (Policy 6.21.c)
+  // Note: This is a soft warning, not a hard block. Users can still apply but are advised to use EL/SPECIAL
+  let mlExcessWarning: string | undefined;
   if (t === "MEDICAL") {
     const yearStart = new Date(year, 0, 1);
     const yearEnd = new Date(year + 1, 0, 1);
@@ -480,16 +489,14 @@ export async function POST(req: Request) {
       },
       _sum: { workingDays: true },
     });
-    const totalUsed = (usedThisYear._sum.workingDays ?? 0) + workingDays;
-    if (totalUsed > policy.accrual.ML_PER_YEAR) {
-      return NextResponse.json(
-        error("ml_annual_cap_exceeded", undefined, traceId, {
-          cap: policy.accrual.ML_PER_YEAR,
-          used: usedThisYear._sum.workingDays ?? 0,
-          requested: workingDays,
-        }),
-        { status: 400 }
-      );
+
+    const mlCheck = checkMedicalLeaveAnnualLimit(
+      usedThisYear._sum.workingDays ?? 0,
+      workingDays
+    );
+
+    if (!mlCheck.withinLimit) {
+      mlExcessWarning = mlCheck.warning;
     }
   }
   
