@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import useSWR from "swr";
 import { Users, User, Pencil } from "lucide-react";
@@ -26,6 +26,7 @@ import {
 
 // Shared Components (barrel export)
 import { FilterBar } from "@/components/shared";
+import { CompletePagination } from "@/components/shared/pagination/Pagination";
 
 // Lib utilities (barrel export)
 import { useUser } from "@/lib";
@@ -56,10 +57,13 @@ const ROLE_OPTIONS = [
   { value: "CEO", label: "CEO" },
 ];
 
+const PAGE_SIZE = 20;
+
 export function EmployeeList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [roleFilter, setRoleFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
   const user = useUser();
 
   const { data, isLoading, error } = useSWR<{ users: EmployeeRecord[] }>(
@@ -120,7 +124,21 @@ export function EmployeeList() {
     setSearchQuery("");
     setDepartmentFilter("all");
     setRoleFilter("all");
+    setCurrentPage(1);
   };
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, departmentFilter, roleFilter]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredEmployees.length / PAGE_SIZE);
+  const paginatedEmployees = useMemo(() => {
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    const endIndex = startIndex + PAGE_SIZE;
+    return filteredEmployees.slice(startIndex, endIndex);
+  }, [filteredEmployees, currentPage]);
 
   const roleLabel = (role: EmployeeRecord["role"]) => {
     switch (role) {
@@ -216,7 +234,7 @@ export function EmployeeList() {
               </EnhancedTableRow>
             </EnhancedTableHeader>
             <EnhancedTableBody>
-                {filteredEmployees.map((employee) => (
+                {paginatedEmployees.map((employee) => (
                   <EnhancedTableRow
                     key={employee.id}
                     className="hover:bg-bg-secondary dark:hover:bg-bg-secondary/50"
@@ -296,10 +314,17 @@ export function EmployeeList() {
         </div>
       )}
 
-      {filteredEmployees.length !== allEmployees.length && (
-        <p className="text-sm text-muted-foreground text-center">
-          Showing {filteredEmployees.length} of {allEmployees.length} employees
-        </p>
+      {filteredEmployees.length > 0 && (
+        <div className="mt-6">
+          <CompletePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageSize={PAGE_SIZE}
+            totalItems={filteredEmployees.length}
+            onPageChange={setCurrentPage}
+            showFirstLast={true}
+          />
+        </div>
       )}
     </div>
   );
