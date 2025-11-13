@@ -93,9 +93,10 @@ export function FilterBar({
           onValueChange={statusFilter.onChange}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder="Filter by Status" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
             {statusFilter.options.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
@@ -108,9 +109,10 @@ export function FilterBar({
       {typeFilter && (
         <Select value={typeFilter.value} onValueChange={typeFilter.onChange}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Type" />
+            <SelectValue placeholder="Filter by Role" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all">All Roles</SelectItem>
             {typeFilter.options.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
@@ -126,9 +128,10 @@ export function FilterBar({
           onValueChange={departmentFilter.onChange}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Department" />
+            <SelectValue placeholder="Filter by Department" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all">All Departments</SelectItem>
             {departmentFilter.options.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
