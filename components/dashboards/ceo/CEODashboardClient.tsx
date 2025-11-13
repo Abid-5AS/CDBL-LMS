@@ -20,9 +20,8 @@ import {
   Shield,
 } from "lucide-react";
 import {
-  KPICard,
-  KPICardSkeleton,
-  KPIGrid,
+  RoleKPICard,
+  ResponsiveDashboardGrid,
   AnalyticsLineChart,
   AnalyticsBarChart,
   AnalyticsPieChart,
@@ -123,75 +122,95 @@ export function CEODashboardClient() {
   return (
     <div className="space-y-6">
       {/* Primary Executive KPIs */}
-      <KPIGrid>
+      <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
         {isLoading ? (
           <>
-            <KPICardSkeleton />
-            <KPICardSkeleton />
-            <KPICardSkeleton />
-            <KPICardSkeleton />
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="glass-card rounded-2xl p-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 space-y-3">
+                    <div className="h-4 w-24 bg-muted/50 animate-pulse rounded" />
+                    <div className="h-8 w-20 bg-muted/50 animate-pulse rounded" />
+                    <div className="h-4 w-32 bg-muted/50 animate-pulse rounded" />
+                  </div>
+                  <div className="h-12 w-12 bg-muted/50 animate-pulse rounded-xl" />
+                </div>
+              </div>
+            ))}
           </>
         ) : (
           <>
-            <KPICard
+            <RoleKPICard
               title="Total Workforce"
               value={stats?.totalEmployees || 0}
               subtitle={`${stats?.activeEmployees || 0} active`}
               icon={Users}
-              variant="info"
+              role="CEO"
             />
-            <KPICard
+            <RoleKPICard
               title="On Leave Today"
               value={stats?.onLeaveToday || 0}
               subtitle={`${stats?.utilizationRate || 0}% available`}
               icon={Activity}
-              variant={
-                stats && stats.utilizationRate < 85
-                  ? "warning"
-                  : "success"
-              }
+              role="CEO"
               trend={
                 stats && stats.utilizationRate
                   ? {
-                      value: stats.utilizationRate >= 90 ? 3 : -2,
+                      value: stats.utilizationRate >= 90 ? 3 : 2,
                       label: "vs target",
+                      direction: stats.utilizationRate >= 90 ? "up" : "down"
                     }
                   : undefined
               }
             />
-            <KPICard
+            <RoleKPICard
               title="Pending Approvals"
               value={stats?.pendingApprovals || 0}
               subtitle={`${stats?.avgApprovalTime?.toFixed(1) || 0}d avg time`}
               icon={Clock}
-              variant={stats && stats.pendingApprovals > 20 ? "warning" : "default"}
+              role="CEO"
+              trend={stats && stats.pendingApprovals > 20 ? {
+                value: stats.pendingApprovals - 20,
+                label: "above normal",
+                direction: "up"
+              } : undefined}
             />
-            <KPICard
+            <RoleKPICard
               title="Compliance Score"
               value={`${stats?.complianceScore || 0}%`}
               subtitle="Policy adherence"
               icon={Shield}
-              variant={stats && stats.complianceScore >= 95 ? "success" : stats && stats.complianceScore >= 85 ? "default" : "warning"}
+              role="CEO"
               trend={
                 stats && stats.complianceScore
                   ? {
-                      value: stats.complianceScore >= 90 ? 2 : -1,
+                      value: stats.complianceScore >= 90 ? 2 : 1,
                       label: "this quarter",
+                      direction: stats.complianceScore >= 90 ? "up" : "down"
                     }
                   : undefined
               }
             />
           </>
         )}
-      </KPIGrid>
+      </ResponsiveDashboardGrid>
 
       {/* Financial & YoY Metrics */}
-      <div className="grid gap-6 md:grid-cols-3">
+      <ResponsiveDashboardGrid columns="1:1:3:3" gap="md">
         {isLoading ? (
           <>
-            <KPICardSkeleton />
-            <KPICardSkeleton />
-            <KPICardSkeleton />
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="glass-card rounded-2xl p-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 space-y-3">
+                    <div className="h-4 w-24 bg-muted/50 animate-pulse rounded" />
+                    <div className="h-8 w-20 bg-muted/50 animate-pulse rounded" />
+                    <div className="h-4 w-32 bg-muted/50 animate-pulse rounded" />
+                  </div>
+                  <div className="h-12 w-12 bg-muted/50 animate-pulse rounded-xl" />
+                </div>
+              </div>
+            ))}
           </>
         ) : (
           <>
