@@ -27,29 +27,29 @@ export function EmployeeActionCenter({ actionItems }: EmployeeActionCenterProps)
   return (
     <Card
       className={cn(
-        "bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl border-l-4",
+        "bg-white/70 dark:bg-bg-secondary/70 backdrop-blur-xl border-white/20 dark:border-border-soft shadow-xl border-l-4",
         actionItems.length > 0
-          ? "border-l-primary"
-          : "border-l-slate-300 dark:border-l-slate-600"
+          ? "border-l-brand"
+          : "border-l-border-soft dark:border-l-border-strong"
       )}
     >
       <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <CardTitle className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-            <Sparkles className="size-4 sm:size-5 text-primary" aria-hidden="true" />
+          <CardTitle className="text-lg sm:text-xl font-semibold text-text-primary dark:text-text-inverted flex items-center gap-2">
+            <Sparkles className="size-4 sm:size-5 text-brand" aria-hidden="true" />
             <span>Action Center</span>
           </CardTitle>
           {actionItems.length > 0 && (
             <Badge
               variant="default"
-              className="bg-primary/10 text-primary dark:bg-primary/20 text-xs"
+              className="bg-brand-soft text-brand dark:bg-brand-soft/20 text-xs"
             >
               {actionItems.length}{" "}
               {actionItems.length === 1 ? "item" : "items"}
             </Badge>
           )}
         </div>
-        <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm">
+        <p className="text-text-secondary dark:text-text-tertiary text-xs sm:text-sm">
           {actionItems.length > 0
             ? "Recommended actions and reminders"
             : "You're all caught up! No pending actions."}
@@ -58,11 +58,11 @@ export function EmployeeActionCenter({ actionItems }: EmployeeActionCenterProps)
       <CardContent>
         {actionItems.length === 0 ? (
           <div className="text-center py-8">
-            <CheckCircle2 className="w-12 h-12 mx-auto text-green-500 mb-3" />
-            <p className="text-sm font-medium text-slate-900 dark:text-white mb-1">
+            <CheckCircle2 className="w-12 h-12 mx-auto text-data-success mb-3" />
+            <p className="text-sm font-medium text-text-primary dark:text-text-inverted mb-1">
               All Clear!
             </p>
-            <p className="text-xs text-slate-600 dark:text-slate-400">
+            <p className="text-xs text-text-secondary dark:text-text-tertiary">
               No action items at this time. Enjoy your day!
             </p>
           </div>
@@ -95,10 +95,10 @@ export function EmployeeActionCenter({ actionItems }: EmployeeActionCenterProps)
                   )}
                 >
                   <div className="flex-1 space-y-1">
-                    <h4 className="font-semibold text-slate-900 dark:text-white text-sm">
+                    <h4 className="font-semibold text-text-primary dark:text-text-inverted text-sm">
                       {item.title}
                     </h4>
-                    <p className="text-xs text-slate-600 dark:text-slate-400">
+                    <p className="text-xs text-text-secondary dark:text-text-tertiary">
                       {item.description}
                     </p>
                   </div>

@@ -1,68 +1,104 @@
 /* ===== Core semantic palette (Light) ===== */
 :root {
-  /* TEXT */
-  --color-text-primary: #0b1220; /* slate-950 */
-  --color-text-secondary: #334155; /* slate-700 */
-  --color-text-tertiary: #64748b; /* slate-500 */
-  --color-text-muted: #6b7280; /* gray-500 */
-  --color-text-inverted: #ffffff;
+  /* ========== DEPTH LAYERS ========== */
+  /* BASE LAYER (Darkest - Canvas/Page Background) */
+  --color-base-darkest: #ffffff; /* Page background - true white canvas */
+  --color-base-dark: #f8fafc; /* Section backgrounds - 1-2 shades lighter */
 
-  /* SURFACES */
-  --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f8fafc; /* slate-50 */
-  --color-bg-tertiary: #eef2f7; /* soft neutral */
-  --color-bg-muted: #e5eaf1; /* subtle border/skeleton */
-  --color-bg-inverted: #0b1220; /* slate-950 */
+  /* CARD LAYER (Elevated - Content containers) */
+  --color-card-elevated: #ffffff; /* Main cards floating above base */
+  --color-card-elevated-subtle: #fcfcfd; /* Nested/secondary cards */
+  --color-card-hover: #ffffff; /* Card on hover - slight brightening */
+  --color-card-pressed: #f8fafc; /* Card when pressed/active */
 
-  /* BRAND / ACCENTS */
-  --color-brand: #4f46e5; /* indigo-600 */
-  --color-brand-soft: #e7e9ff; /* indigo-100 */
-  --color-brand-strong: #3730a3; /* indigo-800 */
+  /* TEXT - Contrast Hierarchy */
+  --color-text-primary: #0b1220; /* Highest contrast - headings, main numbers */
+  --color-text-secondary: #334155; /* Medium contrast - labels, descriptions */
+  --color-text-tertiary: #64748b; /* Lower contrast - metadata, timestamps */
+  --color-text-muted: #94a3b8; /* Subtle - placeholders, disabled */
+  --color-text-inverted: #ffffff; /* Inverse for dark backgrounds */
 
-  /* DATA STATES */
-  --color-data-success: #16a34a; /* emerald-600 */
+  /* SURFACES - Full Stack */
+  --color-bg-primary: #ffffff; /* Page/canvas background */
+  --color-bg-secondary: #f8fafc; /* Section/panel backgrounds */
+  --color-bg-tertiary: #eef2f7; /* Interactive surfaces, hover states */
+  --color-bg-muted: #e5eaf1; /* Subtle borders, skeleton screens */
+  --color-bg-inverted: #0b1220; /* Dark overlay backgrounds */
+
+  /* BRAND / PRIMARY ACCENT (Blue - Primary CTA) */
+  --color-brand: #4f46e5; /* indigo-600 - Primary action button */
+  --color-brand-soft: #e7e9ff; /* indigo-100 - Soft background/badge */
+  --color-brand-strong: #3730a3; /* indigo-800 - Strong emphasis */
+
+  /* INTERACTIVE STATE COLORS */
+  --color-interactive-hover-border: #6366f1; /* Accent color for borders on hover */
+  --color-interactive-hover-bg: #e7e9ff; /* Soft accent for hover backgrounds */
+  --color-interactive-focus-ring: #6366f1; /* Focus ring color */
+  --color-interactive-active: #3730a3; /* Active/pressed state */
+  --color-interactive-disabled: #94a3b8; /* Disabled state */
+
+  /* SECONDARY ACTION (Muted version of accent for less important actions) */
+  --color-action-secondary: #94a3b8; /* Muted gray for secondary buttons */
+  --color-action-secondary-bg: #f1f5f9; /* Light background for secondary buttons */
+
+  /* DESTRUCTIVE ACTION (Warm accent - Red/Orange for dangerous actions) */
+  --color-action-destructive: #dc2626; /* red-600 - Explicit warning for delete/critical */
+  --color-action-destructive-soft: #fee2e2; /* red-100 - Soft background */
+
+  /* DATA STATES (Status/feedback colors - Success, Warning, Error, Info) */
+  --color-data-success: #16a34a; /* emerald-600 - Confirmation/positive */
   --color-data-success-soft: #dcfce7; /* emerald-100 */
   --color-data-success-strong: #166534; /* emerald-800 */
 
-  --color-data-warning: #d97706; /* amber-600 */
+  --color-data-warning: #d97706; /* amber-600 - Caution/attention needed */
   --color-data-warning-soft: #fef3c7; /* amber-100 */
   --color-data-warning-strong: #92400e; /* amber-800 */
 
-  --color-data-error: #e11d48; /* rose-600 */
-  --color-data-error-soft: #ffe4e6; /* rose-100 */
-  --color-data-error-strong: #9f1239; /* rose-800 */
+  --color-data-error: #dc2626; /* red-600 - Error/failure state */
+  --color-data-error-soft: #fee2e2; /* red-100 */
+  --color-data-error-strong: #7f1d1d; /* red-900 */
 
-  --color-data-info: #0284c7; /* sky-600 */
+  --color-data-info: #0284c7; /* sky-600 - Informational */
   --color-data-info-soft: #e0f2fe; /* sky-100 */
   --color-data-info-strong: #075985; /* sky-800 */
 
-  /* LEAVE TYPES (consistent, muted, HR-friendly) */
-  --color-leave-earned: #16a34a; /* emerald-600 */
-  --color-leave-casual: #2563eb; /* blue-600 */
-  --color-leave-medical: #0ea5e9; /* cyan-600 */
-  --color-leave-sick: #e11d48; /* rose-600 */
-  --color-leave-unpaid: #6b7280; /* gray-500 */
-  --color-leave-maternity: #db2777; /* pink-600 */
-  --color-leave-paternity: #7c3aed; /* violet-600 */
+  /* ICON TREATMENT (Match associated text contrast) */
+  --color-icon-primary: var(--color-text-primary); /* Primary icons - highest contrast */
+  --color-icon-secondary: var(--color-text-secondary); /* Secondary icons */
+  --color-icon-muted: var(--color-text-muted); /* Decorative icons - subtle */
+  --color-icon-accent: var(--color-brand); /* Active/important icons using accent */
+  --color-icon-success: var(--color-data-success);
+  --color-icon-warning: var(--color-data-warning);
+  --color-icon-error: var(--color-data-error);
+  --color-icon-info: var(--color-data-info);
 
-  /* CARD CATEGORIES (subtle, not neon) */
-  --color-card-kpi: #b45309; /* amber-700 for titles/icons */
+  /* LEAVE TYPES (HR-friendly, clear differentiation) */
+  --color-leave-earned: #16a34a; /* emerald-600 - Accrued balance */
+  --color-leave-casual: #2563eb; /* blue-600 - Regular/flexible time off */
+  --color-leave-medical: #0ea5e9; /* cyan-600 - Medical purposes */
+  --color-leave-sick: #dc2626; /* red-600 - Illness/health related */
+  --color-leave-unpaid: #6b7280; /* gray-500 - No pay benefit */
+  --color-leave-maternity: #db2777; /* pink-600 - Maternity benefit */
+  --color-leave-paternity: #7c3aed; /* violet-600 - Paternity benefit */
+
+  /* CARD CATEGORIES (Content type indicators - subtle, not overwhelming) */
+  --color-card-kpi: #b45309; /* amber-700 - Key performance indicators */
   --color-card-kpi-soft: #fff7ed; /* amber-50 */
-  --color-card-action: var(--color-brand);
+  --color-card-action: var(--color-brand); /* Interactive/action cards */
   --color-card-action-soft: var(--color-brand-soft);
-  --color-card-summary: #7c3aed; /* violet-600 */
+  --color-card-summary: #7c3aed; /* violet-600 - Overview/summary cards */
   --color-card-summary-soft: #f3e8ff; /* violet-100 */
   --color-card-kpi-strong: #92400e;
   --color-card-action-strong: var(--color-brand-strong);
   --color-card-summary-strong: #5b21b6;
 
-  /* UI STATUSES */
-  --color-status-draft: #6b7280; /* gray-500 */
-  --color-status-submitted: #2563eb; /* blue-600 */
-  --color-status-approved: #16a34a; /* emerald-600 */
-  --color-status-rejected: #e11d48; /* rose-600 */
-  --color-status-returned: #d97706; /* amber-600 */
-  --color-status-cancelled: #94a3b8; /* slate-400 */
+  /* UI STATUSES (Request/Process states with clear semantics) */
+  --color-status-draft: #6b7280; /* gray-500 - Not yet submitted */
+  --color-status-submitted: #2563eb; /* blue-600 - Awaiting review */
+  --color-status-approved: #16a34a; /* emerald-600 - Confirmed/Accepted */
+  --color-status-rejected: #dc2626; /* red-600 - Denied/Not approved */
+  --color-status-returned: #d97706; /* amber-600 - Needs revision */
+  --color-status-cancelled: #94a3b8; /* slate-400 - Voided/Not applicable */
 
   /* FOCUS / RING */
   --color-ring: #6366f1; /* indigo-500 */
@@ -88,26 +124,52 @@
 
 /* ===== Dark mode ===== */
 .dark {
-  /* TEXT */
-  --color-text-primary: #fafafa; /* zinc-50 */
-  --color-text-secondary: #d4d4d8; /* zinc-300 */
-  --color-text-tertiary: #a1a1a6; /* zinc-400 - improved contrast */
-  --color-text-muted: #a1a1a6; /* zinc-400 - improved contrast */
-  --color-text-inverted: #09090b;
+  /* ========== DEPTH LAYERS - DARK ========== */
+  /* BASE LAYER (Darkest - Canvas/Page Background) */
+  --color-base-darkest: #09090b; /* True black - page background */
+  --color-base-dark: #0f0f12; /* Slightly lighter section background */
 
-  /* SURFACES */
-  --color-bg-primary: #09090b; /* true black */
-  --color-bg-secondary: #0f0f12; /* zinc-950 */
-  --color-bg-tertiary: #18181b; /* zinc-900 */
-  --color-bg-muted: #27272a; /* zinc-800 - subtle border */
-  --color-bg-inverted: #ffffff;
+  /* CARD LAYER (Elevated - Content containers) */
+  --color-card-elevated: #121216; /* Main cards elevated above base */
+  --color-card-elevated-subtle: #0f0f12; /* Nested/secondary cards */
+  --color-card-hover: #1a1a1f; /* Card on hover - slightly lighter */
+  --color-card-pressed: #0f0f12; /* Card when pressed/active */
 
-  /* BRAND / ACCENTS */
-  --color-brand: #818cf8; /* indigo-400 */
-  --color-brand-soft: #1f235a; /* indigo-950 */
-  --color-brand-strong: #c7d2fe; /* indigo-200 */
+  /* TEXT - Contrast Hierarchy (Dark mode) */
+  --color-text-primary: #fafafa; /* Highest contrast - near white */
+  --color-text-secondary: #d4d4d8; /* Medium contrast - zinc-300 */
+  --color-text-tertiary: #a1a1a6; /* Lower contrast - zinc-400 */
+  --color-text-muted: #71717a; /* Subtle - zinc-500 */
+  --color-text-inverted: #09090b; /* Inverse for light backgrounds */
 
-  /* DATA STATES */
+  /* SURFACES - Full Stack (Dark mode) */
+  --color-bg-primary: #09090b; /* True black canvas */
+  --color-bg-secondary: #0f0f12; /* Zinc-950 section backgrounds */
+  --color-bg-tertiary: #18181b; /* Zinc-900 interactive surfaces */
+  --color-bg-muted: #27272a; /* Zinc-800 borders, subtle elements */
+  --color-bg-inverted: #ffffff; /* Light overlay backgrounds */
+
+  /* BRAND / PRIMARY ACCENT (Lighter for dark mode) */
+  --color-brand: #818cf8; /* indigo-400 - Lighter for visibility */
+  --color-brand-soft: #1f235a; /* Deep indigo for soft backgrounds */
+  --color-brand-strong: #c7d2fe; /* Very light indigo for emphasis */
+
+  /* INTERACTIVE STATE COLORS - Dark mode */
+  --color-interactive-hover-border: #818cf8; /* Accent border for hover */
+  --color-interactive-hover-bg: #1f235a; /* Soft accent background for hover */
+  --color-interactive-focus-ring: #818cf8; /* Focus ring in dark mode */
+  --color-interactive-active: #c7d2fe; /* Active state - light indigo */
+  --color-interactive-disabled: #71717a; /* Disabled - muted gray */
+
+  /* SECONDARY ACTION - Dark mode */
+  --color-action-secondary: #71717a; /* Muted gray for secondary buttons */
+  --color-action-secondary-bg: #27272a; /* Dark background for secondary buttons */
+
+  /* DESTRUCTIVE ACTION - Dark mode */
+  --color-action-destructive: #ef4444; /* red-500 - Brighter for dark background */
+  --color-action-destructive-soft: #3a0a13; /* Deep red background */
+
+  /* DATA STATES - Dark mode */
   --color-data-success: #34d399; /* emerald-400 */
   --color-data-success-soft: #062e22; /* deep emerald bg */
   --color-data-success-strong: #bbf7d0; /* emerald-200 */
@@ -116,41 +178,51 @@
   --color-data-warning-soft: #3b2a07; /* deep amber bg */
   --color-data-warning-strong: #fde68a; /* amber-200 */
 
-  --color-data-error: #fb7185; /* rose-400 */
-  --color-data-error-soft: #3a0a13; /* deep rose bg */
-  --color-data-error-strong: #fecdd3; /* rose-200 */
+  --color-data-error: #ef4444; /* red-500 - match destructive */
+  --color-data-error-soft: #3a0a13; /* deep red bg */
+  --color-data-error-strong: #fecaca; /* red-200 */
 
   --color-data-info: #38bdf8; /* sky-400 */
   --color-data-info-soft: #072637; /* deep sky bg */
   --color-data-info-strong: #bae6fd; /* sky-200 */
 
-  /* LEAVE TYPES */
+  /* ICON TREATMENT - Dark mode */
+  --color-icon-primary: var(--color-text-primary); /* Near white - highest contrast */
+  --color-icon-secondary: var(--color-text-secondary); /* Zinc-300 */
+  --color-icon-muted: var(--color-text-muted); /* Zinc-500 - subtle */
+  --color-icon-accent: var(--color-brand); /* Indigo-400 */
+  --color-icon-success: var(--color-data-success);
+  --color-icon-warning: var(--color-data-warning);
+  --color-icon-error: var(--color-data-error);
+  --color-icon-info: var(--color-data-info);
+
+  /* LEAVE TYPES - Dark mode */
   --color-leave-earned: #34d399; /* emerald-400 */
   --color-leave-casual: #60a5fa; /* blue-400 */
   --color-leave-medical: #22d3ee; /* cyan-400 */
-  --color-leave-sick: #fb7185; /* rose-400 */
+  --color-leave-sick: #ef4444; /* red-500 */
   --color-leave-unpaid: #9ca3af; /* gray-400 */
   --color-leave-maternity: #f472b6; /* pink-400 */
   --color-leave-paternity: #a78bfa; /* violet-400 */
 
-  /* CARDS */
-  --color-card-kpi: #f59e0b;
-  --color-card-kpi-soft: #1a1205;
-  --color-card-kpi-strong: #fde68a;
-  --color-card-action: var(--color-brand);
-  --color-card-action-soft: #151637;
-  --color-card-action-strong: var(--color-brand-strong);
-  --color-card-summary: #a78bfa;
-  --color-card-summary-soft: #1b1030;
-  --color-card-summary-strong: #ddd6fe;
+  /* CARD CATEGORIES - Dark mode */
+  --color-card-kpi: #f59e0b; /* amber-500 */
+  --color-card-kpi-soft: #1a1205; /* Deep amber background */
+  --color-card-kpi-strong: #fde68a; /* amber-200 */
+  --color-card-action: var(--color-brand); /* indigo-400 */
+  --color-card-action-soft: #151637; /* Deep indigo */
+  --color-card-action-strong: var(--color-brand-strong); /* indigo-200 */
+  --color-card-summary: #a78bfa; /* violet-400 */
+  --color-card-summary-soft: #1b1030; /* Deep violet */
+  --color-card-summary-strong: #ddd6fe; /* violet-200 */
 
-  /* UI STATUSES */
-  --color-status-draft: #9ca3af;
-  --color-status-submitted: #93c5fd;
-  --color-status-approved: #86efac;
-  --color-status-rejected: #fca5a5;
-  --color-status-returned: #fbbf24;
-  --color-status-cancelled: #9ca3af;
+  /* UI STATUSES - Dark mode */
+  --color-status-draft: #9ca3af; /* gray-400 */
+  --color-status-submitted: #60a5fa; /* blue-400 */
+  --color-status-approved: #34d399; /* emerald-400 */
+  --color-status-rejected: #ef4444; /* red-500 */
+  --color-status-returned: #f59e0b; /* amber-500 */
+  --color-status-cancelled: #9ca3af; /* gray-400 */
 
   --color-ring: #818cf8;
 
@@ -169,24 +241,49 @@
   --shadow-2: 0 2px 8px rgba(0, 0, 0, 0.5), 0 1px 1px rgba(0, 0, 0, 0.35);
 }
 
-/* ===== Tailwind @theme bridge (unchanged) ===== */
+/* ===== Tailwind @theme bridge (includes new tokens) ===== */
 @theme {
+  /* Base Layer & Card Layer tokens */
+  --color-base-darkest: var(--color-base-darkest);
+  --color-base-dark: var(--color-base-dark);
+  --color-card-elevated: var(--color-card-elevated);
+  --color-card-elevated-subtle: var(--color-card-elevated-subtle);
+  --color-card-hover: var(--color-card-hover);
+  --color-card-pressed: var(--color-card-pressed);
+
+  /* Text Hierarchy tokens */
   --color-text-primary: var(--color-text-primary);
   --color-text-secondary: var(--color-text-secondary);
   --color-text-tertiary: var(--color-text-tertiary);
   --color-text-inverted: var(--color-text-inverted);
   --color-text-muted: var(--color-text-muted);
 
+  /* Surface tokens */
   --color-bg-primary: var(--color-bg-primary);
   --color-bg-secondary: var(--color-bg-secondary);
   --color-bg-tertiary: var(--color-bg-tertiary);
   --color-bg-inverted: var(--color-bg-inverted);
   --color-bg-muted: var(--color-bg-muted);
 
+  /* Brand / Primary Accent */
   --color-brand: var(--color-brand);
   --color-brand-soft: var(--color-brand-soft);
   --color-brand-strong: var(--color-brand-strong);
 
+  /* Interactive State tokens */
+  --color-interactive-hover-border: var(--color-interactive-hover-border);
+  --color-interactive-hover-bg: var(--color-interactive-hover-bg);
+  --color-interactive-focus-ring: var(--color-interactive-focus-ring);
+  --color-interactive-active: var(--color-interactive-active);
+  --color-interactive-disabled: var(--color-interactive-disabled);
+
+  /* Action tokens */
+  --color-action-secondary: var(--color-action-secondary);
+  --color-action-secondary-bg: var(--color-action-secondary-bg);
+  --color-action-destructive: var(--color-action-destructive);
+  --color-action-destructive-soft: var(--color-action-destructive-soft);
+
+  /* Data State tokens */
   --color-data-success: var(--color-data-success);
   --color-data-success-soft: var(--color-data-success-soft);
   --color-data-success-strong: var(--color-data-success-strong);
@@ -200,6 +297,17 @@
   --color-data-info-soft: var(--color-data-info-soft);
   --color-data-info-strong: var(--color-data-info-strong);
 
+  /* Icon Treatment tokens */
+  --color-icon-primary: var(--color-icon-primary);
+  --color-icon-secondary: var(--color-icon-secondary);
+  --color-icon-muted: var(--color-icon-muted);
+  --color-icon-accent: var(--color-icon-accent);
+  --color-icon-success: var(--color-icon-success);
+  --color-icon-warning: var(--color-icon-warning);
+  --color-icon-error: var(--color-icon-error);
+  --color-icon-info: var(--color-icon-info);
+
+  /* Leave Type tokens */
   --color-leave-earned: var(--color-leave-earned);
   --color-leave-casual: var(--color-leave-casual);
   --color-leave-medical: var(--color-leave-medical);
