@@ -350,8 +350,8 @@ export function CEODashboardClient() {
                 days: item.days,
               }))}
               dataKeys={[
-                { key: "requests", name: "Requests", color: "#3b82f6" },
-                { key: "days", name: "Total Days", color: "#10b981" },
+                { key: "requests", name: "Requests", color: "hsl(var(--chart-1))" },
+                { key: "days", name: "Total Days", color: "hsl(var(--chart-2))" },
               ]}
               xAxisKey="name"
             />
@@ -368,7 +368,7 @@ export function CEODashboardClient() {
                 onLeave: dept.onLeave,
               }))}
               dataKeys={[
-                { key: "utilization", name: "Utilization %", color: "#3b82f6" },
+                { key: "utilization", name: "Utilization %", color: "hsl(var(--chart-1))" },
               ]}
               xAxisKey="name"
             />

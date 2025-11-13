@@ -31,6 +31,7 @@ import { CompletePagination } from "@/components/shared/pagination/Pagination";
 // Lib utilities (barrel export)
 import { useUser } from "@/lib";
 import { canEditEmployee, type AppRole } from "@/lib/rbac";
+import { getRoleBadgeClasses, getRoleLabel } from "@/lib/ui-utils";
 
 type EmployeeRecord = {
   id: number;
@@ -140,20 +141,6 @@ export function EmployeeList() {
     return filteredEmployees.slice(startIndex, endIndex);
   }, [filteredEmployees, currentPage]);
 
-  const roleLabel = (role: EmployeeRecord["role"]) => {
-    switch (role) {
-      case "DEPT_HEAD":
-        return "Manager";
-      case "HR_ADMIN":
-        return "HR Admin";
-      case "HR_HEAD":
-        return "HR Head";
-      case "CEO":
-        return "CEO";
-      default:
-        return "Employee";
-    }
-  };
 
   if (isLoading) {
     return (
@@ -254,19 +241,9 @@ export function EmployeeList() {
                     <EnhancedTableCell>
                       <Badge
                         variant="outline"
-                        className={
-                          employee.role === "CEO"
-                            ? "bg-card-summary/10 text-card-summary border-card-summary/20"
-                            : employee.role === "HR_HEAD"
-                            ? "bg-data-info/10 text-data-info border-data-info/20"
-                            : employee.role === "HR_ADMIN"
-                            ? "bg-data-info/10 text-data-info border-data-info/20"
-                            : employee.role === "DEPT_HEAD"
-                            ? "bg-data-success/10 text-data-success border-data-success/20"
-                            : "bg-bg-secondary text-text-secondary border-bg-muted"
-                        }
+                        className={getRoleBadgeClasses(employee.role)}
                       >
-                        {roleLabel(employee.role)}
+                        {getRoleLabel(employee.role)}
                       </Badge>
                     </EnhancedTableCell>
                     <EnhancedTableCell className="text-right">

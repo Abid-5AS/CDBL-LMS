@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CompletePagination } from "@/components/shared/pagination/Pagination";
 import { CreateUserDialog } from "./create-user-dialog";
 import type { AuditLogRecord } from "./admin-dashboard";
 
@@ -18,6 +19,7 @@ export type AdminUserRecord = {
 };
 
 const ROLE_OPTIONS: Array<AdminUserRecord["role"]> = ["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"];
+const PAGE_SIZE = 20;
 
 type UserManagementProps = {
   users: AdminUserRecord[];
@@ -28,6 +30,7 @@ type UserManagementProps = {
 
 export function UserManagement({ users, onRoleChange, onCreate, busyUserId }: UserManagementProps) {
   const [query, setQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -40,6 +43,19 @@ export function UserManagement({ users, onRoleChange, onCreate, busyUserId }: Us
       );
     });
   }, [users, query]);
+
+  // Reset to page 1 when search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [query]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginatedUsers = useMemo(() => {
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    const endIndex = startIndex + PAGE_SIZE;
+    return filtered.slice(startIndex, endIndex);
+  }, [filtered, currentPage]);
 
   return (
     <div className="space-y-4">
@@ -73,7 +89,7 @@ export function UserManagement({ users, onRoleChange, onCreate, busyUserId }: Us
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {filtered.map((user) => {
+            {paginatedUsers.map((user) => {
               const updating = busyUserId === user.id;
               return (
                 <tr key={user.id} className="hover:bg-bg-secondary/60">
@@ -113,7 +129,7 @@ export function UserManagement({ users, onRoleChange, onCreate, busyUserId }: Us
                 </tr>
               );
             })}
-            {filtered.length === 0 ? (
+            {paginatedUsers.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-6 text-center text-sm text-muted-foreground">
                   No users match your search.
@@ -123,6 +139,17 @@ export function UserManagement({ users, onRoleChange, onCreate, busyUserId }: Us
           </tbody>
         </table>
       </div>
+
+      {filtered.length > 0 && (
+        <CompletePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          pageSize={PAGE_SIZE}
+          totalItems={filtered.length}
+          onPageChange={setCurrentPage}
+          showFirstLast={true}
+        />
+      )}
     </div>
   );
 }

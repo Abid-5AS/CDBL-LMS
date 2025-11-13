@@ -186,7 +186,7 @@ export function HRAdminDashboardClient() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-semibold" style={{ color: "var(--role-hr-admin-accent, #7c3aed)" }}>
+                    <p className="text-2xl font-semibold" style={{ color: "var(--role-hr-admin-accent)" }}>
                       {stats?.dailyProgress || 0}%
                     </p>
                   </div>
@@ -196,7 +196,7 @@ export function HRAdminDashboardClient() {
                   className="h-2"
                   style={{
                     // @ts-ignore
-                    "--progress-background": "var(--role-hr-admin-accent, #7c3aed)"
+                    "--progress-background": "var(--role-hr-admin-accent)"
                   }}
                 />
                 {stats && stats.dailyProgress >= 100 && (

@@ -60,8 +60,8 @@ export function HolidaysList({ holidays }: HolidaysListProps) {
           >
             {/* Left side - Holiday info */}
             <div className="flex items-center gap-4 flex-1 min-w-0">
-              <div className="p-2 bg-indigo-500/10 rounded-lg shrink-0">
-                <Calendar className="size-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+              <div className="p-2 bg-data-info/10 rounded-lg shrink-0">
+                <Calendar className="size-5 text-data-info" aria-hidden="true" />
               </div>
 
               <div className="flex-1 min-w-0">
@@ -89,7 +89,7 @@ export function HolidaysList({ holidays }: HolidaysListProps) {
                   {!isPast && daysUntil > 0 && (
                     <>
                       <span>•</span>
-                      <span className="text-orange-600 dark:text-orange-400">
+                      <span className="text-data-warning">
                         {daysUntil === 1 ? "Tomorrow" : `In ${daysUntil} days`}
                       </span>
                     </>
@@ -107,7 +107,7 @@ export function HolidaysList({ holidays }: HolidaysListProps) {
               )}
 
               {!isPast && daysUntil <= 7 && daysUntil > 0 && (
-                <Badge variant="default" className="text-xs bg-orange-500">
+                <Badge variant="default" className="text-xs bg-data-warning/90 text-white">
                   <Clock className="size-3 mr-1" aria-hidden="true" />
                   {daysUntil}d
                 </Badge>
