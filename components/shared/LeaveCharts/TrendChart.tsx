@@ -122,9 +122,9 @@ export function TrendChart({
 
   const isDark = theme === "dark";
   const gridColor = isDark
-    ? "rgba(255, 255, 255, 0.08)"
-    : "rgba(0, 0, 0, 0.08)";
-  const textColor = isDark ? "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.6)";
+    ? "rgba(255, 255, 255, 0.1)"
+    : "rgba(0, 0, 0, 0.15)";
+  const textColor = isDark ? "rgba(255, 255, 255, 0.85)" : "rgba(0, 0, 0, 0.75)";
 
   return (
     <div className={cn("w-full", className)} style={{ height: `${height}px` }}>

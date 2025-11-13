@@ -6,7 +6,8 @@ import type { EmployeeDashboardData } from "@/lib/employee";
 import type { AppRole } from "@/lib/rbac";
 import { canEditEmployee } from "@/lib/rbac";
 import { Button, Badge } from "@/components/ui";
-import { EmployeeProfileCard, LeaveHistoryTable } from "@/components/shared";
+import { EmployeeProfileCard } from "./EmployeeProfileCard";
+import { LeaveHistoryTable } from "./LeaveHistoryTable";
 import { HRStatCards } from "@/components";
 import { Pencil } from "lucide-react";
 
