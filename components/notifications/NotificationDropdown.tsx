@@ -16,8 +16,9 @@ import {
   DropdownMenuTrigger,
   Button,
   Badge,
-  EmptyState,
 } from "@/components/ui";
+
+import { EmptyState } from "@/components/shared";
 
 // Lib utilities
 import { formatDate } from "@/lib";

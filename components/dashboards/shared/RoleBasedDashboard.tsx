@@ -254,7 +254,7 @@ export function RoleDashboardCard({
     : roleConfigs.EMPLOYEE;
 
   const cardClasses = cn(
-    "rounded-xl border shadow-sm transition-all duration-300",
+    "rounded-xl border shadow-sm transition-all duration-300 h-full",
     variant === "default" && "bg-card border-border hover:shadow-md",
     variant === "accent" && [
       "border-[color:var(--dashboard-accent)]/20",
@@ -262,9 +262,8 @@ export function RoleDashboardCard({
       "hover:shadow-lg hover:shadow-[color:var(--dashboard-accent)]/10",
     ],
     variant === "glass" && [
-      "bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl",
-      "border-white/20 dark:border-slate-700/50",
-      "shadow-xl hover:shadow-2xl",
+      "glass-card",
+      "hover:shadow-xl",
     ],
     className
   );
@@ -325,7 +324,10 @@ export function RoleKPICard({
     <RoleDashboardCard
       role={role}
       variant="glass"
-      className={cn("p-4 sm:p-6", className)}
+      className={cn(
+        "p-4 sm:p-6 flex flex-col h-full min-h-[160px]",
+        className
+      )}
       animate={false}
     >
       <div className="flex items-start justify-between">

@@ -12,3 +12,11 @@ export {
 } from "./AnalyticsChart";
 
 export { ExportButton, ExportCSVButton } from "./ExportButton";
+export * from "./ResponsiveDashboardGrid";
+
+// Role-based dashboard components
+export {
+  RoleBasedDashboard,
+  RoleDashboardCard,
+  RoleKPICard,
+} from "./RoleBasedDashboard";

@@ -10,8 +10,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  EmptyState,
 } from "@/components/ui";
+import { EmptyState } from "@/components/shared";
 import { Activity } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
