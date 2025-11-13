@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { Suspense } from "react";
+import useSWR from "swr";
 import { Plus, Users, FileText, Calendar } from "lucide-react";
 import {
   Button,
@@ -21,13 +24,49 @@ import {
   QuickActions,
   type QuickAction,
 } from "@/components/shared/QuickActions";
-import { useApiQuery } from "@/lib/apiClient";
+import { apiFetcher } from "@/lib/apiClient";
 
 type HRDashboardProps = {
   username: string;
 };
 
+interface LeaveTrendData {
+  data: Array<{ month: string; leaves: number }>;
+}
+
+interface HRAdminStats {
+  leaveTypeBreakdown: Array<{
+    type: string;
+    count: number;
+    totalDays: number;
+  }>;
+}
+
 export function HRDashboard({ username }: HRDashboardProps) {
+  // Fetch leave trend data
+  const { data: trendData, isLoading: trendLoading } = useSWR<LeaveTrendData>(
+    "/api/dashboard/leave-trend",
+    apiFetcher
+  );
+
+  // Fetch leave type distribution data
+  const { data: statsData, isLoading: statsLoading } = useSWR<HRAdminStats>(
+    "/api/dashboard/hr-admin/stats",
+    apiFetcher
+  );
+
+  // Transform trend data for the chart
+  const chartTrendData = trendData?.data?.map((item) => ({
+    month: item.month,
+    leaves: item.leaves,
+  })) || [];
+
+  // Transform type distribution data for the pie chart
+  const pieData = statsData?.leaveTypeBreakdown?.map((item) => ({
+    name: item.type,
+    value: item.count,
+  })) || [];
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -89,19 +128,19 @@ export function HRDashboard({ username }: HRDashboardProps) {
       <section className="grid gap-6 lg:grid-cols-2">
         <ChartContainer
           title="Monthly Leave Trend"
-          loading={false}
-          empty={false}
+          loading={trendLoading}
+          empty={!trendLoading && chartTrendData.length === 0}
           height={300}
         >
-          <TrendChart data={[]} height={300} />
+          <TrendChart data={chartTrendData} height={300} />
         </ChartContainer>
         <ChartContainer
           title="Leave Type Distribution"
-          loading={false}
-          empty={false}
+          loading={statsLoading}
+          empty={!statsLoading && pieData.length === 0}
           height={300}
         >
-          <TypePie data={[]} height={300} />
+          <TypePie data={pieData} height={300} />
         </ChartContainer>
       </section>
     </div>

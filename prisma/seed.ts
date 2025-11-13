@@ -33,7 +33,7 @@ const SEED_RESET =
   ["true", "1", "yes"].includes(
     (process.env.SEED_RESET ?? "").trim().toLowerCase()
   ) || false;
-const EMPLOYEES_PER_DEPT = 4;
+const EMPLOYEES_PER_DEPT = 8; // Increased from 4 to 8 for more realistic data
 const UPLOAD_ROOT = path.join(process.cwd(), "private", "uploads");
 
 const nameRng = new SeededRandom(3101);
@@ -575,7 +575,8 @@ async function createLeaveRequests(users: SeedUser[], holidays: SeedHoliday[]) {
     const deptHead = employee.department && deptHeads.get(employee.department);
     if (!deptHead) continue;
 
-    const numRequests = leaveRng.nextInt(6, 10);
+    // Increased from 6-10 to 12-18 for better trend visualization across 12 months
+    const numRequests = leaveRng.nextInt(12, 18);
     for (let i = 0; i < numRequests; i++) {
       const leaveType = leaveRng.pick([
         LeaveType.EARNED,
@@ -904,7 +905,8 @@ function buildDateRange(
     startDate.setDate(startDate.getDate() + daysAhead);
     startDate = ensureWorkingDay(startDate, holidays);
   } else {
-    const daysAgo = leaveRng.nextInt(10, 180);
+    // Increased from 10-180 to 10-365 to cover full 12 months for trend charts
+    const daysAgo = leaveRng.nextInt(10, 365);
     startDate.setDate(startDate.getDate() - daysAgo);
     startDate = ensureWorkingDay(startDate, holidays);
   }
