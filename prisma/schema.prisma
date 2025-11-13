@@ -27,6 +27,7 @@ enum LeaveType {
   STUDY
   SPECIAL_DISABILITY
   QUARANTINE
+  SPECIAL // EL excess >60 days, usable for medical or rest outside Bangladesh (Policy 6.19.c)
 }
 
 enum LeaveStatus {

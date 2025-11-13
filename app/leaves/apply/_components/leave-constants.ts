@@ -10,7 +10,8 @@ export type LeaveType =
   | "SPECIAL_DISABILITY"
   | "QUARANTINE"
   | "EXTRAWITHPAY"
-  | "EXTRAWITHOUTPAY";
+  | "EXTRAWITHOUTPAY"
+  | "SPECIAL"; // Not directly selectable - transferred from EL excess
 
 export const LEAVE_OPTIONS: { value: LeaveType; label: string }[] = [
   { value: "EARNED", label: leaveTypeLabel.EARNED },
@@ -36,6 +37,7 @@ export const POLICY_TOOLTIPS: Record<LeaveType, string> = {
   QUARANTINE: "Backdating allowed if applicable. Medical certificate may be required. Subject to HR verification.",
   EXTRAWITHPAY: "Requires CEO approval. Subject to company policy. May require supporting documentation.",
   EXTRAWITHOUTPAY: "Requires CEO approval. Does not affect leave balance. Subject to company policy.",
+  SPECIAL: "Automatically transferred from EL excess beyond 60 days. Can be used for medical reasons or rest outside Bangladesh.",
 };
 
 export const RULE_TIPS: Record<LeaveType, string[]> = {
@@ -90,5 +92,11 @@ export const RULE_TIPS: Record<LeaveType, string[]> = {
     "Requires CEO approval",
     "Does not affect leave balance",
     "Subject to company policy",
+  ],
+  SPECIAL: [
+    "Auto-transferred from EL when balance exceeds 60 days",
+    "Maximum 180 days total (60 EL + 120 SPECIAL)",
+    "Can only be used for medical reasons or rest outside Bangladesh",
+    "Full pay during leave",
   ],
 };

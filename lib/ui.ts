@@ -9,4 +9,5 @@ export const leaveTypeLabel: Record<string, string> = {
   STUDY: "Study Leave",
   SPECIAL_DISABILITY: "Special Disability Leave",
   QUARANTINE: "Quarantine Leave",
+  SPECIAL: "Special Leave (EL Excess)",
 };

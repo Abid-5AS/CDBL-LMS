@@ -82,6 +82,7 @@ export const SERVICE_ELIGIBILITY_YEARS: Record<string, number> = {
   STUDY: 3,
   SPECIAL_DISABILITY: 3,
   QUARANTINE: 0,
+  SPECIAL: 1, // Transferred from EL, same eligibility requirement
 };
 
 /**

@@ -42,6 +42,7 @@ const ApplySchema = z.object({
     "STUDY",
     "SPECIAL_DISABILITY",
     "QUARANTINE",
+    "SPECIAL", // Can be used for medical or rest outside Bangladesh (Policy 6.19.c)
   ]),
   startDate: z.string(),
   endDate: z.string(),
