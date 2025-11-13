@@ -11,7 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Inbox, Loader2, ChevronLeft, ChevronRight, CheckCircle2, ArrowRight, RotateCcw, XCircle } from "lucide-react";
+import { Inbox, Loader2, CheckCircle2, ArrowRight, RotateCcw, XCircle } from "lucide-react";
 import { SUCCESS_MESSAGES } from "@/lib";
 import { toast } from "sonner";
 import { getToastMessage } from "@/lib";
@@ -39,6 +39,7 @@ import {
   ForwardDialog,
   CancelDialog,
 } from "@/components/shared/modals";
+import { ScrollingPagination } from "@/components/shared/pagination";
 
 type DeptHeadPendingTableProps = {
   data?: {
@@ -553,78 +554,13 @@ export function DeptHeadPendingTable({
               </ModernTable.Card.Root>
 
               {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      set({ page: Math.max(1, state.page - 1) });
-                      setTimeout(() => {
-                        const tableElement = document.getElementById("pending-requests-table");
-                        if (tableElement) {
-                          tableElement.scrollIntoView({ behavior: "smooth", block: "start" });
-                        }
-                      }, 100);
-                    }}
-                    disabled={state.page === 1}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                    Previous
-                  </Button>
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      let pageNum;
-                      if (totalPages <= 5) {
-                        pageNum = i + 1;
-                      } else if (state.page <= 3) {
-                        pageNum = i + 1;
-                      } else if (state.page >= totalPages - 2) {
-                        pageNum = totalPages - 4 + i;
-                      } else {
-                        pageNum = state.page - 2 + i;
-                      }
-
-                      return (
-                        <Button
-                          key={pageNum}
-                          variant={state.page === pageNum ? "default" : "outline"}
-                          size="sm"
-                          className="h-8 w-8 p-0"
-                          onClick={() => {
-                            set({ page: pageNum });
-                            setTimeout(() => {
-                              const tableElement = document.getElementById("pending-requests-table");
-                              if (tableElement) {
-                                tableElement.scrollIntoView({ behavior: "smooth", block: "start" });
-                              }
-                            }, 100);
-                          }}
-                        >
-                          {pageNum}
-                        </Button>
-                      );
-                    })}
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      set({ page: Math.min(totalPages, state.page + 1) });
-                      setTimeout(() => {
-                        const tableElement = document.getElementById("pending-requests-table");
-                        if (tableElement) {
-                          tableElement.scrollIntoView({ behavior: "smooth", block: "start" });
-                        }
-                      }, 100);
-                    }}
-                    disabled={state.page === totalPages}
-                  >
-                    Next
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
+              <ScrollingPagination
+                currentPage={state.page}
+                totalPages={totalPages}
+                onPageChange={(page) => set({ page })}
+                scrollToElementId="pending-requests-table"
+                className="mt-4"
+              />
             </div>
           )}
         </div>
