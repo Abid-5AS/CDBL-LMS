@@ -12,6 +12,10 @@ export const cache = "no-store";
 
 const RecallSchema = z.object({
   comment: z.string().optional(),
+  // Policy 6.9: Employee recalled from leave is entitled to travel allowance
+  travelAllowance: z.number().optional(), // Travel allowance amount in BDT
+  travelDistance: z.number().optional(), // Distance traveled in km
+  travelNotes: z.string().optional(), // Additional travel details
 });
 
 /**
@@ -21,6 +25,9 @@ const RecallSchema = z.object({
  * - Sets status to RECALLED
  * - Restores remaining balance for unused days
  * - Only valid for future/ongoing leaves (not past leaves)
+ * - Optionally tracks travel allowance per Policy 6.9
+ *   "Employee recalled from leave shall be treated on duty from the date
+ *    s/he starts for the station and shall be entitled to traveling allowance"
  */
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const traceId = getTraceId(request as any);
@@ -155,6 +162,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         balanceRestored,
         restoredDays: balanceRestored ? remainingDays : 0,
         comment: parsed.data.comment,
+        // Policy 6.9: Travel allowance tracking for recalled employees
+        travelAllowance: parsed.data.travelAllowance,
+        travelDistance: parsed.data.travelDistance,
+        travelNotes: parsed.data.travelNotes,
       },
     },
   });
@@ -165,6 +176,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     status: updated.status,
     balanceRestored,
     remainingDays,
+    travelAllowanceTracked: !!parsed.data.travelAllowance,
+    travelDetails: parsed.data.travelAllowance
+      ? {
+          allowance: parsed.data.travelAllowance,
+          distance: parsed.data.travelDistance,
+          notes: parsed.data.travelNotes,
+        }
+      : undefined,
   });
 }
 
