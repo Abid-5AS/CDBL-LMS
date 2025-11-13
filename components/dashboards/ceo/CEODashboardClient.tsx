@@ -20,14 +20,14 @@ import {
   Shield,
 } from "lucide-react";
 import {
-  KPICard,
-  KPICardSkeleton,
-  KPIGrid,
+  RoleKPICard,
+  ResponsiveDashboardGrid,
   AnalyticsLineChart,
   AnalyticsBarChart,
   AnalyticsPieChart,
   ExportButton,
 } from "@/components/dashboards/shared";
+import { DashboardGridSkeleton } from "@/components/shared/skeletons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardCardSkeleton } from "@/app/dashboard/shared/LoadingFallback";
 import { Separator } from "@/components/ui/separator";
@@ -123,78 +123,69 @@ export function CEODashboardClient() {
   return (
     <div className="space-y-6">
       {/* Primary Executive KPIs */}
-      <KPIGrid>
-        {isLoading ? (
-          <>
-            <KPICardSkeleton />
-            <KPICardSkeleton />
-            <KPICardSkeleton />
-            <KPICardSkeleton />
-          </>
-        ) : (
-          <>
-            <KPICard
+      {isLoading ? (
+        <DashboardGridSkeleton cards={4} />
+      ) : (
+        <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
+          <RoleKPICard
               title="Total Workforce"
               value={stats?.totalEmployees || 0}
               subtitle={`${stats?.activeEmployees || 0} active`}
               icon={Users}
-              variant="info"
+              role="CEO"
             />
-            <KPICard
+            <RoleKPICard
               title="On Leave Today"
               value={stats?.onLeaveToday || 0}
               subtitle={`${stats?.utilizationRate || 0}% available`}
               icon={Activity}
-              variant={
-                stats && stats.utilizationRate < 85
-                  ? "warning"
-                  : "success"
-              }
+              role="CEO"
               trend={
                 stats && stats.utilizationRate
                   ? {
-                      value: stats.utilizationRate >= 90 ? 3 : -2,
+                      value: stats.utilizationRate >= 90 ? 3 : 2,
                       label: "vs target",
+                      direction: stats.utilizationRate >= 90 ? "up" : "down"
                     }
                   : undefined
               }
             />
-            <KPICard
+            <RoleKPICard
               title="Pending Approvals"
               value={stats?.pendingApprovals || 0}
               subtitle={`${stats?.avgApprovalTime?.toFixed(1) || 0}d avg time`}
               icon={Clock}
-              variant={stats && stats.pendingApprovals > 20 ? "warning" : "default"}
+              role="CEO"
+              trend={stats && stats.pendingApprovals > 20 ? {
+                value: stats.pendingApprovals - 20,
+                label: "above normal",
+                direction: "up"
+              } : undefined}
             />
-            <KPICard
+            <RoleKPICard
               title="Compliance Score"
               value={`${stats?.complianceScore || 0}%`}
               subtitle="Policy adherence"
               icon={Shield}
-              variant={stats && stats.complianceScore >= 95 ? "success" : stats && stats.complianceScore >= 85 ? "default" : "warning"}
+              role="CEO"
               trend={
                 stats && stats.complianceScore
                   ? {
-                      value: stats.complianceScore >= 90 ? 2 : -1,
+                      value: stats.complianceScore >= 90 ? 2 : 1,
                       label: "this quarter",
+                      direction: stats.complianceScore >= 90 ? "up" : "down"
                     }
                   : undefined
               }
             />
-          </>
-        )}
-      </KPIGrid>
+        </ResponsiveDashboardGrid>
+      )}
 
       {/* Financial & YoY Metrics */}
-      <div className="grid gap-6 md:grid-cols-3">
-        {isLoading ? (
-          <>
-            <KPICardSkeleton />
-            <KPICardSkeleton />
-            <KPICardSkeleton />
-          </>
-        ) : (
-          <>
+      {isLoading ? (
+        <DashboardGridSkeleton cards={3} className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" />
+      ) : (
+        <ResponsiveDashboardGrid columns="1:1:3:3" gap="md">
             {/* Financial Impact Card */}
             <Card className="rounded-2xl">
               <CardHeader className="pb-3">
@@ -312,9 +303,8 @@ export function CEODashboardClient() {
                 </div>
               </CardContent>
             </Card>
-          </>
-        )}
-      </div>
+        </ResponsiveDashboardGrid>
+      )}
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -331,8 +321,8 @@ export function CEODashboardClient() {
                 days: item.days,
               }))}
               dataKeys={[
-                { key: "requests", name: "Requests", color: "#3b82f6" },
-                { key: "days", name: "Total Days", color: "#10b981" },
+                { key: "requests", name: "Requests", color: "hsl(var(--chart-1))" },
+                { key: "days", name: "Total Days", color: "hsl(var(--chart-2))" },
               ]}
               xAxisKey="name"
             />
@@ -349,7 +339,7 @@ export function CEODashboardClient() {
                 onLeave: dept.onLeave,
               }))}
               dataKeys={[
-                { key: "utilization", name: "Utilization %", color: "#3b82f6" },
+                { key: "utilization", name: "Utilization %", color: "hsl(var(--chart-1))" },
               ]}
               xAxisKey="name"
             />

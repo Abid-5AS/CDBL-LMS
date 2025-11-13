@@ -60,7 +60,7 @@ function BalanceContent() {
   return (
     <div className="space-y-6">
       <section className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold text-text-secondary">Leave Balance</h1>
+        <h1 className="text-2xl font-semibold text-foreground">Leave Balance</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           View your current leave balances and accrual information for {data?.year ?? currentYear}
         </p>
@@ -113,7 +113,7 @@ function BalanceContent() {
               <CardContent className="space-y-4">
                 <div>
                   <div className="flex items-baseline justify-between">
-                    <p className="text-3xl font-semibold text-text-secondary">
+                    <p className="text-3xl font-semibold text-foreground">
                       {isLoading ? "..." : available}
                     </p>
                     <p className="text-sm text-muted-foreground">

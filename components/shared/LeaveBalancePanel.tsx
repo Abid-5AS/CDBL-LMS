@@ -94,9 +94,9 @@ function ProgressBar({
 
   return (
     <div className={cn("space-y-1", className)}>
-      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-text-secondary dark:text-text-secondary">
+      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         <span>{label}</span>
-        <span className="text-text-secondary dark:text-text-secondary">
+        <span className="text-muted-foreground">
           {Math.round(clampedPercent)}%
         </span>
       </div>
@@ -179,10 +179,10 @@ export function LeaveBalancePanel({
       <div className={cn("space-y-2", className)}>
         {/* Total Remaining */}
         <div className="flex items-center justify-center md:justify-end gap-2 px-2">
-          <span className="text-2xl font-bold text-text-secondary dark:text-text-secondary">
+          <span className="text-2xl font-bold text-foreground">
             {totalRemaining}
           </span>
-          <span className="text-sm text-text-secondary dark:text-text-secondary">
+          <span className="text-sm text-muted-foreground">
             Days Remaining
           </span>
         </div>
@@ -226,7 +226,7 @@ export function LeaveBalancePanel({
                         fill="none"
                         stroke="currentColor"
                         strokeWidth="2"
-                        className="text-text-secondary dark:text-text-secondary"
+                        className="text-muted-foreground/30"
                       />
                       <circle
                         cx="18"
@@ -241,17 +241,17 @@ export function LeaveBalancePanel({
                       />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-xs font-bold text-text-secondary dark:text-text-secondary">
+                      <span className="text-xs font-bold text-foreground">
                         {remaining}
                       </span>
                     </div>
                   </div>
                 )}
                 <div className="text-center mt-1">
-                  <p className="text-xs font-semibold text-text-secondary dark:text-text-secondary">
+                  <p className="text-xs font-semibold text-foreground">
                     {config.label.split(" ")[0]}
                   </p>
-                  <p className="text-[10px] text-text-secondary dark:text-text-secondary">
+                  <p className="text-[10px] text-muted-foreground">
                     {remaining}/{balance.total}
                   </p>
                 </div>
@@ -309,10 +309,10 @@ export function LeaveBalancePanel({
                       <Icon className="size-5" />
                     </div>
                     <div>
-                      <p className="font-semibold text-text-secondary dark:text-text-secondary">
+                      <p className="font-semibold text-foreground">
                         {config.label}
                       </p>
-                      <p className="text-xs text-text-secondary dark:text-text-secondary">
+                      <p className="text-xs text-muted-foreground">
                         {remaining}/{balance.total} days
                       </p>
                     </div>
@@ -321,10 +321,10 @@ export function LeaveBalancePanel({
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-3xl font-bold text-text-secondary dark:text-text-secondary">
+                    <p className="text-3xl font-bold text-foreground">
                       {remaining}
                     </p>
-                    <p className="text-sm text-text-secondary dark:text-text-secondary">
+                    <p className="text-sm text-muted-foreground">
                       {Math.round(percentRemaining)}% remaining
                     </p>
                     {balance.projected !== undefined && (
@@ -346,7 +346,7 @@ export function LeaveBalancePanel({
                           fill="none"
                           stroke="currentColor"
                           strokeWidth="2"
-                          className="text-text-secondary dark:text-text-secondary"
+                          className="text-muted-foreground/30"
                         />
                         <circle
                           cx="18"

@@ -5,9 +5,8 @@ import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
 import { Clock, Users, RotateCcw, Calendar, Activity, TrendingUp, AlertCircle, CheckCircle2 } from "lucide-react";
 import {
-  KPICard,
-  KPICardSkeleton,
-  KPIGrid,
+  RoleKPICard,
+  ResponsiveDashboardGrid,
   AnalyticsBarChart,
   ExportButton,
 } from "@/components/dashboards/shared";
@@ -83,87 +82,123 @@ export function HRHeadDashboardClient() {
   return (
     <div className="space-y-6">
       {/* Top KPI Cards */}
-      <KPIGrid>
+      <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
         {isLoading ? (
           <>
-            <KPICardSkeleton />
-            <KPICardSkeleton />
-            <KPICardSkeleton />
-            <KPICardSkeleton />
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="glass-card rounded-2xl p-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 space-y-3">
+                    <div className="h-4 w-24 bg-muted/50 animate-pulse rounded" />
+                    <div className="h-8 w-20 bg-muted/50 animate-pulse rounded" />
+                    <div className="h-4 w-32 bg-muted/50 animate-pulse rounded" />
+                  </div>
+                  <div className="h-12 w-12 bg-muted/50 animate-pulse rounded-xl" />
+                </div>
+              </div>
+            ))}
           </>
         ) : (
           <>
-            <KPICard
+            <RoleKPICard
               title="Pending Requests"
               value={stats?.pending || 0}
               subtitle="Awaiting approval"
               icon={Clock}
-              variant={stats && stats.pending > 10 ? "warning" : "default"}
+              role="HR_HEAD"
+              trend={stats && stats.pending > 10 ? {
+                value: stats.pending - 10,
+                label: "above normal",
+                direction: "up"
+              } : undefined}
             />
-            <KPICard
+            <RoleKPICard
               title="On Leave Today"
               value={stats?.onLeave || 0}
               subtitle={`Out of ${stats?.totalEmployees || 0} employees`}
               icon={Users}
-              variant="info"
+              role="HR_HEAD"
             />
-            <KPICard
+            <RoleKPICard
               title="Returned for Modification"
               value={stats?.returned || 0}
               subtitle="Require employee action"
               icon={RotateCcw}
-              variant={stats && stats.returned > 0 ? "warning" : "success"}
+              role="HR_HEAD"
+              trend={stats && stats.returned > 0 ? {
+                value: stats.returned,
+                label: "needs attention",
+                direction: "down"
+              } : undefined}
             />
-            <KPICard
+            <RoleKPICard
               title="Upcoming Leaves"
               value={stats?.upcoming || 0}
               subtitle="Next 7 days"
               icon={Calendar}
-              variant="default"
+              role="HR_HEAD"
             />
           </>
         )}
-      </KPIGrid>
+      </ResponsiveDashboardGrid>
 
       {/* Secondary Metrics */}
-      <div className="grid gap-6 md:grid-cols-3">
+      <ResponsiveDashboardGrid columns="1:1:3:3" gap="md">
         {isLoading ? (
           <>
-            <KPICardSkeleton />
-            <KPICardSkeleton />
-            <KPICardSkeleton />
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="glass-card rounded-2xl p-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 space-y-3">
+                    <div className="h-4 w-24 bg-muted/50 animate-pulse rounded" />
+                    <div className="h-8 w-20 bg-muted/50 animate-pulse rounded" />
+                    <div className="h-4 w-32 bg-muted/50 animate-pulse rounded" />
+                  </div>
+                  <div className="h-12 w-12 bg-muted/50 animate-pulse rounded-xl" />
+                </div>
+              </div>
+            ))}
           </>
         ) : (
           <>
-            <KPICard
+            <RoleKPICard
               title="This Month"
               value={stats?.monthlyRequests || 0}
               subtitle="Total requests submitted"
               icon={Activity}
-              variant="default"
+              role="HR_HEAD"
             />
-            <KPICard
+            <RoleKPICard
               title="New Hires"
               value={stats?.newHires || 0}
               subtitle="Joined this month"
               icon={Users}
-              variant="success"
+              role="HR_HEAD"
+              trend={stats && stats.newHires > 0 ? {
+                value: stats.newHires,
+                label: "this month",
+                direction: "up"
+              } : undefined}
             />
-            <KPICard
+            <RoleKPICard
               title="Policy Compliance"
               value={`${stats?.complianceScore || 0}%`}
               subtitle="Meeting SLA targets"
               icon={CheckCircle2}
-              variant={stats && stats.complianceScore >= 90 ? "success" : "warning"}
+              role="HR_HEAD"
               trend={
                 stats && stats.complianceScore
-                  ? { value: stats.complianceScore >= 90 ? 2 : -5, label: "vs last month" }
+                  ? {
+                      value: stats.complianceScore >= 90 ? 2 : 5,
+                      label: "vs last month",
+                      direction: stats.complianceScore >= 90 ? "up" : "down"
+                    }
                   : undefined
               }
             />
           </>
         )}
-      </div>
+      </ResponsiveDashboardGrid>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Main Content - Left Side */}

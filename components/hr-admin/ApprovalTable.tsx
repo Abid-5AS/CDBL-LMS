@@ -303,6 +303,10 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
             icon={CheckCircle}
             title="No pending requests"
             description="You are all caught up! There are currently no leave requests awaiting approval."
+            action={{
+              label: "View Past Approvals",
+              href: "/approvals?status=APPROVED",
+            }}
             className="py-8"
           />
         </CardContent>

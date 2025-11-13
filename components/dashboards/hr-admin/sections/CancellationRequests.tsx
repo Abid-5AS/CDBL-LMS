@@ -9,7 +9,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { AlertCircle } from "lucide-react";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { AlertCircle, XCircle } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
 import Link from "next/link";
@@ -71,11 +72,16 @@ export function CancellationRequestsPanel() {
           </div>
         </div>
         <div className="p-6">
-          <div className="py-8 text-center">
-            <p className="text-sm text-muted-foreground">
-              No cancellation requests
-            </p>
-          </div>
+          <EmptyState
+            icon={XCircle}
+            title="No cancellation requests"
+            description="There are currently no pending cancellation requests to review."
+            variant="minimal"
+            action={{
+              label: "View All Requests",
+              href: "/approvals",
+            }}
+          />
         </div>
       </div>
     );
