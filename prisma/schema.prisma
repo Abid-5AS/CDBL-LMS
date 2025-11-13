@@ -27,6 +27,7 @@ enum LeaveType {
   STUDY
   SPECIAL_DISABILITY
   QUARANTINE
+  SPECIAL // EL excess >60 days, usable for medical or rest outside Bangladesh (Policy 6.19.c)
 }
 
 enum LeaveStatus {
@@ -42,22 +43,26 @@ enum LeaveStatus {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   name       String
-  email      String   @unique
+  email      String    @unique
   password   String?
-  empCode    String?  @unique
-  role       Role     @default(EMPLOYEE)
+  empCode    String?   @unique
+  role       Role      @default(EMPLOYEE)
   department String?
-  deptHeadId Int? // User ID of department head (self-relation)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  deptHeadId     Int?       // User ID of department head (self-relation)
+  joinDate       DateTime? // Service start date for eligibility calculations (Policy 6.18)
+  retirementDate DateTime? // Expected retirement date for study leave validation (Policy 6.25.a)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
 
-  leaves      LeaveRequest[]
-  balances    Balance[]
-  approvals   Approval[]     @relation("ApprovalApprover")
-  deptHead    User?          @relation("HeadToMembers", fields: [deptHeadId], references: [id])
-  teamMembers User[]         @relation("HeadToMembers")
+  leaves              LeaveRequest[]
+  balances            Balance[]
+  approvals           Approval[]           @relation("ApprovalApprover")
+  deptHead            User?                @relation("HeadToMembers", fields: [deptHeadId], references: [id])
+  teamMembers         User[]               @relation("HeadToMembers")
+  encashmentRequests  EncashmentRequest[]
+  encashmentApprovals EncashmentRequest[]  @relation("EncashmentApprover")
 
   @@index([deptHeadId])
 }
@@ -180,6 +185,37 @@ model LeaveVersion {
 
   @@index([leaveId])
   @@index([leaveId, version])
+}
+
+enum EncashmentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PAID
+}
+
+// EL Encashment Request (Policy 6.19.f)
+// Employees can encash EL balance exceeding 10 days
+model EncashmentRequest {
+  id               Int               @id @default(autoincrement())
+  userId           Int
+  year             Int // Year of EL balance being encashed
+  daysRequested    Int // Days employee wants to encash
+  balanceAtRequest Int // EL balance at time of request (for audit)
+  reason           String? // Optional reason for encashment
+  status           EncashmentStatus  @default(PENDING)
+  approvedBy       Int? // User ID of approver (typically CEO)
+  approvedAt       DateTime?
+  rejectionReason  String?
+  paidAt           DateTime? // When payment was processed
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  user     User  @relation(fields: [userId], references: [id])
+  approver User? @relation("EncashmentApprover", fields: [approvedBy], references: [id])
+
+  @@index([userId, status])
+  @@index([status])
 }
 
 model OrgSettings {

@@ -143,58 +143,116 @@ export async function processELAccrual(targetMonth?: Date): Promise<AccrualResul
       });
     }
 
-    // Check carry-forward cap
+    // Check carry-forward cap and special leave transfer (Policy 6.19.c)
     const totalBeforeAccrual = (balance.opening || 0) + (balance.accrued || 0);
     const totalAfterAccrual = totalBeforeAccrual + policy.elAccrualPerMonth;
 
     if (totalAfterAccrual > EL_MAX_CARRY) {
-      // Cap at 60 days total
-      const maxAccruable = Math.max(0, EL_MAX_CARRY - totalBeforeAccrual);
-      
-      if (maxAccruable > 0) {
-        const newAccrued = (balance.accrued || 0) + maxAccruable;
+      // EL would exceed 60 days - handle special leave transfer
+      const excessDays = totalAfterAccrual - EL_MAX_CARRY;
+      const daysToEL = policy.elAccrualPerMonth - excessDays; // Days that fit in EL
+
+      // Get or create SPECIAL leave balance for transfer
+      let specialBalance = await prisma.balance.findUnique({
+        where: {
+          userId_type_year: {
+            userId: employee.id,
+            type: "SPECIAL",
+            year: currentYear,
+          },
+        },
+      });
+
+      if (!specialBalance) {
+        specialBalance = await prisma.balance.create({
+          data: {
+            userId: employee.id,
+            type: "SPECIAL",
+            year: currentYear,
+            opening: 0,
+            accrued: 0,
+            used: 0,
+            closing: 0,
+          },
+        });
+      }
+
+      const specialTotal = (specialBalance.opening || 0) + (specialBalance.accrued || 0);
+      const SPECIAL_MAX = 120; // Policy 6.19.c: up to 180 total (60 EL + 120 SPECIAL)
+      const specialSpaceAvailable = Math.max(0, SPECIAL_MAX - specialTotal);
+
+      let daysToSpecial = Math.min(excessDays, specialSpaceAvailable);
+      let actualAccrual = daysToEL + daysToSpecial;
+
+      // Update EL balance (cap at 60)
+      if (daysToEL > 0) {
+        const newAccrued = (balance.accrued || 0) + daysToEL;
         const newClosing = (balance.opening || 0) + newAccrued - (balance.used || 0);
 
         await prisma.balance.update({
           where: { id: balance.id },
           data: {
             accrued: newAccrued,
-            closing: newClosing,
+            closing: Math.min(newClosing, EL_MAX_CARRY), // Cap closing at 60
+          },
+        });
+      }
+
+      // Transfer excess to SPECIAL
+      if (daysToSpecial > 0) {
+        const newSpecialAccrued = (specialBalance.accrued || 0) + daysToSpecial;
+        const newSpecialClosing = (specialBalance.opening || 0) + newSpecialAccrued - (specialBalance.used || 0);
+
+        await prisma.balance.update({
+          where: { id: specialBalance.id },
+          data: {
+            accrued: newSpecialAccrued,
+            closing: newSpecialClosing,
           },
         });
 
-        results.push({
-          userId: employee.id,
-          email: employee.email,
-          accrued: maxAccruable,
-          skipped: false,
-          reason: `Capped at 60 days total (would have been ${policy.elAccrualPerMonth})`,
-        });
-
-        // Create audit log
+        // Audit log for special transfer
         await prisma.auditLog.create({
           data: {
             actorEmail: "system@cdbl.local",
-            action: "EL_ACCRUED",
+            action: "EL_TRANSFERRED_TO_SPECIAL",
             targetEmail: employee.email,
             details: {
               userId: employee.id,
               month: monthToProcess.toISOString().slice(0, 7),
-              accrued: maxAccruable,
-              capped: true,
-              totalBalance: totalBeforeAccrual + maxAccruable,
+              transferredDays: daysToSpecial,
+              specialBalance: newSpecialClosing,
             },
           },
         });
-      } else {
-        results.push({
-          userId: employee.id,
-          email: employee.email,
-          accrued: 0,
-          skipped: false,
-          reason: "Already at 60-day carry-forward cap",
-        });
       }
+
+      results.push({
+        userId: employee.id,
+        email: employee.email,
+        accrued: actualAccrual,
+        skipped: false,
+        reason: daysToSpecial > 0
+          ? `${daysToEL} days to EL, ${daysToSpecial} days transferred to SPECIAL`
+          : `EL capped at 60 days, SPECIAL also full at 120 days`,
+      });
+
+      // Audit log for EL accrual
+      await prisma.auditLog.create({
+        data: {
+          actorEmail: "system@cdbl.local",
+          action: "EL_ACCRUED",
+          targetEmail: employee.email,
+          details: {
+            userId: employee.id,
+            month: monthToProcess.toISOString().slice(0, 7),
+            accrued: daysToEL,
+            capped: true,
+            totalEL: EL_MAX_CARRY,
+            transferredToSpecial: daysToSpecial,
+          },
+        },
+      });
     } else {
       // Normal accrual
       const newAccrued = (balance.accrued || 0) + policy.elAccrualPerMonth;

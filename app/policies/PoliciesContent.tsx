@@ -80,7 +80,7 @@ const KEY_RULES = [
   },
   {
     title: "Notice period requirements",
-    description: `Earned leave requires at least ${policy.elMinNoticeDays} working days advance notice. Casual leave applications should ideally be submitted ${policy.clMinNoticeDays} days in advance, though this is a soft recommendation.`,
+    description: `Earned leave requires at least ${policy.elMinNoticeDays} working days advance notice. Casual leave and Quarantine leave are exempt from notice requirements per Policy 6.11.a and can be applied without advance notice.`,
   },
 ];
 

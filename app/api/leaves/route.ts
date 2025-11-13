@@ -11,6 +11,14 @@ import {
   canBackdate,
   withinBackdateLimit,
   makeWarnings,
+  checkLeaveEligibility,
+  calculateMaternityLeaveDays,
+  validateQuarantineLeaveDuration,
+  validateSpecialDisabilityDuration,
+  validateExtraordinaryLeaveDuration,
+  checkMedicalLeaveAnnualLimit,
+  validateStudyLeaveDuration,
+  validateStudyLeaveRetirement,
 } from "@/lib/policy";
 import { promises as fs } from "fs";
 import path from "path";
@@ -22,7 +30,7 @@ import { normalizeToDhakaMidnight } from "@/lib/date-utils";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
 import { getStepForRole } from "@/lib/workflow";
-import { violatesCasualLeaveSideTouch } from "@/lib/leave-validation";
+import { violatesCasualLeaveSideTouch, violatesCasualLeaveCombination, validatePaternityLeaveEligibility } from "@/lib/leave-validation";
 import { generateSignedUrl } from "@/lib/storage";
 
 const ApplySchema = z.object({
@@ -37,6 +45,7 @@ const ApplySchema = z.object({
     "STUDY",
     "SPECIAL_DISABILITY",
     "QUARANTINE",
+    "SPECIAL", // Can be used for medical or rest outside Bangladesh (Policy 6.19.c)
   ]),
   startDate: z.string(),
   endDate: z.string(),
@@ -170,6 +179,30 @@ export async function POST(req: Request) {
     return NextResponse.json(error("invalid_dates", undefined, traceId), { status: 400 });
   }
 
+  // Check service eligibility per Policy 6.18
+  const requester = await prisma.user.findUnique({
+    where: { id: me.id },
+    select: { joinDate: true, retirementDate: true },
+  });
+
+  if (!requester || !requester.joinDate) {
+    return NextResponse.json(
+      error("user_join_date_missing", "Employee join date not found. Please contact HR.", traceId),
+      { status: 400 }
+    );
+  }
+
+  const eligibilityCheck = checkLeaveEligibility(parsedInput.type, requester.joinDate);
+  if (!eligibilityCheck.eligible) {
+    return NextResponse.json(
+      error("service_eligibility_not_met", eligibilityCheck.reason, traceId, {
+        leaveType: parsedInput.type,
+        requiredYears: eligibilityCheck.requiredYears,
+      }),
+      { status: 403 }
+    );
+  }
+
   let certificateUrl: string | undefined;
   if (certificateFile) {
     const ext = (certificateFile.name.split(".").pop() ?? "").toLowerCase();
@@ -223,6 +256,191 @@ export async function POST(req: Request) {
         }),
         { status: 400 }
       );
+    }
+
+    // Enforce CL combination rule (Policy 6.20.e: cannot be combined with other leaves)
+    const combinationCheck = await violatesCasualLeaveCombination(
+      me.id,
+      startDateOnly,
+      endDateOnly
+    );
+
+    if (combinationCheck.violates && combinationCheck.conflictingLeave) {
+      const conflict = combinationCheck.conflictingLeave;
+      return NextResponse.json(
+        error(
+          "cl_cannot_combine_with_other_leave",
+          `Casual leave cannot be combined with or adjacent to other leaves (Policy 6.20.e). Conflicts with ${conflict.type} leave from ${conflict.startDate.toLocaleDateString()} to ${conflict.endDate.toLocaleDateString()}.`,
+          traceId,
+          {
+            conflictingLeaveId: conflict.id,
+            conflictingLeaveType: conflict.type,
+            conflictingStartDate: conflict.startDate,
+            conflictingEndDate: conflict.endDate,
+          }
+        ),
+        { status: 400 }
+      );
+    }
+  }
+
+  // Enforce maternity leave pro-rating for employees with <6 months service (Policy 6.23.c)
+  if (t === "MATERNITY") {
+    const maternityCalc = calculateMaternityLeaveDays(requester.joinDate);
+    if (workingDays > maternityCalc.days) {
+      const explanation = maternityCalc.isProrated
+        ? `Prorated to ${maternityCalc.days} days based on ${maternityCalc.serviceMonths.toFixed(1)} months of service (Policy 6.23.c)`
+        : `Maximum 56 days (8 weeks) per Policy 6.23.a`;
+
+      return NextResponse.json(
+        error("maternity_exceeds_entitlement", explanation, traceId, {
+          maxDays: maternityCalc.days,
+          requested: workingDays,
+          isProrated: maternityCalc.isProrated,
+          serviceMonths: maternityCalc.serviceMonths,
+        }),
+        { status: 400 }
+      );
+    }
+  }
+
+  // Enforce paternity leave occasion and interval limits (Policy 6.24.b)
+  if (t === "PATERNITY") {
+    const paternityCheck = await validatePaternityLeaveEligibility(me.id, startDateOnly);
+    if (!paternityCheck.valid) {
+      return NextResponse.json(
+        error("paternity_eligibility_not_met", paternityCheck.reason, traceId, {
+          previousLeaves: paternityCheck.previousLeaves,
+          monthsSinceFirst: paternityCheck.monthsSinceFirst,
+        }),
+        { status: 403 }
+      );
+    }
+  }
+
+  // Enforce quarantine leave duration limits (Policy 6.28.b)
+  if (t === "QUARANTINE") {
+    const quarantineCheck = validateQuarantineLeaveDuration(workingDays);
+    if (!quarantineCheck.valid) {
+      return NextResponse.json(
+        error("quarantine_exceeds_maximum", quarantineCheck.reason, traceId, {
+          requested: workingDays,
+          maximum: 30,
+        }),
+        { status: 400 }
+      );
+    }
+    // Note: Exceptional approval (21-30 days) is handled by workflow (CEO approval required)
+  }
+
+  // Enforce special disability leave duration limits (Policy 6.27.c)
+  if (t === "SPECIAL_DISABILITY") {
+    const disabilityCheck = validateSpecialDisabilityDuration(workingDays);
+    if (!disabilityCheck.valid) {
+      return NextResponse.json(
+        error("disability_exceeds_maximum", disabilityCheck.reason, traceId, {
+          requested: workingDays,
+          maximum: 180,
+        }),
+        { status: 400 }
+      );
+    }
+  }
+
+  // Enforce extraordinary leave duration limits (Policy 6.22.a, 6.22.b)
+  if (t === "EXTRAWITHPAY" || t === "EXTRAWITHOUTPAY") {
+    const extraordinaryCheck = validateExtraordinaryLeaveDuration(workingDays, requester.joinDate);
+    if (!extraordinaryCheck.valid) {
+      return NextResponse.json(
+        error("extraordinary_exceeds_maximum", extraordinaryCheck.reason, traceId, {
+          requested: workingDays,
+          maxAllowed: extraordinaryCheck.maxAllowed,
+        }),
+        { status: 400 }
+      );
+    }
+  }
+
+  // Enforce study leave duration limits (Policy 6.25.b)
+  if (t === "STUDY") {
+    // Check if user has previous approved study leave
+    const previousStudyLeaves = await prisma.leaveRequest.findMany({
+      where: {
+        requesterId: me.id,
+        type: "STUDY",
+        status: "APPROVED",
+      },
+      orderBy: { endDate: "desc" },
+    });
+
+    const previousTotalDays = previousStudyLeaves.reduce(
+      (sum, leave) => sum + leave.workingDays,
+      0
+    );
+
+    const studyCheck = validateStudyLeaveDuration(workingDays, previousTotalDays);
+
+    if (!studyCheck.valid) {
+      return NextResponse.json(
+        error("study_leave_duration_exceeded", studyCheck.reason, traceId, {
+          requested: workingDays,
+          previousDays: previousTotalDays,
+          totalDays: studyCheck.totalDays,
+          isExtension: studyCheck.isExtension,
+        }),
+        { status: 400 }
+      );
+    }
+
+    // Log if this is an extension requiring Board approval
+    if (studyCheck.requiresBoardApproval) {
+      await prisma.auditLog.create({
+        data: {
+          actorEmail: me.email,
+          action: "STUDY_LEAVE_EXTENSION_REQUESTED",
+          targetEmail: me.email,
+          details: {
+            requestedDays: workingDays,
+            previousDays: previousTotalDays,
+            totalDays: studyCheck.totalDays,
+            requiresBoardApproval: true,
+            message: "Study leave extension requires Board of Directors approval per Policy 6.25.b",
+          },
+        },
+      });
+    }
+
+    // Enforce study leave retirement eligibility (Policy 6.25.a)
+    // Employee must have at least 5 years until retirement after study leave ends
+    const retirementCheck = validateStudyLeaveRetirement(
+      requester.retirementDate,
+      end
+    );
+
+    if (!retirementCheck.valid) {
+      return NextResponse.json(
+        error("study_leave_retirement_insufficient", retirementCheck.reason, traceId, {
+          studyLeaveEnd: end.toISOString(),
+          retirementDate: requester.retirementDate?.toISOString(),
+          yearsUntilRetirement: retirementCheck.yearsUntilRetirement,
+        }),
+        { status: 400 }
+      );
+    }
+
+    // Log warning if retirement date not set
+    if (requester.retirementDate === null) {
+      await prisma.auditLog.create({
+        data: {
+          actorEmail: me.email,
+          action: "STUDY_LEAVE_NO_RETIREMENT_DATE",
+          targetEmail: me.email,
+          details: {
+            message: "Study leave requested without retirement date set. Cannot validate 5-year buffer requirement per Policy 6.25.a",
+            studyLeaveEnd: end.toISOString(),
+          },
+        },
+      });
     }
   }
 
@@ -292,13 +510,8 @@ export async function POST(req: Request) {
 
   const warnings = makeWarnings(parsedInput.type, today, startDateOnly);
 
-  // Soft warning: CL advance notice <5 working days (allow submit)
-  if (t === "CASUAL") {
-    const workingDaysUntilStart = await countWorkingDays(today, startDateOnly);
-    if (workingDaysUntilStart < policy.clMinNoticeDays) {
-      warnings.clShortNotice = true;
-    }
-  }
+  // Note: Casual leave is EXEMPT from notice requirements per Policy 6.11.a
+  // "All applications for leave... at least 5 working days ahead (with the exception of casual leave and quarantine leave)"
 
   const needsCertificate = parsedInput.needsCertificate ?? mustCert;
   if (mustCert && certificateUrl) {
@@ -306,6 +519,11 @@ export async function POST(req: Request) {
   } else if (mustCert) {
     // This shouldn't happen due to hard block above, but keep for consistency
     (warnings as Record<string, boolean>).mlNeedsCertificate = true;
+  }
+
+  // Add medical leave excess warning if applicable
+  if (mlExcessWarning) {
+    (warnings as Record<string, any>).mlExcessWarning = mlExcessWarning;
   }
 
   const year = yearOf(start);
@@ -336,6 +554,9 @@ export async function POST(req: Request) {
     }
   }
   
+  // Medical leave >14 days advisory (Policy 6.21.c)
+  // Note: This is a soft warning, not a hard block. Users can still apply but are advised to use EL/SPECIAL
+  let mlExcessWarning: string | undefined;
   if (t === "MEDICAL") {
     const yearStart = new Date(year, 0, 1);
     const yearEnd = new Date(year + 1, 0, 1);
@@ -348,16 +569,14 @@ export async function POST(req: Request) {
       },
       _sum: { workingDays: true },
     });
-    const totalUsed = (usedThisYear._sum.workingDays ?? 0) + workingDays;
-    if (totalUsed > policy.accrual.ML_PER_YEAR) {
-      return NextResponse.json(
-        error("ml_annual_cap_exceeded", undefined, traceId, {
-          cap: policy.accrual.ML_PER_YEAR,
-          used: usedThisYear._sum.workingDays ?? 0,
-          requested: workingDays,
-        }),
-        { status: 400 }
-      );
+
+    const mlCheck = checkMedicalLeaveAnnualLimit(
+      usedThisYear._sum.workingDays ?? 0,
+      workingDays
+    );
+
+    if (!mlCheck.withinLimit) {
+      mlExcessWarning = mlCheck.warning;
     }
   }
   
