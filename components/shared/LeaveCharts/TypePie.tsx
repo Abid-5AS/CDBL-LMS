@@ -8,14 +8,14 @@ import {
   Tooltip as RechartsTooltip,
   Legend,
 } from "recharts";
-import { ChartTooltip } from "@/components/reports/ChartTooltip";
 import { useTheme } from "next-themes";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
 
 export type Slice = {
-  type: "CASUAL" | "EARNED" | "MEDICAL";
+  type?: "CASUAL" | "EARNED" | "MEDICAL";
+  name?: string; // Support flexible naming
   value: number; // counts; percent computed inside
 };
 
@@ -28,24 +28,72 @@ export type TypePieProps = {
   className?: string;
 };
 
-// Color tokens from leave type palette (synced with theme.css design tokens)
-// Light mode colors - matches --color-leave-* in theme.css
-const TYPE_COLORS_LIGHT: Record<Slice["type"], string> = {
-  EARNED: "#16a34a", // emerald-600 (matches --color-leave-earned)
-  CASUAL: "#2563eb", // blue-600 (matches --color-leave-casual)
-  MEDICAL: "#0ea5e9", // cyan-600 (matches --color-leave-medical)
+// Modern color palette using CSS variables for consistent theming
+const CHART_COLORS = [
+  "hsl(var(--chart-1))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-3))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-5))",
+];
+
+// Fallback colors for leave types (used when CSS variables unavailable)
+const TYPE_COLORS_MAP: Record<string, string> = {
+  EARNED: "hsl(var(--chart-2))",
+  CASUAL: "hsl(var(--chart-1))",
+  MEDICAL: "hsl(var(--chart-3))",
 };
 
-// Dark mode colors - matches dark theme in theme.css
-const TYPE_COLORS_DARK: Record<Slice["type"], string> = {
-  EARNED: "#34d399", // emerald-400
-  CASUAL: "#60a5fa", // blue-400
-  MEDICAL: "#22d3ee", // cyan-400
+// Custom glass-styled tooltip
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="glass-card rounded-lg p-3 border border-border/50 shadow-xl backdrop-blur-xl">
+        <p className="text-sm font-semibold text-foreground mb-2">{data.name}</p>
+        <div className="space-y-1">
+          <div className="flex items-center justify-between gap-3 text-xs">
+            <span className="text-muted-foreground">Count:</span>
+            <span className="font-semibold text-foreground">{data.value}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3 text-xs">
+            <span className="text-muted-foreground">Percentage:</span>
+            <span className="font-semibold text-foreground">{data.percent.toFixed(1)}%</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
+// Custom label renderer with better styling
+const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
+  if (percent < 5) return null; // Hide labels for small slices
+
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="white"
+      textAnchor={x > cx ? "start" : "end"}
+      dominantBaseline="central"
+      className="text-xs font-semibold"
+      style={{ textShadow: "0 0 4px rgba(0,0,0,0.8)" }}
+    >
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
 };
 
 /**
- * TypePie - Leave type distribution pie/donut chart
- * Consolidates LeaveTypePieChart and type distribution displays
+ * TypePie - Modern leave type distribution donut chart
+ * Enhanced with gradients, glass tooltips, and flexible data support
  */
 export function TypePie({
   data,
@@ -57,21 +105,36 @@ export function TypePie({
 }: TypePieProps) {
   const { theme } = useTheme();
 
-  // Compute percentages and total
+  // Compute percentages and total, support both type and name fields
   const chartData = useMemo(() => {
     const total = data.reduce((sum, slice) => sum + slice.value, 0);
     if (total === 0) return [];
 
-    return data.map((slice) => ({
-      name: leaveTypeLabel[slice.type] || slice.type,
-      value: slice.value,
-      percent: (slice.value / total) * 100,
-      type: slice.type,
-    }));
+    return data.map((slice, index) => {
+      // Support both typed and generic data
+      const displayName = slice.type
+        ? (leaveTypeLabel[slice.type] || slice.type)
+        : (slice.name || `Category ${index + 1}`);
+
+      return {
+        name: displayName,
+        value: slice.value,
+        percent: (slice.value / total) * 100,
+        type: slice.type,
+        originalIndex: index,
+      };
+    });
   }, [data]);
 
-  const isDark = theme === "dark";
-  const TYPE_COLORS = isDark ? TYPE_COLORS_DARK : TYPE_COLORS_LIGHT;
+  // Get color for a slice
+  const getSliceColor = (entry: any, index: number): string => {
+    // If it has a type, use type-specific color
+    if (entry.type && TYPE_COLORS_MAP[entry.type]) {
+      return TYPE_COLORS_MAP[entry.type];
+    }
+    // Otherwise use sequential colors
+    return CHART_COLORS[index % CHART_COLORS.length];
+  };
 
   if (chartData.length === 0) {
     return null; // Empty state handled by ChartContainer
@@ -86,12 +149,10 @@ export function TypePie({
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={({ name, percent }) =>
-              `${name} ${percent.toFixed(0)}%`
-            }
-            outerRadius={donut ? 80 : 100}
-            innerRadius={donut ? 50 : 0}
-            fill="#8884d8"
+            label={renderCustomLabel}
+            outerRadius={donut ? 90 : 110}
+            innerRadius={donut ? 60 : 0}
+            paddingAngle={2}
             dataKey="value"
             onClick={(e) => {
               if (onSliceClick && e?.type) {
@@ -103,41 +164,34 @@ export function TypePie({
                 onSliceClick(type);
               }
             }}
-            aria-label={`Leave type distribution chart showing ${chartData.length} leave types with total of ${chartData.reduce((sum, d) => sum + d.value, 0)} days`}
+            aria-label={`Leave type distribution chart showing ${chartData.length} categories with total of ${chartData.reduce((sum, d) => sum + d.value, 0)} items`}
           >
             {chartData.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
-                fill={TYPE_COLORS[entry.type as Slice["type"]] || "#8884d8"}
+                fill={getSliceColor(entry, index)}
+                className="transition-opacity hover:opacity-80 cursor-pointer"
+                stroke={theme === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}
+                strokeWidth={2}
               />
             ))}
           </Pie>
-          <RechartsTooltip
-            content={(props) => {
-              if (!props.active || !props.payload?.[0]) return null;
-              const entry = props.payload[0].payload;
-              return (
-                <ChartTooltip
-                  active={props.active}
-                  payload={[
-                    {
-                      ...props.payload[0],
-                      name: entry.name,
-                      value: `${entry.value} (${entry.percent.toFixed(1)}%)`,
-                    },
-                  ]}
-                  label={props.label}
-                />
-              );
-            }}
-          />
+          <RechartsTooltip content={<CustomTooltip />} />
           {showLegend && (
             <Legend
-              wrapperStyle={{ fontSize: "12px" }}
+              wrapperStyle={{
+                fontSize: "12px",
+                paddingTop: "10px",
+              }}
               iconType="circle"
+              iconSize={10}
               formatter={(value, entry: any) => {
                 const data = entry.payload;
-                return `${value}: ${data.value} (${data.percent.toFixed(1)}%)`;
+                return (
+                  <span className="text-xs text-muted-foreground">
+                    {value}: <span className="font-semibold text-foreground">{data.value}</span> ({data.percent.toFixed(1)}%)
+                  </span>
+                );
               }}
             />
           )}
