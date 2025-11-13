@@ -166,27 +166,46 @@ enum Role {
 
 ---
 
-## 5. Approval Permissions by Role
+## 5. Approval Permissions by Role (v2.0)
 
-### HR_ADMIN (Step 1)
-- **Actions**: Can FORWARD to DEPT_HEAD
-- **Cannot**: APPROVE or REJECT (not final decision maker)
-- **Function**: `canPerformAction(role, action)`
-- **Location**: `lib/workflow.ts` lines 34-46
+### DEFAULT Chain (EL, ML, and most leave types)
 
-### DEPT_HEAD (Step 2)
-- **Actions**: Can FORWARD to HR_HEAD
-- **Cannot**: APPROVE or REJECT
+#### HR_ADMIN (Step 1)
+- **Actions**: Can FORWARD to DEPT_HEAD or REJECT (operational role)
+- **Cannot**: APPROVE (not final approver)
+- **Function**: `canPerformAction(role, action, type)`
+- **Location**: `lib/workflow.ts` lines 75-109
+- **Note**: HR_ADMIN can REJECT as operational role to block invalid requests early
 
-### HR_HEAD (Step 3)
-- **Actions**: Can APPROVE or REJECT (final decision)
-- **Cannot**: FORWARD (no next role or is final approver)
+#### DEPT_HEAD (Step 2)
+- **Actions**: Can FORWARD to HR_HEAD or RETURN for modification
+- **Cannot**: APPROVE or REJECT (not final approver in DEFAULT chain)
+- **Note**: For CASUAL leave, DEPT_HEAD IS the final approver
 
-### CEO (Step 4)
-- **Actions**: Can APPROVE or REJECT (final decision)
+#### HR_HEAD (Step 3)
+- **Actions**: Can FORWARD to CEO or RETURN for modification
+- **Cannot**: APPROVE or REJECT (not final approver in DEFAULT chain)
+- **Note**: Intermediate approver, must forward to CEO for final decision
+
+#### CEO (Step 4 - **Final Approver**)
+- **Actions**: Can APPROVE or REJECT
 - **Cannot**: FORWARD (last in chain)
+- **Authority**: CEO is the **sole final approver** for DEFAULT leave types
 
-> **Updated Behavior:** Roles now determined dynamically from `getChainFor(type)`. Only final approver in the active chain can `APPROVE` or `REJECT`. Intermediate roles can only `FORWARD` or `RETURN`.
+### CASUAL Chain
+
+#### DEPT_HEAD (Step 1 - **Final Approver**)
+- **Actions**: Can APPROVE or REJECT (final approver for CASUAL leave)
+- **Chain**: CASUAL uses single-step chain: `["DEPT_HEAD"]`
+- **Policy**: Per Policy 6.10 - CASUAL leave bypasses normal approval chain
+- **Authority**: DEPT_HEAD is the **sole final approver** for CASUAL leave
+
+> **Key Rules (v2.0)**:
+> - Roles determined dynamically from `getChainFor(type)`
+> - Only **final approver** in the active chain can **APPROVE**
+> - Intermediate roles can only **FORWARD** or **RETURN**
+> - HR_ADMIN can **REJECT** as operational role (but cannot APPROVE)
+> - CEO is final approver for DEFAULT, DEPT_HEAD is final approver for CASUAL
 
 ---
 

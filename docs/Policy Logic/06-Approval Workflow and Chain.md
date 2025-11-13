@@ -92,18 +92,25 @@ type ApprovalAction = "FORWARD" | "APPROVE" | "REJECT"
 ```
 
 ### Action Permissions by Role
-**Rule**: Permissions depend on **position in the active chain** for the request’s leave type.
+**Rule**: Permissions depend on **position in the active chain** for the request's leave type.
 
 | Position in Chain | FORWARD | APPROVE | REJECT |
 |-------------------|---------|---------|--------|
-| Intermediate step | ✅ Yes  | ❌ No   | ❌ No  |
+| Intermediate step | ✅ Yes  | ❌ No   | ✅ HR_ADMIN only* |
 | Final step        | ❌ No   | ✅ Yes  | ✅ Yes |
 
+***Exception**: HR_ADMIN can REJECT as operational role (to block invalid requests early), but cannot APPROVE.
+
+**Final Approvers by Leave Type**:
+- **DEFAULT** (EL, ML, etc.): CEO is the sole final approver
+- **CASUAL**: DEPT_HEAD is the sole final approver
+
 **Functions**:
-- `isFinalApprover(role, type)` → true if `role` is last in `getChainFor(type)`.
+- `isFinalApprover(role, type)` → true if `role` is last in `getChainFor(type)`
 - `canPerformAction(role, action, type)`:
   - `FORWARD` → allowed if not final step
-  - `APPROVE/REJECT` → allowed only if final step
+  - `APPROVE` → allowed only if final step
+  - `REJECT` → allowed if final step OR if role is HR_ADMIN (operational exception)
 
 ---
 

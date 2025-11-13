@@ -35,28 +35,27 @@ enum LeaveType {
 
 ## 2. Entitlement Rules (Hardcoded Constants)
 
-### Source: `lib/policy.ts` (Policy Version v1.1)
+### Source: `lib/policy.ts` (Policy Version v2.0)
 
-| Leave Type      | Annual Entitlement                      | Consecutive Limit | Notice Requirement | Carry Forward      |
-| --------------- | --------------------------------------- | ----------------- | ------------------ | ------------------ |
-| **EARNED (EL)** | 20 days/year (accrual: 2 days/month) ⚠️ | None              | 15 days minimum ⚠️ | Yes, up to 60 days |
+| Leave Type      | Annual Entitlement                     | Consecutive Limit | Notice Requirement    | Carry Forward      |
+| --------------- | -------------------------------------- | ----------------- | --------------------- | ------------------ |
+| **EARNED (EL)** | 24 days/year (accrual: 2 days/month) ✅ | None              | 5 working days min ✅ | Yes, up to 60 days |
+| **CASUAL (CL)** | 10 days/year | 3 days maximum per spell | None (exempt) ✅ | No |
+| **MEDICAL (ML)** | 14 days/year | None | None (same-day allowed) ✅ | No |
 
-> ⚠️ **Contradiction Note**:
+> ✅ **Policy Alignment Verified (v2.0)**:
 >
-> - **SourceOfTruth.md (6.19)** states: "2 working days per month = **24 days/year**"
-> - **System implements**: 20 days/year (assuming 10 working months)
-> - **SourceOfTruth.md (6.11)** states: "All non-sick leave → submit **≥5 working days ahead**"
-> - **System enforces**: 15 days minimum for EL
-> - **Action Required**: Clarify with HR which values are correct
->   | **CASUAL (CL)** | 10 days/year | 3 days maximum per spell | 5 days (soft warning) | No |
->   | **MEDICAL (ML)** | 14 days/year | None | None (same-day allowed) | No |
+> - **EL Accrual**: System now implements **24 days/year** (2 days/month × 12 months) per Policy 6.19 ✅
+> - **EL Notice**: System now enforces **≥5 working days** advance notice per Policy 6.11 ✅
+> - **CL Notice**: Casual Leave is exempt from advance notice requirement per Policy 6.11 ✅
+> - All values now consistent with HR Policy & Procedures Manual Chapter 06
 
 ### Policy Constants (Exact Values)
 
 ```typescript
-// From lib/policy.ts
+// From lib/policy.ts (v2.0)
 accrual: {
-  EL_PER_YEAR: 20,
+  EL_PER_YEAR: 24,  // ✅ Updated from 20 to 24 per Policy 6.19
   CL_PER_YEAR: 10,
   ML_PER_YEAR: 14
 }
@@ -67,7 +66,7 @@ carryForwardCap: {
 elAccrualPerMonth: 2  // EL accrues 2 working days per month
 clMaxConsecutiveDays: 3
 clMinNoticeDays: 5  // Warning only (soft rule)
-elMinNoticeDays: 15 // Hard requirement
+elMinNoticeDays: 5  // ✅ Updated from 15 to 5 working days per Policy 6.11
 ```
 
 ---
@@ -96,16 +95,17 @@ elMinNoticeDays: 15 // Hard requirement
 
 ### Advance Notice Requirement
 
-- **Minimum**: 15 days before start date
+- **Minimum**: 5 working days before start date ✅
 - **Enforcement**: Hard block (returns HTTP 400)
 - **Error code**: `el_insufficient_notice`
 - **Source**: `app/api/leaves/route.ts` lines 173-182
+- **Policy Reference**: Policy 6.11 - "All non-sick leave → submit ≥5 working days ahead"
 
-> ⚠️ **Contradiction with SourceOfTruth.md (6.11)**:
+> ✅ **Policy Alignment Verified (v2.0)**:
 >
-> - **HR Policy states**: "All non-sick leave → submit ≥ 5 working days ahead"
-> - **System enforces**: 15 days minimum for EL
-> - **Clarification needed**: Is EL subject to the general 5-day rule or does it have a special 15-day requirement?
+> - **EL Notice**: System now correctly enforces **5 working days** advance notice per Policy 6.11
+> - **Working Days Calculation**: Uses `countWorkingDays()` function excluding Friday/Saturday
+> - **Consistent with HR Policy**: EL follows general advance notice rule for non-sick leave
 
 ---
 

@@ -43,13 +43,29 @@ System of record: Prisma `LeaveRequest` table (MySQL).
 
 5) Approval Hierarchy (System Implementation)
 ---------------------------------------------
-- **4-Step Approval Chain**: HR_ADMIN → DEPT_HEAD → HR_HEAD → CEO
 
-**Current Implementation**:
-- HR_ADMIN: Validates policy compliance, forwards to DEPT_HEAD
-- DEPT_HEAD: Reviews team requests, forwards to HR_HEAD
-- HR_HEAD: Final approval authority, can approve/reject or forward to CEO
-- CEO: Executive approval authority for sensitive/strategic cases
+### DEFAULT Approval Chain (EL, ML, and most leave types)
+- **4-Step Chain**: HR_ADMIN → DEPT_HEAD → HR_HEAD → CEO
+
+**Implementation**:
+- **HR_ADMIN** (Step 1): Validates policy compliance, can FORWARD to DEPT_HEAD or REJECT (operational role)
+- **DEPT_HEAD** (Step 2): Reviews team requests, can only FORWARD to HR_HEAD or RETURN for modification
+- **HR_HEAD** (Step 3): Reviews requests, can only FORWARD to CEO or RETURN for modification
+- **CEO** (Step 4): **Final approver** - can APPROVE or REJECT
+
+### CASUAL Leave Approval Chain
+- **1-Step Chain**: DEPT_HEAD only
+
+**Implementation**:
+- **DEPT_HEAD**: **Final approver** for CASUAL leave - can APPROVE or REJECT directly
+- HR_ADMIN is not involved in CASUAL leave approval per Policy 6.10 exception
+
+**Key Rules**:
+1. Chain must be followed sequentially - **no skipping steps**
+2. Only the **final approver** in each chain can APPROVE
+3. Intermediate roles can only FORWARD or RETURN for modification
+4. HR_ADMIN can REJECT as operational role (but cannot APPROVE)
+5. Self-approval is prevented (requestor cannot approve own leave)
 
 Each step creates an approval record and audit log. See [Approval Workflow Documentation](./Policy%20Logic/06-Approval-Workflow-and-Chain.md) for details.
 
