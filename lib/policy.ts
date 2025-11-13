@@ -7,9 +7,10 @@ export const policy = {
   carryForwardCap: { EL: 60, EARNED: 60 }, // cap total carry at 60
   allowBackdate: { EL: true, CL: false, ML: true, EARNED: true, CASUAL: false, MEDICAL: true },
   maxBackdateDays: { EL: 30, ML: 30, EARNED: 30, MEDICAL: 30 },
-  elMinNoticeDays: 5, // hard requirement: ≥5 working days per Policy 6.11
+  elMinNoticeDays: 5, // hard requirement: ≥5 working days per Policy 6.11 (for EL only)
   clMaxConsecutiveDays: 3, // Policy: max 3 days per spell
-  // Note: CL is exempt from notice period per Policy 6.11.a
+  // IMPORTANT: CL and Quarantine leave are EXEMPT from notice requirements per Policy 6.11.a
+  // "All applications for leave... at least 5 working days ahead (with the exception of casual leave and quarantine leave)"
   elAccrualPerMonth: 2, // EL accrues 2 days/month
 };
 

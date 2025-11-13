@@ -510,13 +510,8 @@ export async function POST(req: Request) {
 
   const warnings = makeWarnings(parsedInput.type, today, startDateOnly);
 
-  // Soft warning: CL advance notice <5 working days (allow submit)
-  if (t === "CASUAL") {
-    const workingDaysUntilStart = await countWorkingDays(today, startDateOnly);
-    if (workingDaysUntilStart < policy.clMinNoticeDays) {
-      warnings.clShortNotice = true;
-    }
-  }
+  // Note: Casual leave is EXEMPT from notice requirements per Policy 6.11.a
+  // "All applications for leave... at least 5 working days ahead (with the exception of casual leave and quarantine leave)"
 
   const needsCertificate = parsedInput.needsCertificate ?? mustCert;
   if (mustCert && certificateUrl) {
