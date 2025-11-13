@@ -15,7 +15,6 @@ import {
   EnhancedTableHead,
   EnhancedTableRow,
   EnhancedTableCell,
-  EmptyState,
   Button,
   Badge,
   Tooltip,
@@ -25,7 +24,7 @@ import {
 } from "@/components/ui";
 
 // Shared Components (barrel export)
-import { FilterBar } from "@/components/shared";
+import { FilterBar, EmptyState } from "@/components/shared";
 import { CompletePagination } from "@/components/shared/pagination/Pagination";
 
 // Lib utilities (barrel export)

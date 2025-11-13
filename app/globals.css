@@ -426,11 +426,11 @@
   --border: var(--color-border);
   --input: var(--color-border);
   --ring: var(--color-ring);
-  --chart-1: #6366f1;
-  --chart-2: #22c55e;
-  --chart-3: #f97316;
-  --chart-4: #0ea5e9;
-  --chart-5: #a855f7;
+  --chart-1: 221 83% 53%;  /* Vibrant Indigo #6366f1 */
+  --chart-2: 142 71% 45%;  /* Vibrant Green #22c55e */
+  --chart-3: 25 95% 53%;   /* Vibrant Orange #f97316 */
+  --chart-4: 199 89% 48%;  /* Vibrant Sky Blue #0ea5e9 */
+  --chart-5: 271 81% 66%;  /* Vibrant Purple #a855f7 */
   --sidebar: #ffffff;
   --sidebar-foreground: var(--color-foreground);
   --sidebar-primary: var(--color-primary);
@@ -507,11 +507,11 @@
   --border: var(--color-border);
   --input: rgba(113, 113, 122, 0.35);
   --ring: var(--color-ring);
-  --chart-1: #818cf8;
-  --chart-2: #4ade80;
-  --chart-3: #fb923c;
-  --chart-4: #38bdf8;
-  --chart-5: #c084fc;
+  --chart-1: 226 80% 74%;  /* Lighter Indigo #818cf8 */
+  --chart-2: 142 76% 61%;  /* Lighter Green #4ade80 */
+  --chart-3: 20 97% 61%;   /* Lighter Orange #fb923c */
+  --chart-4: 199 91% 60%;  /* Lighter Sky Blue #38bdf8 */
+  --chart-5: 270 95% 75%;  /* Lighter Purple #c084fc */
   --sidebar: rgba(24, 24, 27, 0.78);
   --sidebar-foreground: var(--color-foreground);
   --sidebar-primary: var(--color-primary);
