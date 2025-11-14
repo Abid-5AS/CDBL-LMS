@@ -56,3 +56,37 @@ export {
   type UnusedExport,
   type SideEffectsAnalysis,
 } from "./treeshaking";
+
+// Lazy loading
+export {
+  dynamicImport,
+  getImportMetrics,
+  clearImportCache,
+  useIntersectionObserver,
+  preloadRoute,
+  createRoutePrefetcher,
+  recordComponentLazyLoad,
+  analyzeCodeSplittingOpportunities,
+  preloadCriticalResources,
+  prefetchResources,
+  getLazyLoadingSummary,
+  type DynamicImportResult,
+  type ChunkLoadStrategy,
+} from "./lazyLoading";
+
+// Code splitting
+export {
+  getOptimalSplitChunksConfig,
+  getRouteChunksConfig,
+  getWebpackOptimizationConfig,
+  getNextJsOptimizationConfig,
+  analyzeDependencies,
+  getChunkSizeWarnings,
+  getCodeSplittingStrategy,
+  createChunkBudget,
+  checkChunkBudget,
+  getCodeSplittingRecommendations,
+  generateCodeSplittingReport,
+  type ChunkConfig,
+  type ChunkAnalysis,
+} from "./codeSplitting";
