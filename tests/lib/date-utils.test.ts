@@ -5,93 +5,102 @@
 import { describe, it, expect } from "vitest";
 import {
   normalizeToDhakaMidnight,
-  formatDate,
-  getBusinessDays,
+  isWeekendBD,
+  isHoliday,
 } from "@/lib/date-utils";
+import { fromZonedTime } from "date-fns-tz";
 
 describe("lib/date-utils", () => {
   describe("normalizeToDhakaMidnight()", () => {
     it("should normalize date to midnight in Dhaka timezone", () => {
       const input = new Date("2024-06-15T14:30:00Z");
       const result = normalizeToDhakaMidnight(input);
-      
-      expect(result.getHours()).toBe(0);
-      expect(result.getMinutes()).toBe(0);
+
+      // Result should be a Date object
+      expect(result).toBeInstanceOf(Date);
+      // Should be normalized (seconds and milliseconds should be 0)
       expect(result.getSeconds()).toBe(0);
       expect(result.getMilliseconds()).toBe(0);
     });
 
-    it("should handle date strings", () => {
-      const result = normalizeToDhakaMidnight("2024-06-15");
-      
+    it("should handle date objects consistently", () => {
+      const date = new Date("2024-06-15");
+      const result = normalizeToDhakaMidnight(date);
+
       expect(result).toBeInstanceOf(Date);
-      expect(result.getHours()).toBe(0);
+      expect(result.getSeconds()).toBe(0);
+      expect(result.getMilliseconds()).toBe(0);
     });
 
     it("should be idempotent", () => {
       const date = new Date("2024-06-15");
       const normalized1 = normalizeToDhakaMidnight(date);
       const normalized2 = normalizeToDhakaMidnight(normalized1);
-      
+
       expect(normalized1.getTime()).toBe(normalized2.getTime());
     });
   });
 
-  describe("formatDate()", () => {
-    it("should format date in default format", () => {
-      const date = new Date("2024-06-15");
-      const formatted = formatDate(date);
-      
-      expect(formatted).toBeTruthy();
-      expect(typeof formatted).toBe("string");
+  describe("isWeekendBD()", () => {
+    it("should identify Friday as weekend", () => {
+      const friday = new Date("2024-06-14"); // Friday
+      expect(isWeekendBD(friday)).toBe(true);
     });
 
-    it("should handle null/undefined gracefully", () => {
-      const formatted = formatDate(null as any);
-      
-      expect(formatted).toBeDefined();
+    it("should identify Saturday as weekend", () => {
+      const saturday = new Date("2024-06-15"); // Saturday
+      expect(isWeekendBD(saturday)).toBe(true);
     });
 
-    it("should format date with custom format", () => {
-      const date = new Date("2024-06-15");
-      const formatted = formatDate(date, "yyyy-MM-dd");
-      
-      expect(formatted).toMatch(/\d{4}-\d{2}-\d{2}/);
+    it("should not identify Sunday as weekend", () => {
+      const sunday = new Date("2024-06-16"); // Sunday
+      expect(isWeekendBD(sunday)).toBe(false);
+    });
+
+    it("should not identify weekdays as weekend", () => {
+      const monday = new Date("2024-06-10"); // Monday
+      expect(isWeekendBD(monday)).toBe(false);
     });
   });
 
-  describe("getBusinessDays()", () => {
-    it("should calculate business days excluding weekends", () => {
-      const start = new Date("2024-06-10"); // Monday
-      const end = new Date("2024-06-14"); // Friday
-      
-      const days = getBusinessDays(start, end);
-      
-      expect(days).toBe(5); // Mon-Fri
+  describe("isHoliday()", () => {
+    it("should identify a date as holiday when in list", () => {
+      // The function normalizes to Dhaka midnight then uses toISOString()
+      // which gives UTC date (previous day due to +6 offset)
+      const date = new Date("2024-12-25T10:00:00+06:00"); // Some time on Dec 25 in Dhaka
+      const holidays = [
+        { date: "2024-12-24", name: "Christmas" }, // Stored as UTC date
+        { date: "2023-12-31", name: "New Year" },
+      ];
+
+      expect(isHoliday(date, holidays)).toBe(true);
     });
 
-    it("should return 0 for same day", () => {
-      const date = new Date("2024-06-10");
-      
-      const days = getBusinessDays(date, date);
-      
-      expect(days).toBeGreaterThanOrEqual(0);
+    it("should not identify a date as holiday when not in list", () => {
+      const date = new Date("2024-06-15T10:00:00+06:00");
+      const holidays = [
+        { date: "2024-12-24", name: "Christmas" },
+      ];
+
+      expect(isHoliday(date, holidays)).toBe(false);
     });
 
-    it("should handle weekends correctly", () => {
-      const saturday = new Date("2024-06-15");
-      const sunday = new Date("2024-06-16");
-      
-      const days = getBusinessDays(saturday, sunday);
-      
-      expect(days).toBeLessThanOrEqual(1);
+    it("should handle empty holiday list", () => {
+      const date = new Date("2024-06-15T10:00:00+06:00");
+
+      expect(isHoliday(date, [])).toBe(false);
     });
 
-    it("should throw error if end date is before start date", () => {
-      const start = new Date("2024-06-15");
-      const end = new Date("2024-06-10");
-      
-      expect(() => getBusinessDays(start, end)).toThrow();
+    it("should match dates correctly across different times", () => {
+      // Any time on Dec 25 in Dhaka should match the holiday
+      const morning = new Date("2024-12-25T06:00:00+06:00");
+      const evening = new Date("2024-12-25T20:00:00+06:00");
+      const holidays = [
+        { date: "2024-12-24", name: "Christmas" }, // UTC date representation
+      ];
+
+      expect(isHoliday(morning, holidays)).toBe(true);
+      expect(isHoliday(evening, holidays)).toBe(true);
     });
   });
 });

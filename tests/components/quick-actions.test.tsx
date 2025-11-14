@@ -1,79 +1,79 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { QuickActions } from "@/components/shared/QuickActions";
+import { Plus, FileText, Calendar } from "lucide-react";
 
 describe("QuickActions Component", () => {
-  const mockLeaves = [
+  const mockActions = [
     {
-      id: 1,
-      type: "EARNED",
-      status: "APPROVED" as const,
-      workingDays: 5,
-      endDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
-      fitnessCertificateUrl: null,
+      label: "New Request",
+      icon: Plus,
+      href: "/leaves/new",
+      variant: "default" as const,
     },
     {
-      id: 2,
-      type: "MEDICAL",
-      status: "APPROVED" as const,
-      workingDays: 8,
-      endDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
-      fitnessCertificateUrl: null,
+      label: "View History",
+      icon: FileText,
+      href: "/leaves/history",
+      variant: "outline" as const,
     },
     {
-      id: 3,
-      type: "CASUAL",
-      status: "PENDING" as const,
-      workingDays: 2,
+      label: "Calendar",
+      icon: Calendar,
+      onClick: vi.fn(),
+      variant: "outline" as const,
     },
   ];
 
-  it("should show Request Cancellation only for APPROVED leaves", () => {
-    const approvedOnlyLeaves = mockLeaves.filter((l) => l.status === "APPROVED");
-    const { container } = render(<QuickActions leaves={approvedOnlyLeaves} isLoading={false} />);
-    
-    // Should show "Request Cancellation" button
-    const cancelButton = container.querySelector('button:has-text("Request Cancellation")');
-    expect(cancelButton).toBeTruthy();
+  it("should render actions in buttons variant", () => {
+    render(<QuickActions actions={mockActions} variant="buttons" />);
+
+    expect(screen.getByText("New Request")).toBeInTheDocument();
+    expect(screen.getByText("View History")).toBeInTheDocument();
+    expect(screen.getByText("Calendar")).toBeInTheDocument();
   });
 
-  it("should show Return to Duty only for ML > 7 days that has ended and missing fitness cert", () => {
-    const medicalLeaves = mockLeaves.filter(
-      (l) => l.type === "MEDICAL" && l.status === "APPROVED" && (l.workingDays ?? 0) > 7
+  it("should render actions in card variant with title", () => {
+    render(
+      <QuickActions
+        actions={mockActions}
+        variant="card"
+        title="Quick Actions"
+      />
     );
-    
-    // Filter by endDate < today and missing fitnessCertificateUrl
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const eligibleLeaves = medicalLeaves.filter((l) => {
-      if (!l.endDate) return false;
-      const endDate = new Date(l.endDate);
-      endDate.setHours(0, 0, 0, 0);
-      const hasEnded = endDate < today;
-      const missingFitnessCert = !l.fitnessCertificateUrl;
-      return hasEnded && missingFitnessCert;
-    });
 
-    expect(eligibleLeaves.length).toBeGreaterThan(0);
+    expect(screen.getByText("Quick Actions")).toBeInTheDocument();
+    expect(screen.getByText("New Request")).toBeInTheDocument();
   });
 
-  it("should hide Return to Duty when fitness certificate exists", () => {
-    const medicalLeaveWithCert = {
-      id: 2,
-      type: "MEDICAL",
-      status: "APPROVED" as const,
-      workingDays: 8,
-      endDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-      fitnessCertificateUrl:
-        "/api/files/signed/fitness-cert.pdf?expires=123&sig=abc",
-    };
+  it("should render actions in dropdown variant", () => {
+    render(<QuickActions actions={mockActions} variant="dropdown" />);
 
-    const { container } = render(<QuickActions leaves={[medicalLeaveWithCert]} isLoading={false} />);
-    
-    // Should NOT show "Return to Duty" when certificate exists
-    const returnButton = container.querySelector('button:has-text("Return to Duty")');
-    expect(returnButton).toBeFalsy();
+    // Dropdown trigger should be present
+    expect(screen.getByRole("button")).toBeInTheDocument();
+  });
+
+  it("should render action with badge", () => {
+    const actionsWithBadge = [
+      {
+        label: "Pending Approvals",
+        icon: FileText,
+        href: "/approvals",
+        badge: 5,
+      },
+    ];
+
+    render(<QuickActions actions={actionsWithBadge} variant="card" />);
+
+    expect(screen.getByText("5")).toBeInTheDocument();
+  });
+
+  it("should handle compact mode", () => {
+    const { container } = render(
+      <QuickActions actions={mockActions} variant="card" compact={true} />
+    );
+
+    expect(container.querySelector('[class*="min-w-[120px]"]')).toBeTruthy();
   });
 });
 

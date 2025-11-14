@@ -8,69 +8,79 @@ import { SearchInput } from "@/components/filters/SearchInput";
 
 describe("SearchInput Component", () => {
   it("should render with placeholder", () => {
-    render(<SearchInput placeholder="Search leaves..." />);
-    
+    const handleChange = vi.fn();
+    render(
+      <SearchInput
+        value=""
+        onChange={handleChange}
+        placeholder="Search leaves..."
+      />
+    );
+
     const input = screen.getByPlaceholderText("Search leaves...");
     expect(input).toBeInTheDocument();
   });
 
   it("should call onChange when user types", () => {
     const handleChange = vi.fn();
-    render(<SearchInput onChange={handleChange} />);
-    
+    render(<SearchInput value="" onChange={handleChange} />);
+
     const input = screen.getByRole("textbox");
     fireEvent.change(input, { target: { value: "test query" } });
-    
-    expect(handleChange).toHaveBeenCalled();
+
+    expect(handleChange).toHaveBeenCalledWith("test query");
   });
 
   it("should display initial value when provided", () => {
-    render(<SearchInput value="initial value" />);
-    
+    const handleChange = vi.fn();
+    render(<SearchInput value="initial value" onChange={handleChange} />);
+
     const input = screen.getByRole("textbox") as HTMLInputElement;
     expect(input.value).toBe("initial value");
   });
 
-  it("should clear input when clear button is clicked", () => {
+  it("should update value when typing", () => {
     const handleChange = vi.fn();
     render(<SearchInput value="test" onChange={handleChange} />);
-    
-    const clearButton = screen.queryByRole("button", { name: /clear/i });
-    if (clearButton) {
-      fireEvent.click(clearButton);
-      expect(handleChange).toHaveBeenCalled();
-    }
-  });
 
-  it("should be disabled when disabled prop is true", () => {
-    render(<SearchInput disabled={true} />);
-    
-    const input = screen.getByRole("textbox") as HTMLInputElement;
-    expect(input.disabled).toBe(true);
+    const input = screen.getByRole("textbox");
+    fireEvent.change(input, { target: { value: "new value" } });
+
+    expect(handleChange).toHaveBeenCalledWith("new value");
   });
 
   it("should show search icon", () => {
-    const { container } = render(<SearchInput />);
-    
+    const handleChange = vi.fn();
+    const { container } = render(<SearchInput value="" onChange={handleChange} />);
+
     // Check for search icon (svg or icon element)
-    const icon = container.querySelector('svg');
+    const icon = container.querySelector("svg");
     expect(icon).toBeTruthy();
   });
 
   it("should apply custom className", () => {
-    const { container } = render(<SearchInput className="custom-search" />);
-    
+    const handleChange = vi.fn();
+    const { container } = render(
+      <SearchInput value="" onChange={handleChange} className="custom-search" />
+    );
+
     const wrapper = container.firstChild as HTMLElement;
     expect(wrapper.className).toContain("custom-search");
   });
 
-  it("should handle onSubmit when Enter is pressed", () => {
-    const handleSubmit = vi.fn();
-    render(<SearchInput onSubmit={handleSubmit} />);
-    
-    const input = screen.getByRole("textbox");
-    fireEvent.keyDown(input, { key: "Enter", code: "Enter" });
-    
-    expect(handleSubmit).toHaveBeenCalled();
+  it("should render default placeholder when not provided", () => {
+    const handleChange = vi.fn();
+    render(<SearchInput value="" onChange={handleChange} />);
+
+    const input = screen.getByPlaceholderText("Search...");
+    expect(input).toBeInTheDocument();
+  });
+
+  it("should handle empty string value", () => {
+    const handleChange = vi.fn();
+    render(<SearchInput value="" onChange={handleChange} />);
+
+    const input = screen.getByRole("textbox") as HTMLInputElement;
+    expect(input.value).toBe("");
   });
 });
