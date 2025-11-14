@@ -14,10 +14,16 @@ import { cn } from "@/lib/utils";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
 
-interface HeatmapData {
+interface HeatmapBucket {
   date: string;
-  value: number;
-  type: string;
+  count: number;
+  types: string[];
+}
+
+interface HeatmapApiResponse {
+  buckets: HeatmapBucket[];
+  periodStart: string;
+  periodEnd: string;
 }
 
 interface LeaveHeatmapProps {
@@ -59,7 +65,7 @@ export function LeaveHeatmap({
 
   // Fetch heatmap data from its own API
   const typesParam = types.length > 0 ? types.join(",") : "all";
-  const { data: heatmapData, isLoading } = useSWR(
+  const { data: heatmapData, isLoading } = useSWR<HeatmapApiResponse>(
     `/api/analytics/heatmap?scope=${scope}&range=${range}&types=${typesParam}&status=${status}`,
     apiFetcher
   );
@@ -128,7 +134,7 @@ export function LeaveHeatmap({
 
     // Generate 53 weeks (to cover full year)
     for (let week = 0; week < 53; week++) {
-      const weekDays: Array<{ date: Date; data?: HeatmapData }> = [];
+      const weekDays: Array<{ date: Date; data?: { count: number; types: string[] } }> = [];
       for (let day = 0; day < 7; day++) {
         const dateStr = format(currentDate, "yyyy-MM-dd");
         const item = dataMap.get(dateStr);

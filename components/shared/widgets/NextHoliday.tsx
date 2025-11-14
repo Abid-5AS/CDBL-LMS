@@ -6,8 +6,17 @@ import { Calendar } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { apiFetcher } from "@/lib/apiClient";
 
+interface Holiday {
+  date: string;
+  name: string;
+}
+
+interface HolidaysResponse {
+  items: Holiday[];
+}
+
 export function NextHoliday() {
-  const { data, error, isLoading } = useSWR("/api/holidays?upcoming=true", apiFetcher, {
+  const { data, error, isLoading } = useSWR<HolidaysResponse>("/api/holidays?upcoming=true", apiFetcher, {
     revalidateOnFocus: false,
   });
 

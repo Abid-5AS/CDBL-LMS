@@ -70,7 +70,7 @@ export function TeamOnLeaveWidget() {
     date: string;
     count: number;
     members: Colleague[];
-  }>(`/api/team/on-leave?date=${today}&scope=team`, fetcher, {
+  }>(`/api/team/on-leave?date=${today}&scope=team`, apiFetcher, {
     revalidateOnFocus: true,
     refreshInterval: 60000, // Refresh every minute
   });

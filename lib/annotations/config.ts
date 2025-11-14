@@ -29,9 +29,9 @@ export interface AnnotationConfig {
   inlineHelp: boolean;
 }
 
-export interface AnnotationsState {
+export type AnnotationsState = {
   [key in AnnotationType]: AnnotationConfig;
-}
+};
 
 /**
  * Default configuration for all annotations
