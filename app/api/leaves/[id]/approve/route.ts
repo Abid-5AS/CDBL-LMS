@@ -152,6 +152,23 @@ export async function POST(
     });
   }
 
+  // Check if this is Casual Leave >3 days requiring auto-conversion (Policy 6.20.e)
+  // Per Policy 6.20(e): "if the total period exceeds... admissible in one spell, the entire period shall be converted into Earned Leave"
+  let clConversionApplied = false;
+  let actualLeaveType = leave.type;
+
+  if (leave.type === "CASUAL" && leave.workingDays > 3) {
+    // Auto-convert entire CL to EL per Policy 6.20.e
+    actualLeaveType = "EARNED";
+    clConversionApplied = true;
+
+    // Update leave type in database
+    await prisma.leaveRequest.update({
+      where: { id: leaveId },
+      data: { type: "EARNED" },
+    });
+  }
+
   // Update leave status
   await prisma.leaveRequest.update({
     where: { id: leaveId },
@@ -269,11 +286,12 @@ export async function POST(
     // It's just recorded in the conversion details for transparency
   } else {
     // Standard balance update for non-ML or ML ≤14 days
+    // Use actualLeaveType to handle CL >3 days auto-conversion to EL
     const balance = await prisma.balance.findUnique({
       where: {
         userId_type_year: {
           userId: leave.requesterId,
-          type: leave.type,
+          type: actualLeaveType,
           year: currentYear,
         },
       },
@@ -290,7 +308,7 @@ export async function POST(
         where: {
           userId_type_year: {
             userId: leave.requesterId,
-            type: leave.type,
+            type: actualLeaveType,
             year: currentYear,
           },
         },
@@ -312,6 +330,15 @@ export async function POST(
         leaveId,
         actorRole: userRole,
         step,
+        ...(clConversionApplied && {
+          clConversion: {
+            applied: true,
+            originalType: "CASUAL",
+            convertedType: "EARNED",
+            workingDays: leave.workingDays,
+            reason: "Casual leave >3 days auto-converted to Earned Leave per Policy 6.20.e",
+          },
+        }),
         ...(conversionDetails && {
           mlConversion: {
             applied: true,
@@ -326,6 +353,15 @@ export async function POST(
   return NextResponse.json({
     ok: true,
     status: newStatus,
+    ...(clConversionApplied && {
+      clConversion: {
+        applied: true,
+        originalType: "CASUAL",
+        convertedType: "EARNED",
+        workingDays: leave.workingDays,
+        message: "Casual leave >3 days was automatically converted to Earned Leave per Policy 6.20.e. The entire leave period will be deducted from your Earned Leave balance.",
+      },
+    }),
     ...(conversionDetails && {
       mlConversion: {
         applied: true,

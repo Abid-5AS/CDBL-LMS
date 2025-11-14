@@ -30,6 +30,11 @@ export type ValidationResult = {
     message: string;
     details?: Record<string, any>;
   };
+  warning?: {
+    code: string;
+    message: string;
+    details?: Record<string, any>;
+  };
 };
 
 export class LeaveValidator {
@@ -130,6 +135,7 @@ export class LeaveValidator {
 
   /**
    * Validate casual leave constraints
+   * Note: CL >3 days is ALLOWED per Policy 6.20(d,e) - will auto-convert to EL during approval
    */
   static async validateCasualLeave(
     userId: number,
@@ -137,20 +143,19 @@ export class LeaveValidator {
     endDate: Date,
     workingDays: number
   ): Promise<ValidationResult> {
-    // Check consecutive days limit
-    if (workingDays > policy.clMaxConsecutiveDays) {
-      return {
-        valid: false,
-        error: {
-          code: "cl_exceeds_consecutive_limit",
-          message: `Casual leave cannot exceed ${policy.clMaxConsecutiveDays} consecutive days`,
-          details: {
-            max: policy.clMaxConsecutiveDays,
-            requested: workingDays,
-          },
-        },
-      };
-    }
+    // CL >3 days: Allow but add warning (will auto-convert to EL per Policy 6.20.d/e)
+    const clConversionWarning =
+      workingDays > policy.clMaxConsecutiveDays
+        ? {
+            code: "cl_will_convert_to_el",
+            message: `Casual leave exceeding ${policy.clMaxConsecutiveDays} days will be automatically converted to Earned Leave per Policy 6.20(e). Your entire leave period (${workingDays} days) will be deducted from your Earned Leave balance.`,
+            details: {
+              max: policy.clMaxConsecutiveDays,
+              requested: workingDays,
+              willConvertToEL: true,
+            },
+          }
+        : undefined;
 
     // Check combination rule
     const startDateOnly = normalizeToDhakaMidnight(startDate);
@@ -179,7 +184,10 @@ export class LeaveValidator {
       };
     }
 
-    return { valid: true };
+    return {
+      valid: true,
+      ...(clConversionWarning && { warning: clConversionWarning }),
+    };
   }
 
   /**
