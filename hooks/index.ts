@@ -8,6 +8,11 @@ export { useLeaveRequests } from "./useLeaveRequests";
 export { useRetry, useFetchWithRetry } from "./useRetry";
 export { useErrorRecovery } from "./useErrorRecovery";
 
+// Color system hooks
+export { useRoleColors } from "./useRoleColors";
+export { useStatusColor } from "./useStatusColor";
+export { useDarkMode } from "./useDarkMode";
+
 // Note: These are already re-exported from @/lib:
 // - useDebounce (from @/lib/use-debounce)
 // - useUser (from @/lib/user-context)
