@@ -20,6 +20,7 @@ import { countWorkingDays } from "@/lib/working-days";
 import { normalizeToDhakaMidnight } from "@/lib/date-utils";
 import {
   violatesCasualLeaveCombination,
+  violatesCasualLeaveSideTouch,
   validatePaternityLeaveEligibility,
 } from "@/lib/leave-validation";
 
@@ -136,6 +137,7 @@ export class LeaveValidator {
   /**
    * Validate casual leave constraints
    * Note: CL >3 days is ALLOWED per Policy 6.20(d,e) - will auto-convert to EL during approval
+   * IMPORTANT: Holiday rule STILL APPLIES even if CL will convert to EL (Policy 6.20.e)
    */
   static async validateCasualLeave(
     userId: number,
@@ -143,6 +145,29 @@ export class LeaveValidator {
     endDate: Date,
     workingDays: number
   ): Promise<ValidationResult> {
+    const startDateOnly = normalizeToDhakaMidnight(startDate);
+    const endDateOnly = normalizeToDhakaMidnight(endDate);
+
+    // CRITICAL: Check holiday side-touch rule FIRST (Policy 6.20.e - strict enforcement)
+    // This applies to ALL CL regardless of duration, even if it will convert to EL
+    const holidayViolation = await violatesCasualLeaveSideTouch(
+      startDateOnly,
+      endDateOnly
+    );
+
+    if (holidayViolation) {
+      return {
+        valid: false,
+        error: {
+          code: "cl_cannot_touch_holiday",
+          message: "Casual Leave cannot be preceded or succeeded by holidays or weekends (Policy 6.20.e). CL must be strictly isolated working days. Please use Earned Leave instead.",
+          details: {
+            requested: workingDays,
+          },
+        },
+      };
+    }
+
     // CL >3 days: Allow but add warning (will auto-convert to EL per Policy 6.20.d/e)
     const clConversionWarning =
       workingDays > policy.clMaxConsecutiveDays
@@ -157,10 +182,7 @@ export class LeaveValidator {
           }
         : undefined;
 
-    // Check combination rule
-    const startDateOnly = normalizeToDhakaMidnight(startDate);
-    const endDateOnly = normalizeToDhakaMidnight(endDate);
-
+    // Check combination rule (no adjacent leaves)
     const combinationCheck = await violatesCasualLeaveCombination(
       userId,
       startDateOnly,
