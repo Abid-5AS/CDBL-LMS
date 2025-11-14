@@ -395,9 +395,9 @@ export function PendingLeaveRequestsTable({
                         leave={leave as any}
                         index={index}
                         isProcessing={isProcessingThis}
-                        onRowClick={(leave) => handleRowClick(leave as any)}
-                        onForward={(leave) => handleForward(leave as any)}
-                        onReturn={(l) => handleQuickAction(l as any, "return")}
+                        onRowClick={(l: any) => handleRowClick(l as any)}
+                        onForward={(l: any) => handleForward(l as any)}
+                        onReturn={(l: any) => handleQuickAction(l as any, "return")}
                       />
                     );
                   })}

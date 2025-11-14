@@ -41,7 +41,7 @@ export function FilterBar({
   onDepartmentChange,
   onLeaveTypeChange,
 }: FilterBarProps) {
-  const { data: departmentsData } = useSWR<{ departments: any[] } | undefined>(
+  const { data: departmentsData } = useSWR<{ departments: any[] }>(
     "/api/departments",
     apiFetcher
   );

@@ -12,7 +12,7 @@ import { AlertCircle, Info, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { apiFetcher } from "@/lib/apiClient";
 
-interface Alert {
+interface AlertItem {
   type:
     | "low_balance"
     | "year_end_lapse"
@@ -27,13 +27,17 @@ interface Alert {
   };
 }
 
+interface AlertsResponse {
+  alerts: AlertItem[];
+}
+
 export function PolicyAlerts() {
-  const { data, error, isLoading } = useSWR("/api/dashboard/alerts", apiFetcher, {
+  const { data, error, isLoading } = useSWR<AlertsResponse>("/api/dashboard/alerts", apiFetcher, {
     revalidateOnFocus: true,
     refreshInterval: 300000, // Refresh every 5 minutes
   });
 
-  const alerts: Alert[] = data?.alerts || [];
+  const alerts: AlertItem[] = data?.alerts || [];
 
   if (isLoading) {
     return (
@@ -48,7 +52,7 @@ export function PolicyAlerts() {
     return null;
   }
 
-  const getSeverityConfig = (severity: Alert["severity"]) => {
+  const getSeverityConfig = (severity: AlertItem["severity"]) => {
     switch (severity) {
       case "critical":
         return {

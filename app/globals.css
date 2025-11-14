@@ -274,6 +274,9 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  /* System font fallbacks (Google Fonts disabled for production) */
+  --font-geist-sans: system-ui, -apple-system, sans-serif;
+  --font-geist-mono: ui-monospace, monospace;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 

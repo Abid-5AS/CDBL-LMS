@@ -14,10 +14,16 @@ import { cn } from "@/lib/utils";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
 
-interface HeatmapData {
+interface HeatmapBucket {
   date: string;
-  value: number;
-  type: string;
+  count: number;
+  types: string[];
+}
+
+interface HeatmapApiResponse {
+  buckets: HeatmapBucket[];
+  periodStart: string;
+  periodEnd: string;
 }
 
 interface LeaveHeatmapProps {
@@ -59,9 +65,7 @@ export function LeaveHeatmap({
 
   // Fetch heatmap data from its own API
   const typesParam = types.length > 0 ? types.join(",") : "all";
-  const { data: heatmapData, isLoading } = useSWR<
-    { buckets: any[]; periodStart?: string; periodEnd?: string } | undefined
-  >(
+  const { data: heatmapData, isLoading } = useSWR<HeatmapApiResponse>(
     `/api/analytics/heatmap?scope=${scope}&range=${range}&types=${typesParam}&status=${status}`,
     apiFetcher
   );
@@ -73,10 +77,10 @@ export function LeaveHeatmap({
     newTypes: string[],
     newStatus: string
   ) => {
-    setScope(newScope as any);
+    setScope(newScope as "me" | "team");
     setRange(newRange as any);
     setTypes(newTypes);
-    setStatus(newStatus);
+    setStatus(newStatus as any);
     if (onParamsChange) {
       onParamsChange({
         scope: newScope,
@@ -130,7 +134,7 @@ export function LeaveHeatmap({
 
     // Generate 53 weeks (to cover full year)
     for (let week = 0; week < 53; week++) {
-      const weekDays: Array<{ date: Date; data?: HeatmapData }> = [];
+      const weekDays: Array<{ date: Date; data?: { count: number; types: string[] } }> = [];
       for (let day = 0; day < 7; day++) {
         const dateStr = format(currentDate, "yyyy-MM-dd");
         const item = dataMap.get(dateStr);

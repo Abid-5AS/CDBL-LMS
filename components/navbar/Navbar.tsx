@@ -30,7 +30,6 @@ export function Navbar() {
         }}
         transition={{
           duration: 0.4,
-          ease: [0.22, 1, 0.36, 1],
           height: { duration: 0.3, ease: "easeInOut" },
         }}
         className="fixed top-0 z-50 w-full backdrop-blur-md bg-white/40 dark:bg-black/40"

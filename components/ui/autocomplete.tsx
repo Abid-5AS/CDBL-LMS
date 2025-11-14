@@ -89,7 +89,7 @@ export function Autocomplete({
   const [searchQuery, setSearchQuery] = React.useState("");
   const [options, setOptions] = React.useState(initialOptions);
   const [isLoading, setIsLoading] = React.useState(false);
-  const searchTimeoutRef = React.useRef<NodeJS.Timeout>();
+  const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // Convert value to array for consistent handling
   const selectedValues = React.useMemo(() => {

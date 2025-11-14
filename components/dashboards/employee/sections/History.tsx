@@ -177,10 +177,9 @@ export function HistoryAnalyticsCard({
 
   // Fetch summary data for analytics
   const { data: summaryData, isLoading: isLoadingSummary } = useSWR<{
-    summary?: any;
-    distribution?: any;
-    heatmap?: any;
-  } | undefined>(
+    summary: any;
+    distribution?: any[];
+  }>(
     `/api/dashboard/analytics/summary?period=${period}`,
     apiFetcher
   );

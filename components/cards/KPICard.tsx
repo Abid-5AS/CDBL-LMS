@@ -75,7 +75,6 @@ export function KPICard({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{
         duration: 0.4,
-        ease: [0.22, 1, 0.36, 1],
         opacity: { duration: 0.3 },
         scale: { duration: 0.4 },
       }}

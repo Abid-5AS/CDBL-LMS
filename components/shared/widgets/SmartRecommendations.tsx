@@ -29,10 +29,14 @@ interface Recommendation {
   };
 }
 
+interface RecommendationsResponse {
+  recommendations: Recommendation[];
+}
+
 export function SmartRecommendations() {
-  const { data, error, isLoading } = useSWR(
+  const { data, error, isLoading } = useSWR<RecommendationsResponse>(
     "/api/dashboard/recommendations",
-    fetcher,
+    apiFetcher,
     {
       revalidateOnFocus: true,
       refreshInterval: 600000, // Refresh every 10 minutes

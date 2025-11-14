@@ -6,10 +6,10 @@
 
 import {
   onCLS,
+  onINP,
   onFCP,
   onLCP,
   onTTFB,
-  onINP,
 } from "web-vitals";
 import {
   getMetricsCollector,

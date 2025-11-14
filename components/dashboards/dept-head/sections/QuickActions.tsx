@@ -15,7 +15,7 @@ export function DeptHeadQuickActions() {
 
   // Fetch team data for export
   const { data: teamData } = useSWR<{
-    items: any[];
+    items: unknown[];
     counts: {
       pending: number;
       forwarded: number;
@@ -112,7 +112,7 @@ export function DeptHeadQuickActions() {
       label: "Export Report",
       icon: isExporting ? Download : FileSpreadsheet,
       onClick: handleExportReport,
-      tooltip: isExporting ? "Exporting..." : "Export team leave report as CSV",
+      tooltip: "Export team leave report as CSV",
     },
   ];
 

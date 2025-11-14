@@ -13,8 +13,8 @@ if (!SECRET) {
 }
 const SECRET_KEY = new TextEncoder().encode(SECRET);
 
-export async function middleware(req: NextRequest) {
-  // Attach trace ID to request for error tracking (Next.js middleware pattern)
+export async function proxy(req: NextRequest) {
+  // Attach trace ID to request for error tracking (Next.js proxy pattern)
   attachTraceId(req);
   
   const token = req.cookies.get("session_token")?.value;
