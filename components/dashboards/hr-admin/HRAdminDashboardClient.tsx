@@ -18,6 +18,7 @@ import { motion } from "framer-motion";
 import {
   RoleKPICard,
   ResponsiveDashboardGrid,
+  DashboardSection,
   ExportButton,
 } from "@/components/dashboards/shared";
 import { ChartContainer, TrendChart, TypePie } from "@/components/shared/LeaveCharts";
@@ -119,13 +120,19 @@ export function HRAdminDashboardClient() {
       className="space-y-6"
     >
       {/* Primary KPIs */}
-      <ResponsiveDashboardGrid
-        columns="2:2:4:4"
-        gap="md"
+      <DashboardSection
+        title="Key Performance Metrics"
+        description="Essential leave management KPIs for your organization"
+        isLoading={false}
         animate={true}
-        staggerChildren={0.1}
-        delayChildren={0.1}
       >
+        <ResponsiveDashboardGrid
+          columns="2:2:4:4"
+          gap="md"
+          animate={true}
+          staggerChildren={0.1}
+          delayChildren={0.1}
+        >
         {isLoading ? (
           <>
             {[...Array(4)].map((_, i) => (
@@ -195,16 +202,23 @@ export function HRAdminDashboardClient() {
             />
           </>
         )}
-      </ResponsiveDashboardGrid>
+        </ResponsiveDashboardGrid>
+      </DashboardSection>
 
       {/* Performance Metrics */}
-      <ResponsiveDashboardGrid
-        columns="1:1:3:3"
-        gap="md"
+      <DashboardSection
+        title="Performance & Compliance"
+        description="Daily metrics, team utilization, and compliance tracking"
+        isLoading={false}
         animate={true}
-        staggerChildren={0.1}
-        delayChildren={0.2}
       >
+        <ResponsiveDashboardGrid
+          columns="1:1:3:3"
+          gap="md"
+          animate={true}
+          staggerChildren={0.1}
+          delayChildren={0.2}
+        >
         {isLoading ? (
           <>
             {[...Array(3)].map((_, i) => (
@@ -305,14 +319,21 @@ export function HRAdminDashboardClient() {
             />
           </>
         )}
-      </ResponsiveDashboardGrid>
+        </ResponsiveDashboardGrid>
+      </DashboardSection>
 
       {/* Pending Requests Table - Full Width */}
-      <motion.div variants={itemVariants}>
-        <Suspense fallback={<DashboardCardSkeleton />}>
-          <PendingLeaveRequestsTable />
-        </Suspense>
-      </motion.div>
+      <DashboardSection
+        title="Pending Leave Requests"
+        description="Review and manage pending leave requests"
+        isLoading={isLoading}
+      >
+        <motion.div variants={itemVariants}>
+          <Suspense fallback={<DashboardCardSkeleton />}>
+            <PendingLeaveRequestsTable />
+          </Suspense>
+        </motion.div>
+      </DashboardSection>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Charts - Left Side (8 columns) */}

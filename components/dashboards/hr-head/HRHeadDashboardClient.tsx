@@ -7,6 +7,7 @@ import { Clock, Users, RotateCcw, Calendar, Activity, TrendingUp, AlertCircle, C
 import {
   RoleKPICard,
   ResponsiveDashboardGrid,
+  DashboardSection,
   AnalyticsBarChart,
   ExportButton,
 } from "@/components/dashboards/shared";
@@ -15,6 +16,32 @@ import {
   CancellationRequests as CancellationRequestsPanel,
   ReturnedRequests as ReturnedRequestsPanel,
 } from "@/components/dashboards";
+
+// Skeleton components for loading states
+function CardSkeleton() {
+  return (
+    <div className="glass-card rounded-2xl p-6">
+      <div className="flex items-start justify-between">
+        <div className="flex-1 space-y-3">
+          <div className="h-4 w-24 bg-muted/50 animate-pulse rounded" />
+          <div className="h-8 w-20 bg-muted/50 animate-pulse rounded" />
+          <div className="h-4 w-32 bg-muted/50 animate-pulse rounded" />
+        </div>
+        <div className="h-12 w-12 bg-muted/50 animate-pulse rounded-xl" />
+      </div>
+    </div>
+  );
+}
+
+function KPIGridSkeleton() {
+  return (
+    <ResponsiveDashboardGrid columns="1:1:3:3" gap="md">
+      <CardSkeleton />
+      <CardSkeleton />
+      <CardSkeleton />
+    </ResponsiveDashboardGrid>
+  );
+}
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { DashboardCardSkeleton } from "@/app/dashboard/shared/LoadingFallback";
@@ -82,25 +109,14 @@ export function HRHeadDashboardClient() {
   return (
     <div className="space-y-6">
       {/* Top KPI Cards */}
-      <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
-        {isLoading ? (
-          <>
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="glass-card rounded-2xl p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 space-y-3">
-                    <div className="h-4 w-24 bg-muted/50 animate-pulse rounded" />
-                    <div className="h-8 w-20 bg-muted/50 animate-pulse rounded" />
-                    <div className="h-4 w-32 bg-muted/50 animate-pulse rounded" />
-                  </div>
-                  <div className="h-12 w-12 bg-muted/50 animate-pulse rounded-xl" />
-                </div>
-              </div>
-            ))}
-          </>
-        ) : (
-          <>
-            <RoleKPICard
+      <DashboardSection
+        title="HR Operations Overview"
+        description="Key metrics for leave management and HR operations"
+        isLoading={isLoading}
+        loadingFallback={<KPIGridSkeleton />}
+      >
+        <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
+          <RoleKPICard
               title="Pending Requests"
               value={stats?.pending || 0}
               subtitle="Awaiting approval"
@@ -138,29 +154,17 @@ export function HRHeadDashboardClient() {
               icon={Calendar}
               role="HR_HEAD"
             />
-          </>
-        )}
-      </ResponsiveDashboardGrid>
+        </ResponsiveDashboardGrid>
+      </DashboardSection>
 
       {/* Secondary Metrics */}
-      <ResponsiveDashboardGrid columns="1:1:3:3" gap="md">
-        {isLoading ? (
-          <>
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="glass-card rounded-2xl p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 space-y-3">
-                    <div className="h-4 w-24 bg-muted/50 animate-pulse rounded" />
-                    <div className="h-8 w-20 bg-muted/50 animate-pulse rounded" />
-                    <div className="h-4 w-32 bg-muted/50 animate-pulse rounded" />
-                  </div>
-                  <div className="h-12 w-12 bg-muted/50 animate-pulse rounded-xl" />
-                </div>
-              </div>
-            ))}
-          </>
-        ) : (
-          <>
+      <DashboardSection
+        title="Performance & Compliance"
+        description="Monthly metrics, new hires, and policy compliance"
+        isLoading={isLoading}
+        loadingFallback={<KPIGridSkeleton />}
+      >
+        <ResponsiveDashboardGrid columns="1:1:3:3" gap="md">
             <RoleKPICard
               title="This Month"
               value={stats?.monthlyRequests || 0}
@@ -196,11 +200,16 @@ export function HRHeadDashboardClient() {
                   : undefined
               }
             />
-          </>
-        )}
-      </ResponsiveDashboardGrid>
+        </ResponsiveDashboardGrid>
+      </DashboardSection>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {/* Approvals & Analytics */}
+      <DashboardSection
+        title="Approvals & Analytics"
+        description="Pending approvals, department performance, and organization metrics"
+        isLoading={isLoading}
+      >
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Main Content - Left Side */}
         <div className="lg:col-span-8 space-y-6">
           {/* Pending Requests Table */}
@@ -334,9 +343,15 @@ export function HRHeadDashboardClient() {
           </Card>
         </div>
       </div>
+      </DashboardSection>
 
       {/* Bottom Section - Full Width */}
-      <div className="grid gap-6 md:grid-cols-2">
+      <DashboardSection
+        title="Additional Requests"
+        description="Returned and cancelled leave requests"
+        isLoading={isLoading}
+      >
+        <div className="grid gap-6 md:grid-cols-2">
         <Suspense fallback={<DashboardCardSkeleton />}>
           <Card className="rounded-2xl">
             <CardHeader>
@@ -358,7 +373,8 @@ export function HRHeadDashboardClient() {
             </CardContent>
           </Card>
         </Suspense>
-      </div>
+        </div>
+      </DashboardSection>
     </div>
   );
 }

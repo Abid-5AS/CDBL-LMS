@@ -4,7 +4,9 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { LayoutProvider } from "./LayoutProvider";
 import { ThemeProvider } from "next-themes";
-import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
+import { ErrorBoundary } from "@/components/errors";
+import { NotificationProvider } from "@/context/NotificationContext";
+import { ToastContainer } from "@/components/notifications";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,10 +47,14 @@ export default function RootLayout({
           Skip to main content
         </a>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <ErrorBoundary>
-            <LayoutProvider>
-              <main id="main-content">{children}</main>
-            </LayoutProvider>
+          <ErrorBoundary level="page">
+            <NotificationProvider maxNotifications={3}>
+              <LayoutProvider>
+                <main id="main-content">{children}</main>
+              </LayoutProvider>
+              {/* Toast notification container */}
+              <ToastContainer position="top-right" maxWidth="md:max-w-sm" />
+            </NotificationProvider>
           </ErrorBoundary>
           <Toaster richColors position="bottom-right" />
         </ThemeProvider>

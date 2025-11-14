@@ -22,6 +22,7 @@ import {
 import {
   RoleKPICard,
   ResponsiveDashboardGrid,
+  DashboardSection,
   AnalyticsLineChart,
   AnalyticsBarChart,
   AnalyticsPieChart,
@@ -123,10 +124,16 @@ export function CEODashboardClient() {
   return (
     <div className="space-y-6">
       {/* Primary Executive KPIs */}
-      {isLoading ? (
-        <DashboardGridSkeleton cards={4} />
-      ) : (
-        <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
+      <DashboardSection
+        title="Executive Overview"
+        description="Key organizational and performance metrics at a glance"
+        isLoading={false}
+        loadingFallback={<DashboardGridSkeleton cards={4} />}
+      >
+        {isLoading ? (
+          <DashboardGridSkeleton cards={4} />
+        ) : (
+          <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
           <RoleKPICard
               title="Total Workforce"
               value={stats?.totalEmployees || 0}
@@ -178,14 +185,21 @@ export function CEODashboardClient() {
                   : undefined
               }
             />
-        </ResponsiveDashboardGrid>
-      )}
+          </ResponsiveDashboardGrid>
+        )}
+      </DashboardSection>
 
       {/* Financial & YoY Metrics */}
-      {isLoading ? (
-        <DashboardGridSkeleton cards={3} className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" />
-      ) : (
-        <ResponsiveDashboardGrid columns="1:1:3:3" gap="md">
+      <DashboardSection
+        title="Financial & Strategic Metrics"
+        description="Financial impact, year-over-year analysis, and system health"
+        isLoading={false}
+        loadingFallback={<DashboardGridSkeleton cards={3} className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" />}
+      >
+        {isLoading ? (
+          <DashboardGridSkeleton cards={3} className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" />
+        ) : (
+          <ResponsiveDashboardGrid columns="1:1:3:3" gap="md">
             {/* Financial Impact Card */}
             <Card className="rounded-2xl">
               <CardHeader className="pb-3">
@@ -303,11 +317,18 @@ export function CEODashboardClient() {
                 </div>
               </CardContent>
             </Card>
-        </ResponsiveDashboardGrid>
-      )}
+          </ResponsiveDashboardGrid>
+        )}
+      </DashboardSection>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {/* Analytics & Insights */}
+      <DashboardSection
+        title="Analytics & Insights"
+        description="Detailed trends, department performance, and AI-powered insights"
+        isLoading={isLoading}
+      >
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column - Charts (8 cols) */}
         <div className="lg:col-span-8 space-y-6">
           {/* Monthly Trend Chart */}
@@ -542,7 +563,8 @@ export function CEODashboardClient() {
             </CardContent>
           </Card>
         </div>
-      </div>
+        </div>
+      </DashboardSection>
     </div>
   );
 }

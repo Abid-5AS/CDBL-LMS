@@ -7,8 +7,8 @@ import { DeptHeadQuickActions } from "./sections/QuickActions";
 import { Card, CardContent } from "@/components/ui";
 import { useApiQueryWithParams } from "@/lib/apiClient";
 import { useFilterFromUrl } from "@/lib/url-filters";
-import { RoleKPICard, ResponsiveDashboardGrid } from "@/components/dashboards/shared";
-import { ClipboardList, CheckCircle, RotateCcw, XCircle } from "lucide-react";
+import { RoleKPICard, ResponsiveDashboardGrid, DashboardSection } from "@/components/dashboards/shared";
+import { ClipboardList, CheckCircle, RotateCcw, XCircle, RefreshCw } from "lucide-react";
 
 function CardSkeleton() {
   return (
@@ -20,6 +20,17 @@ function CardSkeleton() {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function KPIGridSkeleton() {
+  return (
+    <ResponsiveDashboardGrid columns="2:2:4:4" gap="md" animate={false}>
+      <CardSkeleton />
+      <CardSkeleton />
+      <CardSkeleton />
+      <CardSkeleton />
+    </ResponsiveDashboardGrid>
   );
 }
 
@@ -57,62 +68,90 @@ export function DeptHeadDashboardWrapper() {
   return (
     <div className="space-y-6">
       {/* Top Row - KPI Cards Grid */}
-      <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
-        <RoleKPICard
-          title="Pending"
-          value={counts.pending}
-          subtitle="Awaiting your review"
-          icon={ClipboardList}
-          role="DEPT_HEAD"
-        />
-        <RoleKPICard
-          title="Forwarded"
-          value={counts.forwarded}
-          subtitle="Sent to HR"
-          icon={CheckCircle}
-          role="DEPT_HEAD"
-        />
-        <RoleKPICard
-          title="Returned"
-          value={counts.returned}
-          subtitle="Need employee action"
-          icon={RotateCcw}
-          role="DEPT_HEAD"
-          trend={counts.returned > 0 ? {
-            value: counts.returned,
-            label: "requires follow-up",
-            direction: "down"
-          } : undefined}
-        />
-        <RoleKPICard
-          title="Cancelled"
-          value={counts.cancelled}
-          subtitle="Withdrawn by employee"
-          icon={XCircle}
-          role="DEPT_HEAD"
-        />
-      </ResponsiveDashboardGrid>
+      <DashboardSection
+        title="Leave Requests Overview"
+        description="Key metrics for your department's leave approvals"
+        isLoading={isLoading}
+        loadingFallback={<KPIGridSkeleton />}
+        action={
+          <button
+            onClick={() => mutate()}
+            className="p-2 hover:bg-muted rounded-lg transition-colors"
+            title="Refresh"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
+        }
+      >
+        <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
+          <RoleKPICard
+            title="Pending"
+            value={counts.pending}
+            subtitle="Awaiting your review"
+            icon={ClipboardList}
+            role="DEPT_HEAD"
+          />
+          <RoleKPICard
+            title="Forwarded"
+            value={counts.forwarded}
+            subtitle="Sent to HR"
+            icon={CheckCircle}
+            role="DEPT_HEAD"
+          />
+          <RoleKPICard
+            title="Returned"
+            value={counts.returned}
+            subtitle="Need employee action"
+            icon={RotateCcw}
+            role="DEPT_HEAD"
+            trend={counts.returned > 0 ? {
+              value: counts.returned,
+              label: "requires follow-up",
+              direction: "down"
+            } : undefined}
+          />
+          <RoleKPICard
+            title="Cancelled"
+            value={counts.cancelled}
+            subtitle="Withdrawn by employee"
+            icon={XCircle}
+            role="DEPT_HEAD"
+          />
+        </ResponsiveDashboardGrid>
+      </DashboardSection>
 
-      {/* Main Content */}
-      <div id="pending-requests-table">
-        <DeptHeadPendingTable
-          data={data}
-          isLoading={isLoading}
-          error={error}
-          onMutate={mutate}
-        />
-      </div>
+      {/* Pending Requests Table */}
+      <DashboardSection
+        title="Pending Leave Requests"
+        description="Review and process leave requests from your department"
+        isLoading={isLoading}
+        error={error}
+      >
+        <div id="pending-requests-table">
+          <DeptHeadPendingTable
+            data={data}
+            isLoading={isLoading}
+            error={error}
+            onMutate={mutate}
+          />
+        </div>
+      </DashboardSection>
 
       {/* Bottom Row - Team Overview and Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Suspense fallback={<CardSkeleton />}>
-          <DeptHeadTeamOverview />
-        </Suspense>
+      <DashboardSection
+        title="Team & Actions"
+        description="Team overview and quick management actions"
+      >
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Suspense fallback={<CardSkeleton />}>
+            <DeptHeadTeamOverview />
+          </Suspense>
 
-        <Suspense fallback={<CardSkeleton />}>
-          <DeptHeadQuickActions />
-        </Suspense>
-      </div>
+          <Suspense fallback={<CardSkeleton />}>
+            <DeptHeadQuickActions />
+          </Suspense>
+        </div>
+      </DashboardSection>
     </div>
   );
 }

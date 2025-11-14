@@ -14,7 +14,7 @@ import {
   Plus,
 } from "lucide-react";
 
-import { Button } from "@/components/ui";
+import { Button, Card, CardContent, Skeleton } from "@/components/ui";
 import { useApiQuery } from "@/lib/apiClient";
 import { useLeaveRequests } from "@/hooks";
 import { leaveTypeLabel } from "@/lib/ui";
@@ -22,6 +22,7 @@ import { RoleBasedDashboard, RoleKPICard } from "../shared/RoleBasedDashboard";
 import {
   ResponsiveDashboardGrid,
   DashboardWithSidebar,
+  DashboardSection,
 } from "../shared/ResponsiveDashboardGrid";
 import { TabbedContent } from "../shared/ProgressiveDisclosure";
 import useSWR from "swr";
@@ -62,6 +63,37 @@ const itemVariants = {
     },
   },
 };
+
+/**
+ * Skeleton loader for KPI cards
+ */
+function KPICardSkeleton() {
+  return (
+    <Card className="rounded-xl border-border/50 shadow-sm">
+      <CardContent className="p-4 sm:p-6">
+        <div className="space-y-4">
+          <Skeleton className="h-4 w-24 rounded" />
+          <Skeleton className="h-8 w-16 rounded" />
+          <Skeleton className="h-3 w-32 rounded" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+/**
+ * Grid of skeleton loaders for KPI section
+ */
+function KPIGridSkeleton() {
+  return (
+    <ResponsiveDashboardGrid columns="2:2:4:4" gap="md" animate={false}>
+      <KPICardSkeleton />
+      <KPICardSkeleton />
+      <KPICardSkeleton />
+      <KPICardSkeleton />
+    </ResponsiveDashboardGrid>
+  );
+}
 
 export function ModernEmployeeDashboard({
   username,
@@ -131,82 +163,103 @@ export function ModernEmployeeDashboard({
           className="space-y-6 lg:space-y-8"
         >
           {/* Quick Stats Grid */}
-          <ResponsiveDashboardGrid
-            columns="2:2:4:4"
-            gap="md"
+          <DashboardSection
+            title="Leave Metrics"
+            description="Your balance, pending requests, and upcoming time off"
+            isLoading={false}
+            loadingFallback={<KPIGridSkeleton />}
             animate={true}
-            staggerChildren={0.1}
-            delayChildren={0.2}
           >
-            <RoleKPICard
-              title="Pending Requests"
-              value={dashboardData.pendingCount}
-              subtitle={
-                dashboardData.pendingStageInfo
-                  ? `With ${dashboardData.pendingStageInfo.role} • ${dashboardData.pendingAverageWait}d avg wait`
-                  : "Awaiting approval"
-              }
-              icon={dashboardData.pendingStageInfo?.icon || Clock}
-              role="EMPLOYEE"
+            <ResponsiveDashboardGrid
+              columns="2:2:4:4"
+              gap="md"
               animate={true}
-            />
+              staggerChildren={0.1}
+              delayChildren={0.2}
+            >
+              <RoleKPICard
+                title="Pending Requests"
+                value={dashboardData.pendingCount}
+                subtitle={
+                  dashboardData.pendingStageInfo
+                    ? `With ${dashboardData.pendingStageInfo.role} • ${dashboardData.pendingAverageWait}d avg wait`
+                    : "Awaiting approval"
+                }
+                icon={dashboardData.pendingStageInfo?.icon || Clock}
+                role="EMPLOYEE"
+                animate={true}
+              />
 
-            <RoleKPICard
-              title="Total Balance"
-              value={dashboardData.totalBalance}
-              subtitle="Days available"
-              icon={Calendar}
-              role="EMPLOYEE"
-              animate={true}
-            />
+              <RoleKPICard
+                title="Total Balance"
+                value={dashboardData.totalBalance}
+                subtitle="Days available"
+                icon={Calendar}
+                role="EMPLOYEE"
+                animate={true}
+              />
 
-            <RoleKPICard
-              title="Days Used"
-              value={dashboardData.usedThisYear}
-              subtitle="This year"
-              icon={BarChart3}
-              role="EMPLOYEE"
-              animate={true}
-            />
+              <RoleKPICard
+                title="Days Used"
+                value={dashboardData.usedThisYear}
+                subtitle="This year"
+                icon={BarChart3}
+                role="EMPLOYEE"
+                animate={true}
+              />
 
-            <RoleKPICard
-              title={
-                dashboardData.nextScheduledLeave
-                  ? "Next Leave"
-                  : "No Upcoming Leave"
-              }
-              value={
-                dashboardData.daysUntilNextLeave !== null
-                  ? dashboardData.daysUntilNextLeave === 0
-                    ? "Today"
-                    : dashboardData.daysUntilNextLeave === 1
-                    ? "Tomorrow"
-                    : `${dashboardData.daysUntilNextLeave} days`
-                  : "—"
-              }
-              subtitle={
-                dashboardData.nextScheduledLeave
-                  ? `${
-                      leaveTypeLabel[dashboardData.nextScheduledLeave.type] ||
-                      dashboardData.nextScheduledLeave.type
-                    } (${
-                      dashboardData.nextScheduledLeave.workingDays || 0
-                    } days)`
-                  : "Plan your next vacation"
-              }
-              icon={TrendingUp}
-              role="EMPLOYEE"
-              animate={true}
-            />
-          </ResponsiveDashboardGrid>
+              <RoleKPICard
+                title={
+                  dashboardData.nextScheduledLeave
+                    ? "Next Leave"
+                    : "No Upcoming Leave"
+                }
+                value={
+                  dashboardData.daysUntilNextLeave !== null
+                    ? dashboardData.daysUntilNextLeave === 0
+                      ? "Today"
+                      : dashboardData.daysUntilNextLeave === 1
+                      ? "Tomorrow"
+                      : `${dashboardData.daysUntilNextLeave} days`
+                    : "—"
+                }
+                subtitle={
+                  dashboardData.nextScheduledLeave
+                    ? `${
+                        leaveTypeLabel[dashboardData.nextScheduledLeave.type] ||
+                        dashboardData.nextScheduledLeave.type
+                      } (${
+                        dashboardData.nextScheduledLeave.workingDays || 0
+                      } days)`
+                    : "Plan your next vacation"
+                }
+                icon={TrendingUp}
+                role="EMPLOYEE"
+                animate={true}
+              />
+            </ResponsiveDashboardGrid>
+          </DashboardSection>
 
           {/* Action Center */}
-          <motion.div variants={itemVariants}>
-            <EmployeeActionCenter actionItems={dashboardData.actionItems} />
-          </motion.div>
+          <DashboardSection
+            title="Recent Actions"
+            description="Items requiring your attention"
+            isLoading={isLoadingLeaves}
+            animate={true}
+          >
+            <motion.div variants={itemVariants}>
+              <EmployeeActionCenter actionItems={dashboardData.actionItems} />
+            </motion.div>
+          </DashboardSection>
 
           {/* Dashboard with Sidebar */}
-          <DashboardWithSidebar defaultTab="overview">
+          <DashboardSection
+            title="Leave Details"
+            description="Balance breakdown, recent activity, and trends"
+            isLoading={isLoadingLeaves || isLoadingBalance}
+            animate={true}
+          >
+            <DashboardWithSidebar>
             <motion.div variants={itemVariants} className="flex-1">
               <TabbedContent
                 defaultTab="overview"
@@ -252,6 +305,7 @@ export function ModernEmployeeDashboard({
               />
             </motion.div>
           </DashboardWithSidebar>
+          </DashboardSection>
         </motion.div>
       </RoleBasedDashboard>
     </>

@@ -11,6 +11,7 @@ import {
   SystemOverviewCards,
   SystemQuickStats,
   SystemQuickAccess,
+  SystemAdminDashboardContent,
 } from "./SystemAdminDashboardClient";
 import { prisma } from "@/lib/prisma";
 
@@ -49,42 +50,9 @@ export async function SystemAdminDashboard({
   const systemStats = await getSystemStats();
 
   return (
-    <div className="space-y-6">
-      <SystemAdminHeader username={username} />
-
-      <DashboardSection
-        title="System Overview"
-        description="Key system metrics and status"
-      >
-        <Suspense fallback={<DashboardCardSkeleton />}>
-          <SystemOverviewCards />
-        </Suspense>
-      </DashboardSection>
-
-      <DashboardSection title="Quick Stats">
-        <SystemQuickStats systemStats={systemStats} />
-      </DashboardSection>
-
-      <DashboardSection
-        title="Recent Audit Logs"
-        description="System activity and access logs"
-        action={
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/admin/audit">View All</Link>
-          </Button>
-        }
-      >
-        <Suspense fallback={<DashboardCardSkeleton />}>
-          <RecentAuditLogs />
-        </Suspense>
-      </DashboardSection>
-
-      <DashboardSection
-        title="Quick Access"
-        description="Common administrative tasks"
-      >
-        <SystemQuickAccess />
-      </DashboardSection>
-    </div>
+    <SystemAdminDashboardContent
+      username={username}
+      systemStats={systemStats}
+    />
   );
 }

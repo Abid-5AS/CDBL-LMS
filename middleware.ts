@@ -3,7 +3,14 @@ import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 import { attachTraceId } from "@/lib/trace";
 
-const SECRET = process.env.JWT_SECRET || process.env.AUTH_SECRET || "dev-secret";
+// Security: JWT_SECRET must be provided in environment
+const SECRET = process.env.JWT_SECRET || process.env.AUTH_SECRET;
+if (!SECRET) {
+  throw new Error(
+    "CRITICAL: JWT_SECRET or AUTH_SECRET must be set in environment variables. " +
+    "Never use hardcoded secrets in production."
+  );
+}
 const SECRET_KEY = new TextEncoder().encode(SECRET);
 
 export async function middleware(req: NextRequest) {

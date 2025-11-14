@@ -140,7 +140,7 @@ const LEAVE_TAB_ITEMS = [
 
 const ITEMS_PER_PAGE = 5;
 
-export function MyLeavesPageContent(): ReactNode {
+export function MyLeavesPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [selectedLeave, setSelectedLeave] = useState<LeaveRow | null>(null);
@@ -238,8 +238,8 @@ export function MyLeavesPageContent(): ReactNode {
     }
   };
 
-  // Fetch balance data for the strip
-  const { data: balanceData, isLoading: balanceLoading } = useSWR(
+  // Fetch balance data for the strip with proper typing
+  const { data: balanceData, isLoading: balanceLoading } = useSWR<Record<string, number>>(
     "/api/balance/mine",
     apiFetcher,
     { revalidateOnFocus: false }
