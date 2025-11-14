@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
 import { canCancel } from "@/lib/rbac";
+import { canCancelMaternityLeave } from "@/lib/leave-validation";
 
 export const cache = "no-store";
 
@@ -11,6 +12,7 @@ export const cache = "no-store";
  * Bulk cancel leave requests (employee-initiated)
  * PATCH /api/leaves/bulk/cancel
  * Body: { ids: number[] }
+ * Note: Maternity leave cannot be cancelled after it has started
  */
 export async function PATCH(req: NextRequest) {
   const traceId = getTraceId(req as any);
@@ -71,6 +73,16 @@ export async function PATCH(req: NextRequest) {
 
         if (leave.status === "RECALLED") {
           results.failed.push({ id: leaveId, reason: "Already recalled" });
+          continue;
+        }
+
+        // Check maternity leave cancellation policy (cannot cancel after start)
+        const maternityCancelCheck = canCancelMaternityLeave(leave);
+        if (!maternityCancelCheck.canCancel) {
+          results.failed.push({
+            id: leaveId,
+            reason: maternityCancelCheck.reason || "Maternity leave cannot be cancelled after start"
+          });
           continue;
         }
 

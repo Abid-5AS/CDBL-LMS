@@ -151,6 +151,44 @@ export async function violatesCasualLeaveCombination(
 }
 
 /**
+ * Check if maternity leave can be cancelled (Policy - Master Spec)
+ *
+ * Rule: Maternity leave CANNOT be cancelled after it has started
+ * Clarified 2025-11-14: Hard block on maternity cancellation after start date
+ *
+ * @param leave - Leave request object with type and startDate
+ * @param today - Current date (defaults to now)
+ * @returns Object with canCancel boolean and reason if blocked
+ */
+export function canCancelMaternityLeave(leave: {
+  type: string;
+  startDate: Date;
+}, today: Date = new Date()): {
+  canCancel: boolean;
+  reason?: string;
+} {
+  // Only applies to maternity leave
+  if (leave.type !== "MATERNITY") {
+    return { canCancel: true };
+  }
+
+  const normalizedToday = normalizeToDhakaMidnight(today);
+  const normalizedStartDate = normalizeToDhakaMidnight(leave.startDate);
+
+  // Check if leave has started
+  const hasStarted = normalizedStartDate <= normalizedToday;
+
+  if (hasStarted) {
+    return {
+      canCancel: false,
+      reason: "Maternity leave cannot be cancelled after it has started (Policy - Master Specification). Please contact HR for assistance.",
+    };
+  }
+
+  return { canCancel: true };
+}
+
+/**
  * Validate paternity leave eligibility (Policy 6.24.b)
  * Rules:
  * - Maximum 2 occasions during entire service life

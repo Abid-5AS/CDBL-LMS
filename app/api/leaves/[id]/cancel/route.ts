@@ -5,6 +5,7 @@ import { LeaveStatus } from "@prisma/client";
 import { z } from "zod";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
+import { canCancelMaternityLeave } from "@/lib/leave-validation";
 
 export const cache = "no-store";
 
@@ -18,6 +19,7 @@ const CancelSchema = z.object({
  * Rules:
  * - Can cancel SUBMITTED/PENDING requests from team members
  * - Cannot cancel already APPROVED requests (those need CANCELLATION_REQUESTED flow)
+ * - Cannot cancel MATERNITY leave after it has started
  * - Creates audit log and restores balance if needed
  */
 export async function POST(
@@ -86,6 +88,18 @@ export async function POST(
         { currentStatus: leave.status }
       ),
       { status: 400 }
+    );
+  }
+
+  // Check maternity leave cancellation policy (cannot cancel after start)
+  const maternityCancelCheck = canCancelMaternityLeave(leave);
+  if (!maternityCancelCheck.canCancel) {
+    return NextResponse.json(
+      error("maternity_cannot_cancel_after_start", maternityCancelCheck.reason, traceId, {
+        leaveType: leave.type,
+        startDate: leave.startDate,
+      }),
+      { status: 403 }
     );
   }
 

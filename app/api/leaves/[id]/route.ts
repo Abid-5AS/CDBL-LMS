@@ -5,12 +5,14 @@ import { LeaveStatus } from "@prisma/client";
 import { normalizeToDhakaMidnight } from "@/lib/date-utils";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
+import { canCancelMaternityLeave } from "@/lib/leave-validation";
 
 /**
  * Employee-initiated cancellation
  * Rules:
  * - SUBMITTED/PENDING → CANCELLED (immediate cancellation)
  * - APPROVED → CANCELLATION_REQUESTED (requires HR review)
+ * - MATERNITY after start → BLOCKED (cannot cancel)
  */
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const traceId = getTraceId(request as any);
@@ -43,6 +45,18 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json(
       error("cancellation_request_invalid", undefined, traceId, { currentStatus: leave.status }),
       { status: 400 }
+    );
+  }
+
+  // Check maternity leave cancellation policy (cannot cancel after start)
+  const maternityCancelCheck = canCancelMaternityLeave(leave);
+  if (!maternityCancelCheck.canCancel) {
+    return NextResponse.json(
+      error("maternity_cannot_cancel_after_start", maternityCancelCheck.reason, traceId, {
+        leaveType: leave.type,
+        startDate: leave.startDate,
+      }),
+      { status: 403 }
     );
   }
 
