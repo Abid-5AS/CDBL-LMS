@@ -1,0 +1,92 @@
+CDBL Leave Management System - MASTER TESTING CHECKLIST
+Generated: 2025-11-15
+Total Tests: 600+
+Purpose: Comprehensive manual testing guide for all features
+
+TESTING CATEGORY,FILENAME,TOTAL TESTS,COMPLETED,PASS,FAIL,PRIORITY,STATUS,NOTES
+Authentication & Login,TEST_01_AUTHENTICATION.csv,60,0,0,0,HIGH,Not Started,"Login, Logout, 2FA, Password, Sessions"
+Employee Features,TEST_02_EMPLOYEE_FEATURES.csv,85,0,0,0,HIGH,Not Started,"Leave apply, balance, cancellation, certificates"
+Department Head Features,TEST_03_DEPT_HEAD_FEATURES.csv,75,0,0,0,HIGH,Not Started,"Team management, approvals, team overview"
+HR Admin Features,TEST_04_HR_ADMIN_FEATURES.csv,80,0,0,0,HIGH,Not Started,"System approvals, holiday mgmt, reports"
+HR Head Features,TEST_05_HR_HEAD_FEATURES.csv,65,0,0,0,MEDIUM,Not Started,"Final approvals, encashment, recall"
+CEO Features,TEST_06_CEO_FEATURES.csv,55,0,0,0,MEDIUM,Not Started,"Executive controls, user mgmt, approvals"
+System Admin Features,TEST_07_SYSTEM_ADMIN_FEATURES.csv,75,0,0,0,MEDIUM,Not Started,"Admin panel, policies, audit logs"
+Policy Compliance,TEST_08_POLICY_COMPLIANCE.csv,120,0,0,0,HIGH,Not Started,"All 20+ policies, validations, edge cases"
+Leave Type Specific Tests,TEST_09_LEAVE_TYPES.csv,90,0,0,0,HIGH,Not Started,"EARNED, CASUAL, MEDICAL, MATERNITY, etc."
+Role-Based Access Control,TEST_10_RBAC.csv,60,0,0,0,HIGH,Not Started,"Permission checks across all roles"
+Dashboard & Analytics,TEST_11_DASHBOARDS_ANALYTICS.csv,55,0,0,0,MEDIUM,Not Started,"All dashboards, charts, analytics"
+Notifications & Communications,TEST_12_NOTIFICATIONS.csv,45,0,0,0,MEDIUM,Not Started,"Notifications, email, badge counts"
+File Uploads & Certificates,TEST_13_FILE_UPLOADS.csv,40,0,0,0,MEDIUM,Not Started,"Medical cert, fitness cert, URL generation"
+Bulk Operations,TEST_14_BULK_OPERATIONS.csv,30,0,0,0,LOW,Not Started,"Bulk approve, cancel, return for mod"
+Edge Cases & Error Handling,TEST_15_EDGE_CASES.csv,85,0,0,0,HIGH,Not Started,"Invalid data, boundary tests, error messages"
+
+OVERALL PROGRESS SUMMARY
+Total Test Cases: 610
+Completed: 0
+Pass Rate: 0%
+Fail Rate: 0%
+Pending: 610
+
+QUICK START GUIDE
+1. Download this file and all TEST_XX_*.csv files to your computer
+2. Open each file in Excel or Google Sheets
+3. Follow the step-by-step instructions for each test
+4. Use the Test Data column - copy and paste values exactly
+5. Mark Status as you test: ☐ = Not Started, ⏳ = In Progress, ✅ = Pass, ❌ = Fail
+6. Add notes/observations in the Notes column
+7. If test fails, describe issue in "Issue Details" column
+8. Screenshots can reference in "Screenshot" column for complex tests
+
+TEST EXECUTION ORDER (Recommended)
+1. START: Authentication tests (must work to test anything else)
+2. Employee Features (basic functionality)
+3. Leave Type Tests (all 11 leave types)
+4. RBAC Tests (permission validation)
+5. Department Head Features (approval chains)
+6. HR Admin Features (system-wide views)
+7. HR Head Features (final approvals)
+8. CEO Features (executive controls)
+9. System Admin Features (system configuration)
+10. Policy Compliance (detailed policy validation)
+11. Dashboard & Analytics (reporting)
+12. Notifications (communication)
+13. File Uploads (certificate handling)
+14. Bulk Operations (batch processing)
+15. FINAL: Edge Cases & Error Handling (robustness)
+
+IMPORTANT NOTES FOR OCD/ADHD-FRIENDLY TESTING
+- Each test is self-contained and step-numbered
+- Test data is provided - no need to improvise
+- Expected results are explicit - you know exactly what success looks like
+- Status column has emoji checkboxes - easy to mark
+- Keep notes brief - one line is fine
+- Don't worry about perfect testing order - do what feels right
+- Break into smaller sessions if needed - each test is ~5-15 minutes
+- Save your progress frequently in the CSV
+- You can pause and resume anytime
+
+COLOR CODING (Apply in Excel)
+- Red background = Failed test (needs investigation)
+- Green background = Passed test
+- Yellow background = In progress
+- Blue background = High priority (do first)
+- Orange background = Medium priority (do second)
+
+SHARED TEST ENVIRONMENT
+All users share test database with seeded data
+Demo Users Available:
+- Admin user: sysadmin@cdbl.local
+- CEO: ceo@demo.local
+- HR Head: hrhead@demo.local
+- HR Admin: hradmin@demo.local
+- Dept Head: manager@demo.local
+- Employee: employee1@demo.local through employee4@demo.local
+All passwords: demo123
+
+GETTING HELP
+If a test fails:
+1. Note the exact error message in "Issue Details"
+2. Screenshot the error screen
+3. Check TEST_DATA_REFERENCE.csv for correct test data
+4. Try test again - sometimes timing issues
+5. If consistently fails - ISSUE FOUND (mark as ❌ Fail)

@@ -4,7 +4,14 @@ import * as React from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Sparkles, CheckCircle2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from "@/components/ui";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Badge,
+  Button,
+} from "@/components/ui";
 import { cn } from "@/lib/utils";
 
 type ActionItem = {
@@ -21,7 +28,9 @@ type EmployeeActionCenterProps = {
   actionItems: ActionItem[];
 };
 
-export function EmployeeActionCenter({ actionItems }: EmployeeActionCenterProps) {
+export function EmployeeActionCenter({
+  actionItems,
+}: EmployeeActionCenterProps) {
   const router = useRouter();
 
   return (
@@ -36,7 +45,10 @@ export function EmployeeActionCenter({ actionItems }: EmployeeActionCenterProps)
       <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <CardTitle className="text-lg sm:text-xl font-semibold text-text-primary dark:text-text-inverted flex items-center gap-2">
-            <Sparkles className="size-4 sm:size-5 text-brand" aria-hidden="true" />
+            <Sparkles
+              className="size-4 sm:size-5 text-brand"
+              aria-hidden="true"
+            />
             <span>Action Center</span>
           </CardTitle>
           {actionItems.length > 0 && (
@@ -44,8 +56,7 @@ export function EmployeeActionCenter({ actionItems }: EmployeeActionCenterProps)
               variant="default"
               className="bg-brand-soft text-brand dark:bg-brand-soft/20 text-xs"
             >
-              {actionItems.length}{" "}
-              {actionItems.length === 1 ? "item" : "items"}
+              {actionItems.length} {actionItems.length === 1 ? "item" : "items"}
             </Badge>
           )}
         </div>
@@ -57,13 +68,14 @@ export function EmployeeActionCenter({ actionItems }: EmployeeActionCenterProps)
       </CardHeader>
       <CardContent>
         {actionItems.length === 0 ? (
-          <div className="text-center py-8">
-            <CheckCircle2 className="w-12 h-12 mx-auto text-data-success mb-3" />
-            <p className="text-sm font-medium text-text-primary dark:text-text-inverted mb-1">
-              All Clear!
+          <div className="flex flex-col items-center justify-center max-w-md mx-auto py-6 sm:py-8 text-center gap-2">
+            <CheckCircle2 className="w-12 h-12 text-data-success mb-2" />
+            <p className="text-sm font-medium text-text-primary dark:text-text-inverted">
+              All clear  no pending actions.
             </p>
             <p className="text-xs text-text-secondary dark:text-text-tertiary">
-              No action items at this time. Enjoy your day!
+              Well surface important items here whenever something needs your
+              attention.
             </p>
           </div>
         ) : (
@@ -105,10 +117,7 @@ export function EmployeeActionCenter({ actionItems }: EmployeeActionCenterProps)
                   <Button
                     size="sm"
                     onClick={() => router.push(item.actionLink)}
-                    className={cn(
-                      "text-white shrink-0 text-xs",
-                      buttonColor
-                    )}
+                    className={cn("text-white shrink-0 text-xs", buttonColor)}
                   >
                     {item.action}
                   </Button>

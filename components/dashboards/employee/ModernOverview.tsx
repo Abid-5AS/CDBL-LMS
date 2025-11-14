@@ -124,10 +124,11 @@ export function ModernEmployeeDashboard({
   // Header actions
   const headerActions = (
     <Button
-      variant="outline"
+      variant="secondary"
       size="sm"
       onClick={() => setShowCustomization(true)}
       className="gap-2"
+      aria-label="Customize your dashboard layout"
     >
       <Settings className="size-4" aria-hidden="true" />
       <span className="hidden sm:inline">Customize</span>
@@ -259,52 +260,56 @@ export function ModernEmployeeDashboard({
             animate={true}
           >
             <DashboardWithSidebar>
-            <motion.div variants={itemVariants} className="flex-1">
-              <TabbedContent
-                title="Leave Details"
-                defaultTab="overview"
-                tabs={[
-                  {
-                    id: "overview",
-                    label: "Overview",
-                    icon: Activity,
-                    badge: dashboardData.pendingCount.toString(),
-                    content: (
-                      <div className="text-center py-8">
-                        <p className="text-text-secondary dark:text-text-tertiary">
-                          Quick overview section - Dashboard stats displayed above
-                        </p>
-                      </div>
-                    ),
-                  },
-                  {
-                    id: "balance",
-                    label: "Leave Balance",
-                    icon: PieChart,
-                    badge: dashboardData.totalBalance.toString(),
-                    content: (
-                      <EmployeeLeaveBalance
-                        balanceData={dashboardData.balanceData}
-                        isLoading={isLoadingBalance}
-                      />
-                    ),
-                  },
-                  {
-                    id: "activity",
-                    label: "Recent Activity",
-                    icon: Activity,
-                    badge: dashboardData.recentLeaves.length.toString(),
-                    content: (
-                      <EmployeeRecentActivity
-                        leaves={dashboardData.recentLeaves}
-                        isLoading={isLoadingLeaves}
-                      />
-                    ),
-                  },
-                ]}
-              />
-            </motion.div>
-          </DashboardWithSidebar>
+              <motion.div variants={itemVariants} className="flex-1">
+                <TabbedContent
+                  title="Leave Details"
+                  defaultTab="overview"
+                  tabs={[
+                    {
+                      id: "overview",
+                      label: "Overview",
+                      icon: Activity,
+                      badge: dashboardData.pendingCount.toString(),
+                      content: (
+                        <div className="flex flex-col items-center justify-center gap-2 py-6 sm:py-8">
+                          <p className="text-base font-medium">
+                            You9re all caught up on leave details.
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Use the Leave Balance and Recent Activity tabs to
+                            explore your data.
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      id: "balance",
+                      label: "Leave Balance",
+                      icon: PieChart,
+                      badge: dashboardData.totalBalance.toString(),
+                      content: (
+                        <EmployeeLeaveBalance
+                          balanceData={dashboardData.balanceData}
+                          isLoading={isLoadingBalance}
+                        />
+                      ),
+                    },
+                    {
+                      id: "activity",
+                      label: "Recent Activity",
+                      icon: Activity,
+                      badge: dashboardData.recentLeaves.length.toString(),
+                      content: (
+                        <EmployeeRecentActivity
+                          leaves={dashboardData.recentLeaves}
+                          isLoading={isLoadingLeaves}
+                        />
+                      ),
+                    },
+                  ]}
+                />
+              </motion.div>
+            </DashboardWithSidebar>
           </DashboardSection>
         </motion.div>
       </RoleBasedDashboard>

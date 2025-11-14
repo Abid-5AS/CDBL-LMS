@@ -1,0 +1,230 @@
+CDBL Leave Management System - TEST DATA REFERENCE GUIDE
+All data you need for manual testing - Copy and paste these values exactly
+
+DEMO USER CREDENTIALS
+User Role,Email,Password,Department,Full Name,Notes
+SYSTEM_ADMIN,sysadmin@cdbl.local,demo123,IT,"System Administrator","Has access to all admin features. Use for testing admin functions."
+CEO,ceo@demo.local,demo123,Executive,"Chief Executive Officer","Can approve all leaves. Use for final approvals."
+HR_HEAD,hrhead@demo.local,demo123,HR,"HR Head","Approves leaves at step 3. Use for HR head approvals."
+HR_ADMIN,hradmin@demo.local,demo123,HR,"HR Administrator","Initial screening (step 1). Use for HR admin approvals."
+DEPT_HEAD,manager@demo.local,demo123,IT,"IT Manager / Dept Head","Department head - approves team leaves. Use for dept head approvals."
+DEPT_HEAD,depthead.hr@cdbl.local,demo123,HR,"HR Dept Head","HR Department head. Use for HR team approvals."
+DEPT_HEAD,depthead.finance@cdbl.local,demo123,Finance,"Finance Dept Head","Finance Dept head. Use for finance team approvals."
+EMPLOYEE,employee1@demo.local,demo123,IT,"Employee 1 (IT)","Regular employee. Use for most employee tests."
+EMPLOYEE,employee2@demo.local,demo123,IT,"Employee 2 (IT)","Regular employee. Use for team member tests."
+EMPLOYEE,employee3@demo.local,demo123,HR,"Employee 3 (HR)","Regular employee. Use for different dept tests."
+EMPLOYEE,employee4@demo.local,demo123,Finance,"Employee 4 (Finance)","Regular employee. Use for different dept tests."
+
+IMPORTANT: All demo passwords are "demo123"
+
+SAMPLE DATES FOR TESTING
+Date Type,Sample Date 1,Sample Date 2,Sample Date 3,Sample Date 4,Notes
+Today (for reference),2025-11-15,,,,"Current test date. Use current date when needed."
+Near future,2025-11-20,2025-11-21,2025-11-22,,"For applying leaves 1-5 days in advance."
+Far future,2025-12-10,2025-12-15,2025-12-20,,"For testing leaves with good notice period."
+Last month,2025-10-10,2025-10-15,2025-10-20,,"For testing historical data if needed."
+Upcoming weekdays,2025-11-20 (Thu),2025-11-24 (Mon),2025-11-25 (Tue),,"For testing working day calculations."
+Including weekend,2025-11-21 (Fri),2025-11-22 (Sat),2025-11-23 (Sun),2025-11-24 (Mon),"For testing weekend exclusion in calculations."
+
+LEAVE DATES - CASUAL LEAVE (Max 3 consecutive days, no side-touch)
+Scenario,Start Date,End Date,Working Days,Notes
+Valid CL - 1 day,2025-11-20,2025-11-20,1,"Thursday. Single day test."
+Valid CL - 2 days,2025-11-20,2025-11-21,2,"Thu-Fri. Two day test."
+Valid CL - 3 days,2025-11-24,2025-11-26,3,"Mon-Wed. Max 3 days test."
+Invalid CL - 4 days,2025-11-20,2025-11-24,4,"Would be 4 days - SHOULD FAIL"
+CL touching weekend,2025-11-21,2025-11-24,3,"Fri-Mon. Side-touch rule may block"
+CL with holiday,2025-11-20,2025-11-24,X,"Check if holiday affects - depends on actual calendar"
+
+LEAVE DATES - EARNED LEAVE (5 day notice required, can backdate)
+Scenario,Start Date,End Date,Working Days,Notice Days (from today: 2025-11-15),Notes
+EL - 1 week advance,2025-11-24,2025-11-26,3,9,"Good notice, should be approved. Mon-Wed."
+EL - 2 weeks advance,2025-12-01,2025-12-05,5,16,"Excellent notice, should be approved. Mon-Fri."
+EL - No notice (<5 days),2025-11-17,2025-11-19,2,2,"Only 2 days notice. Should show warning."
+EL - Backdate,2025-11-10,2025-11-14,5,-5,"Past date. System may allow with confirmation."
+
+LEAVE DATES - MEDICAL LEAVE (No notice required, certificate >3 days)
+Scenario,Start Date,End Date,Working Days,Certificate Required,Notes
+ML - 1 day,2025-11-17,2025-11-17,1,No,"Single day. No cert needed."
+ML - 3 days,2025-11-17,2025-11-19,3,No,"3 days exactly - borderline, check policy."
+ML - 4 days,2025-11-17,2025-11-20,4,Yes,"4 days. Certificate required."
+ML - 8 days (fitness cert on return),2025-11-17,2025-11-24,8,Yes + Fitness,"8 days. Fitness cert on return required."
+ML - backdate,2025-11-10,2025-11-14,5,Yes,"Backdate ML. Should allow."
+
+CERTIFICATE FILE PATHS (For upload testing)
+File Type,Filename,Format,Size,Notes
+Medical Certificate,sample-medical-cert.pdf,PDF,~150 KB,"Sample certificate. Use for ML >3 days."
+Fitness Certificate,sample-fitness-cert.jpg,JPG,~200 KB,"Sample fitness cert. Use for ML >7 days return."
+Invalid File 1,invalid-file.txt,TXT,~10 KB,"Should be rejected (not PDF/image)."
+Invalid File 2,large-file.mp4,MP4,~50 MB,"Should be rejected (too large, wrong format)."
+Invalid File 3,document.docx,DOCX,~100 KB,"Should be rejected (wrong format)."
+Valid JPG,receipt.jpg,JPG,~300 KB,"Valid image file for medical certificate."
+Valid PNG,receipt.png,PNG,~250 KB,"Valid PNG image for fitness certificate."
+Oversized PDF,huge-file.pdf,PDF,~10 MB,"Should be rejected (exceeds 5 MB limit)."
+
+LEAVE BALANCE EXAMPLES
+User: employee1@demo.local - Current Balances (As of 2025-11-15)
+Leave Type,Opening Balance,Accrued,Used,Closing (Available),Max/Limit,Notes
+Earned (EL),12 days,11 days (9+2/month),2 days,21 days,60 days,"12 carried from last year. Accrued so far this year."
+Casual (CL),0 days,8.3 days (10/12*10),1 day,7.3 days,10 days/year,"No carry-forward. Accrued proportionally."
+Medical (ML),0 days,11.7 days (14/12*10),3 days,8.7 days,14 days/year,"No carry-forward. Annual limit enforced."
+Maternity,-,-,-,-,56/112 days,"Not used. Shows when employee applies."
+Paternity,-,-,-,-,Max 10 days,"Not used. Max 2 occasions."
+Quarantine,-,-,-,-,21/30 days,"Not used. Shows when applied."
+
+USER PROFILE DATA
+User,Email,Employee Code,Department,Designation,Join Date,Retirement Date,Notes
+employee1@demo.local,employee1@demo.local,IT001,IT,Software Engineer,2023-01-15,2058-01-15,"Standard employee. ~2 years service."
+employee2@demo.local,employee2@demo.local,IT002,IT,Developer,2022-01-15,2057-01-15,">3 years service. Eligible for EXTRAWITHPAY."
+employee3@demo.local,employee3@demo.local,HR001,HR,HR Officer,2022-06-15,2057-06-15,"~2.5 years service. Eligible for most leaves."
+employee4@demo.local,employee4@demo.local,FIN001,Finance,Accountant,2020-01-15,2055-01-15,"~5 years service. Eligible for extended extraordinary leave."
+manager@demo.local,manager@demo.local,IT-DH01,IT,Manager,2018-01-15,2053-01-15,">5 years. Dept head. Eligible for all leaves."
+
+TEST SCENARIOS & WORKFLOWS
+Scenario Name,Steps,Expected Outcome,Test User,Notes
+Complete Leave Request Flow,"1. Login 2. Apply for EL 3. Wait for approvals 4. Check balance","Balance deducted after approval",employee1@demo.local,"Tests full workflow: submit -> HR admin forwards -> Dept head forwards -> HR head approves -> CEO final approval"
+Returned & Resubmit,"1. Have returned leave 2. Click edit 3. Change date 4. Resubmit","Resubmitted as new version",employee1@demo.local,"Tests workflow when request is returned for changes."
+Cancellation Request,"1. Have APPROVED leave 2. Request cancellation 3. Approver approves 4. Check balance","Balance restored, status CANCELLED",employee1@demo.local,"Tests cancellation of approved leave."
+Medical Cert Upload,"1. Apply ML >3 days 2. Upload cert 3. Submit 4. Check stored","Cert URL stored, visible to approvers",employee1@demo.local,"Tests certificate handling."
+Fitness Cert on Return,"1. Have APPROVED ML >7 days 2. Record duty return 3. Upload fitness cert","Fitness cert stored, return confirmed",employee1@demo.local,"Tests duty return for medical leave."
+Multi-level Approval,"1. Submit leave 2. Approve at each level 3. Check progression","Shows which step it's at",employee1@demo.local,"Tests 4-step approval: HR -> DeptHead -> HRHead -> CEO"
+Insufficient Balance,"1. Try to apply >available CL 2. Submit form","Error shown, cannot submit",employee1@demo.local,"Tests balance validation."
+Notice Period Warning,"1. Apply EL <5 days away 2. Try to submit","Warning shown but allows submission",employee1@demo.local,"Tests notice period warning."
+
+COMMON ERROR MESSAGES (What you might see)
+Error Type,Error Message,Likely Cause,How to Fix
+Insufficient Balance,"You have insufficient leave balance for this request","Applied for more days than available","Reduce days requested or wait for balance accrual."
+Notice Period,"This leave requires X days advance notice. You have provided Y days.","Applied without sufficient notice (EL: 5 days required)","Choose dates further in advance or proceed with warning."
+Certificate Required,"Medical certificate is required for leaves exceeding 3 days.","Applied for ML >3 days without uploading cert","Upload valid PDF or image certificate file."
+Service Ineligible,"You are not eligible for this leave type yet. Please check back on [DATE].","Service requirement not met (e.g., <3 yrs for EXTRAWITHPAY)","Try different leave type or apply after eligibility date."
+Invalid Date Range,"End date must be after start date.","End date selected before start date or same as start","Select valid date range with end date after start date."
+Date In Past,"Cannot apply for leave in the past.","Selected date before today (backdate not allowed for type)","Choose future date or check if leave type allows backdating."
+File Too Large,"File size exceeds 5MB limit.","Certificate file is larger than allowed","Upload smaller file or compress image."
+Invalid File Type,"Only PDF and image files (JPG, PNG) are accepted.","Tried to upload TXT, DOCX, MP4, etc.","Use PDF or image format (JPG, PNG)."
+Session Expired,"Your session has expired. Please login again.","Haven't used system for 24 hours or server restarted","Go back to login and enter credentials again."
+Access Denied,"You do not have permission to access this resource.","Wrong role trying to access feature","Login with correct role or contact admin."
+
+BALANCE CALCULATION EXAMPLES
+Example 1: EARNED Leave Balance
+Opening Balance: 15 days (from last year carry-forward, max 60)
+Year Start: 2025-01-01
+Today: 2025-11-15 (11.5 months elapsed)
+Monthly Accrual: 2 days/month
+Months Completed: 11 months = 11 days earned + 1 day from Nov = 12 days total accrued
+Used so far: 5 days (from approved leaves)
+Current Balance: 15 + 12 - 5 = 22 days available
+
+Example 2: CASUAL Leave Balance
+Annual allocation: 10 days (no carry-forward)
+Year Start: 2025-01-01
+Months Elapsed: 11.5 months
+Accrued this year: (11.5 / 12) * 10 = 9.58 ≈ 9-10 days
+Used so far: 2 days
+Current Balance: 10 - 2 = 8 days available (or 9.58 if calculated monthly)
+
+Example 3: MEDICAL Leave Balance
+Annual allocation: 14 days (no carry-forward)
+Year Start: 2025-01-01
+Months Elapsed: 11.5 months
+Accrued: (11.5 / 12) * 14 = 13.4 ≈ 13-14 days
+Used so far: 3 days
+Current Balance: 14 - 3 = 11 days available
+
+WEEKEND & HOLIDAY EXCEPTIONS (Bangladesh Context)
+Day Type,Days Included,Notes
+Regular Weekday,Monday-Thursday,"Normal working days."
+Weekend Friday,Friday,"Weekend in Bangladesh (not working day)."
+Weekend Saturday,Saturday,"Weekend in Bangladesh (not working day)."
+Public Holidays (Sample),Bangla New Year (April 14),Exclude from working days calculation
+Public Holidays (Sample),Independence Day (March 26),Exclude from working days calculation
+Optional Holidays,Durga Puja (Oct date varies),"May be included/excluded based on setting."
+
+WORKING DAYS CALCULATION EXAMPLES
+Example: Nov 20-22 (Thu-Sat)
+Start: 2025-11-20 (Thursday)
+End: 2025-11-22 (Saturday)
+Calendar days: 3 days
+Weekends to exclude: Saturday (1 day)
+Holidays in range: None
+Working days = 3 - 1 = 2 days
+
+Example: Nov 24-26 (Mon-Wed)
+Start: 2025-11-24 (Monday)
+End: 2025-11-26 (Wednesday)
+Calendar days: 3 days
+Weekends to exclude: None
+Holidays: None
+Working days = 3 days
+
+Example: Nov 20-24 (Thu-Mon) crossing weekend
+Start: 2025-11-20 (Thursday)
+End: 2025-11-24 (Monday)
+Calendar days: 5 days
+Weekends: Friday (1) + Saturday (1) = 2 days
+Working days = 5 - 2 = 3 days
+
+POLICY QUICK REFERENCE (For validation testing)
+Policy Number,Rule,Requirement,Test Case
+Policy 6.10,CASUAL Leave Limit,Max 3 consecutive days,"Apply 4 days of CL - should fail"
+Policy 6.11,CASUAL Exemption,Exempt from notice requirements,"Apply CL with 0 notice - should work"
+Policy 6.11,EL Notice,Requires 5 working days notice,">5 days away: OK, <5 days: warning"
+Policy 6.14,Medical Fitness,Fitness cert required if ML >7 days,"ML 8 days -> must upload fitness cert on return"
+Policy 6.19,EL Carry-forward,Max 60 days cap,"EL balance capped at 60 days"
+Policy 6.19,EL Encashment,Must retain 10 days min,"Cannot encash if leaves <10 days remaining"
+Policy 6.20,CL Accrual,10 days/year,"CL: no carry, only 10 days per year"
+Policy 6.21,ML Accrual,14 days/year,"ML: 14 days/year, excess uses EL"
+Policy 6.23,Maternity,56 days if ≥6mo service,"ML test: check eligibility and duration"
+Policy 6.24,Paternity,"Max 2 occasions, 36mo apart","Cannot apply paternity leave 3rd time"
+Policy 6.25,Study Leave,Max 365 days initial + 365 extension,"SL: check duration limits and duration"
+
+ROLE PERMISSION MATRIX (For access testing)
+Feature,EMPLOYEE,DEPT_HEAD,HR_ADMIN,HR_HEAD,CEO,SYSTEM_ADMIN
+Apply Leave,✓,✓,✓,✓,✓,✓
+Approve Leaves,✗,✓ (team),✓,✓,✓,✓
+Final Approve,✗,✗,✗,✓ (some),✓,✓
+Reject Leaves,✗,✓ (team),✓,✓,✓,✓
+Cancel Leaves,✓ (own),✓ (team),✓,✓,✓,✓
+View Own Balance,✓,✓,✓,✓,✓,✓
+View All Balances,✗,✓ (team),✓,✓,✓,✓
+Manage Users,✗,✗,✗,✗,✓,✓
+Manage Holidays,✗,✗,✗,✗,✗,✓
+Configure Policies,✗,✗,✗,✗,✗,✓
+View Audit Logs,✗,✗,✗,✗,✗,✓
+Export Reports,✗,✗,✓,✓,✓,✓
+View Analytics,✗,✓ (team),✓,✓,✓,✓
+
+HTTP STATUS CODES YOU MIGHT ENCOUNTER
+Code,Meaning,Common Scenario,What to Do
+200,OK / Success,"Leave submitted successfully, data retrieved","Test passed. Expected behavior."
+201,Created,"New leave request created","Test passed. Resource created."
+400,Bad Request,"Invalid form data, missing required field","Check error message, fix form data"
+401,Unauthorized,"Session expired, not logged in","Login again with credentials."
+403,Forbidden,"Access denied, wrong role for action","Verify correct user role for action."
+404,Not Found,"Leave ID doesn't exist, wrong URL","Check URL/ID, try different leave."
+409,Conflict,"Action violates business rule (e.g., already approved)","Review policy constraints."
+422,Unprocessable Entity,"Validation failed (e.g., insufficient balance)","Review validation error message."
+429,Too Many Requests,"Rate limited after multiple failed attempts","Wait 15 minutes before retrying."
+500,Server Error,"Unexpected server issue","Note error, report to team, try again later."
+502,Bad Gateway,"Server temporarily unavailable","Wait a few seconds, retry."
+503,Service Unavailable,"Server under maintenance","Wait and retry later."
+
+USEFUL BROWSER DEVELOPER TOOLS SHORTCUTS
+Action,Keyboard Shortcut (Windows),Keyboard Shortcut (Mac),Purpose
+Open Dev Tools,F12 or Ctrl+Shift+I,Cmd+Option+I,"View network requests, console errors"
+Open Inspector,Ctrl+Shift+C,Cmd+Shift+C,"Inspect HTML elements on page"
+Open Console,Ctrl+Shift+J,Cmd+Shift+J,"View JavaScript errors and logs"
+Open Network Tab,Ctrl+Shift+N,Cmd+Shift+N,"View HTTP requests and responses"
+Open Application Tab,Ctrl+Shift+I then App,Cmd+Option+I then App,"View cookies and localStorage"
+Check Network Requests,F12 -> Network,Cmd+Option+I -> Network,"Monitor API calls while testing"
+
+TIPS FOR SUCCESSFUL TESTING
+Tip Category,Tip,Example
+Data Entry,"Always use exact data from this reference sheet","Type: employee1@demo.local not employee1 @ demo.local"
+Dates,"When tests say 'future date' use 2025-11-24+","Not a random date. Consistency matters."
+Passwords,"Always use demo123 for all demo accounts","Not 'demo' or 'password' or 'demo12'."
+Wait Times,"Allow 2-3 seconds for pages to load","Don't click submit twice. Wait for response."
+Error Messages,"Read error messages carefully - they tell you what's wrong","'Insufficient notice' vs 'Insufficient balance' - different fixes"
+Status Codes,"Look for Status column if testing APIs","Each test has expected status in test sheet."
+Clear Cache,"Between test cycles, clear browser cache if issues arise","Dev Tools -> Clear site data. Or test in incognito."
+Take Notes,"Write observations in 'Notes' column while testing","Helps track patterns and remember details."
+Screenshots,"Take screenshots of errors or unusual behavior","Paste filename in 'Screenshot' column."
+Ask for Help,"If test keeps failing, check this reference sheet first","99% of issues are data entry or timing."
