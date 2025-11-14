@@ -22,6 +22,9 @@ export { useCache, useAsyncCache } from "./useCache";
 // API optimization hooks
 export { useOptimizedAPI, useMultipleAPIs, useAPIStats } from "./useOptimizedAPI";
 
+// Accessibility hooks
+export { useAccessibilityAudit } from "./useAccessibilityAudit";
+
 // Note: These are already re-exported from @/lib:
 // - useDebounce (from @/lib/use-debounce)
 // - useUser (from @/lib/user-context)
