@@ -36,7 +36,7 @@ function KPIGridSkeleton() {
 
 export function DeptHeadDashboardWrapper() {
   const { state } = useFilterFromUrl();
-  const { data, isLoading, error, mutate } = useApiQueryWithParams<{
+  const { data: rawData, isLoading, error, mutate } = useApiQueryWithParams<{
     items: unknown[];
     counts: {
       pending: number;
@@ -58,12 +58,19 @@ export function DeptHeadDashboardWrapper() {
     }
   );
 
-  const counts = data?.counts || {
+  const counts = rawData?.counts || {
     pending: 0,
     forwarded: 0,
     returned: 0,
     cancelled: 0,
   };
+
+  // Transform API response to component format
+  const data = rawData ? {
+    rows: rawData.items as any[],
+    total: rawData.items.length,
+    counts: rawData.counts,
+  } : undefined;
 
   return (
     <div className="space-y-6">
