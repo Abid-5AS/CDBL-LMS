@@ -6,7 +6,7 @@ import {
   type Holiday,
 } from "./date-utils";
 
-async function fetchHolidaysInRange(start: Date, end: Date): Promise<Holiday[]> {
+export async function fetchHolidaysInRange(start: Date, end: Date): Promise<Holiday[]> {
   const normalizedStart = normalizeToDhakaMidnight(start);
   const normalizedEnd = normalizeToDhakaMidnight(end);
 
