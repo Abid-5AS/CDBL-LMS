@@ -13,6 +13,9 @@ export { useRoleColors } from "./useRoleColors";
 export { useStatusColor } from "./useStatusColor";
 export { useDarkMode } from "./useDarkMode";
 
+// Performance monitoring hooks
+export { usePerformanceMonitor } from "./usePerformanceMonitor";
+
 // Note: These are already re-exported from @/lib:
 // - useDebounce (from @/lib/use-debounce)
 // - useUser (from @/lib/user-context)
