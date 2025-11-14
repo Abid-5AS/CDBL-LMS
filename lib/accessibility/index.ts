@@ -41,3 +41,26 @@ export {
   type KeyboardEventMap,
   type FocusTrapOptions,
 } from "./keyboard";
+
+// ARIA attributes and semantic HTML
+export {
+  AriaAttributeBuilder,
+  getSemanticElement,
+  aria,
+  associateLabel,
+  associateDescription,
+  liveRegion,
+  errorAttributes,
+  buttonAttributes,
+  linkAttributes,
+  getHeadingElement,
+  landmarkAttributes,
+  tabAttributes,
+  tabPanelAttributes,
+  optionAttributes,
+  validateAriaAttributes,
+  getRecommendedRoles,
+  type AriaRole,
+  type AriaPoliteness,
+  type Landmark,
+} from "./aria";
