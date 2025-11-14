@@ -94,6 +94,7 @@
     "commander": "^14.0.2",
     "eslint": "^9",
     "eslint-config-next": "16.0.0",
+    "jsdom": "^27.2.0",
     "next-devtools-mcp": "^0.2.1",
     "prisma": "^6.17.1",
     "shadcn": "^3.5.0",
