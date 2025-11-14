@@ -16,6 +16,9 @@ export { useDarkMode } from "./useDarkMode";
 // Performance monitoring hooks
 export { usePerformanceMonitor } from "./usePerformanceMonitor";
 
+// Cache hooks
+export { useCache, useAsyncCache } from "./useCache";
+
 // Note: These are already re-exported from @/lib:
 // - useDebounce (from @/lib/use-debounce)
 // - useUser (from @/lib/user-context)
