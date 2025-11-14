@@ -64,3 +64,23 @@ export {
   type AriaPoliteness,
   type Landmark,
 } from "./aria";
+
+// Screen reader support
+export {
+  screenReaderOnlyStyles,
+  getScreenReaderOnlyClass,
+  createScreenReaderText,
+  ScreenReaderAnnouncer,
+  getGlobalAnnouncer,
+  announce,
+  tableHeaderAttributes,
+  tableCaption,
+  listItemAttributes,
+  createSkipLink,
+  isHiddenFromScreenReaders,
+  announceRegion,
+  expandableAttributes,
+  createPageStructure,
+  getScreenReaderStyles,
+  type AnnouncementOptions,
+} from "./screenReader";
