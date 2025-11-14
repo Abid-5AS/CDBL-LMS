@@ -245,7 +245,7 @@ export function CEODashboardClient() {
                 <div className="flex items-end justify-between">
                   <div>
                     <p className="text-3xl font-bold">
-                      {stats?.yoyGrowth > 0 ? "+" : ""}{stats?.yoyGrowth || 0}%
+                      {(stats?.yoyGrowth ?? 0) > 0 ? "+" : ""}{stats?.yoyGrowth ?? 0}%
                     </p>
                     <p className="text-sm text-muted-foreground">
                       vs last year

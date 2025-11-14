@@ -30,7 +30,7 @@ export function AnalyticsSection() {
   // Fetch summary data independently (not from heatmap)
   const { data: summaryData, isLoading: isLoadingSummary } = useSWR(
     `/api/dashboard/analytics/summary?period=${period}`,
-    fetcher
+    apiFetcher
   );
 
   const summary = useMemo(() => {

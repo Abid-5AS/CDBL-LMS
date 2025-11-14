@@ -59,7 +59,6 @@ const itemVariants = {
     y: 0,
     transition: {
       duration: 0.4,
-      ease: [0.22, 1, 0.36, 1],
     },
   },
 };
@@ -262,6 +261,7 @@ export function ModernEmployeeDashboard({
             <DashboardWithSidebar>
             <motion.div variants={itemVariants} className="flex-1">
               <TabbedContent
+                title="Leave Details"
                 defaultTab="overview"
                 tabs={[
                   {

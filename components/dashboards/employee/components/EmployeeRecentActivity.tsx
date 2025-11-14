@@ -81,7 +81,7 @@ export function EmployeeRecentActivity({
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            <StatusBadge status={leave.status} />
+            <StatusBadge status={leave.status as any} />
             <ArrowRight className="size-4 text-text-muted" aria-hidden="true" />
           </div>
         </motion.div>

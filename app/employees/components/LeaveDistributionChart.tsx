@@ -29,9 +29,11 @@ export function LeaveDistributionChart({ data }: LeaveDistributionChartProps) {
                 innerRadius={60}
                 outerRadius={90}
                 paddingAngle={3}
-                label={({ type, value }) =>
-                  `${type} (${total > 0 ? Math.round((((value as number) ?? 0) / total) * 100) : 0}%)`
-                }
+                label={(props: any) => {
+                  const entry = data[props.index];
+                  const percentage = total > 0 ? Math.round(((props.value ?? 0) / total) * 100) : 0;
+                  return `${entry.type} (${percentage}%)`;
+                }}
               >
                 {data.map((entry, index) => (
                   <Cell
