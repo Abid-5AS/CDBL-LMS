@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { LogOut, Settings, Search } from "lucide-react";
 
 import { ThemeToggle } from "../theme-toggle";
+import { AnnotationsToggle } from "../annotations-toggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useGesture } from "@/hooks/use-gesture";
@@ -177,7 +178,10 @@ export function MobileMenu({
                         {user.role?.toLowerCase()}
                       </p>
                     </div>
-                    <ThemeToggle />
+                    <div className="flex items-center gap-1">
+                      <ThemeToggle />
+                      <AnnotationsToggle />
+                    </div>
                   </div>
 
                   {/* Action Buttons */}

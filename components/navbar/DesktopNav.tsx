@@ -6,6 +6,7 @@ import { Search, Command } from "lucide-react";
 
 import { NotificationDropdown } from "@/components/navbar";
 import { ThemeToggle } from "../theme-toggle";
+import { AnnotationsToggle } from "../annotations-toggle";
 import { cn } from "@/lib/utils";
 import { useSearch } from "@/hooks/use-search";
 
@@ -164,9 +165,10 @@ export function DesktopNav({
           <NotificationDropdown />
         </div>
 
-        {/* Theme Toggle */}
-        <div className="flex items-center">
+        {/* Theme Toggle & Annotations (Development) */}
+        <div className="flex items-center gap-1">
           <ThemeToggle />
+          <AnnotationsToggle />
         </div>
 
         {/* Divider before profile */}

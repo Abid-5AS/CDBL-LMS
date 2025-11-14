@@ -230,6 +230,18 @@ export function resetAnnotationsConfig(): void {
 }
 
 /**
+ * Toggle all annotations on/off
+ */
+export function toggleAllAnnotations(enabled: boolean): void {
+  const config = getAnnotationsConfig();
+  Object.keys(config).forEach((key) => {
+    config[key as AnnotationType].enabled = enabled;
+  });
+  saveAnnotationsConfig(config);
+  window.dispatchEvent(new CustomEvent("annotations-changed", { detail: { all: true, enabled } }));
+}
+
+/**
  * Get statistics about annotations
  */
 export function getAnnotationsStats() {
