@@ -176,9 +176,13 @@ export function HistoryAnalyticsCard({
   const [period, setPeriod] = useState<FilterPeriod>("year");
 
   // Fetch summary data for analytics
-  const { data: summaryData, isLoading: isLoadingSummary } = useSWR(
+  const { data: summaryData, isLoading: isLoadingSummary } = useSWR<{
+    summary?: any;
+    distribution?: any;
+    heatmap?: any;
+  } | undefined>(
     `/api/dashboard/analytics/summary?period=${period}`,
-    fetcher
+    apiFetcher
   );
 
   const summary = useMemo(() => {
