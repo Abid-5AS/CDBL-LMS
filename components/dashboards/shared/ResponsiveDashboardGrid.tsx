@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { AlertCircle } from "lucide-react";
 
 type ResponsiveDashboardGridProps = {
   children: ReactNode;
@@ -143,8 +144,28 @@ export function ResponsiveDashboardGrid({
 }
 
 /**
- * Dashboard Section with responsive layout
+ * Enhanced Dashboard Section with responsive layout
+ *
+ * Features:
+ * - Optional loading state with fallback
+ * - Error state display
+ * - Smooth animations
+ * - Responsive header layout
+ * - Optional divider
  */
+export interface DashboardSectionProps {
+  title?: string;
+  description?: string;
+  action?: ReactNode;
+  children: ReactNode;
+  className?: string;
+  animate?: boolean;
+  isLoading?: boolean;
+  error?: Error | null;
+  loadingFallback?: ReactNode;
+  showDivider?: boolean;
+}
+
 export function DashboardSection({
   title,
   description,
@@ -152,35 +173,85 @@ export function DashboardSection({
   children,
   className,
   animate = true,
-}: {
-  title?: string;
-  description?: string;
-  action?: ReactNode;
-  children: ReactNode;
-  className?: string;
-  animate?: boolean;
-}) {
-  const content = (
-    <section className={cn("space-y-4 sm:space-y-6", className)}>
-      {(title || description || action) && (
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
-          <div className="flex-1">
-            {title && (
-              <h2 className="text-lg sm:text-xl font-semibold text-foreground">
-                {title}
-              </h2>
-            )}
-            {description && (
-              <p className="mt-1 text-sm text-muted-foreground">
-                {description}
-              </p>
-            )}
+  isLoading = false,
+  error = null,
+  loadingFallback,
+  showDivider = false,
+}: DashboardSectionProps) {
+  // Error display
+  if (error) {
+    const errorContent = (
+      <div className={cn("rounded-lg border border-destructive/50 bg-destructive/10 p-4", className)}>
+        <div className="flex gap-3">
+          <div className="shrink-0">
+            <AlertCircle className="h-5 w-5 text-destructive" />
           </div>
-          {action && <div className="shrink-0">{action}</div>}
+          <div className="flex-1">
+            <p className="text-sm font-medium text-destructive">
+              Error loading section
+            </p>
+            <p className="mt-1 text-xs text-destructive/80">
+              {error.message || "An error occurred while loading this section."}
+            </p>
+          </div>
         </div>
-      )}
-      {children}
-    </section>
+      </div>
+    );
+
+    if (animate) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {errorContent}
+        </motion.div>
+      );
+    }
+    return errorContent;
+  }
+
+  // Loading state
+  if (isLoading && loadingFallback) {
+    if (animate) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {loadingFallback}
+        </motion.div>
+      );
+    }
+    return loadingFallback;
+  }
+
+  const content = (
+    <>
+      <section className={cn("space-y-4 sm:space-y-6", className)}>
+        {(title || description || action) && (
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
+            <div className="flex-1">
+              {title && (
+                <h2 className="text-lg sm:text-xl font-semibold text-foreground">
+                  {title}
+                </h2>
+              )}
+              {description && (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {description}
+                </p>
+              )}
+            </div>
+            {action && <div className="shrink-0">{action}</div>}
+          </div>
+        )}
+        {children}
+      </section>
+      {showDivider && <hr className="my-4 sm:my-6 border-border" />}
+    </>
   );
 
   if (animate) {
@@ -188,7 +259,7 @@ export function DashboardSection({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       >
         {content}
       </motion.div>
