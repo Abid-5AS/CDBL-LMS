@@ -127,7 +127,7 @@ describe("Chart Adapters", () => {
         },
       ];
 
-      const { trend, slices } = computeFromHistory(history);
+      const { trend, slices } = computeFromHistory(history, 2024);
 
       expect(trend.find((t) => t.month === "Jan")?.approved).toBe(5);
       expect(trend.find((t) => t.month === "Jan")?.pending).toBe(2);

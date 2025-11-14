@@ -27,6 +27,7 @@ const MONTH_ABBREV = [
 /**
  * Adapter: fromReportsSummary
  * Converts reports summary data to TrendPoint[] and Slice[]
+ * Ensures all 12 months are present in Jan-Dec order
  */
 export function fromReportsSummary(summary: {
   monthlyTrend?: Array<{ month: string; leaves: number }>;
@@ -35,11 +36,17 @@ export function fromReportsSummary(summary: {
   trend: TrendPoint[];
   slices: Slice[];
 } {
-  const trend: TrendPoint[] =
-    summary.monthlyTrend?.map((item) => ({
-      month: item.month,
-      approved: item.leaves || 0,
-    })) || [];
+  // Create a map from provided data
+  const monthDataMap = new Map<string, number>();
+  summary.monthlyTrend?.forEach((item) => {
+    monthDataMap.set(item.month, item.leaves || 0);
+  });
+
+  // Ensure all 12 months are present in correct order
+  const trend: TrendPoint[] = MONTH_ABBREV.map((month) => ({
+    month,
+    approved: monthDataMap.get(month) || 0,
+  }));
 
   const slices: Slice[] =
     summary.typeDistribution
@@ -80,20 +87,35 @@ export function fromReportsSummary(summary: {
 /**
  * Adapter: fromDashboardAgg
  * Converts dashboard aggregation data to TrendPoint[] and Slice[]
+ * Ensures all 12 months are present with default values
  */
 export function fromDashboardAgg(agg: {
-  monthlyTrend?: Array<{ month: string; approved: number; pending?: number }>;
+  monthlyTrend?: Array<{ month: string; approved: number; pending?: number; returned?: number }>;
   typeDistribution?: Array<{ type: string; count: number }>;
 }): {
   trend: TrendPoint[];
   slices: Slice[];
 } {
-  const trend: TrendPoint[] =
-    agg.monthlyTrend?.map((item) => ({
-      month: item.month,
-      approved: item.approved,
-      pending: item.pending,
-    })) || [];
+  // Create a map from provided data
+  const monthDataMap = new Map<string, { approved: number; pending: number; returned: number }>();
+  agg.monthlyTrend?.forEach((item) => {
+    monthDataMap.set(item.month, {
+      approved: item.approved || 0,
+      pending: item.pending || 0,
+      returned: item.returned || 0,
+    });
+  });
+
+  // Ensure all 12 months are present in correct order with defaults
+  const trend: TrendPoint[] = MONTH_ABBREV.map((month) => {
+    const data = monthDataMap.get(month);
+    return {
+      month,
+      approved: data?.approved || 0,
+      pending: data?.pending || 0,
+      returned: data?.returned || 0,
+    };
+  });
 
   const slices: Slice[] =
     agg.typeDistribution
@@ -124,10 +146,10 @@ export function computeFromHistory(
 } {
   const currentYear = year ?? new Date().getFullYear();
 
-  // Initialize trend data for all months
-  const trendMap = new Map<string, { approved: number; pending: number }>();
+  // Initialize trend data for all months with all status types
+  const trendMap = new Map<string, { approved: number; pending: number; returned: number }>();
   MONTH_ABBREV.forEach((month) => {
-    trendMap.set(month, { approved: 0, pending: 0 });
+    trendMap.set(month, { approved: 0, pending: 0, returned: 0 });
   });
 
   // Initialize slice data
@@ -146,16 +168,20 @@ export function computeFromHistory(
 
     // Update trend
     if (leave.status === "APPROVED") {
-      const current = trendMap.get(month) || { approved: 0, pending: 0 };
+      const current = trendMap.get(month) || { approved: 0, pending: 0, returned: 0 };
       current.approved += leave.workingDays || 0;
       trendMap.set(month, current);
     } else if (leave.status === "PENDING" || leave.status === "SUBMITTED") {
-      const current = trendMap.get(month) || { approved: 0, pending: 0 };
+      const current = trendMap.get(month) || { approved: 0, pending: 0, returned: 0 };
       current.pending += leave.workingDays || 0;
+      trendMap.set(month, current);
+    } else if (leave.status === "RETURNED") {
+      const current = trendMap.get(month) || { approved: 0, pending: 0, returned: 0 };
+      current.returned += leave.workingDays || 0;
       trendMap.set(month, current);
     }
 
-    // Update slices
+    // Update slices (count approved and pending leaves)
     if (
       (leave.status === "APPROVED" || leave.status === "PENDING") &&
       ["CASUAL", "EARNED", "MEDICAL"].includes(leave.type)
@@ -167,18 +193,22 @@ export function computeFromHistory(
   });
 
   const trend: TrendPoint[] = MONTH_ABBREV.map((month) => {
-    const data = trendMap.get(month) || { approved: 0, pending: 0 };
+    const data = trendMap.get(month) || { approved: 0, pending: 0, returned: 0 };
     return {
       month,
       approved: data.approved,
       pending: data.pending,
+      returned: data.returned,
     };
   });
 
-  const slices: Slice[] = Array.from(sliceMap.entries()).map(([type, value]) => ({
-    type,
-    value,
-  }));
+  // Filter out slices with 0 values
+  const slices: Slice[] = Array.from(sliceMap.entries())
+    .filter(([, value]) => value > 0)
+    .map(([type, value]) => ({
+      type,
+      value,
+    }));
 
   return { trend, slices };
 }
