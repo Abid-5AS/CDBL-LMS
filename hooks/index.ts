@@ -24,6 +24,7 @@ export { useOptimizedAPI, useMultipleAPIs, useAPIStats } from "./useOptimizedAPI
 
 // Accessibility hooks
 export { useAccessibilityAudit } from "./useAccessibilityAudit";
+export { useKeyboardNav } from "./useKeyboardNav";
 
 // Note: These are already re-exported from @/lib:
 // - useDebounce (from @/lib/use-debounce)

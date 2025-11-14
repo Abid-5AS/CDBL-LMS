@@ -25,3 +25,19 @@ export {
   type WCAGCriterionResult,
   type WCAGComplianceReport,
 } from "./wcag";
+
+// Keyboard accessibility
+export {
+  KeyboardEventHandler,
+  FocusTrap,
+  setFocus,
+  getFocusedElement,
+  hasFocus,
+  getFocusableElements,
+  focusNext,
+  focusPrevious,
+  restoreFocus,
+  type KeyboardHandler,
+  type KeyboardEventMap,
+  type FocusTrapOptions,
+} from "./keyboard";
