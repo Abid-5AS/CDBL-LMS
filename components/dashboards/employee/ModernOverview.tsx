@@ -218,7 +218,7 @@ export function ModernEmployeeDashboard({
                     badge: dashboardData.pendingCount.toString(),
                     content: (
                       <div className="text-center py-8">
-                        <p className="text-slate-600 dark:text-slate-400">
+                        <p className="text-text-secondary dark:text-text-tertiary">
                           Quick overview section - Dashboard stats displayed above
                         </p>
                       </div>

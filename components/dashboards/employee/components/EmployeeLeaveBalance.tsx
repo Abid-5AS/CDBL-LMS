@@ -55,9 +55,9 @@ const leaveColors: Record<
     border: "border-indigo-200 dark:border-indigo-800",
   },
   EXTRAWITHOUTPAY: {
-    light: "bg-slate-50/50 dark:bg-slate-900/10",
-    text: "text-slate-600 dark:text-slate-400",
-    border: "border-slate-200 dark:border-slate-800",
+    light: "bg-bg-secondary/50 dark:bg-bg-tertiary/30",
+    text: "text-text-secondary dark:text-text-tertiary",
+    border: "border-border-soft dark:border-border-strong",
   },
 };
 
@@ -76,12 +76,12 @@ export function EmployeeLeaveBalance({
         {[1, 2, 3, 4, 5, 6].map((i) => (
           <div
             key={i}
-            className="animate-pulse p-4 rounded-xl border border-slate-200 dark:border-slate-700"
+            className="animate-pulse p-4 rounded-xl border border-border-soft dark:border-border-strong"
           >
-            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-2/3 mb-3"></div>
-            <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded w-1/3 mb-2"></div>
-            <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded w-full mb-2"></div>
-            <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
+            <div className="h-4 bg-bg-muted dark:bg-bg-tertiary rounded w-2/3 mb-3"></div>
+            <div className="h-8 bg-bg-muted dark:bg-bg-tertiary rounded w-1/3 mb-2"></div>
+            <div className="h-2 bg-bg-muted dark:bg-bg-tertiary rounded w-full mb-2"></div>
+            <div className="h-3 bg-bg-muted dark:bg-bg-tertiary rounded w-1/2"></div>
           </div>
         ))}
       </ResponsiveDashboardGrid>
@@ -91,7 +91,7 @@ export function EmployeeLeaveBalance({
   if (Object.keys(balanceData).length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-slate-600 dark:text-slate-400">
+        <p className="text-text-secondary dark:text-text-tertiary">
           No balance information available
         </p>
       </div>
@@ -114,12 +114,12 @@ export function EmployeeLeaveBalance({
           <div
             key={type}
             className={cn(
-              "p-4 rounded-xl border border-white/20 dark:border-slate-700/50",
+              "p-4 rounded-xl border border-white/20 dark:border-border-soft/50",
               color.light
             )}
           >
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-semibold text-slate-900 dark:text-white text-sm">
+              <h4 className="font-semibold text-text-primary dark:text-text-inverted text-sm">
                 {type.charAt(0) + type.slice(1).toLowerCase()} Leave
               </h4>
               <span className={cn("text-2xl font-bold", color.text)}>
@@ -127,7 +127,7 @@ export function EmployeeLeaveBalance({
               </span>
             </div>
             <Progress value={percentage} className="h-2 mb-2" />
-            <p className="text-xs text-slate-600 dark:text-slate-400">
+            <p className="text-xs text-text-secondary dark:text-text-tertiary">
               {balance} days available
             </p>
           </div>

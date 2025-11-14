@@ -38,11 +38,45 @@
   background: rgba(255, 255, 255, 0.95);
   box-shadow: var(--elevation-3), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   transform: translateY(-2px);
+  border-color: var(--color-interactive-hover-border);
 }
 
 .dark .glass-card:hover {
   background: rgba(18, 18, 21, 0.8);
   box-shadow: var(--elevation-3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-color: var(--color-interactive-hover-border);
+}
+
+/* ===== Interactive State Utilities ===== */
+/* Hover state for cards */
+.card-interactive {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-color: var(--border-soft);
+}
+
+.card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elevation-3);
+  border-color: var(--color-interactive-hover-border);
+  background: var(--color-card-hover);
+}
+
+.dark .card-interactive:hover {
+  background: var(--color-card-hover);
+  border-color: var(--color-interactive-hover-border);
+}
+
+/* Active/pressed state */
+.card-interactive:active {
+  transform: translateY(0);
+  box-shadow: var(--elevation-1);
+  background: var(--color-card-pressed);
+}
+
+/* Focus state */
+.card-interactive:focus-within {
+  outline: 2px solid var(--color-interactive-focus-ring);
+  outline-offset: 2px;
 }
 
 .glass-nav {
@@ -616,22 +650,25 @@
 @layer utilities {
   /* Enhanced Surface Utilities */
   .surface-card {
-    background-color: var(--color-card);
+    background-color: var(--color-card-elevated);
     box-shadow: var(--shadow-md);
     border-radius: var(--radius-2xl);
     border: 1px solid var(--color-border);
     transition: transform var(--duration-300) var(--ease-out),
       box-shadow var(--duration-300) var(--ease-out),
-      background-color var(--duration-500) var(--ease-out);
+      background-color var(--duration-300) var(--ease-out),
+      border-color var(--duration-200) var(--ease-out);
   }
 
   .surface-card:hover {
     transform: translateY(calc(-1 * var(--space-1)));
     box-shadow: var(--shadow-lg);
+    border-color: var(--color-interactive-hover-border);
+    background-color: var(--color-card-hover);
   }
 
   .surface-card-interactive {
-    background-color: var(--color-card);
+    background-color: var(--color-card-elevated);
     box-shadow: var(--shadow-sm);
     border-radius: var(--radius-2xl);
     border: 1px solid var(--color-border);
@@ -642,16 +679,109 @@
   .surface-card-interactive:hover {
     transform: translateY(calc(-1 * var(--space-0-5)));
     box-shadow: var(--shadow-md);
-    border-color: var(--color-border-strong);
+    border-color: var(--color-interactive-hover-border);
+    background-color: var(--color-card-hover);
   }
 
   .surface-card-interactive:active {
     transform: translateY(0);
     box-shadow: var(--shadow-xs);
+    background-color: var(--color-card-pressed);
   }
 
   .surface-muted {
     background-color: var(--color-surface-muted);
+  }
+
+  /* Button State Utilities */
+  /* Primary Action Button - Bright accent color */
+  .btn-primary {
+    background-color: var(--color-brand);
+    color: var(--color-text-inverted);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font-weight: var(--font-medium);
+    padding: var(--space-2) var(--space-4);
+    cursor: pointer;
+    transition: all var(--duration-200) var(--ease-out);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-brand-strong);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--color-brand) 40%, transparent);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--color-brand) 40%, transparent);
+  }
+
+  .btn-primary:disabled {
+    background-color: var(--color-interactive-disabled);
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  /* Secondary Action Button - Muted version */
+  .btn-secondary {
+    background-color: var(--color-action-secondary-bg);
+    color: var(--color-action-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-weight: var(--font-medium);
+    padding: var(--space-2) var(--space-4);
+    cursor: pointer;
+    transition: all var(--duration-200) var(--ease-out);
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-secondary);
+    border-color: var(--color-border-strong);
+  }
+
+  .btn-secondary:active {
+    background-color: var(--color-bg-secondary);
+  }
+
+  .dark .btn-secondary {
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-secondary);
+  }
+
+  .dark .btn-secondary:hover {
+    background-color: var(--color-bg-muted);
+    border-color: var(--color-border-strong);
+  }
+
+  /* Destructive Action Button - Red for danger */
+  .btn-destructive {
+    background-color: var(--color-action-destructive);
+    color: var(--color-text-inverted);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font-weight: var(--font-medium);
+    padding: var(--space-2) var(--space-4);
+    cursor: pointer;
+    transition: all var(--duration-200) var(--ease-out);
+  }
+
+  .btn-destructive:hover {
+    background-color: color-mix(in srgb, var(--color-action-destructive) 90%, black);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--color-action-destructive) 40%, transparent);
+  }
+
+  .btn-destructive:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--color-action-destructive) 40%, transparent);
+  }
+
+  .btn-destructive:disabled {
+    background-color: var(--color-interactive-disabled);
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 
   /* Enhanced Typography Utilities */
