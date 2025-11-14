@@ -90,3 +90,21 @@ export {
   type ChunkConfig,
   type ChunkAnalysis,
 } from "./codeSplitting";
+
+// Image optimization
+export {
+  getResponsiveImageSrcSet,
+  getImageUrl,
+  getResponsiveImageSizes,
+  calculateOptimalDimensions,
+  getImageCompressionRecommendations,
+  generatePictureElement,
+  analyzeImagePerformance,
+  getImageOptimizationStrategy,
+  recordImageLoadMetrics,
+  getImageMetricsSummary,
+  generateImageOptimizationReport,
+  type ImageFormat,
+  type ResponsiveImageConfig,
+  type ImageLoadingStrategy,
+} from "./imageOptimization";
