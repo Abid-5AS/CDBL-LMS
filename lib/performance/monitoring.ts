@@ -5,11 +5,11 @@
  */
 
 import {
-  getCLS,
-  getFID,
-  getFCP,
-  getLCP,
-  getTTFB,
+  onCLS,
+  onINP,
+  onFCP,
+  onLCP,
+  onTTFB,
 } from "web-vitals";
 import {
   getMetricsCollector,
@@ -33,23 +33,23 @@ export function initializeWebVitals(): void {
   }
 
   // Collect LCP (Largest Contentful Paint)
-  getLCP((metric) => {
+  onLCP((metric) => {
     recordWebVital("LCP", metric.value);
     if (MONITORING_CONFIG.logWebVitals) {
       console.log("LCP:", metric.value);
     }
   });
 
-  // Collect FID (First Input Delay)
-  getFID((metric) => {
-    recordWebVital("FID", metric.value);
+  // Collect INP (Interaction to Next Paint - replaces FID)
+  onINP((metric) => {
+    recordWebVital("INP", metric.value);
     if (MONITORING_CONFIG.logWebVitals) {
-      console.log("FID:", metric.value);
+      console.log("INP:", metric.value);
     }
   });
 
   // Collect CLS (Cumulative Layout Shift)
-  getCLS((metric) => {
+  onCLS((metric) => {
     recordWebVital("CLS", metric.value);
     if (MONITORING_CONFIG.logWebVitals) {
       console.log("CLS:", metric.value);
@@ -57,7 +57,7 @@ export function initializeWebVitals(): void {
   });
 
   // Collect FCP (First Contentful Paint)
-  getFCP((metric) => {
+  onFCP((metric) => {
     recordWebVital("FCP", metric.value);
     if (MONITORING_CONFIG.logWebVitals) {
       console.log("FCP:", metric.value);
@@ -65,7 +65,7 @@ export function initializeWebVitals(): void {
   });
 
   // Collect TTFB (Time to First Byte)
-  getTTFB((metric) => {
+  onTTFB((metric) => {
     recordWebVital("TTFB", metric.value);
     if (MONITORING_CONFIG.logWebVitals) {
       console.log("TTFB:", metric.value);

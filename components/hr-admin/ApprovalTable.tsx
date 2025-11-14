@@ -266,7 +266,6 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         <CardContent>
           <EmptyState
             icon={Loader2}
-            iconClassName="animate-spin"
             title="Loading approval queue..."
             description="Fetching pending leave requests"
             className="py-8"
@@ -450,18 +449,18 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                             ceoMode={userRole === "CEO" || userRole === "HR_HEAD"}
                             onForward={
                               userRole === "HR_ADMIN" || userRole === "DEPT_HEAD"
-                                ? () => handleDecision(item.id, "forward", item.requestedByName)
+                                ? () => handleDecision(item.id, "forward", item.requestedByName || undefined)
                                 : undefined
                             }
                             onReturn={
                               userRole === "HR_ADMIN" || userRole === "DEPT_HEAD"
-                                ? () => handleDecision(item.id, "return", item.requestedByName)
+                                ? () => handleDecision(item.id, "return", item.requestedByName || undefined)
                                 : undefined
                             }
-                            onCancel={() => handleDecision(item.id, "reject", item.requestedByName)}
+                            onCancel={() => handleDecision(item.id, "reject", item.requestedByName || undefined)}
                             onApprove={
                               userRole === "CEO" || userRole === "HR_HEAD"
-                                ? () => handleDecision(item.id, "approve", item.requestedByName)
+                                ? () => handleDecision(item.id, "approve", item.requestedByName || undefined)
                                 : undefined
                             }
                             disabled={processingId !== null}

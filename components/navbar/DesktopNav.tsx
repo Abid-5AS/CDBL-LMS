@@ -61,7 +61,6 @@ export function DesktopNav({
                   transition={{
                     duration: 0.3,
                     delay: 0.3 + index * 0.05,
-                    ease: [0.22, 1, 0.36, 1],
                   }}
                 >
                   <Link

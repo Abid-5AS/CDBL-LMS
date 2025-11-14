@@ -288,7 +288,7 @@ export function PendingLeaveRequestsTable({
                             exit={{ opacity: 0, x: -20 }}
                             transition={{ duration: 0.2, delay: index * 0.03 }}
                             className="group border-b border-bg-muted hover:bg-bg-secondary cursor-pointer transition-colors"
-                            onClick={() => handleRowClick(leave)}
+                            onClick={() => handleRowClick(leave as any)}
                           >
                             <TableCell className="py-4">
                               <div className="flex items-center gap-3">
@@ -364,9 +364,9 @@ export function PendingLeaveRequestsTable({
                                   leave.status === "SUBMITTED") && (
                                   <ApprovalActionButtons
                                     size="sm"
-                                    onForward={() => handleForward(leave)}
-                                    onReturn={() => handleQuickAction(leave, "return")}
-                                    onCancel={() => handleQuickAction(leave, "reject")}
+                                    onForward={() => handleForward(leave as any)}
+                                    onReturn={() => handleQuickAction(leave as any, "return")}
+                                    onCancel={() => handleQuickAction(leave as any, "reject")}
                                     disabled={isProcessingThis}
                                     loading={isProcessingThis}
                                     loadingAction={isProcessingThis ? "forward" : null}
@@ -392,12 +392,12 @@ export function PendingLeaveRequestsTable({
                     return (
                       <PendingLeaveCard
                         key={leave.id}
-                        leave={leave}
+                        leave={leave as any}
                         index={index}
                         isProcessing={isProcessingThis}
-                        onRowClick={handleRowClick}
-                        onForward={handleForward}
-                        onReturn={(l) => handleQuickAction(l, "return")}
+                        onRowClick={(l: any) => handleRowClick(l as any)}
+                        onForward={(l: any) => handleForward(l as any)}
+                        onReturn={(l: any) => handleQuickAction(l as any, "return")}
                       />
                     );
                   })}

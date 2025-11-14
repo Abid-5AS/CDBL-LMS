@@ -14,7 +14,15 @@ export function DeptHeadQuickActions() {
   const [isExporting, setIsExporting] = useState(false);
 
   // Fetch team data for export
-  const { data: teamData } = useSWR(
+  const { data: teamData } = useSWR<{
+    items: unknown[];
+    counts: {
+      pending: number;
+      forwarded: number;
+      returned: number;
+      cancelled: number;
+    };
+  }>(
     "/api/manager/pending",
     apiFetcher
   );
@@ -105,7 +113,6 @@ export function DeptHeadQuickActions() {
       icon: isExporting ? Download : FileSpreadsheet,
       onClick: handleExportReport,
       tooltip: "Export team leave report as CSV",
-      disabled: isExporting,
     },
   ];
 

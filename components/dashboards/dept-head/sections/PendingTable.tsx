@@ -103,7 +103,7 @@ export function DeptHeadPendingTable({
     setSearchInput("");
   };
 
-  const hasActiveFilters = state.q || state.status !== "PENDING" || state.type !== "ALL";
+  const hasActiveFilters = Boolean(state.q) || state.status !== "PENDING" || state.type !== "ALL";
 
   // Helper to determine available actions based on user role and leave type
   const getAvailableActions = (leaveType: LeaveType): Array<"approve" | "forward" | "return" | "cancel"> => {

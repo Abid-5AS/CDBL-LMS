@@ -54,7 +54,7 @@ interface UseKeyboardNavOptions {
  *     },
  *   });
  *
- *   return <div ref={containerRef}>{/* modal content */}</div>;
+ *   return <div ref={containerRef}>modal content</div>;
  * }
  * ```
  */

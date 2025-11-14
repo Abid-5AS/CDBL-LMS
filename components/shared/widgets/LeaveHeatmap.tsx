@@ -61,7 +61,7 @@ export function LeaveHeatmap({
   const typesParam = types.length > 0 ? types.join(",") : "all";
   const { data: heatmapData, isLoading } = useSWR(
     `/api/analytics/heatmap?scope=${scope}&range=${range}&types=${typesParam}&status=${status}`,
-    fetcher
+    apiFetcher
   );
 
   // Notify parent of param changes (optional callback)
@@ -71,10 +71,10 @@ export function LeaveHeatmap({
     newTypes: string[],
     newStatus: string
   ) => {
-    setScope(newScope);
-    setRange(newRange);
+    setScope(newScope as "me" | "team");
+    setRange(newRange as any);
     setTypes(newTypes);
-    setStatus(newStatus);
+    setStatus(newStatus as any);
     if (onParamsChange) {
       onParamsChange({
         scope: newScope,

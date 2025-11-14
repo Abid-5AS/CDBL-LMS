@@ -29,8 +29,8 @@ export function LeaveDistributionChart({ data }: LeaveDistributionChartProps) {
                 innerRadius={60}
                 outerRadius={90}
                 paddingAngle={3}
-                label={({ type, value }) =>
-                  `${type} (${total > 0 ? Math.round((((value as number) ?? 0) / total) * 100) : 0}%)`
+                label={({ payload, value }: any) =>
+                  `${payload?.type || 'Unknown'} (${total > 0 ? Math.round((((value as number) ?? 0) / total) * 100) : 0}%)`
                 }
               >
                 {data.map((entry, index) => (

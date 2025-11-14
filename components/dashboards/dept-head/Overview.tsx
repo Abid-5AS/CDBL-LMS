@@ -129,7 +129,7 @@ export function DeptHeadDashboardWrapper() {
       >
         <div id="pending-requests-table">
           <DeptHeadPendingTable
-            data={data}
+            data={data ? { rows: data.items, total: data.items?.length ?? 0, counts: data.counts } : undefined}
             isLoading={isLoading}
             error={error}
             onMutate={mutate}

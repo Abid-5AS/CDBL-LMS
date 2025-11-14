@@ -15,7 +15,7 @@ async function PoliciesPageWrapper() {
 
   // All authenticated users can view policies
   const allowedRoles = ["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"];
-  if (!allowedRoles.includes(role)) {
+  if (!role || !allowedRoles.includes(role)) {
     redirect("/dashboard");
   }
 

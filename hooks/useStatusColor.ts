@@ -57,7 +57,7 @@ export function useStatusColor(options: UseStatusColorOptions) {
     if (isLeaveStatus) {
       // Map leave status to standard status type
       statusType = mapLeaveStatusToType(status);
-      color = getLeaveStatusColor(status as keyof import("@/constants/colors").typeof import("@/constants/colors").LEAVE_STATUS_COLORS, isDark ? "dark" : "light");
+      color = getLeaveStatusColor(status as any, isDark ? "dark" : "light");
       bgColor = getLeaveStatusColor(status as any, "bg");
     } else {
       statusType = status as StatusType;

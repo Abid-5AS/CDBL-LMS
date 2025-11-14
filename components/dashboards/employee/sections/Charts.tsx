@@ -28,9 +28,12 @@ export function AnalyticsSection() {
   const [period, setPeriod] = useState<FilterPeriod>("year");
 
   // Fetch summary data independently (not from heatmap)
-  const { data: summaryData, isLoading: isLoadingSummary } = useSWR(
+  const { data: summaryData, isLoading: isLoadingSummary } = useSWR<{
+    summary: any;
+    distribution?: any[];
+  }>(
     `/api/dashboard/analytics/summary?period=${period}`,
-    fetcher
+    apiFetcher
   );
 
   const summary = useMemo(() => {
