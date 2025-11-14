@@ -1,0 +1,203 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                  CDBL LEAVE MANAGEMENT - TESTING QUICK START                   ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+📋 STEP 1: SETUP (5 minutes)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1. Open Terminal
+  2. Navigate to project:
+     $ cd /Users/md.abidshahriar/Documents/CDBL/cdbl-leave-management
+
+  3. Install dependencies:
+     $ npm install
+
+  4. Reset database:
+     $ npx prisma migrate reset --force
+
+  5. Start server:
+     $ npm run dev
+     Expected: ✓ Ready in Xs, ✓ http://localhost:3000
+
+
+🧪 STEP 2: RUN AUTOMATED TESTS (10 minutes)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Open new terminal and run:
+
+  Option A - Run all tests:
+    $ npm test
+
+  Option B - Run specific suite:
+    $ npm test -- backend-api.test.ts
+    $ npm test -- frontend-components.test.tsx
+    $ npm test -- integration.test.ts
+
+  Expected Results:
+    ✓ Backend API Tests:      39/39 pass
+    ✓ Frontend Components:    50/50 pass
+    ✓ Integration Tests:      28/28 pass
+    ─────────────────────────────────────
+    ✓ TOTAL:                117/117 pass
+
+
+📝 STEP 3: MANUAL TESTING (1-2 hours)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Follow TESTING_CHECKLIST.md:
+
+  ☐ Pre-Testing Setup
+  ☐ Backend API Tests (39 checks)
+  ☐ Frontend Components (50 checks)
+  ☐ Integration Tests (28 checks)
+  ☐ Role-Based Testing
+  ☐ Feature Testing
+  ☐ Performance Testing
+  ☐ Accessibility Testing
+  ☐ Security Testing
+
+
+✅ STEP 4: SIGN OFF
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Complete TESTING_CHECKLIST.md:
+
+  ☐ Total tests passed: ___/294+
+  ☐ Issues found: ___ critical, ___ high priority, ___ medium, ___ low
+  ☐ QA Engineer Name: ___________________
+  ☐ Sign-off Date: ___________________
+  ☐ Status: ☐ Pass ☐ Pass with issues ☐ Fail
+
+
+🧑‍💻 TEST USERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Email                    | Role      | Password    | Department
+  ─────────────────────────┼───────────┼─────────────┼──────────────
+  ceo@cdbl.com             | CEO       | Test@123456 | Executive
+  hrhead@cdbl.com          | HR_HEAD   | Test@123456 | HR
+  hradmin@cdbl.com         | HR_ADMIN  | Test@123456 | HR
+  depthead@cdbl.com        | DEPT_HEAD | Test@123456 | Operations
+  employee1@cdbl.com       | EMPLOYEE  | Test@123456 | Operations
+  employee2@cdbl.com       | EMPLOYEE  | Test@123456 | Finance
+  employee3@cdbl.com       | EMPLOYEE  | Test@123456 | IT
+
+
+📊 LEAVE BALANCES (FY 2025)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Leave Type           | Opening | Accrued | Used | Available
+  ─────────────────────┼─────────┼─────────┼──────┼───────────
+  Casual Leave (CL)    | 5       | 8.33    | 2    | 11.33
+  Medical Leave (ML)   | 0       | 11.67   | 1    | 10.67
+  Earned Leave (EL)    | 15      | 15      | 5    | 25
+  Extra w/ Pay         | 0       | 0       | 0    | 0
+  Extra w/o Pay        | 0       | 0       | 0    | 0
+
+
+🗓️ HOLIDAYS 2025
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ☐ Jan 26:  Republic Day
+  ☐ Mar 17:  Bengali New Year
+  ☐ Aug 15:  Independence Day
+  ☐ Dec 16:  Victory Day
+  ☐ Dec 25:  Christmas (Optional)
+
+
+📚 DOCUMENTATION FILES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  READ FIRST:
+  ☐ TESTING_SUMMARY.md           - Overview of all tests
+  ☐ RUN_TESTS.md                 - How to run tests
+  ☐ TESTING_CHECKLIST.md         - Complete testing checklist
+
+  REFERENCE:
+  ☐ QA_TESTING_GUIDE.md          - Detailed QA guide
+  ☐ QA_QUICK_REFERENCE.md        - Quick lookup
+  ☐ AUTH_BYPASS_IMPLEMENTATION.md - Auth setup
+  ☐ DATABASE_RESET_AND_SEEDING.md - Database setup
+
+
+🎯 TEST FILES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  tests/backend-api.test.ts           (39 tests)
+  tests/frontend-components.test.tsx  (50 tests)
+  tests/integration.test.ts           (28 tests)
+
+
+⚡ QUICK COMMANDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Setup:
+    $ npm install
+    $ npx prisma migrate reset --force
+
+  Run Tests:
+    $ npm test                          (all tests)
+    $ npm test -- --watch              (watch mode)
+    $ npm test -- --coverage           (coverage report)
+
+  Server:
+    $ npm run dev                       (start server)
+    $ npm run build                     (build for production)
+
+  Database:
+    $ npx prisma studio               (view database)
+    $ npx prisma db seed              (reseed test data)
+
+
+📈 EXPECTED RESULTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Automated Tests (117):
+    ✓ 39 Backend API tests
+    ✓ 50 Frontend component tests
+    ✓ 28 Integration tests
+    ✓ 100% Pass Rate
+
+  Manual Tests (177+):
+    ✓ All user roles tested
+    ✓ All features verified
+    ✓ Performance validated
+    ✓ Accessibility checked
+    ✓ Security validated
+
+  Overall:
+    ✓ 294+ Total Tests
+    ✓ 95%+ Pass Rate Required
+    ✓ 0 Critical Issues
+    ✓ < 3 High Priority Issues
+
+
+🚨 TROUBLESHOOTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  MySQL not running:
+    $ brew services start mysql-server    (Mac)
+
+  Port 3000 already in use:
+    $ lsof -ti :3000 | xargs kill -9
+
+  Database connection error:
+    $ npx prisma migrate reset --force
+
+  Tests not running:
+    $ npm test -- --clearCache
+    $ npm test
+
+
+✨ STATUS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ✓ All test scripts created
+  ✓ All documentation prepared
+  ✓ Test data configured
+  ✓ Ready for testing
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+              For more details, see TESTING_SUMMARY.md
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
