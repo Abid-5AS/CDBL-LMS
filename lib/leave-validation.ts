@@ -39,10 +39,16 @@ type CasualLeaveValidationOptions = {
 };
 
 /**
- * Check if Casual Leave violates the side-touch rule.
- * Rules:
- * - Start or end date cannot fall on a Friday/Saturday/company holiday
- * - Day before start and day after end cannot be a Friday/Saturday/company holiday
+ * Check if Casual Leave violates the holiday rules (Policy 6.20.e)
+ *
+ * CL is the STRICTEST leave type. Per Policy 6.20(e):
+ * "Casual leave cannot be combined with any other leave or preceded or succeeded by any holidays."
+ *
+ * Rules (BOTH must be satisfied):
+ * A) CL dates must be PURE WORKING DAYS (no holidays/weekends within CL dates)
+ * B) CL cannot be ADJACENT to holidays (day before start / day after end cannot be holiday)
+ *
+ * Updated 2025-11-14: Clarified that BOTH rules A and B apply
  */
 export async function violatesCasualLeaveSideTouch(
   start: Date,
@@ -59,9 +65,16 @@ export async function violatesCasualLeaveSideTouch(
     options.holidays ??
     (await fetchHolidaysInRange(rangeStart, rangeEnd));
 
-  if (isNonWorking(normalizedStart, holidays)) return true;
-  if (isNonWorking(normalizedEnd, holidays)) return true;
+  // Rule A: Check EVERY day in CL range is a working day (no holidays/weekends within CL)
+  let currentDate = new Date(normalizedStart);
+  while (currentDate <= normalizedEnd) {
+    if (isNonWorking(currentDate, holidays)) {
+      return true; // CL contains a holiday/weekend → violation
+    }
+    currentDate = addDays(currentDate, 1);
+  }
 
+  // Rule B: Check day before start and day after end are working days (no adjacency to holidays)
   const beforeStart = addDays(normalizedStart, -1);
   const afterEnd = addDays(normalizedEnd, 1);
 
