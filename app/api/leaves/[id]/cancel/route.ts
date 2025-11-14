@@ -6,6 +6,7 @@ import { z } from "zod";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
 import { canCancelMaternityLeave } from "@/lib/leave-validation";
+import { processELOverflow } from "@/lib/el-overflow";
 
 export const cache = "no-store";
 
@@ -154,6 +155,16 @@ export async function POST(
         closing: newClosing,
       },
     });
+
+    // Check if EL overflow to SPECIAL is needed (Policy 6.19.c)
+    if (leave.type === "EARNED" && newClosing > 60) {
+      await processELOverflow(
+        leave.requesterId,
+        currentYear,
+        user.email,
+        "leave_cancelled"
+      );
+    }
   }
 
   // Create audit log
