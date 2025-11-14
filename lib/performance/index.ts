@@ -30,3 +30,29 @@ export {
   initializePerformanceMonitoring,
   getPerformanceReport,
 } from "./monitoring";
+
+// Bundle analysis
+export {
+  analyzeBundleSize,
+  estimateBundleReductionPotential,
+  getBundleSizeComparison,
+  analyzeBundleComposition,
+  getBundleSummary,
+  exportBundleAnalysis,
+  type BundleMetadata,
+  type BundleAnalysisResult,
+} from "./bundleAnalysis";
+
+// Tree shaking and dead code
+export {
+  detectUnusedDependencies,
+  analyzeModuleExports,
+  checkDeadCodePatterns,
+  analyzeDependencySize,
+  getTreeShakingRecommendations,
+  estimateTreeShakingSavings,
+  generateTreeShakingReport,
+  type ModuleAnalysis,
+  type UnusedExport,
+  type SideEffectsAnalysis,
+} from "./treeshaking";
