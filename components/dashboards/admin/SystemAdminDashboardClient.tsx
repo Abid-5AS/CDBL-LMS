@@ -1,10 +1,15 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { Activity, Settings, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { KPICard } from "@/components/cards/KPICard";
 import { QuickActions } from "@/components/shared/QuickActions";
+import { DashboardSection } from "@/app/dashboard/shared/DashboardLayout";
+import { DashboardCardSkeleton } from "@/app/dashboard/shared/LoadingFallback";
+import { RoleBasedDashboard } from "@/components/dashboards/shared/RoleBasedDashboard";
+import { RecentAuditLogs } from "@/components/shared/widgets/RecentAuditLogs";
 
 type SystemStats = {
   totalUsers: number;
@@ -121,5 +126,68 @@ export function SystemQuickAccess() {
         </Button>
       ))}
     </div>
+  );
+}
+
+/**
+ * SystemAdminDashboardContent - Client wrapper with RoleBasedDashboard
+ *
+ * Wraps the dashboard content with role-based styling, animations, and sections.
+ * This is a client component to support RoleBasedDashboard wrapper and animations.
+ */
+type SystemAdminDashboardContentProps = {
+  username: string;
+  systemStats: SystemStats;
+};
+
+export function SystemAdminDashboardContent({
+  username,
+  systemStats,
+}: SystemAdminDashboardContentProps) {
+  return (
+    <RoleBasedDashboard
+      role="SYSTEM_ADMIN"
+      title="Admin Console"
+      description="System-level configuration and management"
+      animate
+    >
+      <div className="space-y-6">
+        <SystemAdminHeader username={username} />
+
+        <DashboardSection
+          title="System Overview"
+          description="Key system metrics and status"
+        >
+          <Suspense fallback={<DashboardCardSkeleton />}>
+            <SystemOverviewCards />
+          </Suspense>
+        </DashboardSection>
+
+        <DashboardSection title="Quick Stats">
+          <SystemQuickStats systemStats={systemStats} />
+        </DashboardSection>
+
+        <DashboardSection
+          title="Recent Audit Logs"
+          description="System activity and access logs"
+          action={
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/admin/audit">View All</Link>
+            </Button>
+          }
+        >
+          <Suspense fallback={<DashboardCardSkeleton />}>
+            <RecentAuditLogs />
+          </Suspense>
+        </DashboardSection>
+
+        <DashboardSection
+          title="Quick Access"
+          description="Common administrative tasks"
+        >
+          <SystemQuickAccess />
+        </DashboardSection>
+      </div>
+    </RoleBasedDashboard>
   );
 }
