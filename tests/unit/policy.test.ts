@@ -119,13 +119,13 @@ describe("lib/policy", () => {
 
   describe("clNoticeWarning()", () => {
     const applyDate = normalizeToDhakaMidnight(new Date("2024-01-01"));
-    
-    it("should warn if less than 5 days notice", () => {
+
+    it("should not warn even if less than 5 days notice (CL exempt per Policy 6.11.a)", () => {
       const start = normalizeToDhakaMidnight(new Date("2024-01-03")); // 2 days later
-      expect(clNoticeWarning(applyDate, start)).toBe(true);
+      expect(clNoticeWarning(applyDate, start)).toBe(false);
     });
 
-    it("should not warn if >= 5 days notice", () => {
+    it("should not warn if >= 5 days notice (CL exempt per Policy 6.11.a)", () => {
       const start = normalizeToDhakaMidnight(new Date("2024-01-10")); // 9 days later
       expect(clNoticeWarning(applyDate, start)).toBe(false);
     });
@@ -133,11 +133,11 @@ describe("lib/policy", () => {
 
   describe("makeWarnings()", () => {
     const applyDate = normalizeToDhakaMidnight(new Date("2024-01-01"));
-    
-    it("should create CL short notice warning", () => {
+
+    it("should NOT create CL short notice warning (CL exempt per Policy 6.11.a)", () => {
       const start = normalizeToDhakaMidnight(new Date("2024-01-03"));
       const warnings = makeWarnings("CASUAL", applyDate, start);
-      expect(warnings.clShortNotice).toBe(true);
+      expect(warnings.clShortNotice).toBeUndefined();
     });
 
     it("should create EL insufficient notice warning", () => {

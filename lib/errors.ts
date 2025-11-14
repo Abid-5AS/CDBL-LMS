@@ -97,8 +97,8 @@ export function error(
 ): ApiError {
   const defaultMessage = ERROR_MESSAGES[code] || "An error occurred. Please try again.";
   const finalMessage = message || defaultMessage;
-  const finalTraceId = traceId || randomUUID();
-  
+  const finalTraceId = traceId || generateTraceId();
+
   return {
     error: code,
     message: finalMessage,

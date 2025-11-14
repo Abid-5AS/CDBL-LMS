@@ -45,6 +45,7 @@ export function withinBackdateLimit(type: LeaveKind | string, applyDate: Date, s
 export type PolicyWarnings = {
   mlNeedsCertificate?: boolean;
   elInsufficientNotice?: boolean;
+  clShortNotice?: boolean;
   // Note: CL is exempt from notice requirements per Policy 6.11.a
 };
 
@@ -53,11 +54,26 @@ export function elNoticeWarning(applyDate: Date, start: Date) {
   return diff < policy.elMinNoticeDays;
 }
 
+/**
+ * Check if CL (Casual Leave) notice is insufficient
+ * Note: Per Policy 6.11.a, CL is EXEMPT from notice requirements
+ * This function always returns false to maintain API consistency
+ */
+export function clNoticeWarning(applyDate: Date, start: Date): boolean {
+  // CL is exempt from notice requirements per Policy 6.11.a
+  // Always return false to indicate no warning needed
+  return false;
+}
+
 export function makeWarnings(type: LeaveKind | string, applyDate: Date, start: Date): PolicyWarnings {
   const warnings: PolicyWarnings = {};
   // Note: CL is exempt from notice requirements per Policy 6.11.a
   if ((String(type) === "EARNED" || String(type) === "EL") && elNoticeWarning(applyDate, start)) {
     warnings.elInsufficientNotice = true;
+  }
+  // CL is exempt, but we can include it for API consistency (will always be false)
+  if ((String(type) === "CASUAL" || String(type) === "CL") && clNoticeWarning(applyDate, start)) {
+    warnings.clShortNotice = true;
   }
   return warnings;
 }
