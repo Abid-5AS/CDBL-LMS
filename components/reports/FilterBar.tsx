@@ -18,8 +18,8 @@ type FilterBarProps = {
   department: string | null;
   leaveType: string | null;
   onDurationChange: (value: string) => void;
-  onDepartmentChange: (value: string) => void;
-  onLeaveTypeChange: (value: string) => void;
+  onDepartmentChange: (value: string | null) => void;
+  onLeaveTypeChange: (value: string | null) => void;
 };
 
 const LEAVE_TYPES = [
@@ -41,7 +41,10 @@ export function FilterBar({
   onDepartmentChange,
   onLeaveTypeChange,
 }: FilterBarProps) {
-  const { data: departmentsData } = useSWR("/api/departments", apiFetcher);
+  const { data: departmentsData } = useSWR<{ departments: any[] } | undefined>(
+    "/api/departments",
+    apiFetcher
+  );
   const departments = departmentsData?.departments || [];
 
   return (

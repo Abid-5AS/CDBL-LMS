@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Navbar } from "@/components/Navbar";
+import { Navbar } from "@/components/navbar";
 import { useUser } from "@/lib/user-context";
 import { SelectionProvider } from "@/lib/selection-context";
 import { cn } from "@/lib/utils";

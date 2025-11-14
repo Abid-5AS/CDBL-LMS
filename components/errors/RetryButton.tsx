@@ -6,7 +6,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RotateCcw, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button, type ButtonProps } from "@/components/ui/button";
@@ -84,7 +84,7 @@ export function RetryButton({
   };
 
   // Auto-reset attempts after delay
-  React.useEffect(() => {
+  useEffect(() => {
     if (resetAfter === 0 || attempts === 0) return;
 
     const timer = setTimeout(handleReset, resetAfter);

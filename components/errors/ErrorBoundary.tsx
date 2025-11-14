@@ -5,6 +5,8 @@
  * Supports error logging and recovery actions
  */
 
+"use client";
+
 import React, { ErrorInfo, ReactNode } from "react";
 import { formatErrorForLogging } from "@/constants/errors";
 import { ErrorFallback } from "./ErrorFallback";

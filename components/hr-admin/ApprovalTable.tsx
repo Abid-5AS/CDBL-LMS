@@ -264,13 +264,15 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     return (
       <Card>
         <CardContent>
-          <EmptyState
-            icon={Loader2}
-            iconClassName="animate-spin"
-            title="Loading approval queue..."
-            description="Fetching pending leave requests"
-            className="py-8"
-          />
+          <div className="py-8 flex flex-col items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mb-4" />
+          <h3 className="font-semibold text-lg text-foreground mb-1">
+            Loading approval queue...
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Fetching pending leave requests
+          </p>
+        </div>
         </CardContent>
       </Card>
     );
@@ -450,18 +452,18 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                             ceoMode={userRole === "CEO" || userRole === "HR_HEAD"}
                             onForward={
                               userRole === "HR_ADMIN" || userRole === "DEPT_HEAD"
-                                ? () => handleDecision(item.id, "forward", item.requestedByName)
+                                ? () => handleDecision(item.id, "forward", item.requestedByName ?? "")
                                 : undefined
                             }
                             onReturn={
                               userRole === "HR_ADMIN" || userRole === "DEPT_HEAD"
-                                ? () => handleDecision(item.id, "return", item.requestedByName)
+                                ? () => handleDecision(item.id, "return", item.requestedByName ?? "")
                                 : undefined
                             }
-                            onCancel={() => handleDecision(item.id, "reject", item.requestedByName)}
+                            onCancel={() => handleDecision(item.id, "reject", item.requestedByName ?? "")}
                             onApprove={
                               userRole === "CEO" || userRole === "HR_HEAD"
-                                ? () => handleDecision(item.id, "approve", item.requestedByName)
+                                ? () => handleDecision(item.id, "approve", item.requestedByName ?? "")
                                 : undefined
                             }
                             disabled={processingId !== null}

@@ -12,7 +12,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Gemini from "../icons/gemini";
+import Gemini from "./gemini";
 
 interface Profile {
     name: string;

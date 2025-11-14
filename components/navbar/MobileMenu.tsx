@@ -28,7 +28,6 @@ const menuVariants = {
     opacity: 0,
     transition: {
       duration: 0.3,
-      ease: [0.22, 1, 0.36, 1],
       when: "afterChildren",
     },
   },
@@ -37,7 +36,6 @@ const menuVariants = {
     opacity: 1,
     transition: {
       duration: 0.4,
-      ease: [0.22, 1, 0.36, 1],
       when: "beforeChildren",
       staggerChildren: 0.05,
     },
@@ -57,7 +55,6 @@ const itemVariants = {
     y: 0,
     transition: {
       duration: 0.3,
-      ease: [0.22, 1, 0.36, 1],
     },
   },
 };
@@ -85,7 +82,7 @@ export function MobileMenu({
     <AnimatePresence>
       {isMobileMenuOpen && (
         <motion.div
-          ref={gestureRef}
+          ref={gestureRef as any}
           variants={menuVariants}
           initial="closed"
           animate="open"

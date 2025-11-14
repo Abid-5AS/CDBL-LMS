@@ -4,5 +4,5 @@
 export { HRStatCards } from "./HRStatCards";
 export { SectionHeader } from "./SectionHeader";
 export { DashboardContainer } from "./DashboardContainer";
-export { default as Navbar } from "./Navbar";
-export { default as LogoutButton } from "./logout-button";
+export { Navbar } from "./navbar";
+export { LogoutButton } from "./logout-button";
