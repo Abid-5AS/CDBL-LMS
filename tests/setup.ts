@@ -1,8 +1,8 @@
-// Vitest setup file with Testing Library and jest-dom
-import "@testing-library/jest-dom/vitest";
+// Vitest setup file
+import { afterEach } from "vitest";
+import { cleanup } from "@testing-library/react";
 
-// Extend Vitest matchers with jest-dom
-import { expect } from "vitest";
-import * as matchers from "@testing-library/jest-dom/matchers";
-
-expect.extend(matchers);
+// Cleanup DOM after each test
+afterEach(() => {
+  cleanup();
+});
