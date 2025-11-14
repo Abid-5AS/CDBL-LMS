@@ -3,10 +3,10 @@
 // Shared components
 
 // Local sections
-import { DashboardGreeting } from "./Sections/Greeting";
-import { ActionCenterCard } from "./Sections/ActionCenter";
-import { LeaveOverviewCard } from "./Sections/LeaveOverview";
-import { HistoryAnalyticsCard } from "./Sections/History";
+import { DashboardGreeting } from "./sections/Greeting";
+import { ActionCenterCard } from "./sections/ActionCenter";
+import { LeaveOverviewCard } from "./sections/LeaveOverview";
+import { HistoryAnalyticsCard } from "./sections/History";
 
 // Lib/Hooks
 import { useApiQuery } from "@/lib/apiClient";
