@@ -19,6 +19,9 @@ export { usePerformanceMonitor } from "./usePerformanceMonitor";
 // Cache hooks
 export { useCache, useAsyncCache } from "./useCache";
 
+// API optimization hooks
+export { useOptimizedAPI, useMultipleAPIs, useAPIStats } from "./useOptimizedAPI";
+
 // Note: These are already re-exported from @/lib:
 // - useDebounce (from @/lib/use-debounce)
 // - useUser (from @/lib/user-context)
