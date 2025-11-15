@@ -5,6 +5,8 @@ import { LeaveStatus } from "@prisma/client";
 import { z } from "zod";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
+import { canCancelMaternityLeave } from "@/lib/leave-validation";
+import { processELOverflow } from "@/lib/el-overflow";
 
 export const cache = "no-store";
 
@@ -18,6 +20,7 @@ const CancelSchema = z.object({
  * Rules:
  * - Can cancel SUBMITTED/PENDING requests from team members
  * - Cannot cancel already APPROVED requests (those need CANCELLATION_REQUESTED flow)
+ * - Cannot cancel MATERNITY leave after it has started
  * - Creates audit log and restores balance if needed
  */
 export async function POST(
@@ -89,6 +92,18 @@ export async function POST(
     );
   }
 
+  // Check maternity leave cancellation policy (cannot cancel after start)
+  const maternityCancelCheck = canCancelMaternityLeave(leave);
+  if (!maternityCancelCheck.canCancel) {
+    return NextResponse.json(
+      error("maternity_cannot_cancel_after_start", maternityCancelCheck.reason, traceId, {
+        leaveType: leave.type,
+        startDate: leave.startDate,
+      }),
+      { status: 403 }
+    );
+  }
+
   // Parse request body - reason is optional
   const body = await request.json().catch(() => ({}));
   const parsed = CancelSchema.safeParse(body);
@@ -140,6 +155,16 @@ export async function POST(
         closing: newClosing,
       },
     });
+
+    // Check if EL overflow to SPECIAL is needed (Policy 6.19.c)
+    if (leave.type === "EARNED" && newClosing > 60) {
+      await processELOverflow(
+        leave.requesterId,
+        currentYear,
+        user.email,
+        "leave_cancelled"
+      );
+    }
   }
 
   // Create audit log

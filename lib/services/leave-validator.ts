@@ -20,12 +20,18 @@ import { countWorkingDays } from "@/lib/working-days";
 import { normalizeToDhakaMidnight } from "@/lib/date-utils";
 import {
   violatesCasualLeaveCombination,
+  violatesCasualLeaveSideTouch,
   validatePaternityLeaveEligibility,
 } from "@/lib/leave-validation";
 
 export type ValidationResult = {
   valid: boolean;
   error?: {
+    code: string;
+    message: string;
+    details?: Record<string, any>;
+  };
+  warning?: {
     code: string;
     message: string;
     details?: Record<string, any>;
@@ -130,6 +136,8 @@ export class LeaveValidator {
 
   /**
    * Validate casual leave constraints
+   * Note: CL >3 days is ALLOWED per Policy 6.20(d,e) - will auto-convert to EL during approval
+   * IMPORTANT: Holiday rule STILL APPLIES even if CL will convert to EL (Policy 6.20.e)
    */
   static async validateCasualLeave(
     userId: number,
@@ -137,25 +145,44 @@ export class LeaveValidator {
     endDate: Date,
     workingDays: number
   ): Promise<ValidationResult> {
-    // Check consecutive days limit
-    if (workingDays > policy.clMaxConsecutiveDays) {
+    const startDateOnly = normalizeToDhakaMidnight(startDate);
+    const endDateOnly = normalizeToDhakaMidnight(endDate);
+
+    // CRITICAL: Check holiday side-touch rule FIRST (Policy 6.20.e - strict enforcement)
+    // This applies to ALL CL regardless of duration, even if it will convert to EL
+    const holidayViolation = await violatesCasualLeaveSideTouch(
+      startDateOnly,
+      endDateOnly
+    );
+
+    if (holidayViolation) {
       return {
         valid: false,
         error: {
-          code: "cl_exceeds_consecutive_limit",
-          message: `Casual leave cannot exceed ${policy.clMaxConsecutiveDays} consecutive days`,
+          code: "cl_cannot_touch_holiday",
+          message: "Casual Leave cannot be preceded or succeeded by holidays or weekends (Policy 6.20.e). CL must be strictly isolated working days. Please use Earned Leave instead.",
           details: {
-            max: policy.clMaxConsecutiveDays,
             requested: workingDays,
           },
         },
       };
     }
 
-    // Check combination rule
-    const startDateOnly = normalizeToDhakaMidnight(startDate);
-    const endDateOnly = normalizeToDhakaMidnight(endDate);
+    // CL >3 days: Allow but add warning (will auto-convert to EL per Policy 6.20.d/e)
+    const clConversionWarning =
+      workingDays > policy.clMaxConsecutiveDays
+        ? {
+            code: "cl_will_convert_to_el",
+            message: `Casual leave exceeding ${policy.clMaxConsecutiveDays} days will be automatically converted to Earned Leave per Policy 6.20(e). Your entire leave period (${workingDays} days) will be deducted from your Earned Leave balance.`,
+            details: {
+              max: policy.clMaxConsecutiveDays,
+              requested: workingDays,
+              willConvertToEL: true,
+            },
+          }
+        : undefined;
 
+    // Check combination rule (no adjacent leaves)
     const combinationCheck = await violatesCasualLeaveCombination(
       userId,
       startDateOnly,
@@ -179,7 +206,10 @@ export class LeaveValidator {
       };
     }
 
-    return { valid: true };
+    return {
+      valid: true,
+      ...(clConversionWarning && { warning: clConversionWarning }),
+    };
   }
 
   /**

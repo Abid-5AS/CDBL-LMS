@@ -81,15 +81,20 @@ model LeaveRequest {
   status                LeaveStatus @default(DRAFT)
   policyVersion         String // e.g. "v2.0"
   isModified            Boolean     @default(false) // True if request was returned and resubmitted
+  parentLeaveId         Int? // For extension/linked requests - references original leave
+  isExtension           Boolean     @default(false) // True if this is an extension request
   createdAt             DateTime    @default(now())
   updatedAt             DateTime    @updatedAt
 
-  requester User           @relation(fields: [requesterId], references: [id])
-  approvals Approval[]
-  comments  LeaveComment[]
-  versions  LeaveVersion[]
+  requester    User           @relation(fields: [requesterId], references: [id])
+  approvals    Approval[]
+  comments     LeaveComment[]
+  versions     LeaveVersion[]
+  parentLeave  LeaveRequest?  @relation("LeaveExtension", fields: [parentLeaveId], references: [id])
+  extensions   LeaveRequest[] @relation("LeaveExtension")
 
   @@index([requesterId, status])
+  @@index([parentLeaveId])
 }
 
 enum ApprovalDecision {

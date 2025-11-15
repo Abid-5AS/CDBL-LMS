@@ -2,14 +2,15 @@ import type { AppRole } from "./rbac";
 import type { LeaveType } from "@prisma/client";
 
 /**
- * Per-type approval chains as per Policy 6.10
- * Policy: "Applications (except Casual Leave) sent through Dept Head → HRD → Management."
- * CASUAL uses shorter chain per Policy 6.10 exception
+ * Per-type approval chains as per Policy 6.10 and Master Specification
+ * All leave types follow the full approval chain: HR_ADMIN → DEPT_HEAD → HR_HEAD → CEO
+ * Policy 6.10(d) exception for CL refers to form/notice requirements, NOT workflow reduction
+ * Clarified 2025-11-14: CL uses FULL chain for audit compliance and CEO final approval
  */
 export const WORKFLOW_CHAINS: Record<LeaveType | "DEFAULT", AppRole[]> = {
   DEFAULT: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"], // Default chain for EL, ML, etc.
   EARNED: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
-  CASUAL: ["DEPT_HEAD"], // Provisional: CL uses shorter chain per Policy 6.10
+  CASUAL: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"], // CL uses full chain (clarified 2025-11-14)
   MEDICAL: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
   EXTRAWITHPAY: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
   EXTRAWITHOUTPAY: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
@@ -18,6 +19,7 @@ export const WORKFLOW_CHAINS: Record<LeaveType | "DEFAULT", AppRole[]> = {
   STUDY: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
   SPECIAL_DISABILITY: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
   QUARANTINE: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
+  SPECIAL: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"], // EL overflow >60 days (Policy 6.19.c)
 };
 
 /**

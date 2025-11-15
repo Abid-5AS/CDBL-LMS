@@ -6,7 +6,7 @@ import {
   type Holiday,
 } from "./date-utils";
 
-async function fetchHolidaysInRange(start: Date, end: Date): Promise<Holiday[]> {
+export async function fetchHolidaysInRange(start: Date, end: Date): Promise<Holiday[]> {
   const normalizedStart = normalizeToDhakaMidnight(start);
   const normalizedEnd = normalizeToDhakaMidnight(end);
 
@@ -39,10 +39,16 @@ type CasualLeaveValidationOptions = {
 };
 
 /**
- * Check if Casual Leave violates the side-touch rule.
- * Rules:
- * - Start or end date cannot fall on a Friday/Saturday/company holiday
- * - Day before start and day after end cannot be a Friday/Saturday/company holiday
+ * Check if Casual Leave violates the holiday rules (Policy 6.20.e)
+ *
+ * CL is the STRICTEST leave type. Per Policy 6.20(e):
+ * "Casual leave cannot be combined with any other leave or preceded or succeeded by any holidays."
+ *
+ * Rules (BOTH must be satisfied):
+ * A) CL dates must be PURE WORKING DAYS (no holidays/weekends within CL dates)
+ * B) CL cannot be ADJACENT to holidays (day before start / day after end cannot be holiday)
+ *
+ * Updated 2025-11-14: Clarified that BOTH rules A and B apply
  */
 export async function violatesCasualLeaveSideTouch(
   start: Date,
@@ -59,9 +65,16 @@ export async function violatesCasualLeaveSideTouch(
     options.holidays ??
     (await fetchHolidaysInRange(rangeStart, rangeEnd));
 
-  if (isNonWorking(normalizedStart, holidays)) return true;
-  if (isNonWorking(normalizedEnd, holidays)) return true;
+  // Rule A: Check EVERY day in CL range is a working day (no holidays/weekends within CL)
+  let currentDate = new Date(normalizedStart);
+  while (currentDate <= normalizedEnd) {
+    if (isNonWorking(currentDate, holidays)) {
+      return true; // CL contains a holiday/weekend → violation
+    }
+    currentDate = addDays(currentDate, 1);
+  }
 
+  // Rule B: Check day before start and day after end are working days (no adjacency to holidays)
   const beforeStart = addDays(normalizedStart, -1);
   const afterEnd = addDays(normalizedEnd, 1);
 
@@ -135,6 +148,44 @@ export async function violatesCasualLeaveCombination(
   }
 
   return { violates: false };
+}
+
+/**
+ * Check if maternity leave can be cancelled (Policy - Master Spec)
+ *
+ * Rule: Maternity leave CANNOT be cancelled after it has started
+ * Clarified 2025-11-14: Hard block on maternity cancellation after start date
+ *
+ * @param leave - Leave request object with type and startDate
+ * @param today - Current date (defaults to now)
+ * @returns Object with canCancel boolean and reason if blocked
+ */
+export function canCancelMaternityLeave(leave: {
+  type: string;
+  startDate: Date;
+}, today: Date = new Date()): {
+  canCancel: boolean;
+  reason?: string;
+} {
+  // Only applies to maternity leave
+  if (leave.type !== "MATERNITY") {
+    return { canCancel: true };
+  }
+
+  const normalizedToday = normalizeToDhakaMidnight(today);
+  const normalizedStartDate = normalizeToDhakaMidnight(leave.startDate);
+
+  // Check if leave has started
+  const hasStarted = normalizedStartDate <= normalizedToday;
+
+  if (hasStarted) {
+    return {
+      canCancel: false,
+      reason: "Maternity leave cannot be cancelled after it has started (Policy - Master Specification). Please contact HR for assistance.",
+    };
+  }
+
+  return { canCancel: true };
 }
 
 /**
