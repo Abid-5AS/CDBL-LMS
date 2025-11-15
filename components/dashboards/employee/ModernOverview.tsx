@@ -279,7 +279,7 @@ export function ModernEmployeeDashboard({
                       content: (
                         <div className="flex flex-col items-center justify-center gap-2 py-6 sm:py-8">
                           <p className="text-base font-medium">
-                            You9re all caught up on leave details.
+                            You're all caught up on leave details.
                           </p>
                           <p className="text-sm text-muted-foreground">
                             Use the Leave Balance and Recent Activity tabs to

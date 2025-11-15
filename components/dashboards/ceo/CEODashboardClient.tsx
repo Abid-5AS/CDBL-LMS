@@ -328,9 +328,9 @@ export function CEODashboardClient() {
         isLoading={isLoading}
       >
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
         {/* Left Column - Charts (8 cols) */}
-        <div className="lg:col-span-8 space-y-6">
+        <div className="lg:col-span-8 space-y-4 sm:space-y-6">
           {/* Monthly Trend Chart */}
           {!isLoading && stats && stats.monthlyTrend && stats.monthlyTrend.length > 0 && (
             <AnalyticsLineChart
@@ -368,7 +368,7 @@ export function CEODashboardClient() {
 
           {/* Leave Type Distribution */}
           {!isLoading && stats && stats.leaveTypes && stats.leaveTypes.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <AnalyticsPieChart
                 title="Leave Type Distribution"
                 subtitle="By request count"
@@ -407,7 +407,7 @@ export function CEODashboardClient() {
         </div>
 
         {/* Right Column - Insights & Quick Stats (4 cols) */}
-        <div className="lg:col-span-4 space-y-6">
+        <div className="lg:col-span-4 space-y-4 sm:space-y-6">
           {/* AI-Powered Insights */}
           {!isLoading && stats && stats.insights && stats.insights.length > 0 && (
             <Card className="rounded-2xl">

@@ -334,9 +334,9 @@ export function HRAdminDashboardClient() {
         </motion.div>
       </DashboardSection>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
         {/* Charts - Left Side (8 columns) */}
-        <motion.div variants={itemVariants} className="lg:col-span-8 space-y-6">
+        <motion.div variants={itemVariants} className="lg:col-span-8 space-y-4 sm:space-y-6">
           {/* Monthly Trend Chart */}
           <ChartContainer
             title="Request Trend"
@@ -358,7 +358,7 @@ export function HRAdminDashboardClient() {
         </motion.div>
 
         {/* Sidebar - Right Side (4 columns) */}
-        <motion.div variants={itemVariants} className="lg:col-span-4 space-y-6">
+        <motion.div variants={itemVariants} className="lg:col-span-4 space-y-4 sm:space-y-6">
           {/* Quick Stats Summary */}
           <Card className="glass-card rounded-2xl border-border hover:shadow-lg transition-all duration-300">
             <CardHeader>

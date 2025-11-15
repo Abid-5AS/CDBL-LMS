@@ -209,9 +209,9 @@ export function HRHeadDashboardClient() {
         description="Pending approvals, department performance, and organization metrics"
         isLoading={isLoading}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
         {/* Main Content - Left Side */}
-        <div className="lg:col-span-8 space-y-6">
+        <div className="lg:col-span-8 space-y-4 sm:space-y-6">
           {/* Pending Requests Table */}
           <Card className="rounded-2xl">
             <CardHeader>
@@ -253,7 +253,7 @@ export function HRHeadDashboardClient() {
         </div>
 
         {/* Sidebar - Right Side */}
-        <div className="lg:col-span-4 space-y-6">
+        <div className="lg:col-span-4 space-y-4 sm:space-y-6">
           {/* Organization Stats */}
           <Card className="rounded-2xl">
             <CardHeader>
@@ -351,7 +351,7 @@ export function HRHeadDashboardClient() {
         description="Returned and cancelled leave requests"
         isLoading={isLoading}
       >
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
         <Suspense fallback={<DashboardCardSkeleton />}>
           <Card className="rounded-2xl">
             <CardHeader>
