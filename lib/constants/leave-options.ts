@@ -3,15 +3,32 @@
  * Used across all components for consistency
  */
 
-import { LeaveType, LeaveStatus } from "@prisma/client";
 import { leaveTypeLabel } from "@/lib/ui";
+
+/**
+ * Leave type enum mirrored from Prisma (for client-side use)
+ * This avoids importing @prisma/client in client components
+ */
+export const LeaveTypeValues = [
+  "EARNED",
+  "CASUAL",
+  "MEDICAL",
+  "EXTRAWITHPAY",
+  "EXTRAWITHOUTPAY",
+  "MATERNITY",
+  "PATERNITY",
+  "STUDY",
+  "SPECIAL_DISABILITY",
+  "QUARANTINE",
+  "SPECIAL",
+] as const;
 
 /**
  * Leave type options for filters and dropdowns
  */
 export const LEAVE_TYPE_OPTIONS = [
   { value: "all", label: "All" },
-  ...Object.values(LeaveType).map((type) => ({
+  ...LeaveTypeValues.map((type) => ({
     value: type,
     label: leaveTypeLabel[type] || type,
   })),

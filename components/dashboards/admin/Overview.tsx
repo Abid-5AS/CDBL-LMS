@@ -53,6 +53,11 @@ export async function SystemAdminDashboard({
     <SystemAdminDashboardContent
       username={username}
       systemStats={systemStats}
+      auditLogsSlot={
+        <Suspense fallback={<DashboardCardSkeleton />}>
+          <RecentAuditLogs />
+        </Suspense>
+      }
     />
   );
 }

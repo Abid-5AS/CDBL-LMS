@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, ReactNode } from "react";
 import Link from "next/link";
 import { Activity, Settings, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,6 @@ import { QuickActions } from "@/components/shared/QuickActions";
 import { DashboardSection } from "@/app/dashboard/shared/DashboardLayout";
 import { DashboardCardSkeleton } from "@/app/dashboard/shared/LoadingFallback";
 import { RoleBasedDashboard } from "@/components/dashboards/shared/RoleBasedDashboard";
-import { RecentAuditLogs } from "@/components/shared/widgets/RecentAuditLogs";
 
 type SystemStats = {
   totalUsers: number;
@@ -138,11 +137,13 @@ export function SystemQuickAccess() {
 type SystemAdminDashboardContentProps = {
   username: string;
   systemStats: SystemStats;
+  auditLogsSlot?: ReactNode;
 };
 
 export function SystemAdminDashboardContent({
   username,
   systemStats,
+  auditLogsSlot,
 }: SystemAdminDashboardContentProps) {
   return (
     <RoleBasedDashboard
@@ -176,9 +177,7 @@ export function SystemAdminDashboardContent({
             </Button>
           }
         >
-          <Suspense fallback={<DashboardCardSkeleton />}>
-            <RecentAuditLogs />
-          </Suspense>
+          {auditLogsSlot || <DashboardCardSkeleton />}
         </DashboardSection>
 
         <DashboardSection

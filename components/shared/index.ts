@@ -28,8 +28,16 @@ export * from "./modals";
 // Re-export all table components
 export * from "./tables";
 
-// Re-export widgets
-export * from "./widgets";
+// Re-export client-side widgets only
+// Note: Server-only widgets like RecentAuditLogs must be imported directly
+// to avoid bundling server-side code in client components
+export { MiniCalendar } from "./widgets";
+export { NextHoliday } from "./widgets";
+export { PolicyAlerts } from "./widgets";
+export { SmartRecommendations } from "./widgets";
+export { LeaveHeatmap } from "./widgets";
+export { SegmentedControlGlider } from "./widgets";
+export { TeamOnLeaveWidget } from "./widgets";
 
 // Re-export leave charts
 export * from "./LeaveCharts";

@@ -6,7 +6,8 @@
 export { MiniCalendar } from "./MiniCalendar";
 export { NextHoliday } from "./NextHoliday";
 export { PolicyAlerts } from "./PolicyAlerts";
-export { RecentAuditLogs } from "./RecentAuditLogs";
+// RecentAuditLogs is a SERVER COMPONENT - must be imported directly
+// export { RecentAuditLogs } from "./RecentAuditLogs";
 export { SmartRecommendations } from "./SmartRecommendations";
 
 // Already exported from their files
