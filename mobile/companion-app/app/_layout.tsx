@@ -6,6 +6,7 @@ import { ThemeProvider } from "../src/providers/ThemeProvider";
 import { useAuthStore } from "../src/store/authStore";
 import { initDatabase } from "../src/database";
 import { ErrorBoundary } from "../src/components/errors/ErrorBoundary";
+import { networkMonitor } from "../src/sync/NetworkMonitor";
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -20,6 +21,7 @@ function RootLayoutNav() {
     const init = async () => {
       try {
         await initDatabase();
+        networkMonitor.initialize();
         await checkAuthStatus();
       } catch (error) {
         console.error('Initialization error:', error);
@@ -27,6 +29,11 @@ function RootLayoutNav() {
     };
 
     init();
+
+    // Cleanup on unmount
+    return () => {
+      networkMonitor.cleanup();
+    };
   }, []);
 
   useEffect(() => {

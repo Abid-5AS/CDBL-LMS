@@ -12,6 +12,8 @@ import { ThemedCard } from "@/src/components/shared/ThemedCard";
 import { ThemedButton } from "@/src/components/shared/ThemedButton";
 import { useTheme } from "@/src/providers/ThemeProvider";
 import { useLeaveApplications } from "@/src/hooks/useLeaveApplications";
+import { syncService } from "@/src/sync/SyncService";
+import { SyncStatusBanner } from "@/src/components/shared/SyncStatusBanner";
 import { format } from "date-fns";
 
 export default function HistoryScreen() {
@@ -50,6 +52,9 @@ export default function HistoryScreen() {
 
   const handleRefresh = async () => {
     setRefreshing(true);
+    // Trigger sync with server
+    await syncService.sync();
+    // Refresh local data
     await refresh();
     setRefreshing(false);
   };
@@ -67,19 +72,21 @@ export default function HistoryScreen() {
   }, [applications, filter, searchQuery]);
 
   return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
-      contentContainerStyle={styles.content}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-          tintColor={colors.primary}
-          colors={[colors.primary]}
-        />
-      }
-    >
-      <View style={styles.header}>
+    <>
+      <SyncStatusBanner />
+      <ScrollView
+        style={[styles.container, { backgroundColor: colors.background }]}
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
+      >
+        <View style={styles.header}>
         <Text
           style={[
             styles.title,
@@ -301,7 +308,8 @@ export default function HistoryScreen() {
           )}
         </>
       )}
-    </ScrollView>
+      </ScrollView>
+    </>
   );
 }
 

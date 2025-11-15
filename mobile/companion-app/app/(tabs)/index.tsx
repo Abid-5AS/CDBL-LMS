@@ -15,6 +15,8 @@ import { useTheme } from "@/src/providers/ThemeProvider";
 import { useUserProfile } from "@/src/hooks/useUserProfile";
 import { useLeaveBalances } from "@/src/hooks/useLeaveBalances";
 import { useLeaveApplications } from "@/src/hooks/useLeaveApplications";
+import { syncService } from "@/src/sync/SyncService";
+import { SyncStatusBanner } from "@/src/components/shared/SyncStatusBanner";
 import { useState } from "react";
 import { FileText, Calendar, Clock, TrendingUp } from "lucide-react-native";
 
@@ -28,6 +30,9 @@ export default function HomeScreen() {
 
   const handleRefresh = async () => {
     setRefreshing(true);
+    // Trigger sync with server
+    await syncService.sync();
+    // Refresh local data
     await Promise.all([refreshProfile(), refreshBalances(), refreshApps()]);
     setRefreshing(false);
   };
@@ -42,19 +47,21 @@ export default function HomeScreen() {
   const topBalances = balances.slice(0, 3);
 
   return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
-      contentContainerStyle={styles.content}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-          tintColor={colors.primary}
-          colors={[colors.primary]}
-        />
-      }
-    >
-      <View style={styles.header}>
+    <>
+      <SyncStatusBanner />
+      <ScrollView
+        style={[styles.container, { backgroundColor: colors.background }]}
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
+      >
+        <View style={styles.header}>
         <Text
           style={[
             styles.greeting,
@@ -372,7 +379,8 @@ export default function HomeScreen() {
           </View>
         </>
       )}
-    </ScrollView>
+      </ScrollView>
+    </>
   );
 }
 
