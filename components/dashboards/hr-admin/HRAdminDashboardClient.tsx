@@ -334,31 +334,32 @@ export function HRAdminDashboardClient() {
         </motion.div>
       </DashboardSection>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
-        {/* Charts - Left Side (8 columns) */}
-        <motion.div variants={itemVariants} className="lg:col-span-8 space-y-4 sm:space-y-6">
-          {/* Monthly Trend Chart */}
-          <ChartContainer
-            title="Request Trend"
-            subtitle="Last 6 months submission pattern"
-            loading={isLoading}
-            empty={!isLoading && (!stats?.monthlyTrend || stats.monthlyTrend.length === 0)}
-            height={350}
-            className="hover:shadow-xl transition-all duration-300"
-          >
-            <TrendChart
-              data={stats?.monthlyTrend?.map((item) => ({
-                month: item.month,
-                leaves: item.count,
-              })) || []}
+      <div className="flex flex-col xl:flex-row gap-4 sm:gap-6">
+        {/* Charts - Main Content */}
+        {!isLoading && stats?.monthlyTrend && stats.monthlyTrend.length > 0 && (
+          <motion.div variants={itemVariants} className="flex-1 min-w-0">
+            <ChartContainer
+              title="Request Trend"
+              subtitle="Last 6 months submission pattern"
+              loading={isLoading}
+              empty={!isLoading && (!stats?.monthlyTrend || stats.monthlyTrend.length === 0)}
               height={350}
-              dataKey="leaves"
-            />
-          </ChartContainer>
-        </motion.div>
+              className="hover:shadow-xl transition-all duration-300"
+            >
+              <TrendChart
+                data={stats.monthlyTrend.map((item) => ({
+                  month: item.month,
+                  leaves: item.count,
+                }))}
+                height={350}
+                dataKey="leaves"
+              />
+            </ChartContainer>
+          </motion.div>
+        )}
 
-        {/* Sidebar - Right Side (4 columns) */}
-        <motion.div variants={itemVariants} className="lg:col-span-4 space-y-4 sm:space-y-6">
+        {/* Sidebar - Quick Stats & Charts */}
+        <motion.div variants={itemVariants} className="xl:w-80 shrink-0 space-y-4 sm:space-y-6">
           {/* Quick Stats Summary */}
           <Card className="glass-card rounded-2xl border-border hover:shadow-lg transition-all duration-300">
             <CardHeader>

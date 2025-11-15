@@ -327,87 +327,88 @@ export function CEODashboardClient() {
         description="Detailed trends, department performance, and AI-powered insights"
         isLoading={isLoading}
       >
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
-        {/* Left Column - Charts (8 cols) */}
-        <div className="lg:col-span-8 space-y-4 sm:space-y-6">
-          {/* Monthly Trend Chart */}
-          {!isLoading && stats && stats.monthlyTrend && stats.monthlyTrend.length > 0 && (
-            <AnalyticsLineChart
-              title="Leave Request Trend"
-              subtitle="12-month historical view"
-              data={stats.monthlyTrend.map((item) => ({
-                name: item.month,
-                requests: item.requests,
-                days: item.days,
-              }))}
-              dataKeys={[
-                { key: "requests", name: "Requests", color: "hsl(var(--chart-1))" },
-                { key: "days", name: "Total Days", color: "hsl(var(--chart-2))" },
-              ]}
-              xAxisKey="name"
-            />
-          )}
-
-          {/* Department Performance */}
-          {!isLoading && stats && stats.departments && stats.departments.length > 0 && (
-            <AnalyticsBarChart
-              title="Department Utilization"
-              subtitle="Workforce availability by department"
-              data={stats.departments.map((dept) => ({
-                name: dept.department,
-                utilization: dept.utilization,
-                onLeave: dept.onLeave,
-              }))}
-              dataKeys={[
-                { key: "utilization", name: "Utilization %", color: "hsl(var(--chart-1))" },
-              ]}
-              xAxisKey="name"
-            />
-          )}
-
-          {/* Leave Type Distribution */}
-          {!isLoading && stats && stats.leaveTypes && stats.leaveTypes.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-              <AnalyticsPieChart
-                title="Leave Type Distribution"
-                subtitle="By request count"
-                data={stats.leaveTypes.map((item) => ({
-                  name: item.type,
-                  value: item.count,
+        <div className="flex flex-col xl:flex-row gap-4 sm:gap-6">
+        {/* Main Charts Section */}
+        {!isLoading && stats && (stats.monthlyTrend?.length > 0 || stats.departments?.length > 0 || stats.leaveTypes?.length > 0) && (
+          <div className="flex-1 space-y-4 sm:space-y-6 min-w-0">
+            {/* Monthly Trend Chart */}
+            {stats.monthlyTrend && stats.monthlyTrend.length > 0 && (
+              <AnalyticsLineChart
+                title="Leave Request Trend"
+                subtitle="12-month historical view"
+                data={stats.monthlyTrend.map((item) => ({
+                  name: item.month,
+                  requests: item.requests,
+                  days: item.days,
                 }))}
-                showPercentage={true}
+                dataKeys={[
+                  { key: "requests", name: "Requests", color: "hsl(var(--chart-1))" },
+                  { key: "days", name: "Total Days", color: "hsl(var(--chart-2))" },
+                ]}
+                xAxisKey="name"
               />
+            )}
 
-              <Card className="rounded-2xl">
-                <CardHeader>
-                  <CardTitle className="text-base">Leave Type Details</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {stats.leaveTypes.slice(0, 5).map((type, index) => (
-                      <div key={index}>
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-sm font-medium">{type.type}</span>
-                          <span className="text-sm text-muted-foreground">
-                            {type.count} requests
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center text-xs text-muted-foreground">
-                          <span>Avg duration: {type.avgDuration.toFixed(1)} days</span>
-                        </div>
-                        {index < stats.leaveTypes.length - 1 && <Separator className="mt-3" />}
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-        </div>
+            {/* Department Performance */}
+            {stats.departments && stats.departments.length > 0 && (
+              <AnalyticsBarChart
+                title="Department Utilization"
+                subtitle="Workforce availability by department"
+                data={stats.departments.map((dept) => ({
+                  name: dept.department,
+                  utilization: dept.utilization,
+                  onLeave: dept.onLeave,
+                }))}
+                dataKeys={[
+                  { key: "utilization", name: "Utilization %", color: "hsl(var(--chart-1))" },
+                ]}
+                xAxisKey="name"
+              />
+            )}
 
-        {/* Right Column - Insights & Quick Stats (4 cols) */}
-        <div className="lg:col-span-4 space-y-4 sm:space-y-6">
+            {/* Leave Type Distribution */}
+            {stats.leaveTypes && stats.leaveTypes.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                <AnalyticsPieChart
+                  title="Leave Type Distribution"
+                  subtitle="By request count"
+                  data={stats.leaveTypes.map((item) => ({
+                    name: item.type,
+                    value: item.count,
+                  }))}
+                  showPercentage={true}
+                />
+
+                <Card className="rounded-2xl">
+                  <CardHeader>
+                    <CardTitle className="text-base">Leave Type Details</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {stats.leaveTypes.slice(0, 5).map((type, index) => (
+                        <div key={index}>
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-sm font-medium">{type.type}</span>
+                            <span className="text-sm text-muted-foreground">
+                              {type.count} requests
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center text-xs text-muted-foreground">
+                            <span>Avg duration: {type.avgDuration.toFixed(1)} days</span>
+                          </div>
+                          {index < stats.leaveTypes.length - 1 && <Separator className="mt-3" />}
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Sidebar - Insights & Quick Stats */}
+        <div className="xl:w-80 shrink-0 space-y-4 sm:space-y-6">
           {/* AI-Powered Insights */}
           {!isLoading && stats && stats.insights && stats.insights.length > 0 && (
             <Card className="rounded-2xl">
