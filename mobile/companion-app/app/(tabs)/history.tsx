@@ -1,56 +1,26 @@
-import { StyleSheet, ScrollView, View, Text, TextInput } from "react-native";
-import { useState } from "react";
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  Text,
+  TextInput,
+  RefreshControl,
+  ActivityIndicator,
+} from "react-native";
+import { useState, useMemo } from "react";
 import { ThemedCard } from "@/src/components/shared/ThemedCard";
 import { ThemedButton } from "@/src/components/shared/ThemedButton";
 import { useTheme } from "@/src/providers/ThemeProvider";
-
-const MOCK_LEAVES = [
-  {
-    id: "1",
-    type: "Casual Leave",
-    startDate: "2025-01-15",
-    endDate: "2025-01-17",
-    days: 3,
-    status: "approved",
-    reason: "Family function",
-    appliedOn: "2025-01-01",
-  },
-  {
-    id: "2",
-    type: "Medical Leave",
-    startDate: "2025-02-20",
-    endDate: "2025-02-21",
-    days: 2,
-    status: "pending",
-    reason: "Doctor appointment",
-    appliedOn: "2025-02-15",
-  },
-  {
-    id: "3",
-    type: "Earned Leave",
-    startDate: "2024-12-24",
-    endDate: "2024-12-31",
-    days: 8,
-    status: "approved",
-    reason: "Year-end vacation",
-    appliedOn: "2024-11-30",
-  },
-  {
-    id: "4",
-    type: "Casual Leave",
-    startDate: "2024-11-10",
-    endDate: "2024-11-10",
-    days: 1,
-    status: "rejected",
-    reason: "Personal work",
-    appliedOn: "2024-11-08",
-  },
-];
+import { useLeaveApplications } from "@/src/hooks/useLeaveApplications";
+import { format } from "date-fns";
 
 export default function HistoryScreen() {
   const { colors, isDark } = useTheme();
   const [filter, setFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const { applications, isLoading, refresh } = useLeaveApplications();
+  const [refreshing, setRefreshing] = useState(false);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -78,20 +48,36 @@ export default function HistoryScreen() {
     }
   };
 
-  const filteredLeaves = MOCK_LEAVES.filter((leave) => {
-    if (filter !== "all" && leave.status !== filter) return false;
-    if (
-      searchQuery &&
-      !leave.reason.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-      return false;
-    return true;
-  });
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await refresh();
+    setRefreshing(false);
+  };
+
+  const filteredLeaves = useMemo(() => {
+    return applications.filter((leave) => {
+      if (filter !== "all" && leave.status !== filter) return false;
+      if (
+        searchQuery &&
+        !leave.reason.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+        return false;
+      return true;
+    });
+  }, [applications, filter, searchQuery]);
 
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.content}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          tintColor={colors.primary}
+          colors={[colors.primary]}
+        />
+      }
     >
       <View style={styles.header}>
         <Text
@@ -153,32 +139,51 @@ export default function HistoryScreen() {
         </View>
       </ThemedCard>
 
-      {filteredLeaves.map((leave) => (
-        <ThemedCard key={leave.id} style={styles.leaveCard}>
-          <View style={styles.leaveHeader}>
-            <View style={{ flex: 1 }}>
-              <Text
-                style={[
-                  styles.leaveType,
-                  { color: "text" in colors ? colors.text : colors.onSurface },
-                ]}
-              >
-                {leave.type}
-              </Text>
-              <Text
-                style={[
-                  styles.leaveDates,
-                  {
-                    color:
-                      "textSecondary" in colors
-                        ? colors.textSecondary
-                        : colors.onSurfaceVariant,
-                  },
-                ]}
-              >
-                {new Date(leave.startDate).toLocaleDateString()} -{" "}
-                {new Date(leave.endDate).toLocaleDateString()}
-              </Text>
+      {isLoading && !refreshing ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text
+            style={[
+              styles.loadingText,
+              {
+                color:
+                  "textSecondary" in colors
+                    ? colors.textSecondary
+                    : colors.onSurfaceVariant,
+              },
+            ]}
+          >
+            Loading leave history...
+          </Text>
+        </View>
+      ) : (
+        <>
+          {filteredLeaves.map((leave) => (
+            <ThemedCard key={leave.id} style={styles.leaveCard}>
+              <View style={styles.leaveHeader}>
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={[
+                      styles.leaveType,
+                      { color: "text" in colors ? colors.text : colors.onSurface },
+                    ]}
+                  >
+                    {leave.leave_type}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.leaveDates,
+                      {
+                        color:
+                          "textSecondary" in colors
+                            ? colors.textSecondary
+                            : colors.onSurfaceVariant,
+                      },
+                    ]}
+                  >
+                    {format(new Date(leave.start_date), "MMM dd, yyyy")} -{" "}
+                    {format(new Date(leave.end_date), "MMM dd, yyyy")}
+                  </Text>
             </View>
             <View
               style={[
@@ -226,7 +231,7 @@ export default function HistoryScreen() {
                   { color: "text" in colors ? colors.text : colors.onSurface },
                 ]}
               >
-                {leave.days} {leave.days === 1 ? "day" : "days"}
+                {leave.days_requested} {leave.days_requested === 1 ? "day" : "days"}
               </Text>
             </View>
             <View style={styles.detailRow}>
@@ -249,7 +254,9 @@ export default function HistoryScreen() {
                   { color: "text" in colors ? colors.text : colors.onSurface },
                 ]}
               >
-                {new Date(leave.appliedOn).toLocaleDateString()}
+                {leave.applied_on
+                  ? format(new Date(leave.applied_on), "MMM dd, yyyy")
+                  : format(new Date(leave.local_created_at), "MMM dd, yyyy")}
               </Text>
             </View>
             <View
@@ -272,10 +279,10 @@ export default function HistoryScreen() {
               </Text>
             </View>
           </View>
-        </ThemedCard>
-      ))}
+            </ThemedCard>
+          ))}
 
-      {filteredLeaves.length === 0 && (
+          {filteredLeaves.length === 0 && !isLoading && (
         <View style={styles.emptyState}>
           <Text
             style={[
@@ -291,6 +298,8 @@ export default function HistoryScreen() {
             No leave applications found
           </Text>
         </View>
+          )}
+        </>
       )}
     </ScrollView>
   );
@@ -400,5 +409,14 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     textAlign: "center",
+  },
+  loadingContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 40,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 15,
   },
 });

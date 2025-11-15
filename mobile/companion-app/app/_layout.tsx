@@ -1,22 +1,63 @@
-import { Stack } from "expo-router";
+import { useEffect } from "react";
+import { Stack, router, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import { ThemeProvider } from "../src/providers/ThemeProvider";
+import { useAuthStore } from "../src/store/authStore";
+import { initDatabase } from "../src/database";
 
 export const unstable_settings = {
   anchor: "(tabs)",
 };
 
+function RootLayoutNav() {
+  const segments = useSegments();
+  const { isAuthenticated, isLoading, checkAuthStatus } = useAuthStore();
+
+  useEffect(() => {
+    // Initialize database and check auth status
+    const init = async () => {
+      try {
+        await initDatabase();
+        await checkAuthStatus();
+      } catch (error) {
+        console.error('Initialization error:', error);
+      }
+    };
+
+    init();
+  }, []);
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    const inAuthGroup = segments[0] === '(tabs)';
+
+    if (!isAuthenticated && inAuthGroup) {
+      // Redirect to login if not authenticated
+      router.replace('/login');
+    } else if (isAuthenticated && !inAuthGroup) {
+      // Redirect to tabs if authenticated
+      router.replace('/(tabs)');
+    }
+  }, [isAuthenticated, segments, isLoading]);
+
+  return (
+    <Stack>
+      <Stack.Screen name="login" options={{ headerShown: false }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="modal"
+        options={{ presentation: "modal", title: "Modal" }}
+      />
+    </Stack>
+  );
+}
+
 export default function RootLayout() {
   return (
     <ThemeProvider>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="modal"
-          options={{ presentation: "modal", title: "Modal" }}
-        />
-      </Stack>
+      <RootLayoutNav />
       <StatusBar style="auto" />
     </ThemeProvider>
   );
