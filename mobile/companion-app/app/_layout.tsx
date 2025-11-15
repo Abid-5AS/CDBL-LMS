@@ -7,6 +7,7 @@ import { useAuthStore } from "../src/store/authStore";
 import { initDatabase } from "../src/database";
 import { ErrorBoundary } from "../src/components/errors/ErrorBoundary";
 import { networkMonitor } from "../src/sync/NetworkMonitor";
+import { notificationService } from "../src/notifications/NotificationService";
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -22,6 +23,7 @@ function RootLayoutNav() {
       try {
         await initDatabase();
         networkMonitor.initialize();
+        await notificationService.initialize();
         await checkAuthStatus();
       } catch (error) {
         console.error('Initialization error:', error);

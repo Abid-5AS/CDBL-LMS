@@ -15,6 +15,7 @@ import { useTheme } from "@/src/providers/ThemeProvider";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLeaveApplications } from "@/src/hooks/useLeaveApplications";
 import { useLeaveBalances } from "@/src/hooks/useLeaveBalances";
+import { useNotifications } from "@/src/hooks/useNotifications";
 import { AIAssistantModal } from "@/src/components/ai/AIAssistantModal";
 import { AILeaveSuggestion } from "@/src/ai/types";
 import { format, parseISO } from "date-fns";
@@ -23,6 +24,7 @@ export default function ApplyLeaveScreen() {
   const { colors, isDark } = useTheme();
   const { createApplication } = useLeaveApplications();
   const { balances, getBalanceByType, isLoading: balancesLoading } = useLeaveBalances();
+  const { scheduleLeaveReminder, sendApplicationSubmitted } = useNotifications();
 
   const [leaveType, setLeaveType] = useState("Casual Leave");
   const [startDate, setStartDate] = useState(new Date());
@@ -94,6 +96,18 @@ export default function ApplyLeaveScreen() {
       });
 
       if (result.success) {
+        // Send notification for submitted application
+        await sendApplicationSubmitted(
+          leaveType,
+          format(startDate, "MMM dd, yyyy"),
+          format(endDate, "MMM dd, yyyy")
+        );
+
+        // Schedule leave reminder (1 day before start)
+        if (result.id) {
+          await scheduleLeaveReminder(result.id, leaveType, startDate);
+        }
+
         Alert.alert(
           "Success",
           "Your leave application has been submitted successfully!",

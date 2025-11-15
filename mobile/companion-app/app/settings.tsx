@@ -14,6 +14,7 @@ import { ThemedButton } from '../src/components/shared/ThemedButton';
 import { useTheme } from '../src/providers/ThemeProvider';
 import { useAuthStore } from '../src/store/authStore';
 import { BiometricAuth } from '../src/auth/BiometricAuth';
+import { useNotifications } from '../src/hooks/useNotifications';
 import {
   Sun,
   Moon,
@@ -22,11 +23,14 @@ import {
   Info,
   LogOut,
   ChevronRight,
+  Bell,
+  BellOff,
 } from 'lucide-react-native';
 
 export default function SettingsScreen() {
   const { colors, isDark, mode, setMode } = useTheme();
   const { logout, biometricEnabled, setBiometricEnabled } = useAuthStore();
+  const { preferences, updatePreferences, isInitialized } = useNotifications();
   const [isTogglingBiometric, setIsTogglingBiometric] = useState(false);
 
   const handleThemeChange = (newMode: 'light' | 'dark' | 'system') => {
@@ -256,6 +260,191 @@ export default function SettingsScreen() {
         </ThemedCard>
       </View>
 
+      {/* Notifications Section */}
+      <View style={styles.section}>
+        <Text
+          style={[
+            styles.sectionTitle,
+            {
+              color:
+                'textSecondary' in colors
+                  ? colors.textSecondary
+                  : colors.onSurfaceVariant,
+            },
+          ]}
+        >
+          NOTIFICATIONS
+        </Text>
+
+        <ThemedCard style={styles.card}>
+          {/* Master Notifications Toggle */}
+          <View style={styles.settingRow}>
+            <View style={styles.settingInfo}>
+              {preferences.enabled ? (
+                <Bell size={24} color={'text' in colors ? colors.text : colors.onSurface} />
+              ) : (
+                <BellOff size={24} color={'text' in colors ? colors.text : colors.onSurface} />
+              )}
+              <View style={styles.settingText}>
+                <Text
+                  style={[
+                    styles.settingTitle,
+                    { color: 'text' in colors ? colors.text : colors.onSurface },
+                  ]}
+                >
+                  Enable Notifications
+                </Text>
+                <Text
+                  style={[
+                    styles.settingDescription,
+                    {
+                      color:
+                        'textSecondary' in colors
+                          ? colors.textSecondary
+                          : colors.onSurfaceVariant,
+                    },
+                  ]}
+                >
+                  Receive leave reminders and updates
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={preferences.enabled}
+              onValueChange={(value) => updatePreferences({ enabled: value })}
+              disabled={!isInitialized}
+              trackColor={{
+                false: isDark ? '#48484A' : '#E5E5EA',
+                true: colors.primary + '80',
+              }}
+              thumbColor={preferences.enabled ? colors.primary : '#FFFFFF'}
+            />
+          </View>
+
+          {/* Notification Types */}
+          {preferences.enabled && (
+            <>
+              <View style={[styles.divider, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }]} />
+
+              <View style={styles.settingRow}>
+                <View style={styles.settingInfo}>
+                  <View style={styles.settingText}>
+                    <Text
+                      style={[
+                        styles.settingTitle,
+                        { color: 'text' in colors ? colors.text : colors.onSurface },
+                      ]}
+                    >
+                      Leave Reminders
+                    </Text>
+                    <Text
+                      style={[
+                        styles.settingDescription,
+                        {
+                          color:
+                            'textSecondary' in colors
+                              ? colors.textSecondary
+                              : colors.onSurfaceVariant,
+                        },
+                      ]}
+                    >
+                      Remind me 1 day before leave starts
+                    </Text>
+                  </View>
+                </View>
+                <Switch
+                  value={preferences.leaveReminders}
+                  onValueChange={(value) => updatePreferences({ leaveReminders: value })}
+                  trackColor={{
+                    false: isDark ? '#48484A' : '#E5E5EA',
+                    true: colors.primary + '80',
+                  }}
+                  thumbColor={preferences.leaveReminders ? colors.primary : '#FFFFFF'}
+                />
+              </View>
+
+              <View style={[styles.divider, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }]} />
+
+              <View style={styles.settingRow}>
+                <View style={styles.settingInfo}>
+                  <View style={styles.settingText}>
+                    <Text
+                      style={[
+                        styles.settingTitle,
+                        { color: 'text' in colors ? colors.text : colors.onSurface },
+                      ]}
+                    >
+                      Low Balance Warnings
+                    </Text>
+                    <Text
+                      style={[
+                        styles.settingDescription,
+                        {
+                          color:
+                            'textSecondary' in colors
+                              ? colors.textSecondary
+                              : colors.onSurfaceVariant,
+                        },
+                      ]}
+                    >
+                      Alert when leave balance is low
+                    </Text>
+                  </View>
+                </View>
+                <Switch
+                  value={preferences.lowBalanceWarnings}
+                  onValueChange={(value) => updatePreferences({ lowBalanceWarnings: value })}
+                  trackColor={{
+                    false: isDark ? '#48484A' : '#E5E5EA',
+                    true: colors.primary + '80',
+                  }}
+                  thumbColor={preferences.lowBalanceWarnings ? colors.primary : '#FFFFFF'}
+                />
+              </View>
+
+              <View style={[styles.divider, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }]} />
+
+              <View style={styles.settingRow}>
+                <View style={styles.settingInfo}>
+                  <View style={styles.settingText}>
+                    <Text
+                      style={[
+                        styles.settingTitle,
+                        { color: 'text' in colors ? colors.text : colors.onSurface },
+                      ]}
+                    >
+                      Application Updates
+                    </Text>
+                    <Text
+                      style={[
+                        styles.settingDescription,
+                        {
+                          color:
+                            'textSecondary' in colors
+                              ? colors.textSecondary
+                              : colors.onSurfaceVariant,
+                        },
+                      ]}
+                    >
+                      Notify on submission and status changes
+                    </Text>
+                  </View>
+                </View>
+                <Switch
+                  value={preferences.applicationUpdates}
+                  onValueChange={(value) => updatePreferences({ applicationUpdates: value })}
+                  trackColor={{
+                    false: isDark ? '#48484A' : '#E5E5EA',
+                    true: colors.primary + '80',
+                  }}
+                  thumbColor={preferences.applicationUpdates ? colors.primary : '#FFFFFF'}
+                />
+              </View>
+            </>
+          )}
+        </ThemedCard>
+      </View>
+
       {/* About Section */}
       <View style={styles.section}>
         <Text
@@ -433,6 +622,10 @@ const styles = StyleSheet.create({
   settingDescription: {
     fontSize: 13,
     fontWeight: '500',
+  },
+  divider: {
+    height: 1,
+    marginVertical: 12,
   },
   logoutContainer: {
     marginTop: 24,
