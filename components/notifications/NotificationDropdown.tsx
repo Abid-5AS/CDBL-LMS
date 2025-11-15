@@ -24,32 +24,63 @@ import { EmptyState } from "@/components/shared";
 import { formatDate } from "@/lib";
 
 type Notification = {
-  id: string;
-  type: "approval" | "rejection" | "pending_review" | "reminder";
+  id: number;
+  type: string;
   title: string;
   message: string;
-  link?: string;
-  timestamp: string;
+  link?: string | null;
+  createdAt: string;
   read: boolean;
 };
 
-// Mock notifications - in real app, fetch from API
+// API fetcher
 const fetcher = (url: string) =>
   fetch(url)
     .then((res) => res.json())
-    .catch(() => ({ notifications: [] }));
+    .then((data) => data.notifications || [])
+    .catch(() => []);
 
 export function NotificationDropdown() {
-  // In a real implementation, fetch actual notifications from API
-  const notifications = useMemo<Notification[]>(() => {
-    // Mock data for now
-    return [];
-  }, []);
+  // Fetch notifications from API
+  const { data: notifications = [], mutate } = useSWR<Notification[]>(
+    "/api/notifications/latest",
+    fetcher,
+    {
+      refreshInterval: 30000, // Refresh every 30 seconds
+      revalidateOnFocus: true,
+    }
+  );
 
   const unreadCount = useMemo(
     () => notifications.filter((n) => !n.read).length,
     [notifications]
   );
+
+  const handleMarkAsRead = async (id: number) => {
+    try {
+      await fetch(`/api/notifications/${id}/read`, { method: "POST" });
+      // Optimistically update local data
+      mutate(
+        notifications.map((n) => (n.id === id ? { ...n, read: true } : n)),
+        false
+      );
+    } catch (error) {
+      console.error("Failed to mark notification as read:", error);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await fetch("/api/notifications/read-all", { method: "POST" });
+      // Optimistically update local data
+      mutate(
+        notifications.map((n) => ({ ...n, read: true })),
+        false
+      );
+    } catch (error) {
+      console.error("Failed to mark all notifications as read:", error);
+    }
+  };
 
   return (
     <DropdownMenu>
@@ -79,11 +110,21 @@ export function NotificationDropdown() {
       >
         <DropdownMenuLabel className="flex items-center justify-between">
           <span>Notifications</span>
-          {unreadCount > 0 && (
-            <Badge variant="destructive" className="text-xs">
-              {unreadCount} new
-            </Badge>
-          )}
+          <div className="flex items-center gap-2">
+            {unreadCount > 0 && (
+              <Badge variant="destructive" className="text-xs">
+                {unreadCount} new
+              </Badge>
+            )}
+            {unreadCount > 0 && (
+              <button
+                onClick={handleMarkAllAsRead}
+                className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                Mark all read
+              </button>
+            )}
+          </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {notifications.length === 0 ? (
@@ -100,7 +141,12 @@ export function NotificationDropdown() {
               <DropdownMenuItem
                 key={notification.id}
                 asChild
-                className={!notification.read ? "bg-data-info" : ""}
+                className={!notification.read ? "bg-blue-50 dark:bg-blue-950/20" : ""}
+                onClick={() => {
+                  if (!notification.read) {
+                    handleMarkAsRead(notification.id);
+                  }
+                }}
               >
                 {notification.link ? (
                   <Link
@@ -108,35 +154,35 @@ export function NotificationDropdown() {
                     className="flex flex-col gap-1 w-full p-2"
                   >
                     <div className="flex items-start justify-between">
-                      <p className="text-sm font-medium text-text-primary">
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                         {notification.title}
                       </p>
                       {!notification.read && (
-                        <span className="h-2 w-2 bg-data-info rounded-full mt-1" />
+                        <span className="h-2 w-2 bg-blue-500 rounded-full mt-1" />
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {notification.message}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {formatDate(notification.timestamp)}
+                      {formatDate(notification.createdAt)}
                     </p>
                   </Link>
                 ) : (
                   <div className="flex flex-col gap-1 w-full p-2">
                     <div className="flex items-start justify-between">
-                      <p className="text-sm font-medium text-text-primary">
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                         {notification.title}
                       </p>
                       {!notification.read && (
-                        <span className="h-2 w-2 bg-data-info rounded-full mt-1" />
+                        <span className="h-2 w-2 bg-blue-500 rounded-full mt-1" />
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {notification.message}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {formatDate(notification.timestamp)}
+                      {formatDate(notification.createdAt)}
                     </p>
                   </div>
                 )}
@@ -146,7 +192,7 @@ export function NotificationDropdown() {
             <DropdownMenuItem asChild>
               <Link
                 href="/notifications"
-                className="w-full text-center text-sm text-data-info"
+                className="w-full text-center text-sm text-blue-600 dark:text-blue-400"
               >
                 View all notifications
               </Link>

@@ -6,8 +6,10 @@ import { getCurrentUser } from "@/lib/auth";
 export const cache = "no-store";
 
 const UpdateSchema = z.object({
-  role: z.enum(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"]).optional(),
-  department: z.string().min(1).optional(),
+  role: z.enum(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"]).optional(),
+  departmentId: z.number().nullable().optional(),
+  department: z.string().min(1).optional(), // Legacy support
+  isActive: z.boolean().optional(),
 });
 
 export async function PATCH(
@@ -16,7 +18,7 @@ export async function PATCH(
 ) {
 
   const current = await getCurrentUser();
-  if (!current || (current.role as string) !== "CEO") {
+  if (!current || !["CEO", "SYSTEM_ADMIN"].includes(current.role as string)) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
@@ -56,15 +58,24 @@ export async function PATCH(
     where: { id: numericId },
     data: {
       role: (payload.role ?? undefined) as any,
-      department: payload.department ?? undefined,
+      departmentId: payload.departmentId === null ? null : (payload.departmentId ?? undefined),
+      department: payload.department ?? undefined, // Legacy support
+      isActive: payload.isActive ?? undefined,
     },
     select: {
       id: true,
       name: true,
       email: true,
-      empCode: true,
+      employeeCode: true,
       role: true,
-      department: true,
+      isActive: true,
+      department: {
+        select: {
+          id: true,
+          name: true,
+          code: true,
+        },
+      },
       createdAt: true,
     },
   });
