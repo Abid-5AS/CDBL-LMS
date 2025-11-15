@@ -14,6 +14,7 @@ import { z } from "zod";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
 import { calculateMLConversion, formatConversionBreakdown } from "@/lib/medical-leave-conversion";
+import { calculateCLConversion, formatCLConversionBreakdown } from "@/lib/casual-leave-conversion";
 
 export const cache = "no-store";
 
@@ -152,23 +153,6 @@ export async function POST(
     });
   }
 
-  // Check if this is Casual Leave >3 days requiring auto-conversion (Policy 6.20.e)
-  // Per Policy 6.20(e): "if the total period exceeds... admissible in one spell, the entire period shall be converted into Earned Leave"
-  let clConversionApplied = false;
-  let actualLeaveType = leave.type;
-
-  if (leave.type === "CASUAL" && leave.workingDays > 3) {
-    // Auto-convert entire CL to EL per Policy 6.20.e
-    actualLeaveType = "EARNED";
-    clConversionApplied = true;
-
-    // Update leave type in database
-    await prisma.leaveRequest.update({
-      where: { id: leaveId },
-      data: { type: "EARNED" },
-    });
-  }
-
   // Update leave status
   await prisma.leaveRequest.update({
     where: { id: leaveId },
@@ -178,10 +162,84 @@ export async function POST(
   // Update balance when leave is approved
   const currentYear = new Date().getFullYear();
 
-  // Check if this is Medical Leave >14 days requiring auto-conversion (Policy 6.21.c)
-  let conversionDetails: string | null = null;
+  // CL >3 days: First 3 days from CL, remaining from EL (Policy 6.20.d)
+  let clConversionDetails: string | null = null;
 
-  if (leave.type === "MEDICAL" && leave.workingDays > 14) {
+  // ML >14 days: First 14 days from ML, excess from EL/Special/Extraordinary (Policy 6.21.c)
+  let mlConversionDetails: string | null = null;
+
+  if (leave.type === "CASUAL" && leave.workingDays > 3) {
+    // Get all relevant balances for conversion calculation
+    const [clBalance, elBalance] = await Promise.all([
+      prisma.balance.findUnique({
+        where: {
+          userId_type_year: {
+            userId: leave.requesterId,
+            type: "CASUAL",
+            year: currentYear,
+          },
+        },
+      }),
+      prisma.balance.findUnique({
+        where: {
+          userId_type_year: {
+            userId: leave.requesterId,
+            type: "EARNED",
+            year: currentYear,
+          },
+        },
+      }),
+    ]);
+
+    // Calculate conversion (first 3 days CL, remaining EL)
+    const conversion = calculateCLConversion(leave.workingDays, {
+      cl: (clBalance?.opening || 0) + (clBalance?.accrued || 0) - (clBalance?.used || 0),
+      el: (elBalance?.opening || 0) + (elBalance?.accrued || 0) - (elBalance?.used || 0),
+    });
+
+    clConversionDetails = formatCLConversionBreakdown(conversion);
+
+    // Update CL balance (first 3 days)
+    if (conversion.clPortion > 0 && clBalance) {
+      const newUsed = (clBalance.used || 0) + conversion.clPortion;
+      const newClosing = (clBalance.opening || 0) + (clBalance.accrued || 0) - newUsed;
+
+      await prisma.balance.update({
+        where: {
+          userId_type_year: {
+            userId: leave.requesterId,
+            type: "CASUAL",
+            year: currentYear,
+          },
+        },
+        data: {
+          used: newUsed,
+          closing: Math.max(newClosing, 0),
+        },
+      });
+    }
+
+    // Update EL balance (excess days)
+    if (conversion.elPortion > 0 && elBalance) {
+      const newUsed = (elBalance.used || 0) + conversion.elPortion;
+      const newClosing = (elBalance.opening || 0) + (elBalance.accrued || 0) - newUsed;
+
+      await prisma.balance.update({
+        where: {
+          userId_type_year: {
+            userId: leave.requesterId,
+            type: "EARNED",
+            year: currentYear,
+          },
+        },
+        data: {
+          used: newUsed,
+          closing: Math.max(newClosing, 0),
+        },
+      });
+    }
+  } else if (leave.type === "MEDICAL" && leave.workingDays > 14) {
+    // Medical Leave >14 days requiring auto-conversion (Policy 6.21.c)
     // Get all relevant balances for conversion calculation
     const [mlBalance, elBalance, specialElBalance] = await Promise.all([
       prisma.balance.findUnique({
@@ -220,7 +278,7 @@ export async function POST(
       specialEl: (specialElBalance?.opening || 0) + (specialElBalance?.accrued || 0) - (specialElBalance?.used || 0),
     });
 
-    conversionDetails = formatConversionBreakdown(conversion);
+    mlConversionDetails = formatConversionBreakdown(conversion);
 
     // Update ML balance (up to 14 days)
     if (conversion.mlPortion > 0 && mlBalance) {
@@ -285,13 +343,12 @@ export async function POST(
     // Note: Extraordinary Leave has no balance to track (unpaid leave)
     // It's just recorded in the conversion details for transparency
   } else {
-    // Standard balance update for non-ML or ML ≤14 days
-    // Use actualLeaveType to handle CL >3 days auto-conversion to EL
+    // Standard balance update for non-CL, non-ML, or CL ≤3 days / ML ≤14 days
     const balance = await prisma.balance.findUnique({
       where: {
         userId_type_year: {
           userId: leave.requesterId,
-          type: actualLeaveType,
+          type: leave.type,
           year: currentYear,
         },
       },
@@ -308,7 +365,7 @@ export async function POST(
         where: {
           userId_type_year: {
             userId: leave.requesterId,
-            type: actualLeaveType,
+            type: leave.type,
             year: currentYear,
           },
         },
@@ -330,20 +387,18 @@ export async function POST(
         leaveId,
         actorRole: userRole,
         step,
-        ...(clConversionApplied && {
+        ...(clConversionDetails && {
           clConversion: {
             applied: true,
-            originalType: "CASUAL",
-            convertedType: "EARNED",
-            workingDays: leave.workingDays,
-            reason: "Casual leave >3 days auto-converted to Earned Leave per Policy 6.20.e",
+            reason: "Casual leave >3 days auto-converted per Policy 6.20.d",
+            breakdown: clConversionDetails,
           },
         }),
-        ...(conversionDetails && {
+        ...(mlConversionDetails && {
           mlConversion: {
             applied: true,
             reason: "Medical leave >14 days auto-converted per Policy 6.21.c",
-            breakdown: conversionDetails,
+            breakdown: mlConversionDetails,
           },
         }),
       },
@@ -353,19 +408,17 @@ export async function POST(
   return NextResponse.json({
     ok: true,
     status: newStatus,
-    ...(clConversionApplied && {
+    ...(clConversionDetails && {
       clConversion: {
         applied: true,
-        originalType: "CASUAL",
-        convertedType: "EARNED",
-        workingDays: leave.workingDays,
-        message: "Casual leave >3 days was automatically converted to Earned Leave per Policy 6.20.e. The entire leave period will be deducted from your Earned Leave balance.",
+        details: clConversionDetails,
+        message: "Casual leave >3 days was automatically converted per Policy 6.20.d. First 3 days deducted from CL balance, remaining days from EL balance. See breakdown in leave details.",
       },
     }),
-    ...(conversionDetails && {
+    ...(mlConversionDetails && {
       mlConversion: {
         applied: true,
-        details: conversionDetails,
+        details: mlConversionDetails,
         message: "Medical leave >14 days was automatically converted per Policy 6.21.c. See breakdown in leave details.",
       },
     }),

@@ -26,6 +26,11 @@ import {
   validatePaternityLeaveEligibility,
   validateExtraordinaryLeavePrerequisite,
 } from "@/lib/leave-validation";
+import {
+  calculateCLConversion,
+  getCLConversionWarning,
+  formatCLConversionBreakdown,
+} from "@/lib/casual-leave-conversion";
 
 export type ValidationResult = {
   valid: boolean;
@@ -139,7 +144,7 @@ export class LeaveValidator {
 
   /**
    * Validate casual leave constraints
-   * Note: CL >3 days is ALLOWED per Policy 6.20(d,e) - will auto-convert to EL during approval
+   * Note: CL >3 days is ALLOWED per Policy 6.20(d,e) - will auto-convert excess to EL
    * IMPORTANT: Holiday rule STILL APPLIES even if CL will convert to EL (Policy 6.20.e)
    */
   static async validateCasualLeave(
@@ -171,20 +176,6 @@ export class LeaveValidator {
       };
     }
 
-    // CL >3 days: Allow but add warning (will auto-convert to EL per Policy 6.20.d/e)
-    const clConversionWarning =
-      workingDays > policy.clMaxConsecutiveDays
-        ? {
-            code: "cl_will_convert_to_el",
-            message: `Casual leave exceeding ${policy.clMaxConsecutiveDays} days will be automatically converted to Earned Leave per Policy 6.20(e). Your entire leave period (${workingDays} days) will be deducted from your Earned Leave balance.`,
-            details: {
-              max: policy.clMaxConsecutiveDays,
-              requested: workingDays,
-              willConvertToEL: true,
-            },
-          }
-        : undefined;
-
     // Check combination rule (no adjacent leaves)
     const combinationCheck = await violatesCasualLeaveCombination(
       userId,
@@ -209,10 +200,63 @@ export class LeaveValidator {
       };
     }
 
-    return {
-      valid: true,
-      ...(clConversionWarning && { warning: clConversionWarning }),
-    };
+    // CL >3 days: Calculate conversion and check balance sufficiency
+    if (workingDays > policy.clMaxConsecutiveDays) {
+      // Get user balances to check if conversion is possible
+      const currentYear = startDateOnly.getFullYear();
+      const balances = await prisma.balance.findMany({
+        where: {
+          userId,
+          year: currentYear,
+          type: { in: ["CASUAL", "EARNED"] },
+        },
+      });
+
+      const clBalance = balances.find(b => b.type === "CASUAL")?.closing ?? 0;
+      const elBalance = balances.find(b => b.type === "EARNED")?.closing ?? 0;
+
+      // Calculate conversion
+      const conversion = calculateCLConversion(workingDays, {
+        cl: clBalance,
+        el: elBalance,
+      });
+
+      // Check if conversion is possible
+      if (conversion.warning) {
+        return {
+          valid: false,
+          error: {
+            code: "cl_conversion_insufficient_balance",
+            message: conversion.warning,
+            details: {
+              requested: workingDays,
+              clBalance,
+              elBalance,
+              conversion: conversion.breakdown,
+            },
+          },
+        };
+      }
+
+      // Return with conversion warning
+      const warningMessage = getCLConversionWarning(workingDays);
+      return {
+        valid: true,
+        warning: {
+          code: "cl_will_convert_to_el",
+          message: warningMessage || formatCLConversionBreakdown(conversion),
+          details: {
+            max: policy.clMaxConsecutiveDays,
+            requested: workingDays,
+            willConvertToEL: true,
+            conversion: conversion.breakdown,
+            balanceImpact: conversion.balanceImpact,
+          },
+        },
+      };
+    }
+
+    return { valid: true };
   }
 
   /**

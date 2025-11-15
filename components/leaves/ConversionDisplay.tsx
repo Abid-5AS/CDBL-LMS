@@ -17,7 +17,7 @@ export interface ConversionDetails {
   timestamp: Date | string;
   appliedBy: string;
   policy?: string;
-  conversionType?: "ML_SPLIT" | "CL_TO_EL" | "EL_OVERFLOW";
+  conversionType?: "ML_SPLIT" | "CL_SPLIT" | "CL_TO_EL" | "EL_OVERFLOW";
 }
 
 interface ConversionDisplayProps {
@@ -46,10 +46,15 @@ const CONVERSION_TYPE_CONFIG = {
     icon: "🏥",
     description: "Medical Leave is limited to 14 days/year. Days exceeding this limit are automatically converted to other available leave types (Policy 6.21.c).",
   },
+  CL_SPLIT: {
+    title: "Casual Leave Auto-Conversion Applied",
+    icon: "🔄",
+    description: "Casual Leave is limited to 3 consecutive days per spell (Policy 6.20.d). Your request uses 3 days from CL balance and the remaining days from Earned Leave balance.",
+  },
   CL_TO_EL: {
     title: "Casual Leave Converted to Earned Leave",
     icon: "🔄",
-    description: "Casual Leave is limited to 3 consecutive days (Policy 6.20.e). Your request has been automatically converted to Earned Leave which provides greater flexibility.",
+    description: "Casual Leave is limited to 3 consecutive days per spell (Policy 6.20.d). First 3 days deducted from CL balance, remaining days from EL balance.",
   },
   EL_OVERFLOW: {
     title: "Earned Leave Overflow to Special Earned Leave",

@@ -16,14 +16,14 @@ export interface ConversionDetails {
   timestamp: Date | string;
   appliedBy: string;
   policy?: string;
-  conversionType?: "ML_SPLIT" | "CL_TO_EL" | "EL_OVERFLOW";
+  conversionType?: "ML_SPLIT" | "CL_SPLIT" | "CL_TO_EL" | "EL_OVERFLOW";
 }
 
 export interface ConversionRecord {
   id: number;
   date: string;
   leaveRequestId: number;
-  conversionType: "ML_SPLIT" | "CL_TO_EL" | "EL_OVERFLOW";
+  conversionType: "ML_SPLIT" | "CL_SPLIT" | "CL_TO_EL" | "EL_OVERFLOW";
   originalType: string;
   originalDays: number;
   conversions: Array<{
@@ -116,20 +116,47 @@ export async function getLeaveConversionDetails(leaveId: number): Promise<Conver
   // Check for CL conversion
   if (details.clConversion?.applied) {
     const clConversion = details.clConversion;
+    const breakdownText = clConversion.breakdown || "";
+    const conversions: Array<{ type: string; days: number; reason?: string }> = [];
+
+    // Extract original days
+    const originalMatch = breakdownText.match(/(\d+) day\(s\) Casual Leave/);
+    const originalDays = originalMatch ? parseInt(originalMatch[1]) : (clConversion.workingDays || 0);
+
+    // Parse each conversion line
+    const lines = breakdownText.split("\n");
+    lines.forEach((line) => {
+      if (line.match(/^\s*\d+\./)) {
+        // Extract days and type
+        const daysMatch = line.match(/(\d+) day\(s\)/);
+        const days = daysMatch ? parseInt(daysMatch[1]) : 0;
+
+        let type = "CASUAL";
+        if (line.includes("Casual Leave balance")) {
+          type = "CASUAL";
+        } else if (line.includes("Earned Leave")) {
+          type = "EARNED";
+        }
+
+        let reason = undefined;
+        if (line.includes("(CL max is")) {
+          reason = "CL limited to 3 days (Policy 6.20.d)";
+        }
+
+        if (days > 0) {
+          conversions.push({ type, days, reason });
+        }
+      }
+    });
+
     return {
       originalType: "CASUAL",
-      originalDays: clConversion.workingDays || 0,
-      conversions: [
-        {
-          type: "EARNED",
-          days: clConversion.workingDays || 0,
-          reason: "Casual leave >3 days auto-converted (Policy 6.20.e)",
-        },
-      ],
+      originalDays,
+      conversions,
       timestamp: auditLog.createdAt,
       appliedBy: details.actorRole || "System",
-      policy: "Policy 6.20.e",
-      conversionType: "CL_TO_EL",
+      policy: "Policy 6.20.d",
+      conversionType: conversions.length > 1 ? "CL_SPLIT" : "CL_TO_EL",
     };
   }
 
@@ -222,21 +249,39 @@ export async function getUserConversionHistory(
     // Check for CL conversion
     if (details.clConversion?.applied) {
       const clConversion = details.clConversion;
+      const breakdownText = clConversion.breakdown || "";
+      const conversions_items: Array<{ type: string; days: number }> = [];
+
+      // Parse breakdown
+      const originalMatch = breakdownText.match(/(\d+) day\(s\) Casual Leave/);
+      const originalDays = originalMatch ? parseInt(originalMatch[1]) : (clConversion.workingDays || leave.workingDays);
+
+      const lines = breakdownText.split("\n");
+      lines.forEach((line) => {
+        if (line.match(/^\s*\d+\./)) {
+          const daysMatch = line.match(/(\d+) day\(s\)/);
+          const days = daysMatch ? parseInt(daysMatch[1]) : 0;
+
+          let type = "CASUAL";
+          if (line.includes("Casual Leave balance")) type = "CASUAL";
+          else if (line.includes("Earned Leave")) type = "EARNED";
+
+          if (days > 0) {
+            conversions_items.push({ type, days });
+          }
+        }
+      });
+
       conversions.push({
         id: log.id,
         date: log.createdAt.toISOString(),
         leaveRequestId: leaveId,
-        conversionType: "CL_TO_EL",
+        conversionType: conversions_items.length > 1 ? "CL_SPLIT" : "CL_TO_EL",
         originalType: "CASUAL",
-        originalDays: clConversion.workingDays || leave.workingDays,
-        conversions: [
-          {
-            type: "EARNED",
-            days: clConversion.workingDays || leave.workingDays,
-          },
-        ],
+        originalDays,
+        conversions: conversions_items,
         appliedBy: details.actorRole || "System",
-        policy: "Policy 6.20.e",
+        policy: "Policy 6.20.d",
       });
     }
   }
@@ -307,6 +352,7 @@ export async function getUserConversionStats(userId: number, year: number) {
     totalDaysConverted: conversions.reduce((sum, c) => sum + c.originalDays, 0),
     byType: {
       ML_SPLIT: conversions.filter((c) => c.conversionType === "ML_SPLIT").length,
+      CL_SPLIT: conversions.filter((c) => c.conversionType === "CL_SPLIT").length,
       CL_TO_EL: conversions.filter((c) => c.conversionType === "CL_TO_EL").length,
       EL_OVERFLOW: conversions.filter((c) => c.conversionType === "EL_OVERFLOW").length,
     },
