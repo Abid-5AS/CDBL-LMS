@@ -18,6 +18,8 @@ import { ThemedButton } from '../src/components/shared/ThemedButton';
 import { useTheme } from '../src/providers/ThemeProvider';
 import { useAuthStore } from '../src/store/authStore';
 import { BiometricAuth } from '../src/auth/BiometricAuth';
+import { seedDatabase } from '../src/database/seedData';
+import { getUserProfile } from '../src/database';
 import type { User } from '../src/auth/types';
 
 export default function LoginScreen() {
@@ -93,6 +95,9 @@ export default function LoginScreen() {
       if (response.success) {
         await login(response.user, response.token, rememberMe);
 
+        // Seed database if no data exists
+        await seedDataIfNeeded(response.user);
+
         // Enable biometric if remember me is checked and biometric is available
         if (rememberMe && biometricAvailable) {
           const enabled = await BiometricAuth.enableBiometric();
@@ -143,7 +148,68 @@ export default function LoginScreen() {
     const response = await simulateLoginAPI(email, 'stored_password');
     if (response.success) {
       await login(response.user, token, true);
+
+      // Seed database if no data exists
+      await seedDataIfNeeded(response.user);
+
       router.replace('/(tabs)');
+    }
+  };
+
+  const seedDataIfNeeded = async (user: User) => {
+    try {
+      // Check if database has data
+      const profile = await getUserProfile();
+
+      if (!profile) {
+        // No data exists, seed with default data using logged-in user info
+        await seedDatabase({
+          userProfile: {
+            employeeId: user.employeeId,
+            name: user.name,
+            email: user.email,
+            department: user.department,
+            role: user.role,
+          },
+          balances: [
+            {
+              leaveType: 'Casual Leave',
+              total: 12,
+              used: 2,
+              pending: 0,
+              available: 10,
+              year: new Date().getFullYear(),
+            },
+            {
+              leaveType: 'Earned Leave',
+              total: 20,
+              used: 5,
+              pending: 2,
+              available: 13,
+              year: new Date().getFullYear(),
+            },
+            {
+              leaveType: 'Medical Leave',
+              total: 14,
+              used: 3,
+              pending: 1,
+              available: 10,
+              year: new Date().getFullYear(),
+            },
+            {
+              leaveType: 'Maternity Leave',
+              total: 90,
+              used: 0,
+              pending: 0,
+              available: 90,
+              year: new Date().getFullYear(),
+            },
+          ],
+        });
+        console.log('✅ Database seeded with default data');
+      }
+    } catch (error) {
+      console.error('Error seeding database:', error);
     }
   };
 

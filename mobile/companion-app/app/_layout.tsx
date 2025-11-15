@@ -5,6 +5,7 @@ import "react-native-reanimated";
 import { ThemeProvider } from "../src/providers/ThemeProvider";
 import { useAuthStore } from "../src/store/authStore";
 import { initDatabase } from "../src/database";
+import { ErrorBoundary } from "../src/components/errors/ErrorBoundary";
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -56,9 +57,11 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <RootLayoutNav />
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <RootLayoutNav />
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
