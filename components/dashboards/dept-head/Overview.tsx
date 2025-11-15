@@ -149,7 +149,7 @@ export function DeptHeadDashboardWrapper() {
         title="Team & Actions"
         description="Team overview and quick management actions"
       >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <Suspense fallback={<CardSkeleton />}>
             <DeptHeadTeamOverview />
           </Suspense>

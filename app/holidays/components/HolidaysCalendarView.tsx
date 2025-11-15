@@ -40,7 +40,6 @@ export function HolidaysCalendarView({ holidays }: HolidaysCalendarViewProps) {
         showWeekends={true}
         onDateClick={(date) => {
           setSelectedDate(date);
-          console.log("Selected date:", date);
         }}
       />
 

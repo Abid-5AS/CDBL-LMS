@@ -46,7 +46,7 @@ export function SystemAdminHeader({ username }: HeaderProps) {
 
 export function SystemOverviewCards() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
       <KPICard
         title="System Status"
         value="Healthy"
@@ -61,7 +61,7 @@ export function SystemOverviewCards() {
 
 export function SystemQuickStats({ systemStats }: QuickStatsProps) {
   return (
-    <div className="grid gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
       <KPICard
         title="Total Users"
         value={systemStats.totalUsers.toString()}
@@ -114,7 +114,7 @@ export function SystemQuickAccess() {
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
       {cards.map(({ href, icon: Icon, title, description }) => (
         <Button key={title} asChild variant="outline" className="h-auto flex-col items-start p-6">
           <Link href={href} className="flex flex-col items-start">

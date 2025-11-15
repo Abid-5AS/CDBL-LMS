@@ -189,17 +189,209 @@ export function CEODashboardClient() {
         )}
       </DashboardSection>
 
-      {/* Financial & YoY Metrics */}
+      {/* Analytics & Insights - MOVED UP (Priority for strategic decision making) */}
       <DashboardSection
-        title="Financial & Strategic Metrics"
-        description="Financial impact, year-over-year analysis, and system health"
+        title="Analytics & Trends"
+        description="Visual insights, department performance, and leave patterns"
+        isLoading={isLoading}
+      >
+        <div className="flex flex-col xl:flex-row gap-4 sm:gap-6">
+        {/* Main Charts Section */}
+        {!isLoading && stats && (stats.monthlyTrend?.length > 0 || stats.departments?.length > 0 || stats.leaveTypes?.length > 0) && (
+          <div className="flex-1 space-y-4 sm:space-y-6 min-w-0">
+            {/* Monthly Trend Chart */}
+            {stats.monthlyTrend && stats.monthlyTrend.length > 0 && (
+              <AnalyticsLineChart
+                title="Leave Request Trend"
+                subtitle="12-month historical view"
+                data={stats.monthlyTrend.map((item) => ({
+                  name: item.month,
+                  requests: item.requests,
+                  days: item.days,
+                }))}
+                dataKeys={[
+                  { key: "requests", name: "Requests", color: "hsl(var(--chart-1))" },
+                  { key: "days", name: "Total Days", color: "hsl(var(--chart-2))" },
+                ]}
+                xAxisKey="name"
+              />
+            )}
+
+            {/* Department Performance */}
+            {stats.departments && stats.departments.length > 0 && (
+              <AnalyticsBarChart
+                title="Department Utilization"
+                subtitle="Workforce availability by department"
+                data={stats.departments.map((dept) => ({
+                  name: dept.department,
+                  utilization: dept.utilization,
+                  onLeave: dept.onLeave,
+                }))}
+                dataKeys={[
+                  { key: "utilization", name: "Utilization %", color: "hsl(var(--chart-1))" },
+                ]}
+                xAxisKey="name"
+              />
+            )}
+
+            {/* Leave Type Distribution */}
+            {stats.leaveTypes && stats.leaveTypes.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                <AnalyticsPieChart
+                  title="Leave Type Distribution"
+                  subtitle="By request count"
+                  data={stats.leaveTypes.map((item) => ({
+                    name: item.type,
+                    value: item.count,
+                  }))}
+                  showPercentage={true}
+                />
+
+                <Card className="rounded-2xl">
+                  <CardHeader>
+                    <CardTitle className="text-base">Leave Type Details</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {stats.leaveTypes.slice(0, 5).map((type, index) => (
+                        <div key={index}>
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-sm font-medium">{type.type}</span>
+                            <span className="text-sm text-muted-foreground">
+                              {type.count} requests
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center text-xs text-muted-foreground">
+                            <span>Avg duration: {type.avgDuration.toFixed(1)} days</span>
+                          </div>
+                          {index < stats.leaveTypes.length - 1 && <Separator className="mt-3" />}
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Sidebar - Insights & Quick Stats */}
+        <div className="xl:w-80 shrink-0 space-y-4 sm:space-y-6">
+          {/* AI-Powered Insights */}
+          {!isLoading && stats && stats.insights && stats.insights.length > 0 && (
+            <Card className="rounded-2xl">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-data-info" />
+                  AI Insights
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {stats.insights.map((insight, index) => (
+                  <div
+                    key={index}
+                    className={cn(
+                      "p-3 rounded-lg border text-sm",
+                      insight.type === "warning" &&
+                        "bg-data-warning/10 border-data-warning/30 text-data-warning",
+                      insight.type === "success" &&
+                        "bg-data-success/10 border-data-success/30 text-data-success",
+                      insight.type === "info" &&
+                        "bg-data-info/10 border-data-info/30 text-data-info"
+                    )}
+                  >
+                    {insight.message}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Quick Financial Summary */}
+          {!isLoading && stats && (
+            <Card className="rounded-2xl">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  Financial Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-2xl font-bold">
+                    ${((stats.estimatedCost || 0) / 1000).toFixed(1)}K
+                  </p>
+                  <p className="text-xs text-muted-foreground">Estimated YTD cost</p>
+                </div>
+                <Separator />
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Leave Days</span>
+                    <span className="font-medium">{stats.totalLeaveDays || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">YoY Growth</span>
+                    <span className={cn("font-medium", stats.yoyGrowth > 10 && "text-data-warning")}>
+                      {(stats.yoyGrowth ?? 0) > 0 ? "+" : ""}{stats.yoyGrowth ?? 0}%
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* System Health Monitor */}
+          {!isLoading && stats?.systemHealth && (
+            <Card className="rounded-2xl">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Activity className="h-4 w-4" />
+                  System Status
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Uptime</span>
+                  <span className="text-lg font-bold text-data-success">
+                    {stats.systemHealth.uptime || 99.9}%
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">API</span>
+                  <Badge
+                    variant={stats.systemHealth.apiStatus === "healthy" ? "default" : "destructive"}
+                    className="text-xs"
+                  >
+                    {stats.systemHealth.apiStatus || "healthy"}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Database</span>
+                  <Badge
+                    variant={stats.systemHealth.dbStatus === "healthy" ? "default" : "destructive"}
+                    className="text-xs"
+                  >
+                    {stats.systemHealth.dbStatus || "healthy"}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+        </div>
+      </DashboardSection>
+
+      {/* Financial & Strategic Metrics - MOVED DOWN (Detail view after trends) */}
+      <DashboardSection
+        title="Financial & Strategic Details"
+        description="Detailed financial analysis and year-over-year comparisons"
         isLoading={false}
         loadingFallback={<DashboardGridSkeleton cards={3} className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" />}
       >
         {isLoading ? (
           <DashboardGridSkeleton cards={3} className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" />
         ) : (
-          <ResponsiveDashboardGrid columns="1:1:3:3" gap="md">
+          <ResponsiveDashboardGrid columns="1:2:3:3" gap="md">
             {/* Financial Impact Card */}
             <Card className="rounded-2xl">
               <CardHeader className="pb-3">
@@ -319,251 +511,6 @@ export function CEODashboardClient() {
             </Card>
           </ResponsiveDashboardGrid>
         )}
-      </DashboardSection>
-
-      {/* Analytics & Insights */}
-      <DashboardSection
-        title="Analytics & Insights"
-        description="Detailed trends, department performance, and AI-powered insights"
-        isLoading={isLoading}
-      >
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column - Charts (8 cols) */}
-        <div className="lg:col-span-8 space-y-6">
-          {/* Monthly Trend Chart */}
-          {!isLoading && stats && stats.monthlyTrend && stats.monthlyTrend.length > 0 && (
-            <AnalyticsLineChart
-              title="Leave Request Trend"
-              subtitle="12-month historical view"
-              data={stats.monthlyTrend.map((item) => ({
-                name: item.month,
-                requests: item.requests,
-                days: item.days,
-              }))}
-              dataKeys={[
-                { key: "requests", name: "Requests", color: "hsl(var(--chart-1))" },
-                { key: "days", name: "Total Days", color: "hsl(var(--chart-2))" },
-              ]}
-              xAxisKey="name"
-            />
-          )}
-
-          {/* Department Performance */}
-          {!isLoading && stats && stats.departments && stats.departments.length > 0 && (
-            <AnalyticsBarChart
-              title="Department Utilization"
-              subtitle="Workforce availability by department"
-              data={stats.departments.map((dept) => ({
-                name: dept.department,
-                utilization: dept.utilization,
-                onLeave: dept.onLeave,
-              }))}
-              dataKeys={[
-                { key: "utilization", name: "Utilization %", color: "hsl(var(--chart-1))" },
-              ]}
-              xAxisKey="name"
-            />
-          )}
-
-          {/* Leave Type Distribution */}
-          {!isLoading && stats && stats.leaveTypes && stats.leaveTypes.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <AnalyticsPieChart
-                title="Leave Type Distribution"
-                subtitle="By request count"
-                data={stats.leaveTypes.map((item) => ({
-                  name: item.type,
-                  value: item.count,
-                }))}
-                showPercentage={true}
-              />
-
-              <Card className="rounded-2xl">
-                <CardHeader>
-                  <CardTitle className="text-base">Leave Type Details</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {stats.leaveTypes.slice(0, 5).map((type, index) => (
-                      <div key={index}>
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-sm font-medium">{type.type}</span>
-                          <span className="text-sm text-muted-foreground">
-                            {type.count} requests
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center text-xs text-muted-foreground">
-                          <span>Avg duration: {type.avgDuration.toFixed(1)} days</span>
-                        </div>
-                        {index < stats.leaveTypes.length - 1 && <Separator className="mt-3" />}
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-        </div>
-
-        {/* Right Column - Insights & Quick Stats (4 cols) */}
-        <div className="lg:col-span-4 space-y-6">
-          {/* AI-Powered Insights */}
-          {!isLoading && stats && stats.insights && stats.insights.length > 0 && (
-            <Card className="rounded-2xl">
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-data-info" />
-                  AI Insights
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {stats.insights.map((insight, index) => (
-                  <div
-                    key={index}
-                    className={cn(
-                      "p-3 rounded-lg border",
-                      insight.type === "warning"
-                        ? "border-data-warning/20 bg-data-warning/5"
-                        : insight.type === "success"
-                        ? "border-data-success/20 bg-data-success/5"
-                        : "border-data-info/20 bg-data-info/5"
-                    )}
-                  >
-                    <div className="flex gap-2">
-                      {insight.type === "warning" && (
-                        <AlertCircle className="h-4 w-4 text-data-warning flex-shrink-0 mt-0.5" />
-                      )}
-                      {insight.type === "success" && (
-                        <CheckCircle2 className="h-4 w-4 text-data-success flex-shrink-0 mt-0.5" />
-                      )}
-                      {insight.type === "info" && (
-                        <Sparkles className="h-4 w-4 text-data-info flex-shrink-0 mt-0.5" />
-                      )}
-                      <p className="text-xs leading-relaxed">{insight.message}</p>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Executive Summary */}
-          <Card className="rounded-2xl">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Briefcase className="h-4 w-4" />
-                Executive Summary
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {isLoading ? (
-                <>
-                  <div className="h-6 w-full bg-muted/50 animate-pulse rounded" />
-                  <div className="h-6 w-full bg-muted/50 animate-pulse rounded" />
-                  <div className="h-6 w-full bg-muted/50 animate-pulse rounded" />
-                </>
-              ) : (
-                <>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Workforce Size</span>
-                    <span className="font-semibold">{stats?.totalEmployees || 0}</span>
-                  </div>
-                  <Separator />
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Utilization Rate</span>
-                    <span className="font-semibold">{stats?.utilizationRate || 0}%</span>
-                  </div>
-                  <Separator />
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Avg Approval Time</span>
-                    <span className="font-semibold">
-                      {stats?.avgApprovalTime?.toFixed(1) || 0} days
-                    </span>
-                  </div>
-                  <Separator />
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Critical Requests</span>
-                    <span className="font-semibold text-data-error">
-                      {stats?.criticalRequests || 0}
-                    </span>
-                  </div>
-                  <Separator />
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">YTD Leave Days</span>
-                    <span className="font-semibold">{stats?.totalLeaveDays || 0}</span>
-                  </div>
-                  <Separator />
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Est. Cost</span>
-                    <span className="font-semibold">
-                      ${((stats?.estimatedCost || 0) / 1000).toFixed(1)}K
-                    </span>
-                  </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card className="rounded-2xl">
-            <CardHeader>
-              <CardTitle className="text-base">Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <a
-                href="/admin"
-                className="block w-full px-4 py-2 text-sm text-center rounded-lg border border-border hover:bg-accent transition-colors"
-              >
-                Open Admin Console
-              </a>
-              {!isLoading && stats && (
-                <ExportButton
-                  data={[
-                    {
-                      metric: "Total Employees",
-                      value: stats.totalEmployees,
-                    },
-                    {
-                      metric: "On Leave Today",
-                      value: stats.onLeaveToday,
-                    },
-                    {
-                      metric: "Utilization Rate",
-                      value: `${stats.utilizationRate}%`,
-                    },
-                    {
-                      metric: "Pending Approvals",
-                      value: stats.pendingApprovals,
-                    },
-                    {
-                      metric: "Compliance Score",
-                      value: `${stats.complianceScore}%`,
-                    },
-                    {
-                      metric: "YoY Growth",
-                      value: `${stats.yoyGrowth}%`,
-                    },
-                    {
-                      metric: "Total Leave Days (YTD)",
-                      value: stats.totalLeaveDays,
-                    },
-                    {
-                      metric: "Estimated Cost",
-                      value: `$${stats.estimatedCost}`,
-                    },
-                  ]}
-                  filename="executive-summary"
-                  title="Executive Dashboard Summary"
-                  formats={["csv", "pdf"]}
-                  size="sm"
-                  className="w-full"
-                />
-              )}
-            </CardContent>
-          </Card>
-        </div>
-        </div>
       </DashboardSection>
     </div>
   );

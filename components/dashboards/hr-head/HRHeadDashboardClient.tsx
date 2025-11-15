@@ -209,9 +209,9 @@ export function HRHeadDashboardClient() {
         description="Pending approvals, department performance, and organization metrics"
         isLoading={isLoading}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Main Content - Left Side */}
-        <div className="lg:col-span-8 space-y-6">
+        <div className="flex flex-col xl:flex-row gap-4 sm:gap-6">
+        {/* Main Content */}
+        <div className="flex-1 min-w-0 space-y-4 sm:space-y-6">
           {/* Pending Requests Table */}
           <Card className="rounded-2xl">
             <CardHeader>
@@ -236,7 +236,7 @@ export function HRHeadDashboardClient() {
           </Card>
 
           {/* Department Analytics */}
-          {!isLoading && stats && stats.departments.length > 0 && (
+          {!isLoading && stats && stats.departments && stats.departments.length > 0 && (
             <AnalyticsBarChart
               title="Department Distribution"
               subtitle="Employees by department"
@@ -252,8 +252,8 @@ export function HRHeadDashboardClient() {
           )}
         </div>
 
-        {/* Sidebar - Right Side */}
-        <div className="lg:col-span-4 space-y-6">
+        {/* Sidebar */}
+        <div className="xl:w-80 shrink-0 space-y-4 sm:space-y-6">
           {/* Organization Stats */}
           <Card className="rounded-2xl">
             <CardHeader>
@@ -351,7 +351,7 @@ export function HRHeadDashboardClient() {
         description="Returned and cancelled leave requests"
         isLoading={isLoading}
       >
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
         <Suspense fallback={<DashboardCardSkeleton />}>
           <Card className="rounded-2xl">
             <CardHeader>
