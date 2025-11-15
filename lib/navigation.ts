@@ -12,6 +12,7 @@ import {
   Calendar,
   Wallet,
   PieChart,
+  HelpCircle,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { Role } from "@prisma/client";
@@ -33,13 +34,14 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
     { icon: ClipboardList, label: "My Leaves", href: "/leaves" },
     { icon: Wallet, label: "Balance", href: "/balance" },
     { icon: BookOpen, label: "Policies", href: "/policies" },
-    { icon: Calendar, label: "Holidays", href: "/holidays" },
+    { icon: HelpCircle, label: "FAQ", href: "/faq" },
   ],
 
   DEPT_HEAD: [
     { icon: Home, label: "Home", href: "/dashboard/dept-head" },
     { icon: ClipboardList, label: "Requests", href: "/approvals" },
     { icon: Users, label: "Team", href: "/employees" },
+    { icon: HelpCircle, label: "FAQ", href: "/faq" },
   ],
 
   HR_ADMIN: [
@@ -48,6 +50,7 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
     { icon: Users, label: "Employees", href: "/employees" },
     { icon: ChartBar, label: "Reports", href: "/reports" },
     { icon: BookOpen, label: "Policies", href: "/policies" },
+    { icon: HelpCircle, label: "FAQ", href: "/faq" },
   ],
 
   HR_HEAD: [
@@ -56,6 +59,7 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
     { icon: Users, label: "Employees", href: "/employees" },
     { icon: ChartBar, label: "Reports", href: "/reports" },
     { icon: Activity, label: "Audit", href: "/admin/audit" },
+    { icon: HelpCircle, label: "FAQ", href: "/faq" },
   ],
 
   CEO: [
@@ -64,6 +68,7 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
     { icon: Shield, label: "Admin", href: "/admin" },
     { icon: Activity, label: "Audit", href: "/admin/audit" },
     { icon: Users, label: "Employees", href: "/employees" },
+    { icon: HelpCircle, label: "FAQ", href: "/faq" },
   ],
 
   SYSTEM_ADMIN: [
@@ -72,6 +77,7 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
     { icon: Shield, label: "Admin", href: "/admin" },
     { icon: Users, label: "Employees", href: "/employees" },
     { icon: Activity, label: "Audit", href: "/admin/audit" },
+    { icon: HelpCircle, label: "FAQ", href: "/faq" },
   ],
 };
 
