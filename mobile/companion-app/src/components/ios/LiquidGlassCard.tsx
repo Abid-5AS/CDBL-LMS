@@ -1,30 +1,67 @@
 import React from "react";
 import { View, StyleSheet, ViewStyle, Platform } from "react-native";
-import { BlurView } from "expo-blur";
 import { useTheme } from "../../providers/ThemeProvider";
+
+// Import @expo/ui components for true iOS 26 Liquid Glass
+// Note: These are SwiftUI-backed and work best in development builds
+let LiquidGlassCard: any = null;
+let LiquidGlassBackground: any = null;
+
+try {
+  const expoUI = require('@expo/ui');
+  LiquidGlassCard = expoUI.LiquidGlassCard;
+  LiquidGlassBackground = expoUI.LiquidGlassBackground;
+} catch (e) {
+  console.log('[@expo/ui] Not available, falling back to expo-blur');
+}
+
+// Fallback to expo-blur if @expo/ui is not available
+import { BlurView } from "expo-blur";
 
 interface LiquidGlassCardProps {
   children: React.ReactNode;
   style?: ViewStyle;
   intensity?: number;
+  materialColor?: 'systemChromeMaterial' | 'systemMaterial' | 'systemThickMaterial' | 'systemThinMaterial' | 'systemUltraThinMaterial';
 }
 
 /**
  * iOS Liquid Glass Card Component
  *
- * Uses expo-blur for beautiful frosted glass effect
- * Works in Expo Go and development builds
+ * Uses @expo/ui for true iOS 26 Liquid Glass with SwiftUI backing
+ * Falls back to expo-blur for Expo Go and when @expo/ui is unavailable
  *
- * For true iOS 26 Liquid Glass with SwiftUI, use a development build
- * and enable @expo/ui components in the code
+ * For best results, use a development build with @expo/ui enabled
  */
-export function LiquidGlassCard({
+export function LiquidGlassCardComponent({
   children,
   style,
   intensity = 80,
+  materialColor = 'systemThickMaterial',
 }: LiquidGlassCardProps) {
   const { isDark } = useTheme();
 
+  // iOS with @expo/ui - True Liquid Glass
+  if (Platform.OS === "ios" && LiquidGlassCard && LiquidGlassBackground) {
+    return (
+      <LiquidGlassBackground
+        materialColor={materialColor}
+        vibrancyMode={isDark ? 'prominent' : 'label'}
+        style={[styles.container, style]}
+      >
+        <LiquidGlassCard
+          materialColor={materialColor}
+          style={styles.glassCard}
+        >
+          <View style={styles.content}>
+            {children}
+          </View>
+        </LiquidGlassCard>
+      </LiquidGlassBackground>
+    );
+  }
+
+  // iOS fallback with expo-blur
   if (Platform.OS === "ios") {
     return (
       <View style={[styles.container, style]}>
@@ -41,7 +78,7 @@ export function LiquidGlassCard({
     );
   }
 
-  // Android fallback
+  // Android fallback - Material Design
   return (
     <View
       style={[
@@ -66,6 +103,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 4,
+  },
+  glassCard: {
+    borderRadius: 20,
+    overflow: "hidden",
   },
   blurContainer: {
     overflow: "hidden",
@@ -92,3 +133,6 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
 });
+
+// Export with original name for compatibility
+export { LiquidGlassCardComponent as LiquidGlassCard };
