@@ -15,7 +15,9 @@ import { useTheme } from "@/src/providers/ThemeProvider";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLeaveApplications } from "@/src/hooks/useLeaveApplications";
 import { useLeaveBalances } from "@/src/hooks/useLeaveBalances";
-import { format } from "date-fns";
+import { AIAssistantModal } from "@/src/components/ai/AIAssistantModal";
+import { AILeaveSuggestion } from "@/src/ai/types";
+import { format, parseISO } from "date-fns";
 
 export default function ApplyLeaveScreen() {
   const { colors, isDark } = useTheme();
@@ -29,6 +31,7 @@ export default function ApplyLeaveScreen() {
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAIModal, setShowAIModal] = useState(false);
 
   // Update end date when start date changes (ensure end date is after start date)
   useEffect(() => {
@@ -148,7 +151,22 @@ export default function ApplyLeaveScreen() {
     }
   };
 
+  const handleApplySuggestion = (suggestion: AILeaveSuggestion) => {
+    try {
+      setLeaveType(suggestion.leaveType);
+      setStartDate(parseISO(suggestion.startDate));
+      setEndDate(parseISO(suggestion.endDate));
+      setReason(suggestion.reason);
+      setShowAIModal(false);
+      Alert.alert("AI Suggestion Applied", "Form filled with AI suggestions. Please review before submitting.");
+    } catch (error) {
+      console.error("Error applying suggestion:", error);
+      Alert.alert("Error", "Failed to apply AI suggestion. Please try manually.");
+    }
+  };
+
   return (
+    <>
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.content}
@@ -176,6 +194,15 @@ export default function ApplyLeaveScreen() {
           Fill in the details below
         </Text>
       </View>
+
+      {/* AI Assistant Button */}
+      <ThemedButton
+        variant="secondary"
+        onPress={() => setShowAIModal(true)}
+        style={{ marginBottom: 16 }}
+      >
+        ✨ Get AI Suggestions
+      </ThemedButton>
 
       <ThemedCard style={styles.card}>
         <Text
@@ -393,6 +420,14 @@ export default function ApplyLeaveScreen() {
         </ThemedButton>
       </View>
     </ScrollView>
+
+    {/* AI Assistant Modal */}
+    <AIAssistantModal
+      visible={showAIModal}
+      onClose={() => setShowAIModal(false)}
+      onApplySuggestion={handleApplySuggestion}
+    />
+    </>
   );
 }
 

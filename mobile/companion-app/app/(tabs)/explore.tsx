@@ -14,6 +14,7 @@ import {
   MessageSquare,
   ChevronRight,
   LogOut,
+  Sparkles,
 } from 'lucide-react-native';
 
 export default function MoreScreen() {
@@ -57,6 +58,18 @@ export default function MoreScreen() {
           label: 'Settings',
           description: 'App preferences and security',
           onPress: () => router.push('/settings'),
+        },
+      ],
+    },
+    {
+      title: 'TOOLS',
+      items: [
+        {
+          icon: Sparkles,
+          label: 'AI Leave Assistant',
+          description: 'Get smart leave suggestions powered by AI',
+          onPress: () => router.push('/ai-assistant'),
+          highlighted: true,
         },
       ],
     },
@@ -161,7 +174,12 @@ export default function MoreScreen() {
               return (
                 <View key={itemIndex}>
                   <TouchableOpacity
-                    style={styles.menuItem}
+                    style={[
+                      styles.menuItem,
+                      item.highlighted && {
+                        backgroundColor: colors.primary + '08',
+                      },
+                    ]}
                     onPress={item.onPress}
                     activeOpacity={0.7}
                   >
@@ -169,7 +187,9 @@ export default function MoreScreen() {
                       style={[
                         styles.menuIcon,
                         {
-                          backgroundColor: isDark
+                          backgroundColor: item.highlighted
+                            ? colors.primary + '20'
+                            : isDark
                             ? 'rgba(255,255,255,0.1)'
                             : 'rgba(0,0,0,0.05)',
                         },
