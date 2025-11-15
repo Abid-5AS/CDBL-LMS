@@ -5,45 +5,182 @@ import {
   Text,
   TextInput,
   Platform,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ThemedCard } from "@/src/components/shared/ThemedCard";
 import { ThemedButton } from "@/src/components/shared/ThemedButton";
 import { useTheme } from "@/src/providers/ThemeProvider";
 import DateTimePicker from "@react-native-community/datetimepicker";
-
-const LEAVE_TYPES = [
-  { id: "casual", label: "Casual Leave", balance: 12 },
-  { id: "earned", label: "Earned Leave", balance: 15 },
-  { id: "medical", label: "Medical Leave", balance: 10 },
-  { id: "maternity", label: "Maternity Leave", balance: 90 },
-];
+import { useLeaveApplications } from "@/src/hooks/useLeaveApplications";
+import { useLeaveBalances } from "@/src/hooks/useLeaveBalances";
+import { useNotifications } from "@/src/hooks/useNotifications";
+import { AIAssistantModal } from "@/src/components/ai/AIAssistantModal";
+import { AILeaveSuggestion } from "@/src/ai/types";
+import { format, parseISO } from "date-fns";
 
 export default function ApplyLeaveScreen() {
   const { colors, isDark } = useTheme();
-  const [leaveType, setLeaveType] = useState("casual");
+  const { createApplication } = useLeaveApplications();
+  const { balances, getBalanceByType, isLoading: balancesLoading } = useLeaveBalances();
+  const { scheduleLeaveReminder, sendApplicationSubmitted } = useNotifications();
+
+  const [leaveType, setLeaveType] = useState("Casual Leave");
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [reason, setReason] = useState("");
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAIModal, setShowAIModal] = useState(false);
 
-  const selectedLeave = LEAVE_TYPES.find((l) => l.id === leaveType);
+  // Update end date when start date changes (ensure end date is after start date)
+  useEffect(() => {
+    if (endDate < startDate) {
+      setEndDate(startDate);
+    }
+  }, [startDate]);
+
+  const selectedBalance = getBalanceByType(leaveType);
   const daysRequested =
     Math.ceil(
       (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
     ) + 1;
 
-  const handleSubmit = () => {
-    // TODO: Save to SQLite and sync queue
-    alert(
-      `Leave application submitted:\n${
-        selectedLeave?.label
-      }\n${daysRequested} days\nFrom: ${startDate.toLocaleDateString()}\nTo: ${endDate.toLocaleDateString()}`
-    );
+  const validateApplication = (): { valid: boolean; message?: string } => {
+    if (!leaveType) {
+      return { valid: false, message: "Please select a leave type" };
+    }
+
+    if (!reason.trim()) {
+      return { valid: false, message: "Please provide a reason for leave" };
+    }
+
+    if (reason.trim().length < 10) {
+      return { valid: false, message: "Reason must be at least 10 characters" };
+    }
+
+    if (daysRequested <= 0) {
+      return { valid: false, message: "Invalid date range" };
+    }
+
+    if (selectedBalance && daysRequested > selectedBalance.available_days) {
+      return {
+        valid: false,
+        message: `Insufficient balance. You have ${selectedBalance.available_days} days available.`,
+      };
+    }
+
+    return { valid: true };
+  };
+
+  const handleSubmit = async () => {
+    const validation = validateApplication();
+
+    if (!validation.valid) {
+      Alert.alert("Validation Error", validation.message);
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      const result = await createApplication({
+        leaveType,
+        startDate: format(startDate, "yyyy-MM-dd"),
+        endDate: format(endDate, "yyyy-MM-dd"),
+        daysRequested,
+        reason: reason.trim(),
+        status: "pending",
+      });
+
+      if (result.success) {
+        // Send notification for submitted application
+        await sendApplicationSubmitted(
+          leaveType,
+          format(startDate, "MMM dd, yyyy"),
+          format(endDate, "MMM dd, yyyy")
+        );
+
+        // Schedule leave reminder (1 day before start)
+        if (result.id) {
+          await scheduleLeaveReminder(result.id, leaveType, startDate);
+        }
+
+        Alert.alert(
+          "Success",
+          "Your leave application has been submitted successfully!",
+          [
+            {
+              text: "OK",
+              onPress: () => {
+                // Reset form
+                setReason("");
+                setStartDate(new Date());
+                setEndDate(new Date());
+              },
+            },
+          ]
+        );
+      } else {
+        Alert.alert("Error", "Failed to submit leave application. Please try again.");
+      }
+    } catch (error) {
+      console.error("Submit error:", error);
+      Alert.alert("Error", "An unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    if (!reason.trim()) {
+      Alert.alert("Validation Error", "Please provide a reason before saving draft");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      const result = await createApplication({
+        leaveType,
+        startDate: format(startDate, "yyyy-MM-dd"),
+        endDate: format(endDate, "yyyy-MM-dd"),
+        daysRequested,
+        reason: reason.trim(),
+        status: "draft",
+      });
+
+      if (result.success) {
+        Alert.alert("Success", "Draft saved successfully!");
+      } else {
+        Alert.alert("Error", "Failed to save draft. Please try again.");
+      }
+    } catch (error) {
+      console.error("Save draft error:", error);
+      Alert.alert("Error", "An unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleApplySuggestion = (suggestion: AILeaveSuggestion) => {
+    try {
+      setLeaveType(suggestion.leaveType);
+      setStartDate(parseISO(suggestion.startDate));
+      setEndDate(parseISO(suggestion.endDate));
+      setReason(suggestion.reason);
+      setShowAIModal(false);
+      Alert.alert("AI Suggestion Applied", "Form filled with AI suggestions. Please review before submitting.");
+    } catch (error) {
+      console.error("Error applying suggestion:", error);
+      Alert.alert("Error", "Failed to apply AI suggestion. Please try manually.");
+    }
   };
 
   return (
+    <>
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.content}
@@ -72,6 +209,15 @@ export default function ApplyLeaveScreen() {
         </Text>
       </View>
 
+      {/* AI Assistant Button */}
+      <ThemedButton
+        variant="secondary"
+        onPress={() => setShowAIModal(true)}
+        style={{ marginBottom: 16 }}
+      >
+        ✨ Get AI Suggestions
+      </ThemedButton>
+
       <ThemedCard style={styles.card}>
         <Text
           style={[
@@ -81,45 +227,52 @@ export default function ApplyLeaveScreen() {
         >
           Leave Type
         </Text>
-        <View style={styles.typeGrid}>
-          {LEAVE_TYPES.map((type) => (
-            <ThemedButton
-              key={type.id}
-              variant={leaveType === type.id ? "primary" : "outline"}
-              onPress={() => setLeaveType(type.id)}
-              style={styles.typeButton}
+
+        {balancesLoading ? (
+          <ActivityIndicator size="small" color={colors.primary} style={{ marginVertical: 20 }} />
+        ) : (
+          <>
+            <View style={styles.typeGrid}>
+              {balances.map((balance) => (
+                <ThemedButton
+                  key={balance.id}
+                  variant={leaveType === balance.leave_type ? "primary" : "outline"}
+                  onPress={() => setLeaveType(balance.leave_type)}
+                  style={styles.typeButton}
+                >
+                  {balance.leave_type}
+                </ThemedButton>
+              ))}
+            </View>
+            <View
+              style={[
+                styles.balanceCard,
+                {
+                  backgroundColor: isDark
+                    ? "rgba(255,255,255,0.05)"
+                    : "rgba(0,0,0,0.03)",
+                },
+              ]}
             >
-              {type.label}
-            </ThemedButton>
-          ))}
-        </View>
-        <View
-          style={[
-            styles.balanceCard,
-            {
-              backgroundColor: isDark
-                ? "rgba(255,255,255,0.05)"
-                : "rgba(0,0,0,0.03)",
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.balanceText,
-              {
-                color:
-                  "textSecondary" in colors
-                    ? colors.textSecondary
-                    : colors.onSurfaceVariant,
-              },
-            ]}
-          >
-            Available Balance
-          </Text>
-          <Text style={[styles.balanceValue, { color: colors.primary }]}>
-            {selectedLeave?.balance} days
-          </Text>
-        </View>
+              <Text
+                style={[
+                  styles.balanceText,
+                  {
+                    color:
+                      "textSecondary" in colors
+                        ? colors.textSecondary
+                        : colors.onSurfaceVariant,
+                  },
+                ]}
+              >
+                Available Balance
+              </Text>
+              <Text style={[styles.balanceValue, { color: colors.primary }]}>
+                {selectedBalance ? selectedBalance.available_days : 0} days
+              </Text>
+            </View>
+          </>
+        )}
       </ThemedCard>
 
       <ThemedCard style={styles.card}>
@@ -265,14 +418,30 @@ export default function ApplyLeaveScreen() {
       </ThemedCard>
 
       <View style={styles.actions}>
-        <ThemedButton variant="primary" onPress={handleSubmit}>
-          Submit Application
+        <ThemedButton
+          variant="primary"
+          onPress={handleSubmit}
+          disabled={isSubmitting || balancesLoading}
+        >
+          {isSubmitting ? "Submitting..." : "Submit Application"}
         </ThemedButton>
-        <ThemedButton variant="outline" onPress={() => alert("Draft saved")}>
+        <ThemedButton
+          variant="outline"
+          onPress={handleSaveDraft}
+          disabled={isSubmitting || balancesLoading}
+        >
           Save as Draft
         </ThemedButton>
       </View>
     </ScrollView>
+
+    {/* AI Assistant Modal */}
+    <AIAssistantModal
+      visible={showAIModal}
+      onClose={() => setShowAIModal(false)}
+      onApplySuggestion={handleApplySuggestion}
+    />
+    </>
   );
 }
 

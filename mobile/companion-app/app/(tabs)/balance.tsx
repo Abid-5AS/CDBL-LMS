@@ -1,54 +1,43 @@
-import { StyleSheet, ScrollView, View, Text } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  Text,
+  RefreshControl,
+  ActivityIndicator,
+} from "react-native";
+import { useState } from "react";
 import { ThemedCard } from "@/src/components/shared/ThemedCard";
 import { useTheme } from "@/src/providers/ThemeProvider";
+import { useLeaveBalances } from "@/src/hooks/useLeaveBalances";
+import { format } from "date-fns";
 
-const LEAVE_BALANCES = [
-  {
-    id: "casual",
-    name: "Casual Leave",
-    available: 12,
-    total: 12,
-    used: 0,
-    pending: 0,
-    color: "#2196F3",
-  },
-  {
-    id: "earned",
-    name: "Earned Leave",
-    available: 15,
-    total: 20,
-    used: 5,
-    pending: 0,
-    color: "#9C27B0",
-  },
-  {
-    id: "medical",
-    name: "Medical Leave",
-    available: 10,
-    total: 14,
-    used: 3,
-    pending: 1,
-    color: "#4CAF50",
-  },
-  {
-    id: "maternity",
-    name: "Maternity Leave",
-    available: 90,
-    total: 90,
-    used: 0,
-    pending: 0,
-    color: "#FF9800",
-  },
-];
-
-const ACCRUAL_HISTORY = [
-  { month: "Jan 2025", earned: 1.67, type: "Earned Leave" },
-  { month: "Feb 2025", earned: 1.67, type: "Earned Leave" },
-  { month: "Mar 2025", earned: 1.67, type: "Earned Leave" },
-];
+const LEAVE_TYPE_COLORS: Record<string, string> = {
+  "Casual Leave": "#2196F3",
+  "Earned Leave": "#9C27B0",
+  "Medical Leave": "#4CAF50",
+  "Maternity Leave": "#FF9800",
+  "Paternity Leave": "#FF5722",
+};
 
 export default function BalanceScreen() {
   const { colors, isDark } = useTheme();
+  const {
+    balances,
+    isLoading,
+    lastSynced,
+    getTotalAvailable,
+    getTotalUsed,
+    refresh,
+  } = useLeaveBalances();
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await refresh();
+    setRefreshing(false);
+  };
 
   const getProgressColor = (percentage: number) => {
     if (percentage >= 70) return "#4CAF50";
@@ -56,10 +45,27 @@ export default function BalanceScreen() {
     return "#F44336";
   };
 
+  const getLeaveTypeColor = (leaveType: string) => {
+    return LEAVE_TYPE_COLORS[leaveType] || colors.primary;
+  };
+
+  const totalGranted = balances.reduce((sum, leave) => sum + leave.total_days, 0);
+  const totalUsed = getTotalUsed();
+  const totalAvailable = getTotalAvailable();
+  const totalPending = balances.reduce((sum, leave) => sum + leave.pending_days, 0);
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.content}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          tintColor={colors.primary}
+          colors={[colors.primary]}
+        />
+      }
     >
       <View style={styles.header}>
         <Text
@@ -81,125 +87,48 @@ export default function BalanceScreen() {
             },
           ]}
         >
-          Current year overview
+          {lastSynced
+            ? `Last synced: ${format(lastSynced, "MMM dd, HH:mm")}`
+            : "Not yet synced"}
         </Text>
       </View>
 
-      <ThemedCard style={styles.summaryCard}>
-        <Text
-          style={[
-            styles.summaryTitle,
-            { color: "text" in colors ? colors.text : colors.onSurface },
-          ]}
-        >
-          Total Available
-        </Text>
-        <Text style={[styles.summaryValue, { color: colors.primary }]}>
-          {LEAVE_BALANCES.reduce((sum, leave) => sum + leave.available, 0)} days
-        </Text>
-        <View style={styles.summaryGrid}>
-          <View style={styles.summaryItem}>
-            <Text
-              style={[
-                styles.summaryLabel,
-                {
-                  color:
-                    "textSecondary" in colors
-                      ? colors.textSecondary
-                      : colors.onSurfaceVariant,
-                },
-              ]}
-            >
-              Total Granted
-            </Text>
-            <Text
-              style={[
-                styles.summaryNumber,
-                { color: "text" in colors ? colors.text : colors.onSurface },
-              ]}
-            >
-              {LEAVE_BALANCES.reduce((sum, leave) => sum + leave.total, 0)}
-            </Text>
-          </View>
-          <View style={styles.summaryItem}>
-            <Text
-              style={[
-                styles.summaryLabel,
-                {
-                  color:
-                    "textSecondary" in colors
-                      ? colors.textSecondary
-                      : colors.onSurfaceVariant,
-                },
-              ]}
-            >
-              Used
-            </Text>
-            <Text
-              style={[
-                styles.summaryNumber,
-                { color: "text" in colors ? colors.text : colors.onSurface },
-              ]}
-            >
-              {LEAVE_BALANCES.reduce((sum, leave) => sum + leave.used, 0)}
-            </Text>
-          </View>
-          <View style={styles.summaryItem}>
-            <Text
-              style={[
-                styles.summaryLabel,
-                {
-                  color:
-                    "textSecondary" in colors
-                      ? colors.textSecondary
-                      : colors.onSurfaceVariant,
-                },
-              ]}
-            >
-              Pending
-            </Text>
-            <Text
-              style={[
-                styles.summaryNumber,
-                { color: "text" in colors ? colors.text : colors.onSurface },
-              ]}
-            >
-              {LEAVE_BALANCES.reduce((sum, leave) => sum + leave.pending, 0)}
-            </Text>
-          </View>
+      {isLoading && !refreshing ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text
+            style={[
+              styles.loadingText,
+              {
+                color:
+                  "textSecondary" in colors
+                    ? colors.textSecondary
+                    : colors.onSurfaceVariant,
+              },
+            ]}
+          >
+            Loading balances...
+          </Text>
         </View>
-      </ThemedCard>
-
-      <Text
-        style={[
-          styles.sectionTitle,
-          { color: "text" in colors ? colors.text : colors.onSurface },
-        ]}
-      >
-        By Leave Type
-      </Text>
-
-      {LEAVE_BALANCES.map((leave) => {
-        const percentage = (leave.available / leave.total) * 100;
-        const progressColor = getProgressColor(percentage);
-
-        return (
-          <ThemedCard key={leave.id} style={styles.balanceCard}>
-            <View style={styles.balanceHeader}>
-              <View style={{ flex: 1 }}>
+      ) : (
+        <>
+          <ThemedCard style={styles.summaryCard}>
+            <Text
+              style={[
+                styles.summaryTitle,
+                { color: "text" in colors ? colors.text : colors.onSurface },
+              ]}
+            >
+              Total Available
+            </Text>
+            <Text style={[styles.summaryValue, { color: colors.primary }]}>
+              {totalAvailable} days
+            </Text>
+            <View style={styles.summaryGrid}>
+              <View style={styles.summaryItem}>
                 <Text
                   style={[
-                    styles.leaveName,
-                    {
-                      color: "text" in colors ? colors.text : colors.onSurface,
-                    },
-                  ]}
-                >
-                  {leave.name}
-                </Text>
-                <Text
-                  style={[
-                    styles.leaveSubtext,
+                    styles.summaryLabel,
                     {
                       color:
                         "textSecondary" in colors
@@ -208,52 +137,21 @@ export default function BalanceScreen() {
                     },
                   ]}
                 >
-                  {leave.available} of {leave.total} days available
+                  Total Granted
                 </Text>
-              </View>
-              <View
-                style={[
-                  styles.availableBadge,
-                  { backgroundColor: leave.color + "20" },
-                ]}
-              >
-                <Text style={[styles.availableValue, { color: leave.color }]}>
-                  {leave.available}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.progressContainer}>
-              <View
-                style={[
-                  styles.progressBar,
-                  {
-                    backgroundColor: isDark
-                      ? "rgba(255,255,255,0.1)"
-                      : "rgba(0,0,0,0.1)",
-                  },
-                ]}
-              >
-                <View
-                  style={[
-                    styles.progressFill,
-                    {
-                      width: `${percentage}%`,
-                      backgroundColor: progressColor,
-                    },
-                  ]}
-                />
-              </View>
-              <Text style={[styles.progressText, { color: progressColor }]}>
-                {percentage.toFixed(0)}%
-              </Text>
-            </View>
-
-            <View style={styles.statsRow}>
-              <View style={styles.statItem}>
                 <Text
                   style={[
-                    styles.statLabel,
+                    styles.summaryNumber,
+                    { color: "text" in colors ? colors.text : colors.onSurface },
+                  ]}
+                >
+                  {totalGranted}
+                </Text>
+              </View>
+              <View style={styles.summaryItem}>
+                <Text
+                  style={[
+                    styles.summaryLabel,
                     {
                       color:
                         "textSecondary" in colors
@@ -264,14 +162,19 @@ export default function BalanceScreen() {
                 >
                   Used
                 </Text>
-                <Text style={[styles.statValue, { color: "#F44336" }]}>
-                  {leave.used}
-                </Text>
-              </View>
-              <View style={styles.statItem}>
                 <Text
                   style={[
-                    styles.statLabel,
+                    styles.summaryNumber,
+                    { color: "text" in colors ? colors.text : colors.onSurface },
+                  ]}
+                >
+                  {totalUsed}
+                </Text>
+              </View>
+              <View style={styles.summaryItem}>
+                <Text
+                  style={[
+                    styles.summaryLabel,
                     {
                       color:
                         "textSecondary" in colors
@@ -282,68 +185,175 @@ export default function BalanceScreen() {
                 >
                   Pending
                 </Text>
-                <Text style={[styles.statValue, { color: "#FF9800" }]}>
-                  {leave.pending}
-                </Text>
-              </View>
-              <View style={styles.statItem}>
                 <Text
                   style={[
-                    styles.statLabel,
-                    {
-                      color:
-                        "textSecondary" in colors
-                          ? colors.textSecondary
-                          : colors.onSurfaceVariant,
-                    },
+                    styles.summaryNumber,
+                    { color: "text" in colors ? colors.text : colors.onSurface },
                   ]}
                 >
-                  Available
-                </Text>
-                <Text style={[styles.statValue, { color: "#4CAF50" }]}>
-                  {leave.available}
+                  {totalPending}
                 </Text>
               </View>
             </View>
           </ThemedCard>
-        );
-      })}
 
-      <Text
-        style={[
-          styles.sectionTitle,
-          { color: "text" in colors ? colors.text : colors.onSurface },
-        ]}
-      >
-        Accrual History
-      </Text>
+          {balances.map((leave) => {
+            const percentage =
+              leave.total_days > 0
+                ? (leave.available_days / leave.total_days) * 100
+                : 0;
+            const leaveColor = getLeaveTypeColor(leave.leave_type);
 
-      <ThemedCard style={styles.accrualCard}>
-        {ACCRUAL_HISTORY.map((item, index) => (
-          <View
-            key={index}
-            style={[
-              styles.accrualRow,
-              index < ACCRUAL_HISTORY.length - 1 && styles.accrualRowBorder,
-              {
-                borderBottomColor: isDark
-                  ? "rgba(255,255,255,0.1)"
-                  : "rgba(0,0,0,0.1)",
-              },
-            ]}
-          >
-            <View style={{ flex: 1 }}>
+            return (
+              <ThemedCard key={leave.id} style={styles.leaveCard}>
+                <View style={styles.leaveHeader}>
+                  <View
+                    style={[styles.colorDot, { backgroundColor: leaveColor }]}
+                  />
+                  <Text
+                    style={[
+                      styles.leaveName,
+                      { color: "text" in colors ? colors.text : colors.onSurface },
+                    ]}
+                  >
+                    {leave.leave_type}
+                  </Text>
+                </View>
+
+                <View style={styles.leaveStats}>
+                  <View style={styles.statBox}>
+                    <Text style={[styles.statValue, { color: leaveColor }]}>
+                      {leave.available_days}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.statLabel,
+                        {
+                          color:
+                            "textSecondary" in colors
+                              ? colors.textSecondary
+                              : colors.onSurfaceVariant,
+                        },
+                      ]}
+                    >
+                      Available
+                    </Text>
+                  </View>
+                  <View style={styles.statBox}>
+                    <Text
+                      style={[
+                        styles.statValue,
+                        { color: "text" in colors ? colors.text : colors.onSurface },
+                      ]}
+                    >
+                      {leave.used_days}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.statLabel,
+                        {
+                          color:
+                            "textSecondary" in colors
+                              ? colors.textSecondary
+                              : colors.onSurfaceVariant,
+                        },
+                      ]}
+                    >
+                      Used
+                    </Text>
+                  </View>
+                  <View style={styles.statBox}>
+                    <Text
+                      style={[
+                        styles.statValue,
+                        { color: "text" in colors ? colors.text : colors.onSurface },
+                      ]}
+                    >
+                      {leave.pending_days}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.statLabel,
+                        {
+                          color:
+                            "textSecondary" in colors
+                              ? colors.textSecondary
+                              : colors.onSurfaceVariant,
+                        },
+                      ]}
+                    >
+                      Pending
+                    </Text>
+                  </View>
+                  <View style={styles.statBox}>
+                    <Text
+                      style={[
+                        styles.statValue,
+                        { color: "text" in colors ? colors.text : colors.onSurface },
+                      ]}
+                    >
+                      {leave.total_days}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.statLabel,
+                        {
+                          color:
+                            "textSecondary" in colors
+                              ? colors.textSecondary
+                              : colors.onSurfaceVariant,
+                        },
+                      ]}
+                    >
+                      Total
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.progressContainer}>
+                  <View
+                    style={[
+                      styles.progressBar,
+                      {
+                        backgroundColor: isDark
+                          ? "rgba(255,255,255,0.1)"
+                          : "rgba(0,0,0,0.1)",
+                      },
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.progressFill,
+                        {
+                          width: `${percentage}%`,
+                          backgroundColor: getProgressColor(percentage),
+                        },
+                      ]}
+                    />
+                  </View>
+                  <Text
+                    style={[
+                      styles.progressText,
+                      {
+                        color:
+                          "textSecondary" in colors
+                            ? colors.textSecondary
+                            : colors.onSurfaceVariant,
+                      },
+                    ]}
+                  >
+                    {percentage.toFixed(0)}% available
+                  </Text>
+                </View>
+              </ThemedCard>
+            );
+          })}
+
+          {balances.length === 0 && !isLoading && (
+            <View style={styles.emptyState}>
               <Text
                 style={[
-                  styles.accrualMonth,
-                  { color: "text" in colors ? colors.text : colors.onSurface },
-                ]}
-              >
-                {item.month}
-              </Text>
-              <Text
-                style={[
-                  styles.accrualType,
+                  styles.emptyText,
                   {
                     color:
                       "textSecondary" in colors
@@ -352,15 +362,12 @@ export default function BalanceScreen() {
                   },
                 ]}
               >
-                {item.type}
+                No leave balances found
               </Text>
             </View>
-            <Text style={[styles.accrualValue, { color: "#4CAF50" }]}>
-              +{item.earned.toFixed(2)} days
-            </Text>
-          </View>
-        ))}
-      </ThemedCard>
+          )}
+        </>
+      )}
     </ScrollView>
   );
 }
@@ -383,17 +390,17 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "500",
   },
   summaryCard: {
-    marginBottom: 24,
+    marginBottom: 20,
     padding: 20,
     alignItems: "center",
   },
   summaryTitle: {
     fontSize: 16,
-    fontWeight: "500",
+    fontWeight: "600",
     marginBottom: 8,
   },
   summaryValue: {
@@ -404,13 +411,14 @@ const styles = StyleSheet.create({
   summaryGrid: {
     flexDirection: "row",
     width: "100%",
-    justifyContent: "space-around",
+    gap: 16,
   },
   summaryItem: {
+    flex: 1,
     alignItems: "center",
   },
   summaryLabel: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "500",
     marginBottom: 4,
   },
@@ -418,50 +426,47 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700",
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    marginBottom: 12,
-    marginTop: 8,
-  },
-  balanceCard: {
-    marginBottom: 12,
+  leaveCard: {
+    marginBottom: 16,
     padding: 16,
   },
-  balanceHeader: {
+  leaveHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
+  },
+  colorDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 12,
   },
   leaveName: {
     fontSize: 18,
     fontWeight: "600",
-    marginBottom: 4,
   },
-  leaveSubtext: {
-    fontSize: 14,
-    fontWeight: "500",
+  leaveStats: {
+    flexDirection: "row",
+    marginBottom: 16,
+    gap: 12,
   },
-  availableBadge: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+  statBox: {
+    flex: 1,
     alignItems: "center",
-    justifyContent: "center",
   },
-  availableValue: {
+  statValue: {
     fontSize: 24,
     fontWeight: "700",
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    fontWeight: "500",
   },
   progressContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    marginBottom: 16,
+    gap: 8,
   },
   progressBar: {
-    flex: 1,
     height: 8,
     borderRadius: 4,
     overflow: "hidden",
@@ -471,51 +476,25 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   progressText: {
-    fontSize: 14,
-    fontWeight: "700",
-    minWidth: 40,
-    textAlign: "right",
-  },
-  statsRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-  },
-  statItem: {
-    alignItems: "center",
-  },
-  statLabel: {
     fontSize: 12,
     fontWeight: "500",
-    marginBottom: 4,
+    textAlign: "center",
   },
-  statValue: {
-    fontSize: 18,
-    fontWeight: "700",
-  },
-  accrualCard: {
-    padding: 16,
-    marginBottom: 16,
-  },
-  accrualRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  loadingContainer: {
     alignItems: "center",
-    paddingVertical: 12,
+    justifyContent: "center",
+    padding: 40,
   },
-  accrualRowBorder: {
-    borderBottomWidth: 1,
+  loadingText: {
+    marginTop: 16,
+    fontSize: 15,
   },
-  accrualMonth: {
+  emptyState: {
+    alignItems: "center",
+    padding: 40,
+  },
+  emptyText: {
     fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 2,
-  },
-  accrualType: {
-    fontSize: 13,
-    fontWeight: "500",
-  },
-  accrualValue: {
-    fontSize: 16,
-    fontWeight: "700",
+    textAlign: "center",
   },
 });
