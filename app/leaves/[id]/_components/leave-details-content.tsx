@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,12 +12,15 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { AlertCircle, RotateCcw, Edit, Calendar, FileText, User, Clock } from "lucide-react";
+import { AlertCircle, RotateCcw, Edit, Calendar, FileText, User, Clock, Upload } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
 import Link from "next/link";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LeaveRequest, LeaveComment, Approval } from "@prisma/client";
+import { FitnessCertificateModal } from "@/components/leaves/FitnessCertificateModal";
+import { DutyReturnFlow } from "@/components/leaves/DutyReturnFlow";
+import { ConversionDisplay, type ConversionDetails } from "@/components/leaves/ConversionDisplay";
 
 type LeaveDetailsContentProps = {
   leave: LeaveRequest & {
@@ -41,12 +45,44 @@ type LeaveDetailsContentProps = {
     createdAt: string;
   }>;
   currentUserId: number;
+  currentUserRole?: string;
+  conversionDetails?: ConversionDetails | null;
 };
 
-export function LeaveDetailsContent({ leave, comments, currentUserId }: LeaveDetailsContentProps) {
+export function LeaveDetailsContent({ leave, comments, currentUserId, currentUserRole, conversionDetails }: LeaveDetailsContentProps) {
   const isRequester = leave.requesterId === currentUserId;
   const isReturned = leave.status === "RETURNED";
-  
+
+  // Fitness certificate modal state
+  const [showCertificateModal, setShowCertificateModal] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Determine if fitness certificate is required and should be shown
+  const requiresFitnessCertificate =
+    leave.type === "MEDICAL" &&
+    leave.workingDays > 7 &&
+    ["APPROVED", "RECALLED"].includes(leave.status);
+
+  const leaveHasEnded = new Date() >= new Date(leave.endDate);
+  const showFitnessCertificatePrompt =
+    requiresFitnessCertificate &&
+    leaveHasEnded &&
+    !leave.fitnessCertificateUrl &&
+    isRequester;
+
+  // Auto-show modal if conditions are met
+  useEffect(() => {
+    if (showFitnessCertificatePrompt) {
+      setShowCertificateModal(true);
+    }
+  }, [showFitnessCertificatePrompt]);
+
+  const handleCertificateUploadSuccess = () => {
+    // Trigger refresh of page data
+    setRefreshKey((prev) => prev + 1);
+    window.location.reload(); // Simple refresh for now
+  };
+
   // Get the most recent return comment (non-employee comment)
   const returnComment = comments
     .filter((c) => c.authorRole !== "EMPLOYEE")
@@ -115,6 +151,19 @@ export function LeaveDetailsContent({ leave, comments, currentUserId }: LeaveDet
         <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
           {/* Left Column: Leave Details */}
           <div className="space-y-6">
+            {/* Conversion Display */}
+            {conversionDetails && (
+              <ConversionDisplay
+                leave={{
+                  id: leave.id,
+                  type: leave.type,
+                  workingDays: leave.workingDays,
+                  conversionDetails,
+                }}
+                showPolicy
+              />
+            )}
+
             {/* Basic Information */}
             <Card className="rounded-2xl border-muted shadow-sm">
               <CardHeader>
@@ -161,13 +210,52 @@ export function LeaveDetailsContent({ leave, comments, currentUserId }: LeaveDet
 
                 {leave.certificateUrl && (
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-2">Certificate</p>
+                    <p className="text-sm font-medium text-muted-foreground mb-2">Medical Certificate</p>
                     <Button asChild variant="outline" size="sm">
                       <a href={leave.certificateUrl} target="_blank" rel="noopener noreferrer">
                         <FileText className="h-4 w-4 mr-2" />
                         View Certificate
                       </a>
                     </Button>
+                  </div>
+                )}
+
+                {/* Fitness Certificate Status */}
+                {requiresFitnessCertificate && (
+                  <div className="pt-4 border-t border-muted">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-muted-foreground">Fitness Certificate</p>
+                      {leave.fitnessCertificateUrl ? (
+                        <Badge variant="default" className="bg-green-600">
+                          Certificate Uploaded
+                        </Badge>
+                      ) : leaveHasEnded ? (
+                        <Badge variant="destructive">Certificate Required</Badge>
+                      ) : (
+                        <Badge variant="secondary">Will be required after leave ends</Badge>
+                      )}
+                    </div>
+                    {leave.fitnessCertificateUrl ? (
+                      <Button asChild variant="outline" size="sm">
+                        <a href={leave.fitnessCertificateUrl} target="_blank" rel="noopener noreferrer">
+                          <FileText className="h-4 w-4 mr-2" />
+                          View Fitness Certificate
+                        </a>
+                      </Button>
+                    ) : isRequester && leaveHasEnded ? (
+                      <Button
+                        onClick={() => setShowCertificateModal(true)}
+                        size="sm"
+                        className="w-full mt-2"
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload Fitness Certificate
+                      </Button>
+                    ) : (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Required for medical leave exceeding 7 days before returning to duty
+                      </p>
+                    )}
                   </div>
                 )}
 
@@ -262,6 +350,25 @@ export function LeaveDetailsContent({ leave, comments, currentUserId }: LeaveDet
                 </CardContent>
               </Card>
             )}
+
+            {/* Fitness Certificate Approval Flow */}
+            {requiresFitnessCertificate && leave.fitnessCertificateUrl && (
+              <DutyReturnFlow
+                leaveId={leave.id}
+                certificateUrl={leave.fitnessCertificateUrl}
+                approvals={leave.approvals.map((a) => ({
+                  id: a.id,
+                  step: a.step,
+                  decision: a.decision,
+                  comment: a.comment || undefined,
+                  decidedAt: a.decidedAt?.toISOString(),
+                  approver: a.approver,
+                }))}
+                currentUserRole={currentUserRole || "EMPLOYEE"}
+                currentUserId={currentUserId}
+                onStatusChange={handleCertificateUploadSuccess}
+              />
+            )}
           </div>
 
           {/* Right Column: Actions & Metadata */}
@@ -309,6 +416,14 @@ export function LeaveDetailsContent({ leave, comments, currentUserId }: LeaveDet
           </div>
         </div>
       </div>
+
+      {/* Fitness Certificate Modal */}
+      <FitnessCertificateModal
+        open={showCertificateModal}
+        onOpenChange={setShowCertificateModal}
+        leaveId={leave.id}
+        onUploadSuccess={handleCertificateUploadSuccess}
+      />
     </div>
   );
 }

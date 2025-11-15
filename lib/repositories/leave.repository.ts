@@ -137,11 +137,14 @@ export class LeaveRepository {
     reason: string;
     certificateUrl?: string;
     needsCertificate?: boolean;
+    incidentDate?: Date; // For Special Disability Leave
+    payCalculation?: any; // For Special Disability Leave: { fullPayDays, halfPayDays, unPaidDays }
   }): Promise<LeaveRequestWithRelations> {
     return prisma.leaveRequest.create({
       data: {
         ...data,
         status: "PENDING",
+        policyVersion: "v2.0", // Default policy version
       },
       include: DEFAULT_INCLUDES,
     });

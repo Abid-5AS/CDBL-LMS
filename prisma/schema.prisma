@@ -83,6 +83,9 @@ model LeaveRequest {
   isModified            Boolean     @default(false) // True if request was returned and resubmitted
   parentLeaveId         Int? // For extension/linked requests - references original leave
   isExtension           Boolean     @default(false) // True if this is an extension request
+  incidentDate          DateTime? // For Special Disability Leave: Date of disabling incident (Policy 6.22)
+  payCalculation        Json? // For Special Disability Leave: Pay breakdown { fullPayDays, halfPayDays, unPaidDays }
+  studyLeaveDocuments   Json? // For Study Leave: { admissionLetterUrl, loanAgreementUrl, feeReceiptUrl, courseDetails: { name, institution, duration, completionDate } }
   createdAt             DateTime    @default(now())
   updatedAt             DateTime    @updatedAt
 

@@ -451,3 +451,125 @@ export function validateStudyLeaveRetirement(
     yearsUntilRetirement,
   };
 }
+
+/**
+ * Calculate Special Disability Leave pay breakdown (Policy 6.22)
+ * Pay structure:
+ * - First 90 days (0-90): Full pay (1.0x)
+ * - Next 90 days (91-180): Half pay (0.5x)
+ * - Beyond 180 days: Unpaid (0x, but duration validation prevents this)
+ *
+ * @param totalDays - Total working days of leave
+ * @returns Pay breakdown with full, half, and unpaid days
+ */
+export function calculateSpecialDisabilityPay(totalDays: number): {
+  fullPayDays: number;
+  halfPayDays: number;
+  unPaidDays: number;
+  totalDays: number;
+} {
+  const FULL_PAY_THRESHOLD = 90;
+  const HALF_PAY_THRESHOLD = 180;
+
+  let fullPayDays = 0;
+  let halfPayDays = 0;
+  let unPaidDays = 0;
+
+  if (totalDays <= FULL_PAY_THRESHOLD) {
+    // All days at full pay
+    fullPayDays = totalDays;
+  } else if (totalDays <= HALF_PAY_THRESHOLD) {
+    // First 90 days at full pay, remainder at half pay
+    fullPayDays = FULL_PAY_THRESHOLD;
+    halfPayDays = totalDays - FULL_PAY_THRESHOLD;
+  } else {
+    // First 90 at full, next 90 at half, remainder unpaid
+    fullPayDays = FULL_PAY_THRESHOLD;
+    halfPayDays = HALF_PAY_THRESHOLD - FULL_PAY_THRESHOLD; // 90 days
+    unPaidDays = totalDays - HALF_PAY_THRESHOLD;
+  }
+
+  return {
+    fullPayDays,
+    halfPayDays,
+    unPaidDays,
+    totalDays,
+  };
+}
+
+/**
+ * Validate Special Disability Leave incident date and timeline (Policy 6.22)
+ * Rules:
+ * - Incident date must be within 3 months before leave start date
+ * - Incident date cannot be in the future
+ * - Duration already validated separately (max 180 days)
+ *
+ * @param incidentDate - Date when the disabling incident occurred
+ * @param startDate - Proposed leave start date
+ * @returns Validation result with incident timeline details
+ */
+export function validateSpecialDisabilityIncidentDate(
+  incidentDate: Date,
+  startDate: Date
+): {
+  valid: boolean;
+  reason?: string;
+  monthsSinceIncident?: number;
+  validDateRange?: { earliest: Date; latest: Date };
+} {
+  const normalizedIncident = normalizeToDhakaMidnight(incidentDate);
+  const normalizedStart = normalizeToDhakaMidnight(startDate);
+  const today = normalizeToDhakaMidnight(new Date());
+
+  // Check if incident date is in the future
+  if (normalizedIncident > today) {
+    return {
+      valid: false,
+      reason: `Incident date cannot be in the future. Incident date: ${normalizedIncident.toLocaleDateString()}, Today: ${today.toLocaleDateString()}`,
+    };
+  }
+
+  // Calculate 3 months before start date (90 days for simplicity)
+  const threeMonthsAgo = new Date(normalizedStart);
+  threeMonthsAgo.setDate(threeMonthsAgo.getDate() - 90);
+
+  // Check if incident is within 3 months of start date
+  if (normalizedIncident < threeMonthsAgo) {
+    const daysSinceIncident = Math.floor(
+      (normalizedStart.getTime() - normalizedIncident.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    const monthsSinceIncident = daysSinceIncident / 30.44;
+
+    return {
+      valid: false,
+      reason: `Special Disability Leave must be taken within 3 months of the disabling incident (Policy 6.22). Incident occurred ${monthsSinceIncident.toFixed(1)} months before leave start. Valid date range: ${threeMonthsAgo.toLocaleDateString()} to ${normalizedStart.toLocaleDateString()}`,
+      monthsSinceIncident,
+      validDateRange: {
+        earliest: threeMonthsAgo,
+        latest: normalizedStart,
+      },
+    };
+  }
+
+  // Check if incident is after start date (doesn't make sense)
+  if (normalizedIncident > normalizedStart) {
+    return {
+      valid: false,
+      reason: `Incident date cannot be after leave start date. Incident: ${normalizedIncident.toLocaleDateString()}, Start: ${normalizedStart.toLocaleDateString()}`,
+    };
+  }
+
+  const daysSinceIncident = Math.floor(
+    (normalizedStart.getTime() - normalizedIncident.getTime()) / (1000 * 60 * 60 * 24)
+  );
+  const monthsSinceIncident = daysSinceIncident / 30.44;
+
+  return {
+    valid: true,
+    monthsSinceIncident,
+    validDateRange: {
+      earliest: threeMonthsAgo,
+      latest: normalizedStart,
+    },
+  };
+}

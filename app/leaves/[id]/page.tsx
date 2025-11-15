@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { LeaveDetailsContent } from "./_components/leave-details-content";
 import { LeaveStatus } from "@prisma/client";
+import { getLeaveConversionDetails } from "@/lib/repositories/conversion.repository";
 
 async function LeaveDetailsPageWrapper({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -88,9 +89,18 @@ async function LeaveDetailsPageWrapper({ params }: { params: Promise<{ id: strin
     createdAt: comment.createdAt.toISOString(),
   }));
 
+  // Get conversion details if leave was converted
+  const conversionDetails = await getLeaveConversionDetails(leaveId);
+
   return (
     <Suspense fallback={<LeaveDetailsFallback />}>
-      <LeaveDetailsContent leave={leave} comments={comments} currentUserId={user.id} />
+      <LeaveDetailsContent
+        leave={leave}
+        comments={comments}
+        currentUserId={user.id}
+        currentUserRole={user.role as string}
+        conversionDetails={conversionDetails}
+      />
     </Suspense>
   );
 }

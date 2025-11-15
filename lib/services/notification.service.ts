@@ -542,6 +542,204 @@ export class NotificationService {
   }
 
   /**
+   * Create notification when fitness certificate is required
+   */
+  static async notifyFitnessCertificateRequired(leaveId: number, employeeId: number): Promise<ServiceResult<void>> {
+    try {
+      const leave = await prisma.leaveRequest.findUnique({
+        where: { id: leaveId },
+        include: { requester: { select: { name: true } } },
+      });
+
+      if (!leave) {
+        return {
+          success: false,
+          error: { code: "leave_not_found", message: "Leave request not found" },
+        };
+      }
+
+      await NotificationRepository.create({
+        userId: employeeId,
+        type: "FITNESS_CERTIFICATE_REQUIRED",
+        title: "Fitness Certificate Required",
+        message: `Your medical leave has ended. Please upload your fitness certificate to return to duty.`,
+        link: `/leaves/${leaveId}`,
+        leaveId: leaveId,
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error("NotificationService.notifyFitnessCertificateRequired error:", error);
+      return {
+        success: false,
+        error: {
+          code: "notification_error",
+          message: "Failed to send fitness certificate required notification",
+        },
+      };
+    }
+  }
+
+  /**
+   * Create notification when fitness certificate is uploaded
+   */
+  static async notifyFitnessCertificateUploaded(leaveId: number): Promise<ServiceResult<void>> {
+    try {
+      const leave = await prisma.leaveRequest.findUnique({
+        where: { id: leaveId },
+        include: { requester: { select: { name: true } } },
+      });
+
+      if (!leave) {
+        return {
+          success: false,
+          error: { code: "leave_not_found", message: "Leave request not found" },
+        };
+      }
+
+      // Notify HR_ADMIN (first reviewer in chain)
+      const hrAdmins = await prisma.user.findMany({
+        where: { role: "HR_ADMIN" },
+        select: { id: true },
+      });
+
+      const notifications: CreateNotificationData[] = hrAdmins.map((admin) => ({
+        userId: admin.id,
+        type: "FITNESS_CERTIFICATE_UPLOADED",
+        title: "Fitness Certificate Awaiting Review",
+        message: `${leave.requester.name} has uploaded a fitness certificate for review.`,
+        link: `/leaves/${leaveId}`,
+        leaveId: leaveId,
+      }));
+
+      await NotificationRepository.createMany(notifications);
+
+      return { success: true };
+    } catch (error) {
+      console.error("NotificationService.notifyFitnessCertificateUploaded error:", error);
+      return {
+        success: false,
+        error: {
+          code: "notification_error",
+          message: "Failed to send fitness certificate uploaded notification",
+        },
+      };
+    }
+  }
+
+  /**
+   * Create notification when fitness certificate is approved by one approver
+   */
+  static async notifyFitnessCertificateApproved(
+    leaveId: number,
+    approverRole: string,
+    isFinal: boolean
+  ): Promise<ServiceResult<void>> {
+    try {
+      const leave = await prisma.leaveRequest.findUnique({
+        where: { id: leaveId },
+        include: { requester: { select: { id: true, name: true } } },
+      });
+
+      if (!leave) {
+        return {
+          success: false,
+          error: { code: "leave_not_found", message: "Leave request not found" },
+        };
+      }
+
+      if (isFinal) {
+        // Notify employee - all approvals complete
+        await NotificationRepository.create({
+          userId: leave.requesterId,
+          type: "FITNESS_CERTIFICATE_APPROVED",
+          title: "Fitness Certificate Approved",
+          message: `Your fitness certificate has been approved. You may now return to duty.`,
+          link: `/leaves/${leaveId}`,
+          leaveId: leaveId,
+        });
+      } else {
+        // Notify next approver in chain
+        const approvalChain = ["HR_ADMIN", "HR_HEAD", "CEO"];
+        const currentIndex = approvalChain.indexOf(approverRole);
+        const nextRole = approvalChain[currentIndex + 1];
+
+        if (nextRole) {
+          const nextApprovers = await prisma.user.findMany({
+            where: { role: nextRole as any },
+            select: { id: true },
+          });
+
+          const notifications: CreateNotificationData[] = nextApprovers.map((approver) => ({
+            userId: approver.id,
+            type: "FITNESS_CERTIFICATE_REVIEW_REQUIRED",
+            title: "Fitness Certificate Review Required",
+            message: `${leave.requester.name}'s fitness certificate requires your review.`,
+            link: `/leaves/${leaveId}`,
+            leaveId: leaveId,
+          }));
+
+          await NotificationRepository.createMany(notifications);
+        }
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error("NotificationService.notifyFitnessCertificateApproved error:", error);
+      return {
+        success: false,
+        error: {
+          code: "notification_error",
+          message: "Failed to send fitness certificate approved notification",
+        },
+      };
+    }
+  }
+
+  /**
+   * Create notification when fitness certificate is rejected
+   */
+  static async notifyFitnessCertificateRejected(
+    leaveId: number,
+    rejectorRole: string,
+    reason: string
+  ): Promise<ServiceResult<void>> {
+    try {
+      const leave = await prisma.leaveRequest.findUnique({
+        where: { id: leaveId },
+        include: { requester: { select: { id: true } } },
+      });
+
+      if (!leave) {
+        return {
+          success: false,
+          error: { code: "leave_not_found", message: "Leave request not found" },
+        };
+      }
+
+      await NotificationRepository.create({
+        userId: leave.requesterId,
+        type: "FITNESS_CERTIFICATE_REJECTED",
+        title: "Fitness Certificate Rejected",
+        message: `Your fitness certificate was rejected by ${rejectorRole.replace("_", " ")}. Reason: ${reason}. Please upload a new certificate.`,
+        link: `/leaves/${leaveId}`,
+        leaveId: leaveId,
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error("NotificationService.notifyFitnessCertificateRejected error:", error);
+      return {
+        success: false,
+        error: {
+          code: "notification_error",
+          message: "Failed to send fitness certificate rejected notification",
+        },
+      };
+    }
+  }
+
+  /**
    * Cleanup old notifications (maintenance task)
    */
   static async cleanup(daysOld: number = 30): Promise<ServiceResult<{ readDeleted: number; expiredDeleted: number }>> {

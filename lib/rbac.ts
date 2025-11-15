@@ -167,3 +167,21 @@ export function canManageHolidays(role: AppRole): boolean {
 export function canViewAudit(role: AppRole): boolean {
   return SYSTEM_ONLY.has(role);
 }
+
+/**
+ * Check if a role can approve fitness certificates
+ * Only HR_ADMIN, HR_HEAD, and CEO can approve fitness certificates
+ * These roles follow a chain: HR_ADMIN → HR_HEAD → CEO
+ */
+export function canApproveFitnessCertificate(role: AppRole): boolean {
+  const FITNESS_CERT_APPROVERS = new Set<AppRole>(["HR_ADMIN", "HR_HEAD", "CEO"]);
+  return FITNESS_CERT_APPROVERS.has(role);
+}
+
+/**
+ * Check if a role can reject fitness certificates
+ * Same roles that can approve can also reject
+ */
+export function canRejectFitnessCertificate(role: AppRole): boolean {
+  return canApproveFitnessCertificate(role);
+}

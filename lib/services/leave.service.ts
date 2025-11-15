@@ -23,6 +23,7 @@ export type CreateLeaveRequestDTO = {
   workingDays?: number;
   needsCertificate?: boolean;
   certificateFile?: File;
+  incidentDate?: Date; // For Special Disability Leave - when the disabling incident occurred
 };
 
 export type ServiceResult<T> = {
@@ -91,6 +92,7 @@ export class LeaveService {
         joinDate: user.joinDate,
         retirementDate: user.retirementDate,
         certificateFile: dto.certificateFile,
+        incidentDate: dto.incidentDate,
       });
 
       if (!validation.valid) {
@@ -100,7 +102,13 @@ export class LeaveService {
         };
       }
 
-      // 5. Create leave request
+      // 5. Extract pay calculation for Special Disability Leave
+      let payCalculation: any = undefined;
+      if (dto.type === "SPECIAL_DISABILITY" && validation.warning?.details?.payCalculation) {
+        payCalculation = validation.warning.details.payCalculation;
+      }
+
+      // 6. Create leave request
       const leaveRequest = await LeaveRepository.create({
         requesterId: userId,
         type: dto.type,
@@ -110,6 +118,8 @@ export class LeaveService {
         reason: dto.reason,
         certificateUrl,
         needsCertificate: dto.needsCertificate,
+        incidentDate: dto.incidentDate,
+        payCalculation: payCalculation,
       });
 
       // 6. Create initial approval record

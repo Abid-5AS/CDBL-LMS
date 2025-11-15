@@ -167,8 +167,8 @@ export function canCancelMaternityLeave(leave: {
   canCancel: boolean;
   reason?: string;
 } {
-  // Only applies to maternity leave
-  if (leave.type !== "MATERNITY") {
+  // Only applies to maternity leave and special disability leave
+  if (leave.type !== "MATERNITY" && leave.type !== "SPECIAL_DISABILITY") {
     return { canCancel: true };
   }
 
@@ -179,9 +179,10 @@ export function canCancelMaternityLeave(leave: {
   const hasStarted = normalizedStartDate <= normalizedToday;
 
   if (hasStarted) {
+    const leaveTypeName = leave.type === "MATERNITY" ? "Maternity" : "Special Disability";
     return {
       canCancel: false,
-      reason: "Maternity leave cannot be cancelled after it has started (Policy - Master Specification). Please contact HR for assistance.",
+      reason: `${leaveTypeName} leave cannot be cancelled after it has started (Policy - Master Specification). Please contact HR for assistance.`,
     };
   }
 
@@ -248,6 +249,145 @@ export async function validatePaternityLeaveEligibility(
   return {
     valid: true,
     previousLeaves: previousPaternity.length,
+  };
+}
+
+/**
+ * Validate Extraordinary Leave prerequisite (Policy 6.26)
+ * Rule: "Can only be taken when no other leave is due to the employee"
+ *
+ * This means employee must have exhausted or nearly exhausted ALL other leave types
+ * before Extraordinary Leave can be granted.
+ *
+ * Thresholds:
+ * - CASUAL: ≤2 days remaining
+ * - EARNED: 0 days (must be fully exhausted)
+ * - MEDICAL: ≤5 days remaining (small buffer allowed)
+ * - MATERNITY/PATERNITY/STUDY/SPECIAL_DISABILITY/QUARANTINE: Not checked (conditional/special leaves)
+ */
+export async function validateExtraordinaryLeavePrerequisite(
+  userId: number,
+  requestedYear: number
+): Promise<{
+  valid: boolean;
+  reason?: string;
+  balanceSummary?: {
+    casual: number;
+    earned: number;
+    medical: number;
+    remainingLeaves: Array<{
+      type: string;
+      balance: number;
+      threshold: number;
+    }>;
+  };
+}> {
+  // Define thresholds for each mandatory leave type
+  const THRESHOLDS = {
+    CASUAL: 2,      // Allow ≤2 days remaining
+    EARNED: 0,      // Must be fully exhausted
+    MEDICAL: 5,     // Allow ≤5 days buffer
+  };
+
+  // Fetch all balances for the requested year
+  const balances = await prisma.balance.findMany({
+    where: {
+      userId,
+      year: requestedYear,
+      type: {
+        in: ["CASUAL", "EARNED", "MEDICAL"],
+      },
+    },
+    select: {
+      type: true,
+      opening: true,
+      accrued: true,
+      used: true,
+      closing: true,
+    },
+  });
+
+  // Calculate remaining balance for each leave type
+  const getRemaining = (type: "CASUAL" | "EARNED" | "MEDICAL"): number => {
+    const record = balances.find((b) => b.type === type);
+    if (!record) return 0;
+
+    // Use closing balance if available, otherwise calculate
+    if (record.closing !== null && record.closing !== undefined) {
+      return record.closing;
+    }
+    return Math.max((record.opening ?? 0) + (record.accrued ?? 0) - (record.used ?? 0), 0);
+  };
+
+  const casualBalance = getRemaining("CASUAL");
+  const earnedBalance = getRemaining("EARNED");
+  const medicalBalance = getRemaining("MEDICAL");
+
+  // Check which leaves exceed their thresholds
+  const violations: Array<{
+    type: string;
+    balance: number;
+    threshold: number;
+  }> = [];
+
+  if (casualBalance > THRESHOLDS.CASUAL) {
+    violations.push({
+      type: "CASUAL",
+      balance: casualBalance,
+      threshold: THRESHOLDS.CASUAL,
+    });
+  }
+
+  if (earnedBalance > THRESHOLDS.EARNED) {
+    violations.push({
+      type: "EARNED",
+      balance: earnedBalance,
+      threshold: THRESHOLDS.EARNED,
+    });
+  }
+
+  if (medicalBalance > THRESHOLDS.MEDICAL) {
+    violations.push({
+      type: "MEDICAL",
+      balance: medicalBalance,
+      threshold: THRESHOLDS.MEDICAL,
+    });
+  }
+
+  // If any violations, return detailed error
+  if (violations.length > 0) {
+    const violationDetails = violations
+      .map((v) => {
+        const leaveTypeName = v.type === "CASUAL"
+          ? "Casual Leave"
+          : v.type === "EARNED"
+            ? "Earned Leave"
+            : "Medical Leave";
+        return `${leaveTypeName}: ${v.balance} days remaining (threshold: ${v.threshold})`;
+      })
+      .join(", ");
+
+    return {
+      valid: false,
+      reason: `Extraordinary Leave can only be taken when no other leave is due (Policy 6.26). You still have: ${violationDetails}. Please use your other leaves first.`,
+      balanceSummary: {
+        casual: casualBalance,
+        earned: earnedBalance,
+        medical: medicalBalance,
+        remainingLeaves: violations,
+      },
+    };
+  }
+
+  // All prerequisites met
+  return {
+    valid: true,
+    balanceSummary: {
+      casual: casualBalance,
+      earned: earnedBalance,
+      medical: medicalBalance,
+      remainingLeaves: [],
+    },
   };
 }
 

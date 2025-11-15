@@ -132,6 +132,28 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     data: updateData,
   });
 
+  // Send notification for fitness certificate upload
+  if (certificateType === "fitness") {
+    // Notify HR_ADMIN (first reviewer in chain)
+    const hrAdmins = await prisma.user.findMany({
+      where: { role: "HR_ADMIN" },
+      select: { id: true },
+    });
+
+    for (const admin of hrAdmins) {
+      await prisma.notification.create({
+        data: {
+          userId: admin.id,
+          type: "FITNESS_CERTIFICATE_UPLOADED",
+          title: "Fitness Certificate Awaiting Review",
+          message: `${leave.requester.email} has uploaded a fitness certificate for review.`,
+          link: `/leaves/${leaveId}`,
+          leaveId,
+        },
+      });
+    }
+  }
+
   // Create audit log
   await prisma.auditLog.create({
     data: {

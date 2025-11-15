@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
+import { ConversionHistory } from "@/components/leaves/ConversionHistory";
 
 type BalanceDetail = {
   type: "EARNED" | "CASUAL" | "MEDICAL";
@@ -181,6 +182,9 @@ function BalanceContent() {
           );
         })}
       </div>
+
+      {/* Conversion History Section */}
+      <ConversionHistory year={data?.year ?? currentYear} showHeader />
     </div>
   );
 }

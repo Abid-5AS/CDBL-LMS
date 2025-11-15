@@ -67,11 +67,15 @@ export function ApplyLeaveForm() {
     lastSavedTime,
     projectedBalancePercent,
     holidays,
+    incidentDate,
+    payCalculation,
     setDateRange,
     setReason,
     setFile,
     setShowOptionalUpload,
     setShowConfirmModal,
+    setIncidentDate,
+    setErrors,
     handleFileError,
     handleTypeChange,
     clearErrors,
@@ -197,6 +201,81 @@ export function ApplyLeaveForm() {
                       errors={{ start: errors.start, end: errors.end }}
                     />
                   </div>
+
+                  {/* Special Disability Leave: Incident Date Field */}
+                  {type === "SPECIAL_DISABILITY" && (
+                    <>
+                      <div className="space-y-3">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-muted-foreground" />
+                            Date of Disabling Incident
+                            <span className="text-destructive">*</span>
+                          </label>
+                          <p className="text-xs text-muted-foreground">
+                            When did the disabling incident occur? Must be within 3 months of leave start date.
+                          </p>
+                          <input
+                            type="date"
+                            value={incidentDate ? incidentDate.toISOString().split('T')[0] : ''}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setIncidentDate(value ? new Date(value) : undefined);
+                              setErrors((prev) => ({ ...prev, incidentDate: undefined }));
+                            }}
+                            max={dateRange.start ? dateRange.start.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
+                            disabled={submitting}
+                            className={cn(
+                              "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+                              errors.incidentDate && "border-destructive"
+                            )}
+                          />
+                          {errors.incidentDate && (
+                            <p className="text-xs text-destructive flex items-center gap-1">
+                              <AlertCircle className="w-3 h-3" />
+                              {errors.incidentDate}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Pay Calculation Preview */}
+                      {payCalculation && (
+                        <div className="rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-950/30 dark:border-blue-800 p-4 space-y-3">
+                          <div className="flex items-center gap-2">
+                            <Info className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                            <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+                              Pay Calculation Preview
+                            </p>
+                          </div>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between items-center">
+                              <span className="text-blue-700 dark:text-blue-300">Full pay (0-90 days):</span>
+                              <span className="font-semibold text-blue-900 dark:text-blue-100">{payCalculation.fullPayDays} days</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-blue-700 dark:text-blue-300">Half pay (91-180 days):</span>
+                              <span className="font-semibold text-blue-900 dark:text-blue-100">{payCalculation.halfPayDays} days</span>
+                            </div>
+                            {payCalculation.unPaidDays > 0 && (
+                              <div className="flex justify-between items-center">
+                                <span className="text-blue-700 dark:text-blue-300">Unpaid (180+ days):</span>
+                                <span className="font-semibold text-destructive">{payCalculation.unPaidDays} days</span>
+                              </div>
+                            )}
+                            <Separator className="my-2" />
+                            <div className="flex justify-between items-center">
+                              <span className="font-medium text-blue-900 dark:text-blue-100">Total days:</span>
+                              <span className="font-bold text-blue-900 dark:text-blue-100">{payCalculation.totalDays} days</span>
+                            </div>
+                          </div>
+                          <p className="text-xs text-blue-600 dark:text-blue-400">
+                            Per Policy 6.22: First 3 months at full pay, next 3 months at half pay
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  )}
 
                   {/* Separator */}
                   <Separator className="my-4" />

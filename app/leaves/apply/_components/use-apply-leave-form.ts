@@ -54,6 +54,7 @@ type FormErrors = {
   reason?: string;
   file?: string;
   general?: string;
+  incidentDate?: string; // For Special Disability Leave
 };
 
 function startOfDay(date: Date) {
@@ -74,6 +75,7 @@ export function useApplyLeaveForm() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [draftLoaded, setDraftLoaded] = useState(false);
   const [showStickyButton, setShowStickyButton] = useState(false);
+  const [incidentDate, setIncidentDate] = useState<Date | undefined>(undefined); // For Special Disability Leave
 
   const {
     data: balances,
@@ -177,6 +179,37 @@ export function useApplyLeaveForm() {
   const warnings = useMemo(() => {
     const list: string[] = [];
 
+    // Extraordinary Leave prerequisite check (Policy 6.26)
+    if ((type === "EXTRAWITHPAY" || type === "EXTRAWITHOUTPAY") && hasBalanceData && balances) {
+      const casualBalance = balances.CASUAL ?? 0;
+      const earnedBalance = balances.EARNED ?? 0;
+      const medicalBalance = balances.MEDICAL ?? 0;
+
+      const THRESHOLDS = {
+        CASUAL: 2,
+        EARNED: 0,
+        MEDICAL: 5,
+      };
+
+      const violations: string[] = [];
+
+      if (casualBalance > THRESHOLDS.CASUAL) {
+        violations.push(`Casual Leave: ${casualBalance} days remaining (threshold: ${THRESHOLDS.CASUAL})`);
+      }
+      if (earnedBalance > THRESHOLDS.EARNED) {
+        violations.push(`Earned Leave: ${earnedBalance} days remaining (threshold: ${THRESHOLDS.EARNED})`);
+      }
+      if (medicalBalance > THRESHOLDS.MEDICAL) {
+        violations.push(`Medical Leave: ${medicalBalance} days remaining (threshold: ${THRESHOLDS.MEDICAL})`);
+      }
+
+      if (violations.length > 0) {
+        list.push(
+          `Policy 6.26: Extraordinary Leave can only be taken when no other leave is due. You still have: ${violations.join(", ")}. Please use your other leaves first.`
+        );
+      }
+    }
+
     if (type === "CASUAL" && requestedDays > policy.clMaxConsecutiveDays) {
       list.push(`Casual Leave cannot exceed ${policy.clMaxConsecutiveDays} consecutive days.`);
     }
@@ -207,7 +240,7 @@ export function useApplyLeaveForm() {
     }
 
     return list;
-  }, [type, requestedDays, requiresCertificate, file, dateRange, holidays]);
+  }, [type, requestedDays, requiresCertificate, file, dateRange, holidays, hasBalanceData, balances]);
 
   useEffect(() => {
     if (!dateRange.start) return;
@@ -226,7 +259,8 @@ export function useApplyLeaveForm() {
     setType(value);
     setFile(null);
     setShowOptionalUpload(false);
-    setErrors((prev) => ({ ...prev, type: undefined }));
+    setIncidentDate(undefined); // Reset incident date when changing leave type
+    setErrors((prev) => ({ ...prev, type: undefined, incidentDate: undefined }));
   };
 
   const clearErrors = () => {
@@ -266,8 +300,56 @@ export function useApplyLeaveForm() {
       newErrors.general = "Insufficient balance for this leave type";
     }
 
+    // Validate Extraordinary Leave prerequisite (Policy 6.26)
+    if ((type === "EXTRAWITHPAY" || type === "EXTRAWITHOUTPAY") && hasBalanceData && balances) {
+      const casualBalance = balances.CASUAL ?? 0;
+      const earnedBalance = balances.EARNED ?? 0;
+      const medicalBalance = balances.MEDICAL ?? 0;
+
+      const THRESHOLDS = {
+        CASUAL: 2,
+        EARNED: 0,
+        MEDICAL: 5,
+      };
+
+      const violations: string[] = [];
+
+      if (casualBalance > THRESHOLDS.CASUAL) {
+        violations.push(`Casual Leave: ${casualBalance} days`);
+      }
+      if (earnedBalance > THRESHOLDS.EARNED) {
+        violations.push(`Earned Leave: ${earnedBalance} days`);
+      }
+      if (medicalBalance > THRESHOLDS.MEDICAL) {
+        violations.push(`Medical Leave: ${medicalBalance} days`);
+      }
+
+      if (violations.length > 0) {
+        newErrors.general = `Cannot apply for Extraordinary Leave. You still have: ${violations.join(", ")}. Please use your other leaves first (Policy 6.26).`;
+      }
+    }
+
     if (requiresCertificate && !file) {
       newErrors.file = "Medical certificate is required for sick leave over 3 days";
+    }
+
+    // Validate incident date for Special Disability Leave
+    if (type === "SPECIAL_DISABILITY") {
+      if (!incidentDate) {
+        newErrors.incidentDate = "Incident date is required for Special Disability Leave";
+      } else if (dateRange.start) {
+        // Check if incident date is within 3 months before start date
+        const threeMonthsAgo = new Date(dateRange.start);
+        threeMonthsAgo.setDate(threeMonthsAgo.getDate() - 90);
+
+        if (incidentDate < threeMonthsAgo) {
+          newErrors.incidentDate = "Incident must have occurred within 3 months of leave start date";
+        } else if (incidentDate > dateRange.start) {
+          newErrors.incidentDate = "Incident date cannot be after leave start date";
+        } else if (incidentDate > new Date()) {
+          newErrors.incidentDate = "Incident date cannot be in the future";
+        }
+      }
     }
 
     setErrors(newErrors);
@@ -296,13 +378,18 @@ export function useApplyLeaveForm() {
 
     try {
       setSubmitting(true);
-      const payload = {
+      const payload: any = {
         type,
         startDate: dateRange.start.toISOString(),
         endDate: dateRange.end.toISOString(),
         reason: reason.trim(),
         needsCertificate: requiresCertificate,
       };
+
+      // Add incident date for Special Disability Leave
+      if (type === "SPECIAL_DISABILITY" && incidentDate) {
+        payload.incidentDate = incidentDate.toISOString();
+      }
 
       let response: Response;
 
@@ -365,6 +452,31 @@ export function useApplyLeaveForm() {
       ? Math.max(0, Math.min(100, (remainingBalance / balanceForType) * 100))
       : 0;
 
+  // Calculate pay breakdown for Special Disability Leave
+  const payCalculation = useMemo(() => {
+    if (type !== "SPECIAL_DISABILITY" || requestedDays <= 0) return null;
+
+    const FULL_PAY_THRESHOLD = 90;
+    const HALF_PAY_THRESHOLD = 180;
+
+    let fullPayDays = 0;
+    let halfPayDays = 0;
+    let unPaidDays = 0;
+
+    if (requestedDays <= FULL_PAY_THRESHOLD) {
+      fullPayDays = requestedDays;
+    } else if (requestedDays <= HALF_PAY_THRESHOLD) {
+      fullPayDays = FULL_PAY_THRESHOLD;
+      halfPayDays = requestedDays - FULL_PAY_THRESHOLD;
+    } else {
+      fullPayDays = FULL_PAY_THRESHOLD;
+      halfPayDays = HALF_PAY_THRESHOLD - FULL_PAY_THRESHOLD;
+      unPaidDays = requestedDays - HALF_PAY_THRESHOLD;
+    }
+
+    return { fullPayDays, halfPayDays, unPaidDays, totalDays: requestedDays };
+  }, [type, requestedDays]);
+
   return {
     type,
     dateRange,
@@ -388,11 +500,14 @@ export function useApplyLeaveForm() {
     lastSavedTime,
     projectedBalancePercent,
     holidays,
+    incidentDate,
+    payCalculation,
     setDateRange,
     setReason,
     setFile,
     setShowOptionalUpload,
     setShowConfirmModal,
+    setIncidentDate,
     handleFileError,
     handleTypeChange,
     clearErrors,

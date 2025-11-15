@@ -33,6 +33,7 @@ import { EmployeeActionCenter } from "./components/EmployeeActionCenter";
 import { EmployeeRecentActivity } from "./components/EmployeeRecentActivity";
 import { EmployeeLeaveBalance } from "./components/EmployeeLeaveBalance";
 import { FloatingQuickActions } from "./components/FloatingQuickActions";
+import { ConversionSummaryCard } from "@/components/leaves/ConversionHistory";
 
 // Extracted hooks and utils
 import { useEmployeeDashboardData } from "./hooks/useEmployeeDashboardData";
@@ -251,6 +252,11 @@ export function ModernEmployeeDashboard({
               <EmployeeActionCenter actionItems={dashboardData.actionItems} />
             </motion.div>
           </DashboardSection>
+
+          {/* Conversion Summary Card */}
+          <motion.div variants={itemVariants}>
+            <ConversionSummaryCard year={new Date().getFullYear()} />
+          </motion.div>
 
           {/* Dashboard with Sidebar */}
           <DashboardSection

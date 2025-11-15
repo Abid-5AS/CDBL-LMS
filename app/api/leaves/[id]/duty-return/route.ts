@@ -86,20 +86,51 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
   // Policy 6.14: Fitness certificate required if ML > 7 days
   if (leave.workingDays > 7) {
-    if (!parsed.data.fitnessCertificateUrl) {
+    // Check if fitness certificate is uploaded
+    if (!leave.fitnessCertificateUrl && !parsed.data.fitnessCertificateUrl) {
       return NextResponse.json(
         error("fitness_certificate_required", "Fitness certificate is required for Medical Leave exceeding 7 days", traceId),
         { status: 400 }
       );
     }
 
-    // Update leave with fitness certificate URL
-    await prisma.leaveRequest.update({
-      where: { id: leaveId },
-      data: {
-        fitnessCertificateUrl: parsed.data.fitnessCertificateUrl,
+    // Check if fitness certificate approval chain is complete
+    // Approval chain: HR_ADMIN → HR_HEAD → CEO (steps 10, 11, 12)
+    const certificateApprovals = await prisma.approval.findMany({
+      where: {
+        leaveId,
+        step: { gte: 10, lte: 12 },
+        decision: "APPROVED",
       },
     });
+
+    const approvalChainRoles = ["HR_ADMIN", "HR_HEAD", "CEO"];
+    const requiredApprovals = approvalChainRoles.length;
+
+    if (certificateApprovals.length < requiredApprovals) {
+      return NextResponse.json(
+        error(
+          "fitness_certificate_approval_pending",
+          `Fitness certificate must be approved by all reviewers (${certificateApprovals.length}/${requiredApprovals} approvals complete)`,
+          traceId,
+          {
+            approvalsComplete: certificateApprovals.length,
+            approvalsRequired: requiredApprovals,
+          }
+        ),
+        { status: 400 }
+      );
+    }
+
+    // Update leave with fitness certificate URL if provided
+    if (parsed.data.fitnessCertificateUrl) {
+      await prisma.leaveRequest.update({
+        where: { id: leaveId },
+        data: {
+          fitnessCertificateUrl: parsed.data.fitnessCertificateUrl,
+        },
+      });
+    }
   }
 
   // Create audit log for duty return

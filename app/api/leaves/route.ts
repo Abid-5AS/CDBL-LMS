@@ -28,6 +28,7 @@ const ApplySchema = z.object({
   reason: z.string().min(3),
   workingDays: z.number().int().positive().optional(),
   needsCertificate: z.boolean().optional(),
+  incidentDate: z.string().optional(), // For Special Disability Leave - when the disabling incident occurred
 });
 
 export async function GET(req: Request) {
@@ -94,6 +95,9 @@ export async function POST(req: Request) {
           ? Number(formData.get("workingDays"))
           : undefined,
         needsCertificate: toBoolean(formData.get("needsCertificate")),
+        incidentDate: formData.get("incidentDate")
+          ? String(formData.get("incidentDate"))
+          : undefined,
       };
 
       const cert = formData.get("certificate");
@@ -113,6 +117,7 @@ export async function POST(req: Request) {
       workingDays: parsedInput.workingDays,
       needsCertificate: parsedInput.needsCertificate,
       certificateFile,
+      incidentDate: parsedInput.incidentDate ? new Date(parsedInput.incidentDate) : undefined,
     });
 
     if (!result.success) {

@@ -15,6 +15,8 @@ import {
   validateExtraordinaryLeaveDuration,
   validateStudyLeaveDuration,
   validateStudyLeaveRetirement,
+  validateSpecialDisabilityIncidentDate,
+  calculateSpecialDisabilityPay,
 } from "@/lib/policy";
 import { countWorkingDays } from "@/lib/working-days";
 import { normalizeToDhakaMidnight } from "@/lib/date-utils";
@@ -22,6 +24,7 @@ import {
   violatesCasualLeaveCombination,
   violatesCasualLeaveSideTouch,
   validatePaternityLeaveEligibility,
+  validateExtraordinaryLeavePrerequisite,
 } from "@/lib/leave-validation";
 
 export type ValidationResult = {
@@ -298,9 +301,14 @@ export class LeaveValidator {
   }
 
   /**
-   * Validate special disability leave duration
+   * Validate special disability leave duration and incident date (Policy 6.22)
    */
-  static validateDisabilityLeave(workingDays: number): ValidationResult {
+  static validateDisabilityLeave(
+    workingDays: number,
+    startDate: Date,
+    incidentDate?: Date
+  ): ValidationResult {
+    // 1. Validate duration
     const disabilityCheck = validateSpecialDisabilityDuration(workingDays);
 
     if (!disabilityCheck.valid) {
@@ -317,16 +325,89 @@ export class LeaveValidator {
       };
     }
 
-    return { valid: true };
+    // 2. Validate incident date (required for Special Disability Leave)
+    if (!incidentDate) {
+      return {
+        valid: false,
+        error: {
+          code: "incident_date_required",
+          message: "Special Disability Leave requires an incident date. Please specify when the disabling incident occurred.",
+          details: {
+            leaveType: "SPECIAL_DISABILITY",
+          },
+        },
+      };
+    }
+
+    // 3. Validate incident date timeline (within 3 months of start)
+    const incidentCheck = validateSpecialDisabilityIncidentDate(
+      incidentDate,
+      startDate
+    );
+
+    if (!incidentCheck.valid) {
+      return {
+        valid: false,
+        error: {
+          code: "incident_date_invalid",
+          message: incidentCheck.reason || "Incident date does not meet policy requirements",
+          details: {
+            monthsSinceIncident: incidentCheck.monthsSinceIncident,
+            validDateRange: incidentCheck.validDateRange,
+          },
+        },
+      };
+    }
+
+    // 4. Calculate and attach pay breakdown
+    const payCalculation = calculateSpecialDisabilityPay(workingDays);
+
+    return {
+      valid: true,
+      // Store pay calculation in warning field for now (will be extracted by service)
+      warning: {
+        code: "disability_pay_calculation",
+        message: `Pay calculation: ${payCalculation.fullPayDays} days full pay, ${payCalculation.halfPayDays} days half pay, ${payCalculation.unPaidDays} days unpaid`,
+        details: {
+          payCalculation,
+          monthsSinceIncident: incidentCheck.monthsSinceIncident,
+        },
+      },
+    };
   }
 
   /**
-   * Validate extraordinary leave duration
+   * Validate extraordinary leave prerequisite and duration
+   * Policy 6.26: Can only be taken when no other leave is due
    */
-  static validateExtraordinaryLeave(
+  static async validateExtraordinaryLeave(
+    userId: number,
     workingDays: number,
-    joinDate: Date
-  ): ValidationResult {
+    joinDate: Date,
+    startDate: Date
+  ): Promise<ValidationResult> {
+    // 1. Check prerequisite: "no other leave is due"
+    const requestedYear = startDate.getFullYear();
+    const prerequisiteCheck = await validateExtraordinaryLeavePrerequisite(
+      userId,
+      requestedYear
+    );
+
+    if (!prerequisiteCheck.valid) {
+      return {
+        valid: false,
+        error: {
+          code: "extraordinary_prerequisite_not_met",
+          message: prerequisiteCheck.reason || "Extraordinary leave prerequisite not met",
+          details: {
+            balanceSummary: prerequisiteCheck.balanceSummary,
+            policy: "Policy 6.26: Extraordinary Leave can only be taken when no other leave is due",
+          },
+        },
+      };
+    }
+
+    // 2. Check duration limits
     const extraordinaryCheck = validateExtraordinaryLeaveDuration(
       workingDays,
       joinDate
@@ -440,6 +521,7 @@ export class LeaveValidator {
     joinDate: Date;
     retirementDate?: Date | null;
     certificateFile?: File;
+    incidentDate?: Date; // For Special Disability Leave
   }): Promise<ValidationResult> {
     const {
       userId,
@@ -450,6 +532,7 @@ export class LeaveValidator {
       joinDate,
       retirementDate,
       certificateFile,
+      incidentDate,
     } = data;
 
     // 1. Validate date range
@@ -493,11 +576,11 @@ export class LeaveValidator {
         return this.validateQuarantineLeave(workingDays);
 
       case "SPECIAL_DISABILITY":
-        return this.validateDisabilityLeave(workingDays);
+        return this.validateDisabilityLeave(workingDays, startDate, incidentDate);
 
       case "EXTRAWITHPAY":
       case "EXTRAWITHOUTPAY":
-        return this.validateExtraordinaryLeave(workingDays, joinDate);
+        return await this.validateExtraordinaryLeave(userId, workingDays, joinDate, startDate);
 
       case "STUDY":
         return await this.validateStudyLeave(userId, workingDays);
