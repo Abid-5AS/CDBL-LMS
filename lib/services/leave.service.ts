@@ -145,7 +145,6 @@ export class LeaveService {
       await this.logAction(
         user.email,
         "LEAVE_REQUEST_CREATED",
-        `Created ${dto.type} leave request`,
         { leaveId: leaveRequest.id }
       );
 
@@ -220,7 +219,6 @@ export class LeaveService {
       await this.logAction(
         `approver_${approverId}`,
         "LEAVE_APPROVED",
-        `Approved leave request ${leaveId}`,
         { leaveId, comment }
       );
 
@@ -281,7 +279,6 @@ export class LeaveService {
       await this.logAction(
         `approver_${approverId}`,
         "LEAVE_REJECTED",
-        `Rejected leave request ${leaveId}`,
         { leaveId, reason }
       );
 
@@ -334,6 +331,9 @@ export class LeaveService {
         };
       }
 
+      // Get next approver first to determine toRole
+      const nextApprover = await this.getNextApprover(leave);
+
       // Update current approval
       await prisma.approval.updateMany({
         where: {
@@ -343,13 +343,13 @@ export class LeaveService {
         },
         data: {
           decision: ApprovalDecision.FORWARDED,
+          toRole: nextApprover?.role || null,
           comment,
           decidedAt: new Date(),
         },
       });
 
       // Create next approval
-      const nextApprover = await this.getNextApprover(leave);
       if (nextApprover) {
         const currentStep = await this.getCurrentStep(leaveId);
         await prisma.approval.create({
@@ -369,7 +369,6 @@ export class LeaveService {
       await this.logAction(
         `approver_${currentApproverId}`,
         "LEAVE_FORWARDED",
-        `Forwarded leave request ${leaveId}`,
         { leaveId, comment }
       );
 
@@ -413,6 +412,8 @@ export class LeaveService {
     reason: string
   ): Promise<ServiceResult<any>> {
     try {
+      // Update existing pending approval to FORWARDED with toRole: null
+      // This indicates the leave is being sent back to employee for modification
       await prisma.approval.updateMany({
         where: {
           leaveId: leaveId,
@@ -420,7 +421,8 @@ export class LeaveService {
           decision: ApprovalDecision.PENDING,
         },
         data: {
-          decision: "RETURNED" as any,
+          decision: ApprovalDecision.FORWARDED,
+          toRole: null, // Returning to employee (no next role)
           comment: reason,
           decidedAt: new Date(),
         },
@@ -431,7 +433,6 @@ export class LeaveService {
       await this.logAction(
         `approver_${approverId}`,
         "LEAVE_RETURNED",
-        `Returned leave request ${leaveId} for modification`,
         { leaveId, reason }
       );
 
@@ -500,7 +501,6 @@ export class LeaveService {
       await this.logAction(
         `user_${userId}`,
         "LEAVE_CANCELLED",
-        `Cancelled leave request ${leaveId}`,
         { leaveId, reason }
       );
 
@@ -618,10 +618,11 @@ export class LeaveService {
 
   private static async getNextApprover(
     leave: any
-  ): Promise<{ id: number } | null> {
+  ): Promise<{ id: number; role: string } | null> {
     // Simplified - would use workflow strategies in production
     const nextRole = "HR_HEAD"; // This should come from workflow strategy
-    return this.findApprover(leave.requesterId, nextRole);
+    const approver = await this.findApprover(leave.requesterId, nextRole);
+    return approver ? { id: approver.id, role: nextRole } : null;
   }
 
   private static async deductFromBalance(
@@ -630,7 +631,23 @@ export class LeaveService {
     days: number
   ): Promise<void> {
     const year = new Date().getFullYear();
-    await prisma.balance.updateMany({
+
+    // Check if balance record exists first
+    const balance = await prisma.balance.findFirst({
+      where: {
+        userId,
+        type: leaveType,
+        year,
+      },
+    });
+
+    if (!balance) {
+      console.error(`Balance record not found for user ${userId}, type ${leaveType}, year ${year}`);
+      throw new Error(`Balance record not found for leave type ${leaveType}`);
+    }
+
+    // Update the balance
+    const result = await prisma.balance.updateMany({
       where: {
         userId,
         type: leaveType,
@@ -640,8 +657,15 @@ export class LeaveService {
         used: {
           increment: days,
         },
+        closing: {
+          decrement: days,
+        },
       },
     });
+
+    if (result.count === 0) {
+      throw new Error(`Failed to deduct balance for user ${userId}`);
+    }
   }
 
   /**
@@ -961,15 +985,13 @@ export class LeaveService {
   private static async logAction(
     actor: string,
     action: string,
-    description: string,
-    metadata?: any
+    details?: any
   ): Promise<void> {
     await prisma.auditLog.create({
       data: {
         actorEmail: actor,
         action,
-        description,
-        metadata: metadata ? JSON.stringify(metadata) : undefined,
+        details: details || undefined,
       },
     });
   }

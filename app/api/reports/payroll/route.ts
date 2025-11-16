@@ -126,11 +126,11 @@ export async function GET(req: NextRequest) {
           lte: endDate,
         },
         ...(departmentParam && departmentParam !== "all" ? {
-          employee: { department: departmentParam },
+          user: { department: departmentParam },
         } : {}),
       },
       include: {
-        employee: {
+        user: {
           select: {
             id: true,
             name: true,
@@ -141,8 +141,8 @@ export async function GET(req: NextRequest) {
         },
       },
       orderBy: [
-        { employee: { department: "asc" } },
-        { employee: { name: "asc" } },
+        { user: { department: "asc" } },
+        { user: { name: "asc" } },
       ],
     });
 
@@ -204,7 +204,7 @@ export async function GET(req: NextRequest) {
 
     // Add all employees with LWP
     for (const [employeeId, lwpData] of lwpByEmployee) {
-      const encashment = encashmentRequests.find((e) => e.employeeId === employeeId);
+      const encashment = encashmentRequests.find((e) => e.userId === employeeId);
 
       payrollRecords.push({
         empCode: lwpData.employee.empCode || `EMP-${employeeId}`,
@@ -224,12 +224,12 @@ export async function GET(req: NextRequest) {
 
     // Add employees with only encashment (no LWP)
     for (const encashment of encashmentRequests) {
-      if (!lwpByEmployee.has(encashment.employeeId)) {
+      if (!lwpByEmployee.has(encashment.userId)) {
         payrollRecords.push({
-          empCode: encashment.employee.empCode || `EMP-${encashment.employeeId}`,
-          employeeName: encashment.employee.name,
-          email: encashment.employee.email,
-          department: encashment.employee.department || "N/A",
+          empCode: encashment.user.empCode || `EMP-${encashment.userId}`,
+          employeeName: encashment.user.name,
+          email: encashment.user.email,
+          department: encashment.user.department || "N/A",
           lwpDays: 0,
           lwpDeduction: "0",
           encashmentDays: encashment.daysRequested,

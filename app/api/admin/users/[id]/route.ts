@@ -58,22 +58,14 @@ export async function PATCH(
     data: {
       role: (payload.role ?? undefined) as any,
       department: payload.department ?? undefined,
-      isActive: payload.isActive ?? undefined,
     },
     select: {
       id: true,
       name: true,
       email: true,
-      employeeCode: true,
+      empCode: true,
       role: true,
-      isActive: true,
-      department: {
-        select: {
-          id: true,
-          name: true,
-          code: true,
-        },
-      },
+      department: true,
       createdAt: true,
     },
   });

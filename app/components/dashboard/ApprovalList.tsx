@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { AppRole } from "@/types/auth";
+import { Role } from "@prisma/client";
 
 /**
  * Approval Chain Step Interface
@@ -59,7 +59,7 @@ export interface ApprovalItem {
  * @property {(id: string | number, reason?: string) => void} onReject - Reject callback
  * @property {(id: string | number) => void} [onForward] - Forward callback
  * @property {boolean} [isLoading] - Loading state
- * @property {AppRole} userRole - Current user's role
+ * @property {Role} userRole - Current user's role
  */
 export interface ApprovalListProps {
   approvals: ApprovalItem[];
@@ -67,7 +67,7 @@ export interface ApprovalListProps {
   onReject: (id: string | number, reason?: string) => void;
   onForward?: (id: string | number) => void;
   isLoading?: boolean;
-  userRole: AppRole;
+  userRole: Role;
   className?: string;
   title?: string;
   description?: string;

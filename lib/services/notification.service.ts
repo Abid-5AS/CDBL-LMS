@@ -3,7 +3,7 @@ import {
   CreateNotificationData,
   NotificationWithRelations,
 } from "@/lib/repositories/notification.repository";
-import { LeaveType, LeaveStatus } from "@prisma/client";
+import { LeaveType, LeaveStatus, ApprovalDecision } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   sendLeaveSubmittedEmail,
@@ -208,7 +208,7 @@ export class NotificationService {
         include: {
           requester: { select: { name: true, email: true } },
           approvals: {
-            where: { decision: "PENDING" },
+            where: { decision: ApprovalDecision.PENDING },
             include: { approver: { select: { id: true } } },
           },
         },

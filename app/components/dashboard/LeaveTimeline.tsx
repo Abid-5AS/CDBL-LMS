@@ -399,7 +399,7 @@ export function LeaveTimeline({
                                       <Circle className="h-2 w-2 fill-current" />
                                     )}
                                   </div>
-                                  {stepIndex < leave.approvalChain.length - 1 && (
+                                  {stepIndex < (leave.approvalChain?.length || 0) - 1 && (
                                     <div
                                       className={cn(
                                         "h-0.5 w-4",

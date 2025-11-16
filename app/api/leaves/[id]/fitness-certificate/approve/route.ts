@@ -175,7 +175,7 @@ export async function POST(
     await prisma.notification.create({
       data: {
         userId: leave.requesterId,
-        type: "FITNESS_CERTIFICATE_APPROVED",
+        type: "LEAVE_APPROVED",
         title: "Fitness Certificate Approved",
         message: `Your fitness certificate has been approved by all reviewers. You may now return to duty.`,
         link: `/leaves/${leaveId}`,
@@ -194,7 +194,7 @@ export async function POST(
       await prisma.notification.create({
         data: {
           userId: approver.id,
-          type: "FITNESS_CERTIFICATE_REVIEW_REQUIRED",
+          type: "APPROVAL_REQUIRED",
           title: "Fitness Certificate Review Required",
           message: `${leave.requester.name}'s fitness certificate requires your review.`,
           link: `/leaves/${leaveId}`,

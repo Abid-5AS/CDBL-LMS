@@ -4,7 +4,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
-import { LeaveType, LeaveStatus, LeaveRequest, Prisma } from "@prisma/client";
+import { LeaveType, LeaveStatus, LeaveRequest, Prisma, ApprovalDecision } from "@prisma/client";
 
 /**
  * Standard includes for leave requests
@@ -96,12 +96,12 @@ export class LeaveRepository {
     return prisma.leaveRequest.findMany({
       where: {
         status: {
-          in: ["PENDING", "SUBMITTED", "FORWARDED"],
+          in: [LeaveStatus.PENDING, LeaveStatus.SUBMITTED],
         },
         approvals: {
           some: {
             approverId,
-            decision: "PENDING",
+            decision: ApprovalDecision.PENDING,
           },
         },
       },

@@ -131,12 +131,12 @@ export async function GET(req: NextRequest) {
     // Get encashment requests for the year
     const encashments = await prisma.encashmentRequest.findMany({
       where: {
-        employeeId: { in: employees.map((e) => e.id) },
+        userId: { in: employees.map((e) => e.id) },
         status: "APPROVED",
         approvedAt: { gte: startOfYear, lte: endOfYear },
       },
       select: {
-        employeeId: true,
+        userId: true,
         daysRequested: true,
       },
     });
@@ -166,7 +166,7 @@ export async function GET(req: NextRequest) {
       const totalDaysTaken = empLeaves.reduce((sum, l) => sum + (l.workingDays || 0), 0);
 
       // Encashment days
-      const empEncashments = encashments.filter((e) => e.employeeId === employee.id);
+      const empEncashments = encashments.filter((e) => e.userId === employee.id);
       const totalEncashed = empEncashments.reduce((sum, e) => sum + (e.daysRequested || 0), 0);
 
       // Tenure in years

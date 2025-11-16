@@ -13,21 +13,14 @@ export async function GET() {
   }
 
   const users = await prisma.user.findMany({
-    orderBy: [{ isActive: "desc" }, { name: "asc" }],
+    orderBy: [{ name: "asc" }],
     select: {
       id: true,
       name: true,
       email: true,
-      employeeCode: true,
+      empCode: true,
       role: true,
-      isActive: true,
-      department: {
-        select: {
-          id: true,
-          name: true,
-          code: true,
-        },
-      },
+      department: true,
       createdAt: true,
     },
   });
@@ -37,7 +30,6 @@ export async function GET() {
     // Legacy format for backward compatibility
     items: users.map((item) => ({
       ...item,
-      empCode: item.employeeCode,
       createdAt: item.createdAt.toISOString(),
     })),
   });
