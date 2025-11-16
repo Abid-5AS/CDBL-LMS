@@ -2,20 +2,19 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
+import { neoInput } from "@/lib/neo-design";
 
 const inputVariants = cva(
-  "flex w-full border bg-background/50 backdrop-blur-sm text-foreground transition-all file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 touch-target",
+  "flex w-full text-foreground transition-all file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 touch-target",
   {
     variants: {
       variant: {
-        default:
-          "border-border shadow-sm focus-visible:border-primary/60 focus-visible:ring-4 focus-visible:ring-primary/20 hover:border-border-strong",
+        default: neoInput.base,
         filled:
           "border-transparent bg-muted/60 shadow-sm focus-visible:bg-background focus-visible:border-primary/60 focus-visible:ring-4 focus-visible:ring-primary/20 hover:bg-muted/80",
         ghost:
           "border-transparent shadow-none focus-visible:border-primary/60 focus-visible:ring-4 focus-visible:ring-primary/20 hover:bg-muted/40",
-        glass:
-          "glass-base border-white/20 dark:border-white/10 shadow-md focus-visible:border-primary/60 focus-visible:ring-4 focus-visible:ring-primary/20",
+        glass: neoInput.base,
       },
       size: {
         sm: "h-9 px-3 py-2 text-sm rounded-lg",
@@ -24,10 +23,8 @@ const inputVariants = cva(
       },
       state: {
         default: "",
-        error:
-          "border-destructive/60 focus-visible:border-destructive focus-visible:ring-destructive/20",
-        success:
-          "border-success/60 focus-visible:border-success focus-visible:ring-success/20",
+        error: neoInput.error.replace(neoInput.base, ""),
+        success: neoInput.success.replace(neoInput.base, ""),
         warning:
           "border-warning/60 focus-visible:border-warning focus-visible:ring-warning/20",
       },
