@@ -12,7 +12,7 @@ type FetchOptions = RequestInit & {
   timeout?: number;
 };
 
-type ApiError = Error & {
+export type ApiError = Error & {
   status?: number;
   data?: unknown;
 };

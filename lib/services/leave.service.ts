@@ -45,7 +45,34 @@ export class LeaveService {
     dto: CreateLeaveRequestDTO
   ): Promise<ServiceResult<any>> {
     try {
-      // 1. Get user information
+      // 1. Check for duplicate submissions (idempotency check)
+      // Look for identical requests within the last 5 minutes
+      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+      const existingRequest = await prisma.leaveRequest.findFirst({
+        where: {
+          requesterId: userId,
+          type: dto.type,
+          startDate: dto.startDate,
+          endDate: dto.endDate,
+          reason: dto.reason,
+          createdAt: {
+            gte: fiveMinutesAgo,
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      if (existingRequest) {
+        // Return the existing request to prevent duplicate
+        return {
+          success: true,
+          data: existingRequest,
+        };
+      }
+
+      // 2. Get user information
       const user = await prisma.user.findUnique({
         where: { id: userId },
         select: {
@@ -68,11 +95,11 @@ export class LeaveService {
         };
       }
 
-      // 2. Calculate working days if not provided
+      // 3. Calculate working days if not provided
       const workingDays =
         dto.workingDays || daysInclusive(dto.startDate, dto.endDate);
 
-      // 3. Handle certificate file upload
+      // 4. Handle certificate file upload
       let certificateUrl: string | undefined;
       if (dto.certificateFile) {
         const fileResult = await this.uploadCertificate(dto.certificateFile);
@@ -82,7 +109,7 @@ export class LeaveService {
         certificateUrl = fileResult.data;
       }
 
-      // 4. Validate leave request
+      // 5. Validate leave request
       const validation = await LeaveValidator.validateLeaveRequest({
         userId,
         type: dto.type,
@@ -102,7 +129,7 @@ export class LeaveService {
         };
       }
 
-      // 5. Extract pay calculation for Special Disability Leave
+      // 6. Extract pay calculation for Special Disability Leave
       let payCalculation: any = undefined;
       if (
         dto.type === "SPECIAL_DISABILITY" &&
@@ -111,7 +138,7 @@ export class LeaveService {
         payCalculation = validation.warning.details.payCalculation;
       }
 
-      // 6. Create leave request
+      // 7. Create leave request
       const leaveRequest = await LeaveRepository.create({
         requesterId: userId,
         type: dto.type,
@@ -125,7 +152,7 @@ export class LeaveService {
         payCalculation: payCalculation,
       });
 
-      // 6. Create initial approval record
+      // 8. Create initial approval record
       const approverRole = this.getInitialApproverRole(dto.type, user.role);
       if (approverRole) {
         const approver = await this.findApprover(userId, approverRole);
@@ -141,14 +168,14 @@ export class LeaveService {
         }
       }
 
-      // 7. Log the creation
+      // 9. Log the creation
       await this.logAction(
         user.email,
         "LEAVE_REQUEST_CREATED",
         { leaveId: leaveRequest.id }
       );
 
-      // 8. Send notifications to approvers and requester
+      // 10. Send notifications to approvers and requester
       await NotificationService.notifyLeaveSubmitted(leaveRequest.id, userId);
 
       return {

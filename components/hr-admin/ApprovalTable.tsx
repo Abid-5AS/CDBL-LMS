@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import useSWR from "swr";
+import useSWR, { mutate as globalMutate } from "swr";
 import { toast } from "sonner";
 import clsx from "clsx";
 
@@ -99,7 +99,8 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     "/api/approvals",
     apiFetcher,
     {
-      revalidateOnFocus: true,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
     }
   );
 
@@ -175,8 +176,22 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     action: "approve" | "reject" | "forward" | "return",
     comment?: string
   ) => {
+    if (processingId) return; // Prevent multiple simultaneous actions
+
     try {
       setProcessingId(id + action);
+
+      // Optimistically remove item from UI
+      const optimisticUpdate = (currentData: ApprovalsResponse | undefined) => {
+        if (!currentData) return currentData;
+        return {
+          ...currentData,
+          items: currentData.items.filter((item) => item.id !== id),
+        };
+      };
+
+      // Apply optimistic update
+      mutate(optimisticUpdate, false);
 
       if (action === "forward") {
         await apiPost(`/api/leaves/${id}/forward`, {});
@@ -185,6 +200,8 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         if (!comment || comment.length < 5) {
           toast.error("Comment must be at least 5 characters");
           setProcessingId(null);
+          // Revert optimistic update
+          await mutate();
           return;
         }
         await apiPost(`/api/leaves/${id}/return`, { comment });
@@ -212,17 +229,25 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
       // Close dialog after success
       closeDialog();
 
-      await mutate();
+      // Revalidate all relevant caches
+      await Promise.all([
+        mutate(), // Revalidate approvals
+        globalMutate("/api/balance/mine"), // Revalidate user balance (critical for UI consistency)
+        globalMutate("/api/leaves?mine=1"), // Revalidate user's leaves
+      ]);
     } catch (err) {
       const message =
         err instanceof Error
           ? getToastMessage(err.message, err.message)
           : getToastMessage("approval_failed", "Failed to update request");
       toast.error(message);
+
+      // Revert optimistic update on error
+      await mutate();
     } finally {
       setProcessingId(null);
     }
-  }, [mutate, closeDialog]);
+  }, [mutate, closeDialog, processingId]);
 
   // Handle decision routing - open dialog for destructive actions
   const handleDecision = useCallback(async (
@@ -261,9 +286,22 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   }, [items]);
 
   const handleBulkApprove = useCallback(async () => {
-    if (selectedIds.size === 0) return;
+    if (selectedIds.size === 0 || isBulkApproving) return;
 
     setIsBulkApproving(true);
+
+    // Optimistically remove selected items from UI
+    const optimisticUpdate = (currentData: ApprovalsResponse | undefined) => {
+      if (!currentData) return currentData;
+      return {
+        ...currentData,
+        items: currentData.items.filter((item) => !selectedIds.has(item.id)),
+      };
+    };
+
+    // Apply optimistic update
+    mutate(optimisticUpdate, false);
+
     try {
       const ids = Array.from(selectedIds).map(Number);
       const response = await apiPost<{ success: boolean; approved: number; failed: number }>("/api/leaves/bulk/approve", { ids });
@@ -279,17 +317,26 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
           }
         );
         setSelectedIds(new Set());
-        mutate();
+
+        // Revalidate all relevant caches
+        await Promise.all([
+          mutate(), // Revalidate approvals
+          globalMutate("/api/balance/mine"), // Revalidate user balance
+          globalMutate("/api/leaves?mine=1"), // Revalidate user's leaves
+        ]);
       } else {
         throw new Error("Bulk approve failed");
       }
     } catch (error) {
       console.error("Bulk approve error:", error);
       toast.error("Failed to approve selected leave requests");
+
+      // Revert optimistic update on error
+      await mutate();
     } finally {
       setIsBulkApproving(false);
     }
-  }, [selectedIds, mutate]);
+  }, [selectedIds, mutate, isBulkApproving]);
 
   const allSelected = items.length > 0 && selectedIds.size === items.length;
   const someSelected = selectedIds.size > 0 && selectedIds.size < items.length;
