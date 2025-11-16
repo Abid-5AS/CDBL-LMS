@@ -262,7 +262,7 @@ function PolicyCard({ policy }: PolicyCardProps) {
   const Icon = policy.icon;
 
   return (
-    <Card>
+    <div className="neo-card p-6">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
@@ -361,7 +361,7 @@ function PolicyCard({ policy }: PolicyCardProps) {
           </div>
         )}
       </CardContent>
-    </Card>
+    </div>
   );
 }
 

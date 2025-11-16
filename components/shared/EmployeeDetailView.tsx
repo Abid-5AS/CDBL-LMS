@@ -81,7 +81,7 @@ export function EmployeeDetailView({
       </nav>
 
       {/* Header with employee info */}
-      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+      <div className="neo-card p-6">
         <div className="flex items-start justify-between flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <h1 className="text-2xl font-semibold text-foreground">
