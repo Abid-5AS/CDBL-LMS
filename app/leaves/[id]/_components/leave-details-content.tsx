@@ -12,7 +12,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { AlertCircle, RotateCcw, Edit, Calendar, FileText, User, Clock, Upload, Bell } from "lucide-react";
+import { AlertCircle, RotateCcw, Edit, Calendar, FileText, User, Clock, Upload, Bell, Plus, Minus } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
 import Link from "next/link";
@@ -21,6 +21,7 @@ import { LeaveRequest, LeaveComment, Approval } from "@prisma/client";
 import { FitnessCertificateModal } from "@/components/leaves/FitnessCertificateModal";
 import { DutyReturnFlow } from "@/components/leaves/DutyReturnFlow";
 import { ConversionDisplay, type ConversionDetails } from "@/components/leaves/ConversionDisplay";
+import { ExtendLeaveModal, ShortenLeaveModal } from "./ExtendShortenModals";
 
 type LeaveDetailsContentProps = {
   leave: LeaveRequest & {
@@ -62,13 +63,21 @@ export function LeaveDetailsContent({ leave, comments, currentUserId, currentUse
   const [isNudging, setIsNudging] = useState(false);
   const [nudgeMessage, setNudgeMessage] = useState<string | null>(null);
 
+  // Extend/Shorten modal state
+  const [showExtendModal, setShowExtendModal] = useState(false);
+  const [showShortenModal, setShowShortenModal] = useState(false);
+
+  // Check if leave can be extended/shortened (APPROVED and has started)
+  const isApproved = leave.status === "APPROVED";
+  const leaveStarted = new Date() >= new Date(leave.startDate);
+  const leaveHasEnded = new Date() >= new Date(leave.endDate);
+  const canModifyLeave = isRequester && isApproved && leaveStarted && !leaveHasEnded;
+
   // Determine if fitness certificate is required and should be shown
   const requiresFitnessCertificate =
     leave.type === "MEDICAL" &&
     leave.workingDays > 7 &&
     ["APPROVED", "RECALLED"].includes(leave.status);
-
-  const leaveHasEnded = new Date() >= new Date(leave.endDate);
   const showFitnessCertificatePrompt =
     requiresFitnessCertificate &&
     leaveHasEnded &&
@@ -450,6 +459,45 @@ export function LeaveDetailsContent({ leave, comments, currentUserId, currentUse
               </Card>
             )}
 
+            {/* Extend/Shorten Actions Card */}
+            {canModifyLeave && (
+              <Card className="rounded-2xl border-muted shadow-sm sticky top-6">
+                <CardHeader>
+                  <CardTitle>Modify Leave</CardTitle>
+                  <CardDescription>
+                    Extend or shorten your approved leave while it's in progress
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button
+                    onClick={() => setShowExtendModal(true)}
+                    className="w-full"
+                    size="lg"
+                    variant="outline"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Extend Leave
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    Request additional days. Extension will require approval.
+                  </p>
+
+                  <Button
+                    onClick={() => setShowShortenModal(true)}
+                    className="w-full"
+                    size="lg"
+                    variant="outline"
+                  >
+                    <Minus className="h-4 w-4 mr-2" />
+                    Shorten Leave
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    Return to work earlier. Unused days will be restored to your balance.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Metadata Card */}
             <Card className="rounded-2xl border-muted shadow-sm">
               <CardHeader>
@@ -480,6 +528,31 @@ export function LeaveDetailsContent({ leave, comments, currentUserId, currentUse
         onOpenChange={setShowCertificateModal}
         leaveId={leave.id}
         onUploadSuccess={handleCertificateUploadSuccess}
+      />
+
+      {/* Extend Leave Modal */}
+      <ExtendLeaveModal
+        open={showExtendModal}
+        onOpenChange={setShowExtendModal}
+        leaveId={leave.id}
+        currentEndDate={new Date(leave.endDate)}
+        onSuccess={() => {
+          setRefreshKey((prev) => prev + 1);
+          window.location.reload();
+        }}
+      />
+
+      {/* Shorten Leave Modal */}
+      <ShortenLeaveModal
+        open={showShortenModal}
+        onOpenChange={setShowShortenModal}
+        leaveId={leave.id}
+        currentEndDate={new Date(leave.endDate)}
+        currentStartDate={new Date(leave.startDate)}
+        onSuccess={() => {
+          setRefreshKey((prev) => prev + 1);
+          window.location.reload();
+        }}
       />
     </div>
   );

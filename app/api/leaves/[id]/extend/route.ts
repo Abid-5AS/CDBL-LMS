@@ -272,7 +272,7 @@ export async function POST(
     } else if (firstApproverRole === "DEPT_HEAD") {
       // Use user's department head
       const userWithDeptHead = await prisma.user.findUnique({
-        where: { id: userId },
+        where: { id: user.id },
         select: { deptHeadId: true },
       });
       firstApproverId = userWithDeptHead?.deptHeadId || null;

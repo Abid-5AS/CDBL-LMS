@@ -139,7 +139,7 @@ export async function POST(
   await prisma.notification.create({
     data: {
       userId: leave.requesterId,
-      type: "FITNESS_CERTIFICATE_REJECTED",
+      type: "LEAVE_REJECTED",
       title: "Fitness Certificate Rejected",
       message: `Your fitness certificate has been rejected by ${user.role.replace("_", " ")}. Reason: ${parsed.data.comment}. Please upload a new certificate.`,
       link: `/leaves/${leaveId}`,

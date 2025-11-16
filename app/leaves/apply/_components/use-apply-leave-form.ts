@@ -508,6 +508,7 @@ export function useApplyLeaveForm() {
     setShowOptionalUpload,
     setShowConfirmModal,
     setIncidentDate,
+    setErrors,
     handleFileError,
     handleTypeChange,
     clearErrors,

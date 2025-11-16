@@ -139,7 +139,6 @@ export function HRAdminDashboardClient() {
           description="Essential leave management KPIs for your organization"
           isLoading={false}
           animate={true}
-          titleClassName="text-xl font-semibold"
         >
           <ResponsiveDashboardGrid
             columns="2:2:4:4"
@@ -274,7 +273,6 @@ export function HRAdminDashboardClient() {
           description="Daily metrics, team utilization, and compliance tracking"
           isLoading={false}
           animate={true}
-          titleClassName="text-xl font-semibold"
         >
           <ResponsiveDashboardGrid
             columns="1:1:3:3"
@@ -432,7 +430,6 @@ export function HRAdminDashboardClient() {
           title="Pending Leave Requests"
           description="Review and manage pending leave requests"
           isLoading={isLoading}
-          titleClassName="text-xl font-semibold"
         >
           <motion.div variants={itemVariants}>
             <Suspense fallback={<DashboardCardSkeleton />}>
@@ -447,7 +444,6 @@ export function HRAdminDashboardClient() {
           description="Request trends and leave type distribution"
           isLoading={false}
           animate={true}
-          titleClassName="text-xl font-semibold"
         >
           <ResponsiveDashboardGrid columns="1:1:2:3" gap="md" animate={true}>
             {/* Quick Stats Summary */}

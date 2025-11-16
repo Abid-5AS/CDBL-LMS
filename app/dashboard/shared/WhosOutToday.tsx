@@ -130,7 +130,7 @@ export function WhosOutToday({ scope = "team", title }: WhosOutTodayProps) {
                   <p className="text-sm font-medium truncate">{member.name}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <Badge variant="outline" className="text-xs">
-                      {leaveTypeLabel(member.type)}
+                      {leaveTypeLabel[member.type]}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
                       {new Date(member.start).toLocaleDateString("en-US", {

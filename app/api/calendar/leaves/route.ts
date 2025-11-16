@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { LeaveRequestStatus, LeaveType } from "@prisma/client";
+import { LeaveStatus, LeaveType } from "@prisma/client";
 
 /**
  * GET /api/calendar/leaves
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     // Build where clause based on view
     let whereClause: any = {
       status: {
-        in: [LeaveRequestStatus.APPROVED, LeaveRequestStatus.SUBMITTED],
+        in: [LeaveStatus.APPROVED, LeaveStatus.SUBMITTED],
       },
       OR: [
         {
@@ -61,15 +61,15 @@ export async function GET(request: NextRequest) {
 
     // Apply view filter
     if (view === "my") {
-      whereClause.userId = user.id;
-    } else if (view === "team" && user.departmentId) {
+      whereClause.requesterId = user.id;
+    } else if (view === "team" && user.department) {
       // Get department members
-      whereClause.user = {
-        departmentId: user.departmentId,
+      whereClause.requester = {
+        department: user.department,
       };
-    } else if (view === "department" && user.departmentId) {
-      whereClause.user = {
-        departmentId: user.departmentId,
+    } else if (view === "department" && user.department) {
+      whereClause.requester = {
+        department: user.department,
       };
     }
     // "all" view - only for admin roles
@@ -92,15 +92,11 @@ export async function GET(request: NextRequest) {
     const leaves = await prisma.leaveRequest.findMany({
       where: whereClause,
       include: {
-        user: {
+        requester: {
           select: {
             name: true,
-            employeeCode: true,
-            department: {
-              select: {
-                name: true,
-              },
-            },
+            empCode: true,
+            department: true,
           },
         },
       },
@@ -112,9 +108,9 @@ export async function GET(request: NextRequest) {
     // Transform to calendar events
     const events = leaves.map((leave) => ({
       id: leave.id,
-      employeeName: leave.user.name,
-      employeeCode: leave.user.employeeCode,
-      department: leave.user.department?.name || "N/A",
+      employeeName: leave.requester.name,
+      employeeCode: leave.requester.empCode,
+      department: leave.requester.department || "N/A",
       leaveType: leave.type,
       startDate: leave.startDate,
       endDate: leave.endDate,

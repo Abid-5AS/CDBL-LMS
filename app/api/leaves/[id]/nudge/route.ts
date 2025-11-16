@@ -49,7 +49,7 @@ export async function POST(
     // Check if already nudged recently (within 24 hours)
     const recentNudge = await prisma.auditLog.findFirst({
       where: {
-        action: "LEAVE_NUDGE",
+        action: "APPROVAL_REQUIRED",
         targetEmail: user.email,
         createdAt: {
           gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
@@ -93,7 +93,7 @@ export async function POST(
     await prisma.notification.create({
       data: {
         userId: approver.id,
-        type: "LEAVE_NUDGE",
+        type: "APPROVAL_REQUIRED",
         title: "Leave Request Reminder",
         message: `${user.name} is waiting for your review on their leave request (${leave.type})`,
         link: `/approvals?status=PENDING`,
@@ -105,7 +105,7 @@ export async function POST(
     await prisma.auditLog.create({
       data: {
         actorEmail: user.email,
-        action: "LEAVE_NUDGE",
+        action: "APPROVAL_REQUIRED",
         targetEmail: approver.email,
         details: `Nudged for leave request #${leaveId}`,
       },

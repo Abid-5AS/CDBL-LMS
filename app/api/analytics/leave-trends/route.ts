@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { LeaveRequestStatus } from "@prisma/client";
+import { LeaveStatus } from "@prisma/client";
 
 /**
  * GET /api/analytics/leave-trends
@@ -45,15 +45,13 @@ export async function GET(request: NextRequest) {
     };
 
     // Department filter for Dept Head role
-    if (user.role === "DEPT_HEAD" && user.departmentId) {
-      whereClause.user = {
-        departmentId: user.departmentId,
+    if (user.role === "DEPT_HEAD" && user.department) {
+      whereClause.requester = {
+        department: user.department,
       };
     } else if (departmentFilter) {
-      whereClause.user = {
-        department: {
-          name: departmentFilter,
-        },
+      whereClause.requester = {
+        department: departmentFilter,
       };
     }
 
@@ -61,13 +59,9 @@ export async function GET(request: NextRequest) {
     const leaves = await prisma.leaveRequest.findMany({
       where: whereClause,
       include: {
-        user: {
+        requester: {
           select: {
-            department: {
-              select: {
-                name: true,
-              },
-            },
+            department: true,
           },
         },
       },
@@ -106,9 +100,9 @@ export async function GET(request: NextRequest) {
       monthlyTrend.push({
         month: monthNames[monthDate.getMonth()],
         leaves: monthLeaves.length,
-        approved: monthLeaves.filter((l) => l.status === LeaveRequestStatus.APPROVED)
+        approved: monthLeaves.filter((l) => l.status === LeaveStatus.APPROVED)
           .length,
-        rejected: monthLeaves.filter((l) => l.status === LeaveRequestStatus.REJECTED)
+        rejected: monthLeaves.filter((l) => l.status === LeaveStatus.REJECTED)
           .length,
       });
     }
@@ -138,29 +132,22 @@ export async function GET(request: NextRequest) {
     >();
 
     leaves.forEach((leave) => {
-      const deptName = leave.user.department?.name || "Unknown";
+      const deptName = leave.requester.department || "Unknown";
       const existing = deptMap.get(deptName) || {
         totalDays: 0,
         employeeIds: new Set(),
       };
       existing.totalDays += leave.workingDays;
-      existing.employeeIds.add(leave.userId);
+      existing.employeeIds.add(leave.requesterId);
       deptMap.set(deptName, existing);
     });
 
     const departmentUtilization = await Promise.all(
       Array.from(deptMap.entries()).map(async ([department, data]) => {
         // Get total employees in department
-        const dept = await prisma.department.findFirst({
-          where: { name: department },
-          include: {
-            _count: {
-              select: { users: true },
-            },
-          },
+        const employeeCount = await prisma.user.count({
+          where: { department: department },
         });
-
-        const employeeCount = dept?._count.users || data.employeeIds.size;
         const avgDaysPerEmployee =
           employeeCount > 0 ? data.totalDays / employeeCount : 0;
 
@@ -184,7 +171,7 @@ export async function GET(request: NextRequest) {
     // Calculate summary stats
     const totalDays = leaves.reduce((sum, leave) => sum + leave.workingDays, 0);
     const approvedLeaves = leaves.filter(
-      (l) => l.status === LeaveRequestStatus.APPROVED
+      (l) => l.status === LeaveStatus.APPROVED
     ).length;
     const approvalRate = totalLeaves > 0 ? (approvedLeaves / totalLeaves) * 100 : 0;
 

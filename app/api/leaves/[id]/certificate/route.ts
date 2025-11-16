@@ -144,7 +144,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       await prisma.notification.create({
         data: {
           userId: admin.id,
-          type: "FITNESS_CERTIFICATE_UPLOADED",
+          type: "APPROVAL_REQUIRED",
           title: "Fitness Certificate Awaiting Review",
           message: `${leave.requester.email} has uploaded a fitness certificate for review.`,
           link: `/leaves/${leaveId}`,

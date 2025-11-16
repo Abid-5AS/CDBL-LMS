@@ -72,6 +72,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkApproving, setIsBulkApproving] = useState(false);
 
   // Dialog state management
   const [dialogState, setDialogState] = useState<{
@@ -257,6 +258,37 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     }
   }, [items]);
 
+  const handleBulkApprove = useCallback(async () => {
+    if (selectedIds.size === 0) return;
+
+    setIsBulkApproving(true);
+    try {
+      const ids = Array.from(selectedIds).map(Number);
+      const response = await apiPost("/api/leaves/bulk/approve", { ids });
+
+      if (response.success) {
+        toast.success(
+          `Successfully approved ${response.approved} leave request(s)`,
+          {
+            description:
+              response.failed > 0
+                ? `${response.failed} request(s) could not be approved`
+                : undefined,
+          }
+        );
+        setSelectedIds(new Set());
+        mutate();
+      } else {
+        throw new Error("Bulk approve failed");
+      }
+    } catch (error) {
+      console.error("Bulk approve error:", error);
+      toast.error("Failed to approve selected leave requests");
+    } finally {
+      setIsBulkApproving(false);
+    }
+  }, [selectedIds, mutate]);
+
   const allSelected = items.length > 0 && selectedIds.size === items.length;
   const someSelected = selectedIds.size > 0 && selectedIds.size < items.length;
 
@@ -330,6 +362,49 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         }}
         onClear={clearFilters}
       />
+
+      {/* Bulk Actions Bar */}
+      {selectedIds.size > 0 && (
+        <Card className="bg-primary/5 border-primary/20">
+          <CardContent className="flex items-center justify-between py-3">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                checked={true}
+                onCheckedChange={() => setSelectedIds(new Set())}
+                className="data-[state=checked]:bg-primary"
+              />
+              <span className="text-sm font-medium">
+                {selectedIds.size} leave request{selectedIds.size > 1 ? "s" : ""} selected
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleBulkApprove}
+                disabled={isBulkApproving}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-600/50 text-white text-sm font-medium rounded-md transition-colors"
+              >
+                {isBulkApproving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Approving...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="h-4 w-4" />
+                    Approve Selected
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => setSelectedIds(new Set())}
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                Clear selection
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {items.length === 0 && allItems.length > 0 ? (
         <Card>

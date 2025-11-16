@@ -146,7 +146,7 @@ export function LeaveCalendar({
 
   // Render calendar days
   const renderCalendarDays = () => {
-    const days: JSX.Element[] = [];
+    const days: React.JSX.Element[] = [];
     let dayCounter = 1 - firstDayOfMonth;
 
     for (let week = 0; week < 6; week++) {
@@ -194,7 +194,7 @@ export function LeaveCalendar({
                       leaveTypeColor(leave.leaveType),
                       "text-white font-medium"
                     )}
-                    title={`${leave.employeeName} - ${leaveTypeLabel(leave.leaveType)}`}
+                    title={`${leave.employeeName} - ${leaveTypeLabel[leave.leaveType]}`}
                   >
                     <span className="hidden sm:inline">
                       {leave.employeeName.split(" ")[0]}
@@ -347,7 +347,7 @@ export function LeaveCalendar({
                       className={cn("size-3 rounded-full", leaveTypeColor(type))}
                     ></div>
                     <span className="text-muted-foreground">
-                      {leaveTypeLabel(type)}
+                      {leaveTypeLabel[type]}
                     </span>
                   </div>
                 )

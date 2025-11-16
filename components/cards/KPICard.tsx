@@ -152,7 +152,6 @@ export function KPICard({
                 <Icon
                   size={20}
                   className={cn("h-5 w-5", iconColor)}
-                  style={!iconColor ? { color: "var(--kpi-accent)" } : undefined}
                 />
               </div>
             )}
