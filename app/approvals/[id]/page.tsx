@@ -23,7 +23,7 @@ async function ApprovalDetailsPageWrapper({
 
   // Check if user is an approver
   const userRole = user.role as string;
-  const isApprover = ["HR_ADMIN", "HR_HEAD", "DEPT_HEAD", "CEO"].includes(
+  const isApprover = ["HR_ADMIN", "HR_HEAD", "DEPT_HEAD", "CEO", "SYSTEM_ADMIN"].includes(
     userRole
   );
 
@@ -65,6 +65,12 @@ async function ApprovalDetailsPageWrapper({
 
   if (!leave) {
     redirect("/approvals");
+  }
+
+  // CRITICAL SECURITY CHECK: Prevent approvers from viewing their own leave in approval view
+  // If an approver is viewing their own leave request, redirect to employee view
+  if (leave.requesterId === user.id) {
+    redirect(`/leaves/${leaveId}`);
   }
 
   // Get employee's leave balances for current year

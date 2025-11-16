@@ -2,14 +2,15 @@
 
 ## Role Hierarchy
 
-The system implements a 5-tier role hierarchy with distinct permissions and access levels:
+The system implements a 6-tier role hierarchy with distinct permissions and access levels:
 
 ```
-CEO (Highest Authority)
-  └── HR_HEAD
-      └── HR_ADMIN
-          └── DEPT_HEAD
-              └── EMPLOYEE (Base Role)
+SYSTEM_ADMIN (System Administrator - Technical)
+  └── CEO (Highest Business Authority)
+      └── HR_HEAD
+          └── HR_ADMIN
+              └── DEPT_HEAD
+                  └── EMPLOYEE (Base Role)
 ```
 
 ### Role Definitions
@@ -18,7 +19,8 @@ CEO (Highest Authority)
 2. **DEPT_HEAD**: Department head or team manager
 3. **HR_ADMIN**: HR administrator, first-level approver
 4. **HR_HEAD**: HR department head, final approver
-5. **CEO**: Chief Executive Officer, highest authority
+5. **CEO**: Chief Executive Officer, highest business authority
+6. **SYSTEM_ADMIN**: System administrator with full technical and administrative access
 
 ---
 
@@ -26,57 +28,57 @@ CEO (Highest Authority)
 
 ### Leave Management
 
-| Action | EMPLOYEE | DEPT_HEAD | HR_ADMIN | HR_HEAD | CEO |
-|--------|----------|-----------|----------|---------|-----|
-| **Apply for Leave** | ✅ Own | ✅ Own | ✅ Own | ✅ Own | ✅ Own |
-| **View Own Leaves** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **View All Leaves** | ❌ | ❌ | ✅ | ✅ | ✅ |
-| **Cancel Own Leave** (Pending) | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Cancel Any Leave** | ❌ | ❌ | ❌ | ❌ | ❌ (Future) |
-| **Approve Leave** | ❌ | ❌ | ❌ | ✅ | ✅ |
-| **Reject Leave** | ❌ | ❌ | ❌ | ✅ | ✅ |
-| **Forward Leave** | ❌ | ✅ (to HR_HEAD) | ✅ (to DEPT_HEAD) | ❌ | ❌ |
-| **Self-Approval** | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Action | EMPLOYEE | DEPT_HEAD | HR_ADMIN | HR_HEAD | CEO | SYSTEM_ADMIN |
+|--------|----------|-----------|----------|---------|-----|--------------|
+| **Apply for Leave** | ✅ Own | ✅ Own | ✅ Own | ✅ Own | ✅ Own | ✅ Own |
+| **View Own Leaves** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **View All Leaves** | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| **Cancel Own Leave** (Pending) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Cancel Any Leave** | ❌ | ❌ | ❌ | ❌ | ❌ (Future) | ✅ |
+| **Approve Leave** | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
+| **Reject Leave** | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
+| **Forward Leave** | ❌ | ✅ (to HR_HEAD) | ✅ (to DEPT_HEAD) | ❌ | ❌ | ✅ |
+| **Self-Approval** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 
 ### Employee Management
 
-| Action | EMPLOYEE | DEPT_HEAD | HR_ADMIN | HR_HEAD | CEO |
-|--------|----------|-----------|----------|---------|-----|
-| **View Own Profile** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Edit Own Profile** | ❌ | ❌ | ❌ | ❌ | ❌ (Future) |
-| **View Employees** | ❌ | ✅ (Team only) | ✅ (EMPLOYEE, DEPT_HEAD) | ✅ (All except CEO) | ✅ (All) |
-| **Edit Employees** | ❌ | ❌ | ✅ (EMPLOYEE, DEPT_HEAD) | ✅ (All except CEO, HR_HEAD) | ✅ (All) |
-| **Create Employees** | ❌ | ❌ | ✅ | ✅ | ✅ |
-| **Assign Roles** | ❌ | ❌ | ✅ (EMPLOYEE, DEPT_HEAD) | ✅ (EMPLOYEE, DEPT_HEAD, HR_ADMIN) | ✅ (All) |
+| Action | EMPLOYEE | DEPT_HEAD | HR_ADMIN | HR_HEAD | CEO | SYSTEM_ADMIN |
+|--------|----------|-----------|----------|---------|-----|--------------|
+| **View Own Profile** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Edit Own Profile** | ❌ | ❌ | ❌ | ❌ | ❌ (Future) | ✅ |
+| **View Employees** | ❌ | ✅ (Team only) | ✅ (EMPLOYEE, DEPT_HEAD) | ✅ (All except CEO) | ✅ (All) | ✅ (All) |
+| **Edit Employees** | ❌ | ❌ | ✅ (EMPLOYEE, DEPT_HEAD) | ✅ (All except CEO, HR_HEAD) | ✅ (All) | ✅ (All) |
+| **Create Employees** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| **Assign Roles** | ❌ | ❌ | ✅ (EMPLOYEE, DEPT_HEAD) | ✅ (EMPLOYEE, DEPT_HEAD, HR_ADMIN) | ✅ (All) | ✅ (All) |
 
 ### Dashboard & Analytics
 
-| Action | EMPLOYEE | DEPT_HEAD | HR_ADMIN | HR_HEAD | CEO |
-|--------|----------|-----------|----------|---------|-----|
-| **Personal Dashboard** | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Team Dashboard** | ❌ | ✅ | ❌ | ❌ | ❌ |
-| **Department Analytics** | ❌ | ✅ | ❌ | ❌ | ❌ |
-| **Org-Wide Analytics** | ❌ | ❌ | ❌ | ✅ | ✅ |
-| **Executive Dashboard** | ❌ | ❌ | ❌ | ❌ | ✅ |
-| **Policy Compliance** | ❌ | ❌ | ❌ | ✅ | ✅ |
+| Action | EMPLOYEE | DEPT_HEAD | HR_ADMIN | HR_HEAD | CEO | SYSTEM_ADMIN |
+|--------|----------|-----------|----------|---------|-----|--------------|
+| **Personal Dashboard** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Team Dashboard** | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ |
+| **Department Analytics** | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ |
+| **Org-Wide Analytics** | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
+| **Executive Dashboard** | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| **Policy Compliance** | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
 
 ### Administrative Functions
 
-| Action | EMPLOYEE | DEPT_HEAD | HR_ADMIN | HR_HEAD | CEO |
-|--------|----------|-----------|----------|---------|-----|
-| **Holiday Management** | ❌ | ❌ | ✅ | ✅ | ✅ |
-| **Policy Configuration** | ❌ | ❌ | ❌ | ✅ | ✅ |
-| **Audit Logs** | ❌ | ❌ | ✅ | ✅ | ✅ |
-| **System Settings** | ❌ | ❌ | ❌ | ✅ | ✅ |
-| **User Management** | ❌ | ❌ | ✅ | ✅ | ✅ |
+| Action | EMPLOYEE | DEPT_HEAD | HR_ADMIN | HR_HEAD | CEO | SYSTEM_ADMIN |
+|--------|----------|-----------|----------|---------|-----|--------------|
+| **Holiday Management** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| **Policy Configuration** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| **Audit Logs** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| **System Settings** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| **User Management** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 
 ### Balance & Leave Data
 
-| Action | EMPLOYEE | DEPT_HEAD | HR_ADMIN | HR_ADMIN | CEO |
-|--------|----------|-----------|----------|----------|-----|
-| **View Own Balance** | ✅ | ✅ | ✅ | ✅ | ❌ (Executive view) |
-| **View Employee Balance** | ❌ | ❌ | ✅ | ✅ | ❌ (Executive view) |
-| **Adjust Balance** | ❌ | ❌ | ❌ (Future) | ❌ (Future) | ❌ (Future) |
+| Action | EMPLOYEE | DEPT_HEAD | HR_ADMIN | HR_HEAD | CEO | SYSTEM_ADMIN |
+|--------|----------|-----------|----------|---------|-----|--------------|
+| **View Own Balance** | ✅ | ✅ | ✅ | ✅ | ❌ (Executive view) | ✅ |
+| **View Employee Balance** | ❌ | ❌ | ✅ | ✅ | ❌ (Executive view) | ✅ |
+| **Adjust Balance** | ❌ | ❌ | ❌ (Future) | ❌ (Future) | ❌ (Future) | ✅ (Future) |
 
 ---
 
@@ -170,6 +172,38 @@ CEO (Highest Authority)
 
 ---
 
+### SYSTEM_ADMIN Dashboard
+
+**Location**: `/dashboard/admin`
+
+**Features**:
+- Full system administration panel
+- Employee creation and management
+- Holiday calendar management
+- Leave policy configuration
+- Organization structure management
+- Comprehensive audit logs
+- System settings and configuration
+- All analytics and reports
+- Approval queue access (for oversight)
+
+**Access**:
+- Can view: Everyone (including all roles)
+- Can edit: Everyone (including all roles)
+- Can create: New employees
+- Full system configuration access
+- Technical and administrative control
+
+**Purpose**:
+The SYSTEM_ADMIN role is designed for technical administrators who manage the system infrastructure, not for business-level decision making. While they have approval capabilities for system oversight, their primary focus is on:
+- System configuration and maintenance
+- User and role management
+- Policy and compliance setup
+- Audit trail monitoring
+- Technical troubleshooting
+
+---
+
 ## Permission Implementation
 
 ### Access Control Functions
@@ -177,19 +211,20 @@ CEO (Highest Authority)
 Located in `lib/rbac.ts`:
 
 #### `canViewAllRequests(role)`
-Returns `true` for: HR_ADMIN, HR_HEAD, CEO, DEPT_HEAD
+Returns `true` for: HR_ADMIN, HR_HEAD, CEO, DEPT_HEAD, SYSTEM_ADMIN
 
 #### `canApprove(role)`
-Returns `true` for: HR_ADMIN, HR_HEAD, CEO, DEPT_HEAD
+Returns `true` for: HR_HEAD, CEO, DEPT_HEAD, SYSTEM_ADMIN
 
-**Note**: `canApprove()` returns true for all approvers, but actual approve/reject is restricted to HR_HEAD and CEO via workflow logic.
+**Note**: `canApprove()` returns true for all approvers, but actual approve/reject is restricted to HR_HEAD, CEO, and SYSTEM_ADMIN via workflow logic.
 
 #### `canViewEmployee(viewerRole, targetRole)`
 
 | Viewer Role | Can View |
 |-------------|----------|
+| SYSTEM_ADMIN | Everyone |
 | CEO | Everyone |
-| HR_HEAD | Everyone except CEO |
+| HR_HEAD | Everyone except CEO, SYSTEM_ADMIN |
 | HR_ADMIN | EMPLOYEE, DEPT_HEAD only |
 | DEPT_HEAD | EMPLOYEE only |
 | EMPLOYEE | Self only |
@@ -198,6 +233,7 @@ Returns `true` for: HR_ADMIN, HR_HEAD, CEO, DEPT_HEAD
 
 | Viewer Role | Can Edit |
 |-------------|----------|
+| SYSTEM_ADMIN | Everyone |
 | CEO | Everyone |
 | HR_HEAD | EMPLOYEE, DEPT_HEAD, HR_ADMIN |
 | HR_ADMIN | EMPLOYEE, DEPT_HEAD only |
@@ -208,13 +244,16 @@ Returns `true` for: HR_ADMIN, HR_HEAD, CEO, DEPT_HEAD
 
 | Viewer Role | Can Assign |
 |-------------|------------|
-| CEO | Any role |
+| SYSTEM_ADMIN | Any role (including SYSTEM_ADMIN) |
+| CEO | Any role except SYSTEM_ADMIN |
 | HR_HEAD | EMPLOYEE, DEPT_HEAD, HR_ADMIN |
 | HR_ADMIN | EMPLOYEE, DEPT_HEAD only |
 | Others | None |
 
 #### `canCreateEmployee(role)`
-Returns `true` for: HR_ADMIN, HR_HEAD, CEO
+Returns `true` for: SYSTEM_ADMIN only
+
+**Note**: Only SYSTEM_ADMIN can create new employees, ensuring controlled user provisioning.
 
 ---
 
@@ -398,7 +437,8 @@ if (!canApprove(user.role)) {
 
 Roles inherit permissions from lower roles:
 
-- **CEO**: Has all permissions
+- **SYSTEM_ADMIN**: Has full system and administrative permissions (technical role)
+- **CEO**: Has all business permissions
 - **HR_HEAD**: Has HR_ADMIN + DEPT_HEAD + EMPLOYEE permissions (with own restrictions)
 - **HR_ADMIN**: Has DEPT_HEAD + EMPLOYEE permissions
 - **DEPT_HEAD**: Has EMPLOYEE permissions + team management
@@ -412,7 +452,8 @@ Function: `getVisibleRoles(role)` in `lib/rbac.ts`
 
 | Viewer Role | Can See Roles |
 |-------------|--------------|
-| CEO | All roles (EMPLOYEE, DEPT_HEAD, HR_ADMIN, HR_HEAD, CEO) |
+| SYSTEM_ADMIN | All roles (EMPLOYEE, DEPT_HEAD, HR_ADMIN, HR_HEAD, CEO, SYSTEM_ADMIN) |
+| CEO | All roles except SYSTEM_ADMIN (EMPLOYEE, DEPT_HEAD, HR_ADMIN, HR_HEAD, CEO) |
 | HR_HEAD | EMPLOYEE, DEPT_HEAD, HR_ADMIN, HR_HEAD |
 | HR_ADMIN | EMPLOYEE, DEPT_HEAD, HR_ADMIN |
 | DEPT_HEAD | EMPLOYEE only |
@@ -473,9 +514,18 @@ Function: `getVisibleRoles(role)` in `lib/rbac.ts`
    - ✅ Can forward to CEO
 
 5. **CEO**:
-   - ✅ Full access to everything
+   - ✅ Full business-level access
    - ✅ Can approve/reject
-   - ✅ Can view/edit anyone
+   - ✅ Can view/edit anyone (except SYSTEM_ADMIN)
+
+6. **SYSTEM_ADMIN**:
+   - ✅ Full system access (all roles)
+   - ✅ Can create employees
+   - ✅ Can manage policies, holidays, system settings
+   - ✅ Can view audit logs
+   - ✅ Can approve/reject (for oversight)
+   - ✅ Can view/edit anyone (including other SYSTEM_ADMINs)
+   - ✅ Can assign any role (including SYSTEM_ADMIN)
 
 ---
 
@@ -488,8 +538,8 @@ Function: `getVisibleRoles(role)` in `lib/rbac.ts`
 
 ---
 
-**Document Version**: 1.0  
-**Last Updated**: Current  
-**Role Count**: 5 roles  
-**Permission Functions**: 6 core functions in `lib/rbac.ts`
+**Document Version**: 2.0
+**Last Updated**: Current
+**Role Count**: 6 roles
+**Permission Functions**: 12+ functions in `lib/rbac.ts`
 
