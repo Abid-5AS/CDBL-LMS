@@ -444,18 +444,18 @@ export function PolicyPageContent() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <a
               href="/faq"
-              className="p-4 rounded-lg border border-border hover:bg-accent transition-colors"
+              className="neo-card group block p-6 cursor-pointer"
             >
-              <h4 className="font-semibold mb-2">Frequently Asked Questions</h4>
+              <h4 className="font-semibold mb-2 text-foreground">Frequently Asked Questions</h4>
               <p className="text-sm text-muted-foreground">
                 Common questions about leave policies and procedures
               </p>
             </a>
             <a
               href="/leaves/apply"
-              className="p-4 rounded-lg border border-border hover:bg-accent transition-colors"
+              className="neo-card group block p-6 cursor-pointer"
             >
-              <h4 className="font-semibold mb-2">Apply for Leave</h4>
+              <h4 className="font-semibold mb-2 text-foreground">Apply for Leave</h4>
               <p className="text-sm text-muted-foreground">
                 Start a new leave request following these policies
               </p>
