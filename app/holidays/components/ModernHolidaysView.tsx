@@ -10,6 +10,7 @@ import { useHolidaysData } from "../hooks/useHolidaysData";
 import { PDFExportButton } from "./PDFExportButton";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui";
+import { EmployeePageHero } from "@/components/employee/PageHero";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -89,15 +90,43 @@ export function ModernHolidaysView({ role }: ModernHolidaysViewProps) {
     );
   }
 
+  const heroStats = [
+    {
+      label: "Total Holidays",
+      value: holidaysStats.total,
+      helper: `${holidaysStats.mandatory} mandatory`,
+    },
+    {
+      label: "Upcoming",
+      value: holidaysStats.upcoming,
+      state: holidaysStats.upcoming === 0 ? "warning" : "success",
+      helper: `${holidaysStats.optional} optional overall`,
+    },
+    {
+      label: "Next Holiday",
+      value: holidaysStats.nextHoliday
+        ? formatDate(holidaysStats.nextHoliday.date)
+        : "—",
+      helper: holidaysStats.nextHoliday?.name,
+    },
+  ];
+
   return (
     <RoleBasedDashboard
       role={role}
       title="Company Holidays"
       description={`View and plan around ${holidaysStats.total} company holidays for ${viewingYearDescription}`}
-      actions={headerActions}
       animate={true}
       backgroundVariant="transparent"
     >
+      <EmployeePageHero
+        eyebrow="Company Calendar"
+        title="Holidays & Closures"
+        description={`Stay ahead of ${holidaysStats.total} holidays scheduled for ${viewingYearDescription}.`}
+        stats={heroStats}
+        actions={headerActions}
+        className="mb-6"
+      />
       <motion.div
         variants={containerVariants}
         initial="hidden"

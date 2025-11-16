@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar as CalendarIcon, X, Sparkles } from "lucide-react";
+import { Calendar as CalendarIcon, X, Sparkles, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -109,6 +109,7 @@ export function DateRangePicker({
   const previewStart = hoverPreview?.start || value.start;
   const previewEnd = hoverPreview?.end || value.end;
   const previewDays = previewStart && previewEnd ? totalDaysInclusive(previewStart, previewEnd) : 0;
+  const selectedDays = value.start && value.end ? totalDaysInclusive(value.start, value.end) : null;
 
   // Calculate breakdown for current selection
   const breakdown = value.start && value.end ? countDaysBreakdown(value.start, value.end, holidays) : null;
@@ -118,24 +119,56 @@ export function DateRangePicker({
       <Popover open={open} onOpenChange={setOpen}>
         <div className="flex items-center gap-2">
           <PopoverTrigger asChild className="flex-1">
-            <Button
-              variant="outline"
+            <button
+              type="button"
               disabled={disabled}
-              className={cn("w-full justify-start text-left font-normal")}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {value.start ? (
-                value.end ? (
-                  <>
-                    {fmtDDMMYYYY(value.start)} - {fmtDDMMYYYY(value.end)}
-                  </>
-                ) : (
-                  fmtDDMMYYYY(value.start)
-                )
-              ) : (
-                <span className="text-muted-foreground">Pick date range</span>
+              aria-label="Select leave date range"
+              aria-expanded={open}
+              className={cn(
+                "w-full rounded-2xl border border-border bg-background/70 px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                disabled && "cursor-not-allowed opacity-50"
               )}
-            </Button>
+            >
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/60 text-muted-foreground">
+                    <CalendarIcon className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
+                      Date range
+                    </span>
+                    <span className="text-sm font-semibold text-foreground">
+                      {value.start ? (
+                        value.end ? (
+                          <>
+                            {fmtDDMMYYYY(value.start)} → {fmtDDMMYYYY(value.end)}
+                          </>
+                        ) : (
+                          `Start: ${fmtDDMMYYYY(value.start)}`
+                        )
+                      ) : (
+                        "Select dates"
+                      )}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {value.start
+                        ? value.end
+                          ? `${selectedDays ?? 0} day${selectedDays && selectedDays !== 1 ? "s" : ""} selected`
+                          : "Choose an end date"
+                        : "Opens calendar picker"}
+                    </span>
+                  </div>
+                </div>
+                <ChevronDown
+                  className={cn(
+                    "h-4 w-4 text-muted-foreground transition-transform",
+                    open && "rotate-180"
+                  )}
+                  aria-hidden="true"
+                />
+              </div>
+            </button>
           </PopoverTrigger>
           {value.start && value.end && (
             <Button
@@ -251,4 +284,3 @@ export function DateRangePicker({
     </div>
   );
 }
-

@@ -2,8 +2,6 @@
 
 import * as React from "react";
 import {
-  HelpCircle,
-  ChevronDown,
   Search,
   BookOpen,
   Calendar,
@@ -28,6 +26,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { EmployeePageHero } from "@/components/employee/PageHero";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 // ============================================
 // FAQ Data
@@ -173,6 +174,11 @@ const faqData = {
   ],
 };
 
+const totalFaqCount = Object.values(faqData).reduce(
+  (sum, faqs) => sum + faqs.length,
+  0
+);
+
 // ============================================
 // FAQ Accordion Component
 // ============================================
@@ -236,33 +242,42 @@ export function FAQPageContent() {
     0 as number
   );
 
+  const heroStats = [
+    { label: "FAQ Categories", value: Object.keys(faqData).length },
+    { label: "Answers Documented", value: totalFaqCount },
+    { label: "Support SLA", value: "< 2 hrs", helper: "HR response window" },
+  ];
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold flex items-center gap-3">
-          <HelpCircle className="size-8 text-primary" />
-          Frequently Asked Questions
-        </h1>
-        <p className="text-muted-foreground text-lg">
-          Find answers to common questions about leave management
-        </p>
-      </div>
+    <div className="space-y-6 py-6">
+      <EmployeePageHero
+        eyebrow="Help Center"
+        title="Frequently Asked Questions"
+        description="Search curated answers about applying for leave, balances, policy compliance, and troubleshooting."
+        stats={heroStats}
+        actions={
+          <Button asChild size="sm">
+            <Link href="/help">Contact Support</Link>
+          </Button>
+        }
+      />
 
       {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-        <Input
-          placeholder="Search FAQs..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 h-12 text-base"
-        />
+      <div className="surface-card p-4 rounded-3xl">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <Input
+            placeholder="Search FAQs..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 h-12 text-base"
+          />
+        </div>
       </div>
 
       {/* Search Results Count */}
       {searchTerm && (
-        <Alert>
+        <Alert className="surface-card border border-border/70">
           <Search className="size-4" />
           <AlertDescription>
             Found {totalResults} result{totalResults !== 1 ? "s" : ""} for
@@ -273,8 +288,8 @@ export function FAQPageContent() {
       )}
 
       {/* FAQ Categories */}
-      <Tabs defaultValue="general" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6">
+      <Tabs defaultValue="general" className="w-full surface-card p-4 rounded-3xl">
+        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 bg-muted/50 rounded-2xl">
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="casual">Casual Leave</TabsTrigger>
           <TabsTrigger value="earned">Earned Leave</TabsTrigger>
@@ -395,7 +410,7 @@ export function FAQPageContent() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <a
+            <Link
               href="/policies"
               className="neo-card group block p-6 cursor-pointer"
             >
@@ -406,8 +421,8 @@ export function FAQPageContent() {
               <p className="text-sm text-muted-foreground">
                 Complete policy documentation
               </p>
-            </a>
-            <a
+            </Link>
+            <Link
               href="/leaves/apply"
               className="neo-card group block p-6 cursor-pointer"
             >
@@ -418,7 +433,7 @@ export function FAQPageContent() {
               <p className="text-sm text-muted-foreground">
                 Start a new leave request
               </p>
-            </a>
+            </Link>
             <a
               href="mailto:hr@cdbl.com"
               className="neo-card group block p-6 cursor-pointer"

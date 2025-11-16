@@ -4,6 +4,8 @@ import Link from "next/link";
 import { ClipboardList, BookOpenText, Info, Wallet } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { fmtDDMMYYYY } from "@/lib/date-utils";
 import { LEAVE_OPTIONS, RULE_TIPS, type LeaveType } from "./leave-constants";
@@ -23,6 +25,7 @@ type LeaveSummarySidebarProps = {
     CASUAL: number;
     MEDICAL: number;
   };
+  policyHint?: string | null;
 };
 
 export function LeaveSummarySidebar({
@@ -35,6 +38,7 @@ export function LeaveSummarySidebar({
   warnings,
   projectedBalancePercent,
   allBalances,
+  policyHint,
 }: LeaveSummarySidebarProps) {
   const typeLabel = LEAVE_OPTIONS.find((o) => o.value === type)?.label ?? "—";
   const durationLabel =
@@ -151,22 +155,48 @@ export function LeaveSummarySidebar({
         </>
       )}
 
-      <div>
-        <h4 className="flex items-center gap-2 text-base font-semibold text-foreground mb-3 leading-6">
-          <BookOpenText className="w-4 h-4 text-primary" />
-          Policy Highlights
-        </h4>
-        <ul className="list-disc pl-4 text-sm text-muted-foreground space-y-1 leading-6">
-          {RULE_TIPS[type].slice(0, 3).map((tip) => (
-            <li key={tip}>{tip}</li>
-          ))}
-        </ul>
-        <Link
-          href="/policies"
-          className="text-primary text-sm font-semibold hover:text-primary/80 mt-4 inline-flex items-center gap-1 leading-6 transition-colors"
-        >
-          View Full Policy →
-        </Link>
+      <div className="space-y-3 rounded-2xl border border-border/70 bg-muted/20 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <BookOpenText className="w-4 h-4 text-primary" />
+            <div>
+              <p className="text-sm font-semibold text-foreground leading-6">
+                Policy & Support
+              </p>
+              <p className="text-xs text-muted-foreground leading-5">
+                Stay compliant and reach out if you need help
+              </p>
+            </div>
+          </div>
+          <Badge variant="outline" className="text-[10px] uppercase tracking-widest">
+            {typeLabel}
+          </Badge>
+        </div>
+        <p className="text-sm text-muted-foreground leading-6">
+          {policyHint ??
+            "Keep an eye on notice periods and required documents before submitting."}
+        </p>
+        <details className="group rounded-xl border border-border/60 bg-background/60 p-3">
+          <summary className="cursor-pointer list-none text-sm font-semibold text-foreground flex items-center justify-between">
+            Key rules to remember
+            <span className="text-xs text-muted-foreground group-open:rotate-90 transition">
+              →
+            </span>
+          </summary>
+          <ul className="mt-3 list-disc pl-4 text-sm text-muted-foreground space-y-1 leading-6">
+            {(RULE_TIPS[type] ?? RULE_TIPS.EARNED).slice(0, 3).map((tip) => (
+              <li key={tip}>{tip}</li>
+            ))}
+          </ul>
+        </details>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline" size="sm" className="flex-1 min-w-[120px]">
+            <Link href="/policies">View Policies</Link>
+          </Button>
+          <Button asChild variant="secondary" size="sm" className="flex-1 min-w-[120px]">
+            <Link href="/help">Contact HR</Link>
+          </Button>
+        </div>
       </div>
 
       {warnings.length > 0 && (

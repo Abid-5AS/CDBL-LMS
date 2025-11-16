@@ -16,7 +16,7 @@ async function FAQPageWrapper() {
 
 export default function FAQPage() {
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
       <Suspense fallback={<Skeleton className="h-[600px] w-full" />}>
         <FAQPageWrapper />
       </Suspense>

@@ -3,7 +3,6 @@
 import {
   AlertCircle,
   Info,
-  HelpCircle,
   Calendar,
   MessageSquare,
   Paperclip,
@@ -160,18 +159,6 @@ export function ApplyLeaveForm() {
               </div>
             ))}
           </div>
-          {policyHint && (
-            <div className="rounded-2xl border border-border/70 px-4 py-3 flex gap-3 items-start bg-muted/30">
-              <Info className="h-4 w-4 text-muted-foreground mt-1" />
-              <div>
-                <p className="text-sm font-semibold text-foreground">Policy Reminder</p>
-                <p className="text-sm text-muted-foreground">
-                  {policyHint.description ||
-                    "Keep an eye on notice periods and required documents before submitting."}
-                </p>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Two-column responsive layout */}
@@ -380,35 +367,47 @@ export function ApplyLeaveForm() {
                 </CardContent>
 
                 {/* Actions inside form */}
-                <div className="flex flex-wrap justify-end gap-3 pt-6 border-t border-muted mt-6 px-6 pb-6">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => router.back()}
-                    disabled={submitting}
-                    className="transition-transform hover:scale-[1.02]"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={handleManualSave}
-                    disabled={submitting}
-                    className="transition-transform hover:scale-[1.02]"
-                    leftIcon={<Save className="size-4" aria-hidden="true" />}
-                  >
-                    Save Draft
-                  </Button>
-                  <Button
-                    type="submit"
-                    loading={submitting}
-                    loadingText="Submitting Request..."
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all hover:scale-[1.01] hover:shadow-md rounded-full px-6"
-                    leftIcon={<Send className="size-4" aria-hidden="true" />}
-                  >
-                    Submit Request
-                  </Button>
+                <div className="flex flex-col gap-4 pt-6 border-t border-muted mt-6 px-6 pb-6">
+                  <div className="text-xs text-muted-foreground" aria-live="polite">
+                    <p className="font-semibold text-foreground text-sm">Form status</p>
+                    <p>
+                      {submitting
+                        ? "Submitting request…"
+                        : lastSavedTime
+                        ? `Auto-saved at ${lastSavedTime}`
+                        : "Draft auto-saves every minute. You can also save manually."}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap justify-end gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => router.back()}
+                      disabled={submitting}
+                      className="transition-transform hover:scale-[1.02]"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={handleManualSave}
+                      disabled={submitting}
+                      className="transition-transform hover:scale-[1.02]"
+                      leftIcon={<Save className="size-4" aria-hidden="true" />}
+                    >
+                      Save Draft
+                    </Button>
+                    <Button
+                      type="submit"
+                      loading={submitting}
+                      loadingText="Submitting Request..."
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all hover:scale-[1.01] hover:shadow-md rounded-full px-6"
+                      leftIcon={<Send className="size-4" aria-hidden="true" />}
+                    >
+                      Submit Request
+                    </Button>
+                  </div>
                 </div>
               </form>
             </Card>
@@ -425,6 +424,7 @@ export function ApplyLeaveForm() {
               balancesError={Boolean(balancesError)}
               warnings={warnings}
               projectedBalancePercent={projectedBalancePercent}
+              policyHint={policyHint}
               allBalances={
                 balances
                   ? {
@@ -435,35 +435,6 @@ export function ApplyLeaveForm() {
                   : undefined
               }
             />
-
-            <Card className="rounded-2xl border border-border bg-card shadow-sm p-5 space-y-3">
-              <div className="flex items-center gap-2">
-                <HelpCircle className="w-4 h-4 text-muted-foreground" />
-                <p className="text-sm font-semibold text-foreground">
-                  Need a hand?
-                </p>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Check your policy rules or chat with HR before submitting to
-                avoid rework.
-              </p>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => router.push("/policies")}
-                >
-                  View Policies
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="flex-1"
-                  onClick={() => router.push("/help")}
-                >
-                  Contact HR
-                </Button>
-              </div>
-            </Card>
           </aside>
         </div>
       </div>

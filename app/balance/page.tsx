@@ -1,12 +1,15 @@
 "use client";
 
 import { Calendar, Clock, TrendingUp, AlertCircle } from "lucide-react";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
 import { ConversionHistory } from "@/components/leaves/ConversionHistory";
+import { EmployeePageHero } from "@/components/employee/PageHero";
 
 type BalanceDetail = {
   type: "EARNED" | "CASUAL" | "MEDICAL";
@@ -60,22 +63,75 @@ function BalanceContent() {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
   const isYearEnd = currentMonth >= 10; // November or December
+  const totalAvailable = data?.balances.reduce((sum, balance) => sum + (balance.closing ?? 0), 0) ?? 0;
+  const totalUsed = data?.balances.reduce((sum, balance) => sum + (balance.used ?? 0), 0) ?? 0;
+  const totalAccrued = data?.balances.reduce((sum, balance) => sum + (balance.accrued ?? 0), 0) ?? 0;
+
+  const utilizationBase = totalAvailable + totalUsed;
+  const utilizationPct =
+    utilizationBase > 0 ? Math.round((totalUsed / utilizationBase) * 100) : 0;
+
+  const heroStats = [
+    {
+      label: "Total Available",
+      value: isLoading ? "…" : `${totalAvailable} days`,
+      state: totalAvailable <= 0 ? "danger" : totalAvailable <= 5 ? "warning" : "success",
+      helper: `Year ${data?.year ?? currentYear}`,
+    },
+    {
+      label: "Used This Year",
+      value: isLoading ? "…" : `${totalUsed} days`,
+      helper: utilizationBase > 0 ? `${utilizationPct}% utilized` : "",
+    },
+    {
+      label: "Accrued",
+      value: isLoading ? "…" : `+${totalAccrued} days`,
+      helper: "Automatic monthly accrual",
+    },
+  ] as const;
 
   return (
-    <div className="space-y-6">
-      <section className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold text-foreground">Leave Balance</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          View your current leave balances and accrual information for {data?.year ?? currentYear}
-        </p>
-      </section>
+    <div className="mx-auto max-w-6xl space-y-6 py-8">
+      <EmployeePageHero
+        eyebrow="Balances"
+        title="Your Leave Overview"
+        description={`Track available days, usage, and policy reminders for ${data?.year ?? currentYear}.`}
+        stats={heroStats}
+        actions={
+          <>
+            <Button variant="outline" asChild size="sm">
+              <Link href="/policies">View Policies</Link>
+            </Button>
+            <Button asChild size="sm">
+              <Link href="/leaves/apply">Apply Leave</Link>
+            </Button>
+          </>
+        }
+      />
 
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="surface-card border border-destructive/40">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>Failed to load balance information. Please try again.</AlertDescription>
         </Alert>
       )}
+
+      <div className="surface-card p-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="text-sm text-muted-foreground">Upcoming accrual checkpoint</p>
+          <p className="text-base font-semibold text-foreground">
+            {isYearEnd ? "Year-end balance reconciliation" : "Monthly accrual closes in 5 days"}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/reports">Download statement</Link>
+          </Button>
+          <Button variant="secondary" size="sm" asChild>
+            <Link href="/leaves">View history</Link>
+          </Button>
+        </div>
+      </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {(["EARNED", "CASUAL", "MEDICAL"] as const).map((type) => {
@@ -106,7 +162,7 @@ function BalanceContent() {
             available > config.maxCarryForward;
 
           return (
-            <Card key={type}>
+            <Card key={type} className="surface-card h-full flex flex-col">
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <Icon className={`h-5 w-5 ${config.color}`} />
@@ -160,23 +216,25 @@ function BalanceContent() {
                   </div>
                 )}
 
-                {showExpiryWarning && (
-                  <Alert variant="default" className="py-2">
-                    <AlertCircle className="h-3 w-3" />
-                    <AlertDescription className="text-xs">
-                      {available} days will expire on Dec 31
-                    </AlertDescription>
-                  </Alert>
-                )}
+                <div className="space-y-1.5">
+                  {showExpiryWarning && (
+                    <Alert variant="default" className="py-2">
+                      <AlertCircle className="h-3 w-3" />
+                      <AlertDescription className="text-xs">
+                        {available} days will expire on Dec 31
+                      </AlertDescription>
+                    </Alert>
+                  )}
 
-                {showCarryForwardWarning && (
-                  <Alert variant="default" className="py-2">
-                    <AlertCircle className="h-3 w-3" />
-                    <AlertDescription className="text-xs">
-                      Max {config.maxCarryForward} days can be carried forward
-                    </AlertDescription>
-                  </Alert>
-                )}
+                  {showCarryForwardWarning && (
+                    <Alert variant="default" className="py-2">
+                      <AlertCircle className="h-3 w-3" />
+                      <AlertDescription className="text-xs">
+                        Max {config.maxCarryForward} days can be carried forward
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
               </CardContent>
             </Card>
           );

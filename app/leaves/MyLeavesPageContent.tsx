@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, type ReactNode } from "react";
+import { useState, useMemo, useEffect, useCallback, type ReactNode } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,6 +9,8 @@ import {
   XCircle,
   ChevronLeft,
   ChevronRight,
+  Table2,
+  History,
 } from "lucide-react";
 
 // UI Components (barrel export)
@@ -35,7 +37,12 @@ import {
 } from "@/components/ui";
 
 // Shared Components (barrel export)
-import { StatusBadge, LeaveDetailsModal, EmptyState } from "@/components/shared";
+import {
+  StatusBadge,
+  LeaveDetailsModal,
+  EmptyState,
+  SharedTimeline,
+} from "@/components/shared";
 import { useLeaveData } from "@/components/providers";
 
 // Lib utilities (barrel export)
@@ -45,6 +52,7 @@ import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
 import Link from "next/link";
 import { Wallet, ArrowRight } from "lucide-react";
+import { SortedTimelineAdapter } from "@/components/shared/timeline-adapters";
 
 type LeaveRow = {
   id: number;
@@ -139,6 +147,11 @@ const LEAVE_TAB_ITEMS = [
 ];
 
 const ITEMS_PER_PAGE = 5;
+const VIEW_MODES = [
+  { id: "table", label: "Table View", icon: Table2 },
+  { id: "timeline", label: "Timeline", icon: History },
+];
+type ViewMode = (typeof VIEW_MODES)[number]["id"];
 
 export function MyLeavesPageContent() {
   const searchParams = useSearchParams();
@@ -147,12 +160,15 @@ export function MyLeavesPageContent() {
   const [modalOpen, setModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [animationDirection, setAnimationDirection] = useState(0);
+  const [viewMode, setViewMode] = useState<ViewMode>("table");
 
   // Fetch data first
   const { data, isLoading, error, mutate } = useLeaveData();
 
   // Get all rows from data
-  const allRows: LeaveRow[] = Array.isArray(data?.items) ? data.items : [];
+  const allRows: LeaveRow[] = useMemo(() => {
+    return Array.isArray(data?.items) ? data.items : [];
+  }, [data?.items]);
 
   // Get initial filter and highlight from URL
   const urlFilter = searchParams.get("status") || "all";
@@ -210,6 +226,31 @@ export function MyLeavesPageContent() {
     });
   }, [allRows, selectedFilter]);
 
+  const timelineItems = useMemo(() => {
+    return SortedTimelineAdapter(filteredRows);
+  }, [filteredRows]);
+
+  const summaryStats = useMemo(() => {
+    return filteredRows.reduce(
+      (acc, row) => {
+        if (
+          row.status === "SUBMITTED" ||
+          row.status === "PENDING" ||
+          row.status === "CANCELLATION_REQUESTED" ||
+          row.status === "RECALLED"
+        ) {
+          acc.pending += 1;
+        } else if (row.status === "APPROVED") {
+          acc.approved += 1;
+        } else if (row.status === "RETURNED" || row.status === "REJECTED") {
+          acc.action += 1;
+        }
+        return acc;
+      },
+      { pending: 0, approved: 0, action: 0 }
+    );
+  }, [filteredRows]);
+
   // Pagination
   const totalPages = Math.ceil(filteredRows.length / ITEMS_PER_PAGE);
   const paginatedRows = useMemo(() => {
@@ -237,6 +278,19 @@ export function MyLeavesPageContent() {
       });
     }
   };
+
+  const handleTimelineItemSelect = useCallback(
+    (itemId: string) => {
+      const numericId = Number(itemId.replace(/\D+/g, ""));
+      if (!numericId) return;
+      const leave = filteredRows.find((row) => row.id === numericId);
+      if (leave) {
+        setSelectedLeave(leave);
+        setModalOpen(true);
+      }
+    },
+    [filteredRows]
+  );
 
   // Fetch balance data for the strip with proper typing
   const { data: balanceData, isLoading: balanceLoading } = useSWR<Record<string, number>>(
@@ -309,8 +363,41 @@ export function MyLeavesPageContent() {
         </div>
       )}
 
-      {/* Status Filter Tabs */}
-      <div className="flex justify-center mb-6">
+      {/* Status Filter + View Toggle */}
+      <div className="surface-card px-4 py-4 space-y-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
+              Status Filters
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Focus on pending work or review past approvals.
+            </p>
+          </div>
+          <div className="inline-flex rounded-full border border-border bg-background/80 p-1 gap-1">
+            {VIEW_MODES.map((mode) => {
+              const Icon = mode.icon;
+              const isActive = viewMode === mode.id;
+              return (
+                <Button
+                  key={mode.id}
+                  variant={isActive ? "default" : "ghost"}
+                  size="sm"
+                  className={cn(
+                    "rounded-full px-4 py-2 text-sm",
+                    isActive
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                  onClick={() => setViewMode(mode.id as ViewMode)}
+                >
+                  <Icon className="size-4 mr-2" aria-hidden="true" />
+                  {mode.label}
+                </Button>
+              );
+            })}
+          </div>
+        </div>
         <EnhancedSmoothTab
           items={LEAVE_TAB_ITEMS}
           value={selectedFilter}
@@ -321,12 +408,12 @@ export function MyLeavesPageContent() {
         />
       </div>
 
-      {/* Requests Table */}
+      {/* Requests Table / Timeline */}
       <AnimatePresence mode="wait">
         {isLoading ? (
           <Card className="surface-card">
             <CardContent className="p-8 text-center text-sm text-muted-foreground">
-              Loading...
+              Loading leave history…
             </CardContent>
           </Card>
         ) : error ? (
@@ -361,9 +448,14 @@ export function MyLeavesPageContent() {
             </CardContent>
           </Card>
         ) : (
-          <Card className="surface-card p-0 overflow-hidden">
+          <Card
+            className={cn(
+              "surface-card",
+              viewMode === "table" ? "p-0 overflow-hidden" : "p-0"
+            )}
+          >
             <motion.div
-              key={selectedFilter}
+              key={`${selectedFilter}-${viewMode}`}
               initial={{
                 opacity: 0,
                 x: animationDirection > 0 ? 100 : -100,
@@ -381,165 +473,222 @@ export function MyLeavesPageContent() {
                 ease: [0.32, 0.72, 0, 1],
               }}
             >
-              <div className="max-h-[450px] overflow-y-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-xs font-medium">Type</TableHead>
-                      <TableHead className="hidden sm:table-cell text-xs font-medium">
-                        Dates
-                      </TableHead>
-                      <TableHead className="hidden md:table-cell text-xs font-medium">
-                        Days
-                      </TableHead>
-                      <TableHead className="text-xs font-medium">Status</TableHead>
-                      <TableHead className="hidden lg:table-cell text-xs font-medium">
-                        Updated
-                      </TableHead>
-                      <TableHead className="text-right text-xs font-medium">
-                        Action
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paginatedRows.map((row, index) => (
-                      <TableRow
-                        key={row.id}
-                        className={cn(
-                          "hover:bg-muted/40 cursor-pointer transition-colors",
-                          index % 2 === 0 && "bg-bg-primary dark:bg-bg-secondary/50"
-                        )}
-                        onClick={() => {
-                          setSelectedLeave(row);
-                          setModalOpen(true);
-                        }}
-                      >
-                          <TableCell className="font-medium text-sm text-text-secondary dark:text-text-secondary">
-                            {leaveTypeLabel[row.type] ?? row.type}
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell text-sm text-text-secondary dark:text-text-secondary">
-                            {formatDate(row.startDate)} →{" "}
-                            {formatDate(row.endDate)}
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell text-sm text-text-secondary dark:text-text-secondary">
-                            {row.workingDays}
-                          </TableCell>
-                          <TableCell>
-                            <StatusBadge status={row.status} />
-                          </TableCell>
-                          <TableCell className="hidden lg:table-cell text-sm text-text-secondary dark:text-text-secondary">
-                            {formatDate(row.updatedAt)}
-                          </TableCell>
-                          <TableCell
-                            className="text-right"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {CANCELABLE_STATUSES.has(row.status) ? (
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 p-0 text-data-error hover:bg-data-error dark:hover:bg-data-error/20"
-                                    aria-label="Cancel request"
-                                  >
-                                    <XCircle className="size-4" aria-hidden="true" />
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>
-                                      Cancel this request?
-                                    </AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      This will mark the request as cancelled.
-                                      Approvers will no longer see it.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Keep</AlertDialogCancel>
-                                    <AlertDialogAction
-                                      onClick={() => cancelRequest(row.id)}
-                                    >
-                                      Cancel Request
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                            ) : (
-                              <span className="text-xs text-text-secondary dark:text-text-secondary">
-                                —
-                              </span>
-                            )}
-                          </TableCell>
+              {viewMode === "table" ? (
+                <>
+                  <div className="max-h-[450px] overflow-y-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-xs font-medium">Type</TableHead>
+                          <TableHead className="hidden sm:table-cell text-xs font-medium">
+                            Dates
+                          </TableHead>
+                          <TableHead className="hidden md:table-cell text-xs font-medium">
+                            Days
+                          </TableHead>
+                          <TableHead className="text-xs font-medium">Status</TableHead>
+                          <TableHead className="hidden lg:table-cell text-xs font-medium">
+                            Updated
+                          </TableHead>
+                          <TableHead className="text-right text-xs font-medium">
+                            Action
+                          </TableHead>
                         </TableRow>
-                      ))}
-                </TableBody>
-              </Table>
-            </div>
+                      </TableHeader>
+                      <TableBody>
+                        {paginatedRows.map((row, index) => (
+                          <TableRow
+                            key={row.id}
+                            className={cn(
+                              "hover:bg-muted/40 cursor-pointer transition-colors",
+                              index % 2 === 0 && "bg-bg-primary dark:bg-bg-secondary/50"
+                            )}
+                            onClick={() => {
+                              setSelectedLeave(row);
+                              setModalOpen(true);
+                            }}
+                          >
+                            <TableCell className="font-medium text-sm text-text-secondary dark:text-text-secondary">
+                              {leaveTypeLabel[row.type] ?? row.type}
+                            </TableCell>
+                            <TableCell className="hidden sm:table-cell text-sm text-text-secondary dark:text-text-secondary">
+                              {formatDate(row.startDate)} → {formatDate(row.endDate)}
+                            </TableCell>
+                            <TableCell className="hidden md:table-cell text-sm text-text-secondary dark:text-text-secondary">
+                              {row.workingDays}
+                            </TableCell>
+                            <TableCell>
+                              <StatusBadge status={row.status} />
+                            </TableCell>
+                            <TableCell className="hidden lg:table-cell text-sm text-text-secondary dark:text-text-secondary">
+                              {formatDate(row.updatedAt)}
+                            </TableCell>
+                            <TableCell
+                              className="text-right"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {CANCELABLE_STATUSES.has(row.status) ? (
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-8 w-8 p-0 text-data-error hover:bg-data-error dark:hover:bg-data-error/20"
+                                      aria-label="Cancel request"
+                                    >
+                                      <XCircle className="size-4" aria-hidden="true" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Cancel this request?</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        This will mark the request as cancelled. Approvers will no
+                                        longer see it.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Keep</AlertDialogCancel>
+                                      <AlertDialogAction onClick={() => cancelRequest(row.id)}>
+                                        Cancel Request
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              ) : (
+                                <span className="text-xs text-text-secondary dark:text-text-secondary">
+                                  —
+                                </span>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className="gap-1"
-                >
-                  <ChevronLeft className="size-4" aria-hidden="true" />
-                  Previous
-                </Button>
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-                    return (
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 mt-4 px-4 pb-4">
                       <Button
-                        key={pageNum}
-                        variant={
-                          currentPage === pageNum ? "default" : "outline"
-                        }
+                        variant="outline"
                         size="sm"
-                        onClick={() => setCurrentPage(pageNum)}
-                        className={cn(
-                          "w-8 h-8 p-0",
-                          currentPage === pageNum &&
-                            "bg-card-action hover:bg-card-action"
-                        )}
+                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                        disabled={currentPage === 1}
+                        className="gap-1"
                       >
-                        {pageNum}
+                        <ChevronLeft className="size-4" aria-hidden="true" />
+                        Previous
                       </Button>
-                    );
-                  })}
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                          let pageNum;
+                          if (totalPages <= 5) {
+                            pageNum = i + 1;
+                          } else if (currentPage <= 3) {
+                            pageNum = i + 1;
+                          } else if (currentPage >= totalPages - 2) {
+                            pageNum = totalPages - 4 + i;
+                          } else {
+                            pageNum = currentPage - 2 + i;
+                          }
+                          return (
+                            <Button
+                              key={pageNum}
+                              variant={currentPage === pageNum ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setCurrentPage(pageNum)}
+                              className={cn(
+                                "w-8 h-8 p-0",
+                                currentPage === pageNum && "bg-card-action hover:bg-card-action"
+                              )}
+                            >
+                              {pageNum}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                        disabled={currentPage === totalPages}
+                        className="gap-1"
+                      >
+                        Next
+                        <ChevronRight className="size-4" aria-hidden="true" />
+                      </Button>
+                      <span className="text-xs text-muted-foreground ml-2">
+                        Page {currentPage} of {totalPages}
+                      </span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="p-6 space-y-6">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
+                        Timeline View
+                      </p>
+                      <h2 className="text-xl font-semibold text-foreground">
+                        Latest leave activity
+                      </h2>
+                      <p className="text-sm text-muted-foreground">
+                        Tap any entry to open the detailed request.
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Button variant="outline" size="sm" onClick={() => setViewMode("table")}>
+                        Back to Table
+                      </Button>
+                      <Button variant="secondary" size="sm" asChild>
+                        <Link href="/leaves/apply">Apply for Leave</Link>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-2xl border border-border/70 p-3">
+                      <p className="text-xs uppercase tracking-widest text-muted-foreground">
+                        Pending / Submitted
+                      </p>
+                      <p className="text-2xl font-semibold text-foreground">
+                        {summaryStats.pending}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-border/70 p-3">
+                      <p className="text-xs uppercase tracking-widest text-muted-foreground">
+                        Approved
+                      </p>
+                      <p className="text-2xl font-semibold text-data-success">
+                        {summaryStats.approved}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-border/70 p-3">
+                      <p className="text-xs uppercase tracking-widest text-muted-foreground">
+                        Needs Attention
+                      </p>
+                      <p className="text-2xl font-semibold text-data-warning">
+                        {summaryStats.action}
+                      </p>
+                    </div>
+                  </div>
+                  <SharedTimeline
+                    items={timelineItems}
+                    variant="requests"
+                    dense
+                    limit={12}
+                    emptyState={
+                      <EmptyState
+                        icon={ClipboardCheck}
+                        title="No history yet"
+                        description="Requests matching this filter will appear here."
+                      />
+                    }
+                    onItemClick={(item) => handleTimelineItemSelect(item.id)}
+                  />
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    setCurrentPage(Math.min(totalPages, currentPage + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="gap-1"
-                >
-                  Next
-                  <ChevronRight className="size-4" aria-hidden="true" />
-                </Button>
-                <span className="text-xs text-muted-foreground ml-2">
-                  Page {currentPage} of {totalPages}
-                </span>
-              </div>
-            )}
-          </motion.div>
+              )}
+            </motion.div>
           </Card>
         )}
       </AnimatePresence>

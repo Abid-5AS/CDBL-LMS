@@ -16,5 +16,6 @@
 - [ ] Employee experience refresh:
   - [x] Modernize employee dashboard/home (hero, quick metrics, availability, alerts, date context).
   - [x] Redesign Apply Leave flow with live balance chips, inline policy hints, and persistent “Today” chip.
-  - [ ] Upgrade My Leaves history with timeline/table toggle + filters and the new surface cards.
-  - [ ] Align Balance, Holidays, Policies, FAQ pages with the new shell and contextual date helpers.
+  - [x] Polish Apply Leave interaction with input-like date picker, live reason counter, and consolidated policy/help panel.
+  - [x] Upgrade My Leaves history with timeline/table toggle + filters and the new surface cards.
+  - [x] Align Balance, Holidays, Policies, FAQ pages with the new shell and contextual date helpers.

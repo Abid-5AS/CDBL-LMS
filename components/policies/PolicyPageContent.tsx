@@ -24,6 +24,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
+import { EmployeePageHero } from "@/components/employee/PageHero";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 // ============================================
 // Policy Data
@@ -397,22 +400,37 @@ function PolicyCard({ policy }: PolicyCardProps) {
 // Main Policy Page Component
 // ============================================
 
+const policySections = Object.values(policyData);
+const totalRules = policySections.reduce((sum, policy) => sum + policy.rules.length, 0);
+const criticalRules = policySections.reduce(
+  (sum, policy) => sum + policy.rules.filter((rule) => rule.type === "critical").length,
+  0
+);
+const totalExamples = policySections.reduce((sum, policy) => sum + policy.examples.length, 0);
+
 export function PolicyPageContent() {
+  const heroStats = [
+    { label: "Policy Sections", value: policySections.length },
+    { label: "Rules Documented", value: totalRules },
+    { label: "Critical Alerts", value: criticalRules, state: criticalRules ? "danger" : "default" },
+  ];
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold flex items-center gap-3">
-          <BookOpen className="size-8 text-primary" />
-          Leave Policies
-        </h1>
-        <p className="text-muted-foreground text-lg">
-          Complete guide to CDBL leave policies, rules, and requirements
-        </p>
-      </div>
+    <div className="space-y-6 py-6">
+      <EmployeePageHero
+        eyebrow="Policies"
+        title="Leave Policies & Guidance"
+        description="Understand every leave type, escalation rule, and compliance requirement before you apply."
+        stats={heroStats}
+        actions={
+          <Button asChild size="sm">
+            <Link href="/reports">Download PDF</Link>
+          </Button>
+        }
+      />
 
       {/* Quick Reference */}
-      <Alert>
+      <Alert className="surface-card border border-border/70">
         <FileText className="size-4" />
         <AlertTitle>Quick Reference</AlertTitle>
         <AlertDescription>
@@ -423,8 +441,8 @@ export function PolicyPageContent() {
       </Alert>
 
       {/* Tabs for Organization */}
-      <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6">
+      <Tabs defaultValue="all" className="w-full surface-card p-4 rounded-3xl">
+        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 bg-muted/50 rounded-2xl">
           <TabsTrigger value="all">All Policies</TabsTrigger>
           <TabsTrigger value="cl">CL</TabsTrigger>
           <TabsTrigger value="el">EL</TabsTrigger>
@@ -463,22 +481,22 @@ export function PolicyPageContent() {
       </Tabs>
 
       {/* Additional Resources */}
-      <Card>
+      <Card className="surface-card">
         <CardHeader>
           <CardTitle>Additional Resources</CardTitle>
           <CardDescription>Need more information?</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <a href="/faq" className="neo-card group block p-6 cursor-pointer">
+            <Link href="/faq" className="neo-card group block p-6 cursor-pointer">
               <h4 className="font-semibold mb-2 text-foreground">
                 Frequently Asked Questions
               </h4>
               <p className="text-sm text-muted-foreground">
                 Common questions about leave policies and procedures
               </p>
-            </a>
-            <a
+            </Link>
+            <Link
               href="/leaves/apply"
               className="neo-card group block p-6 cursor-pointer"
             >
@@ -488,7 +506,7 @@ export function PolicyPageContent() {
               <p className="text-sm text-muted-foreground">
                 Start a new leave request following these policies
               </p>
-            </a>
+            </Link>
           </div>
         </CardContent>
       </Card>

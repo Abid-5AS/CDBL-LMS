@@ -80,7 +80,7 @@ export function ConversionHistory({
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className="surface-card">
         <CardHeader>
           {showHeader && (
             <>
@@ -113,7 +113,7 @@ export function ConversionHistory({
 
   if (conversions.length === 0) {
     return showHeader ? (
-      <Card>
+      <Card className="surface-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ArrowRightLeft className="h-5 w-5" />
@@ -135,7 +135,7 @@ export function ConversionHistory({
   }
 
   return (
-    <Card>
+    <Card className="surface-card">
       <CardHeader>
         {showHeader && (
           <>

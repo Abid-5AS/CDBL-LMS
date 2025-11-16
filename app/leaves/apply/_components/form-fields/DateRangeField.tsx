@@ -55,6 +55,9 @@ export function DateRangeField({
           </Tooltip>
         </TooltipProvider>
       </div>
+      <p className="text-xs text-muted-foreground">
+        Select the start and end date. Weekends or holidays are counted but not permitted as start/end.
+      </p>
       <DateRangePicker
         value={{ start: dateRange.start, end: dateRange.end }}
         onChange={(range) => setDateRange({ start: range.start, end: range.end })}
