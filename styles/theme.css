@@ -199,7 +199,7 @@
   --color-text-primary: #f5f7ff;
   --color-text-secondary: #c3c8ec;
   --color-text-tertiary: #96a0d6;
-  --color-text-muted: #7780b3;
+  --color-text-muted: #8b94c4;
   --color-text-inverted: #05070e;
 
   --color-bg-primary: #01030d;
@@ -428,6 +428,7 @@ body {
   border: 1px solid var(--shell-card-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shell-card-glow);
+  -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
 }
 
@@ -449,6 +450,7 @@ body {
   border: 1px solid var(--shell-card-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-1);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
 
@@ -457,5 +459,6 @@ body {
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
   overflow: hidden;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }

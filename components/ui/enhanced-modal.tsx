@@ -268,7 +268,7 @@ export function EnhancedModal({
               sizeClasses[isFullscreen ? "full" : size],
               variantClasses[variant],
               !isFullscreen && positionClasses[position],
-              isFullscreen && "!max-w-[100vw] !max-h-[100vh] !rounded-none",
+              isFullscreen && "!max-w-[100vw] !max-h-[100vh] rounded-lg",
               contentClassName,
               className
             )}

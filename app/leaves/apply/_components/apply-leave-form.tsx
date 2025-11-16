@@ -450,8 +450,8 @@ export function ApplyLeaveForm() {
             disabled={submitting}
             size="lg"
             className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg transition-all hover:scale-[1.02]"
+            leftIcon={<Send className="size-4" aria-hidden="true" />}
           >
-            <Send className="w-4 h-4 mr-2" />
             {submitting ? "Submitting..." : "Submit Request"}
           </Button>
         </div>

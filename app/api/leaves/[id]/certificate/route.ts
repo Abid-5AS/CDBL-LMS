@@ -91,7 +91,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const fileType = await fromBuffer(buffer);
   if (!fileType) {
     return NextResponse.json(
-      error("certificate_invalid_type", "Cannot determine file type. Upload a valid PDF, JPG, or PNG file.", traceId),
+      error("certificate_invalid_type", "Invalid file format. Please upload a PDF or image file.", traceId),
       { status: 400 }
     );
   }
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const allowedMimeTypes = ["application/pdf", "image/jpeg", "image/png"];
   if (!allowedMimeTypes.includes(fileType.mime)) {
     return NextResponse.json(
-      error("certificate_invalid_type", `File content type (${fileType.mime}) not allowed. PDF, JPG, PNG only.`, traceId),
+      error("certificate_invalid_type", "File format not supported. Please use PDF, JPG, or PNG.", traceId),
       { status: 400 }
     );
   }

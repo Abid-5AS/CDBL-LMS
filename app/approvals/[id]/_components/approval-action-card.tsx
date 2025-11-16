@@ -221,11 +221,9 @@ export function ApprovalActionCard({
             disabled={isPending}
             className="w-full h-12 text-base bg-green-600 hover:bg-green-700 justify-between"
             size="lg"
+            leftIcon={<CheckCircle2 className="h-4 w-4" aria-hidden="true" />}
           >
-            <span className="flex items-center">
-              <CheckCircle2 className="h-5 w-5 mr-2" />
-              Approve Request
-            </span>
+            <span>Approve Request</span>
             <kbd className="hidden sm:inline-flex h-5 min-w-5 items-center justify-center rounded border border-white/30 bg-white/20 px-1.5 text-[11px] font-medium text-white">
               A
             </kbd>
@@ -238,11 +236,9 @@ export function ApprovalActionCard({
             className="w-full h-12 text-base bg-red-600 hover:bg-red-700 justify-between"
             size="lg"
             variant="destructive"
+            leftIcon={<XCircle className="h-4 w-4" aria-hidden="true" />}
           >
-            <span className="flex items-center">
-              <XCircle className="h-5 w-5 mr-2" />
-              Reject Request
-            </span>
+            <span>Reject Request</span>
             <kbd className="hidden sm:inline-flex h-5 min-w-5 items-center justify-center rounded border border-white/30 bg-white/20 px-1.5 text-[11px] font-medium text-white">
               R
             </kbd>
@@ -256,11 +252,9 @@ export function ApprovalActionCard({
               className="w-full h-12 text-base justify-between"
               size="lg"
               variant="secondary"
+              leftIcon={<Forward className="h-4 w-4" aria-hidden="true" />}
             >
-              <span className="flex items-center">
-                <Forward className="h-5 w-5 mr-2" />
-                Forward to Next Approver
-              </span>
+              <span>Forward to Next Approver</span>
               <kbd className="hidden sm:inline-flex h-5 min-w-5 items-center justify-center rounded border border-border bg-muted px-1.5 text-[11px] font-medium">
                 F
               </kbd>
@@ -274,11 +268,9 @@ export function ApprovalActionCard({
             className="w-full h-12 text-base justify-between"
             size="lg"
             variant="outline"
+            leftIcon={<RotateCcw className="h-4 w-4" aria-hidden="true" />}
           >
-            <span className="flex items-center">
-              <RotateCcw className="h-5 w-5 mr-2" />
-              Return for Modification
-            </span>
+            <span>Return for Modification</span>
             <kbd className="hidden sm:inline-flex h-5 min-w-5 items-center justify-center rounded border border-border bg-muted px-1.5 text-[11px] font-medium">
               M
             </kbd>
