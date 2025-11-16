@@ -4,6 +4,7 @@ import type { ComponentType, CSSProperties, ReactNode } from "react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui";
 import { cn } from "@/lib/utils";
+import { glassCard } from "@/lib/neo-design";
 
 type KPICardProps = {
   title: string;
@@ -92,8 +93,10 @@ export function KPICard({
     >
       <div
         className={cn(
-          "neo-card group relative overflow-hidden",
+          glassCard.elevated,
+          "group relative overflow-hidden rounded-2xl",
           "px-6 py-5 sm:px-7 sm:py-6",
+          "transition-all duration-300 hover:shadow-3xl",
           className
         )}
         style={accentVars}

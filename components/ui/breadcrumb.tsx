@@ -170,7 +170,7 @@ export function Breadcrumb({
           {/* Breadcrumb Items */}
           {displayItems.map((item, index) => {
             const isLast = index === displayItems.length - 1;
-            const Icon = item.icon;
+            const Icon = "icon" in item ? item.icon : undefined;
 
             return (
               <React.Fragment key={`${item.label}-${index}`}>
@@ -182,7 +182,7 @@ export function Breadcrumb({
                 )}
 
                 <li className="min-w-0">
-                  {item.isEllipsis ? (
+                  {"isEllipsis" in item && item.isEllipsis ? (
                     // Ellipsis with dropdown for collapsed items
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

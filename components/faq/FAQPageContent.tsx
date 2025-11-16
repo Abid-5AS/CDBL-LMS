@@ -232,8 +232,8 @@ export function FAQPageContent() {
   }, [searchTerm]);
 
   const totalResults = Object.values(filteredFAQs).reduce(
-    (sum, faqs: any) => sum + faqs.length,
-    0
+    (sum: number, faqs: any) => sum + faqs.length,
+    0 as number
   );
 
   return (

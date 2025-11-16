@@ -92,11 +92,11 @@ export function Autocomplete({
   const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // Convert value to array for consistent handling
-  const selectedValues = React.useMemo(() => {
+  const selectedValues = React.useMemo<string[]>(() => {
     if (multiple) {
-      return Array.isArray(value) ? value : value ? [value] : [];
+      return Array.isArray(value) ? value : value ? [value as string] : [];
     }
-    return value ? [value] : [];
+    return value ? [value as string] : [];
   }, [value, multiple]);
 
   // Get selected options

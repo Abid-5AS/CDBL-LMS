@@ -9,6 +9,7 @@ import { ThemeToggle } from "../theme-toggle";
 import { AnnotationsToggle } from "../annotations-toggle";
 import { cn } from "@/lib/utils";
 import { useSearch } from "@/hooks/use-search";
+import { glassCard } from "@/lib/neo-design";
 
 import type { NavbarState } from "./use-navbar-state";
 import { Brand } from "./Brand";

@@ -26,18 +26,19 @@ type LeaveCalendarViewProps = {
   currentUserRole: string;
 };
 
+// Professional Neo + Glassmorphism Design System
 const LEAVE_TYPE_COLORS: Record<LeaveType, string> = {
-  EARNED: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  CASUAL: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  MEDICAL: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  MATERNITY: "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300",
-  PATERNITY: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  STUDY: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  EXTRAWITHPAY: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  EXTRAWITHOUTPAY: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
-  SPECIAL_DISABILITY: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
-  QUARANTINE: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
-  SPECIAL: "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",
+  EARNED: "bg-gradient-to-br from-[#0066FF]/90 to-[#00A3FF]/70 text-white shadow-lg shadow-blue-500/30 backdrop-blur-sm border border-white/20",
+  CASUAL: "bg-gradient-to-br from-[#00D084]/90 to-[#34D399]/70 text-white shadow-lg shadow-emerald-500/30 backdrop-blur-sm border border-white/20",
+  MEDICAL: "bg-gradient-to-br from-[#FF3B30]/90 to-[#FF6461]/70 text-white shadow-lg shadow-red-500/30 backdrop-blur-sm border border-white/20",
+  MATERNITY: "bg-gradient-to-br from-[#FF2D55]/90 to-[#FF69B4]/70 text-white shadow-lg shadow-pink-500/30 backdrop-blur-sm border border-white/20",
+  PATERNITY: "bg-gradient-to-br from-[#5E5CE6]/90 to-[#8B5CF6]/70 text-white shadow-lg shadow-violet-500/30 backdrop-blur-sm border border-white/20",
+  STUDY: "bg-gradient-to-br from-[#FFCC00]/90 to-[#FBBF24]/70 text-gray-900 shadow-lg shadow-yellow-500/30 backdrop-blur-sm border border-white/20",
+  EXTRAWITHPAY: "bg-gradient-to-br from-[#FF9500]/90 to-[#FB923C]/70 text-white shadow-lg shadow-orange-500/30 backdrop-blur-sm border border-white/20",
+  EXTRAWITHOUTPAY: "bg-gradient-to-br from-[#8E8E93]/90 to-[#9CA3AF]/70 text-white shadow-lg shadow-gray-500/30 backdrop-blur-sm border border-white/20",
+  SPECIAL_DISABILITY: "bg-gradient-to-br from-[#5856D6]/90 to-[#6366F1]/70 text-white shadow-lg shadow-indigo-500/30 backdrop-blur-sm border border-white/20",
+  QUARANTINE: "bg-gradient-to-br from-[#32ADE6]/90 to-[#38BDF8]/70 text-white shadow-lg shadow-sky-500/30 backdrop-blur-sm border border-white/20",
+  SPECIAL: "bg-gradient-to-br from-[#AF52DE]/90 to-[#C084FC]/70 text-white shadow-lg shadow-purple-500/30 backdrop-blur-sm border border-white/20",
 };
 
 export function LeaveCalendarView({ currentUserRole }: LeaveCalendarViewProps) {

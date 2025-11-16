@@ -23,6 +23,8 @@ import {
 import { useApplyLeaveForm } from "./use-apply-leave-form";
 import { LEAVE_OPTIONS, POLICY_TOOLTIPS, type LeaveType } from "./leave-constants";
 import { LeaveSummarySidebar } from "./leave-summary-sidebar";
+import { glassCard, neoBadge } from "@/lib/neo-design";
+import { cn } from "@/lib/utils";
 
 const steps = [
   {
@@ -121,7 +123,7 @@ export function MultiStepLeaveForm() {
     switch (currentStep) {
       case 0: // Leave Type
         return (
-          <Card>
+          <Card className={cn(glassCard.elevated, "rounded-2xl")}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="w-5 h-5" />
@@ -163,7 +165,7 @@ export function MultiStepLeaveForm() {
 
       case 1: // Dates & Duration
         return (
-          <Card>
+          <Card className={cn(glassCard.elevated, "rounded-2xl")}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
@@ -242,7 +244,7 @@ export function MultiStepLeaveForm() {
 
       case 2: // Details & Reason
         return (
-          <Card>
+          <Card className={cn(glassCard.elevated, "rounded-2xl")}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="w-5 h-5" />
@@ -265,7 +267,7 @@ export function MultiStepLeaveForm() {
 
       case 3: // Documents
         return (
-          <Card>
+          <Card className={cn(glassCard.elevated, "rounded-2xl")}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Clock className="w-5 h-5" />
@@ -304,7 +306,7 @@ export function MultiStepLeaveForm() {
 
       case 4: // Review & Submit
         return (
-          <Card>
+          <Card className={cn(glassCard.elevated, "rounded-2xl")}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5" />

@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { User, Calendar } from "lucide-react";
 import { leaveTypeLabel } from "@/lib/ui";
 import { LeaveType } from "@prisma/client";
+import { glassCard, neoBadge } from "@/lib/neo-design";
+import { cn } from "@/lib/utils";
 
 type TeamMember = {
   id: number;
@@ -56,7 +58,7 @@ export function WhosOutToday({ scope = "team", title }: WhosOutTodayProps) {
 
   if (loading) {
     return (
-      <Card className="rounded-2xl border-muted shadow-sm">
+      <Card className={cn(glassCard.elevated, "rounded-2xl")}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
@@ -74,7 +76,7 @@ export function WhosOutToday({ scope = "team", title }: WhosOutTodayProps) {
 
   if (error) {
     return (
-      <Card className="rounded-2xl border-muted shadow-sm">
+      <Card className={cn(glassCard.elevated, "rounded-2xl")}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
@@ -91,7 +93,7 @@ export function WhosOutToday({ scope = "team", title }: WhosOutTodayProps) {
   }
 
   return (
-    <Card className="rounded-2xl border-muted shadow-sm">
+    <Card className={cn(glassCard.elevated, "rounded-2xl")}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 justify-between">
           <div className="flex items-center gap-2">
@@ -99,7 +101,7 @@ export function WhosOutToday({ scope = "team", title }: WhosOutTodayProps) {
             {displayTitle}
           </div>
           {data && data.count > 0 && (
-            <Badge variant="secondary" className="ml-auto">
+            <Badge variant="secondary" className={cn("ml-auto", neoBadge.glass)}>
               {data.count} {data.count === 1 ? "person" : "people"}
             </Badge>
           )}
@@ -119,17 +121,22 @@ export function WhosOutToday({ scope = "team", title }: WhosOutTodayProps) {
             {data.members.map((member) => (
               <div
                 key={member.id}
-                className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                className={cn(
+                  "flex items-start gap-3 p-3 rounded-lg transition-all duration-300",
+                  "backdrop-blur-md bg-white/30 dark:bg-gray-900/30",
+                  "border border-white/20 dark:border-white/10",
+                  "hover:bg-white/50 dark:hover:bg-gray-900/50 hover:shadow-lg"
+                )}
               >
                 <div className="flex-shrink-0 mt-0.5">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center backdrop-blur-sm border border-white/20">
                     <User className="h-5 w-5 text-primary" />
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{member.name}</p>
                   <div className="flex items-center gap-2 mt-1">
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className={cn("text-xs", neoBadge.glass)}>
                       {leaveTypeLabel[member.type]}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
