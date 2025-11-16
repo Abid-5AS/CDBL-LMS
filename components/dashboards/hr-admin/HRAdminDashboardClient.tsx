@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, lazy, memo } from "react";
+import { Suspense, lazy, memo, useEffect, useState } from "react";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
 import {
@@ -104,6 +104,30 @@ const itemVariants = {
 };
 
 function HRAdminDashboardClientImpl() {
+  // Track hydration state to prevent hydration mismatches from animations
+  const [isHydrated, setIsHydrated] = useState(false);
+  useEffect(() => {
+    // Suppress hydration warnings for browser extension attributes (bis_skin_checked)
+    const originalError = console.error;
+    const handleError = (...args: any[]) => {
+      const message = args[0]?.toString?.() || "";
+      if (
+        message.includes("hydration") &&
+        message.includes("bis_skin_checked")
+      ) {
+        return; // Suppress browser extension hydration warnings
+      }
+      originalError(...args);
+    };
+    console.error = handleError;
+
+    setIsHydrated(true);
+
+    return () => {
+      console.error = originalError;
+    };
+  }, []);
+
   // Fetch KPIs first for instant rendering
   const {
     data: kpiData,
@@ -156,7 +180,7 @@ function HRAdminDashboardClientImpl() {
       <motion.div
         variants={containerVariants}
         initial="hidden"
-        animate="visible"
+        animate={isHydrated ? "visible" : "hidden"}
         className="space-y-4"
       >
         {/* Primary KPIs */}
