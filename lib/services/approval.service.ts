@@ -115,7 +115,7 @@ export class ApprovalService {
         };
       }
 
-      if (!["PENDING", "SUBMITTED", "FORWARDED"].includes(leave.status)) {
+      if (!["PENDING", "SUBMITTED"].includes(leave.status)) {
         return {
           success: false,
           error: {
@@ -339,8 +339,8 @@ export class ApprovalService {
         decision: "PENDING",
       });
 
-      // 5. Update leave status to FORWARDED
-      await LeaveRepository.updateStatus(leaveId, "FORWARDED");
+      // 5. Update leave status - keep as PENDING since it's still being processed
+      await LeaveRepository.updateStatus(leaveId, "PENDING");
 
       // 6. Log the forward action
       await this.logAction(
