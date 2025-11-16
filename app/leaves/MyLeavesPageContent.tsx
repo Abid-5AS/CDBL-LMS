@@ -339,7 +339,7 @@ export function MyLeavesPageContent() {
                   selectedFilter === "all"
                     ? {
                         label: "Apply for Leave",
-                        href: "/apply",
+                        href: "/leaves/apply",
                       }
                     : undefined
                 }

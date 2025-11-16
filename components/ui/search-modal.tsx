@@ -58,7 +58,7 @@ const staticResults: SearchResult[] = [
     id: "my-leaves",
     title: "My Leaves",
     description: "View your leave history and status",
-    href: "/leaves/my",
+    href: "/leaves",
     icon: FileText,
     category: "Leaves",
     keywords: ["history", "status", "my", "leaves"],
@@ -104,7 +104,7 @@ const staticResults: SearchResult[] = [
 const quickActions = [
   { title: "Apply Leave", href: "/leaves/apply", icon: Calendar },
   { title: "Check Balance", href: "/balance", icon: Clock },
-  { title: "View History", href: "/leaves/my", icon: FileText },
+  { title: "View History", href: "/leaves", icon: FileText },
   { title: "Dashboard", href: "/dashboard", icon: TrendingUp },
 ];
 
@@ -315,8 +315,9 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
               <button
                 onClick={onClose}
                 className="p-2 rounded-xl hover:bg-white/10 transition-colors focus-ring"
+                aria-label="Close search"
               >
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
 
