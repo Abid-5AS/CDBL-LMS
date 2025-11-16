@@ -1,13 +1,7 @@
 "use client";
 
 import { ReactNode, useEffect, useRef } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Skeleton,
-} from "@/components/ui";
+import { Skeleton } from "@/components/ui";
 import { EmptyState } from "../EmptyState";
 import { BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -62,36 +56,25 @@ export function ChartContainer({
   }, [loading, empty, onRender]);
 
   return (
-    <Card className={cn("glass-card", className)}>
-      <CardHeader>
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 min-w-0">
-            <CardTitle>{title}</CardTitle>
-            {subtitle && (
-              <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
-            )}
-          </div>
-          {actionsSlot && <div className="flex-shrink-0">{actionsSlot}</div>}
+    <div className={cn("neo-card space-y-4 px-6 py-6", className)}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
+            {subtitle || "Analytics"}
+          </p>
+          <h3 className="text-lg font-semibold text-foreground">{title}</h3>
         </div>
-      </CardHeader>
-      <CardContent>
-        {loading ? (
-          <Skeleton className="w-full" style={{ height: `${height}px` }} />
-        ) : empty ? (
-          <div
-            className="flex items-center justify-center"
-            style={{ height: `${height}px` }}
-          >
-            <EmptyState
-              icon={BarChart3}
-              title={emptyTitle}
-              description={emptyDescription}
-            />
-          </div>
-        ) : (
-          children
-        )}
-      </CardContent>
-    </Card>
+        {actionsSlot && <div className="flex-shrink-0">{actionsSlot}</div>}
+      </div>
+      {loading ? (
+        <Skeleton className="w-full" style={{ height: `${height}px` }} />
+      ) : empty ? (
+        <div className="flex h-full items-center justify-center" style={{ height: `${height}px` }}>
+          <EmptyState icon={BarChart3} title={emptyTitle} description={emptyDescription} />
+        </div>
+      ) : (
+        children
+      )}
+    </div>
   );
 }

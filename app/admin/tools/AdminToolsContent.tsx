@@ -13,7 +13,13 @@ import {
   TrendingUp,
   Clock,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { HolidayCalendarManager } from "@/components/admin/HolidayCalendarManager";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,8 +30,18 @@ interface AdminToolsContentProps {
 
 export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
   const canManageUsers = ["CEO", "SYSTEM_ADMIN"].includes(userRole);
-  const canManageHolidays = ["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"].includes(userRole);
-  const canViewAnalytics = ["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"].includes(userRole);
+  const canManageHolidays = [
+    "HR_ADMIN",
+    "HR_HEAD",
+    "CEO",
+    "SYSTEM_ADMIN",
+  ].includes(userRole);
+  const canViewAnalytics = [
+    "HR_ADMIN",
+    "HR_HEAD",
+    "CEO",
+    "SYSTEM_ADMIN",
+  ].includes(userRole);
 
   return (
     <div className="space-y-6">
@@ -46,14 +62,16 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
         {canViewAnalytics && (
           <Link
             href="/reports"
-            className="block p-6 rounded-lg border border-border hover:bg-accent transition-colors hover:shadow-md"
+            className="neo-card group block p-6 cursor-pointer"
           >
             <div className="flex items-start gap-4">
               <div className="p-3 rounded-lg bg-primary/10">
                 <BarChart3 className="size-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Leave Analytics</h3>
+                <h3 className="font-semibold mb-1 text-foreground">
+                  Leave Analytics
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   View trends, department utilization, and detailed reports
                 </p>
@@ -65,14 +83,16 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
         {/* Policies */}
         <Link
           href="/policies"
-          className="block p-6 rounded-lg border border-border hover:bg-accent transition-colors hover:shadow-md"
+          className="neo-card group block p-6 cursor-pointer"
         >
           <div className="flex items-start gap-4">
             <div className="p-3 rounded-lg bg-blue-500/10">
               <BookOpen className="size-6 text-blue-600" />
             </div>
             <div>
-              <h3 className="font-semibold mb-1">Leave Policies</h3>
+              <h3 className="font-semibold mb-1 text-foreground">
+                Leave Policies
+              </h3>
               <p className="text-sm text-muted-foreground">
                 Comprehensive policy documentation for all leave types
               </p>
@@ -81,16 +101,13 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
         </Link>
 
         {/* FAQ */}
-        <Link
-          href="/faq"
-          className="block p-6 rounded-lg border border-border hover:bg-accent transition-colors hover:shadow-md"
-        >
+        <Link href="/faq" className="neo-card group block p-6 cursor-pointer">
           <div className="flex items-start gap-4">
             <div className="p-3 rounded-lg bg-green-500/10">
               <HelpCircle className="size-6 text-green-600" />
             </div>
             <div>
-              <h3 className="font-semibold mb-1">FAQ & Help</h3>
+              <h3 className="font-semibold mb-1 text-foreground">FAQ & Help</h3>
               <p className="text-sm text-muted-foreground">
                 Frequently asked questions and quick help resources
               </p>
@@ -101,14 +118,16 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
         {/* Employees */}
         <Link
           href="/employees"
-          className="block p-6 rounded-lg border border-border hover:bg-accent transition-colors hover:shadow-md"
+          className="neo-card group block p-6 cursor-pointer"
         >
           <div className="flex items-start gap-4">
             <div className="p-3 rounded-lg bg-purple-500/10">
               <Users className="size-6 text-purple-600" />
             </div>
             <div>
-              <h3 className="font-semibold mb-1">Employee Directory</h3>
+              <h3 className="font-semibold mb-1 text-foreground">
+                Employee Directory
+              </h3>
               <p className="text-sm text-muted-foreground">
                 Browse all employees, balances, and leave history
               </p>
@@ -119,14 +138,14 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
         {/* Audit Logs */}
         <Link
           href="/admin/audit"
-          className="block p-6 rounded-lg border border-border hover:bg-accent transition-colors hover:shadow-md"
+          className="neo-card group block p-6 cursor-pointer"
         >
           <div className="flex items-start gap-4">
             <div className="p-3 rounded-lg bg-orange-500/10">
               <Shield className="size-6 text-orange-600" />
             </div>
             <div>
-              <h3 className="font-semibold mb-1">Audit Logs</h3>
+              <h3 className="font-semibold mb-1 text-foreground">Audit Logs</h3>
               <p className="text-sm text-muted-foreground">
                 Review system activity and administrative actions
               </p>
@@ -137,14 +156,16 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
         {/* Approvals */}
         <Link
           href="/approvals"
-          className="block p-6 rounded-lg border border-border hover:bg-accent transition-colors hover:shadow-md"
+          className="neo-card group block p-6 cursor-pointer"
         >
           <div className="flex items-start gap-4">
             <div className="p-3 rounded-lg bg-yellow-500/10">
               <Clock className="size-6 text-yellow-600" />
             </div>
             <div>
-              <h3 className="font-semibold mb-1">Pending Approvals</h3>
+              <h3 className="font-semibold mb-1 text-foreground">
+                Pending Approvals
+              </h3>
               <p className="text-sm text-muted-foreground">
                 Review and process leave approval requests
               </p>
@@ -154,10 +175,17 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
       </div>
 
       {/* Management Tools */}
-      <Tabs defaultValue={canManageUsers ? "users" : "holidays"} className="w-full">
+      <Tabs
+        defaultValue={canManageUsers ? "users" : "holidays"}
+        className="w-full"
+      >
         <TabsList className="grid w-full grid-cols-2">
-          {canManageUsers && <TabsTrigger value="users">User Management</TabsTrigger>}
-          {canManageHolidays && <TabsTrigger value="holidays">Holiday Calendar</TabsTrigger>}
+          {canManageUsers && (
+            <TabsTrigger value="users">User Management</TabsTrigger>
+          )}
+          {canManageHolidays && (
+            <TabsTrigger value="holidays">Holiday Calendar</TabsTrigger>
+          )}
         </TabsList>
 
         {canManageUsers && (

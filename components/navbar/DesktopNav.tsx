@@ -47,10 +47,10 @@ export function DesktopNav({
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
-        className="group relative flex items-center gap-1 rounded-2xl bg-zinc-100/50 dark:bg-zinc-900/40 p-1.5 shadow-[0_0_20px_rgba(0,0,0,0.03)] dark:shadow-[0_0_20px_rgba(255,255,255,0.02)] backdrop-blur-xl border border-zinc-200/50 dark:border-white/5"
+        className="group relative flex items-center gap-0.5 rounded-2xl bg-zinc-100/50 dark:bg-zinc-900/40 p-1 shadow-[0_0_20px_rgba(0,0,0,0.03)] dark:shadow-[0_0_20px_rgba(255,255,255,0.02)] backdrop-blur-xl border border-zinc-200/50 dark:border-white/5"
       >
         <nav role="navigation" aria-label="Primary navigation">
-          <ul className="flex items-center gap-1">
+          <ul className="flex items-center gap-0.5">
             {navLinks.map((link, index) => {
               const Icon = link.icon;
               const active = isActive(link.href);
@@ -68,7 +68,7 @@ export function DesktopNav({
                     href={link.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "group/link relative flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium transition-all duration-300 focus-ring whitespace-nowrap overflow-hidden",
+                      "group/link relative flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-sm font-medium transition-all duration-300 focus-ring whitespace-nowrap overflow-hidden",
                       active
                         ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 shadow-md shadow-zinc-900/5 dark:shadow-zinc-950/20 border border-zinc-200/60 dark:border-zinc-700/60"
                         : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-white/60 dark:hover:bg-zinc-800/50 border border-transparent"
@@ -83,13 +83,13 @@ export function DesktopNav({
 
                     <Icon
                       className={cn(
-                        "h-4 w-4 transition-all duration-300",
+                        "h-4 w-4 transition-all duration-300 shrink-0",
                         active
                           ? "text-zinc-900 dark:text-zinc-100 scale-105"
                           : "text-zinc-500 dark:text-zinc-500 group-hover/link:scale-110 group-hover/link:text-zinc-900 dark:group-hover/link:text-zinc-100"
                       )}
                     />
-                    <span className="font-medium whitespace-nowrap relative">
+                    <span className="hidden lg:inline font-medium whitespace-nowrap relative">
                       {link.label}
                       {/* Active underline indicator */}
                       {active && (
@@ -134,13 +134,13 @@ export function DesktopNav({
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.4, delay: 0.3 }}
-        className="flex items-center gap-3 rounded-2xl bg-zinc-100/50 dark:bg-zinc-900/40 px-2 py-1.5 shadow-[0_0_20px_rgba(0,0,0,0.03)] dark:shadow-[0_0_20px_rgba(255,255,255,0.02)] backdrop-blur-xl border border-zinc-200/50 dark:border-white/5 flex-shrink-0"
+        className="flex items-center gap-0.5 rounded-2xl bg-zinc-100/50 dark:bg-zinc-900/40 p-1 shadow-[0_0_20px_rgba(0,0,0,0.03)] dark:shadow-[0_0_20px_rgba(255,255,255,0.02)] backdrop-blur-xl border border-zinc-200/50 dark:border-white/5 shrink-0"
       >
         {/* Search Button */}
         <motion.button
           whileHover={{ scale: 1.05, y: -1 }}
           whileTap={{ scale: 0.95 }}
-          className="group/search relative flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-white/80 dark:hover:bg-zinc-800/60 transition-all duration-300 focus-ring overflow-hidden"
+          className="group/search relative flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-white/80 dark:hover:bg-zinc-800/60 transition-all duration-300 focus-ring overflow-hidden"
           onClick={openSearch}
         >
           {/* Hover gradient */}
@@ -151,8 +151,8 @@ export function DesktopNav({
           />
 
           <Search className="h-4 w-4 transition-transform duration-300 group-hover/search:rotate-12" />
-          <span className="hidden lg:inline font-medium">Search</span>
-          <kbd className="hidden lg:inline-flex items-center gap-1 rounded-md border border-zinc-200/60 dark:border-zinc-700/60 bg-zinc-50 dark:bg-zinc-800/80 px-1.5 py-0.5 text-xs font-mono text-zinc-600 dark:text-zinc-400 shadow-sm">
+          <span className="hidden xl:inline font-medium">Search</span>
+          <kbd className="hidden xl:inline-flex items-center gap-1 rounded-md border border-zinc-200/60 dark:border-zinc-700/60 bg-zinc-50 dark:bg-zinc-800/80 px-1.5 py-0.5 text-xs font-mono text-zinc-600 dark:text-zinc-400 shadow-sm">
             <Command className="h-3 w-3" />K
           </kbd>
         </motion.button>

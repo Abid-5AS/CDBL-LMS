@@ -1,15 +1,9 @@
 "use client";
 
 import useSWR from "swr";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-  Button,
-  Skeleton,
-} from "@/components/ui";
-import { AlertCircle, Info, AlertTriangle } from "lucide-react";
 import Link from "next/link";
+import { Button, Skeleton } from "@/components/ui";
+import { AlertCircle, AlertTriangle, Info } from "lucide-react";
 import { apiFetcher } from "@/lib/apiClient";
 
 interface AlertItem {
@@ -31,19 +25,45 @@ interface AlertsResponse {
   alerts: AlertItem[];
 }
 
-export function PolicyAlerts() {
-  const { data, error, isLoading } = useSWR<AlertsResponse>("/api/dashboard/alerts", apiFetcher, {
-    revalidateOnFocus: true,
-    refreshInterval: 300000, // Refresh every 5 minutes
-  });
+const severityAccent: Record<AlertItem["severity"], {
+  color: string;
+  Icon: typeof AlertCircle;
+  label: string;
+}> = {
+  critical: {
+    color: "var(--color-data-error)",
+    Icon: AlertCircle,
+    label: "Critical",
+  },
+  warning: {
+    color: "var(--color-data-warning)",
+    Icon: AlertTriangle,
+    label: "Warning",
+  },
+  info: {
+    color: "var(--color-data-info)",
+    Icon: Info,
+    label: "Info",
+  },
+};
 
-  const alerts: AlertItem[] = data?.alerts || [];
+export function PolicyAlerts() {
+  const { data, error, isLoading } = useSWR<AlertsResponse>(
+    "/api/dashboard/alerts",
+    apiFetcher,
+    {
+      revalidateOnFocus: true,
+      refreshInterval: 300000,
+    }
+  );
+
+  const alerts = data?.alerts || [];
 
   if (isLoading) {
     return (
       <div className="space-y-3">
-        <Skeleton className="h-20 w-full" />
-        <Skeleton className="h-20 w-full" />
+        <Skeleton className="h-20 rounded-2xl" />
+        <Skeleton className="h-20 rounded-2xl" />
       </div>
     );
   }
@@ -52,58 +72,53 @@ export function PolicyAlerts() {
     return null;
   }
 
-  const getSeverityConfig = (severity: AlertItem["severity"]) => {
-    switch (severity) {
-      case "critical":
-        return {
-          variant: "destructive" as const,
-          icon: AlertCircle,
-          className: "border-data-error bg-data-error",
-        };
-      case "warning":
-        return {
-          variant: "destructive" as const,
-          icon: AlertTriangle,
-          className: "border-data-warning bg-data-warning",
-        };
-      default:
-        return {
-          variant: "default" as const,
-          icon: Info,
-          className: "border-data-info bg-data-info",
-        };
-    }
-  };
-
   return (
     <div className="space-y-3">
       {alerts.map((alert, index) => {
-        const config = getSeverityConfig(alert.severity);
-        const Icon = config.icon;
-
+        const { color, Icon, label } = severityAccent[alert.severity];
         return (
-          <Alert key={index} className={config.className}>
-            <Icon className="h-4 w-4" />
-            <AlertTitle className="text-sm font-semibold">
-              {alert.title}
-            </AlertTitle>
-            <AlertDescription className="text-sm text-text-secondary mt-1">
-              {alert.message}
-              {alert.action && (
-                <div className="mt-3">
-                  <Button
-                    asChild
-                    variant={
-                      alert.severity === "critical" ? "destructive" : "default"
-                    }
-                    size="sm"
-                  >
-                    <Link href={alert.action.href}>{alert.action.label}</Link>
-                  </Button>
+          <div
+            key={index}
+            className="neo-card relative px-5 py-4"
+            style={{
+              borderColor: `color-mix(in srgb, ${color} 35%, transparent)`,
+              backgroundColor: `color-mix(in srgb, ${color} 10%, transparent)`,
+            }}
+          >
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex gap-3">
+                <div
+                  className="rounded-2xl border border-white/20 p-3 shadow-inner"
+                  style={{ background: `color-mix(in srgb, ${color} 18%, transparent)` }}
+                >
+                  <Icon className="h-5 w-5" style={{ color }} />
                 </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h4 className="text-sm font-semibold text-foreground">
+                      {alert.title}
+                    </h4>
+                    <span
+                      className="rounded-full px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.3em]"
+                      style={{ color }}
+                    >
+                      {label}
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{alert.message}</p>
+                </div>
+              </div>
+              {alert.action && (
+                <Button
+                  asChild
+                  size="sm"
+                  variant={alert.severity === "critical" ? "destructive" : "outline"}
+                >
+                  <Link href={alert.action.href}>{alert.action.label}</Link>
+                </Button>
               )}
-            </AlertDescription>
-          </Alert>
+            </div>
+          </div>
         );
       })}
     </div>

@@ -13,7 +13,13 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -33,31 +39,36 @@ const policyData = {
     rules: [
       {
         title: "Maximum Duration",
-        description: "CL is limited to a maximum of 3 (three) consecutive working days per spell.",
+        description:
+          "CL is limited to a maximum of 3 (three) consecutive working days per spell.",
         type: "critical",
         policyRef: "6.20.a",
       },
       {
         title: "Annual Quota",
-        description: "An employee can apply for a maximum of 10 (ten) days of CL in a calendar year.",
+        description:
+          "An employee can apply for a maximum of 10 (ten) days of CL in a calendar year.",
         type: "info",
         policyRef: "6.20.b",
       },
       {
         title: "No Advance Accrual",
-        description: "CL cannot be accrued in advance. It must be utilized within the calendar year.",
+        description:
+          "CL cannot be accrued in advance. It must be utilized within the calendar year.",
         type: "warning",
         policyRef: "6.20.c",
       },
       {
         title: "Auto-Conversion to EL",
-        description: "If more than 3 consecutive days are requested, the first 3 days will be deducted from CL balance and the remaining days will automatically be converted to Earned Leave (EL).",
+        description:
+          "If more than 3 consecutive days are requested, the first 3 days will be deducted from CL balance and the remaining days will automatically be converted to Earned Leave (EL).",
         type: "info",
         policyRef: "6.20.d",
       },
       {
         title: "No Holiday Adjacency",
-        description: "CL cannot be availed immediately before or after a public holiday, weekly holiday, or any other type of leave.",
+        description:
+          "CL cannot be availed immediately before or after a public holiday, weekly holiday, or any other type of leave.",
         type: "critical",
         policyRef: "6.20.e",
       },
@@ -89,25 +100,29 @@ const policyData = {
     rules: [
       {
         title: "Accrual Rate",
-        description: "EL is accrued at 1.5 days per month of service, totaling 18 days per year.",
+        description:
+          "EL is accrued at 1.5 days per month of service, totaling 18 days per year.",
         type: "info",
         policyRef: "6.21.a",
       },
       {
         title: "Notice Period",
-        description: "For EL exceeding 10 consecutive days, at least 30 days advance notice is required.",
+        description:
+          "For EL exceeding 10 consecutive days, at least 30 days advance notice is required.",
         type: "warning",
         policyRef: "6.21.b",
       },
       {
         title: "Maximum Accumulation",
-        description: "EL can be accumulated up to a maximum of 60 days. Excess days overflow to Special EL bucket (up to 180 days total).",
+        description:
+          "EL can be accumulated up to a maximum of 60 days. Excess days overflow to Special EL bucket (up to 180 days total).",
         type: "info",
         policyRef: "6.21.c",
       },
       {
         title: "Encashment",
-        description: "Employees can encash EL from the overflow balance (Special EL) only.",
+        description:
+          "Employees can encash EL from the overflow balance (Special EL) only.",
         type: "info",
         policyRef: "6.21.d",
       },
@@ -139,25 +154,29 @@ const policyData = {
     rules: [
       {
         title: "Annual Quota",
-        description: "Employees are entitled to 14 days of ML per calendar year.",
+        description:
+          "Employees are entitled to 14 days of ML per calendar year.",
         type: "info",
         policyRef: "6.14.a",
       },
       {
         title: "Fitness Certificate (>7 days)",
-        description: "ML exceeding 7 consecutive working days requires a fitness certificate for return to duty.",
+        description:
+          "ML exceeding 7 consecutive working days requires a fitness certificate for return to duty.",
         type: "critical",
         policyRef: "6.14.b",
       },
       {
         title: "Auto-Conversion (>14 days)",
-        description: "If ML exceeds 14 days, the first 14 days are deducted from ML balance, and the excess is converted to EL/Special EL/Extraordinary Leave.",
+        description:
+          "If ML exceeds 14 days, the first 14 days are deducted from ML balance, and the excess is converted to EL/Special EL/Extraordinary Leave.",
         type: "warning",
         policyRef: "6.21.c",
       },
       {
         title: "Return to Duty",
-        description: "Return to duty is blocked until the fitness certificate is approved by HR Admin → HR Head → CEO.",
+        description:
+          "Return to duty is blocked until the fitness certificate is approved by HR Admin → HR Head → CEO.",
         type: "critical",
         policyRef: "6.14.c",
       },
@@ -189,19 +208,22 @@ const policyData = {
     rules: [
       {
         title: "Duration",
-        description: "Female employees are entitled to 90 days of paid maternity leave.",
+        description:
+          "Female employees are entitled to 90 days of paid maternity leave.",
         type: "info",
         policyRef: "6.15.a",
       },
       {
         title: "Advance Notice",
-        description: "At least 30 days advance notice should be given before the expected delivery date.",
+        description:
+          "At least 30 days advance notice should be given before the expected delivery date.",
         type: "warning",
         policyRef: "6.15.b",
       },
       {
         title: "Cannot Be Cancelled",
-        description: "Maternity leave, once approved, cannot be cancelled or modified.",
+        description:
+          "Maternity leave, once approved, cannot be cancelled or modified.",
         type: "critical",
         policyRef: "6.15.c",
       },
@@ -228,13 +250,15 @@ const policyData = {
     rules: [
       {
         title: "Duration",
-        description: "Male employees are entitled to 7 days of paid paternity leave.",
+        description:
+          "Male employees are entitled to 7 days of paid paternity leave.",
         type: "info",
         policyRef: "6.16.a",
       },
       {
         title: "Timing",
-        description: "Paternity leave must be availed within 30 days of the child's birth.",
+        description:
+          "Paternity leave must be availed within 30 days of the child's birth.",
         type: "warning",
         policyRef: "6.16.b",
       },
@@ -262,7 +286,7 @@ function PolicyCard({ policy }: PolicyCardProps) {
   const Icon = policy.icon;
 
   return (
-    <Card>
+    <div className="neo-card p-6">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
@@ -297,8 +321,10 @@ function PolicyCard({ policy }: PolicyCardProps) {
                   : "default"
               }
               className={cn(
-                rule.type === "warning" && "border-yellow-500/50 bg-yellow-50/50",
-                rule.type === "info" && "border-blue-500/50 bg-blue-50/50"
+                rule.type === "warning" &&
+                  "border-yellow-500/50 dark:border-yellow-600/30 bg-yellow-50/50 dark:bg-yellow-900/20",
+                rule.type === "info" &&
+                  "border-blue-500/50 dark:border-blue-600/30 bg-blue-50/50 dark:bg-blue-900/20"
               )}
             >
               {rule.type === "critical" && <XCircle className="size-4" />}
@@ -337,7 +363,7 @@ function PolicyCard({ policy }: PolicyCardProps) {
                 {policy.examples.map((example, index) => (
                   <div
                     key={index}
-                    className="p-3 rounded-md border border-border bg-muted/30"
+                    className="p-3 rounded-md border border-border bg-muted/30 dark:bg-muted/50"
                   >
                     <div className="flex items-start gap-3">
                       <div className="mt-0.5">
@@ -348,7 +374,9 @@ function PolicyCard({ policy }: PolicyCardProps) {
                         )}
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium text-sm">{example.scenario}</p>
+                        <p className="font-medium text-sm">
+                          {example.scenario}
+                        </p>
                         <p className="text-sm text-muted-foreground mt-1">
                           {example.result}
                         </p>
@@ -361,7 +389,7 @@ function PolicyCard({ policy }: PolicyCardProps) {
           </div>
         )}
       </CardContent>
-    </Card>
+    </div>
   );
 }
 
@@ -389,8 +417,8 @@ export function PolicyPageContent() {
         <AlertTitle>Quick Reference</AlertTitle>
         <AlertDescription>
           All leave policies follow CDBL Personnel Policy Manual Chapter 6. Each
-          leave request goes through the standard approval chain: HR Admin → Dept
-          Head → HR Head → CEO.
+          leave request goes through the standard approval chain: HR Admin →
+          Dept Head → HR Head → CEO.
         </AlertDescription>
       </Alert>
 
@@ -442,20 +470,21 @@ export function PolicyPageContent() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <a
-              href="/faq"
-              className="p-4 rounded-lg border border-border hover:bg-accent transition-colors"
-            >
-              <h4 className="font-semibold mb-2">Frequently Asked Questions</h4>
+            <a href="/faq" className="neo-card group block p-6 cursor-pointer">
+              <h4 className="font-semibold mb-2 text-foreground">
+                Frequently Asked Questions
+              </h4>
               <p className="text-sm text-muted-foreground">
                 Common questions about leave policies and procedures
               </p>
             </a>
             <a
               href="/leaves/apply"
-              className="p-4 rounded-lg border border-border hover:bg-accent transition-colors"
+              className="neo-card group block p-6 cursor-pointer"
             >
-              <h4 className="font-semibold mb-2">Apply for Leave</h4>
+              <h4 className="font-semibold mb-2 text-foreground">
+                Apply for Leave
+              </h4>
               <p className="text-sm text-muted-foreground">
                 Start a new leave request following these policies
               </p>

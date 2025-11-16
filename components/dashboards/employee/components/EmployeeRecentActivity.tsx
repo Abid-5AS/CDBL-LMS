@@ -47,11 +47,11 @@ export function EmployeeRecentActivity({
     return (
       <div className="text-center py-8">
         <Calendar
-          className="size-12 text-text-muted dark:text-text-tertiary mx-auto mb-4"
+          className="size-12 text-muted-foreground mx-auto mb-4"
           aria-hidden="true"
         />
-        <p className="text-text-secondary dark:text-text-tertiary">No recent activity</p>
-        <p className="text-sm text-text-muted dark:text-text-muted mt-1">
+        <p className="text-muted-foreground">No recent activity</p>
+        <p className="text-sm text-muted-foreground mt-1">
           Your leave requests will appear here
         </p>
       </div>
@@ -73,10 +73,10 @@ export function EmployeeRecentActivity({
             {leave.type.charAt(0)}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-medium text-text-primary dark:text-text-inverted truncate">
+            <p className="font-medium text-foreground truncate">
               {leave.typeLabel}
             </p>
-            <p className="text-sm text-text-secondary dark:text-text-tertiary">
+            <p className="text-sm text-muted-foreground">
               {leave.formattedDates} ({leave.workingDays} days)
             </p>
           </div>

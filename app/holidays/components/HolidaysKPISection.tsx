@@ -31,7 +31,7 @@ type StatCardProps = {
 
 function HolidayStatCard({ label, value, helper, icon }: StatCardProps) {
   return (
-    <div className="rounded-2xl border border-border bg-card shadow-sm p-4 flex flex-col gap-3 h-full">
+    <div className="neo-card p-4 flex flex-col gap-3 h-full">
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">{label}</p>
         <div className={iconClasses}>{icon}</div>

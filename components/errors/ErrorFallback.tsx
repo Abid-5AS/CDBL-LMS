@@ -64,7 +64,9 @@ export function ErrorFallback({
   }
 
   // Default: page-level error
-  return <ErrorPage error={error} onReset={onReset} isDevelopment={isDevelopment} />;
+  return (
+    <ErrorPage error={error} onReset={onReset} isDevelopment={isDevelopment} />
+  );
 }
 
 /**
@@ -82,32 +84,32 @@ function ErrorPage({
   const userMessage = getErrorMessage(error);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-6">
         {/* Icon */}
         <div className="flex justify-center">
-          <div className="rounded-full bg-destructive/10 p-4">
-            <AlertCircle className="h-8 w-8 text-destructive" />
+          <div className="rounded-2xl bg-gradient-to-br from-red-500/10 to-red-600/5 p-6 border border-red-500/20 shadow-[0_4px_20px_rgba(239,68,68,0.15)]">
+            <AlertCircle className="h-10 w-10 text-red-600 dark:text-red-400" />
           </div>
         </div>
 
         {/* Error message */}
-        <div className="space-y-2 text-center">
-          <h1 className="text-2xl font-bold tracking-tight">
+        <div className="space-y-3 text-center">
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">
             Something went wrong
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
             {userMessage}
           </p>
         </div>
 
         {/* Development error details */}
         {isDevelopment && (
-          <details className="rounded-lg border border-destructive/30 bg-destructive/5 p-4">
-            <summary className="cursor-pointer font-mono text-xs font-semibold text-destructive">
+          <details className="neo-card rounded-xl border-red-500/30 bg-red-500/5 p-4">
+            <summary className="cursor-pointer font-mono text-xs font-semibold text-red-600 dark:text-red-400">
               Error details (Development)
             </summary>
-            <pre className="mt-2 overflow-auto rounded bg-background p-2 text-xs">
+            <pre className="mt-3 overflow-auto rounded-lg bg-[var(--color-card-elevated)] p-3 text-xs border border-[var(--shell-card-border)]">
               {error.message}
               {error.stack && `\n\n${error.stack}`}
             </pre>
@@ -118,15 +120,15 @@ function ErrorPage({
         <div className="flex gap-3">
           <Button
             onClick={onReset}
-            className="flex-1"
+            className="flex-1 neo-button rounded-xl bg-gradient-to-r from-[rgb(91,94,252)] to-[rgb(71,74,232)] hover:shadow-[0_4px_16px_rgba(91,94,252,0.4)] transition-all duration-200"
             variant="default"
           >
             <RotateCcw className="mr-2 h-4 w-4" />
             Try again
           </Button>
           <Button
-            onClick={() => window.location.href = "/"}
-            className="flex-1"
+            onClick={() => (window.location.href = "/")}
+            className="flex-1 neo-button rounded-xl border-[var(--shell-card-border)] hover:border-[rgb(91,94,252)]/50 hover:bg-[rgba(91,94,252,0.05)] transition-all duration-200"
             variant="outline"
           >
             <Home className="mr-2 h-4 w-4" />
@@ -135,11 +137,11 @@ function ErrorPage({
         </div>
 
         {/* Support message */}
-        <p className="text-xs text-muted-foreground text-center">
+        <p className="text-xs text-[var(--color-text-secondary)] text-center">
           If the problem persists, please{" "}
           <a
             href="mailto:support@example.com"
-            className="underline hover:text-foreground"
+            className="underline hover:text-[rgb(91,94,252)] transition-colors"
           >
             contact support
           </a>
@@ -162,13 +164,17 @@ function ErrorSection({
   const userMessage = getErrorMessage(error);
 
   return (
-    <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4">
-      <div className="flex gap-3">
-        <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+    <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-5 neo-card">
+      <div className="flex gap-3.5">
+        <div className="rounded-lg bg-red-500/10 p-2 h-fit">
+          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+        </div>
 
-        <div className="flex-1 space-y-2">
-          <h3 className="font-medium text-foreground">Failed to load</h3>
-          <p className="text-sm text-muted-foreground">
+        <div className="flex-1 space-y-2.5">
+          <h3 className="font-semibold text-[var(--color-text-primary)]">
+            Failed to load
+          </h3>
+          <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
             {userMessage}
           </p>
 
@@ -176,7 +182,7 @@ function ErrorSection({
             onClick={onReset}
             size="sm"
             variant="outline"
-            className="mt-2"
+            className="mt-3 neo-button rounded-lg border-[var(--shell-card-border)] hover:border-[rgb(91,94,252)]/50 hover:bg-[rgba(91,94,252,0.05)] transition-all duration-200"
           >
             <RotateCcw className="mr-2 h-3 w-3" />
             Try again
@@ -190,26 +196,24 @@ function ErrorSection({
 /**
  * ErrorCard - Compact error for card-level boundaries
  */
-function ErrorCard({
-  error,
-  onReset,
-}: {
-  error: Error;
-  onReset: () => void;
-}) {
+function ErrorCard({ error, onReset }: { error: Error; onReset: () => void }) {
   return (
-    <div className={cn(
-      "glass-card rounded-2xl p-6",
-      "border border-destructive/20 bg-destructive/5"
-    )}>
+    <div
+      className={cn(
+        "neo-card rounded-xl p-5",
+        "border border-red-500/20 bg-red-500/5 shadow-[var(--shadow-1)]"
+      )}
+    >
       <div className="flex gap-3">
-        <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+        <div className="rounded-lg bg-red-500/10 p-2 h-fit">
+          <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0" />
+        </div>
 
         <div className="flex-1 space-y-2 min-w-0">
-          <p className="text-sm font-medium text-foreground">
+          <p className="text-sm font-semibold text-[var(--color-text-primary)]">
             Error loading content
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
             {getErrorMessage(error)}
           </p>
 
@@ -217,7 +221,7 @@ function ErrorCard({
             onClick={onReset}
             size="sm"
             variant="ghost"
-            className="h-7 text-xs mt-2"
+            className="h-8 text-xs mt-2 rounded-lg hover:bg-[rgba(91,94,252,0.05)] hover:text-[rgb(91,94,252)] transition-all duration-200"
           >
             Retry
           </Button>

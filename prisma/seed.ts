@@ -33,7 +33,7 @@ const SEED_RESET =
   ["true", "1", "yes"].includes(
     (process.env.SEED_RESET ?? "").trim().toLowerCase()
   ) || false;
-const EMPLOYEES_PER_DEPT = 8; // Increased from 4 to 8 for more realistic data
+const EMPLOYEES_PER_DEPT = 8; // Realistic for testing (24 total employees)
 const UPLOAD_ROOT = path.join(process.cwd(), "private", "uploads");
 
 const nameRng = new SeededRandom(3101);
@@ -335,8 +335,10 @@ async function createBalances(users: SeedUser[]) {
       const used =
         user.role === Role.EMPLOYEE
           ? type === LeaveType.EARNED
-            ? balanceRng.nextInt(0, 2)
-            : balanceRng.nextInt(4, 6)
+            ? balanceRng.nextInt(2, 8)
+            : type === LeaveType.CASUAL
+            ? balanceRng.nextInt(2, 6)
+            : balanceRng.nextInt(1, 4)
           : 0;
       const closing = Math.max(accrued - used, 0);
 
@@ -532,7 +534,7 @@ async function createLeaveRequests(users: SeedUser[], holidays: SeedHoliday[]) {
   let leaveCount = 0;
 
   // Create currently active leaves for some employees (teammates on leave)
-  const employeesOnLeave = employees.slice(0, Math.min(3, employees.length));
+  const employeesOnLeave = employees.slice(0, Math.min(8, employees.length));
   for (const employee of employeesOnLeave) {
     const deptHead = employee.department && deptHeads.get(employee.department);
     if (!deptHead) continue;
@@ -578,8 +580,8 @@ async function createLeaveRequests(users: SeedUser[], holidays: SeedHoliday[]) {
     const deptHead = employee.department && deptHeads.get(employee.department);
     if (!deptHead) continue;
 
-    // Increased from 6-10 to 12-18 for better trend visualization across 12 months
-    const numRequests = leaveRng.nextInt(12, 18);
+    // 10-15 requests per employee for realistic testing (240-360 total across 24 employees)
+    const numRequests = leaveRng.nextInt(10, 15);
     for (let i = 0; i < numRequests; i++) {
       const leaveType = leaveRng.pick([
         LeaveType.EARNED,
@@ -829,7 +831,10 @@ async function createPendingRequestsForITDeptHead(
   const itEmployees = users.filter(
     (user) => user.role === Role.EMPLOYEE && user.department === "IT"
   );
-  const pendingEmployees = itEmployees.slice(0, 3);
+  const pendingEmployees = itEmployees.slice(
+    0,
+    Math.min(6, itEmployees.length)
+  );
   for (const employee of pendingEmployees) {
     const leaveType = pendingRng.pick([LeaveType.EARNED, LeaveType.MEDICAL]);
     const startDate = ensureWorkingDay(

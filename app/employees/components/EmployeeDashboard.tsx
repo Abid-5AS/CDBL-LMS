@@ -9,7 +9,7 @@ import { DashboardContainer, SectionHeader } from "@/components";
 import { EmployeeProfileCard, LeaveHistoryTable } from "@/components/shared";
 import { LeaveBalanceCard } from "./LeaveBalanceCard";
 import ChartsSection from "./ChartsSection";
-import { HRStatCards } from "@/components";
+import { HRStatCards } from "@/components/HRStatCards";
 import { ApprovalActions } from "./ApprovalActions";
 import { canEditEmployee, type AppRole } from "@/lib/rbac";
 import Link from "next/link";

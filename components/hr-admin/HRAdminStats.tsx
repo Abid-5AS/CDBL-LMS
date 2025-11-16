@@ -36,14 +36,17 @@ export function HRAdminStats({ items, loading }: HRAdminStatsProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {cards.map((card) => (
-        <Card key={card.title}>
+        <Card
+          key={card.title}
+          className="rounded-2xl border border-border bg-card/90 shadow-sm"
+        >
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-medium uppercase text-muted-foreground">
               {card.title}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold text-text-primary">
+            <p className="text-2xl font-semibold text-foreground">
               {card.value}
             </p>
           </CardContent>

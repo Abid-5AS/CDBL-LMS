@@ -73,7 +73,9 @@ export class ApprovalRepository {
   /**
    * Find all approvals for a specific leave request
    */
-  static async findByLeaveId(leaveId: number): Promise<ApprovalWithRelations[]> {
+  static async findByLeaveId(
+    leaveId: number
+  ): Promise<ApprovalWithRelations[]> {
     return prisma.approval.findMany({
       where: { leaveId },
       include: this.DEFAULT_INCLUDES,
@@ -83,8 +85,14 @@ export class ApprovalRepository {
 
   /**
    * Find pending approvals for a specific approver
+   * Optimized with limit and minimal includes
    */
-  static async findPendingForApprover(approverId: number): Promise<ApprovalWithRelations[]> {
+  static async findPendingForApprover(
+    approverId: number,
+    options?: { limit?: number; offset?: number }
+  ): Promise<ApprovalWithRelations[]> {
+    const { limit = 50, offset = 0 } = options || {};
+
     return prisma.approval.findMany({
       where: {
         approverId,
@@ -92,9 +100,11 @@ export class ApprovalRepository {
       },
       include: this.DEFAULT_INCLUDES,
       orderBy: [
-        { leave: { createdAt: "asc" } },
+        { leave: { createdAt: "desc" } }, // Most recent first
         { step: "asc" },
       ],
+      take: limit,
+      skip: offset,
     });
   }
 
@@ -115,10 +125,7 @@ export class ApprovalRepository {
         ...(options?.decision ? { decision: options.decision } : {}),
       },
       include: this.DEFAULT_INCLUDES,
-      orderBy: [
-        { decidedAt: "desc" },
-        { leave: { createdAt: "desc" } },
-      ],
+      orderBy: [{ decidedAt: "desc" }, { leave: { createdAt: "desc" } }],
       take: options?.limit,
       skip: options?.offset,
     });
@@ -127,7 +134,9 @@ export class ApprovalRepository {
   /**
    * Find current pending approval for a leave request
    */
-  static async findCurrentPendingApproval(leaveId: number): Promise<ApprovalWithRelations | null> {
+  static async findCurrentPendingApproval(
+    leaveId: number
+  ): Promise<ApprovalWithRelations | null> {
     return prisma.approval.findFirst({
       where: {
         leaveId,
@@ -234,7 +243,8 @@ export class ApprovalRepository {
     if (approvals.length === 0) return false;
 
     return approvals.every(
-      (approval) => approval.decision === "APPROVED" || approval.decision === "FORWARDED"
+      (approval) =>
+        approval.decision === "APPROVED" || approval.decision === "FORWARDED"
     );
   }
 

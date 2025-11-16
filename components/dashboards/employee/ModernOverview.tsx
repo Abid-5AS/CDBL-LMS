@@ -99,8 +99,6 @@ export function ModernEmployeeDashboard({
   username,
 }: EmployeeDashboardContentProps) {
   const router = useRouter();
-  const [showCustomization, setShowCustomization] = React.useState(false);
-
   const { allRows: leaves, isLoading: isLoadingLeaves } = useLeaveRequests({
     enableSelection: false,
   });
@@ -122,20 +120,6 @@ export function ModernEmployeeDashboard({
   // Process data using custom hook
   const dashboardData = useEmployeeDashboardData(leaves, balanceData);
 
-  // Header actions
-  const headerActions = (
-    <Button
-      variant="secondary"
-      size="sm"
-      onClick={() => setShowCustomization(true)}
-      className="gap-2"
-      aria-label="Customize your dashboard layout"
-    >
-      <Settings className="size-4" aria-hidden="true" />
-      <span className="hidden sm:inline">Customize</span>
-    </Button>
-  );
-
   const quickActions = [
     {
       label: "Apply for Leave",
@@ -151,11 +135,8 @@ export function ModernEmployeeDashboard({
       <FloatingQuickActions actions={quickActions} />
       <RoleBasedDashboard
         role="EMPLOYEE"
-        title={`Welcome back, ${username}`}
-        description="Manage your time off, track balances, and stay updated with your leave requests"
-        actions={headerActions}
         animate={true}
-        backgroundVariant="solid"
+        backgroundVariant="transparent"
       >
         <motion.div
           variants={containerVariants}

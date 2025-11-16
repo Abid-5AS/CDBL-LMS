@@ -44,7 +44,7 @@ export function EmployeeActionCenter({
     >
       <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <CardTitle className="text-lg sm:text-xl font-semibold text-text-primary dark:text-text-inverted flex items-center gap-2">
+          <CardTitle className="text-lg sm:text-xl font-semibold text-foreground flex items-center gap-2">
             <Sparkles
               className="size-4 sm:size-5 text-brand"
               aria-hidden="true"
@@ -60,7 +60,7 @@ export function EmployeeActionCenter({
             </Badge>
           )}
         </div>
-        <p className="text-text-secondary dark:text-text-tertiary text-xs sm:text-sm">
+        <p className="text-muted-foreground text-xs sm:text-sm">
           {actionItems.length > 0
             ? "Recommended actions and reminders"
             : "You're all caught up! No pending actions."}
@@ -70,10 +70,10 @@ export function EmployeeActionCenter({
         {actionItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center max-w-md mx-auto py-6 sm:py-8 text-center gap-2">
             <CheckCircle2 className="w-12 h-12 text-data-success mb-2" />
-            <p className="text-sm font-medium text-text-primary dark:text-text-inverted">
-              All clear  no pending actions.
+            <p className="text-sm font-medium text-foreground">
+              All clear no pending actions.
             </p>
-            <p className="text-xs text-text-secondary dark:text-text-tertiary">
+            <p className="text-xs text-muted-foreground">
               Well surface important items here whenever something needs your
               attention.
             </p>
@@ -107,10 +107,10 @@ export function EmployeeActionCenter({
                   )}
                 >
                   <div className="flex-1 space-y-1">
-                    <h4 className="font-semibold text-text-primary dark:text-text-inverted text-sm">
+                    <h4 className="font-semibold text-foreground text-sm">
                       {item.title}
                     </h4>
-                    <p className="text-xs text-text-secondary dark:text-text-tertiary">
+                    <p className="text-xs text-muted-foreground">
                       {item.description}
                     </p>
                   </div>

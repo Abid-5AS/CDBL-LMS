@@ -3,7 +3,6 @@
 import { motion, type Variants } from "framer-motion";
 import { Calendar, Star, Clock } from "lucide-react";
 import { Badge } from "@/components/ui";
-import { RoleDashboardCard } from "../../../components/dashboards/shared/RoleBasedDashboard";
 import { formatDate, cn } from "@/lib/utils";
 import type { Holiday } from "../hooks/useHolidaysData";
 
@@ -52,72 +51,64 @@ export function HolidaysGrid({ holidays }: HolidaysGridProps) {
             initial="hidden"
             animate="visible"
           >
-            <RoleDashboardCard
-              role="EMPLOYEE"
-              variant="glass"
+            <div
               className={cn(
-                "h-full transition-all duration-300 hover:scale-[1.01]",
+                "neo-card p-4 h-full flex flex-col",
                 isPast && "opacity-75"
               )}
-              animate={true}
             >
-              <div className="p-4 h-full flex flex-col">
-                {/* Header */}
-                <div className="flex items-start justify-between mb-3">
-                  <div className="p-2 bg-indigo-500/10 rounded-lg">
-                    <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    {holiday.isOptional && (
-                      <Badge variant="outline" className="text-xs">
-                        <Star className="w-3 h-3 mr-1" />
-                        Optional
-                      </Badge>
-                    )}
-                    {isPast && (
-                      <Badge variant="secondary" className="text-xs">
-                        Past
-                      </Badge>
-                    )}
-                    {!isPast && daysUntil <= 7 && daysUntil > 0 && (
-                      <Badge
-                        variant="default"
-                        className="text-xs bg-orange-500"
-                      >
-                        <Clock className="w-3 h-3 mr-1" />
-                        {daysUntil}d
-                      </Badge>
-                    )}
-                  </div>
+              {/* Header */}
+              <div className="flex items-start justify-between mb-3">
+                <div className="p-2 bg-indigo-500/10 rounded-lg">
+                  <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 </div>
-
-                {/* Content */}
-                <div className="flex-1">
-                  <h3 className="font-semibold text-foreground mb-2 line-clamp-2">
-                    {holiday.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {formatDate(holiday.date)}
-                  </p>
-
-                  {/* Day of week */}
-                  <p className="text-xs text-muted-foreground">
-                    {holidayDate.toLocaleDateString("en-US", {
-                      weekday: "long",
-                    })}
-                  </p>
+                <div className="flex flex-col gap-1">
+                  {holiday.isOptional && (
+                    <Badge variant="outline" className="text-xs">
+                      <Star className="w-3 h-3 mr-1" />
+                      Optional
+                    </Badge>
+                  )}
+                  {isPast && (
+                    <Badge variant="secondary" className="text-xs">
+                      Past
+                    </Badge>
+                  )}
+                  {!isPast && daysUntil <= 7 && daysUntil > 0 && (
+                    <Badge variant="default" className="text-xs bg-orange-500">
+                      <Clock className="w-3 h-3 mr-1" />
+                      {daysUntil}d
+                    </Badge>
+                  )}
                 </div>
-
-                {/* Footer */}
-                {!isPast && daysUntil > 0 && (
-                  <div className="mt-3 pt-3 border-t border-border">
-                    <p className="text-xs text-muted-foreground">
-                      {daysUntil === 1 ? "Tomorrow" : `In ${daysUntil} days`}
-                    </p>
-                  </div>
-                )}
               </div>
-            </RoleDashboardCard>
+
+              {/* Content */}
+              <div className="flex-1">
+                <h3 className="font-semibold text-foreground mb-2 line-clamp-2">
+                  {holiday.name}
+                </h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {formatDate(holiday.date)}
+                </p>
+
+                {/* Day of week */}
+                <p className="text-xs text-muted-foreground">
+                  {holidayDate.toLocaleDateString("en-US", {
+                    weekday: "long",
+                  })}
+                </p>
+              </div>
+
+              {/* Footer */}
+              {!isPast && daysUntil > 0 && (
+                <div className="mt-3 pt-3 border-t border-border">
+                  <p className="text-xs text-muted-foreground">
+                    {daysUntil === 1 ? "Tomorrow" : `In ${daysUntil} days`}
+                  </p>
+                </div>
+              )}
+            </div>
           </motion.div>
         );
       })}

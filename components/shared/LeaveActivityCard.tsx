@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -13,90 +14,83 @@ interface LeaveActivityData {
   unit: string;
 }
 
-interface CircleProgressProps {
+const LEAVE_COLORS: Record<LeaveActivityData["type"], string> = {
+  EARNED: "var(--color-leave-earned)",
+  CASUAL: "var(--color-leave-casual)",
+  MEDICAL: "var(--color-leave-medical)",
+};
+
+const circleStroke = (size: number) => size / 2 - 12;
+
+function ActivityMeter({
+  data,
+  index,
+}: {
   data: LeaveActivityData;
   index: number;
-}
-
-const CircleProgress = ({ data, index }: CircleProgressProps) => {
-  const percentage = Math.min((data.used / data.total) * 100, 100);
-  const circumference = 2 * Math.PI * (data.size / 2 - 10);
-  const strokeDasharray = circumference;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
-
-  // Animation delay based on index
-  const animationDelay = index * 0.2;
+}) {
+  const percentage = data.total ? Math.min((data.used / data.total) * 100, 100) : 0;
+  const radius = circleStroke(data.size);
+  const circumference = 2 * Math.PI * radius;
+  const dashOffset = circumference - (percentage / 100) * circumference;
+  const accent = data.color || LEAVE_COLORS[data.type];
 
   return (
-    <div className="relative flex items-center justify-center">
+    <div
+      className="relative flex items-center justify-center"
+      style={{
+        "--leave-meter-accent": accent,
+        "--leave-meter-track": `color-mix(in srgb, ${accent} 25%, transparent)`,
+      } as React.CSSProperties}
+    >
       <motion.svg
         width={data.size}
         height={data.size}
-        className="transform -rotate-90"
-        initial={{ scale: 0, rotate: -90 }}
-        animate={{ scale: 1, rotate: -90 }}
-        transition={{
-          duration: 0.8,
-          delay: animationDelay,
-          type: "spring",
-          stiffness: 100,
-          damping: 15,
-        }}
+        className="-rotate-90"
+        initial={{ opacity: 0, scale: 0.6 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, delay: index * 0.15 }}
       >
-        {/* Background circle */}
         <circle
           cx={data.size / 2}
           cy={data.size / 2}
-          r={data.size / 2 - 10}
+          r={radius}
           fill="none"
-          stroke="currentColor"
-          strokeWidth="8"
-          className="text-gray-200 dark:text-gray-700 opacity-30"
+          strokeWidth={8}
+          stroke="var(--leave-meter-track)"
         />
-
-        {/* Progress circle */}
         <motion.circle
           cx={data.size / 2}
           cy={data.size / 2}
-          r={data.size / 2 - 10}
+          r={radius}
           fill="none"
-          stroke={data.color}
-          strokeWidth="8"
+          strokeWidth={8}
           strokeLinecap="round"
-          strokeDasharray={strokeDasharray}
-          strokeDashoffset={strokeDashoffset}
+          strokeDasharray={circumference}
+          strokeDashoffset={dashOffset}
+          stroke="var(--leave-meter-accent)"
           initial={{ strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset }}
-          transition={{
-            duration: 1.5,
-            delay: animationDelay + 0.3,
-            ease: "easeOut",
-          }}
-          className="drop-shadow-lg"
+          animate={{ strokeDashoffset: dashOffset }}
+          transition={{ duration: 0.9, delay: index * 0.15 + 0.1, ease: "easeOut" }}
         />
       </motion.svg>
-
-      {/* Center content */}
       <motion.div
         className="absolute inset-0 flex flex-col items-center justify-center text-center"
-        initial={{ opacity: 0, scale: 0.5 }}
+        initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{
-          duration: 0.6,
-          delay: animationDelay + 0.5,
-        }}
+        transition={{ delay: index * 0.15 + 0.2 }}
       >
-        <div className="text-lg font-bold text-foreground">{data.used}</div>
-        <div className="text-xs text-muted-foreground font-medium">
+        <p className="text-lg font-semibold text-foreground">{data.used}</p>
+        <p className="text-[11px] text-muted-foreground">
           of {data.total} {data.unit}
-        </div>
-        <div className="text-xs text-muted-foreground mt-1">
+        </p>
+        <p className="text-xs font-medium text-muted-foreground">
           {Math.round(percentage)}%
-        </div>
+        </p>
       </motion.div>
     </div>
   );
-};
+}
 
 interface LeaveActivityCardProps {
   title?: string;
@@ -109,79 +103,80 @@ export function LeaveActivityCard({
   activities,
   className,
 }: LeaveActivityCardProps) {
+  const totals = useMemo(() => {
+    const used = activities.reduce((sum, item) => sum + item.used, 0);
+    const total = activities.reduce((sum, item) => sum + item.total, 0);
+    return { used, remaining: Math.max(total - used, 0) };
+  }, [activities]);
+
   return (
     <div
       className={cn(
-        "relative w-full p-6 rounded-2xl border bg-card",
-        "shadow-lg dark:shadow-none",
+        "neo-card relative flex flex-col gap-6 overflow-hidden px-6 py-6",
         className
       )}
     >
-      <div className="flex flex-col items-center gap-6">
+      <div className="relative text-center">
         <motion.h3
           className="text-xl font-semibold text-foreground"
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.4 }}
         >
           {title}
         </motion.h3>
-
-        <div className="flex items-center justify-center gap-4 flex-wrap">
-          {activities.map((activity, index) => (
-            <div
-              key={activity.type}
-              className="flex flex-col items-center gap-3"
-            >
-              <CircleProgress data={activity} index={index} />
-              <motion.div
-                className="text-center"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.2 + 0.8 }}
-              >
-                <div className="text-sm font-medium text-foreground">
-                  {activity.label}
-                </div>
-                <div
-                  className="text-xs font-semibold mt-1"
-                  style={{ color: activity.color }}
-                >
-                  {activity.used}/{activity.total} {activity.unit}
-                </div>
-              </motion.div>
-            </div>
-          ))}
-        </div>
-
-        {/* Summary */}
-        <motion.div
-          className="flex items-center justify-center gap-6 text-sm text-muted-foreground"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 1.2 }}
-        >
-          <div className="text-center">
-            <div className="font-medium">Total Used</div>
-            <div className="text-foreground font-semibold">
-              {activities.reduce((sum, act) => sum + act.used, 0)} days
-            </div>
-          </div>
-          <div className="w-px h-6 bg-border"></div>
-          <div className="text-center">
-            <div className="font-medium">Remaining</div>
-            <div className="text-foreground font-semibold">
-              {activities.reduce((sum, act) => sum + (act.total - act.used), 0)}{" "}
-              days
-            </div>
-          </div>
-        </motion.div>
+        <p className="text-sm text-muted-foreground">
+          View usage across earned, casual, and medical categories
+        </p>
       </div>
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        {activities.map((activity, index) => (
+          <div key={activity.type} className="flex flex-col items-center gap-3">
+            <ActivityMeter data={activity} index={index} />
+            <motion.div
+              className="text-center"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: index * 0.15 + 0.2 }}
+            >
+              <p className="text-sm font-semibold text-foreground">
+                {activity.label}
+              </p>
+              <p
+                className="text-xs font-medium"
+                style={{ color: activity.color || LEAVE_COLORS[activity.type] }}
+              >
+                {activity.used}/{activity.total} {activity.unit}
+              </p>
+            </motion.div>
+          </div>
+        ))}
+      </div>
+
+      <motion.div
+        className="grid grid-cols-2 gap-4 rounded-2xl border border-white/10 p-4 text-center text-sm"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.4 }}
+      >
+        <div>
+          <p className="text-muted-foreground">Total Used</p>
+          <p className="text-2xl font-semibold text-foreground">
+            {totals.used} days
+          </p>
+        </div>
+        <div>
+          <p className="text-muted-foreground">Remaining</p>
+          <p className="text-2xl font-semibold text-foreground">
+            {totals.remaining} days
+          </p>
+        </div>
+      </motion.div>
     </div>
   );
 }
 
-// Helper function to create leave activity data
 export function createLeaveActivityData(balances: {
   earnedUsed: number;
   earnedTotal: number;
@@ -196,7 +191,7 @@ export function createLeaveActivityData(balances: {
       type: "EARNED",
       used: balances.earnedUsed,
       total: balances.earnedTotal,
-      color: "#FF2D55", // Red for primary leave type
+      color: "var(--color-leave-earned)",
       size: 120,
       unit: "days",
     },
@@ -205,8 +200,8 @@ export function createLeaveActivityData(balances: {
       type: "CASUAL",
       used: balances.casualUsed,
       total: balances.casualTotal,
-      color: "#A3F900", // Green for casual leave
-      size: 100,
+      color: "var(--color-leave-casual)",
+      size: 120,
       unit: "days",
     },
     {
@@ -214,8 +209,8 @@ export function createLeaveActivityData(balances: {
       type: "MEDICAL",
       used: balances.medicalUsed,
       total: balances.medicalTotal,
-      color: "#04C7DD", // Blue for medical leave
-      size: 80,
+      color: "var(--color-leave-medical)",
+      size: 120,
       unit: "days",
     },
   ];

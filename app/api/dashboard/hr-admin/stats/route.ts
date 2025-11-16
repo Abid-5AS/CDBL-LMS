@@ -2,29 +2,32 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 
+// In-memory cache for dashboard stats (1 minute TTL)
+let cachedStats: any = null;
+let cacheTimestamp: number = 0;
+const CACHE_TTL = 60 * 1000; // 1 minute
+
 /**
  * GET /api/dashboard/hr-admin/stats
  *
  * Returns comprehensive statistics for HR_ADMIN dashboard
- * - Employees on leave today
- * - Pending requests
- * - Average approval time
- * - Encashment pending
- * - Total leaves this year
- * - Processed today
- * - Daily processing target progress
- * - Team utilization rate
- * - Policy compliance score
+ * With 1-minute in-memory caching for improved performance
  */
 export async function GET(req: NextRequest) {
+  // Check cache first
+  const now = Date.now();
+  if (cachedStats && now - cacheTimestamp < CACHE_TTL) {
+    return NextResponse.json(cachedStats, {
+      headers: {
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
+      },
+    });
+  }
   try {
     const user = await getCurrentUser();
 
     if (!user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Verify HR_ADMIN, HR_HEAD, or CEO role
@@ -44,16 +47,21 @@ export async function GET(req: NextRequest) {
     const startOfYear = new Date(now.getFullYear(), 0, 1);
     const startOfNextYear = new Date(now.getFullYear() + 1, 0, 1);
 
-    // Parallel queries for optimal performance
+    // Get monthly trend (last 6 months) - moved here for single query
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+    // Optimized parallel queries with aggregations
     const [
       employeesOnLeave,
       pendingRequests,
       approvalTimeData,
-      encashmentPending,
       totalLeavesThisYear,
       processedToday,
       totalEmployees,
-      leaveRequestsThisYear,
+      leaveTypeBreakdown,
+      yearStatsAgg,
+      monthlyRequests,
     ] = await Promise.all([
       // Employees on leave today
       prisma.leaveRequest.count({
@@ -71,7 +79,7 @@ export async function GET(req: NextRequest) {
         },
       }),
 
-      // Average approval time (approved requests in last 30 days)
+      // Average approval time (LIMIT to 100 most recent for speed)
       prisma.leaveRequest.findMany({
         where: {
           status: "APPROVED",
@@ -83,10 +91,11 @@ export async function GET(req: NextRequest) {
           createdAt: true,
           updatedAt: true,
         },
+        take: 100,
+        orderBy: {
+          updatedAt: "desc",
+        },
       }),
-
-      // Encashment pending (placeholder - not yet implemented in schema)
-      Promise.resolve(0), // TODO: Implement encashment feature
 
       // Total approved leaves this year
       prisma.leaveRequest.count({
@@ -112,7 +121,7 @@ export async function GET(req: NextRequest) {
         },
       }),
 
-      // Total employees
+      // Total employees (cached count)
       prisma.user.count({
         where: {
           role: {
@@ -121,16 +130,49 @@ export async function GET(req: NextRequest) {
         },
       }),
 
-      // All leave requests this year
-      prisma.leaveRequest.findMany({
+      // Leave type breakdown - combined query
+      prisma.leaveRequest.groupBy({
+        by: ["type"],
+        where: {
+          status: "APPROVED",
+          startDate: {
+            gte: startOfYear,
+            lt: startOfNextYear,
+          },
+        },
+        _count: {
+          id: true,
+        },
+        _sum: {
+          workingDays: true,
+        },
+      }),
+
+      // Aggregate stats for year - single query instead of fetching all records
+      prisma.leaveRequest.aggregate({
         where: {
           startDate: {
             gte: startOfYear,
             lt: startOfNextYear,
           },
         },
-        select: {
+        _sum: {
           workingDays: true,
+        },
+        _count: {
+          id: true,
+        },
+      }),
+
+      // Monthly trend data
+      prisma.leaveRequest.findMany({
+        where: {
+          createdAt: {
+            gte: sixMonthsAgo,
+          },
+        },
+        select: {
+          createdAt: true,
         },
       }),
     ]);
@@ -146,72 +188,36 @@ export async function GET(req: NextRequest) {
       avgApprovalTime = totalTime / approvalTimeData.length;
     }
 
-    // Calculate team utilization (average leave days per employee)
-    const totalLeaveDays = leaveRequestsThisYear.reduce(
-      (sum, req) => sum + req.workingDays,
-      0
-    );
+    // Calculate team utilization using aggregated data
+    const totalLeaveDays = yearStatsAgg._sum.workingDays || 0;
     const avgLeaveDaysPerEmployee =
       totalEmployees > 0 ? totalLeaveDays / totalEmployees : 0;
-    // Fixed: Team utilization should be inverse of leave usage
-    // Higher leave usage = lower team availability
+    // Team utilization: inverse of leave usage
     const teamUtilization = Math.max(
       100 - Math.min(Math.round((avgLeaveDaysPerEmployee / 24) * 100), 100),
       0
-    ); // Assuming 24 days per year average
+    );
 
-    // Daily target (assuming 10 requests per day target)
+    // Daily target and progress
     const dailyTarget = 10;
     const dailyProgress = Math.min(
       Math.round((processedToday / dailyTarget) * 100),
       100
     );
 
-    // Policy compliance score (placeholder calculation)
-    // In a real system, this would check for policy violations
+    // Policy compliance score (placeholder)
     const complianceScore = 94;
 
-    // Get leave type breakdown
-    const leaveTypeBreakdown = await prisma.leaveRequest.groupBy({
-      by: ["type"],
-      where: {
-        status: "APPROVED",
-        startDate: {
-          gte: startOfYear,
-          lt: startOfNextYear,
-        },
-      },
-      _count: {
-        id: true,
-      },
-      _sum: {
-        workingDays: true,
-      },
-    });
+    // Encashment pending (placeholder)
+    const encashmentPending = 0;
 
-    // Get monthly trend (last 6 months)
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-
-    const monthlyTrend = await prisma.leaveRequest.groupBy({
-      by: ["createdAt"],
-      where: {
-        createdAt: {
-          gte: sixMonthsAgo,
-        },
-      },
-      _count: {
-        id: true,
-      },
-    });
-
-    // Process monthly trend data
+    // Process monthly trend data - faster grouping
     const trendByMonth: { [key: string]: number } = {};
-    monthlyTrend.forEach((item) => {
+    monthlyRequests.forEach((item) => {
       const monthKey = `${item.createdAt.getFullYear()}-${String(
         item.createdAt.getMonth() + 1
       ).padStart(2, "0")}`;
-      trendByMonth[monthKey] = (trendByMonth[monthKey] || 0) + item._count.id;
+      trendByMonth[monthKey] = (trendByMonth[monthKey] || 0) + 1;
     });
 
     const stats = {
@@ -239,13 +245,23 @@ export async function GET(req: NextRequest) {
       })),
 
       // Trend data
-      monthlyTrend: Object.entries(trendByMonth).map(([month, count]) => ({
-        month,
-        count,
-      })),
+      monthlyTrend: Object.entries(trendByMonth)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([month, count]) => ({
+          month,
+          count,
+        })),
     };
 
-    return NextResponse.json(stats);
+    // Update cache
+    cachedStats = stats;
+    cacheTimestamp = Date.now();
+
+    return NextResponse.json(stats, {
+      headers: {
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
+      },
+    });
   } catch (error) {
     console.error("Error fetching HR_ADMIN stats:", error);
     return NextResponse.json(
@@ -254,3 +270,6 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
+// Optional: Clear cache on POST/PUT/DELETE operations
+// export const runtime = 'nodejs'; // Commented out - incompatible with cacheComponents

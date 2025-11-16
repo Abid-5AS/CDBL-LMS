@@ -26,15 +26,32 @@ type QuickStatsProps = {
 
 export function SystemAdminHeader({ username }: HeaderProps) {
   const actions = [
-    { label: "User Management", icon: Users, href: "/admin", variant: "default" as const },
-    { label: "Audit Logs", icon: Activity, href: "/admin/audit", variant: "outline" as const },
-    { label: "System Settings", icon: Settings, href: "/admin", variant: "outline" as const },
+    {
+      label: "User Management",
+      icon: Users,
+      href: "/admin",
+      variant: "default" as const,
+    },
+    {
+      label: "Audit Logs",
+      icon: Activity,
+      href: "/admin/audit",
+      variant: "outline" as const,
+    },
+    {
+      label: "System Settings",
+      icon: Settings,
+      href: "/admin",
+      variant: "outline" as const,
+    },
   ];
 
   return (
     <div className="flex items-start justify-between gap-4 mb-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Admin Console</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          Admin Console
+        </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Welcome back, {username}. Manage system configuration and users.
         </p>
@@ -83,8 +100,16 @@ export function SystemQuickStats({ systemStats }: QuickStatsProps) {
         value={systemStats.systemHealth === "healthy" ? "Healthy" : "Warning"}
         subtext="System status"
         icon={Activity}
-        iconColor={systemStats.systemHealth === "healthy" ? "text-data-success" : "text-data-warning"}
-        accentColor={systemStats.systemHealth === "healthy" ? "bg-data-success" : "bg-data-warning"}
+        iconColor={
+          systemStats.systemHealth === "healthy"
+            ? "text-data-success"
+            : "text-data-warning"
+        }
+        accentColor={
+          systemStats.systemHealth === "healthy"
+            ? "bg-data-success"
+            : "bg-data-warning"
+        }
         status={systemStats.systemHealth === "healthy" ? "healthy" : "low"}
       />
     </div>
@@ -116,11 +141,18 @@ export function SystemQuickAccess() {
   return (
     <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
       {cards.map(({ href, icon: Icon, title, description }) => (
-        <Button key={title} asChild variant="outline" className="h-auto flex-col items-start p-6">
+        <Button
+          key={title}
+          asChild
+          variant="outline"
+          className="h-auto flex-col items-start p-6"
+        >
           <Link href={href} className="flex flex-col items-start">
             <Icon className="mb-2 h-6 w-6" />
             <span className="font-semibold">{title}</span>
-            <span className="text-xs text-muted-foreground mt-1">{description}</span>
+            <span className="text-xs text-muted-foreground mt-1">
+              {description}
+            </span>
           </Link>
         </Button>
       ))}

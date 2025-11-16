@@ -1,14 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Skeleton,
-  Button,
-} from "@/components/ui";
+import Link from "next/link";
+import { Button, Skeleton } from "@/components/ui";
 import {
   Lightbulb,
   ChevronDown,
@@ -21,41 +15,21 @@ import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
 import { cn } from "@/lib/utils";
 
-
 interface Insight {
   kind: string;
   text: string;
   meta?: Record<string, any>;
 }
 
-function getSeverityConfig(kind: string) {
-  if (
-    kind.includes("WARNING") ||
-    kind.includes("LAPSE") ||
-    kind.includes("RISK")
-  ) {
-    return {
-      icon: AlertTriangle,
-      color: "text-data-warning dark:text-data-warning",
-      bg: "bg-data-warning dark:bg-data-warning/30",
-      border: "border-data-warning dark:border-data-warning",
-    };
+const insightAccent = (kind: string) => {
+  if (kind.match(/(WARNING|LAPSE|RISK)/i)) {
+    return { Icon: AlertTriangle, color: "var(--color-data-warning)", label: "Warning" };
   }
-  if (kind.includes("ERROR") || kind.includes("ACTION")) {
-    return {
-      icon: XCircle,
-      color: "text-data-error dark:text-data-error",
-      bg: "bg-data-error dark:bg-data-error/30",
-      border: "border-data-error dark:border-data-error",
-    };
+  if (kind.match(/(ERROR|ACTION)/i)) {
+    return { Icon: XCircle, color: "var(--color-data-error)", label: "Action" };
   }
-  return {
-    icon: Info,
-    color: "text-data-info dark:text-data-info",
-    bg: "bg-data-info dark:bg-data-info/30",
-    border: "border-data-info dark:border-data-info",
-  };
-}
+  return { Icon: Info, color: "var(--color-data-info)", label: "Info" };
+};
 
 export function InsightsWidget() {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -64,86 +38,81 @@ export function InsightsWidget() {
     apiFetcher,
     {
       revalidateOnFocus: true,
-      refreshInterval: 300000, // Refresh every 5 minutes
+      refreshInterval: 300000,
     }
   );
 
   if (isLoading) {
-    return (
-      <Card className="solid-card animate-fade-in-up">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Lightbulb className="size-4" />
-            Insights & Suggestions
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-24 w-full" />
-        </CardContent>
-      </Card>
-    );
+    return <Skeleton className="h-32 w-full rounded-2xl" />;
   }
 
-  if (error || !data || !data.insights || data.insights.length === 0) {
-    return null; // Don't show empty state, just hide the widget
+  if (error || !data?.insights?.length) {
+    return null;
   }
 
   const insights = data.insights;
 
   return (
-    <Card className="solid-card animate-fade-in-up">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Lightbulb className="size-4" />
-            Insights & Suggestions
-          </CardTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="h-7 w-7 p-0"
-          >
-            {isExpanded ? (
-              <ChevronUp className="size-4" />
-            ) : (
-              <ChevronDown className="size-4" />
-            )}
-          </Button>
+    <div className="neo-card animate-fade-in-up space-y-4 px-6 py-5">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="rounded-2xl border border-white/20 p-3 shadow-inner">
+            <Lightbulb className="h-5 w-5 text-data-warning" />
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
+              Insights
+            </p>
+            <h3 className="text-lg font-semibold text-foreground">
+              Recommendations
+            </h3>
+          </div>
         </div>
-      </CardHeader>
-      {isExpanded && (
-        <CardContent className="space-y-3">
-          {insights.map((insight, index) => {
-            const config = getSeverityConfig(insight.kind);
-            const Icon = config.icon;
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsExpanded((prev) => !prev)}
+          className="h-8 w-8 p-0"
+        >
+          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </Button>
+      </div>
 
+      {isExpanded && (
+        <div className="space-y-3">
+          {insights.map((insight, index) => {
+            const { Icon, color, label } = insightAccent(insight.kind);
             return (
               <div
-                key={insight.kind}
-                className={cn(
-                  "rounded-lg border p-3 animate-fade-in-up",
-                  config.bg,
-                  config.border,
-                  "border"
-                )}
-                style={{ animationDelay: `${index * 100}ms` }}
+                key={`${insight.kind}-${index}`}
+                className="rounded-2xl border border-white/10 bg-[color-mix(in_srgb,var(--color-card)90%,transparent)] px-4 py-3"
               >
                 <div className="flex items-start gap-3">
-                  <Icon
-                    className={cn("size-5 mt-0.5 flex-shrink-0", config.color)}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className={cn("text-sm font-medium", config.color)}>
-                      {insight.text}
-                    </p>
+                  <Icon className="h-5 w-5" style={{ color }} />
+                  <div className="flex-1 space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-sm font-medium text-foreground">
+                        {insight.text}
+                      </p>
+                      <span
+                        className="rounded-full px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.3em]"
+                        style={{ color }}
+                      >
+                        {label}
+                      </span>
+                    </div>
+                    {insight.meta?.link && (
+                      <Button asChild variant="ghost" size="sm" className="px-0 text-[13px]">
+                        <Link href={insight.meta.link}>View detail</Link>
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
             );
           })}
-        </CardContent>
+        </div>
       )}
-    </Card>
+    </div>
   );
 }
