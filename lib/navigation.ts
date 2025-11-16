@@ -68,6 +68,7 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
 
   CEO: [
     { icon: Home, label: "Home", href: "/dashboard/ceo" },
+    { icon: ClipboardList, label: "Approvals", href: "/approvals" },
     { icon: ChartBar, label: "Reports", href: "/reports" },
     { icon: Shield, label: "Admin", href: "/admin" },
     { icon: Activity, label: "Audit", href: "/admin/audit" },
@@ -78,6 +79,7 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
 
   SYSTEM_ADMIN: [
     { icon: Home, label: "Home", href: "/dashboard/admin" },
+    { icon: ClipboardList, label: "Approvals", href: "/approvals" },
     { icon: ChartBar, label: "Reports", href: "/reports" },
     { icon: Shield, label: "Admin", href: "/admin" },
     { icon: Users, label: "Employees", href: "/employees" },

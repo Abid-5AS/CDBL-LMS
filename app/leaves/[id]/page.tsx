@@ -65,11 +65,17 @@ async function LeaveDetailsPageWrapper({ params }: { params: Promise<{ id: strin
 
   // Check access: requester or approver
   const userRole = user.role as string;
-  const hasAccess =
-    leave.requesterId === user.id ||
-    ["HR_ADMIN", "HR_HEAD", "DEPT_HEAD", "CEO"].includes(userRole);
+  const isOwner = leave.requesterId === user.id;
+  const isApprover = ["HR_ADMIN", "HR_HEAD", "DEPT_HEAD", "CEO", "SYSTEM_ADMIN"].includes(userRole);
 
-  if (!hasAccess) {
+  // CRITICAL SECURITY CHECK: Redirect approvers to the correct view
+  // If user is an approver BUT NOT the owner, redirect to approval view
+  if (isApprover && !isOwner) {
+    redirect(`/approvals/${leaveId}`);
+  }
+
+  // If user is neither owner nor approver, deny access
+  if (!isOwner && !isApprover) {
     redirect("/dashboard");
   }
 
