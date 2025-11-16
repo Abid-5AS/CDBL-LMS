@@ -631,7 +631,23 @@ export class LeaveService {
     days: number
   ): Promise<void> {
     const year = new Date().getFullYear();
-    await prisma.balance.updateMany({
+
+    // Check if balance record exists first
+    const balance = await prisma.balance.findFirst({
+      where: {
+        userId,
+        type: leaveType,
+        year,
+      },
+    });
+
+    if (!balance) {
+      console.error(`Balance record not found for user ${userId}, type ${leaveType}, year ${year}`);
+      throw new Error(`Balance record not found for leave type ${leaveType}`);
+    }
+
+    // Update the balance
+    const result = await prisma.balance.updateMany({
       where: {
         userId,
         type: leaveType,
@@ -641,8 +657,15 @@ export class LeaveService {
         used: {
           increment: days,
         },
+        closing: {
+          decrement: days,
+        },
       },
     });
+
+    if (result.count === 0) {
+      throw new Error(`Failed to deduct balance for user ${userId}`);
+    }
   }
 
   /**

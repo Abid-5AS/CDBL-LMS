@@ -96,7 +96,7 @@ export class ApprovalRepository {
     return prisma.approval.findMany({
       where: {
         approverId,
-        decision: "PENDING",
+        decision: ApprovalDecision.PENDING,
       },
       include: this.DEFAULT_INCLUDES,
       orderBy: [
@@ -140,7 +140,7 @@ export class ApprovalRepository {
     return prisma.approval.findFirst({
       where: {
         leaveId,
-        decision: "PENDING",
+        decision: ApprovalDecision.PENDING,
       },
       include: this.DEFAULT_INCLUDES,
       orderBy: { step: "asc" },
@@ -163,7 +163,7 @@ export class ApprovalRepository {
         leaveId: data.leaveId,
         approverId: data.approverId,
         step: data.step,
-        decision: data.decision || "PENDING",
+        decision: data.decision || ApprovalDecision.PENDING,
         comment: data.comment,
         toRole: data.toRole,
       },
@@ -205,7 +205,7 @@ export class ApprovalRepository {
       where: {
         leaveId,
         approverId,
-        decision: "PENDING",
+        decision: ApprovalDecision.PENDING,
       },
       data: {
         decision,
@@ -224,7 +224,7 @@ export class ApprovalRepository {
     const pendingCount = await prisma.approval.count({
       where: {
         leaveId,
-        decision: "PENDING",
+        decision: ApprovalDecision.PENDING,
       },
     });
 
@@ -244,7 +244,8 @@ export class ApprovalRepository {
 
     return approvals.every(
       (approval) =>
-        approval.decision === "APPROVED" || approval.decision === "FORWARDED"
+        approval.decision === ApprovalDecision.APPROVED ||
+        approval.decision === ApprovalDecision.FORWARDED
     );
   }
 
@@ -259,10 +260,10 @@ export class ApprovalRepository {
     total: number;
   }> {
     const [pending, approved, rejected, forwarded, total] = await Promise.all([
-      prisma.approval.count({ where: { approverId, decision: "PENDING" } }),
-      prisma.approval.count({ where: { approverId, decision: "APPROVED" } }),
-      prisma.approval.count({ where: { approverId, decision: "REJECTED" } }),
-      prisma.approval.count({ where: { approverId, decision: "FORWARDED" } }),
+      prisma.approval.count({ where: { approverId, decision: ApprovalDecision.PENDING } }),
+      prisma.approval.count({ where: { approverId, decision: ApprovalDecision.APPROVED } }),
+      prisma.approval.count({ where: { approverId, decision: ApprovalDecision.REJECTED } }),
+      prisma.approval.count({ where: { approverId, decision: ApprovalDecision.FORWARDED } }),
       prisma.approval.count({ where: { approverId } }),
     ]);
 
@@ -321,7 +322,7 @@ export class ApprovalRepository {
     return prisma.approval.count({
       where: {
         approverId,
-        decision: "PENDING",
+        decision: ApprovalDecision.PENDING,
       },
     });
   }
