@@ -17,8 +17,7 @@ export function ApprovalsContent() {
 
   const handleSelect = useCallback(
     (item: HRApprovalItem) => {
-      const targetId = item.requestedById ?? item.id;
-      router.push(`/employees/${targetId}?request=${item.id}&from=approvals`);
+      router.push(`/leaves/${item.id}`);
     },
     [router],
   );
