@@ -37,6 +37,7 @@ import { ConversionSummaryCard } from "@/components/leaves/ConversionHistory";
 
 // Extracted hooks and utils
 import { useEmployeeDashboardData } from "./hooks/useEmployeeDashboardData";
+import { WhosOutToday } from "@/app/dashboard/shared/WhosOutToday";
 
 type EmployeeDashboardContentProps = {
   username: string;
@@ -237,6 +238,11 @@ export function ModernEmployeeDashboard({
           {/* Conversion Summary Card */}
           <motion.div variants={itemVariants}>
             <ConversionSummaryCard year={new Date().getFullYear()} />
+          </motion.div>
+
+          {/* Who's Out Today Widget */}
+          <motion.div variants={itemVariants}>
+            <WhosOutToday scope="team" />
           </motion.div>
 
           {/* Dashboard with Sidebar */}

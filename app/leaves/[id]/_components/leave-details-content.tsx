@@ -12,7 +12,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { AlertCircle, RotateCcw, Edit, Calendar, FileText, User, Clock, Upload } from "lucide-react";
+import { AlertCircle, RotateCcw, Edit, Calendar, FileText, User, Clock, Upload, Bell } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
 import Link from "next/link";
@@ -52,10 +52,15 @@ type LeaveDetailsContentProps = {
 export function LeaveDetailsContent({ leave, comments, currentUserId, currentUserRole, conversionDetails }: LeaveDetailsContentProps) {
   const isRequester = leave.requesterId === currentUserId;
   const isReturned = leave.status === "RETURNED";
+  const isPending = leave.status === "PENDING" || leave.status === "SUBMITTED";
 
   // Fitness certificate modal state
   const [showCertificateModal, setShowCertificateModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // Nudge state
+  const [isNudging, setIsNudging] = useState(false);
+  const [nudgeMessage, setNudgeMessage] = useState<string | null>(null);
 
   // Determine if fitness certificate is required and should be shown
   const requiresFitnessCertificate =
@@ -81,6 +86,30 @@ export function LeaveDetailsContent({ leave, comments, currentUserId, currentUse
     // Trigger refresh of page data
     setRefreshKey((prev) => prev + 1);
     window.location.reload(); // Simple refresh for now
+  };
+
+  const handleNudge = async () => {
+    try {
+      setIsNudging(true);
+      setNudgeMessage(null);
+
+      const response = await fetch(`/api/leaves/${leave.id}/nudge`, {
+        method: "POST",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setNudgeMessage(data.error || "Failed to send nudge");
+        return;
+      }
+
+      setNudgeMessage(data.message || "Reminder sent successfully");
+    } catch (error) {
+      setNudgeMessage("Failed to send nudge");
+    } finally {
+      setIsNudging(false);
+    }
   };
 
   // Get the most recent return comment (non-employee comment)
@@ -374,21 +403,49 @@ export function LeaveDetailsContent({ leave, comments, currentUserId, currentUse
           {/* Right Column: Actions & Metadata */}
           <div className="space-y-6">
             {/* Actions Card */}
-            {isRequester && isReturned && (
+            {isRequester && (isReturned || isPending) && (
               <Card className="rounded-2xl border-muted shadow-sm sticky top-6">
                 <CardHeader>
                   <CardTitle>Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button asChild className="w-full" size="lg">
-                    <Link href={`/leaves/${leave.id}/edit`}>
-                      <Edit className="h-4 w-4 mr-2" />
-                      Edit & Resubmit
-                    </Link>
-                  </Button>
-                  <p className="text-xs text-muted-foreground">
-                    Make necessary changes and resubmit your request for approval.
-                  </p>
+                  {isReturned && (
+                    <>
+                      <Button asChild className="w-full" size="lg">
+                        <Link href={`/leaves/${leave.id}/edit`}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit & Resubmit
+                        </Link>
+                      </Button>
+                      <p className="text-xs text-muted-foreground">
+                        Make necessary changes and resubmit your request for approval.
+                      </p>
+                    </>
+                  )}
+
+                  {isPending && (
+                    <>
+                      <Button
+                        onClick={handleNudge}
+                        disabled={isNudging}
+                        className="w-full"
+                        size="lg"
+                        variant="outline"
+                      >
+                        <Bell className="h-4 w-4 mr-2" />
+                        {isNudging ? "Sending..." : "Nudge Approver"}
+                      </Button>
+                      {nudgeMessage && (
+                        <p className={`text-xs ${nudgeMessage.includes("successfully") || nudgeMessage.includes("sent to") ? "text-green-600" : "text-destructive"}`}>
+                          {nudgeMessage}
+                        </p>
+                      )}
+                      <p className="text-xs text-muted-foreground">
+                        Send a reminder to the approver if your request has been pending for a while.
+                        {" "}(Limited to once per 24 hours)
+                      </p>
+                    </>
+                  )}
                 </CardContent>
               </Card>
             )}
