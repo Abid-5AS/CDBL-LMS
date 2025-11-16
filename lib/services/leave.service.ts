@@ -145,7 +145,6 @@ export class LeaveService {
       await this.logAction(
         user.email,
         "LEAVE_REQUEST_CREATED",
-        `Created ${dto.type} leave request`,
         { leaveId: leaveRequest.id }
       );
 
@@ -220,7 +219,6 @@ export class LeaveService {
       await this.logAction(
         `approver_${approverId}`,
         "LEAVE_APPROVED",
-        `Approved leave request ${leaveId}`,
         { leaveId, comment }
       );
 
@@ -281,7 +279,6 @@ export class LeaveService {
       await this.logAction(
         `approver_${approverId}`,
         "LEAVE_REJECTED",
-        `Rejected leave request ${leaveId}`,
         { leaveId, reason }
       );
 
@@ -369,7 +366,6 @@ export class LeaveService {
       await this.logAction(
         `approver_${currentApproverId}`,
         "LEAVE_FORWARDED",
-        `Forwarded leave request ${leaveId}`,
         { leaveId, comment }
       );
 
@@ -431,7 +427,6 @@ export class LeaveService {
       await this.logAction(
         `approver_${approverId}`,
         "LEAVE_RETURNED",
-        `Returned leave request ${leaveId} for modification`,
         { leaveId, reason }
       );
 
@@ -500,7 +495,6 @@ export class LeaveService {
       await this.logAction(
         `user_${userId}`,
         "LEAVE_CANCELLED",
-        `Cancelled leave request ${leaveId}`,
         { leaveId, reason }
       );
 
@@ -961,15 +955,13 @@ export class LeaveService {
   private static async logAction(
     actor: string,
     action: string,
-    description: string,
-    metadata?: any
+    details?: any
   ): Promise<void> {
     await prisma.auditLog.create({
       data: {
         actorEmail: actor,
         action,
-        description,
-        metadata: metadata ? JSON.stringify(metadata) : undefined,
+        details: details || undefined,
       },
     });
   }
