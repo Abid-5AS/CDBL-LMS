@@ -51,17 +51,13 @@ export async function GET(req: NextRequest) {
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-    // Optimized parallel queries with aggregations
+    // CRITICAL: First batch - KPI card data (fast queries only)
+    // These should return in < 100ms total
     const [
       employeesOnLeave,
       pendingRequests,
-      approvalTimeData,
       totalLeavesThisYear,
       processedToday,
-      totalEmployees,
-      leaveTypeBreakdown,
-      yearStatsAgg,
-      monthlyRequests,
     ] = await Promise.all([
       // Employees on leave today
       prisma.leaveRequest.count({
@@ -76,24 +72,6 @@ export async function GET(req: NextRequest) {
       prisma.leaveRequest.count({
         where: {
           status: "PENDING",
-        },
-      }),
-
-      // Average approval time (LIMIT to 100 most recent for speed)
-      prisma.leaveRequest.findMany({
-        where: {
-          status: "APPROVED",
-          updatedAt: {
-            gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-          },
-        },
-        select: {
-          createdAt: true,
-          updatedAt: true,
-        },
-        take: 100,
-        orderBy: {
-          updatedAt: "desc",
         },
       }),
 
@@ -118,6 +96,34 @@ export async function GET(req: NextRequest) {
             gte: today,
             lt: tomorrow,
           },
+        },
+      }),
+    ]);
+
+    // NON-CRITICAL: Second batch - analytical data (can be slower)
+    // These queries will complete in background, KPIs already rendered
+    const [
+      approvalTimeData,
+      totalEmployees,
+      leaveTypeBreakdown,
+      yearStatsAgg,
+      monthlyRequests,
+    ] = await Promise.all([
+      // Average approval time (LIMIT to 100 most recent for speed)
+      prisma.leaveRequest.findMany({
+        where: {
+          status: "APPROVED",
+          updatedAt: {
+            gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+          },
+        },
+        select: {
+          createdAt: true,
+          updatedAt: true,
+        },
+        take: 100,
+        orderBy: {
+          updatedAt: "desc",
         },
       }),
 

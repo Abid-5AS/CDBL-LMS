@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense, lazy, memo } from "react";
-import dynamic from "next/dynamic";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
 import {
@@ -20,12 +19,9 @@ import {
   RoleKPICard,
   ResponsiveDashboardGrid,
   DashboardSection,
-  ExportButton,
 } from "@/components/dashboards/shared";
 import {
   ChartContainer,
-  TrendChart,
-  TypePie,
 } from "@/components/shared/LeaveCharts";
 import { PendingLeaveRequestsTable } from "./sections/PendingApprovals";
 import { CancellationRequestsPanel } from "./sections/CancellationRequests";
@@ -108,17 +104,34 @@ const itemVariants = {
 };
 
 function HRAdminDashboardClientImpl() {
+  // Fetch KPIs first for instant rendering
+  const {
+    data: kpiData,
+    isLoading: isKPILoading,
+  } = useSWR<HRAdminStats>("/api/dashboard/hr-admin/kpis", apiFetcher, {
+    refreshInterval: 60000, // Refresh every minute
+    revalidateOnFocus: false,
+    dedupingInterval: 10000,
+    revalidateOnReconnect: true,
+    keepPreviousData: true,
+  });
+
+  // Fetch full displayStats in background (includes charts/analytics)
   const {
     data: stats,
-    isLoading,
+    isLoading: isStatsLoading,
     error,
   } = useSWR<HRAdminStats>("/api/dashboard/hr-admin/stats", apiFetcher, {
-    refreshInterval: 60000, // Refresh every minute (matches backend cache)
-    revalidateOnFocus: false, // Disable refetch on focus to reduce load
-    dedupingInterval: 10000, // Dedupe requests within 10s
+    refreshInterval: 60000,
+    revalidateOnFocus: false,
+    dedupingInterval: 10000,
     revalidateOnReconnect: true,
-    keepPreviousData: true, // Show stale data while revalidating
+    keepPreviousData: true,
   });
+
+  // Use KPI data if available, fall back to full stats
+  const displayStats = kpiData || stats;
+  const isLoading = isKPILoading && !displayStats;
 
   if (error) {
     return (
@@ -182,7 +195,7 @@ function HRAdminDashboardClientImpl() {
               <>
                 <RoleKPICard
                   title="Employees on Leave"
-                  value={stats?.employeesOnLeave || 0}
+                  value={displayStats?.employeesOnLeave || 0}
                   subtitle="Currently absent"
                   icon={Users}
                   role="HR_ADMIN"
@@ -191,15 +204,15 @@ function HRAdminDashboardClientImpl() {
                 <div className="relative">
                   <RoleKPICard
                     title="Pending Requests"
-                    value={stats?.pendingRequests || 0}
+                    value={displayStats?.pendingRequests || 0}
                     subtitle="Awaiting action"
                     icon={Clock}
                     role="HR_ADMIN"
                     animate={true}
                     trend={
-                      stats && stats.pendingRequests > 15
+                      displayStats && displayStats.pendingRequests > 15
                         ? {
-                            value: stats.pendingRequests,
+                            value: displayStats.pendingRequests,
                             label: "needs attention",
                             direction: "up",
                           }
@@ -227,21 +240,21 @@ function HRAdminDashboardClientImpl() {
                 <div className="relative">
                   <RoleKPICard
                     title="Avg Approval Time"
-                    value={`${stats?.avgApprovalTime?.toFixed(1) || 0}d`}
+                    value={`${displayStats?.avgApprovalTime?.toFixed(1) || 0}d`}
                     subtitle="Processing speed"
                     icon={TrendingUp}
                     role="HR_ADMIN"
                     animate={true}
                     trend={
-                      stats && stats.avgApprovalTime > 3
+                      displayStats && displayStats.avgApprovalTime > 3
                         ? {
-                            value: Math.round((stats.avgApprovalTime - 3) * 10),
+                            value: Math.round((displayStats.avgApprovalTime - 3) * 10),
                             label: "vs 3d target",
                             direction: "down",
                           }
-                        : stats && stats.avgApprovalTime > 0
+                        : displayStats && displayStats.avgApprovalTime > 0
                         ? {
-                            value: Math.round((3 - stats.avgApprovalTime) * 10),
+                            value: Math.round((3 - displayStats.avgApprovalTime) * 10),
                             label: "below target",
                             direction: "up",
                           }
@@ -268,7 +281,7 @@ function HRAdminDashboardClientImpl() {
                 </div>
                 <RoleKPICard
                   title="Total Leaves (YTD)"
-                  value={stats?.totalLeavesThisYear || 0}
+                  value={displayStats?.totalLeavesThisYear || 0}
                   subtitle="This year"
                   icon={Calendar}
                   role="HR_ADMIN"
@@ -325,20 +338,20 @@ function HRAdminDashboardClientImpl() {
                       <div className="flex items-end justify-between">
                         <div>
                           <p className="text-3xl font-bold">
-                            {stats?.processedToday || 0}
+                            {displayStats?.processedToday || 0}
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            of {stats?.dailyTarget || 10} target
+                            of {displayStats?.dailyTarget || 10} target
                           </p>
                         </div>
                         <div className="text-right">
                           <p className="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
-                            {stats?.dailyProgress || 0}%
+                            {displayStats?.dailyProgress || 0}%
                           </p>
                         </div>
                       </div>
                       <Progress
-                        value={stats?.dailyProgress || 0}
+                        value={displayStats?.dailyProgress || 0}
                         className="h-2 bg-gradient-to-r from-blue-100 to-violet-100 dark:from-blue-950 dark:to-violet-950"
                         style={{
                           // @ts-ignore
@@ -346,7 +359,7 @@ function HRAdminDashboardClientImpl() {
                             "linear-gradient(to right, #3b82f6, #7c3aed)",
                         }}
                       />
-                      {stats && stats.dailyProgress >= 100 && (
+                      {displayStats && displayStats.dailyProgress >= 100 && (
                         <p className="text-xs text-data-success flex items-center gap-1">
                           <CheckCircle2 className="h-3 w-3" />
                           Target achieved!
@@ -359,18 +372,18 @@ function HRAdminDashboardClientImpl() {
                 <div className="relative h-full">
                   <RoleKPICard
                     title="Team Utilization"
-                    value={`${stats?.teamUtilization || 0}%`}
+                    value={`${displayStats?.teamUtilization || 0}%`}
                     subtitle="Workforce availability"
                     icon={Activity}
                     role="HR_ADMIN"
                     animate={true}
                     trend={
-                      stats && stats.teamUtilization
+                      displayStats && displayStats.teamUtilization
                         ? {
-                            value: stats.teamUtilization >= 85 ? 2 : 3,
+                            value: displayStats.teamUtilization >= 85 ? 2 : 3,
                             label: "vs target",
                             direction:
-                              stats.teamUtilization >= 85 ? "up" : "down",
+                              displayStats.teamUtilization >= 85 ? "up" : "down",
                           }
                         : undefined
                     }
@@ -397,18 +410,18 @@ function HRAdminDashboardClientImpl() {
                 <div className="relative h-full">
                   <RoleKPICard
                     title="Compliance Score"
-                    value={`${stats?.complianceScore || 0}%`}
+                    value={`${displayStats?.complianceScore || 0}%`}
                     subtitle="Policy adherence"
                     icon={CheckCircle2}
                     role="HR_ADMIN"
                     animate={true}
                     trend={
-                      stats && stats.complianceScore
+                      displayStats && displayStats.complianceScore
                         ? {
-                            value: stats.complianceScore >= 90 ? 1 : 2,
+                            value: displayStats.complianceScore >= 90 ? 1 : 2,
                             label: "this month",
                             direction:
-                              stats.complianceScore >= 90 ? "up" : "down",
+                              displayStats.complianceScore >= 90 ? "up" : "down",
                           }
                         : undefined
                     }
@@ -480,21 +493,21 @@ function HRAdminDashboardClientImpl() {
                           Processed Today
                         </span>
                         <span className="font-semibold text-foreground">
-                          {stats?.processedToday || 0}
+                          {displayStats?.processedToday || 0}
                         </span>
                       </div>
                       <Separator />
                       <div className="flex justify-between items-center text-sm group hover:bg-muted/30 p-2 rounded-lg transition-colors">
                         <span className="text-muted-foreground">Pending</span>
                         <span className="font-semibold text-foreground">
-                          {stats?.pendingRequests || 0}
+                          {displayStats?.pendingRequests || 0}
                         </span>
                       </div>
                       <Separator />
                       <div className="flex justify-between items-center text-sm group hover:bg-muted/30 p-2 rounded-lg transition-colors">
                         <span className="text-muted-foreground">On Leave</span>
                         <span className="font-semibold text-foreground">
-                          {stats?.employeesOnLeave || 0}
+                          {displayStats?.employeesOnLeave || 0}
                         </span>
                       </div>
                       <Separator />
@@ -503,7 +516,7 @@ function HRAdminDashboardClientImpl() {
                           Avg Processing
                         </span>
                         <span className="font-semibold text-foreground">
-                          {stats?.avgApprovalTime?.toFixed(1) || 0} days
+                          {displayStats?.avgApprovalTime?.toFixed(1) || 0} days
                         </span>
                       </div>
                       <Separator />
@@ -512,7 +525,7 @@ function HRAdminDashboardClientImpl() {
                           Encashment Queue
                         </span>
                         <span className="font-semibold text-foreground">
-                          {stats?.encashmentPending || 0}
+                          {displayStats?.encashmentPending || 0}
                         </span>
                       </div>
                     </>
@@ -529,8 +542,8 @@ function HRAdminDashboardClientImpl() {
                 loading={isLoading}
                 empty={
                   !isLoading &&
-                  (!stats?.leaveTypeBreakdown ||
-                    stats.leaveTypeBreakdown.length === 0)
+                  (!displayStats?.leaveTypeBreakdown ||
+                    displayStats.leaveTypeBreakdown.length === 0)
                 }
                 height={400}
                 className="hover:shadow-xl transition-all duration-300 h-full"
@@ -538,7 +551,7 @@ function HRAdminDashboardClientImpl() {
                 <Suspense fallback={<div className="h-[360px] bg-muted/20 animate-pulse rounded" />}>
                   <LazyTypePie
                     data={
-                      stats?.leaveTypeBreakdown?.map((item) => ({
+                      displayStats?.leaveTypeBreakdown?.map((item) => ({
                         name: item.type,
                         value: item.count,
                       })) || []
@@ -551,8 +564,8 @@ function HRAdminDashboardClientImpl() {
 
             {/* Request Trend Chart */}
             {!isLoading &&
-              stats?.monthlyTrend &&
-              stats.monthlyTrend.length > 0 && (
+              displayStats?.monthlyTrend &&
+              displayStats.monthlyTrend.length > 0 && (
                 <motion.div variants={itemVariants}>
                   <ChartContainer
                     title="Request Trend"
@@ -560,14 +573,14 @@ function HRAdminDashboardClientImpl() {
                     loading={isLoading}
                     empty={
                       !isLoading &&
-                      (!stats?.monthlyTrend || stats.monthlyTrend.length === 0)
+                      (!displayStats?.monthlyTrend || displayStats.monthlyTrend.length === 0)
                     }
                     height={400}
                     className="hover:shadow-xl transition-all duration-300 h-full"
                   >
                     <Suspense fallback={<div className="h-[360px] bg-muted/20 animate-pulse rounded" />}>
                       <LazyTrendChart
-                        data={stats.monthlyTrend.map((item) => ({
+                        data={displayStats.monthlyTrend.map((item) => ({
                           month: item.month,
                           leaves: item.count,
                         }))}
