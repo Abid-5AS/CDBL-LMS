@@ -25,17 +25,20 @@ export function FloatingQuickActions({ actions }: FloatingQuickActionsProps) {
             key={action.label}
             type="button"
             onClick={action.onClick}
-            className="group relative h-14 w-14 rounded-2xl border border-border bg-card shadow-lg shadow-black/10 hover:border-primary/40 transition-all"
+            className="flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 shadow-lg shadow-black/10 hover:border-primary/40 transition-all text-left w-64"
             aria-label={action.label}
           >
             <span
-              className={`absolute inset-0 rounded-2xl ${action.accent} flex items-center justify-center transition-all group-hover:scale-105`}
+              className={`flex h-11 w-11 items-center justify-center rounded-xl ${action.accent}`}
             >
               <Icon className="size-5" />
             </span>
-            <span className="absolute right-16 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-card border border-border px-3 py-2 rounded-lg shadow-lg text-sm font-medium pointer-events-none">
-              {action.label}
-            </span>
+            <div className="flex flex-col text-sm">
+              <span className="font-semibold text-foreground">{action.label}</span>
+              <span className="text-xs text-muted-foreground">
+                {action.description}
+              </span>
+            </div>
           </button>
         );
       })}

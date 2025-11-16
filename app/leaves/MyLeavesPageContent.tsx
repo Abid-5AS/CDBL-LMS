@@ -327,39 +327,21 @@ export function MyLeavesPageContent() {
       </div>
 
       {!balanceLoading && balanceData && (
-        <div className="surface-card px-4 py-4 flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Wallet className="size-4 text-primary" aria-hidden="true" />
-            </div>
-            <div className="flex flex-wrap items-center gap-4 text-sm">
-              <span className="text-muted-foreground">
-                Earned:{" "}
-                <span className="font-semibold text-foreground">
-                  {balanceData.EARNED || 0}
-                </span>
-              </span>
-              <span className="text-muted-foreground">
-                Casual:{" "}
-                <span className="font-semibold text-foreground">
-                  {balanceData.CASUAL || 0}
-                </span>
-              </span>
-              <span className="text-muted-foreground">
-                Medical:{" "}
-                <span className="font-semibold text-foreground">
-                  {balanceData.MEDICAL || 0}
-                </span>
-              </span>
-            </div>
+        <div className="surface-card px-4 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm text-muted-foreground">
+              Balance details live on the Balance page.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Track accruals, carry forward rules, and conversions from there.
+            </p>
           </div>
-          <Link
-            href="/balance"
-            className="ml-auto text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
-          >
-            View balance details
-            <ArrowRight className="size-3" aria-hidden="true" />
-          </Link>
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/balance">
+              View Balance
+              <ArrowRight className="size-4 ml-2" aria-hidden="true" />
+            </Link>
+          </Button>
         </div>
       )}
 

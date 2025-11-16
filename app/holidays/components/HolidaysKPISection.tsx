@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, type Variants } from "framer-motion";
-import { Calendar, CalendarDays, Clock, Star } from "lucide-react";
+import { CalendarDays, Clock, Star, History } from "lucide-react";
 import type { HolidaysStats } from "../hooks/useHolidaysData";
 
 type HolidaysKPISectionProps = {
@@ -47,12 +47,6 @@ function HolidayStatCard({ label, value, helper, icon }: StatCardProps) {
 export function HolidaysKPISection({ stats }: HolidaysKPISectionProps) {
   const cards: StatCardProps[] = [
     {
-      label: "Total Holidays",
-      value: stats.total,
-      helper: "This year",
-      icon: <Calendar className="size-4" aria-hidden="true" />,
-    },
-    {
       label: "Upcoming",
       value: stats.upcoming,
       helper: "Holidays ahead",
@@ -69,6 +63,12 @@ export function HolidaysKPISection({ stats }: HolidaysKPISectionProps) {
       value: stats.optional,
       helper: "Choose to observe",
       icon: <Star className="size-4" aria-hidden="true" />,
+    },
+    {
+      label: "Already Observed",
+      value: stats.past,
+      helper: "Completed this year",
+      icon: <History className="size-4" aria-hidden="true" />,
     },
   ];
 

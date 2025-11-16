@@ -52,6 +52,8 @@ export function LeaveSummarySidebar({
     ? "Unavailable"
     : `${Math.max(remainingBalance, 0)} days`;
 
+  const needsInput = requestedDays <= 0 || !dateRange.start || !dateRange.end;
+
   return (
     <Card className="rounded-2xl border border-border bg-card shadow-lg shadow-black/5 dark:shadow-black/20 p-6 space-y-6 lg:sticky lg:top-24">
       <div>
@@ -84,6 +86,12 @@ export function LeaveSummarySidebar({
             </span>
           </div>
         </div>
+
+        {needsInput && (
+          <p className="mt-4 text-xs text-muted-foreground">
+            Select a leave type and date range to preview remaining balance and warnings.
+          </p>
+        )}
 
         {requestedDays > 0 && !balancesLoading && !balancesError && (
           <div className="mt-4 space-y-1.5">

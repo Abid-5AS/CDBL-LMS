@@ -9,7 +9,7 @@ import { HolidaysMainContent } from "./HolidaysMainContent";
 import { useHolidaysData } from "../hooks/useHolidaysData";
 import { PDFExportButton } from "./PDFExportButton";
 import { formatDate } from "@/lib/utils";
-import { Badge } from "@/components/ui";
+import { Badge, TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui";
 import { EmployeePageHero } from "@/components/employee/PageHero";
 
 const containerVariants = {
@@ -40,7 +40,18 @@ export function ModernHolidaysView({ role }: ModernHolidaysViewProps) {
   } = useHolidaysData();
 
   const headerActions = (
-    <PDFExportButton variant="outline" size="sm" className="gap-2 rounded-xl" />
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <PDFExportButton variant="outline" size="sm" className="gap-2 rounded-xl" />
+        </TooltipTrigger>
+        <TooltipContent>
+          <p className="text-xs max-w-xs">
+            Downloads the full holiday list for the selected filters, including mandatory/optional flags.
+          </p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 
   const viewingYearDescription =
@@ -90,24 +101,36 @@ export function ModernHolidaysView({ role }: ModernHolidaysViewProps) {
     );
   }
 
+  const today = new Date();
+  const nextHolidayDate = holidaysStats.nextHoliday
+    ? new Date(holidaysStats.nextHoliday.date)
+    : null;
+  const daysUntilNext =
+    nextHolidayDate && nextHolidayDate > today
+      ? Math.ceil(
+          (nextHolidayDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+        )
+      : null;
+
   const heroStats = [
     {
       label: "Total Holidays",
       value: holidaysStats.total,
-      helper: `${holidaysStats.mandatory} mandatory`,
-    },
-    {
-      label: "Upcoming",
-      value: holidaysStats.upcoming,
-      state: holidaysStats.upcoming === 0 ? "warning" : "success",
-      helper: `${holidaysStats.optional} optional overall`,
+      helper: `${holidaysStats.availableYears[0] || new Date().getFullYear()}`,
     },
     {
       label: "Next Holiday",
-      value: holidaysStats.nextHoliday
+      value: holidaysStats.nextHoliday?.name ?? "None scheduled",
+      helper: holidaysStats.nextHoliday
         ? formatDate(holidaysStats.nextHoliday.date)
-        : "—",
-      helper: holidaysStats.nextHoliday?.name,
+        : "Stay tuned for updates",
+    },
+    {
+      label: "Days Until Next",
+      value: daysUntilNext !== null ? `${daysUntilNext} days` : "—",
+      helper:
+        daysUntilNext !== null ? "Plan coverage now" : "All observances passed",
+      state: daysUntilNext !== null && daysUntilNext <= 7 ? "warning" : "default",
     },
   ];
 

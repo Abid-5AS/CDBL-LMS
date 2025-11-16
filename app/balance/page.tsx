@@ -123,8 +123,8 @@ function BalanceContent() {
             {isYearEnd ? "Year-end balance reconciliation" : "Monthly accrual closes in 5 days"}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="ghost" size="sm" asChild>
+        <div className="flex flex-wrap gap-2 justify-start md:justify-end">
+          <Button variant="outline" size="sm" asChild>
             <Link href="/reports">Download statement</Link>
           </Button>
           <Button variant="secondary" size="sm" asChild>
@@ -216,7 +216,7 @@ function BalanceContent() {
                   </div>
                 )}
 
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 min-h-[60px]">
                   {showExpiryWarning && (
                     <Alert variant="default" className="py-2">
                       <AlertCircle className="h-3 w-3" />
@@ -233,6 +233,12 @@ function BalanceContent() {
                         Max {config.maxCarryForward} days can be carried forward
                       </AlertDescription>
                     </Alert>
+                  )}
+
+                  {!showExpiryWarning && !showCarryForwardWarning && (
+                    <p className="text-xs text-muted-foreground">
+                      All balances are within policy thresholds.
+                    </p>
                   )}
                 </div>
               </CardContent>

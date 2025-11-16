@@ -189,9 +189,19 @@ export function ModernEmployeeDashboard({
                       </p>
                     </>
                   ) : (
-                    <p className="text-sm text-muted-foreground">
-                      No upcoming leave booked.
-                    </p>
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">
+                        You have no upcoming leave booked.
+                      </p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="px-0 text-primary"
+                        onClick={() => router.push("/leaves/apply")}
+                      >
+                        Schedule leave
+                      </Button>
+                    </div>
                   )}
                 </div>
                 <div className="rounded-xl border border-border/60 px-4 py-3 flex flex-col gap-3">
@@ -337,7 +347,7 @@ export function ModernEmployeeDashboard({
                       content: (
                         <div className="flex flex-col items-center justify-center gap-2 py-6 sm:py-8">
                           <p className="text-base font-medium">
-                            You're all caught up on leave details.
+                            You&apos;re all caught up on leave details.
                           </p>
                           <p className="text-sm text-muted-foreground">
                             Use the Leave Balance and Recent Activity tabs to

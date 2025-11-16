@@ -354,7 +354,7 @@ export function RoleKPICard({
   const content = (
     <div
       className={cn(
-        "neo-card group relative flex h-full min-h-[170px] flex-col overflow-hidden",
+        "neo-card group relative flex h-full min-h-[190px] flex-col overflow-hidden",
         "px-5 py-5 sm:px-6 sm:py-6",
         className
       )}
@@ -378,7 +378,9 @@ export function RoleKPICard({
               {value}
             </p>
             {subtitle && (
-              <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>
+              <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+                {subtitle}
+              </p>
             )}
           </div>
           {trend && (
