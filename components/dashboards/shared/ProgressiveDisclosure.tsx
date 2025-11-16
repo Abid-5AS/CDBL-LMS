@@ -202,6 +202,10 @@ export function TabbedContent({
   );
   const resolvedActiveTab = activeTab ?? defaultActiveTab;
 
+  // Generate stable ID for this Tabs instance to fix hydration mismatch
+  // Use a combination of title and defaultTab to create a unique but stable identifier
+  const stableId = `tabs-${title.toLowerCase().replace(/\s+/g, '-')}-${defaultActiveTab}`;
+
   useEffect(() => {
     if (value && value !== activeTab) {
       setActiveTab(value);
@@ -228,7 +232,7 @@ export function TabbedContent({
       </CardHeader>
 
       <CardContent className="pt-0">
-        <Tabs value={resolvedActiveTab} onValueChange={handleTabChange}>
+        <Tabs id={stableId} value={resolvedActiveTab} onValueChange={handleTabChange}>
           <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1 h-auto p-1">
             {tabs.map((tab) => {
               const TabIcon = tab.icon;

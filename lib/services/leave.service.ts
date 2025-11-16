@@ -565,9 +565,10 @@ export class LeaveService {
     leaveType: LeaveType,
     userRole: string
   ): string | null {
-    // For most users, first approver is department head
+    // For all employees, first approver is HR_ADMIN per the approval chain:
+    // Employee → HR_ADMIN → DEPT_HEAD → HR_HEAD → CEO
     if (userRole === "EMPLOYEE") {
-      return "DEPT_HEAD";
+      return "HR_ADMIN";
     }
     return null;
   }
