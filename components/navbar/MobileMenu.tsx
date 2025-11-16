@@ -83,25 +83,30 @@ export function MobileMenu({
     <AnimatePresence>
       {isMobileMenuOpen && (
         <motion.div
+          id="mobile-menu"
           ref={gestureRef as any}
           variants={menuVariants}
           initial="closed"
           animate="open"
           exit="closed"
           className="md:hidden overflow-hidden"
+          role="navigation"
+          aria-label="Mobile navigation menu"
         >
           {/* Glass morphism background */}
           <div className="glass-modal-overlay absolute inset-0" />
-          <div className="relative glass-nav border-t border-white/20 dark:border-white/10">
+          <div className="relative glass-nav border-t border-border dark:border-border">
             <div className="container-responsive py-6 space-y-6">
               {/* Search Bar */}
               <motion.div variants={itemVariants}>
                 <button
-                  className="w-full flex items-center gap-3 glass-base p-4 rounded-2xl shadow-md border border-white/20 dark:border-white/10 text-left focus-ring hover-lift"
+                  type="button"
+                  className="w-full flex items-center gap-3 glass-base p-4 rounded-2xl shadow-md border border-border dark:border-border text-left focus-ring hover-lift"
                   onClick={() => {
                     openSearch();
                     closeMobileMenu();
                   }}
+                  aria-label="Search leaves and related information"
                 >
                   <Search className="h-5 w-5 text-muted-foreground" />
                   <span className="text-muted-foreground">Search...</span>
@@ -112,7 +117,7 @@ export function MobileMenu({
               </motion.div>
 
               {/* Navigation Links */}
-              <motion.nav variants={itemVariants} className="space-y-2">
+              <motion.nav variants={itemVariants} className="space-y-2" aria-label="Navigation links">
                 {navLinks.map((link, index) => {
                   const Icon = link.icon;
                   const active = isActive(link.href);
@@ -125,18 +130,19 @@ export function MobileMenu({
                       <Link
                         href={link.href}
                         onClick={closeMobileMenu}
+                        aria-current={active ? "page" : undefined}
                         className={cn(
                           "flex items-center gap-4 p-4 rounded-2xl text-base font-medium transition-all duration-200 focus-ring hover-lift active-press",
                           active
-                            ? "bg-primary/90 text-primary-foreground shadow-md"
-                            : "glass-base border border-white/20 dark:border-white/10 text-foreground hover:border-primary/40"
+                            ? "bg-primary text-primary-foreground shadow-md"
+                            : "glass-base border border-border dark:border-border text-foreground hover:border-primary"
                         )}
                       >
                         <div
                           className={cn(
                             "flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200",
                             active
-                              ? "bg-white/20 text-primary-foreground"
+                              ? "bg-primary-foreground/20 text-primary-foreground"
                               : "bg-primary/10 text-primary"
                           )}
                         >
@@ -162,7 +168,7 @@ export function MobileMenu({
 
               {/* User Profile Section */}
               <motion.div variants={itemVariants}>
-                <div className="glass-base p-4 rounded-2xl border border-white/20 dark:border-white/10 shadow-md">
+                <div className="glass-base p-4 rounded-2xl border border-border dark:border-border shadow-md">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-primary-foreground font-bold text-lg shadow-lg">
                       {user.name?.[0]?.toUpperCase() ?? "U"}

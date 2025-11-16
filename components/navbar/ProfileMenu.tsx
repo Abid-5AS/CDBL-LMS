@@ -7,10 +7,8 @@ import { cn } from "@/lib/utils";
 import {
   LogOut,
   Settings,
-  User,
-  FileText,
-  Calendar,
-  BarChart3,
+  CalendarPlus,
+  HelpCircle,
 } from "lucide-react";
 
 import {
@@ -20,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import type { NavbarState } from "./use-navbar-state";
 
 type ProfileMenuProps = {
@@ -43,32 +42,32 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
       CEO: {
         label: "CEO",
         color:
-          "text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-500/10 border-amber-500/10",
+          "text-role-ceo-accent bg-role-ceo-accent-soft border-role-ceo-accent",
       },
       HR_HEAD: {
         label: "HR Head",
         color:
-          "text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-500/10 border-orange-500/10",
+          "text-role-hr-head-accent bg-role-hr-head-accent-soft border-role-hr-head-accent",
       },
       HR_ADMIN: {
         label: "HR Admin",
         color:
-          "text-purple-600 bg-purple-50 dark:text-purple-400 dark:bg-purple-500/10 border-purple-500/10",
+          "text-role-hr-admin-accent bg-role-hr-admin-accent-soft border-role-hr-admin-accent",
       },
       DEPT_HEAD: {
         label: "Manager",
         color:
-          "text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-500/10 border-emerald-500/10",
+          "text-role-dept-head-accent bg-role-dept-head-accent-soft border-role-dept-head-accent",
       },
       SYSTEM_ADMIN: {
         label: "Admin",
         color:
-          "text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-500/10 border-red-500/10",
+          "text-destructive bg-destructive/10 border-destructive/20",
       },
       EMPLOYEE: {
         label: "Employee",
         color:
-          "text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-500/10 border-blue-500/10",
+          "text-role-employee-accent bg-role-employee-accent-soft border-role-employee-accent",
       },
     };
     return badges[role] || badges.EMPLOYEE;
@@ -78,29 +77,14 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
 
   const menuItems: MenuItem[] = [
     {
-      label: "Profile",
-      href: "/settings",
-      icon: <User className="size-4" aria-hidden="true" />,
-    },
-    {
-      label: "My Leaves",
-      href: "/leaves/my",
-      icon: <Calendar className="size-4" aria-hidden="true" />,
-    },
-    {
-      label: "Leave Balance",
-      href: "/balance",
-      icon: <BarChart3 className="size-4" aria-hidden="true" />,
-    },
-    {
       label: "Settings",
       href: "/settings",
       icon: <Settings className="size-4" aria-hidden="true" />,
     },
     {
-      label: "Policies",
-      href: "/policies",
-      icon: <FileText className="size-4" aria-hidden="true" />,
+      label: "Help",
+      href: "/help",
+      icon: <HelpCircle className="size-4" aria-hidden="true" />,
     },
   ];
 
@@ -122,22 +106,22 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
               type="button"
               whileHover={{ scale: 1.02, y: -1 }}
               whileTap={{ scale: 0.98 }}
-              className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl bg-white/80 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-700/60 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-white dark:hover:bg-zinc-800 hover:shadow-md transition-all duration-300 focus:outline-none focus-ring"
+              className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl bg-background/80 dark:bg-muted/60 border border-border hover:border-border-strong hover:bg-background dark:hover:bg-muted hover:shadow-md transition-all duration-300 focus:outline-none focus-ring"
             >
               <div className="text-left hidden sm:block">
-                <div className="text-[11px] font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight leading-tight">
+                <div className="text-[11px] font-semibold text-foreground tracking-tight leading-tight">
                   {user.name}
                 </div>
-                <div className="text-[10px] text-zinc-500 dark:text-zinc-400 tracking-tight leading-tight">
+                <div className="text-[10px] text-muted-foreground tracking-tight leading-tight">
                   {user.department || user.role}
                 </div>
               </div>
               <div className="relative">
                 <motion.div
                   whileHover={{ rotate: 5 }}
-                  className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 p-0.5 shadow-md"
+                  className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent p-0.5 shadow-md"
                 >
-                  <div className="w-full h-full rounded-full flex items-center justify-center bg-white dark:bg-zinc-900 text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                  <div className="w-full h-full rounded-full flex items-center justify-center bg-background dark:bg-muted text-xs font-bold text-foreground">
                     {initials}
                   </div>
                 </motion.div>
@@ -160,8 +144,8 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
               className={cn(
                 "transition-all duration-200",
                 isOpen
-                  ? "text-blue-500 dark:text-blue-400 scale-110"
-                  : "text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-600 dark:group-hover:text-zinc-300"
+                  ? "text-primary dark:text-primary scale-110"
+                  : "text-muted-foreground dark:text-muted-foreground group-hover:text-foreground dark:group-hover:text-foreground"
               )}
               aria-hidden="true"
             >
@@ -178,22 +162,22 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
           <DropdownMenuContent
             align="end"
             sideOffset={8}
-            className="w-64 p-2 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm border border-zinc-200/60 dark:border-zinc-800/60 rounded-2xl shadow-xl shadow-zinc-900/5 dark:shadow-zinc-950/20 
+            className="w-64 p-2 bg-background/95 dark:bg-muted/95 backdrop-blur-sm border border-border rounded-2xl shadow-xl shadow-foreground/5 dark:shadow-background/20 
                     data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 origin-top-right"
           >
             {/* User Info Header */}
-            <div className="px-3 py-3 mb-2 border-b border-zinc-200/50 dark:border-zinc-800/50">
+            <div className="px-3 py-3 mb-2 border-b border-border/50">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 p-0.5 flex-shrink-0">
-                  <div className="w-full h-full rounded-full flex items-center justify-center bg-white dark:bg-zinc-900 text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent p-0.5 flex-shrink-0">
+                  <div className="w-full h-full rounded-full flex items-center justify-center bg-background dark:bg-muted text-sm font-bold text-foreground">
                     {initials}
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">
+                  <div className="text-sm font-semibold text-foreground truncate">
                     {user.name}
                   </div>
-                  <div className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                  <div className="text-xs text-muted-foreground truncate">
                     {user.email}
                   </div>
                   <span
@@ -208,18 +192,29 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
               </div>
             </div>
 
+            <div className="px-3 pb-2">
+              <Button
+                asChild
+                size="sm"
+                className="w-full gap-1.5"
+                leftIcon={<CalendarPlus className="h-4 w-4" />}
+              >
+                <Link href="/leaves/apply">Apply</Link>
+              </Button>
+            </div>
+
             <div className="space-y-1">
               {menuItems.map((item) => (
                 <DropdownMenuItem key={item.label} asChild>
                   <Link
                     href={item.href}
-                    className="flex items-center p-3 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/60 rounded-xl transition-all duration-200 cursor-pointer group hover:shadow-sm border border-transparent hover:border-zinc-200/50 dark:hover:border-zinc-700/50"
+                    className="flex items-center p-3 hover:bg-muted/80 dark:hover:bg-muted/60 rounded-xl transition-all duration-200 cursor-pointer group hover:shadow-sm border border-transparent hover:border-border/50"
                   >
                     <div className="flex items-center gap-2 flex-1">
-                      <span className="text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">
+                      <span className="text-muted-foreground group-hover:text-foreground transition-colors">
                         {item.icon}
                       </span>
-                      <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 tracking-tight leading-tight whitespace-nowrap group-hover:text-zinc-950 dark:group-hover:text-zinc-50 transition-colors">
+                      <span className="text-sm font-medium text-foreground tracking-tight leading-tight whitespace-nowrap group-hover:text-foreground transition-colors">
                         {item.label}
                       </span>
                     </div>
@@ -228,16 +223,16 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
               ))}
             </div>
 
-            <DropdownMenuSeparator className="my-2 bg-gradient-to-r from-transparent via-zinc-200 to-transparent dark:via-zinc-800" />
+            <DropdownMenuSeparator className="my-2 bg-gradient-to-r from-transparent via-border to-transparent" />
 
             <DropdownMenuItem asChild>
               <button
                 type="button"
                 onClick={onLogout}
-                className="w-full flex items-center gap-3 p-3 duration-200 bg-red-500/10 rounded-xl hover:bg-red-500/20 cursor-pointer border border-transparent hover:border-red-500/30 hover:shadow-sm transition-all group"
+                className="w-full flex items-center gap-3 p-3 duration-200 bg-destructive/10 rounded-xl hover:bg-destructive/20 cursor-pointer border border-transparent hover:border-destructive/30 hover:shadow-sm transition-all group"
               >
-                <LogOut className="size-4 text-red-500 group-hover:text-red-600 transition-colors" aria-hidden="true" />
-                <span className="text-sm font-medium text-red-500 group-hover:text-red-600 transition-colors">
+                <LogOut className="size-4 text-destructive group-hover:text-destructive/80 transition-colors" aria-hidden="true" />
+                <span className="text-sm font-medium text-destructive group-hover:text-destructive/80 transition-colors">
                   Sign Out
                 </span>
               </button>

@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
 import { useUser } from "@/lib/user-context";
 import { SelectionProvider } from "@/lib/selection-context";
 import { cn } from "@/lib/utils";
@@ -73,6 +74,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
             >
               <div className="page-shell">{children}</div>
             </main>
+            <Footer />
             <SlideDrawer />
             <FloatingActionButton />
           </div>

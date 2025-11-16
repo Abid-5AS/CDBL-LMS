@@ -6,6 +6,7 @@ import { DesktopNav } from "./DesktopNav";
 import { MobileBar } from "./MobileBar";
 import { MobileMenu } from "./MobileMenu";
 import { useNavbarState } from "./use-navbar-state";
+import { cn } from "@/lib/utils";
 import { useHasMounted } from "@/hooks/use-has-mounted";
 
 export function Navbar() {
@@ -28,21 +29,20 @@ export function Navbar() {
           duration: 0.4,
           height: { duration: 0.3, ease: "easeInOut" },
         }}
-        className="fixed top-0 z-50 w-full border-b backdrop-blur-2xl"
+        className={cn(
+          "fixed top-0 z-50 w-full border-b border-border",
+          "bg-background/90 backdrop-blur-2xl shadow-[0_15px_45px_rgba(15,23,42,0.18)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.65)]",
+          "relative overflow-x-hidden"
+        )}
         role="navigation"
         aria-label="Main navigation"
-        style={{
-          backgroundColor: "var(--shell-sidebar-bg)",
-          borderColor: "var(--shell-divider)",
-          boxShadow: state.scrolled ? "var(--shadow-2)" : "var(--shadow-1)",
-        }}
       >
         <div className="pointer-events-none absolute inset-0 opacity-70">
-          <div className="absolute inset-0 bg-gradient-to-r from-white/25 via-transparent to-white/25 dark:from-white/5 dark:via-white/0 dark:to-white/5" />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/30 via-transparent to-white/30 dark:from-white/5 dark:via-white/0 dark:to-white/5" />
         </div>
 
         {/* Content container */}
-        <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-4 sm:px-6 lg:px-8">
+        <div className="relative mx-auto flex h-full w-full max-w-7xl min-w-0 flex-col">
           <DesktopNav {...state} />
           <MobileBar {...state} />
         </div>

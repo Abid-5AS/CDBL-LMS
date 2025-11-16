@@ -56,14 +56,8 @@ export function useNavbarState(): NavbarState {
       if (href.startsWith("/dashboard/")) {
         return pathname === href || pathname.startsWith(`${href}/`);
       }
-      if (href === "/leaves/apply") {
-        return pathname === "/leaves/apply";
-      }
       if (href === "/leaves") {
-        return (
-          pathname === "/leaves" ||
-          (pathname.startsWith("/leaves/") && pathname !== "/leaves/apply")
-        );
+        return pathname === "/leaves" || pathname.startsWith("/leaves/");
       }
       if (href === "/reports") {
         return pathname === "/reports";

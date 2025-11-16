@@ -1,6 +1,5 @@
 import {
   Home,
-  FileText,
   ClipboardList,
   BookOpen,
   Users,
@@ -30,12 +29,9 @@ export type NavItem = {
 export const roleNavConfig: Record<UserRole, NavItem[]> = {
   EMPLOYEE: [
     { icon: Home, label: "Home", href: "/dashboard/employee" },
-    { icon: FileText, label: "Apply", href: "/leaves/apply" },
     { icon: ClipboardList, label: "My Leaves", href: "/leaves" },
     { icon: Wallet, label: "Balance", href: "/balance" },
     { icon: Calendar, label: "Holidays", href: "/holidays" },
-    { icon: BookOpen, label: "Policies", href: "/policies" },
-    { icon: HelpCircle, label: "FAQ", href: "/faq" },
   ],
 
   DEPT_HEAD: [

@@ -15,7 +15,7 @@ export function Brand({ compact = false }: { compact?: boolean }) {
         "flex items-center gap-2.5 group focus-ring rounded-xl transition-all duration-300",
         compact
           ? "hover:scale-[1.02]"
-          : "rounded-2xl bg-zinc-100/50 dark:bg-zinc-900/40 px-3 py-2 shadow-[0_0_20px_rgba(0,0,0,0.03)] dark:shadow-[0_0_20px_rgba(255,255,255,0.02)] backdrop-blur-xl border border-zinc-200/50 dark:border-white/5 hover:shadow-[0_0_30px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.04)]"
+          : "rounded-2xl bg-muted/50 dark:bg-muted/40 px-3 py-2 shadow-[0_0_20px_rgba(0,0,0,0.03)] dark:shadow-[0_0_20px_rgba(255,255,255,0.02)] backdrop-blur-xl border border-border dark:border-border hover:shadow-[0_0_30px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.04)]"
       )}
     >
       {/* Logo */}
@@ -23,7 +23,7 @@ export function Brand({ compact = false }: { compact?: boolean }) {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         className={cn(
-          "flex items-center justify-center transition-all duration-300 relative bg-white rounded-lg shadow-sm",
+          "flex items-center justify-center transition-all duration-300 relative bg-background rounded-lg shadow-sm",
           compact ? "h-8 w-auto p-1" : "h-10 w-auto p-1.5"
         )}
       >
@@ -46,7 +46,7 @@ export function Brand({ compact = false }: { compact?: boolean }) {
           transition={{ duration: 0.3, delay: 0.2 }}
           className="flex flex-col"
         >
-          <span className="text-[11px] text-zinc-600 dark:text-zinc-400 font-medium tracking-tight">
+          <span className="text-[11px] text-muted-foreground dark:text-muted-foreground font-medium tracking-tight">
             Leave Management System
           </span>
         </motion.div>
@@ -54,7 +54,7 @@ export function Brand({ compact = false }: { compact?: boolean }) {
 
       {/* Hover gradient effect */}
       <motion.div
-        className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"
+        className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/5 via-accent/5 to-destructive/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"
         initial={false}
       />
     </Link>
