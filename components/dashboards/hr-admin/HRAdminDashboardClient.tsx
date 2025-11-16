@@ -150,20 +150,19 @@ export function HRAdminDashboardClient() {
             {isLoading ? (
               <>
                 {[...Array(4)].map((_, i) => (
-                  <motion.div
+                  <div
                     key={i}
-                    variants={itemVariants}
-                    className="glass-card rounded-2xl p-6"
+                    className="neo-card relative flex h-full min-h-[170px] flex-col px-5 py-5 sm:px-6 sm:py-6"
                   >
-                    <div className="flex items-start justify-between">
+                    <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 space-y-3">
-                        <div className="h-4 w-24 bg-muted/50 animate-pulse rounded" />
-                        <div className="h-8 w-20 bg-muted/50 animate-pulse rounded" />
-                        <div className="h-4 w-32 bg-muted/50 animate-pulse rounded" />
+                        <div className="h-3 w-28 bg-muted/40 animate-pulse rounded" />
+                        <div className="h-9 w-24 bg-muted/40 animate-pulse rounded" />
+                        <div className="h-4 w-32 bg-muted/40 animate-pulse rounded" />
                       </div>
-                      <div className="h-12 w-12 bg-muted/50 animate-pulse rounded-xl" />
+                      <div className="h-12 w-12 bg-muted/40 animate-pulse rounded-2xl" />
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </>
             ) : (
@@ -284,33 +283,32 @@ export function HRAdminDashboardClient() {
             {isLoading ? (
               <>
                 {[...Array(3)].map((_, i) => (
-                  <motion.div
+                  <div
                     key={i}
-                    variants={itemVariants}
-                    className="glass-card rounded-2xl p-6"
+                    className="glass-card rounded-2xl border-border h-full min-h-[170px] flex flex-col p-6"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1 space-y-3">
-                        <div className="h-4 w-24 bg-muted/50 animate-pulse rounded" />
-                        <div className="h-8 w-20 bg-muted/50 animate-pulse rounded" />
-                        <div className="h-4 w-32 bg-muted/50 animate-pulse rounded" />
+                        <div className="h-4 w-24 bg-muted/40 animate-pulse rounded" />
+                        <div className="h-8 w-20 bg-muted/40 animate-pulse rounded" />
+                        <div className="h-4 w-32 bg-muted/40 animate-pulse rounded" />
                       </div>
-                      <div className="h-12 w-12 bg-muted/50 animate-pulse rounded-xl" />
+                      <div className="h-12 w-12 bg-muted/40 animate-pulse rounded-xl" />
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </>
             ) : (
               <>
-                <motion.div variants={itemVariants}>
-                  <Card className="glass-card rounded-2xl border-border hover:shadow-lg transition-all duration-300">
+                <motion.div variants={itemVariants} className="h-full">
+                  <Card className="glass-card rounded-2xl border-border hover:shadow-lg transition-all duration-300 h-full flex flex-col">
                     <CardHeader className="pb-3">
                       <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                         <Target className="h-4 w-4" />
                         Daily Processing
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-3">
+                    <CardContent className="space-y-3 flex-1 flex flex-col justify-center">
                       <div className="flex items-end justify-between">
                         <div>
                           <p className="text-3xl font-bold">
@@ -345,7 +343,7 @@ export function HRAdminDashboardClient() {
                   </Card>
                 </motion.div>
 
-                <div className="relative">
+                <div className="relative h-full">
                   <RoleKPICard
                     title="Team Utilization"
                     value={`${stats?.teamUtilization || 0}%`}
@@ -368,7 +366,7 @@ export function HRAdminDashboardClient() {
                     <TooltipTrigger asChild>
                       <button
                         aria-label="Information about team utilization"
-                        className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+                        className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors z-10"
                       >
                         <Info className="h-4 w-4" />
                       </button>
@@ -383,7 +381,7 @@ export function HRAdminDashboardClient() {
                   </Tooltip>
                 </div>
 
-                <div className="relative">
+                <div className="relative h-full">
                   <RoleKPICard
                     title="Compliance Score"
                     value={`${stats?.complianceScore || 0}%`}
@@ -406,7 +404,7 @@ export function HRAdminDashboardClient() {
                     <TooltipTrigger asChild>
                       <button
                         aria-label="Information about compliance score"
-                        className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+                        className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors z-10"
                       >
                         <Info className="h-4 w-4" />
                       </button>
