@@ -19,23 +19,19 @@ const GLASS_CONFIG = {
     medium: "backdrop-blur-md",
     light: "backdrop-blur-sm",
   },
+  // Combined light/dark backgrounds with proper dark: prefix
   background: {
-    light: {
-      strong: "bg-white/80",
-      medium: "bg-white/70",
-      subtle: "bg-white/50",
-    },
-    dark: {
-      strong: "bg-gray-900/80",
-      medium: "bg-gray-900/70",
-      subtle: "bg-gray-900/50",
-    },
+    strong: "bg-white/80 dark:bg-gray-900/80",
+    medium: "bg-white/70 dark:bg-gray-900/70",
+    subtle: "bg-white/50 dark:bg-gray-900/50",
   },
+  // Combined light/dark borders with proper dark: prefix
   border: {
-    strong: "border-white/30",
-    medium: "border-white/20",
-    subtle: "border-white/10",
+    strong: "border border-white/30 dark:border-white/15",
+    medium: "border border-white/20 dark:border-white/10",
+    subtle: "border border-white/10 dark:border-white/5",
   },
+  // Shadows with dark mode support
   shadow: {
     strong: "shadow-2xl shadow-black/20 dark:shadow-black/40",
     medium: "shadow-2xl shadow-black/10 dark:shadow-black/30",
@@ -45,10 +41,10 @@ const GLASS_CONFIG = {
 
 // Glassmorphism Card Variants
 export const glassCard = {
-  base: `${GLASS_CONFIG.blur.strong} ${GLASS_CONFIG.background.light.medium} dark:${GLASS_CONFIG.background.dark.medium} border ${GLASS_CONFIG.border.medium} dark:${GLASS_CONFIG.border.subtle} ${GLASS_CONFIG.shadow.medium}`,
-  elevated: `${GLASS_CONFIG.blur.strong} ${GLASS_CONFIG.background.light.strong} dark:${GLASS_CONFIG.background.dark.strong} border ${GLASS_CONFIG.border.strong} dark:border-white/15 ${GLASS_CONFIG.shadow.strong}`,
-  subtle: `${GLASS_CONFIG.blur.medium} ${GLASS_CONFIG.background.light.subtle} dark:${GLASS_CONFIG.background.dark.subtle} border ${GLASS_CONFIG.border.subtle} dark:border-white/5 ${GLASS_CONFIG.shadow.subtle}`,
-  interactive: `${GLASS_CONFIG.blur.strong} ${GLASS_CONFIG.background.light.medium} dark:${GLASS_CONFIG.background.dark.medium} border ${GLASS_CONFIG.border.medium} dark:${GLASS_CONFIG.border.subtle} ${GLASS_CONFIG.shadow.medium} hover:bg-white/80 dark:hover:bg-gray-900/80 hover:shadow-3xl transition-all duration-300`,
+  base: `${GLASS_CONFIG.blur.strong} ${GLASS_CONFIG.background.medium} ${GLASS_CONFIG.border.medium} ${GLASS_CONFIG.shadow.medium}`,
+  elevated: `${GLASS_CONFIG.blur.strong} ${GLASS_CONFIG.background.strong} ${GLASS_CONFIG.border.strong} ${GLASS_CONFIG.shadow.strong}`,
+  subtle: `${GLASS_CONFIG.blur.medium} ${GLASS_CONFIG.background.subtle} ${GLASS_CONFIG.border.subtle} ${GLASS_CONFIG.shadow.subtle}`,
+  interactive: `${GLASS_CONFIG.blur.strong} ${GLASS_CONFIG.background.medium} ${GLASS_CONFIG.border.medium} ${GLASS_CONFIG.shadow.medium} hover:bg-white/80 dark:hover:bg-gray-900/80 hover:shadow-3xl transition-all duration-300`,
 };
 
 // Neo Button Variants
@@ -95,7 +91,7 @@ export const neoGlow = {
 // ACTION & NOTIFICATION STYLES
 // ============================================
 export const neoAction = {
-  item: `${GLASS_CONFIG.blur.medium} bg-white/40 dark:bg-gray-900/40 border ${GLASS_CONFIG.border.medium} dark:${GLASS_CONFIG.border.subtle} rounded-xl p-3 hover:bg-white/60 dark:hover:bg-gray-900/60 transition-all duration-300`,
+  item: `${GLASS_CONFIG.blur.medium} bg-white/40 dark:bg-gray-900/40 ${GLASS_CONFIG.border.medium} rounded-xl p-3 hover:bg-white/60 dark:hover:bg-gray-900/60 transition-all duration-300`,
   destructive: `${GLASS_CONFIG.blur.medium} bg-red-50/60 dark:bg-red-900/20 border border-red-200/50 dark:border-red-800/30 rounded-xl p-3 hover:bg-red-50/80 dark:hover:bg-red-900/30 transition-all duration-300`,
   warning: `${GLASS_CONFIG.blur.medium} bg-amber-50/60 dark:bg-amber-900/20 border border-amber-200/50 dark:border-amber-800/30 rounded-xl p-3 hover:bg-amber-50/80 dark:hover:bg-amber-900/30 transition-all duration-300`,
   info: `${GLASS_CONFIG.blur.medium} bg-blue-50/60 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-800/30 rounded-xl p-3 hover:bg-blue-50/80 dark:hover:bg-blue-900/30 transition-all duration-300`,
@@ -108,29 +104,29 @@ export const neoAction = {
 export const neoDashboard = {
   section: `${glassCard.base} rounded-2xl p-6`,
   widget: `${glassCard.subtle} rounded-xl p-4`,
-  sidebar: `${GLASS_CONFIG.blur.strong} bg-white/60 dark:bg-gray-900/60 border-r ${GLASS_CONFIG.border.medium} dark:${GLASS_CONFIG.border.subtle}`,
+  sidebar: `${GLASS_CONFIG.blur.strong} bg-white/60 dark:bg-gray-900/60 border-r border-r-white/20 dark:border-r-white/10`,
 };
 
 // ============================================
 // LIST & TABLE ITEM STYLES
 // ============================================
 export const neoList = {
-  item: `${GLASS_CONFIG.blur.light} bg-white/30 dark:bg-gray-900/30 border ${GLASS_CONFIG.border.subtle} rounded-lg p-3 hover:bg-white/50 dark:hover:bg-gray-900/50 hover:shadow-lg transition-all duration-300`,
-  itemActive: `${GLASS_CONFIG.blur.medium} bg-white/60 dark:bg-gray-900/60 border border-blue-500/50 rounded-lg p-3 shadow-lg shadow-blue-500/20 transition-all duration-300`,
+  item: `${GLASS_CONFIG.blur.light} bg-white/30 dark:bg-gray-900/30 ${GLASS_CONFIG.border.subtle} rounded-lg p-3 hover:bg-white/50 dark:hover:bg-gray-900/50 hover:shadow-lg transition-all duration-300`,
+  itemActive: `${GLASS_CONFIG.blur.medium} bg-white/60 dark:bg-gray-900/60 border border-blue-500/50 dark:border-blue-500/50 rounded-lg p-3 shadow-lg shadow-blue-500/20 transition-all duration-300`,
 };
 
 // ============================================
 // EMPTY STATE STYLES
 // ============================================
 export const neoEmpty = {
-  container: `${GLASS_CONFIG.blur.medium} bg-white/40 dark:bg-gray-900/40 border ${GLASS_CONFIG.border.subtle} rounded-xl p-8 text-center`,
+  container: `${GLASS_CONFIG.blur.medium} bg-white/40 dark:bg-gray-900/40 ${GLASS_CONFIG.border.subtle} rounded-xl p-8 text-center`,
 };
 
 // ============================================
 // MODAL & DIALOG STYLES
 // ============================================
 export const neoModal = {
-  overlay: "backdrop-blur-md bg-black/30",
+  overlay: "backdrop-blur-md bg-black/30 dark:bg-black/50",
   content: `${glassCard.elevated} rounded-2xl`,
 };
 

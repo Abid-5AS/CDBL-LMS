@@ -11,28 +11,22 @@ const inputVariants = cva(
       variant: {
         default: neoInput.base,
         filled:
-          "border-transparent bg-muted/60 shadow-sm focus-visible:bg-background focus-visible:border-primary/60 focus-visible:ring-4 focus-visible:ring-primary/20 hover:bg-muted/80",
+          "border-transparent bg-muted/60 dark:bg-muted/40 shadow-sm focus-visible:bg-background focus-visible:border-primary/60 focus-visible:ring-4 focus-visible:ring-primary/20 hover:bg-muted/80 dark:hover:bg-muted/60",
         ghost:
           "border-transparent shadow-none focus-visible:border-primary/60 focus-visible:ring-4 focus-visible:ring-primary/20 hover:bg-muted/40",
         glass: neoInput.base,
+        error: neoInput.error,
+        success: neoInput.success,
       },
       size: {
         sm: "h-9 px-3 py-2 text-sm rounded-lg",
         default: "h-10 px-4 py-2.5 text-sm rounded-xl",
         lg: "h-11 px-5 py-3 text-base rounded-xl",
       },
-      state: {
-        default: "",
-        error: neoInput.error.replace(neoInput.base, ""),
-        success: neoInput.success.replace(neoInput.base, ""),
-        warning:
-          "border-warning/60 focus-visible:border-warning focus-visible:ring-warning/20",
-      },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
-      state: "default",
     },
   }
 );
@@ -55,7 +49,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       type,
       variant,
       size,
-      state,
       label,
       helperText,
       errorMessage,
@@ -71,7 +64,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const [hasValue, setHasValue] = React.useState(false);
     const inputId = React.useId();
 
-    const actualState = errorMessage ? "error" : state;
+    // Auto-detect variant based on errorMessage
+    const actualVariant = errorMessage ? "error" : variant;
     const showFloatingLabel = floating && (focused || hasValue || placeholder);
 
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -103,7 +97,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               id={inputId}
               ref={ref}
               className={cn(
-                inputVariants({ variant, size, state: actualState }),
+                inputVariants({ variant: actualVariant, size }),
                 leftIcon && "pl-10",
                 rightIcon && "pr-10",
                 floating && "placeholder-transparent",
@@ -118,7 +112,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                   ? `${inputId}-description`
                   : undefined
               }
-              aria-invalid={actualState === "error"}
+              aria-invalid={actualVariant === "error"}
               {...props}
             />
             {rightIcon && (
@@ -144,7 +138,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               id={`${inputId}-description`}
               className={cn(
                 "mt-1.5 text-xs",
-                actualState === "error"
+                actualVariant === "error"
                   ? "text-destructive"
                   : "text-muted-foreground"
               )}
@@ -177,7 +171,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             ref={ref}
             className={cn(
-              inputVariants({ variant, size, state: actualState }),
+              inputVariants({ variant: actualVariant, size }),
               leftIcon && "pl-10",
               rightIcon && "pr-10",
               className
@@ -186,7 +180,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             aria-describedby={
               helperText || errorMessage ? `${inputId}-description` : undefined
             }
-            aria-invalid={actualState === "error"}
+            aria-invalid={actualVariant === "error"}
             {...props}
           />
           {rightIcon && (
@@ -200,7 +194,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             id={`${inputId}-description`}
             className={cn(
               "text-xs",
-              actualState === "error"
+              actualVariant === "error"
                 ? "text-destructive"
                 : "text-muted-foreground"
             )}
