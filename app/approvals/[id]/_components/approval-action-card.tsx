@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -67,6 +67,48 @@ export function ApprovalActionCard({
   // Determine which actions are available based on role
   const isCEO = currentUserRole === "CEO";
   const canForward = ["HR_ADMIN", "DEPT_HEAD"].includes(currentUserRole);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Ignore if user is typing in an input/textarea or if a dialog is open
+      const target = event.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        activeDialog !== null ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.altKey
+      ) {
+        return;
+      }
+
+      switch (event.key.toLowerCase()) {
+        case "a":
+          event.preventDefault();
+          setActiveDialog("approve");
+          break;
+        case "r":
+          event.preventDefault();
+          setActiveDialog("reject");
+          break;
+        case "m":
+          event.preventDefault();
+          setActiveDialog("return");
+          break;
+        case "f":
+          if (canForward) {
+            event.preventDefault();
+            setActiveDialog("forward");
+          }
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeDialog, canForward]);
 
   const handleApprove = async () => {
     startTransition(async () => {
@@ -177,23 +219,33 @@ export function ApprovalActionCard({
           <Button
             onClick={() => setActiveDialog("approve")}
             disabled={isPending}
-            className="w-full h-12 text-base bg-green-600 hover:bg-green-700"
+            className="w-full h-12 text-base bg-green-600 hover:bg-green-700 justify-between"
             size="lg"
           >
-            <CheckCircle2 className="h-5 w-5 mr-2" />
-            Approve Request
+            <span className="flex items-center">
+              <CheckCircle2 className="h-5 w-5 mr-2" />
+              Approve Request
+            </span>
+            <kbd className="hidden sm:inline-flex h-5 min-w-5 items-center justify-center rounded border border-white/30 bg-white/20 px-1.5 text-[11px] font-medium text-white">
+              A
+            </kbd>
           </Button>
 
           {/* Reject Button */}
           <Button
             onClick={() => setActiveDialog("reject")}
             disabled={isPending}
-            className="w-full h-12 text-base bg-red-600 hover:bg-red-700"
+            className="w-full h-12 text-base bg-red-600 hover:bg-red-700 justify-between"
             size="lg"
             variant="destructive"
           >
-            <XCircle className="h-5 w-5 mr-2" />
-            Reject Request
+            <span className="flex items-center">
+              <XCircle className="h-5 w-5 mr-2" />
+              Reject Request
+            </span>
+            <kbd className="hidden sm:inline-flex h-5 min-w-5 items-center justify-center rounded border border-white/30 bg-white/20 px-1.5 text-[11px] font-medium text-white">
+              R
+            </kbd>
           </Button>
 
           {/* Forward Button (if not CEO) */}
@@ -201,12 +253,17 @@ export function ApprovalActionCard({
             <Button
               onClick={() => setActiveDialog("forward")}
               disabled={isPending}
-              className="w-full h-12 text-base"
+              className="w-full h-12 text-base justify-between"
               size="lg"
               variant="secondary"
             >
-              <Forward className="h-5 w-5 mr-2" />
-              Forward to Next Approver
+              <span className="flex items-center">
+                <Forward className="h-5 w-5 mr-2" />
+                Forward to Next Approver
+              </span>
+              <kbd className="hidden sm:inline-flex h-5 min-w-5 items-center justify-center rounded border border-border bg-muted px-1.5 text-[11px] font-medium">
+                F
+              </kbd>
             </Button>
           )}
 
@@ -214,12 +271,17 @@ export function ApprovalActionCard({
           <Button
             onClick={() => setActiveDialog("return")}
             disabled={isPending}
-            className="w-full h-12 text-base"
+            className="w-full h-12 text-base justify-between"
             size="lg"
             variant="outline"
           >
-            <RotateCcw className="h-5 w-5 mr-2" />
-            Return for Modification
+            <span className="flex items-center">
+              <RotateCcw className="h-5 w-5 mr-2" />
+              Return for Modification
+            </span>
+            <kbd className="hidden sm:inline-flex h-5 min-w-5 items-center justify-center rounded border border-border bg-muted px-1.5 text-[11px] font-medium">
+              M
+            </kbd>
           </Button>
 
           <p className="text-xs text-muted-foreground text-center mt-4">

@@ -21,7 +21,7 @@ import {
   AlertDialogTitle,
   Textarea,
 } from "@/components/ui";
-import { CheckCircle, FilterX, Loader2 } from "lucide-react";
+import { CheckCircle, FilterX, Loader2, XCircle } from "lucide-react";
 
 // Shared Components (barrel export)
 import { FilterBar, ApprovalActionButtons, EmptyState } from "@/components/shared";
@@ -52,6 +52,7 @@ import {
   rejectLeaveRequest,
   returnLeaveForModification,
   bulkApproveLeaveRequests,
+  bulkRejectLeaveRequests,
 } from "@/app/actions/leave-actions";
 
 type ApprovalsResponse = { items: HRApprovalItem[] };
@@ -90,6 +91,8 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     employeeName: string | null;
   }>({ type: null, itemId: null, employeeName: null });
   const [returnComment, setReturnComment] = useState("");
+  const [showBulkRejectDialog, setShowBulkRejectDialog] = useState(false);
+  const [bulkRejectReason, setBulkRejectReason] = useState("");
 
   const { setSelection } = useSelectionContext();
   const user = useUser();
@@ -344,6 +347,51 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     });
   }, [selectedIds, setOptimisticItems, startTransition, mutate]);
 
+  const handleBulkReject = useCallback(async () => {
+    if (selectedIds.size === 0 || !bulkRejectReason.trim() || bulkRejectReason.trim().length < 5) {
+      toast.error("Please provide a rejection reason (minimum 5 characters)");
+      return;
+    }
+
+    // Optimistically remove selected items from UI
+    selectedIds.forEach((id) => setOptimisticItems(id));
+
+    // Clear selection immediately
+    const idsToReject = Array.from(selectedIds);
+    setSelectedIds(new Set());
+    setShowBulkRejectDialog(false);
+    setBulkRejectReason("");
+
+    // Execute Server Action with useTransition
+    startTransition(async () => {
+      try {
+        const ids = idsToReject.map(Number);
+        const result = await bulkRejectLeaveRequests(ids, bulkRejectReason.trim());
+
+        if (result.success) {
+          toast.success(
+            `Successfully rejected ${result.rejected} leave request${result.rejected > 1 ? "s" : ""}` +
+            (result.failed > 0 ? `. ${result.failed} failed.` : "")
+          );
+
+          // Revalidate data
+          await mutate();
+        } else {
+          toast.error(result.error || "Failed to reject selected leave requests");
+
+          // Revert optimistic update on error
+          await mutate();
+        }
+      } catch (error) {
+        console.error("Bulk reject error:", error);
+        toast.error("Failed to reject selected leave requests");
+
+        // Revert optimistic update on error
+        await mutate();
+      }
+    });
+  }, [selectedIds, bulkRejectReason, setOptimisticItems, startTransition, mutate]);
+
   const allSelected = items.length > 0 && selectedIds.size === items.length;
   const someSelected = selectedIds.size > 0 && selectedIds.size < items.length;
 
@@ -452,6 +500,17 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                     Approve Selected
                   </>
                 )}
+              </button>
+              <button
+                onClick={() => setShowBulkRejectDialog(true)}
+                disabled={isPending}
+                className={cn(
+                  "inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md",
+                  "bg-red-600 text-white hover:bg-red-700 transition-colors"
+                )}
+              >
+                <XCircle className="h-4 w-4" />
+                Reject Selected
               </button>
               <button
                 onClick={() => setSelectedIds(new Set())}
@@ -700,6 +759,65 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
               className="bg-warning text-warning-foreground hover:bg-warning/90"
             >
               Return Request
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Reject Dialog */}
+      <AlertDialog
+        open={showBulkRejectDialog}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowBulkRejectDialog(false);
+            setBulkRejectReason("");
+          }
+        }}
+      >
+        <AlertDialogContent className={cn(glassCard.elevated, "rounded-2xl")}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bulk Reject Leave Requests?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You are about to reject <strong>{selectedIds.size}</strong> leave request
+              {selectedIds.size > 1 ? "s" : ""}. This action cannot be undone, and all
+              affected employees will be notified.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <label
+              htmlFor="bulk-reject-reason"
+              className="text-sm font-medium text-foreground block mb-2"
+            >
+              Rejection Reason <span className="text-destructive">*</span>
+            </label>
+            <Textarea
+              id="bulk-reject-reason"
+              value={bulkRejectReason}
+              onChange={(e) => setBulkRejectReason(e.target.value)}
+              placeholder="Provide a detailed reason for rejecting these leave requests..."
+              className={cn(neoInput.glass, "min-h-[100px]")}
+              maxLength={500}
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Minimum 5 characters required. {bulkRejectReason.length}/500
+            </p>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                setShowBulkRejectDialog(false);
+                setBulkRejectReason("");
+              }}
+              className={neoButton.glass}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkReject}
+              className="bg-red-600 hover:bg-red-700 text-white"
+              disabled={!bulkRejectReason.trim() || bulkRejectReason.trim().length < 5}
+            >
+              Reject All Selected
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

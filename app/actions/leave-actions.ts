@@ -341,3 +341,52 @@ export async function bulkApproveLeaveRequests(leaveIds: number[]) {
     };
   }
 }
+
+/**
+ * Bulk reject leave requests
+ * Uses: POST /api/leaves/bulk/reject
+ */
+export async function bulkRejectLeaveRequests(leaveIds: number[], reason: string) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    if (!reason || reason.trim().length < 5) {
+      return { success: false, error: "Rejection reason is required (minimum 5 characters)" };
+    }
+
+    const response = await fetch("/api/leaves/bulk/reject", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ids: leaveIds, reason: reason.trim() }),
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      return { success: false, error: data.error || "Failed to reject requests" };
+    }
+
+    const data = await response.json();
+
+    // Automatic cache invalidation
+    revalidatePath("/approvals");
+    revalidatePath("/leaves");
+    revalidatePath("/dashboard");
+
+    return {
+      success: true,
+      rejected: data.rejected || 0,
+      failed: data.failed || 0,
+    };
+  } catch (error) {
+    console.error("bulkRejectLeaveRequests error:", error);
+    return {
+      success: false,
+      error: "Failed to reject requests",
+    };
+  }
+}
