@@ -374,10 +374,13 @@ export function useApplyLeaveForm() {
   };
 
   const handleConfirmSubmit = async () => {
-    if (!dateRange.start || !dateRange.end) return;
+    if (!dateRange.start || !dateRange.end || submitting) return;
+
+    // Close modal immediately to prevent multiple clicks
+    setShowConfirmModal(false);
+    setSubmitting(true);
 
     try {
-      setSubmitting(true);
       const payload: any = {
         type,
         startDate: dateRange.start.toISOString(),
@@ -416,9 +419,11 @@ export function useApplyLeaveForm() {
           data?.message
         );
         toast.error(errorMessage);
+        setSubmitting(false);
         return;
       }
 
+      // Clear draft and show success
       clearDraft();
 
       // Show success message with request ID if available
@@ -437,9 +442,7 @@ export function useApplyLeaveForm() {
     } catch (error) {
       console.error(error);
       toast.error(getToastMessage("network_error", "Network error. Please try again."));
-    } finally {
       setSubmitting(false);
-      setShowConfirmModal(false);
     }
   };
 
