@@ -3,7 +3,7 @@
  * Orchestrates business logic for leave management
  */
 
-import { LeaveType, LeaveStatus } from "@prisma/client";
+import { LeaveType, LeaveStatus, ApprovalDecision } from "@prisma/client";
 import { LeaveRepository } from "@/lib/repositories/leave.repository";
 import { LeaveValidator } from "./leave-validator";
 import { NotificationService } from "./notification.service";
@@ -132,10 +132,10 @@ export class LeaveService {
         if (approver) {
           await prisma.approval.create({
             data: {
-              leaveRequestId: leaveRequest.id,
+              leaveId: leaveRequest.id,
               approverId: approver.id,
               step: 1,
-              decision: "PENDING",
+              decision: ApprovalDecision.PENDING,
             },
           });
         }
@@ -146,7 +146,7 @@ export class LeaveService {
         user.email,
         "LEAVE_REQUEST_CREATED",
         `Created ${dto.type} leave request`,
-        { leaveRequestId: leaveRequest.id }
+        { leaveId: leaveRequest.id }
       );
 
       // 8. Send notifications to approvers and requester
@@ -191,12 +191,12 @@ export class LeaveService {
       // Update approval record
       await prisma.approval.updateMany({
         where: {
-          leaveRequestId: leaveId,
+          leaveId: leaveId,
           approverId,
-          decision: "PENDING",
+          decision: ApprovalDecision.PENDING,
         },
         data: {
-          decision: "APPROVED",
+          decision: ApprovalDecision.APPROVED,
           comment,
           decidedAt: new Date(),
         },
@@ -263,12 +263,12 @@ export class LeaveService {
       // Update approval record
       await prisma.approval.updateMany({
         where: {
-          leaveRequestId: leaveId,
+          leaveId: leaveId,
           approverId,
-          decision: "PENDING",
+          decision: ApprovalDecision.PENDING,
         },
         data: {
-          decision: "REJECTED",
+          decision: ApprovalDecision.REJECTED,
           comment: reason,
           decidedAt: new Date(),
         },
@@ -337,12 +337,12 @@ export class LeaveService {
       // Update current approval
       await prisma.approval.updateMany({
         where: {
-          leaveRequestId: leaveId,
+          leaveId: leaveId,
           approverId: currentApproverId,
-          decision: "PENDING",
+          decision: ApprovalDecision.PENDING,
         },
         data: {
-          decision: "FORWARDED",
+          decision: ApprovalDecision.FORWARDED,
           comment,
           decidedAt: new Date(),
         },
@@ -354,16 +354,16 @@ export class LeaveService {
         const currentStep = await this.getCurrentStep(leaveId);
         await prisma.approval.create({
           data: {
-            leaveRequestId: leaveId,
+            leaveId: leaveId,
             approverId: nextApprover.id,
             step: currentStep + 1,
-            decision: "PENDING",
+            decision: ApprovalDecision.PENDING,
           },
         });
       }
 
-      // Update status
-      await LeaveRepository.updateStatus(leaveId, "FORWARDED");
+      // Update status - keep as PENDING since it's still being processed
+      await LeaveRepository.updateStatus(leaveId, "PENDING");
 
       // Log action
       await this.logAction(
@@ -415,12 +415,12 @@ export class LeaveService {
     try {
       await prisma.approval.updateMany({
         where: {
-          leaveRequestId: leaveId,
+          leaveId: leaveId,
           approverId,
-          decision: "PENDING",
+          decision: ApprovalDecision.PENDING,
         },
         data: {
-          decision: "RETURNED",
+          decision: "RETURNED" as any,
           comment: reason,
           decidedAt: new Date(),
         },
@@ -598,8 +598,8 @@ export class LeaveService {
   private static async isFinalApproval(leaveId: number): Promise<boolean> {
     const pendingApprovals = await prisma.approval.count({
       where: {
-        leaveRequestId: leaveId,
-        decision: "PENDING",
+        leaveId: leaveId,
+        decision: ApprovalDecision.PENDING,
       },
     });
 
@@ -608,7 +608,7 @@ export class LeaveService {
 
   private static async getCurrentStep(leaveId: number): Promise<number> {
     const maxStep = await prisma.approval.findFirst({
-      where: { leaveRequestId: leaveId },
+      where: { leaveId: leaveId },
       orderBy: { step: "desc" },
       select: { step: true },
     });
