@@ -83,13 +83,13 @@ export function DesktopNav({
 
                     <Icon
                       className={cn(
-                        "h-4 w-4 transition-all duration-300",
+                        "h-4 w-4 transition-all duration-300 shrink-0",
                         active
                           ? "text-zinc-900 dark:text-zinc-100 scale-105"
                           : "text-zinc-500 dark:text-zinc-500 group-hover/link:scale-110 group-hover/link:text-zinc-900 dark:group-hover/link:text-zinc-100"
                       )}
                     />
-                    <span className="font-medium whitespace-nowrap relative">
+                    <span className="hidden lg:inline font-medium whitespace-nowrap relative">
                       {link.label}
                       {/* Active underline indicator */}
                       {active && (
@@ -151,8 +151,8 @@ export function DesktopNav({
           />
 
           <Search className="h-4 w-4 transition-transform duration-300 group-hover/search:rotate-12" />
-          <span className="hidden lg:inline font-medium">Search</span>
-          <kbd className="hidden lg:inline-flex items-center gap-1 rounded-md border border-zinc-200/60 dark:border-zinc-700/60 bg-zinc-50 dark:bg-zinc-800/80 px-1.5 py-0.5 text-xs font-mono text-zinc-600 dark:text-zinc-400 shadow-sm">
+          <span className="hidden xl:inline font-medium">Search</span>
+          <kbd className="hidden xl:inline-flex items-center gap-1 rounded-md border border-zinc-200/60 dark:border-zinc-700/60 bg-zinc-50 dark:bg-zinc-800/80 px-1.5 py-0.5 text-xs font-mono text-zinc-600 dark:text-zinc-400 shadow-sm">
             <Command className="h-3 w-3" />K
           </kbd>
         </motion.button>

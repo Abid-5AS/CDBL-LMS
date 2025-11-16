@@ -113,7 +113,7 @@ export function ModernHolidaysView({ role }: ModernHolidaysViewProps) {
 
         {/* Simple highlight card for upcoming holiday */}
         {holidaysStats.nextHoliday && (
-          <section className="rounded-2xl border border-border bg-card shadow-sm p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <section className="neo-card p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
               <div className="px-4 py-3 rounded-xl bg-muted text-sm font-semibold text-indigo-600 dark:text-indigo-300">
                 {formatDate(holidaysStats.nextHoliday.date)}
