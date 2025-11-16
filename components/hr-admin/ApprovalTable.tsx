@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useOptimistic, useTransition } from "react";
 import useSWR, { mutate as globalMutate } from "swr";
 import { toast } from "sonner";
 import clsx from "clsx";
@@ -45,6 +45,15 @@ import { HRApprovalItem } from "./types";
 import { useSelectionContext } from "@/lib/selection-context";
 import { apiFetcher, apiPost } from "@/lib/apiClient";
 
+// Server Actions
+import {
+  forwardLeaveRequest,
+  approveLeaveRequest,
+  rejectLeaveRequest,
+  returnLeaveForModification,
+  bulkApproveLeaveRequests,
+} from "@/app/actions/leave-actions";
+
 type ApprovalsResponse = { items: HRApprovalItem[] };
 
 type ApprovalTableProps = {
@@ -69,12 +78,10 @@ const STATUS_OPTIONS = [
 const TYPE_OPTIONS = LEAVE_TYPE_OPTIONS;
 
 export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
-  const [processingId, setProcessingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [isBulkApproving, setIsBulkApproving] = useState(false);
 
   // Dialog state management
   const [dialogState, setDialogState] = useState<{
@@ -104,9 +111,21 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     }
   );
 
+  // React 19 useOptimistic for instant UI updates
+  const [optimisticItems, setOptimisticItems] = useOptimistic(
+    data?.items ?? [],
+    (state: HRApprovalItem[], removedId: string) => {
+      return state.filter((item) => item.id !== removedId);
+    }
+  );
+
+  // useTransition for Server Actions
+  const [isPending, startTransition] = useTransition();
+
+  // Use optimistic items for instant UI updates
   const allItems = useMemo(
-    () => (Array.isArray(data?.items) ? data!.items : []),
-    [data]
+    () => optimisticItems,
+    [optimisticItems]
   );
 
   const items = useMemo(() => {
@@ -170,84 +189,81 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     setReturnComment("");
   }, []);
 
-  // Execute decision after confirmation
+  // Execute decision using Server Actions with useTransition
   const executeDecision = useCallback(async (
     id: string,
     action: "approve" | "reject" | "forward" | "return",
     comment?: string
   ) => {
-    if (processingId) return; // Prevent multiple simultaneous actions
+    // Instant UI update with useOptimistic
+    setOptimisticItems(id);
 
-    try {
-      setProcessingId(id + action);
+    // Remove from selection immediately
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
 
-      // Optimistically remove item from UI
-      const optimisticUpdate = (currentData: ApprovalsResponse | undefined) => {
-        if (!currentData) return currentData;
-        return {
-          ...currentData,
-          items: currentData.items.filter((item) => item.id !== id),
-        };
-      };
+    // Close dialog immediately
+    closeDialog();
 
-      // Apply optimistic update
-      mutate(optimisticUpdate, false);
+    // Execute Server Action with useTransition
+    startTransition(async () => {
+      let result;
 
-      if (action === "forward") {
-        await apiPost(`/api/leaves/${id}/forward`, {});
-        toast.success("Request forwarded successfully");
-      } else if (action === "return") {
-        if (!comment || comment.length < 5) {
-          toast.error("Comment must be at least 5 characters");
-          setProcessingId(null);
-          // Revert optimistic update
-          await mutate();
-          return;
+      try {
+        const numericId = Number(id);
+
+        if (action === "forward") {
+          result = await forwardLeaveRequest(numericId);
+          if (result.success) {
+            toast.success("Request forwarded successfully");
+          }
+        } else if (action === "return") {
+          if (!comment || comment.length < 5) {
+            toast.error("Comment must be at least 5 characters");
+            // Revert optimistic update
+            await mutate();
+            return;
+          }
+          result = await returnLeaveForModification(numericId, comment);
+          if (result.success) {
+            toast.success("Request returned for modification");
+          }
+        } else if (action === "approve") {
+          result = await approveLeaveRequest(numericId, comment);
+          if (result.success) {
+            toast.success(SUCCESS_MESSAGES.leave_approved);
+          }
+        } else if (action === "reject") {
+          result = await rejectLeaveRequest(numericId, comment);
+          if (result.success) {
+            toast.success(SUCCESS_MESSAGES.leave_rejected);
+          }
         }
-        await apiPost(`/api/leaves/${id}/return`, { comment });
-        toast.success("Request returned for modification");
-      } else {
-        // approve or reject
-        await apiPost<{ ok: boolean; status: string }>(
-          `/api/approvals/${id}/decision`,
-          { action, comment: undefined }
-        );
-        toast.success(
-          action === "approve"
-            ? SUCCESS_MESSAGES.leave_approved
-            : SUCCESS_MESSAGES.leave_rejected
-        );
+
+        if (result && !result.success) {
+          toast.error(result.error || "Failed to update request");
+          // Revert optimistic update on error
+          await mutate();
+        }
+
+        // Server Actions auto-revalidate via revalidatePath
+        // But we still revalidate SWR cache for consistency
+        await mutate();
+      } catch (err) {
+        const message =
+          err instanceof Error
+            ? getToastMessage(err.message, err.message)
+            : getToastMessage("approval_failed", "Failed to update request");
+        toast.error(message);
+
+        // Revert optimistic update on error
+        await mutate();
       }
-
-      // Remove from selection if selected
-      setSelectedIds((prev) => {
-        const next = new Set(prev);
-        next.delete(id);
-        return next;
-      });
-
-      // Close dialog after success
-      closeDialog();
-
-      // Revalidate all relevant caches
-      await Promise.all([
-        mutate(), // Revalidate approvals
-        globalMutate("/api/balance/mine"), // Revalidate user balance (critical for UI consistency)
-        globalMutate("/api/leaves?mine=1"), // Revalidate user's leaves
-      ]);
-    } catch (err) {
-      const message =
-        err instanceof Error
-          ? getToastMessage(err.message, err.message)
-          : getToastMessage("approval_failed", "Failed to update request");
-      toast.error(message);
-
-      // Revert optimistic update on error
-      await mutate();
-    } finally {
-      setProcessingId(null);
-    }
-  }, [mutate, closeDialog, processingId]);
+    });
+  }, [setOptimisticItems, closeDialog, startTransition, mutate]);
 
   // Handle decision routing - open dialog for destructive actions
   const handleDecision = useCallback(async (
@@ -286,57 +302,47 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   }, [items]);
 
   const handleBulkApprove = useCallback(async () => {
-    if (selectedIds.size === 0 || isBulkApproving) return;
-
-    setIsBulkApproving(true);
+    if (selectedIds.size === 0) return;
 
     // Optimistically remove selected items from UI
-    const optimisticUpdate = (currentData: ApprovalsResponse | undefined) => {
-      if (!currentData) return currentData;
-      return {
-        ...currentData,
-        items: currentData.items.filter((item) => !selectedIds.has(item.id)),
-      };
-    };
+    selectedIds.forEach((id) => setOptimisticItems(id));
 
-    // Apply optimistic update
-    mutate(optimisticUpdate, false);
+    // Clear selection immediately
+    setSelectedIds(new Set());
 
-    try {
-      const ids = Array.from(selectedIds).map(Number);
-      const response = await apiPost<{ success: boolean; approved: number; failed: number }>("/api/leaves/bulk/approve", { ids });
+    // Execute Server Action with useTransition
+    startTransition(async () => {
+      try {
+        const ids = Array.from(selectedIds).map(Number);
+        const result = await bulkApproveLeaveRequests(ids);
 
-      if (response.success) {
-        toast.success(
-          `Successfully approved ${response.approved} leave request(s)`,
-          {
-            description:
-              response.failed > 0
-                ? `${response.failed} request(s) could not be approved`
-                : undefined,
-          }
-        );
-        setSelectedIds(new Set());
+        if (result.success) {
+          toast.success(
+            `Successfully approved ${result.approved} leave request(s)`,
+            {
+              description:
+                result.failed > 0
+                  ? `${result.failed} request(s) could not be approved`
+                  : undefined,
+            }
+          );
 
-        // Revalidate all relevant caches
-        await Promise.all([
-          mutate(), // Revalidate approvals
-          globalMutate("/api/balance/mine"), // Revalidate user balance
-          globalMutate("/api/leaves?mine=1"), // Revalidate user's leaves
-        ]);
-      } else {
-        throw new Error("Bulk approve failed");
+          // Server Actions auto-revalidate, but refresh SWR cache too
+          await mutate();
+        } else {
+          toast.error(result.error || "Failed to approve selected requests");
+          // Revert optimistic update on error
+          await mutate();
+        }
+      } catch (error) {
+        console.error("Bulk approve error:", error);
+        toast.error("Failed to approve selected leave requests");
+
+        // Revert optimistic update on error
+        await mutate();
       }
-    } catch (error) {
-      console.error("Bulk approve error:", error);
-      toast.error("Failed to approve selected leave requests");
-
-      // Revert optimistic update on error
-      await mutate();
-    } finally {
-      setIsBulkApproving(false);
-    }
-  }, [selectedIds, mutate, isBulkApproving]);
+    });
+  }, [selectedIds, setOptimisticItems, startTransition, mutate]);
 
   const allSelected = items.length > 0 && selectedIds.size === items.length;
   const someSelected = selectedIds.size > 0 && selectedIds.size < items.length;
@@ -429,13 +435,13 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
             <div className="flex items-center gap-2">
               <button
                 onClick={handleBulkApprove}
-                disabled={isBulkApproving}
+                disabled={isPending}
                 className={cn(
                   "inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md",
                   neoButton.success
                 )}
               >
-                {isBulkApproving ? (
+                {isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Approving...
@@ -590,16 +596,9 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                                 ? () => handleDecision(item.id, "approve", item.requestedByName || undefined)
                                 : undefined
                             }
-                            disabled={processingId !== null}
-                            loading={processingId !== null}
-                            loadingAction={
-                              processingId?.startsWith(item.id)
-                                ? (processingId.replace(
-                                    item.id,
-                                    ""
-                                  ) as ApprovalAction)
-                                : null
-                            }
+                            disabled={isPending}
+                            loading={isPending}
+                            loadingAction={null}
                           />
                         </div>
                       </ModernTable.Cell>
