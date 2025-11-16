@@ -14,6 +14,10 @@ type LayoutWrapperProps = {
   children: React.ReactNode;
 };
 
+function ShellBackground() {
+  return null;
+}
+
 export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const pathname = usePathname();
   const user = useUser();
@@ -33,6 +37,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
     "/ceo",
     "/admin",
     "/balance",
+    "/faq",
   ].some((p) => pathname.startsWith(p));
 
   // If no user or doesn't need unified layout
@@ -46,21 +51,20 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
       <SelectionProvider>
         <LeaveDataProvider>
           <div
-            className="flex min-h-screen flex-col bg-background"
+            className="relative flex min-h-screen w-full flex-col overflow-hidden"
             suppressHydrationWarning
           >
+            <ShellBackground />
             <Navbar />
             <main
               className={cn(
-                "flex-1 overflow-y-auto",
-                "pt-[72px]" // Offset for fixed navbar (initial height, animates to 60px on scroll)
+                "relative z-10 flex-1",
+                "pt-[110px] sm:pt-[120px] pb-12"
               )}
               role="main"
               aria-label="Main content"
             >
-              <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                {children}
-              </div>
+              <div className="page-shell">{children}</div>
             </main>
             <SlideDrawer />
             <FloatingActionButton />

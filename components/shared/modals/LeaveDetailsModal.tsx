@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   GlassModal,
   GlassModalContent,
@@ -21,6 +21,7 @@ import {
   MessageSquare,
   Eye,
   X,
+  Loader2,
 } from "lucide-react";
 import { SharedTimeline } from "@/components/shared/SharedTimeline";
 import { ApprovalTimelineAdapter } from "@/components/shared/timeline-adapters";
@@ -39,6 +40,7 @@ import {
 } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 type LeaveDetails = {
   id: number;
@@ -80,6 +82,7 @@ export function LeaveDetailsModal({
   leave,
 }: LeaveDetailsModalProps) {
   const router = useRouter();
+  const [isNudging, setIsNudging] = useState(false);
 
   // Keyboard navigation
   useEffect(() => {
@@ -94,6 +97,30 @@ export function LeaveDetailsModal({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [open, onOpenChange]);
+
+  const handleNudge = async () => {
+    if (!leave) return;
+
+    setIsNudging(true);
+    try {
+      const response = await fetch(`/api/leaves/${leave.id}/nudge`, {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        toast.error(error.error || "Failed to send nudge");
+        return;
+      }
+
+      const data = await response.json();
+      toast.success(data.message || "Reminder sent successfully");
+    } catch (error) {
+      toast.error("Failed to send nudge");
+    } finally {
+      setIsNudging(false);
+    }
+  };
 
   if (!leave) return null;
 
@@ -112,14 +139,14 @@ export function LeaveDetailsModal({
 
   return (
     <GlassModal open={open} onOpenChange={onOpenChange}>
-      <GlassModalContent className="max-w-3xl max-h-[90vh] overflow-y-auto [&>button]:hidden">
-        <GlassModalHeader className="pb-3">
+      <GlassModalContent className="max-w-3xl max-h-[90vh] overflow-y-auto [&>button]:hidden rounded-3xl border-border/50 bg-card/95 backdrop-blur-xl shadow-2xl">
+        <GlassModalHeader className="pb-4 border-b border-border/50">
           {/* Header Row 1: Title + Status + Close Button */}
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              <FileText className="h-5 w-5 text-card-action dark:text-card-action shrink-0" />
+              <FileText className="h-5 w-5 text-brand shrink-0" />
               <div className="flex items-center gap-2 min-w-0">
-                <GlassModalTitle className="text-lg font-semibold text-text-secondary dark:text-text-secondary truncate">
+                <GlassModalTitle className="text-lg font-semibold text-foreground truncate">
                   {leaveTypeLabel[leave.type] || leave.type}
                 </GlassModalTitle>
                 <StatusBadge status={leave.status} />
@@ -130,7 +157,7 @@ export function LeaveDetailsModal({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 shrink-0"
+              className="h-8 w-8 shrink-0 hover:bg-muted"
               onClick={() => onOpenChange(false)}
               aria-label="Close modal"
             >
@@ -139,7 +166,7 @@ export function LeaveDetailsModal({
           </div>
 
           {/* Header Row 2: Stepper */}
-          <div className="mb-3">
+          <div className="mb-4">
             <ApprovalStepper currentIndex={currentIndex} />
           </div>
 
@@ -149,20 +176,20 @@ export function LeaveDetailsModal({
               {currentIndex < 4 ? (
                 <>
                   Next:{" "}
-                  <span className="font-semibold text-text-secondary dark:text-text-secondary">
+                  <span className="font-semibold text-foreground">
                     {nextApprover}
                   </span>
                 </>
               ) : leave.status === "APPROVED" ? (
-                <span className="text-data-success dark:text-data-success font-semibold">
+                <span className="text-green-600 dark:text-green-400 font-semibold">
                   Approved
                 </span>
               ) : leave.status === "REJECTED" ? (
-                <span className="text-data-error dark:text-data-error font-semibold">
+                <span className="text-red-600 dark:text-red-400 font-semibold">
                   Rejected
                 </span>
               ) : (
-                <span className="font-semibold text-text-secondary dark:text-text-secondary">
+                <span className="font-semibold text-foreground">
                   Completed
                 </span>
               )}
@@ -170,7 +197,7 @@ export function LeaveDetailsModal({
             {latestDate && (
               <span>
                 Last update:{" "}
-                <span className="font-medium">
+                <span className="font-medium text-foreground">
                   {formatHeaderDate(latestDate)}
                 </span>
               </span>
@@ -178,38 +205,38 @@ export function LeaveDetailsModal({
           </div>
         </GlassModalHeader>
 
-        <div className="space-y-4 mt-2">
+        <div className="space-y-5 mt-4 px-1">
           {/* Dates and Duration */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex items-start gap-2">
-              <Calendar className="h-4 w-4 text-text-secondary dark:text-text-secondary mt-0.5 shrink-0" />
-              <div>
-                <p className="text-xs font-medium text-text-secondary dark:text-text-secondary mb-1">
+            <div className="flex items-start gap-3 p-3 rounded-2xl bg-muted/50 border border-border/50">
+              <Calendar className="h-4 w-4 text-brand mt-0.5 shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-muted-foreground mb-1">
                   Start Date
                 </p>
-                <p className="text-sm font-semibold text-text-secondary dark:text-text-secondary">
+                <p className="text-sm font-semibold text-foreground">
                   {formatDate(leave.startDate)}
                 </p>
               </div>
             </div>
-            <div className="flex items-start gap-2">
-              <Calendar className="h-4 w-4 text-text-secondary dark:text-text-secondary mt-0.5 shrink-0" />
-              <div>
-                <p className="text-xs font-medium text-text-secondary dark:text-text-secondary mb-1">
+            <div className="flex items-start gap-3 p-3 rounded-2xl bg-muted/50 border border-border/50">
+              <Calendar className="h-4 w-4 text-brand mt-0.5 shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-muted-foreground mb-1">
                   End Date
                 </p>
-                <p className="text-sm font-semibold text-text-secondary dark:text-text-secondary">
+                <p className="text-sm font-semibold text-foreground">
                   {formatDate(leave.endDate)}
                 </p>
               </div>
             </div>
-            <div className="flex items-start gap-2">
-              <Clock className="h-4 w-4 text-text-secondary dark:text-text-secondary mt-0.5 shrink-0" />
-              <div>
-                <p className="text-xs font-medium text-text-secondary dark:text-text-secondary mb-1">
+            <div className="flex items-start gap-3 p-3 rounded-2xl bg-muted/50 border border-border/50">
+              <Clock className="h-4 w-4 text-brand mt-0.5 shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-muted-foreground mb-1">
                   Duration
                 </p>
-                <p className="text-sm font-semibold text-text-secondary dark:text-text-secondary">
+                <p className="text-sm font-semibold text-foreground">
                   {leave.workingDays} {leave.workingDays === 1 ? "day" : "days"}
                 </p>
               </div>
@@ -219,62 +246,20 @@ export function LeaveDetailsModal({
           {/* Reason */}
           {leave.reason && (
             <div>
-              <p className="text-xs font-medium text-text-secondary dark:text-text-secondary mb-2">
+              <p className="text-xs font-medium text-muted-foreground mb-2">
                 Reason
               </p>
-              <div className="bg-bg-secondary dark:bg-bg-secondary/50 rounded-lg p-3 border border-border-strong dark:border-border-strong">
-                <p className="text-sm text-text-secondary dark:text-text-secondary leading-relaxed whitespace-pre-wrap">
+              <div className="bg-muted/50 rounded-2xl p-4 border border-border/50">
+                <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
                   {leave.reason}
                 </p>
               </div>
             </div>
           )}
-
-          {/* Approval History (Collapsible) */}
-          <Accordion type="single" collapsible className="w-full">
-            <AccordionItem
-              value="history"
-              className="border-border-strong dark:border-border-strong"
-            >
-              <AccordionTrigger className="text-xs font-medium text-text-secondary dark:text-text-secondary py-2 hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <User className="h-3.5 w-3.5" />
-                  <span>History</span>
-                  {leave.approvals && leave.approvals.length > 0 && (
-                    <span className="text-muted-foreground">
-                      ({leave.approvals.length})
-                    </span>
-                  )}
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="pt-2">
-                <div className="max-h-64 overflow-y-auto">
-                  <SharedTimeline
-                    items={ApprovalTimelineAdapter(
-                      leave.approvals?.map((a) => ({
-                        step: a.step,
-                        approver:
-                          typeof a.approver === "string"
-                            ? a.approver
-                            : a.approver?.name || undefined,
-                        decision: a.decision,
-                        comment: a.comment || undefined,
-                        decidedAt: a.decidedAt || undefined,
-                        toRole: a.toRole,
-                      })) || [],
-                      leave.createdAt,
-                      leave.status
-                    )}
-                    variant="approval"
-                  />
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
         </div>
 
         {/* Footer with Actions */}
-        <GlassModalFooter className="flex justify-between items-center pt-4 border-t border-border-strong dark:border-border-strong mt-4">
+        <GlassModalFooter className="flex justify-between items-center pt-4 border-t border-border/50 mt-6">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Close
           </Button>
@@ -303,12 +288,20 @@ export function LeaveDetailsModal({
             {canNudge && (
               <Button
                 variant="outline"
-                onClick={() => {
-                  console.log("Nudge approver for leave", leave.id);
-                }}
+                onClick={handleNudge}
+                disabled={isNudging}
               >
-                <MessageSquare className="h-4 w-4 mr-2" />
-                Nudge
+                {isNudging ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Nudge
+                  </>
+                )}
               </Button>
             )}
           </div>

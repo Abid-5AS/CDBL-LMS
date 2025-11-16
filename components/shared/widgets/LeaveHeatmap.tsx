@@ -2,13 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-  Button,
-} from "@/components/ui";
+import Link from "next/link";
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent, Button, Skeleton } from "@/components/ui";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import useSWR from "swr";
@@ -37,17 +32,17 @@ interface LeaveHeatmapProps {
   }) => void;
 }
 
-function getIntensityColor(count: number): string {
-  if (count === 0) return "bg-bg-secondary dark:bg-bg-secondary";
-  if (count === 1) return "bg-data-success dark:bg-data-success";
-  if (count === 2) return "bg-data-success dark:bg-data-success";
-  if (count === 3) return "bg-data-success dark:bg-data-success";
-  return "bg-data-success dark:bg-data-success"; // 4+ days
-}
+const SCOPE_FILTERS = [
+  { label: "Me", value: "me" },
+  { label: "Team", value: "team" },
+];
+
+const RANGE_FILTERS = [
+  { label: "Year", value: "year" },
+  { label: "Rolling 12", value: "rolling12" },
+];
 
 function getDayOfWeek(date: Date): number {
-  // Sunday = 0, Monday = 1, ..., Saturday = 6
-  // But we want Monday = 0, ..., Sunday = 6 for grid layout
   const day = date.getDay();
   return day === 0 ? 6 : day - 1;
 }
@@ -60,17 +55,15 @@ export function LeaveHeatmap({
   const router = useRouter();
   const [scope, setScope] = useState(defaultScope);
   const [range, setRange] = useState(defaultRange);
-  const [types, setTypes] = useState<string[]>([]); // Empty = all
+  const [types, setTypes] = useState<string[]>([]);
   const [status, setStatus] = useState<string>("APPROVED");
 
-  // Fetch heatmap data from its own API
   const typesParam = types.length > 0 ? types.join(",") : "all";
   const { data: heatmapData, isLoading } = useSWR<HeatmapApiResponse>(
     `/api/analytics/heatmap?scope=${scope}&range=${range}&types=${typesParam}&status=${status}`,
     apiFetcher
   );
 
-  // Notify parent of param changes (optional callback)
   const handleParamsChange = (
     newScope: string,
     newRange: string,
@@ -78,225 +71,179 @@ export function LeaveHeatmap({
     newStatus: string
   ) => {
     setScope(newScope as "me" | "team");
-    setRange(newRange as any);
+    setRange(newRange as typeof range);
     setTypes(newTypes);
-    setStatus(newStatus as any);
-    if (onParamsChange) {
-      onParamsChange({
-        scope: newScope,
-        range: newRange,
-        types: newTypes,
-        status: newStatus,
-      });
-    }
+    setStatus(newStatus);
+    onParamsChange?.({
+      scope: newScope,
+      range: newRange,
+      types: newTypes,
+      status: newStatus,
+    });
   };
 
-  const buckets = heatmapData?.buckets || [];
-  const periodStart = heatmapData?.periodStart
-    ? new Date(heatmapData.periodStart)
-    : new Date();
-  const periodEnd = heatmapData?.periodEnd
-    ? new Date(heatmapData.periodEnd)
-    : new Date();
-
-  const { grid, year } = useMemo(() => {
+  const { grid } = useMemo(() => {
     if (isLoading || !heatmapData) {
-      return { grid: [], year: new Date().getFullYear() };
+      return { grid: [] };
     }
 
+    const buckets = heatmapData.buckets ?? [];
+    const periodStart = heatmapData.periodStart
+      ? new Date(heatmapData.periodStart)
+      : new Date();
+    const periodEnd = heatmapData.periodEnd
+      ? new Date(heatmapData.periodEnd)
+      : new Date();
     const currentYear = new Date().getFullYear();
-    const startDate =
-      range === "rolling12" ? periodStart : new Date(currentYear, 0, 1);
+    const startDate = range === "rolling12" ? periodStart : new Date(currentYear, 0, 1);
+    const endDate = range === "rolling12" ? periodEnd : new Date(currentYear, 11, 31);
 
-    const endDate =
-      range === "rolling12" ? periodEnd : new Date(currentYear, 11, 31);
-
-    // Create a map for quick lookup from buckets
     const dataMap = new Map<string, { count: number; types: string[] }>();
-    buckets.forEach(
-      (bucket: { date: string; count: number; types: string[] }) => {
-        dataMap.set(bucket.date, { count: bucket.count, types: bucket.types });
-      }
-    );
+    buckets.forEach((bucket) => dataMap.set(bucket.date, { count: bucket.count, types: bucket.types }));
 
-    // Generate grid: 52 weeks × 7 days
-    const weeks: Array<
-      Array<{ date: Date; data?: { count: number; types: string[] } }>
-    > = [];
+    const weeks: Array<Array<{ date: Date; data?: { count: number; types: string[] } }>> = [];
     let currentDate = new Date(startDate);
 
-    // Find the first Monday (or start of year if it's a Monday)
     const firstDay = getDayOfWeek(currentDate);
     if (firstDay !== 0) {
-      // Move to previous Monday
       currentDate.setDate(currentDate.getDate() - firstDay);
     }
 
-    // Generate 53 weeks (to cover full year)
     for (let week = 0; week < 53; week++) {
       const weekDays: Array<{ date: Date; data?: { count: number; types: string[] } }> = [];
       for (let day = 0; day < 7; day++) {
         const dateStr = format(currentDate, "yyyy-MM-dd");
-        const item = dataMap.get(dateStr);
         weekDays.push({
           date: new Date(currentDate),
-          data: item ? { count: item.count, types: item.types } : undefined,
+          data: dataMap.get(dateStr),
         });
         currentDate.setDate(currentDate.getDate() + 1);
       }
       weeks.push(weekDays);
-
-      // Stop if we've passed the end date
-      if (currentDate > endDate && week > 0) {
-        break;
-      }
+      if (currentDate > endDate && week > 0) break;
     }
 
-    return { grid: weeks, year: currentYear };
-  }, [buckets, range, periodStart, periodEnd, isLoading, heatmapData]);
+    return { grid: weeks };
+  }, [heatmapData, range, isLoading]);
 
   if (isLoading) {
-    return (
-      <div className="h-[200px] flex items-center justify-center text-muted-foreground">
-        Loading heatmap...
-      </div>
-    );
+    return <Skeleton className="h-64 w-full rounded-2xl" />;
   }
 
-  if (grid.length === 0 || buckets.length === 0) {
-    return (
-      <div className="text-center py-8 text-text-secondary dark:text-text-secondary">
-        <p className="text-sm mb-4">
-          {scope === "me"
-            ? "No leave days in this period."
-            : "No team leave days."}
-        </p>
-        <div className="flex gap-2 justify-center">
-          {scope === "me" ? (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => router.push("/leaves/apply")}
-              >
-                Apply Leave
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleParamsChange("team", range, types, status)}
-              >
-                Switch to Team
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleParamsChange("me", range, types, status)}
-              >
-                Back to Me
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => router.push("/leaves?scope=team")}
-              >
-                Open Team on Leave
-              </Button>
-            </>
-          )}
-        </div>
+  const renderEmptyState = () => (
+    <div className="text-center space-y-4 py-10 text-muted-foreground">
+      <p className="text-sm">
+        {scope === "me" ? "No leave days in this period." : "No team leave days."}
+      </p>
+      <div className="flex flex-wrap justify-center gap-2">
+        {scope === "me" ? (
+          <>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/leaves/apply">Apply Leave</Link>
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => handleParamsChange("team", range, types, status)}>
+              Switch to Team
+            </Button>
+          </>
+        ) : (
+          <Button variant="ghost" size="sm" onClick={() => handleParamsChange("me", range, types, status)}>
+            Back to Me
+          </Button>
+        )}
       </div>
-    );
+    </div>
+  );
+
+  const intensity = (count = 0) => {
+    if (count === 0) return "var(--color-card)";
+    if (count === 1) return "color-mix(in srgb, var(--color-data-success) 40%, transparent)";
+    if (count === 2) return "color-mix(in srgb, var(--color-data-success) 60%, transparent)";
+    if (count >= 3) return "var(--color-data-success)";
+    return "var(--color-card)";
+  };
+
+  if (grid.length === 0 || buckets.length === 0) {
+    return renderEmptyState();
   }
 
   return (
-    <div className="w-full overflow-x-auto">
-      <div className="inline-block min-w-full">
+    <div className="neo-card space-y-6 px-6 py-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Heatmap</p>
+          <h3 className="text-xl font-semibold text-foreground">Leave Activity</h3>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {SCOPE_FILTERS.map((filter) => (
+            <Button
+              key={filter.value}
+              variant={scope === filter.value ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleParamsChange(filter.value, range, types, status)}
+            >
+              {filter.label}
+            </Button>
+          ))}
+          {RANGE_FILTERS.map((filter) => (
+            <Button
+              key={filter.value}
+              variant={range === filter.value ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleParamsChange(scope, filter.value, types, status)}
+            >
+              {filter.label}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      <TooltipProvider>
+        <div className="grid grid-flow-col auto-cols-fr gap-1 overflow-x-auto rounded-xl border border-white/10 bg-[color-mix(in_srgb,var(--color-card)90%,transparent)] p-3">
+          {grid.map((week, weekIndex) => (
+            <div key={weekIndex} className="grid gap-1" style={{ gridTemplateRows: "repeat(7, 1fr)" }}>
+              {week.map((day, dayIndex) => {
+                const color = intensity(day.data?.count ?? 0);
+                return (
+                  <Tooltip key={dayIndex}>
+                    <TooltipTrigger asChild>
+                      <div
+                        className="h-4 w-4 rounded-md"
+                        style={{ backgroundColor: color }}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <div className="text-sm font-semibold">
+                        {format(day.date, "MMM d, yyyy")}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {day.data?.count ?? 0} days
+                      </div>
+                      {day.data?.types && day.data.types.length > 0 && (
+                        <div className="text-xs text-muted-foreground">
+                          {day.data.types.join(", ")}
+                        </div>
+                      )}
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </TooltipProvider>
+
+      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+        <span>Less</span>
         <div className="flex gap-1">
-          {/* Day labels */}
-          <div className="flex flex-col gap-1 mr-2 pt-7">
-            <div className="text-[10px] text-text-secondary dark:text-text-secondary h-3">
-              Mon
-            </div>
-            <div className="text-[10px] text-text-secondary dark:text-text-secondary h-3">
-              Wed
-            </div>
-            <div className="text-[10px] text-text-secondary dark:text-text-secondary h-3">
-              Fri
-            </div>
-          </div>
-
-          {/* Grid */}
-          <div className="flex gap-1">
-            {grid.map((week, weekIndex) => (
-              <div key={weekIndex} className="flex flex-col gap-1">
-                {week.map((day, dayIndex) => {
-                  const count = day.data?.count ?? 0;
-                  const dayTypes = day.data?.types ?? [];
-                  const dateStr = format(day.date, "MMM dd, yyyy");
-                  const isInRange =
-                    day.date >= new Date(year, 0, 1) &&
-                    day.date <= new Date(year, 11, 31);
-
-                  return (
-                    <TooltipProvider key={`${weekIndex}-${dayIndex}`}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div
-                            className={cn(
-                              "w-3 h-3 rounded-sm cursor-pointer transition-all hover:scale-125 hover:ring-2 hover:ring-border-strong dark:hover:ring-border-strong",
-                              isInRange || range === "rolling12"
-                                ? getIntensityColor(count)
-                                : "bg-bg-secondary dark:bg-bg-secondary"
-                            )}
-                            title={
-                              count > 0
-                                ? `${count} day${
-                                    count > 1 ? "s" : ""
-                                  } on ${dateStr}`
-                                : `No leave on ${dateStr}`
-                            }
-                          />
-                        </TooltipTrigger>
-                        {count > 0 && (
-                          <TooltipContent>
-                            <div className="text-xs">
-                              <p className="font-semibold">
-                                {count} day{count > 1 ? "s" : ""} on leave
-                              </p>
-                              <p className="text-text-secondary mt-1">{dateStr}</p>
-                              {dayTypes.length > 0 && (
-                                <p className="text-text-secondary">
-                                  {dayTypes.join(", ")}
-                                </p>
-                              )}
-                            </div>
-                          </TooltipContent>
-                        )}
-                      </Tooltip>
-                    </TooltipProvider>
-                  );
-                })}
-              </div>
-            ))}
-          </div>
+          {[0, 1, 2, 3].map((count) => (
+            <div
+              key={count}
+              className="h-3 w-3 rounded-md"
+              style={{ backgroundColor: intensity(count) }}
+            />
+          ))}
         </div>
-
-        {/* Legend */}
-        <div className="flex items-center gap-2 mt-4 text-xs text-text-secondary dark:text-text-secondary">
-          <span>Less</span>
-          <div className="flex gap-1">
-            <div className="w-3 h-3 rounded-sm bg-bg-secondary dark:bg-bg-secondary" />
-            <div className="w-3 h-3 rounded-sm bg-data-success dark:bg-data-success" />
-            <div className="w-3 h-3 rounded-sm bg-data-success dark:bg-data-success" />
-            <div className="w-3 h-3 rounded-sm bg-data-success dark:bg-data-success" />
-            <div className="w-3 h-3 rounded-sm bg-data-success dark:bg-data-success" />
-          </div>
-          <span>More</span>
-        </div>
+        <span>More</span>
       </div>
     </div>
   );

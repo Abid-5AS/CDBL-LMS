@@ -375,30 +375,30 @@ export function FAQPageContent() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <a
               href="/policies"
-              className="p-4 rounded-lg border border-border hover:bg-accent transition-colors"
+              className="neo-card group block p-6 cursor-pointer"
             >
-              <BookOpen className="size-5 mb-2 text-primary" />
-              <h4 className="font-semibold mb-1">Leave Policies</h4>
+              <BookOpen className="size-6 mb-3 text-primary" />
+              <h4 className="font-semibold mb-2 text-foreground">Leave Policies</h4>
               <p className="text-sm text-muted-foreground">
                 Complete policy documentation
               </p>
             </a>
             <a
               href="/leaves/apply"
-              className="p-4 rounded-lg border border-border hover:bg-accent transition-colors"
+              className="neo-card group block p-6 cursor-pointer"
             >
-              <Calendar className="size-5 mb-2 text-primary" />
-              <h4 className="font-semibold mb-1">Apply for Leave</h4>
+              <Calendar className="size-6 mb-3 text-primary" />
+              <h4 className="font-semibold mb-2 text-foreground">Apply for Leave</h4>
               <p className="text-sm text-muted-foreground">
                 Start a new leave request
               </p>
             </a>
             <a
               href="mailto:hr@cdbl.com"
-              className="p-4 rounded-lg border border-border hover:bg-accent transition-colors"
+              className="neo-card group block p-6 cursor-pointer"
             >
-              <Mail className="size-5 mb-2 text-primary" />
-              <h4 className="font-semibold mb-1">Contact HR</h4>
+              <Mail className="size-6 mb-3 text-primary" />
+              <h4 className="font-semibold mb-2 text-foreground">Contact HR</h4>
               <p className="text-sm text-muted-foreground">
                 Email us for specific queries
               </p>

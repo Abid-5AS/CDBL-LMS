@@ -14,7 +14,9 @@ export const cache = "no-store";
 
 const ExtendSchema = z.object({
   newEndDate: z.string(), // New extended end date
-  extensionReason: z.string().min(10, "Extension reason must be at least 10 characters"),
+  extensionReason: z
+    .string()
+    .min(10, "Extension reason must be at least 10 characters"),
 });
 
 /**
@@ -73,7 +75,11 @@ export async function POST(
   // Check ownership
   if (parentLeave.requesterId !== user.id) {
     return NextResponse.json(
-      error("forbidden", "You can only extend your own leave requests", traceId),
+      error(
+        "forbidden",
+        "You can only extend your own leave requests",
+        traceId
+      ),
       { status: 403 }
     );
   }
@@ -266,10 +272,10 @@ export async function POST(
     } else if (firstApproverRole === "DEPT_HEAD") {
       // Use user's department head
       const userWithDeptHead = await prisma.user.findUnique({
-        where: { id: user.id },
-        select: { departmentHeadId: true },
+        where: { id: userId },
+        select: { deptHeadId: true },
       });
-      firstApproverId = userWithDeptHead?.departmentHeadId || null;
+      firstApproverId = userWithDeptHead?.deptHeadId || null;
     }
 
     if (firstApproverId) {

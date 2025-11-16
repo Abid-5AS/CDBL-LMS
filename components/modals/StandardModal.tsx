@@ -43,17 +43,21 @@ const variantStyles = {
   danger: {
     icon: <AlertTriangle className="h-5 w-5" />,
     iconBg: "bg-destructive/10 text-destructive",
-    confirmButton: "bg-destructive hover:bg-destructive/90 text-destructive-foreground",
+    confirmButton:
+      "bg-destructive hover:bg-destructive/90 text-destructive-foreground",
   },
   warning: {
     icon: <AlertTriangle className="h-5 w-5" />,
-    iconBg: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400",
-    confirmButton: "bg-yellow-600 hover:bg-yellow-700 text-white dark:bg-yellow-500 dark:hover:bg-yellow-600",
+    iconBg:
+      "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400",
+    confirmButton:
+      "bg-yellow-600 hover:bg-yellow-700 text-white dark:bg-yellow-500 dark:hover:bg-yellow-600",
   },
   info: {
     icon: <Info className="h-5 w-5" />,
     iconBg: "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400",
-    confirmButton: "bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600",
+    confirmButton:
+      "bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600",
   },
 };
 
@@ -118,7 +122,7 @@ export function StandardModal({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
         className={cn(
-          "glass-modal max-h-[90vh] overflow-y-auto",
+          "neo-card max-h-[90vh] overflow-y-auto rounded-2xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] shadow-[0_20px_60px_rgba(0,0,0,0.3)] backdrop-blur-xl",
           sizeClasses[size],
           className
         )}
@@ -138,35 +142,42 @@ export function StandardModal({
           <button
             onClick={handleClose}
             disabled={isLoading}
-            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            className="absolute right-4 top-4 rounded-lg opacity-60 hover:opacity-100 transition-all duration-200 hover:bg-[rgba(91,94,252,0.1)] p-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(91,94,252)] disabled:pointer-events-none"
           >
-            <X className="h-4 w-4" />
+            <X className="h-4 w-4 text-[var(--color-text-secondary)]" />
             <span className="sr-only">Close</span>
           </button>
         )}
 
-        <DialogHeader>
+        <DialogHeader className="border-b border-[var(--shell-card-border)] pb-5">
           {/* Icon for variants */}
           {(icon || variantConfig.icon) && (
-            <div className={cn("mb-3 inline-flex items-center justify-center rounded-full p-3 w-12 h-12", variantConfig.iconBg)}>
+            <div
+              className={cn(
+                "mb-4 inline-flex items-center justify-center rounded-xl p-3 w-12 h-12 shadow-sm",
+                variantConfig.iconBg
+              )}
+            >
               {icon || variantConfig.icon}
             </div>
           )}
 
-          <DialogTitle className="text-xl font-semibold">{title}</DialogTitle>
+          <DialogTitle className="text-xl font-semibold text-[var(--color-text-primary)]">
+            {title}
+          </DialogTitle>
           {description && (
-            <DialogDescription className="text-sm text-muted-foreground mt-2">
+            <DialogDescription className="text-sm text-[var(--color-text-secondary)] mt-2 leading-relaxed">
               {description}
             </DialogDescription>
           )}
         </DialogHeader>
 
         {/* Content */}
-        <div className="py-4">{children}</div>
+        <div className="py-6">{children}</div>
 
         {/* Footer */}
         {!hideFooter && (
-          <DialogFooter className="gap-2">
+          <DialogFooter className="gap-3 border-t border-[var(--shell-card-border)] pt-5">
             {footer ? (
               footer
             ) : (
@@ -176,7 +187,7 @@ export function StandardModal({
                   variant="outline"
                   onClick={handleClose}
                   disabled={isLoading}
-                  className="min-w-[100px]"
+                  className="min-w-[100px] neo-button rounded-xl border-[var(--shell-card-border)] hover:border-[rgb(91,94,252)]/50 hover:bg-[rgba(91,94,252,0.05)] transition-all duration-200"
                 >
                   {cancelText}
                 </Button>
@@ -185,7 +196,10 @@ export function StandardModal({
                     type="button"
                     onClick={handleConfirm}
                     disabled={isLoading}
-                    className={cn("min-w-[100px]", variantConfig.confirmButton)}
+                    className={cn(
+                      "min-w-[100px] neo-button rounded-xl transition-all duration-200 shadow-sm hover:shadow-md",
+                      variantConfig.confirmButton
+                    )}
                   >
                     {isLoading ? (
                       <>

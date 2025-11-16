@@ -7,8 +7,7 @@ export const cache = "no-store";
 
 const UpdateSchema = z.object({
   role: z.enum(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"]).optional(),
-  departmentId: z.number().nullable().optional(),
-  department: z.string().min(1).optional(), // Legacy support
+  department: z.string().min(1).nullable().optional(),
   isActive: z.boolean().optional(),
 });
 
@@ -58,8 +57,7 @@ export async function PATCH(
     where: { id: numericId },
     data: {
       role: (payload.role ?? undefined) as any,
-      departmentId: payload.departmentId === null ? null : (payload.departmentId ?? undefined),
-      department: payload.department ?? undefined, // Legacy support
+      department: payload.department ?? undefined,
       isActive: payload.isActive ?? undefined,
     },
     select: {

@@ -35,9 +35,9 @@ export function ApprovalActionButtons({
   size = "default",
   className = "",
 }: ApprovalActionButtonsProps) {
-  const buttonSize = size === "sm" ? "h-9 w-9" : "h-12 w-12";
+  const buttonSize = size === "sm" ? "h-10 w-10" : "h-12 w-12";
   const iconSize = size === "sm" ? "h-4 w-4" : "h-5 w-5";
-  const gap = size === "sm" ? "gap-1.5" : "gap-2";
+  const gap = size === "sm" ? "gap-2" : "gap-2.5";
   // Employee: Only cancel
   if (employeeMode) {
     return (
@@ -48,10 +48,12 @@ export function ApprovalActionButtons({
             variant="ghost"
             onClick={onCancel}
             disabled={disabled || loading}
-            className={`group ${buttonSize} rounded-2xl border border-border hover:border-destructive transition-colors`}
+            className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-red-500/50 hover:bg-red-500/5 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(239,68,68,0.15)]`}
             title="Cancel Request"
           >
-            <X className={`${iconSize} text-destructive group-hover:text-destructive transition-colors`} />
+            <X
+              className={`${iconSize} text-red-600 dark:text-red-400 transition-colors`}
+            />
           </Button>
         )}
       </div>
@@ -68,10 +70,12 @@ export function ApprovalActionButtons({
             variant="ghost"
             onClick={onApprove}
             disabled={disabled || loading}
-            className={`group ${buttonSize} rounded-2xl border border-border hover:border-success transition-colors`}
+            className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-green-500/50 hover:bg-green-500/5 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(34,197,94,0.15)]`}
             title="Approve"
           >
-            <Check className={`${iconSize} text-success group-hover:text-success transition-colors`} />
+            <Check
+              className={`${iconSize} text-green-600 dark:text-green-400 transition-colors`}
+            />
           </Button>
         )}
         {onCancel && (
@@ -80,10 +84,12 @@ export function ApprovalActionButtons({
             variant="ghost"
             onClick={onCancel}
             disabled={disabled || loading}
-            className={`group ${buttonSize} rounded-2xl border border-border hover:border-destructive transition-colors`}
+            className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-red-500/50 hover:bg-red-500/5 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(239,68,68,0.15)]`}
             title="Cancel Request"
           >
-            <X className={`${iconSize} text-destructive group-hover:text-destructive transition-colors`} />
+            <X
+              className={`${iconSize} text-red-600 dark:text-red-400 transition-colors`}
+            />
           </Button>
         )}
       </div>
@@ -99,13 +105,17 @@ export function ApprovalActionButtons({
           variant="ghost"
           onClick={onForward}
           disabled={disabled || loading}
-          className={`group ${buttonSize} rounded-2xl border border-border hover:border-primary transition-colors`}
+          className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-[rgb(91,94,252)]/50 hover:bg-[rgba(91,94,252,0.05)] transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(91,94,252,0.2)]`}
           title="Forward to Next Stage"
         >
           {loadingAction === "forward" ? (
-            <div className={`${iconSize} animate-spin rounded-full border-2 border-primary border-t-transparent`} />
+            <div
+              className={`${iconSize} animate-spin rounded-full border-2 border-[rgb(91,94,252)] border-t-transparent`}
+            />
           ) : (
-            <ArrowRight className={`${iconSize} text-primary group-hover:text-primary transition-colors`} />
+            <ArrowRight
+              className={`${iconSize} text-[rgb(91,94,252)] transition-colors`}
+            />
           )}
         </Button>
       )}
@@ -115,13 +125,17 @@ export function ApprovalActionButtons({
           variant="ghost"
           onClick={onReturn}
           disabled={disabled || loading}
-          className={`group ${buttonSize} rounded-2xl border border-border hover:border-warning transition-colors`}
+          className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-amber-500/50 hover:bg-amber-500/5 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(245,158,11,0.15)]`}
           title="Return for Modification"
         >
           {loadingAction === "return" ? (
-            <div className={`${iconSize} animate-spin rounded-full border-2 border-warning border-t-transparent`} />
+            <div
+              className={`${iconSize} animate-spin rounded-full border-2 border-amber-600 border-t-transparent`}
+            />
           ) : (
-            <RotateCcw className={`${iconSize} text-warning group-hover:text-warning transition-colors`} />
+            <RotateCcw
+              className={`${iconSize} text-amber-600 dark:text-amber-400 transition-colors`}
+            />
           )}
         </Button>
       )}
@@ -131,13 +145,17 @@ export function ApprovalActionButtons({
           variant="ghost"
           onClick={onCancel}
           disabled={disabled || loading}
-          className={`group ${buttonSize} rounded-2xl border border-border hover:border-destructive transition-colors`}
+          className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-red-500/50 hover:bg-red-500/5 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(239,68,68,0.15)]`}
           title="Cancel Request"
         >
           {loadingAction === "cancel" ? (
-            <div className={`${iconSize} animate-spin rounded-full border-2 border-destructive border-t-transparent`} />
+            <div
+              className={`${iconSize} animate-spin rounded-full border-2 border-red-600 border-t-transparent`}
+            />
           ) : (
-            <X className={`${iconSize} text-destructive group-hover:text-destructive transition-colors`} />
+            <X
+              className={`${iconSize} text-red-600 dark:text-red-400 transition-colors`}
+            />
           )}
         </Button>
       )}

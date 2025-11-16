@@ -297,8 +297,8 @@ function PolicyCard({ policy }: PolicyCardProps) {
                   : "default"
               }
               className={cn(
-                rule.type === "warning" && "border-yellow-500/50 bg-yellow-50/50",
-                rule.type === "info" && "border-blue-500/50 bg-blue-50/50"
+                rule.type === "warning" && "border-yellow-500/50 dark:border-yellow-600/30 bg-yellow-50/50 dark:bg-yellow-900/20",
+                rule.type === "info" && "border-blue-500/50 dark:border-blue-600/30 bg-blue-50/50 dark:bg-blue-900/20"
               )}
             >
               {rule.type === "critical" && <XCircle className="size-4" />}
@@ -337,7 +337,7 @@ function PolicyCard({ policy }: PolicyCardProps) {
                 {policy.examples.map((example, index) => (
                   <div
                     key={index}
-                    className="p-3 rounded-md border border-border bg-muted/30"
+                    className="p-3 rounded-md border border-border bg-muted/30 dark:bg-muted/50"
                   >
                     <div className="flex items-start gap-3">
                       <div className="mt-0.5">

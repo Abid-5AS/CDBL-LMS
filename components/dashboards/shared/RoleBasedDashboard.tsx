@@ -1,8 +1,9 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import type { Role } from "@prisma/client";
 
 type RoleBasedDashboardProps = {
@@ -165,7 +166,10 @@ export function RoleBasedDashboard({
   const containerClasses = cn("min-h-screen", backgroundClass, className);
 
   const contentClasses = cn(
-    "container mx-auto py-6 sm:py-8 lg:py-10",
+    "container mx-auto",
+    title || description || actions
+      ? "py-6 sm:py-8 lg:py-10"
+      : "py-3 sm:py-4 lg:py-6",
     fullWidth ? "px-0" : config.padding,
     !fullWidth && config.maxWidth
   );
@@ -185,27 +189,37 @@ export function RoleBasedDashboard({
       <div className={contentClasses}>
         {/* Header Section */}
         {(title || description || actions) && (
-          <div className="mb-6 sm:mb-8 lg:mb-10">
+          <div
+            className={cn(
+              "mb-6 sm:mb-8 lg:mb-10",
+              !title && !description && actions && "mb-4"
+            )}
+          >
             <div
               className={cn(
                 "flex flex-col gap-4",
-                actions && "sm:flex-row sm:items-start sm:justify-between"
+                actions && !title && !description && "justify-end",
+                actions &&
+                  (title || description) &&
+                  "sm:flex-row sm:items-start sm:justify-between"
               )}
             >
-              <div className="flex-1">
-                {title && (
-                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
-                    {title}
-                  </h1>
-                )}
-                {description && (
-                  <p className="text-sm sm:text-base text-muted-foreground max-w-3xl">
-                    {description}
-                  </p>
-                )}
-              </div>
+              {(title || description) && (
+                <div className="flex-1">
+                  {title && (
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
+                      {title}
+                    </h1>
+                  )}
+                  {description && (
+                    <p className="text-sm sm:text-base text-muted-foreground max-w-3xl">
+                      {description}
+                    </p>
+                  )}
+                </div>
+              )}
               {actions && (
-                <div className="shrink-0 flex flex-wrap gap-2 sm:gap-3">
+                <div className="shrink-0 flex flex-wrap gap-2 sm:gap-3 ml-auto">
                   {actions}
                 </div>
               )}
@@ -260,10 +274,7 @@ export function RoleDashboardCard({
       "bg-gradient-to-br from-[color:var(--dashboard-accent-soft)] to-card",
       "hover:shadow-lg hover:shadow-[color:var(--dashboard-accent)]/10",
     ],
-    variant === "glass" && [
-      "glass-card",
-      "hover:shadow-xl",
-    ],
+    variant === "glass" && ["glass-card", "hover:shadow-xl"],
     className
   );
 
@@ -319,47 +330,69 @@ export function RoleKPICard({
     ? roleConfigs[role] || roleConfigs.EMPLOYEE
     : roleConfigs.EMPLOYEE;
 
+  const accentVars: CSSProperties & {
+    "--role-kpi-accent"?: string;
+    "--role-kpi-accent-soft"?: string;
+    "--role-kpi-accent-muted"?: string;
+  } = {
+    "--role-kpi-accent": config.accent,
+    "--role-kpi-accent-soft": config.accentSoft,
+    "--role-kpi-accent-muted":
+      "color-mix(in srgb, var(--role-kpi-accent) 8%, transparent)",
+  };
+
+  const trendGlyph = trend ? (
+    trend.direction === "up" ? (
+      <TrendingUp className="h-3.5 w-3.5" />
+    ) : trend.direction === "down" ? (
+      <TrendingDown className="h-3.5 w-3.5" />
+    ) : (
+      <Minus className="h-3.5 w-3.5" />
+    )
+  ) : null;
+
   const content = (
-    <RoleDashboardCard
-      role={role}
-      variant="glass"
+    <div
       className={cn(
-        "p-4 sm:p-6 flex flex-col h-full min-h-[160px]",
+        "neo-card group relative flex h-full min-h-[170px] flex-col overflow-hidden",
+        "px-5 py-5 sm:px-6 sm:py-6",
         className
       )}
-      animate={false}
+      style={accentVars}
     >
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-medium text-muted-foreground mb-1">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        style={{
+          background:
+            "radial-gradient(circle at 15% 0%, var(--role-kpi-accent-soft), transparent 60%)",
+        }}
+      />
+      <div className="relative flex items-start justify-between gap-4">
+        <div className="flex-1 space-y-3">
+          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.35em] text-[color:var(--color-foreground-subtle)]">
             {title}
           </p>
-          <p className="text-2xl sm:text-3xl font-bold text-foreground mb-1">
-            {value}
-          </p>
-          {subtitle && (
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              {subtitle}
+          <div>
+            <p className="text-3xl font-semibold text-foreground sm:text-4xl">
+              {value}
             </p>
-          )}
+            {subtitle && (
+              <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>
+            )}
+          </div>
           {trend && (
-            <div className="flex items-center gap-1 mt-2">
-              <span
-                className={cn(
-                  "text-xs font-medium",
-                  trend.direction === "up" &&
-                    "text-green-600 dark:text-green-400",
-                  trend.direction === "down" &&
-                    "text-red-600 dark:text-red-400",
-                  trend.direction === "neutral" && "text-muted-foreground"
-                )}
-              >
-                {trend.direction === "up" && "↗"}
-                {trend.direction === "down" && "↘"}
-                {trend.direction === "neutral" && "→"}
+            <div className="inline-flex items-center gap-2 rounded-full bg-[var(--role-kpi-accent-soft)]/70 px-3 py-1 text-xs font-semibold text-[color:var(--role-kpi-accent)]">
+              {trendGlyph}
+              <span>
+                {trend.direction === "down"
+                  ? "-"
+                  : trend.direction === "up"
+                  ? "+"
+                  : ""}
                 {Math.abs(trend.value)}%
               </span>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-[color:var(--color-foreground-subtle)]/80">
                 {trend.label}
               </span>
             </div>
@@ -367,23 +400,20 @@ export function RoleKPICard({
         </div>
         {Icon && (
           <div
-            className="p-2 sm:p-3 rounded-xl"
+            className="rounded-2xl border border-white/20 p-3 shadow-inner dark:border-white/5"
             style={{
-              backgroundColor: config.accentSoft,
+              background:
+                "linear-gradient(135deg, var(--role-kpi-accent-soft), transparent)",
             }}
-            suppressHydrationWarning
           >
-            <span
-              style={{ color: config.accent }}
-              suppressHydrationWarning
-              className="inline-flex"
-            >
-              <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
-            </span>
+            <Icon
+              className="h-6 w-6"
+              style={{ color: "var(--role-kpi-accent)" }}
+            />
           </div>
         )}
       </div>
-    </RoleDashboardCard>
+    </div>
   );
 
   if (animate) {

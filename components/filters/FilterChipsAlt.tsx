@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import clsx from "clsx";
 
 type FilterOption = {
@@ -20,27 +21,31 @@ export function FilterChips({
 }: FilterChipsProps) {
   return (
     <div
-      className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide"
+      className="flex items-center gap-2.5 overflow-x-auto pb-2 scrollbar-hide"
       data-filter-chips
     >
       {options.map((option) => {
         const isSelected = selectedValue === option.value;
         return (
-          <button
+          <motion.button
             key={option.value}
             onClick={() => onChange(option.value)}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className={clsx(
-              "relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 ease-out whitespace-nowrap",
-              "focus:outline-none focus:ring-2 focus:ring-card-action focus:ring-offset-2",
-              "hover:scale-105",
+              "relative px-5 py-2.5 text-sm font-semibold rounded-xl",
+              "transition-all duration-200 ease-out whitespace-nowrap",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(91,94,252)] focus-visible:ring-offset-2",
               isSelected
-                ? "bg-card-action text-text-inverted shadow-sm"
-                : "bg-bg-primary border border-border-strong text-text-secondary hover:border-border-strong"
+                ? "bg-gradient-to-br from-[rgb(91,94,252)] to-[rgb(71,74,232)] text-white shadow-[0_4px_12px_rgba(91,94,252,0.3)]"
+                : "bg-[var(--color-card-elevated)] border border-[var(--shell-card-border)] text-[var(--color-text-secondary)] hover:border-[rgb(91,94,252)]/30 hover:bg-[rgba(91,94,252,0.04)]"
             )}
+            role="tab"
+            aria-selected={isSelected}
             aria-current={isSelected ? "page" : undefined}
           >
             {option.label}
-          </button>
+          </motion.button>
         );
       })}
     </div>

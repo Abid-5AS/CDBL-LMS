@@ -1,248 +1,311 @@
 /* ===== Core semantic palette (Light) ===== */
 :root {
+  /* ===== Aurora-inspired shell tokens ===== */
+  --shell-gradient: radial-gradient(
+      circle at 8% 0%,
+      rgba(90, 104, 255, 0.35),
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 92% 0%,
+      rgba(14, 165, 233, 0.25),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 50% 100%,
+      rgba(236, 72, 153, 0.2),
+      transparent 45%
+    ),
+    linear-gradient(180deg, #fdfbff 0%, #f5f7ff 36%, #f6fbff 70%, #eff4ff 100%);
+  --shell-overlay: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.85),
+    rgba(255, 255, 255, 0.5)
+  );
+  --shell-grid-color: rgba(104, 118, 179, 0.12);
+  --shell-grid-size: 140px;
+  --shell-card-border: rgba(15, 23, 42, 0.08);
+  --shell-card-glow: 0 25px 60px rgba(101, 116, 255, 0.15);
+  --shell-card-glow-strong: 0 35px 120px rgba(91, 94, 252, 0.25);
+  --shell-border: rgba(91, 104, 255, 0.18);
+  --shell-sidebar-bg: rgba(255, 255, 255, 0.7);
+  --shell-content-bg: rgba(255, 255, 255, 0.85);
+  --shell-divider: rgba(99, 102, 241, 0.14);
+  --shell-noise-opacity: 0.25;
+
   /* ========== DEPTH LAYERS ========== */
-  /* BASE LAYER (Darkest - Canvas/Page Background) */
-  --color-base-darkest: #ffffff; /* Page background - true white canvas */
-  --color-base-dark: #f8fafc; /* Section backgrounds - 1-2 shades lighter */
+  --color-base-darkest: #f9f9ff;
+  --color-base-dark: #eff3ff;
 
   /* CARD LAYER (Elevated - Content containers) */
-  --color-card-elevated: #ffffff; /* Main cards floating above base */
-  --color-card-elevated-subtle: #fcfcfd; /* Nested/secondary cards */
-  --color-card-hover: #ffffff; /* Card on hover - slight brightening */
-  --color-card-pressed: #f8fafc; /* Card when pressed/active */
+  --color-card-elevated: #ffffff;
+  --color-card-elevated-subtle: #f7f6ff;
+  --color-card-hover: #ffffff;
+  --color-card-pressed: #eff2ff;
 
   /* TEXT - Contrast Hierarchy */
-  --color-text-primary: #0b1220; /* Highest contrast - headings, main numbers */
-  --color-text-secondary: #334155; /* Medium contrast - labels, descriptions */
-  --color-text-tertiary: #64748b; /* Lower contrast - metadata, timestamps */
-  --color-text-muted: #94a3b8; /* Subtle - placeholders, disabled */
-  --color-text-inverted: #ffffff; /* Inverse for dark backgrounds */
+  --color-text-primary: #050b18;
+  --color-text-secondary: #263154;
+  --color-text-tertiary: #4b5674;
+  --color-text-muted: #8a94b5;
+  --color-text-inverted: #ffffff;
 
   /* SURFACES - Full Stack */
-  --color-bg-primary: #ffffff; /* Page/canvas background */
-  --color-bg-secondary: #f8fafc; /* Section/panel backgrounds */
-  --color-bg-tertiary: #eef2f7; /* Interactive surfaces, hover states */
-  --color-bg-muted: #e5eaf1; /* Subtle borders, skeleton screens */
-  --color-bg-inverted: #0b1220; /* Dark overlay backgrounds */
+  --color-bg-primary: #f6f8fc;
+  --color-bg-secondary: #eef1ff;
+  --color-bg-tertiary: #e3e8ff;
+  --color-bg-muted: #d8def1;
+  --color-bg-inverted: #050413;
 
-  /* BRAND / PRIMARY ACCENT (Blue - Primary CTA) */
-  --color-brand: #4f46e5; /* indigo-600 - Primary action button */
-  --color-brand-soft: #e7e9ff; /* indigo-100 - Soft background/badge */
-  --color-brand-strong: #3730a3; /* indigo-800 - Strong emphasis */
+  /* BRAND / PRIMARY ACCENT */
+  --color-brand: #5b5efc;
+  --color-brand-soft: #e7e8ff;
+  --color-brand-strong: #2628f6;
 
   /* INTERACTIVE STATE COLORS */
-  --color-interactive-hover-border: #6366f1; /* Accent color for borders on hover */
-  --color-interactive-hover-bg: #e7e9ff; /* Soft accent for hover backgrounds */
-  --color-interactive-focus-ring: #6366f1; /* Focus ring color */
-  --color-interactive-active: #3730a3; /* Active/pressed state */
-  --color-interactive-disabled: #94a3b8; /* Disabled state */
+  --color-interactive-hover-border: #7c83ff;
+  --color-interactive-hover-bg: #ecebff;
+  --color-interactive-focus-ring: #7c83ff;
+  --color-interactive-active: #2d34ff;
+  --color-interactive-disabled: #a0a7c7;
 
-  /* SECONDARY ACTION (Muted version of accent for less important actions) */
-  --color-action-secondary: #94a3b8; /* Muted gray for secondary buttons */
-  --color-action-secondary-bg: #f1f5f9; /* Light background for secondary buttons */
+  /* SECONDARY ACTION */
+  --color-action-secondary: #3f4c6b;
+  --color-action-secondary-bg: rgba(63, 76, 107, 0.08);
 
-  /* DESTRUCTIVE ACTION (Warm accent - Red/Orange for dangerous actions) */
-  --color-action-destructive: #dc2626; /* red-600 - Explicit warning for delete/critical */
-  --color-action-destructive-soft: #fee2e2; /* red-100 - Soft background */
+  /* DESTRUCTIVE ACTION */
+  --color-action-destructive: #f04461;
+  --color-action-destructive-soft: #ffe5ea;
 
-  /* DATA STATES (Status/feedback colors - Success, Warning, Error, Info) */
-  --color-data-success: #16a34a; /* emerald-600 - Confirmation/positive */
-  --color-data-success-soft: #dcfce7; /* emerald-100 */
-  --color-data-success-strong: #166534; /* emerald-800 */
+  /* DATA STATES */
+  --color-data-success: #0fb881;
+  --color-data-success-soft: #d5f5e8;
+  --color-data-success-strong: #0c8a60;
 
-  --color-data-warning: #d97706; /* amber-600 - Caution/attention needed */
-  --color-data-warning-soft: #fef3c7; /* amber-100 */
-  --color-data-warning-strong: #92400e; /* amber-800 */
+  --color-data-warning: #f7a600;
+  --color-data-warning-soft: #fff3d6;
+  --color-data-warning-strong: #b46a00;
 
-  --color-data-error: #dc2626; /* red-600 - Error/failure state */
-  --color-data-error-soft: #fee2e2; /* red-100 */
-  --color-data-error-strong: #7f1d1d; /* red-900 */
+  --color-data-error: #f04461;
+  --color-data-error-soft: #ffe2e8;
+  --color-data-error-strong: #b0213c;
 
-  --color-data-info: #0284c7; /* sky-600 - Informational */
-  --color-data-info-soft: #e0f2fe; /* sky-100 */
-  --color-data-info-strong: #075985; /* sky-800 */
+  --color-data-info: #0ea5e9;
+  --color-data-info-soft: #d4f1ff;
+  --color-data-info-strong: #026aa2;
 
-  /* ICON TREATMENT (Match associated text contrast) */
-  --color-icon-primary: var(--color-text-primary); /* Primary icons - highest contrast */
-  --color-icon-secondary: var(--color-text-secondary); /* Secondary icons */
-  --color-icon-muted: var(--color-text-muted); /* Decorative icons - subtle */
-  --color-icon-accent: var(--color-brand); /* Active/important icons using accent */
+  /* ICON TREATMENT */
+  --color-icon-primary: var(--color-text-primary);
+  --color-icon-secondary: var(--color-text-secondary);
+  --color-icon-muted: var(--color-text-muted);
+  --color-icon-accent: var(--color-brand);
   --color-icon-success: var(--color-data-success);
   --color-icon-warning: var(--color-data-warning);
   --color-icon-error: var(--color-data-error);
   --color-icon-info: var(--color-data-info);
 
-  /* LEAVE TYPES (HR-friendly, clear differentiation) */
-  --color-leave-earned: #16a34a; /* emerald-600 - Accrued balance */
-  --color-leave-casual: #2563eb; /* blue-600 - Regular/flexible time off */
-  --color-leave-medical: #0ea5e9; /* cyan-600 - Medical purposes */
-  --color-leave-sick: #dc2626; /* red-600 - Illness/health related */
-  --color-leave-unpaid: #6b7280; /* gray-500 - No pay benefit */
-  --color-leave-maternity: #db2777; /* pink-600 - Maternity benefit */
-  --color-leave-paternity: #7c3aed; /* violet-600 - Paternity benefit */
+  /* LEAVE TYPES */
+  --color-leave-earned: #14b885;
+  --color-leave-casual: #2563eb;
+  --color-leave-medical: #0ea5e9;
+  --color-leave-sick: #f04461;
+  --color-leave-unpaid: #6b7280;
+  --color-leave-maternity: #db2777;
+  --color-leave-paternity: #7c3aed;
 
-  /* CARD CATEGORIES (Content type indicators - subtle, not overwhelming) */
-  --color-card-kpi: #b45309; /* amber-700 - Key performance indicators */
-  --color-card-kpi-soft: #fff7ed; /* amber-50 */
-  --color-card-action: var(--color-brand); /* Interactive/action cards */
+  /* CARD CATEGORIES */
+  --color-card-kpi: #d97706;
+  --color-card-kpi-soft: #fff4e2;
+  --color-card-kpi-strong: #9c4a00;
+  --color-card-action: var(--color-brand);
   --color-card-action-soft: var(--color-brand-soft);
-  --color-card-summary: #7c3aed; /* violet-600 - Overview/summary cards */
-  --color-card-summary-soft: #f3e8ff; /* violet-100 */
-  --color-card-kpi-strong: #92400e;
-  --color-card-action-strong: var(--color-brand-strong);
+  --color-card-action-strong: #1f1ddc;
+  --color-card-summary: #9333ea;
+  --color-card-summary-soft: #f5e8ff;
   --color-card-summary-strong: #5b21b6;
 
-  /* UI STATUSES (Request/Process states with clear semantics) */
-  --color-status-draft: #6b7280; /* gray-500 - Not yet submitted */
-  --color-status-submitted: #2563eb; /* blue-600 - Awaiting review */
-  --color-status-approved: #16a34a; /* emerald-600 - Confirmed/Accepted */
-  --color-status-rejected: #dc2626; /* red-600 - Denied/Not approved */
-  --color-status-returned: #d97706; /* amber-600 - Needs revision */
-  --color-status-cancelled: #94a3b8; /* slate-400 - Voided/Not applicable */
+  /* UI STATUSES */
+  --color-status-draft: #94a3b8;
+  --color-status-submitted: #2563eb;
+  --color-status-approved: #22c55e;
+  --color-status-rejected: #f04461;
+  --color-status-returned: #f97316;
+  --color-status-cancelled: #94a3b8;
 
   /* FOCUS / RING */
-  --color-ring: #6366f1; /* indigo-500 */
+  --color-ring: #7c83ff;
 
-  /* SURFACES - Elevation Scale */
-  --surface-canvas: #ffffff; /* page background */
-  --surface-subtle: #f8fafc; /* section bg / strips */
-  --surface-1: #ffffff; /* cards/panels */
-  --surface-2: #fcfcfd; /* nested cards */
+  /* SURFACES */
+  --surface-canvas: #f6f8fc;
+  --surface-subtle: #eef2ff;
+  --surface-1: #ffffff;
+  --surface-2: #f7f6ff;
 
   /* BORDERS + DIVIDERS */
-  --border-soft: #e5e7eb; /* gray-200 */
-  --border-strong: #cbd5e1; /* slate-300 */
+  --border-soft: rgba(15, 23, 42, 0.08);
+  --border-strong: rgba(15, 23, 42, 0.18);
 
   /* SHADOWS */
-  --shadow-1: 0 1px 2px rgba(15, 23, 42, 0.06);
-  --shadow-2: 0 2px 6px rgba(15, 23, 42, 0.08), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --shadow-1: 0 15px 35px rgba(15, 23, 42, 0.08);
+  --shadow-2: 0 25px 65px rgba(76, 99, 255, 0.15);
 
   /* RADIUS */
-  --radius-md: 14px;
-  --radius-lg: 18px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
 }
 
 /* ===== Dark mode ===== */
 .dark {
-  /* ========== DEPTH LAYERS - DARK ========== */
-  /* BASE LAYER (Darkest - Canvas/Page Background) */
-  --color-base-darkest: #09090b; /* True black - page background */
-  --color-base-dark: #0f0f12; /* Slightly lighter section background */
+  --shell-gradient: radial-gradient(
+      circle at 12% 12%,
+      rgba(90, 94, 252, 0.3),
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 88% 0%,
+      rgba(14, 165, 233, 0.25),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 15% 80%,
+      rgba(244, 63, 94, 0.25),
+      transparent 50%
+    ),
+    linear-gradient(180deg, #050513 0%, #050a24 35%, #060a2c 100%);
+  --shell-overlay: linear-gradient(
+    180deg,
+    rgba(2, 4, 18, 0.9),
+    rgba(4, 8, 26, 0.95)
+  );
+  --shell-grid-color: rgba(114, 119, 189, 0.18);
+  --shell-grid-size: 140px;
+  --shell-card-border: rgba(147, 162, 255, 0.18);
+  --shell-card-glow: 0 30px 90px rgba(22, 94, 255, 0.35);
+  --shell-card-glow-strong: 0 45px 120px rgba(156, 163, 255, 0.35);
+  --shell-border: rgba(129, 140, 248, 0.32);
+  --shell-sidebar-bg: rgba(5, 9, 24, 0.78);
+  --shell-content-bg: rgba(7, 12, 27, 0.85);
+  --shell-divider: rgba(129, 140, 248, 0.22);
+  --shell-noise-opacity: 0.32;
 
-  /* CARD LAYER (Elevated - Content containers) */
-  --color-card-elevated: #121216; /* Main cards elevated above base */
-  --color-card-elevated-subtle: #0f0f12; /* Nested/secondary cards */
-  --color-card-hover: #1a1a1f; /* Card on hover - slightly lighter */
-  --color-card-pressed: #0f0f12; /* Card when pressed/active */
+  --color-base-darkest: #01030d;
+  --color-base-dark: #060a1f;
 
-  /* TEXT - Contrast Hierarchy (Dark mode) */
-  --color-text-primary: #fafafa; /* Highest contrast - near white */
-  --color-text-secondary: #d4d4d8; /* Medium contrast - zinc-300 */
-  --color-text-tertiary: #a1a1a6; /* Lower contrast - zinc-400 */
-  --color-text-muted: #71717a; /* Subtle - zinc-500 */
-  --color-text-inverted: #09090b; /* Inverse for light backgrounds */
+  --color-card-elevated: rgba(8, 12, 28, 0.92);
+  --color-card-elevated-subtle: rgba(7, 10, 25, 0.9);
+  --color-card-hover: rgba(14, 20, 44, 0.95);
+  --color-card-pressed: rgba(5, 9, 22, 0.88);
 
-  /* SURFACES - Full Stack (Dark mode) */
-  --color-bg-primary: #09090b; /* True black canvas */
-  --color-bg-secondary: #0f0f12; /* Zinc-950 section backgrounds */
-  --color-bg-tertiary: #18181b; /* Zinc-900 interactive surfaces */
-  --color-bg-muted: #27272a; /* Zinc-800 borders, subtle elements */
-  --color-bg-inverted: #ffffff; /* Light overlay backgrounds */
+  --color-text-primary: #f5f7ff;
+  --color-text-secondary: #c3c8ec;
+  --color-text-tertiary: #96a0d6;
+  --color-text-muted: #7780b3;
+  --color-text-inverted: #05070e;
 
-  /* BRAND / PRIMARY ACCENT (Lighter for dark mode) */
-  --color-brand: #818cf8; /* indigo-400 - Lighter for visibility */
-  --color-brand-soft: #1f235a; /* Deep indigo for soft backgrounds */
-  --color-brand-strong: #c7d2fe; /* Very light indigo for emphasis */
+  --color-bg-primary: #01030d;
+  --color-bg-secondary: #04091a;
+  --color-bg-tertiary: #0c1230;
+  --color-bg-muted: #161c3f;
+  --color-bg-inverted: #f8f9ff;
 
-  /* INTERACTIVE STATE COLORS - Dark mode */
-  --color-interactive-hover-border: #818cf8; /* Accent border for hover */
-  --color-interactive-hover-bg: #1f235a; /* Soft accent background for hover */
-  --color-interactive-focus-ring: #818cf8; /* Focus ring in dark mode */
-  --color-interactive-active: #c7d2fe; /* Active state - light indigo */
-  --color-interactive-disabled: #71717a; /* Disabled - muted gray */
+  --color-brand: #aab7ff;
+  --color-brand-soft: #1b1f5c;
+  --color-brand-strong: #eef0ff;
 
-  /* SECONDARY ACTION - Dark mode */
-  --color-action-secondary: #71717a; /* Muted gray for secondary buttons */
-  --color-action-secondary-bg: #27272a; /* Dark background for secondary buttons */
+  --color-interactive-hover-border: #b3bdfd;
+  --color-interactive-hover-bg: rgba(49, 57, 134, 0.6);
+  --color-interactive-focus-ring: #aabeff;
+  --color-interactive-active: #eef1ff;
+  --color-interactive-disabled: #6b7099;
 
-  /* DESTRUCTIVE ACTION - Dark mode */
-  --color-action-destructive: #ef4444; /* red-500 - Brighter for dark background */
-  --color-action-destructive-soft: #3a0a13; /* Deep red background */
+  --color-action-secondary: #98a0cc;
+  --color-action-secondary-bg: rgba(124, 134, 196, 0.16);
 
-  /* DATA STATES - Dark mode */
-  --color-data-success: #34d399; /* emerald-400 */
-  --color-data-success-soft: #062e22; /* deep emerald bg */
-  --color-data-success-strong: #bbf7d0; /* emerald-200 */
+  --color-action-destructive: #ff6b7c;
+  --color-action-destructive-soft: rgba(255, 107, 124, 0.14);
 
-  --color-data-warning: #f59e0b; /* amber-500 */
-  --color-data-warning-soft: #3b2a07; /* deep amber bg */
-  --color-data-warning-strong: #fde68a; /* amber-200 */
+  --color-data-success: #4ad7b1;
+  --color-data-success-soft: rgba(18, 77, 64, 0.55);
+  --color-data-success-strong: #c5ffe9;
 
-  --color-data-error: #ef4444; /* red-500 - match destructive */
-  --color-data-error-soft: #3a0a13; /* deep red bg */
-  --color-data-error-strong: #fecaca; /* red-200 */
+  --color-data-warning: #fdbb4d;
+  --color-data-warning-soft: rgba(108, 62, 14, 0.6);
+  --color-data-warning-strong: #ffe2b0;
 
-  --color-data-info: #38bdf8; /* sky-400 */
-  --color-data-info-soft: #072637; /* deep sky bg */
-  --color-data-info-strong: #bae6fd; /* sky-200 */
+  --color-data-error: #ff6b7c;
+  --color-data-error-soft: rgba(104, 24, 33, 0.7);
+  --color-data-error-strong: #ffd1da;
 
-  /* ICON TREATMENT - Dark mode */
-  --color-icon-primary: var(--color-text-primary); /* Near white - highest contrast */
-  --color-icon-secondary: var(--color-text-secondary); /* Zinc-300 */
-  --color-icon-muted: var(--color-text-muted); /* Zinc-500 - subtle */
-  --color-icon-accent: var(--color-brand); /* Indigo-400 */
+  --color-data-info: #5ad5ff;
+  --color-data-info-soft: rgba(15, 52, 80, 0.65);
+  --color-data-info-strong: #d6f6ff;
+
+  --color-icon-primary: var(--color-text-primary);
+  --color-icon-secondary: var(--color-text-secondary);
+  --color-icon-muted: var(--color-text-muted);
+  --color-icon-accent: var(--color-brand);
   --color-icon-success: var(--color-data-success);
   --color-icon-warning: var(--color-data-warning);
   --color-icon-error: var(--color-data-error);
   --color-icon-info: var(--color-data-info);
 
-  /* LEAVE TYPES - Dark mode */
-  --color-leave-earned: #34d399; /* emerald-400 */
-  --color-leave-casual: #60a5fa; /* blue-400 */
-  --color-leave-medical: #22d3ee; /* cyan-400 */
-  --color-leave-sick: #ef4444; /* red-500 */
-  --color-leave-unpaid: #9ca3af; /* gray-400 */
-  --color-leave-maternity: #f472b6; /* pink-400 */
-  --color-leave-paternity: #a78bfa; /* violet-400 */
+  --color-leave-earned: #4ad7b1;
+  --color-leave-casual: #8ab8ff;
+  --color-leave-medical: #5ad5ff;
+  --color-leave-sick: #ff6b7c;
+  --color-leave-unpaid: #7c87b0;
+  --color-leave-maternity: #f686d7;
+  --color-leave-paternity: #caa7ff;
 
-  /* CARD CATEGORIES - Dark mode */
-  --color-card-kpi: #f59e0b; /* amber-500 */
-  --color-card-kpi-soft: #1a1205; /* Deep amber background */
-  --color-card-kpi-strong: #fde68a; /* amber-200 */
-  --color-card-action: var(--color-brand); /* indigo-400 */
-  --color-card-action-soft: #151637; /* Deep indigo */
-  --color-card-action-strong: var(--color-brand-strong); /* indigo-200 */
-  --color-card-summary: #a78bfa; /* violet-400 */
-  --color-card-summary-soft: #1b1030; /* Deep violet */
-  --color-card-summary-strong: #ddd6fe; /* violet-200 */
+  --color-card-kpi: #fdbb4d;
+  --color-card-kpi-soft: rgba(96, 56, 6, 0.45);
+  --color-card-kpi-strong: #ffe3b0;
+  --color-card-action: var(--color-brand);
+  --color-card-action-soft: rgba(59, 63, 126, 0.65);
+  --color-card-action-strong: #f4f5ff;
+  --color-card-summary: #caa7ff;
+  --color-card-summary-soft: rgba(71, 37, 121, 0.65);
+  --color-card-summary-strong: #fbedff;
 
-  /* UI STATUSES - Dark mode */
-  --color-status-draft: #9ca3af; /* gray-400 */
-  --color-status-submitted: #60a5fa; /* blue-400 */
-  --color-status-approved: #34d399; /* emerald-400 */
-  --color-status-rejected: #ef4444; /* red-500 */
-  --color-status-returned: #f59e0b; /* amber-500 */
-  --color-status-cancelled: #9ca3af; /* gray-400 */
+  --color-status-draft: #7a82aa;
+  --color-status-submitted: #8ab8ff;
+  --color-status-approved: #4ad7b1;
+  --color-status-rejected: #ff6b7c;
+  --color-status-returned: #fdbb4d;
+  --color-status-cancelled: #6b7099;
 
-  --color-ring: #818cf8;
+  --color-ring: #aabeff;
 
-  /* SURFACES - Dark Mode (Black/Gray theme) */
-  --surface-canvas: #09090b;
-  --surface-subtle: #0f0f12;
-  --surface-1: #121216;
-  --surface-2: #0f0f12;
+  --surface-canvas: #01030d;
+  --surface-subtle: rgba(5, 9, 24, 0.75);
+  --surface-1: rgba(8, 12, 28, 0.88);
+  --surface-2: rgba(7, 10, 25, 0.84);
 
-  /* BORDERS - Dark Mode (Zinc palette) */
-  --border-soft: #27272a;
-  --border-strong: #3f3f46;
+  --border-soft: rgba(147, 162, 255, 0.2);
+  --border-strong: rgba(147, 162, 255, 0.35);
 
-  /* SHADOWS - Dark Mode */
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.45);
-  --shadow-2: 0 2px 8px rgba(0, 0, 0, 0.5), 0 1px 1px rgba(0, 0, 0, 0.35);
+  --shadow-1: 0 20px 55px rgba(0, 0, 0, 0.55);
+  --shadow-2: 0 30px 90px rgba(3, 7, 18, 0.85), 0 40px 110px rgba(73, 97, 255, 0.25);
+
+  --radius-md: 18px;
+  --radius-lg: 28px;
 }
 
 /* ===== Tailwind @theme bridge (includes new tokens) ===== */
 @theme {
+  --shell-gradient: var(--shell-gradient);
+  --shell-overlay: var(--shell-overlay);
+  --shell-grid-color: var(--shell-grid-color);
+  --shell-grid-size: var(--shell-grid-size);
+  --shell-card-border: var(--shell-card-border);
+  --shell-card-glow: var(--shell-card-glow);
+  --shell-card-glow-strong: var(--shell-card-glow-strong);
+  --shell-border: var(--shell-border);
+  --shell-sidebar-bg: var(--shell-sidebar-bg);
+  --shell-content-bg: var(--shell-content-bg);
+  --shell-divider: var(--shell-divider);
+  --shell-noise-opacity: var(--shell-noise-opacity);
+
   /* Base Layer & Card Layer tokens */
   --color-base-darkest: var(--color-base-darkest);
   --color-base-dark: var(--color-base-dark);
@@ -355,74 +418,44 @@
 }
 
 /* ===== Elevation System Utilities ===== */
-
-/* Page background */
 body {
-  background: var(--surface-canvas);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
 }
 
-/* App panel - main container */
 .app-panel {
-  background: var(--surface-1);
-  border: 1px solid var(--border-soft);
+  background: var(--shell-content-bg);
+  border: 1px solid var(--shell-card-border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-2);
+  box-shadow: var(--shell-card-glow);
+  backdrop-filter: blur(18px);
 }
 
-/* Section - dashboard block */
 .section {
-  background: var(--surface-1);
-  border: 1px solid var(--border-soft);
+  background: var(--shell-content-bg);
+  border: 1px solid var(--shell-card-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-1);
   overflow: hidden;
 }
 
-/* Section header strip */
 .section-header {
-  background: var(--surface-subtle);
-  border-bottom: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--shell-sidebar-bg) 65%, transparent);
+  border-bottom: 1px solid var(--shell-divider);
 }
 
-/* Card - KPI tiles, inner cards */
 .card {
-  background: var(--surface-2);
-  border: 1px solid var(--border-soft);
+  background: var(--color-card-elevated);
+  border: 1px solid var(--shell-card-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-1);
+  backdrop-filter: blur(12px);
 }
 
-/* Table styling */
 .table {
-  background: var(--surface-1);
+  background: var(--shell-content-bg);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
   overflow: hidden;
-}
-
-.table thead th {
-  background: var(--surface-subtle);
-  color: var(--color-text-secondary);
-  border-bottom: 1px solid var(--border-strong);
-}
-
-.table tbody tr {
-  border-bottom: 1px solid var(--border-soft);
-}
-
-.table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.table tbody tr:hover {
-  background: color-mix(in srgb, var(--color-brand-soft) 35%, transparent);
-}
-
-/* Dividers */
-.divider {
-  border-color: var(--border-soft);
-}
-
-.divider-strong {
-  border-color: var(--border-strong);
+  backdrop-filter: blur(10px);
 }

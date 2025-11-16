@@ -54,7 +54,7 @@ export class LeaveService {
           role: true,
           joinDate: true,
           retirementDate: true,
-          departmentHeadId: true,
+          deptHeadId: true,
         },
       });
 
@@ -104,7 +104,10 @@ export class LeaveService {
 
       // 5. Extract pay calculation for Special Disability Leave
       let payCalculation: any = undefined;
-      if (dto.type === "SPECIAL_DISABILITY" && validation.warning?.details?.payCalculation) {
+      if (
+        dto.type === "SPECIAL_DISABILITY" &&
+        validation.warning?.details?.payCalculation
+      ) {
         payCalculation = validation.warning.details.payCalculation;
       }
 
@@ -288,7 +291,11 @@ export class LeaveService {
         select: { name: true },
       });
       if (approver) {
-        await NotificationService.notifyLeaveRejected(leaveId, approver.name, reason);
+        await NotificationService.notifyLeaveRejected(
+          leaveId,
+          approver.name,
+          reason
+        );
       }
 
       return {
@@ -373,7 +380,11 @@ export class LeaveService {
           select: { name: true },
         });
         if (forwarder) {
-          await NotificationService.notifyLeaveForwarded(leaveId, nextApprover.id, forwarder.name);
+          await NotificationService.notifyLeaveForwarded(
+            leaveId,
+            nextApprover.id,
+            forwarder.name
+          );
         }
       }
 
@@ -430,7 +441,11 @@ export class LeaveService {
         select: { name: true },
       });
       if (approver) {
-        await NotificationService.notifyLeaveReturned(leaveId, approver.name, reason);
+        await NotificationService.notifyLeaveReturned(
+          leaveId,
+          approver.name,
+          reason
+        );
       }
 
       return {
@@ -510,7 +525,9 @@ export class LeaveService {
 
   // ===== Private Helper Methods =====
 
-  private static async uploadCertificate(file: File): Promise<ServiceResult<string>> {
+  private static async uploadCertificate(
+    file: File
+  ): Promise<ServiceResult<string>> {
     try {
       const validation = LeaveValidator.validateFileUpload(file);
       if (!validation.valid) {
@@ -562,11 +579,11 @@ export class LeaveService {
     // Find user's department head or role-based approver
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { departmentHeadId: true },
+      select: { deptHeadId: true },
     });
 
-    if (user?.departmentHeadId) {
-      return { id: user.departmentHeadId };
+    if (user?.deptHeadId) {
+      return { id: user.deptHeadId };
     }
 
     // Fallback: find first user with the role
@@ -599,7 +616,9 @@ export class LeaveService {
     return maxStep?.step || 0;
   }
 
-  private static async getNextApprover(leave: any): Promise<{ id: number } | null> {
+  private static async getNextApprover(
+    leave: any
+  ): Promise<{ id: number } | null> {
     // Simplified - would use workflow strategies in production
     const nextRole = "HR_HEAD"; // This should come from workflow strategy
     return this.findApprover(leave.requesterId, nextRole);
@@ -637,16 +656,18 @@ export class LeaveService {
       page?: number;
       pageSize?: number;
     }
-  ): Promise<ServiceResult<{
-    rows: any[];
-    total: number;
-    counts: {
-      pending: number;
-      forwarded: number;
-      returned: number;
-      cancelled: number;
-    };
-  }>> {
+  ): Promise<
+    ServiceResult<{
+      rows: any[];
+      total: number;
+      counts: {
+        pending: number;
+        forwarded: number;
+        returned: number;
+        cancelled: number;
+      };
+    }>
+  > {
     try {
       const {
         search = "",
@@ -715,7 +736,9 @@ export class LeaveService {
 
       // Deduplicate (same requester + dates)
       const key = (r: any) =>
-        `${r.requesterId}-${r.startDate.toISOString()}-${r.endDate.toISOString()}`;
+        `${
+          r.requesterId
+        }-${r.startDate.toISOString()}-${r.endDate.toISOString()}`;
       const seen = new Set<string>();
       const uniqueRows = rowsRaw.filter((r) =>
         seen.has(key(r)) ? false : seen.add(key(r))
@@ -725,10 +748,7 @@ export class LeaveService {
       const total = uniqueRows.length;
 
       // Apply pagination AFTER deduplication
-      const rows = uniqueRows.slice(
-        (page - 1) * pageSize,
-        page * pageSize
-      );
+      const rows = uniqueRows.slice((page - 1) * pageSize, page * pageSize);
 
       // Calculate status counts
       const counts = await this.getTeamLeaveCounts(deptHeadId, teamMemberIds);

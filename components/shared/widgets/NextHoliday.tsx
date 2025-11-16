@@ -1,8 +1,9 @@
 "use client";
 
 import useSWR from "swr";
-import { Card, CardContent, Skeleton } from "@/components/ui";
-import { Calendar } from "lucide-react";
+import Link from "next/link";
+import { Calendar, ArrowRight } from "lucide-react";
+import { Skeleton, Button } from "@/components/ui";
 import { formatDate } from "@/lib/utils";
 import { apiFetcher } from "@/lib/apiClient";
 
@@ -16,49 +17,62 @@ interface HolidaysResponse {
 }
 
 export function NextHoliday() {
-  const { data, error, isLoading } = useSWR<HolidaysResponse>("/api/holidays?upcoming=true", apiFetcher, {
-    revalidateOnFocus: false,
-  });
+  const { data, error, isLoading } = useSWR<HolidaysResponse>(
+    "/api/holidays?upcoming=true",
+    apiFetcher,
+    {
+      revalidateOnFocus: false,
+    }
+  );
 
   if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="p-4">
-          <Skeleton className="h-16 w-full" />
-        </CardContent>
-      </Card>
-    );
+    return <Skeleton className="h-28 w-full rounded-2xl" />;
   }
 
   const holidays = Array.isArray(data?.items) ? data.items : [];
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const nextHoliday = holidays.find((holiday: { date: string }) => {
+  const nextHoliday = holidays.find((holiday) => {
     const holidayDate = new Date(holiday.date);
     holidayDate.setHours(0, 0, 0, 0);
     return holidayDate >= today;
   });
 
-  if (!nextHoliday) {
+  const accent = "var(--color-data-info)";
+
+  if (!nextHoliday || error) {
     return (
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-data-info dark:bg-data-info/30">
-              <Calendar className="h-4 w-4 text-data-info dark:text-data-info" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-xs text-muted-foreground mb-0.5">
-                Next Holiday
-              </div>
-              <div className="text-sm font-medium text-foreground">
-                No upcoming holidays
-              </div>
-            </div>
+      <div
+        className="neo-card flex flex-col gap-3 px-5 py-5"
+        style={{
+          "--holiday-accent": accent,
+          "--holiday-accent-soft": `color-mix(in srgb, ${accent} 15%, transparent)`,
+        } as React.CSSProperties}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="rounded-2xl border border-white/20 p-3 shadow-inner"
+            style={{ background: "var(--holiday-accent-soft)" }}
+          >
+            <Calendar className="h-5 w-5" style={{ color: accent }} />
           </div>
-        </CardContent>
-      </Card>
+          <div>
+            <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
+              Upcoming
+            </p>
+            <h3 className="text-lg font-semibold text-foreground">
+              No upcoming holidays
+            </h3>
+          </div>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          You&apos;re all caught up. Keep an eye on the holiday calendar for future plans.
+        </p>
+        <Button asChild variant="outline" size="sm" className="w-fit">
+          <Link href="/holidays">View Calendar</Link>
+        </Button>
+      </div>
     );
   }
 
@@ -68,34 +82,52 @@ export function NextHoliday() {
   );
 
   return (
-    <Card>
-      <CardContent className="p-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-data-info dark:bg-data-info/30">
-            <Calendar className="h-4 w-4 text-data-info dark:text-data-info" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-xs text-muted-foreground mb-0.5">
-              Next Holiday
-            </div>
-            <div className="text-sm font-medium text-foreground truncate">
-              {nextHoliday.name}
-            </div>
-            <div className="text-xs text-muted-foreground mt-0.5">
-              {formatDate(nextHoliday.date)}
-              {daysUntil >= 0 && (
-                <span className="ml-2 text-data-info dark:text-data-info font-medium">
-                  {daysUntil === 0
-                    ? "Today"
-                    : daysUntil === 1
-                    ? "Tomorrow"
-                    : `in ${daysUntil} days`}
-                </span>
-              )}
-            </div>
-          </div>
+    <div
+      className="neo-card flex flex-col gap-4 px-5 py-5"
+      style={{
+        "--holiday-accent": accent,
+        "--holiday-accent-soft": `color-mix(in srgb, ${accent} 20%, transparent)`,
+      } as React.CSSProperties}
+    >
+      <div className="flex items-center gap-3">
+        <div
+          className="rounded-2xl border border-white/20 p-3 shadow-inner"
+          style={{ background: "var(--holiday-accent-soft)" }}
+        >
+          <Calendar className="h-5 w-5" style={{ color: accent }} />
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
+            Next Holiday
+          </p>
+          <h3 className="text-xl font-semibold text-foreground">
+            {nextHoliday.name}
+          </h3>
+        </div>
+      </div>
+
+      <div className="flex items-baseline gap-2 text-muted-foreground">
+        <p className="text-base font-medium text-foreground">
+          {formatDate(nextHoliday.date)}
+        </p>
+        <span className="text-sm font-semibold" style={{ color: accent }}>
+          {daysUntil === 0
+            ? "Today"
+            : daysUntil === 1
+            ? "Tomorrow"
+            : `in ${daysUntil} days`}
+        </span>
+      </div>
+
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <span>Plan ahead and update your schedule.</span>
+        <Button asChild variant="ghost" size="sm" className="gap-2 p-0">
+          <Link href="/holidays">
+            View details
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </Button>
+      </div>
+    </div>
   );
 }

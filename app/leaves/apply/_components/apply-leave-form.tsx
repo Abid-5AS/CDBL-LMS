@@ -111,8 +111,8 @@ export function ApplyLeaveForm() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/40 py-12">
-      <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10 space-y-10">
+    <div className="space-y-6">
+      <div className="mx-auto max-w-[1400px] space-y-10">
         {/* Header */}
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -213,17 +213,31 @@ export function ApplyLeaveForm() {
                             <span className="text-destructive">*</span>
                           </label>
                           <p className="text-xs text-muted-foreground">
-                            When did the disabling incident occur? Must be within 3 months of leave start date.
+                            When did the disabling incident occur? Must be
+                            within 3 months of leave start date.
                           </p>
                           <input
                             type="date"
-                            value={incidentDate ? incidentDate.toISOString().split('T')[0] : ''}
+                            value={
+                              incidentDate
+                                ? incidentDate.toISOString().split("T")[0]
+                                : ""
+                            }
                             onChange={(e) => {
                               const value = e.target.value;
-                              setIncidentDate(value ? new Date(value) : undefined);
-                              setErrors((prev) => ({ ...prev, incidentDate: undefined }));
+                              setIncidentDate(
+                                value ? new Date(value) : undefined
+                              );
+                              setErrors((prev) => ({
+                                ...prev,
+                                incidentDate: undefined,
+                              }));
                             }}
-                            max={dateRange.start ? dateRange.start.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
+                            max={
+                              dateRange.start
+                                ? dateRange.start.toISOString().split("T")[0]
+                                : new Date().toISOString().split("T")[0]
+                            }
                             disabled={submitting}
                             className={cn(
                               "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
@@ -250,27 +264,44 @@ export function ApplyLeaveForm() {
                           </div>
                           <div className="space-y-2 text-sm">
                             <div className="flex justify-between items-center">
-                              <span className="text-blue-700 dark:text-blue-300">Full pay (0-90 days):</span>
-                              <span className="font-semibold text-blue-900 dark:text-blue-100">{payCalculation.fullPayDays} days</span>
+                              <span className="text-blue-700 dark:text-blue-300">
+                                Full pay (0-90 days):
+                              </span>
+                              <span className="font-semibold text-blue-900 dark:text-blue-100">
+                                {payCalculation.fullPayDays} days
+                              </span>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-blue-700 dark:text-blue-300">Half pay (91-180 days):</span>
-                              <span className="font-semibold text-blue-900 dark:text-blue-100">{payCalculation.halfPayDays} days</span>
+                              <span className="text-blue-700 dark:text-blue-300">
+                                Half pay (91-180 days):
+                              </span>
+                              <span className="font-semibold text-blue-900 dark:text-blue-100">
+                                {payCalculation.halfPayDays} days
+                              </span>
                             </div>
                             {payCalculation.unPaidDays > 0 && (
                               <div className="flex justify-between items-center">
-                                <span className="text-blue-700 dark:text-blue-300">Unpaid (180+ days):</span>
-                                <span className="font-semibold text-destructive">{payCalculation.unPaidDays} days</span>
+                                <span className="text-blue-700 dark:text-blue-300">
+                                  Unpaid (180+ days):
+                                </span>
+                                <span className="font-semibold text-destructive">
+                                  {payCalculation.unPaidDays} days
+                                </span>
                               </div>
                             )}
                             <Separator className="my-2" />
                             <div className="flex justify-between items-center">
-                              <span className="font-medium text-blue-900 dark:text-blue-100">Total days:</span>
-                              <span className="font-bold text-blue-900 dark:text-blue-100">{payCalculation.totalDays} days</span>
+                              <span className="font-medium text-blue-900 dark:text-blue-100">
+                                Total days:
+                              </span>
+                              <span className="font-bold text-blue-900 dark:text-blue-100">
+                                {payCalculation.totalDays} days
+                              </span>
                             </div>
                           </div>
                           <p className="text-xs text-blue-600 dark:text-blue-400">
-                            Per Policy 6.22: First 3 months at full pay, next 3 months at half pay
+                            Per Policy 6.22: First 3 months at full pay, next 3
+                            months at half pay
                           </p>
                         </div>
                       )}
@@ -358,11 +389,15 @@ export function ApplyLeaveForm() {
               balancesError={Boolean(balancesError)}
               warnings={warnings}
               projectedBalancePercent={projectedBalancePercent}
-              allBalances={balances ? {
-                EARNED: balances.EARNED,
-                CASUAL: balances.CASUAL,
-                MEDICAL: balances.MEDICAL,
-              } : undefined}
+              allBalances={
+                balances
+                  ? {
+                      EARNED: balances.EARNED,
+                      CASUAL: balances.CASUAL,
+                      MEDICAL: balances.MEDICAL,
+                    }
+                  : undefined
+              }
             />
 
             <Card className="rounded-2xl border border-border bg-card shadow-sm p-5 space-y-3">

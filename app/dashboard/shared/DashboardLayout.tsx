@@ -1,6 +1,7 @@
-import { ReactNode } from "react";
+import { ReactNode, CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 import type { Role } from "@prisma/client";
+import { getRoleAccentColor, getRoleSoftColor } from "@/constants/colors";
 
 type DashboardLayoutProps = {
   children: ReactNode;
@@ -43,38 +44,61 @@ export function DashboardLayout({
   role,
   actions,
 }: DashboardLayoutProps) {
+  const accentColor = role ? getRoleAccentColor(role) : undefined;
+  const accentSoft = role ? getRoleSoftColor(role) : undefined;
+  const formattedRole = role
+    ? role
+        .toLowerCase()
+        .split("_")
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(" ")
+    : undefined;
+
   return (
-    <div className={cn("w-full min-h-screen", className)}>
-      <div
-        className={cn(
-          fullWidth ? "px-0" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
-          "py-6"
-        )}
-      >
-        {(title || description || actions) && (
-          <div
-            className={cn(
-              "mb-6",
-              actions && "flex items-start justify-between gap-4"
-            )}
-          >
-            <div className="flex-1">
+    <div className={cn("page-stack", className)}>
+      {(title || description || actions) && (
+        <section
+          className={cn(
+            "page-section space-y-5",
+            fullWidth && "page-section--wide"
+          )}
+        >
+          <div className="page-section__header flex-col gap-4 md:flex-row">
+            <div className="flex-1 space-y-4">
+              {formattedRole && (
+                <span
+                  className="inline-flex items-center rounded-full px-3 py-1 text-[0.7rem] font-semibold tracking-[0.3em] uppercase"
+                  style={
+                    {
+                      backgroundColor: accentSoft,
+                      color: accentColor,
+                    } as CSSProperties
+                  }
+                >
+                  {formattedRole}
+                </span>
+              )}
               {title && (
-                <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+                <h1 className="page-shell__title">
                   {title}
                 </h1>
               )}
               {description && (
-                <p className="mt-2 text-sm text-muted-foreground">
+                <p className="page-shell__subtitle text-base">
                   {description}
                 </p>
               )}
             </div>
-            {actions && <div className="flex-shrink-0">{actions}</div>}
+            {actions && (
+              <div className="page-shell__actions md:justify-end">
+                {actions}
+              </div>
+            )}
           </div>
-        )}
-        {children}
-      </div>
+        </section>
+      )}
+
+      <div className={cn("page-stack", fullWidth && "page-section--wide")}>{children}</div>
     </div>
   );
 }
@@ -91,17 +115,7 @@ export function DashboardGrid({
   className?: string;
 }) {
   return (
-    <div
-      className={cn(
-        "grid gap-6",
-        "grid-cols-1",
-        "md:grid-cols-2",
-        "xl:grid-cols-3",
-        className
-      )}
-    >
-      {children}
-    </div>
+    <div className={cn("stats-grid", className)}>{children}</div>
   );
 }
 
@@ -122,12 +136,14 @@ export function DashboardSection({
   className?: string;
 }) {
   return (
-    <section className={cn("space-y-4", className)}>
+    <section className={cn("page-section space-y-4", className)}>
       {(title || description || action) && (
-        <div className="flex items-start justify-between gap-4">
+        <div className="page-section__header">
           <div>
             {title && (
-              <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+              <h2 className="text-lg font-semibold text-foreground">
+                {title}
+              </h2>
             )}
             {description && (
               <p className="mt-1 text-sm text-muted-foreground">
@@ -135,7 +151,7 @@ export function DashboardSection({
               </p>
             )}
           </div>
-          {action && <div>{action}</div>}
+          {action && <div className="page-section__actions">{action}</div>}
         </div>
       )}
       {children}

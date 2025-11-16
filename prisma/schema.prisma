@@ -98,6 +98,10 @@ model LeaveRequest {
 
   @@index([requesterId, status])
   @@index([parentLeaveId])
+  @@index([status, startDate]) // Optimize dashboard stats queries
+  @@index([status, updatedAt]) // Optimize processed today queries
+  @@index([startDate, endDate, status]) // Optimize employees on leave queries
+  @@index([type, status, startDate]) // Optimize leave type breakdown queries
 }
 
 enum ApprovalDecision {
@@ -121,6 +125,8 @@ model Approval {
   approver User         @relation("ApprovalApprover", fields: [approverId], references: [id])
 
   @@index([leaveId])
+  @@index([approverId, decision]) // Optimize pending approvals query
+  @@index([approverId, decidedAt]) // Optimize approval history queries
 }
 
 model Balance {

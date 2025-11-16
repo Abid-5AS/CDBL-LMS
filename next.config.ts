@@ -12,7 +12,11 @@ const nextConfig: NextConfig = {
   },
   webpack: (config, { isServer }) => {
     if (isServer) {
-      config.externals = [...(config.externals || []), "@prisma/client", "prisma"];
+      config.externals = [
+        ...(config.externals || []),
+        "@prisma/client",
+        "prisma",
+      ];
     }
     return config;
   },
@@ -22,7 +26,10 @@ const nextConfig: NextConfig = {
         source: "/(.*)",
         headers: [
           { key: "Referrer-Policy", value: "no-referrer" },
-          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
           { key: "X-Content-Type-Options", value: "nosniff" },
         ],
       },

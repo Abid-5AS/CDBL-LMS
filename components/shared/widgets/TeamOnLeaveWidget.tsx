@@ -1,19 +1,16 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Skeleton,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui";
-import { Users, User } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
+import { Users, User } from "lucide-react";
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  Skeleton,
+} from "@/components/ui";
 import { formatDate } from "@/lib/utils";
 import { apiFetcher } from "@/lib/apiClient";
 
@@ -23,160 +20,127 @@ interface Colleague {
   email: string;
   empCode?: string;
   type: string;
-  range: [string, string]; // [startDate, endDate] in YYYY-MM-DD format
+  range: [string, string];
 }
 
-function getInitials(name: string): string {
+const AVATAR_COLORS = [
+  "var(--color-leave-earned)",
+  "var(--color-leave-casual)",
+  "var(--color-leave-medical)",
+  "var(--color-data-info)",
+];
+
+const Avatar = ({ name }: { name: string }) => {
   const parts = name.split(" ");
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
-  }
-  return name.substring(0, 2).toUpperCase();
-}
-
-function Avatar({ name, className }: { name: string; className?: string }) {
-  const initials = getInitials(name);
-  // Generate a color based on name hash for consistency
-  const colors = [
-    "bg-leave-casual",
-    "bg-leave-earned",
-    "bg-leave-sick",
-    "bg-leave-maternity",
-    "bg-leave-paternity",
-    "bg-card-action",
-    "bg-card-summary",
-    "bg-data-info",
-  ];
+  const initials = parts.length >= 2 ? `${parts[0][0]}${parts.at(-1)?.[0] ?? ""}` : name.slice(0, 2);
   const colorIndex =
-    name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) %
-    colors.length;
-  const bgColor = colors[colorIndex];
+    name.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0) % AVATAR_COLORS.length;
 
   return (
     <div
-      className={`${bgColor} text-text-inverted rounded-full flex items-center justify-center font-semibold text-xs ${
-        className || "size-10"
-      }`}
+      className="flex size-12 items-center justify-center rounded-2xl text-sm font-semibold"
+      style={{
+        backgroundColor: AVATAR_COLORS[colorIndex],
+        color: "var(--color-text-inverted)",
+      }}
     >
-      {initials}
+      {initials.toUpperCase()}
     </div>
   );
-}
+};
 
 export function TeamOnLeaveWidget() {
   const router = useRouter();
-  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  const today = new Date().toISOString().slice(0, 10);
   const { data, isLoading, error } = useSWR<{
     date: string;
     count: number;
     members: Colleague[];
   }>(`/api/team/on-leave?date=${today}&scope=team`, apiFetcher, {
     revalidateOnFocus: true,
-    refreshInterval: 60000, // Refresh every minute
+    refreshInterval: 60000,
   });
 
   if (isLoading) {
-    return (
-      <Card className="solid-card animate-fade-in-up">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Users className="size-4" />
-            Team on Leave Today
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-20 w-full" />
-        </CardContent>
-      </Card>
-    );
+    return <Skeleton className="h-44 w-full rounded-2xl" />;
   }
 
-  if (error || !data) {
-    return null; // Don't show error state, just hide the widget
-  }
+  if (error || !data) return null;
 
   const colleagues = data.members || [];
   const count = data.count ?? colleagues.length;
 
   if (colleagues.length === 0) {
     return (
-      <Card className="solid-card animate-fade-in-up">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Users className="size-4" />
-            Team on Leave Today
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center py-6 text-center">
-            <User className="size-12 text-text-secondary dark:text-text-secondary mb-2" />
-            <p className="text-sm font-medium text-text-secondary dark:text-text-secondary">
-              No team members on leave today
-            </p>
-            <p className="text-xs text-text-secondary dark:text-text-secondary mt-1">
-              All colleagues are present
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="neo-card flex flex-col items-center gap-3 px-6 py-6 text-center">
+        <div className="rounded-2xl border border-white/10 p-3 shadow-inner">
+          <Users className="h-6 w-6 text-muted-foreground" />
+        </div>
+        <p className="text-sm font-semibold text-foreground">
+          No team members on leave today
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Everyone is present. Plan ahead using the holiday calendar.
+        </p>
+        <Link href="/leaves" className="text-xs font-semibold text-primary underline">
+          View leave board
+        </Link>
+      </div>
     );
   }
 
   return (
-    <Card className="solid-card animate-fade-in-up">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base flex items-center gap-2">
-          <Users className="size-4" />
-          Team on Leave Today
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-text-secondary dark:text-text-secondary mb-4">
-          {count} colleague{count > 1 ? "s" : ""} on leave today
-        </p>
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
-          {colleagues.map((colleague) => (
-            <TooltipProvider key={colleague.id}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div
-                    className="flex flex-col items-center gap-2 min-w-[80px] cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Navigate to filtered list
-                      router.push(
-                        `/leaves?deptHeadId=${colleague.id}&date=${today}`
-                      );
-                    }}
-                  >
-                    <Avatar name={colleague.name} />
-                    <div className="text-center">
-                      <p className="text-xs font-semibold text-text-secondary dark:text-text-secondary truncate max-w-[80px]">
-                        {colleague.name.split(" ")[0]}
-                      </p>
-                      <p className="text-[10px] text-text-secondary dark:text-text-secondary">
-                        {colleague.type}
-                      </p>
-                    </div>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <div className="text-sm">
-                    <p className="font-semibold">{colleague.name}</p>
-                    <p className="text-xs text-text-secondary mt-1">
-                      {colleague.type} Leave
-                    </p>
-                    <p className="text-xs text-text-secondary">
-                      {formatDate(colleague.range[0])} →{" "}
-                      {formatDate(colleague.range[1])}
-                    </p>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          ))}
+    <div className="neo-card space-y-4 px-6 py-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
+            Team Today
+          </p>
+          <h3 className="text-lg font-semibold text-foreground">Team on Leave</h3>
+          <p className="text-sm text-muted-foreground">
+            {count} colleague{count > 1 ? "s" : ""} on leave
+          </p>
         </div>
-      </CardContent>
-    </Card>
+        <button
+          type="button"
+          className="text-xs font-semibold text-muted-foreground hover:text-foreground"
+          onClick={() => router.push("/leaves?scope=team")}
+        >
+          View details
+        </button>
+      </div>
+
+      <div className="flex gap-4 overflow-x-auto pb-2">
+        {colleagues.map((colleague) => (
+          <TooltipProvider key={colleague.id}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  className="flex min-w-[96px] flex-col items-center gap-2 rounded-2xl border border-white/10 bg-[color-mix(in_srgb,var(--color-card)90%,transparent)] px-4 py-3 text-center hover:-translate-y-0.5"
+                  onClick={() => router.push(`/leaves?userId=${colleague.id}&date=${today}`)}
+                >
+                  <Avatar name={colleague.name} />
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">
+                      {colleague.name.split(" ")[0]}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{colleague.type}</p>
+                  </div>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <div className="text-sm">
+                  <p className="font-semibold">{colleague.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {colleague.type} • {formatDate(colleague.range[0])} → {formatDate(colleague.range[1])}
+                  </p>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ))}
+      </div>
+    </div>
   );
 }

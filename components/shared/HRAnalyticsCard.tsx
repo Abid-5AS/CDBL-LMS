@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -20,125 +21,106 @@ interface AnalyticsCircleProps {
 
 const AnalyticsCircle = ({ data, index }: AnalyticsCircleProps) => {
   const percentage = Math.min((data.current / data.target) * 100, 100);
-  const circumference = 2 * Math.PI * (data.size / 2 - 8);
-  const strokeDasharray = circumference;
+  const radius = data.size / 2 - 8;
+  const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
+  const accent = data.color || "var(--color-brand)";
 
   const animationDelay = index * 0.15;
 
-  const getTrendIcon = () => {
-    switch (data.trend) {
-      case "up":
-        return "↗";
-      case "down":
-        return "↘";
-      default:
-        return "→";
-    }
-  };
-
-  const getTrendColor = () => {
-    switch (data.trend) {
-      case "up":
-        return "text-green-500";
-      case "down":
-        return "text-red-500";
-      default:
-        return "text-gray-400";
-    }
-  };
-
   return (
-    <div className="relative flex items-center justify-center">
+    <div
+      className="relative flex items-center justify-center"
+      style={{
+        "--analytics-accent": accent,
+        "--analytics-accent-soft": `color-mix(in srgb, ${accent} 22%, transparent)`,
+        "--analytics-accent-muted": `color-mix(in srgb, ${accent} 10%, transparent)`,
+      } as React.CSSProperties}
+    >
       <motion.svg
         width={data.size}
         height={data.size}
-        className="transform -rotate-90"
-        initial={{ scale: 0, rotate: -90 }}
-        animate={{ scale: 1, rotate: -90 }}
+        className="-rotate-90"
+        initial={{ scale: 0.7, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
         transition={{
-          duration: 0.8,
+          duration: 0.7,
           delay: animationDelay,
           type: "spring",
-          stiffness: 120,
-          damping: 12,
+          stiffness: 160,
         }}
       >
-        {/* Background circle */}
         <circle
           cx={data.size / 2}
           cy={data.size / 2}
-          r={data.size / 2 - 8}
+          r={radius}
           fill="none"
-          stroke="currentColor"
-          strokeWidth="6"
-          className="text-gray-200 dark:text-gray-700 opacity-20"
+          strokeWidth={4}
+          stroke="var(--analytics-accent-muted)"
         />
-
-        {/* Progress circle */}
         <motion.circle
           cx={data.size / 2}
           cy={data.size / 2}
-          r={data.size / 2 - 8}
+          r={radius}
           fill="none"
-          stroke={data.color}
-          strokeWidth="6"
+          strokeWidth={4.5}
           strokeLinecap="round"
-          strokeDasharray={strokeDasharray}
+          strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
+          stroke="var(--analytics-accent)"
           initial={{ strokeDashoffset: circumference }}
           animate={{ strokeDashoffset }}
           transition={{
-            duration: 1.8,
-            delay: animationDelay + 0.4,
-            ease: [0.4, 0, 0.2, 1],
+            duration: 1.2,
+            delay: animationDelay + 0.2,
+            ease: [0.23, 1, 0.32, 1],
           }}
-          className="filter drop-shadow-sm"
         />
-
-        {/* Glow effect for high values */}
         {percentage > 80 && (
           <motion.circle
             cx={data.size / 2}
             cy={data.size / 2}
-            r={data.size / 2 - 8}
+            r={radius}
             fill="none"
-            stroke={data.color}
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeDasharray={strokeDasharray}
+            strokeWidth={2}
+            stroke="var(--analytics-accent)"
+            strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.3 }}
-            transition={{
-              duration: 1.8,
-              delay: animationDelay + 0.6,
-            }}
-            className="filter blur-sm"
+            animate={{ opacity: 0.6 }}
+            transition={{ delay: animationDelay + 0.4 }}
+            className="blur-[1px]"
           />
         )}
       </motion.svg>
 
-      {/* Center content */}
       <motion.div
         className="absolute inset-0 flex flex-col items-center justify-center text-center"
-        initial={{ opacity: 0, scale: 0.3 }}
+        initial={{ opacity: 0, scale: 0.7 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{
-          duration: 0.7,
-          delay: animationDelay + 0.6,
-          type: "spring",
-          stiffness: 200,
-        }}
+        transition={{ delay: animationDelay + 0.3, type: "spring", stiffness: 220 }}
       >
-        <div className="text-lg font-bold text-foreground">{data.current}</div>
-        <div className="text-[10px] text-muted-foreground font-medium">
+        <div className="text-lg font-semibold text-foreground">
+          {data.current}
+        </div>
+        <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
           {data.unit}
         </div>
         {data.trend && (
-          <div className={cn("text-xs mt-0.5", getTrendColor())}>
-            {getTrendIcon()}
-          </div>
+          <span
+            className={cn(
+              "mt-1 text-xs font-semibold",
+              data.trend === "up" && "text-data-success",
+              data.trend === "down" && "text-data-error",
+              data.trend === "stable" && "text-muted-foreground"
+            )}
+          >
+            {data.trend === "up"
+              ? "↗"
+              : data.trend === "down"
+              ? "↘"
+              : "→"}
+          </span>
         )}
       </motion.div>
     </div>
@@ -158,97 +140,112 @@ export function HRAnalyticsCard({
   className,
   subtitle,
 }: HRAnalyticsCardProps) {
-  const overallEfficiency =
-    metrics.length > 0
-      ? Math.round(
-          metrics.reduce(
-            (sum, metric) => sum + (metric.current / metric.target) * 100,
-            0
-          ) / metrics.length
-        )
-      : 0;
+  const { overallEfficiency, accentGradient } = useMemo(() => {
+    if (metrics.length === 0) {
+      return { overallEfficiency: 0, accentGradient: "var(--color-brand)" };
+    }
+    const efficiency = Math.round(
+      metrics.reduce(
+        (sum, metric) => sum + (metric.current / metric.target) * 100,
+        0
+      ) / metrics.length
+    );
+    const accent = metrics[0].color || "var(--color-brand)";
+    return { overallEfficiency: efficiency, accentGradient: accent };
+  }, [metrics]);
 
   return (
     <div
       className={cn(
-        "relative w-full p-6 rounded-2xl border bg-card",
-        "shadow-sm hover:shadow-md transition-shadow duration-300",
+        "neo-card relative flex w-full flex-col gap-6 overflow-hidden px-6 py-6",
         className
       )}
+      style={{
+        "--analytics-card-accent": accentGradient,
+        "--analytics-card-accent-soft": `color-mix(in srgb, ${accentGradient} 20%, transparent)`,
+      } as React.CSSProperties}
     >
-      <div className="flex flex-col gap-5">
-        {/* Header */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 hover:opacity-100"
+        style={{
+          background:
+            "radial-gradient(circle at 0% 0%, var(--analytics-card-accent-soft), transparent 55%)",
+        }}
+      />
+      <div className="relative flex flex-col gap-2 text-center">
         <motion.div
-          className="text-center"
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.4 }}
+          className="space-y-1"
         >
-          <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+          <h3 className="text-xl font-semibold text-foreground">{title}</h3>
           {subtitle && (
-            <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
+            <p className="text-sm text-muted-foreground">{subtitle}</p>
           )}
         </motion.div>
-
-        {/* Metrics Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 place-items-center">
-          {metrics.map((metric, index) => (
-            <div
-              key={metric.label}
-              className="flex flex-col items-center gap-2"
-            >
-              <AnalyticsCircle data={metric} index={index} />
-              <motion.div
-                className="text-center"
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.15 + 0.8 }}
-              >
-                <div className="text-xs font-medium text-foreground">
-                  {metric.label}
-                </div>
-                <div
-                  className="text-[10px] font-semibold mt-0.5"
-                  style={{ color: metric.color }}
-                >
-                  {metric.current}/{metric.target}
-                </div>
-              </motion.div>
-            </div>
-          ))}
-        </div>
-
-        {/* Overall Summary */}
-        <motion.div
-          className="flex items-center justify-center gap-4 pt-3 border-t border-border"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 1.0 }}
-        >
-          <div className="text-center">
-            <div className="text-xs text-muted-foreground">
-              Overall Efficiency
-            </div>
-            <div
-              className={cn(
-                "text-sm font-bold mt-0.5",
-                overallEfficiency >= 80
-                  ? "text-green-600"
-                  : overallEfficiency >= 60
-                  ? "text-yellow-600"
-                  : "text-red-600"
-              )}
-            >
-              {overallEfficiency}%
-            </div>
-          </div>
-        </motion.div>
       </div>
+
+      <div className="relative grid grid-cols-2 gap-4 md:grid-cols-4">
+        {metrics.map((metric, index) => (
+          <div key={metric.label} className="flex flex-col items-center gap-2">
+            <AnalyticsCircle data={metric} index={index} />
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: index * 0.15 + 0.3 }}
+              className="text-center"
+            >
+              <p className="text-sm font-semibold text-foreground">
+                {metric.label}
+              </p>
+              <p
+                className="text-xs font-medium text-muted-foreground"
+                style={{ color: metric.color || undefined }}
+              >
+                {metric.current}/{metric.target}
+              </p>
+            </motion.div>
+          </div>
+        ))}
+      </div>
+
+      <motion.div
+        className="relative flex flex-col items-center gap-2 border-t border-border pt-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.5 }}
+      >
+        <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
+          Overall Efficiency
+        </p>
+        <div className="flex items-center gap-3">
+          <span className="text-3xl font-semibold text-foreground">
+            {overallEfficiency}%
+          </span>
+          <span
+            className={cn(
+              "text-xs font-semibold px-3 py-1 rounded-full",
+              overallEfficiency >= 80
+                ? "text-data-success"
+                : overallEfficiency >= 60
+                ? "text-data-warning"
+                : "text-data-error"
+            )}
+          >
+            {overallEfficiency >= 80
+              ? "On Track"
+              : overallEfficiency >= 60
+              ? "Moderate"
+              : "Attention"}
+          </span>
+        </div>
+      </motion.div>
     </div>
   );
 }
 
-// Helper function to create HR analytics data
 export function createHRAnalyticsData(data: {
   pendingApprovals: number;
   maxPendingTarget: number;
@@ -264,8 +261,8 @@ export function createHRAnalyticsData(data: {
       label: "Pending",
       current: data.pendingApprovals,
       target: data.maxPendingTarget,
-      color: "#FF6B6B", // Red for pending items (lower is better)
-      size: 80,
+      color: "var(--color-data-error)",
+      size: 96,
       unit: "requests",
       trend:
         data.pendingApprovals > data.maxPendingTarget * 0.8
@@ -278,8 +275,8 @@ export function createHRAnalyticsData(data: {
       label: "Processed",
       current: data.processedToday,
       target: data.dailyTarget,
-      color: "#4ECDC4", // Teal for processed items
-      size: 80,
+      color: "var(--color-data-success)",
+      size: 96,
       unit: "today",
       trend: data.processedToday >= data.dailyTarget ? "up" : "down",
     },
@@ -287,8 +284,8 @@ export function createHRAnalyticsData(data: {
       label: "Utilization",
       current: data.teamUtilization,
       target: data.utilizationTarget,
-      color: "#45B7D1", // Blue for utilization
-      size: 80,
+      color: "var(--color-data-info)",
+      size: 96,
       unit: "%",
       trend:
         data.teamUtilization >= data.utilizationTarget * 0.9 ? "up" : "down",
@@ -297,8 +294,8 @@ export function createHRAnalyticsData(data: {
       label: "Compliance",
       current: data.complianceScore,
       target: data.complianceTarget,
-      color: "#96CEB4", // Green for compliance
-      size: 80,
+      color: "var(--color-data-warning)",
+      size: 96,
       unit: "score",
       trend:
         data.complianceScore >= data.complianceTarget * 0.95

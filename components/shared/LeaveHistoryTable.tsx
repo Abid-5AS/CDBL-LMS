@@ -25,29 +25,19 @@ const STATUS_VARIANTS: Record<string, string> = {
 
 export function LeaveHistoryTable({ history }: LeaveHistoryTableProps) {
   return (
-    <div className="rounded-lg border border-bg-muted backdrop-blur-xl bg-bg-primary/70 p-4 shadow-sm">
-      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+    <div className="neo-card rounded-2xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] p-6 shadow-[var(--shadow-1)]">
+      <h3 className="mb-5 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-secondary)]">
         Recent Leave History
       </h3>
-      <div className="max-h-[250px] overflow-y-auto rounded-lg border border-border-strong dark:border-border-strong">
+      <div className="max-h-[280px] overflow-y-auto rounded-xl border border-[var(--shell-card-border)]">
         <Table>
-          <TableHeader className="bg-bg-secondary dark:bg-bg-secondary/50">
+          <TableHeader>
             <TableRow>
-              <TableHead className="text-xs font-semibold uppercase text-muted-foreground">
-                Type
-              </TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-muted-foreground">
-                Start
-              </TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-muted-foreground">
-                End
-              </TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-muted-foreground">
-                Days
-              </TableHead>
-              <TableHead className="text-xs font-semibold uppercase text-muted-foreground">
-                Status
-              </TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Start</TableHead>
+              <TableHead>End</TableHead>
+              <TableHead>Days</TableHead>
+              <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -55,29 +45,24 @@ export function LeaveHistoryTable({ history }: LeaveHistoryTableProps) {
               <TableRow>
                 <TableCell
                   colSpan={5}
-                  className="py-6 text-center text-sm text-muted-foreground"
+                  className="py-8 text-center text-sm text-[var(--color-text-secondary)]"
                 >
                   No leave records available.
                 </TableCell>
               </TableRow>
             ) : (
               history.map((leave) => (
-                <TableRow
-                  key={leave.id}
-                  className="hover:bg-bg-secondary dark:hover:bg-bg-secondary/50"
-                >
-                  <TableCell className="text-sm font-medium text-text-secondary dark:text-text-secondary">
+                <TableRow key={leave.id}>
+                  <TableCell className="text-sm font-medium">
                     {leave.type}
                   </TableCell>
-                  <TableCell className="text-sm text-text-secondary dark:text-text-secondary">
+                  <TableCell className="text-sm">
                     {formatDate(leave.start)}
                   </TableCell>
-                  <TableCell className="text-sm text-text-secondary dark:text-text-secondary">
+                  <TableCell className="text-sm">
                     {formatDate(leave.end)}
                   </TableCell>
-                  <TableCell className="text-sm text-text-secondary dark:text-text-secondary">
-                    {leave.days}
-                  </TableCell>
+                  <TableCell className="text-sm">{leave.days}</TableCell>
                   <TableCell>
                     <Badge
                       className={

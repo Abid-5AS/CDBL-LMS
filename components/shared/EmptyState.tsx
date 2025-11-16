@@ -3,8 +3,9 @@
 import * as React from "react";
 import Link from "next/link";
 import { LucideIcon } from "lucide-react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Button, Card, CardContent } from "@/components/ui";
+import { Button } from "@/components/ui";
 
 type EmptyStateProps = {
   icon?: LucideIcon;
@@ -21,8 +22,8 @@ type EmptyStateProps = {
 };
 
 /**
- * Unified Empty State Component
- * Consolidates empty state implementations across the codebase
+ * Unified Empty State Component - Neo Style
+ * Consolidates empty state implementations with refined aesthetics
  * Supports multiple variants for different contexts
  */
 export function EmptyState({
@@ -35,10 +36,13 @@ export function EmptyState({
   variant = "default",
 }: EmptyStateProps) {
   const content = (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
       className={cn(
-        "flex flex-col items-center justify-center py-12 px-4 text-center",
-        variant === "minimal" && "py-6",
+        "flex flex-col items-center justify-center py-16 px-6 text-center",
+        variant === "minimal" && "py-8",
         className
       )}
       role="status"
@@ -47,27 +51,27 @@ export function EmptyState({
       {Icon && (
         <div
           className={cn(
-            "flex items-center justify-center rounded-full mb-4",
-            variant === "minimal"
-              ? "h-12 w-12 bg-muted/50"
-              : "h-16 w-16 bg-card-action dark:bg-card-action/30"
+            "relative flex items-center justify-center rounded-2xl mb-6",
+            "border border-[var(--shell-card-border)]",
+            "bg-gradient-to-br from-[rgba(91,94,252,0.06)] to-transparent",
+            "shadow-[0_2px_8px_rgba(91,94,252,0.08)]",
+            variant === "minimal" ? "h-14 w-14" : "h-20 w-20"
           )}
           aria-hidden="true"
         >
           <Icon
             className={cn(
-              variant === "minimal"
-                ? "h-6 w-6 text-muted-foreground"
-                : "h-8 w-8 text-card-action dark:text-card-action"
+              "text-[rgb(91,94,252)]",
+              variant === "minimal" ? "h-7 w-7" : "h-10 w-10"
             )}
           />
         </div>
       )}
       <h3
         className={cn(
-          "font-semibold mb-1",
-          variant === "minimal" ? "text-base" : "text-lg",
-          "text-foreground"
+          "font-semibold mb-2 tracking-tight",
+          variant === "minimal" ? "text-base" : "text-xl",
+          "text-[var(--color-text-primary)]"
         )}
       >
         {title}
@@ -75,23 +79,21 @@ export function EmptyState({
       {description && (
         <p
           className={cn(
-            "text-sm max-w-md mb-4",
-            variant === "minimal"
-              ? "text-muted-foreground"
-              : "text-muted-foreground"
+            "text-sm max-w-md mb-6 leading-relaxed",
+            "text-[var(--color-text-secondary)]"
           )}
         >
           {description}
         </p>
       )}
       {action && (
-        <div className="flex flex-col gap-2 items-center">
+        <div className="flex flex-col gap-3 items-center">
           {action.href ? (
             <Button
               asChild
               variant="outline"
               size="sm"
-              className="rounded-full"
+              className="neo-button rounded-xl"
             >
               <Link href={action.href} aria-label={action.label}>
                 {action.label}
@@ -103,7 +105,7 @@ export function EmptyState({
               variant="outline"
               size="sm"
               aria-label={action.label}
-              className="rounded-full"
+              className="neo-button rounded-xl"
             >
               {action.label}
             </Button>
@@ -111,22 +113,18 @@ export function EmptyState({
           {helpText && (
             <Link
               href="/help"
-              className="text-xs text-card-action hover:text-card-action hover:underline dark:text-card-action"
+              className="text-xs text-[rgb(91,94,252)] hover:text-[rgb(71,74,232)] hover:underline transition-colors duration-200"
             >
               {helpText}
             </Link>
           )}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 
   if (variant === "card") {
-    return (
-      <Card>
-        <CardContent className="p-0">{content}</CardContent>
-      </Card>
-    );
+    return <div className="neo-card">{content}</div>;
   }
 
   return content;

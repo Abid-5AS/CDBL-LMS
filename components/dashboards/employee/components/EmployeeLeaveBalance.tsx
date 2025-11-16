@@ -91,7 +91,7 @@ export function EmployeeLeaveBalance({
   if (Object.keys(balanceData).length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-text-secondary dark:text-text-tertiary">
+        <p className="text-muted-foreground">
           No balance information available
         </p>
       </div>
@@ -103,12 +103,8 @@ export function EmployeeLeaveBalance({
   return (
     <ResponsiveDashboardGrid columns="1:2:3:3" gap="md">
       {Object.entries(balanceData).map(([type, balance]) => {
-        const color =
-          leaveColors[type] || leaveColors.EXTRAWITHOUTPAY;
-        const percentage = Math.min(
-          (balance / maxBalance) * 100,
-          100
-        );
+        const color = leaveColors[type] || leaveColors.EXTRAWITHOUTPAY;
+        const percentage = Math.min((balance / maxBalance) * 100, 100);
 
         return (
           <div
@@ -119,7 +115,7 @@ export function EmployeeLeaveBalance({
             )}
           >
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-semibold text-text-primary dark:text-text-inverted text-sm">
+              <h4 className="font-semibold text-foreground text-sm">
                 {type.charAt(0) + type.slice(1).toLowerCase()} Leave
               </h4>
               <span className={cn("text-2xl font-bold", color.text)}>
@@ -127,7 +123,7 @@ export function EmployeeLeaveBalance({
               </span>
             </div>
             <Progress value={percentage} className="h-2 mb-2" />
-            <p className="text-xs text-text-secondary dark:text-text-tertiary">
+            <p className="text-xs text-muted-foreground">
               {balance} days available
             </p>
           </div>

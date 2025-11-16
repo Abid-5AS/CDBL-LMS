@@ -64,17 +64,21 @@ export function ExportSection({
     : null;
 
   return (
-    <Card className="glass-card">
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+    <Card className="neo-card">
+      <CardHeader className="border-b border-[var(--shell-card-border)]">
+        <CardTitle className="text-lg font-semibold text-[var(--color-text-primary)]">
+          {title}
+        </CardTitle>
+        <CardDescription className="text-sm text-[var(--color-text-secondary)]">
+          {description}
+        </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <div className="flex flex-wrap items-center gap-3">
           <Button
             onClick={() => handleExport("csv")}
             variant="outline"
-            className="flex items-center gap-2"
+            className="neo-button flex items-center gap-2 rounded-xl border-[var(--shell-card-border)] hover:border-[rgb(91,94,252)]/50 hover:bg-[rgba(91,94,252,0.05)] transition-all duration-200"
           >
             <FileSpreadsheet className="h-4 w-4" />
             Export as CSV
@@ -82,13 +86,13 @@ export function ExportSection({
           <Button
             onClick={() => handleExport("pdf")}
             variant="outline"
-            className="flex items-center gap-2"
+            className="neo-button flex items-center gap-2 rounded-xl border-[var(--shell-card-border)] hover:border-[rgb(91,94,252)]/50 hover:bg-[rgba(91,94,252,0.05)] transition-all duration-200"
           >
             <FileText className="h-4 w-4" />
             Export as PDF
           </Button>
           {showFilters && filterSummary && (
-            <p className="text-sm text-muted-foreground ml-auto">
+            <p className="text-sm text-[var(--color-text-secondary)] ml-auto font-medium">
               {filterSummary}
             </p>
           )}

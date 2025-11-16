@@ -14,4 +14,3 @@ export { SmartRecommendations } from "./SmartRecommendations";
 export { LeaveHeatmap } from "./LeaveHeatmap";
 export { SegmentedControlGlider } from "./SegmentedControlGlider";
 export { TeamOnLeaveWidget } from "./TeamOnLeaveWidget";
-

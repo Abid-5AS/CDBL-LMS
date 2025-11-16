@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-x-auto rounded-lg border border-border-strong/20 bg-bg-primary shadow-sm"
+      className="neo-table-container relative w-full overflow-hidden rounded-2xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] shadow-[var(--shadow-1)] backdrop-blur-sm"
       role="region"
       aria-label="Data table"
     >
@@ -19,7 +19,7 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
         {...props}
       />
     </div>
-  )
+  );
 }
 
 function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
@@ -27,14 +27,14 @@ function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
     <thead
       data-slot="table-header"
       className={cn(
-        "[&_tr]:border-b [&_tr]:bg-bg-muted/30 dark:[&_tr]:bg-bg-muted/20",
-        "[&_tr]:border-border-strong/20 dark:[&_tr]:border-border-strong/10",
-        "[&_tr]:sticky [&_tr]:top-0 [&_tr]:z-10 [&_tr]:backdrop-blur-sm",
+        "[&_tr]:border-b [&_tr]:border-[var(--shell-card-border)]",
+        "[&_tr]:bg-gradient-to-br [&_tr]:from-[var(--color-card-elevated)]/50 [&_tr]:to-transparent",
+        "[&_tr]:sticky [&_tr]:top-0 [&_tr]:z-10 [&_tr]:backdrop-blur-xl",
         className
       )}
       {...props}
     />
-  )
+  );
 }
 
 function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
@@ -42,12 +42,14 @@ function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
     <tbody
       data-slot="table-body"
       className={cn(
-        "[&_tr:last-child]:border-0 [&_tr:hover]:bg-bg-secondary/50 dark:[&_tr:hover]:bg-[rgba(255,255,255,0.05)]",
+        "[&_tr:last-child]:border-0",
+        "[&_tr:hover]:bg-gradient-to-r [&_tr:hover]:from-[rgba(91,94,252,0.04)] [&_tr:hover]:to-transparent",
+        "[&_tr]:transition-all [&_tr]:duration-200",
         className
       )}
       {...props}
     />
-  )
+  );
 }
 
 function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
@@ -60,7 +62,7 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
       )}
       {...props}
     />
-  )
+  );
 }
 
 function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
@@ -68,15 +70,16 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "border-b border-border-strong dark:border-[rgba(255,255,255,0.05)]",
-        "hover:bg-bg-secondary/50 dark:hover:bg-[rgba(255,255,255,0.05)]",
-        "data-[state=selected]:bg-bg-secondary dark:data-[state=selected]:bg-[rgba(255,255,255,0.08)]",
-        "transition-colors",
+        "border-b border-[var(--shell-card-border)]/40",
+        "hover:bg-gradient-to-r hover:from-[rgba(91,94,252,0.04)] hover:to-transparent",
+        "data-[state=selected]:bg-gradient-to-r data-[state=selected]:from-[rgba(91,94,252,0.08)] data-[state=selected]:to-transparent",
+        "data-[state=selected]:border-[rgba(91,94,252,0.2)]",
+        "transition-all duration-200 ease-out",
         className
       )}
       {...props}
     />
-  )
+  );
 }
 
 function TableHead({ className, ...props }: React.ComponentProps<"th">) {
@@ -84,14 +87,15 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        "text-foreground h-12 px-4 text-left align-middle font-semibold text-xs uppercase tracking-wider",
-        "text-text-secondary dark:text-[var(--text-primary)]",
+        "h-12 px-5 text-left align-middle",
+        "text-[0.7rem] font-semibold uppercase tracking-[0.12em]",
+        "text-[var(--color-foreground-subtle)]",
         "whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className
       )}
       {...props}
     />
-  )
+  );
 }
 
 function TableCell({ className, ...props }: React.ComponentProps<"td">) {
@@ -99,14 +103,14 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
     <td
       data-slot="table-cell"
       className={cn(
-        "px-4 py-3 align-middle text-sm",
-        "text-text-secondary dark:text-[var(--text-primary)]",
+        "px-5 py-4 align-middle text-sm",
+        "text-[var(--color-text-secondary)]",
         "[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className
       )}
       {...props}
     />
-  )
+  );
 }
 
 function TableCaption({
@@ -119,7 +123,7 @@ function TableCaption({
       className={cn("text-muted-foreground mt-4 text-sm", className)}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -131,4 +135,4 @@ export {
   TableRow,
   TableCell,
   TableCaption,
-}
+};

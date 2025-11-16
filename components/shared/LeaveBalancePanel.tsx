@@ -1,16 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
-import Link from "next/link";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Progress,
-  Badge,
-  Skeleton,
-} from "@/components/ui";
+  useMemo,
+  type CSSProperties,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
+import Link from "next/link";
+import { Skeleton } from "@/components/ui";
 import { EmptyState } from "./EmptyState";
 import { Umbrella, Zap, HeartPulse, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -19,18 +16,18 @@ export type BalanceType = "EARNED" | "CASUAL" | "MEDICAL";
 
 export type Balance = {
   type: BalanceType;
-  used: number; // YTD used
-  total: number; // annual entitlement
-  projected?: number; // optional server projection
-  carryForward?: number; // applicable for EARNED
+  used: number;
+  total: number;
+  projected?: number;
+  carryForward?: number;
 };
 
 export type LeaveBalancePanelProps = {
   balances: Balance[];
   variant?: "full" | "compact";
-  showMeters?: boolean; // default true
-  showPolicyHints?: boolean; // default false
-  onClickType?: (t: BalanceType) => void; // optional nav
+  showMeters?: boolean;
+  showPolicyHints?: boolean;
+  onClickType?: (t: BalanceType) => void;
   loading?: boolean;
   emptyState?: React.ReactNode;
   className?: string;
@@ -41,83 +38,127 @@ const TYPE_CONFIG: Record<
   {
     label: string;
     icon: typeof Umbrella;
-    gradient: string;
-    bgGradient: string;
-    borderColor: string;
-    colorClass: string;
+    accent: string;
   }
 > = {
   EARNED: {
     label: "Earned Leave",
     icon: Umbrella,
-    gradient: "from-data-warning to-data-warning",
-    bgGradient:
-      "from-data-warning to-data-warning dark:from-data-warning/30 dark:to-data-warning/30",
-    borderColor: "border-data-warning dark:border-data-warning",
-    colorClass: "bg-data-warning",
+    accent: "var(--color-leave-earned, #16a34a)",
   },
   CASUAL: {
     label: "Casual Leave",
     icon: Zap,
-    gradient: "from-data-info to-data-info",
-    bgGradient:
-      "from-data-info to-data-info dark:from-data-info/30 dark:to-data-info/30",
-    borderColor: "border-data-info dark:border-data-info",
-    colorClass: "bg-data-info",
+    accent: "var(--color-leave-casual, #2563eb)",
   },
   MEDICAL: {
     label: "Medical Leave",
     icon: HeartPulse,
-    gradient: "from-data-success to-data-success",
-    bgGradient:
-      "from-data-success to-data-success dark:from-data-success/30 dark:to-data-success/30",
-    borderColor: "border-data-success dark:border-data-success",
-    colorClass: "bg-data-success",
+    accent: "var(--color-leave-medical, #0ea5e9)",
   },
 };
 
-/**
- * ProgressBar subcomponent for displaying leave usage
- */
+type AccentVars = CSSProperties & {
+  "--balance-accent"?: string;
+  "--balance-accent-soft"?: string;
+  "--balance-accent-muted"?: string;
+};
+
+const createAccentVars = (accent: string): AccentVars => ({
+  "--balance-accent": accent,
+  "--balance-accent-soft": `color-mix(in srgb, ${accent} 18%, transparent)`,
+  "--balance-accent-muted": `color-mix(in srgb, ${accent} 8%, transparent)`,
+});
+
 function ProgressBar({
   percent,
   label,
-  colorClass,
+  accent,
   className,
 }: {
   percent: number;
   label: string;
-  colorClass: string;
+  accent: string;
   className?: string;
 }) {
   const clampedPercent = Math.min(Math.max(percent, 0), 100);
+  const trackBg = `color-mix(in srgb, ${accent} 10%, transparent)`;
+  const indicatorBg = `linear-gradient(90deg, color-mix(in srgb, ${accent} 35%, transparent), ${accent})`;
 
   return (
     <div className={cn("space-y-1", className)}>
-      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         <span>{label}</span>
-        <span className="text-muted-foreground">
-          {Math.round(clampedPercent)}%
-        </span>
+        <span>{Math.round(clampedPercent)}%</span>
       </div>
-      <Progress
-        value={clampedPercent}
-        className="h-2"
-        indicatorClassName={colorClass}
+      <div
+        className="relative h-2 rounded-full"
+        style={{ backgroundColor: trackBg }}
         aria-valuenow={clampedPercent}
         aria-valuemin={0}
         aria-valuemax={100}
+        role="progressbar"
         aria-label={`${label}: ${Math.round(clampedPercent)}% used`}
-      />
+      >
+        <div
+          className="absolute inset-y-0 left-0 rounded-full"
+          style={{
+            width: `${clampedPercent}%`,
+            backgroundImage: indicatorBg,
+            boxShadow: `0 6px 18px color-mix(in srgb, ${accent} 25%, transparent)`,
+          }}
+        />
+      </div>
     </div>
   );
 }
 
-/**
- * Unified Leave Balance Panel
- * Consolidates LeaveBalanceCards, LeaveBalancesCompact, BalanceMetersGroup
- * Supports full and compact variants with meters and policy hints
- */
+function CircularMeter({
+  percent,
+  accent,
+  size = 80,
+  children,
+}: {
+  percent: number;
+  accent: string;
+  size?: number;
+  children?: ReactNode;
+}) {
+  const clampedPercent = Math.min(Math.max(percent, 0), 100);
+  const dash = clampedPercent * 0.9;
+  const trackColor = `color-mix(in srgb, ${accent} 15%, transparent)`;
+
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg className="h-full w-full -rotate-90" viewBox="0 0 36 36">
+        <circle
+          cx="18"
+          cy="18"
+          r="16"
+          fill="none"
+          strokeWidth="2"
+          stroke={trackColor}
+        />
+        <circle
+          cx="18"
+          cy="18"
+          r="16"
+          fill="none"
+          strokeWidth="2"
+          strokeDasharray={`${dash}, 100`}
+          strokeLinecap="round"
+          stroke={accent}
+        />
+      </svg>
+      {children && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function LeaveBalancePanel({
   balances,
   variant = "full",
@@ -129,7 +170,6 @@ export function LeaveBalancePanel({
   className,
 }: LeaveBalancePanelProps) {
   const sortedBalances = useMemo(() => {
-    // Sort: EARNED, CASUAL, MEDICAL
     const order: BalanceType[] = ["EARNED", "CASUAL", "MEDICAL"];
     return [...balances].sort(
       (a, b) => order.indexOf(a.type) - order.indexOf(b.type)
@@ -137,28 +177,25 @@ export function LeaveBalancePanel({
   }, [balances]);
 
   if (loading) {
-    if (variant === "compact") {
-      return (
-        <div className={cn("grid grid-cols-3 gap-2", className)}>
-          <Skeleton className="h-24 rounded-lg" />
-          <Skeleton className="h-24 rounded-lg" />
-          <Skeleton className="h-24 rounded-lg" />
-        </div>
-      );
-    }
+    const skeletonGrid =
+      variant === "compact"
+        ? "grid grid-cols-1 gap-2 sm:grid-cols-3"
+        : "grid grid-cols-1 gap-4 md:grid-cols-3";
+    const skeletonHeight = variant === "compact" ? "h-24" : "h-44";
     return (
-      <div className={cn("grid grid-cols-1 md:grid-cols-3 gap-4", className)}>
-        <Skeleton className="h-40 rounded-xl" />
-        <Skeleton className="h-40 rounded-xl" />
-        <Skeleton className="h-40 rounded-xl" />
+      <div className={cn(skeletonGrid, className)}>
+        {[0, 1, 2].map((idx) => (
+          <Skeleton
+            key={idx}
+            className={cn(skeletonHeight, "rounded-2xl bg-muted/40")}
+          />
+        ))}
       </div>
     );
   }
 
   if (sortedBalances.length === 0) {
-    if (emptyState) {
-      return <>{emptyState}</>;
-    }
+    if (emptyState) return <>{emptyState}</>;
     return (
       <EmptyState
         icon={Info}
@@ -168,7 +205,21 @@ export function LeaveBalancePanel({
     );
   }
 
-  // Compact variant: single row chips
+  const getInteractiveProps = (type: BalanceType) =>
+    onClickType
+      ? {
+          role: "button" as const,
+          tabIndex: 0,
+          onClick: () => onClickType(type),
+          onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              onClickType(type);
+            }
+          },
+        }
+      : {};
+
   if (variant === "compact") {
     const totalRemaining = sortedBalances.reduce((sum, b) => {
       const remaining = Math.max(b.total - b.used, 0);
@@ -176,86 +227,57 @@ export function LeaveBalancePanel({
     }, 0);
 
     return (
-      <div className={cn("space-y-2", className)}>
-        {/* Total Remaining */}
-        <div className="flex items-center justify-center md:justify-end gap-2 px-2">
-          <span className="text-2xl font-bold text-foreground">
+      <div className={cn("space-y-3", className)}>
+        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground sm:justify-end">
+          <span className="text-2xl font-semibold text-foreground">
             {totalRemaining}
           </span>
-          <span className="text-sm text-muted-foreground">
-            Days Remaining
-          </span>
+          <span>Days Remaining</span>
         </div>
 
-        {/* 3-column compact cards */}
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {sortedBalances.map((balance) => {
             const config = TYPE_CONFIG[balance.type];
             const Icon = config.icon;
             const remaining = Math.max(balance.total - balance.used, 0);
-            const percentUsed =
-              balance.total > 0 ? (balance.used / balance.total) * 100 : 0;
+            const percentRemaining =
+              balance.total > 0 ? (remaining / balance.total) * 100 : 0;
+            const accentVars = createAccentVars(config.accent);
 
             return (
-              <Card
+              <div
                 key={balance.type}
                 className={cn(
-                  "solid-card p-2 flex flex-col items-center cursor-pointer transition-all hover:scale-[1.02]",
-                  onClickType && "hover:shadow-md"
+                  "neo-card group flex flex-col items-center gap-2 text-center",
+                  onClickType && "cursor-pointer transition hover:-translate-y-1"
                 )}
-                onClick={() => onClickType?.(balance.type)}
-                role={onClickType ? "button" : undefined}
-                tabIndex={onClickType ? 0 : undefined}
-                onKeyDown={(e) => {
-                  if (onClickType && (e.key === "Enter" || e.key === " ")) {
-                    e.preventDefault();
-                    onClickType(balance.type);
-                  }
-                }}
+                style={accentVars}
+                {...getInteractiveProps(balance.type)}
               >
                 {showMeters && (
-                  <div className="relative w-16 h-16 mb-1">
-                    <svg
-                      className="w-16 h-16 transform -rotate-90"
-                      viewBox="0 0 36 36"
-                    >
-                      <circle
-                        cx="18"
-                        cy="18"
-                        r="16"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        className="text-muted-foreground/30"
-                      />
-                      <circle
-                        cx="18"
-                        cy="18"
-                        r="16"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeDasharray={`${percentUsed * 0.9}, 100`}
-                        className={config.colorClass}
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-xs font-bold text-foreground">
-                        {remaining}
-                      </span>
-                    </div>
-                  </div>
+                  <CircularMeter
+                    percent={percentRemaining}
+                    accent={config.accent}
+                    size={82}
+                  >
+                    <span className="text-sm font-semibold text-foreground">
+                      {remaining}
+                    </span>
+                  </CircularMeter>
                 )}
-                <div className="text-center mt-1">
-                  <p className="text-xs font-semibold text-foreground">
+                <div>
+                  <p className="text-sm font-semibold text-foreground">
                     {config.label.split(" ")[0]}
                   </p>
-                  <p className="text-[10px] text-muted-foreground">
-                    {remaining}/{balance.total}
+                  <p className="text-xs text-muted-foreground">
+                    {remaining}/{balance.total} days
                   </p>
                 </div>
-              </Card>
+                <div className="inline-flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-[color:var(--color-foreground-subtle)]">
+                  <Icon className="h-4 w-4" />
+                  <span>{Math.round(percentRemaining)}%</span>
+                </div>
+              </div>
             );
           })}
         </div>
@@ -263,10 +285,9 @@ export function LeaveBalancePanel({
     );
   }
 
-  // Full variant: cards with meters
   return (
     <div className={cn("space-y-4", className)}>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {sortedBalances.map((balance) => {
           const config = TYPE_CONFIG[balance.type];
           const Icon = config.icon;
@@ -274,42 +295,44 @@ export function LeaveBalancePanel({
           const percentUsed =
             balance.total > 0 ? (balance.used / balance.total) * 100 : 0;
           const percentRemaining = 100 - percentUsed;
+          const accentVars = createAccentVars(config.accent);
 
           return (
-            <Card
+            <div
               key={balance.type}
               className={cn(
-                "solid-card cursor-pointer transition-all hover:scale-[1.02] hover:shadow-lg",
-                "bg-gradient-to-br",
-                config.bgGradient,
-                config.borderColor,
-                "border-2",
-                onClickType && "hover:shadow-xl"
+                "neo-card group relative flex flex-col gap-4 overflow-hidden px-6 py-6",
+                onClickType && "cursor-pointer transition hover:-translate-y-1"
               )}
-              onClick={() => onClickType?.(balance.type)}
-              role={onClickType ? "button" : undefined}
-              tabIndex={onClickType ? 0 : undefined}
-              onKeyDown={(e) => {
-                if (onClickType && (e.key === "Enter" || e.key === " ")) {
-                  e.preventDefault();
-                  onClickType(balance.type);
-                }
-              }}
+              style={accentVars}
+              {...getInteractiveProps(balance.type)}
             >
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-x-6 top-0 h-px opacity-80"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent, var(--balance-accent), transparent)",
+                }}
+              />
+
+              <div className="relative flex items-start justify-between gap-4">
+                <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-3">
                     <div
-                      className={cn(
-                        "p-2 rounded-lg bg-gradient-to-br",
-                        config.gradient,
-                        "text-text-inverted"
-                      )}
+                      className="rounded-2xl border border-white/20 p-3 shadow-inner dark:border-white/5"
+                      style={{
+                        background:
+                          "linear-gradient(135deg, var(--balance-accent-soft), transparent)",
+                      }}
                     >
-                      <Icon className="size-5" />
+                      <Icon
+                        className="h-5 w-5"
+                        style={{ color: "var(--balance-accent)" }}
+                      />
                     </div>
                     <div>
-                      <p className="font-semibold text-foreground">
+                      <p className="text-xs font-semibold uppercase tracking-[0.35em] text-[color:var(--color-foreground-subtle)]">
                         {config.label}
                       </p>
                       <p className="text-xs text-muted-foreground">
@@ -318,79 +341,73 @@ export function LeaveBalancePanel({
                     </div>
                   </div>
                 </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-3xl font-bold text-foreground">
-                      {remaining}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {Math.round(percentRemaining)}% remaining
-                    </p>
-                    {balance.projected !== undefined && (
-                      <Badge variant="secondary" className="mt-1 text-xs">
-                        Projected: {balance.projected} days
-                      </Badge>
-                    )}
-                  </div>
-                  {showMeters && (
-                    <div className="w-20 h-20">
-                      <svg
-                        className="w-20 h-20 transform -rotate-90"
-                        viewBox="0 0 36 36"
-                      >
-                        <circle
-                          cx="18"
-                          cy="18"
-                          r="16"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          className="text-muted-foreground/30"
-                        />
-                        <circle
-                          cx="18"
-                          cy="18"
-                          r="16"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeDasharray={`${percentRemaining * 0.9}, 100`}
-                          className={cn(config.colorClass, "text-text-inverted")}
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-
                 {showMeters && (
-                  <div className="mt-4">
-                    <ProgressBar
-                      percent={percentUsed}
-                      label={`${balance.used}/${balance.total} used`}
-                      colorClass={config.colorClass}
-                    />
-                  </div>
+                  <CircularMeter
+                    percent={percentRemaining}
+                    accent={config.accent}
+                    size={96}
+                  >
+                    <span className="text-sm font-semibold text-foreground">
+                      {Math.round(percentRemaining)}%
+                    </span>
+                  </CircularMeter>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-4xl font-semibold text-foreground">
+                  {remaining}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {Math.round(percentRemaining)}% remaining
+                </p>
+                {balance.projected !== undefined && (
+                  <span
+                    className="inline-flex w-fit items-center rounded-full border border-white/20 px-3 py-1 text-xs font-semibold"
+                    style={{ color: "var(--balance-accent)" }}
+                  >
+                    Projected: {balance.projected} days
+                  </span>
+                )}
+              </div>
+
+              {showMeters && (
+                <ProgressBar
+                  percent={percentUsed}
+                  label={`${balance.used}/${balance.total} used`}
+                  accent={config.accent}
+                  className="pt-2"
+                />
+              )}
+            </div>
           );
         })}
       </div>
 
-      {/* Policy hints footer */}
       {showPolicyHints && (
-        <div className="rounded-lg border border-data-warning dark:border-data-warning bg-data-warning/50 dark:bg-data-warning/20 p-4">
-          <div className="flex items-start gap-2">
-            <Info className="h-4 w-4 text-data-warning dark:text-data-warning mt-0.5 shrink-0" />
-            <div className="flex-1 text-sm text-data-warning dark:text-data-warning">
-              <p className="font-medium mb-1">Earned Leave Carry Forward</p>
+        <div
+          className="rounded-2xl border p-4"
+          style={{
+            borderColor:
+              "color-mix(in srgb, var(--color-data-warning) 35%, transparent)",
+            backgroundColor:
+              "color-mix(in srgb, var(--color-data-warning) 8%, transparent)",
+          }}
+        >
+          <div className="flex items-start gap-3">
+            <Info
+              className="h-5 w-5"
+              style={{ color: "var(--color-data-warning)" }}
+            />
+            <div className="text-sm text-muted-foreground">
+              <p className="font-semibold text-foreground">
+                Earned Leave Carry Forward
+              </p>
               <p>
-                Earned leave carries forward up to 60 days.{" "}
+                Earned leave carries forward up to 60 days. {""}
                 <Link
                   href="/policies#earned-leave"
-                  className="underline hover:text-data-warning dark:hover:text-data-warning font-medium"
+                  className="font-semibold underline"
                 >
                   See Policy
                 </Link>

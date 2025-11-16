@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { LucideIcon, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { useMemo, CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 
 export interface KPICardProps {
@@ -19,32 +20,15 @@ export interface KPICardProps {
   onClick?: () => void;
 }
 
-const variantStyles = {
-  default: {
-    card: "glass-card hover:shadow-lg",
-    icon: "text-foreground/70",
-    iconBg: "bg-muted/50",
-  },
-  success: {
-    card: "glass-card hover:shadow-lg border-l-4 border-l-data-success",
-    icon: "text-data-success",
-    iconBg: "bg-data-success/10",
-  },
-  warning: {
-    card: "glass-card hover:shadow-lg border-l-4 border-l-data-warning",
-    icon: "text-data-warning",
-    iconBg: "bg-data-warning/10",
-  },
-  error: {
-    card: "glass-card hover:shadow-lg border-l-4 border-l-data-error",
-    icon: "text-data-error",
-    iconBg: "bg-data-error/10",
-  },
-  info: {
-    card: "glass-card hover:shadow-lg border-l-4 border-l-data-info",
-    icon: "text-data-info",
-    iconBg: "bg-data-info/10",
-  },
+const variantAccent: Record<
+  NonNullable<KPICardProps["variant"]>,
+  string
+> = {
+  default: "var(--color-brand)",
+  success: "var(--color-data-success)",
+  warning: "var(--color-data-warning)",
+  error: "var(--color-data-error)",
+  info: "var(--color-data-info)",
 };
 
 export function KPICard({
@@ -58,92 +42,112 @@ export function KPICard({
   className,
   onClick,
 }: KPICardProps) {
-  const styles = variantStyles[variant];
+  const accent = useMemo(() => variantAccent[variant], [variant]);
 
-  const getTrendIcon = () => {
-    if (!trend) return null;
-    if (trend.value > 0) return TrendingUp;
-    if (trend.value < 0) return TrendingDown;
-    return Minus;
+  type AccentVars = CSSProperties & {
+    "--kpi-accent"?: string;
+    "--kpi-accent-soft"?: string;
+    "--kpi-accent-muted"?: string;
   };
 
-  const TrendIcon = getTrendIcon();
+  const accentVars: AccentVars = useMemo(
+    () => ({
+      "--kpi-accent": accent,
+      "--kpi-accent-soft": `color-mix(in srgb, ${accent} 18%, transparent)`,
+      "--kpi-accent-muted": `color-mix(in srgb, ${accent} 6%, transparent)`,
+    }),
+    [accent]
+  );
 
-  const getTrendColor = () => {
-    if (!trend) return "";
-    if (trend.value > 0) return "text-data-success";
-    if (trend.value < 0) return "text-data-error";
-    return "text-muted-foreground";
+  const renderTrendIcon = () => {
+    if (!trend) return null;
+    if (trend.value > 0) return <TrendingUp className="h-3.5 w-3.5" />;
+    if (trend.value < 0) return <TrendingDown className="h-3.5 w-3.5" />;
+    return <Minus className="h-3.5 w-3.5" />;
   };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      whileHover={{ scale: onClick ? 1.02 : 1 }}
-      className={cn(
-        styles.card,
-        "rounded-2xl p-6 transition-all duration-200",
-        onClick && "cursor-pointer",
-        className
-      )}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      whileHover={{
+        y: -4,
+        scale: onClick ? 1.01 : 1,
+      }}
+      className={cn(onClick && "cursor-pointer", className)}
       onClick={onClick}
+      style={accentVars}
     >
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-medium text-muted-foreground mb-1">
-            {title}
-          </p>
+      <div className="neo-card group relative overflow-hidden px-5 py-5 sm:px-6 sm:py-6">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+          style={{
+            background:
+              "radial-gradient(circle at 10% 0%, var(--kpi-accent-soft), transparent 55%)",
+          }}
+        />
+        <div className="relative flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[color:var(--color-foreground-subtle)]">
+              {title}
+            </p>
 
-          {isLoading ? (
-            <div className="space-y-2">
-              <div className="h-8 w-24 bg-muted/50 animate-pulse rounded" />
-              {subtitle && (
-                <div className="h-4 w-32 bg-muted/50 animate-pulse rounded" />
-              )}
-            </div>
-          ) : (
-            <>
-              <motion.p
-                initial={{ scale: 0.8 }}
-                animate={{ scale: 1 }}
-                className="text-3xl font-bold tracking-tight mt-1"
-              >
-                {value}
-              </motion.p>
+            {isLoading ? (
+              <div className="mt-4 space-y-2">
+                <div className="h-8 w-24 animate-pulse rounded bg-muted/60" />
+                {subtitle && (
+                  <div className="h-4 w-32 animate-pulse rounded bg-muted/60" />
+                )}
+              </div>
+            ) : (
+              <>
+                <motion.p
+                  initial={{ scale: 0.92, opacity: 0.7 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="mt-3 text-3xl font-semibold tracking-tight text-foreground"
+                >
+                  {value}
+                </motion.p>
 
-              {subtitle && (
-                <p className="text-sm text-muted-foreground mt-2">
-                  {subtitle}
-                </p>
-              )}
+                {subtitle && (
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {subtitle}
+                  </p>
+                )}
 
-              {trend && (
-                <div className="flex items-center gap-1 mt-2">
-                  {TrendIcon && (
-                    <TrendIcon className={cn("h-4 w-4", getTrendColor())} />
-                  )}
-                  <span className={cn("text-sm font-medium", getTrendColor())}>
-                    {trend.value > 0 ? "+" : ""}
-                    {trend.value}%
-                  </span>
-                  {trend.label && (
-                    <span className="text-sm text-muted-foreground ml-1">
-                      {trend.label}
+                {trend && (
+                  <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-[var(--kpi-accent-soft)]/70 px-3 py-1 text-xs font-semibold text-[color:var(--kpi-accent)]">
+                    {renderTrendIcon()}
+                    <span>
+                      {trend.value > 0 ? "+" : ""}
+                      {trend.value}%
                     </span>
-                  )}
-                </div>
-              )}
-            </>
+                    {trend.label && (
+                      <span className="text-[color:var(--color-foreground-subtle)]/80">
+                        {trend.label}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          {Icon && (
+            <div
+              className="rounded-2xl border border-white/20 p-3 shadow-inner dark:border-white/5"
+              style={{
+                background:
+                  "linear-gradient(135deg, var(--kpi-accent-soft), transparent)",
+                color: "var(--kpi-accent)",
+              }}
+            >
+              <Icon className="h-5 w-5" />
+            </div>
           )}
         </div>
-
-        {Icon && (
-          <div className={cn("p-3 rounded-xl", styles.iconBg)}>
-            <Icon className={cn("h-6 w-6", styles.icon)} />
-          </div>
-        )}
       </div>
     </motion.div>
   );
@@ -152,14 +156,14 @@ export function KPICard({
 // Skeleton loader for KPI cards
 export function KPICardSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn("glass-card rounded-2xl p-6", className)}>
+    <div className={cn("neo-card rounded-2xl p-6", className)}>
       <div className="flex items-start justify-between">
         <div className="flex-1 space-y-3">
-          <div className="h-4 w-24 bg-muted/50 animate-pulse rounded" />
-          <div className="h-8 w-20 bg-muted/50 animate-pulse rounded" />
-          <div className="h-4 w-32 bg-muted/50 animate-pulse rounded" />
+          <div className="h-3 w-24 animate-pulse rounded bg-muted/50" />
+          <div className="h-9 w-28 animate-pulse rounded bg-muted/50" />
+          <div className="h-4 w-32 animate-pulse rounded bg-muted/50" />
         </div>
-        <div className="h-12 w-12 bg-muted/50 animate-pulse rounded-xl" />
+        <div className="h-12 w-12 animate-pulse rounded-2xl bg-muted/40" />
       </div>
     </div>
   );
