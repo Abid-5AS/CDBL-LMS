@@ -382,8 +382,10 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   /* System font fallbacks (Google Fonts disabled for production) */
-  --font-geist-sans: system-ui, -apple-system, sans-serif;
-  --font-geist-mono: ui-monospace, monospace;
+  /* System-first font stack: uses OS-native fonts for optimal performance and native feel */
+  --font-geist-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Roboto", sans-serif;
+  --font-geist-mono: ui-monospace, "Monaco", "Menlo", monospace;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
@@ -695,16 +697,8 @@
   }
 
   html {
-    font-family: var(
-      --font-geist-sans,
-      "Inter",
-      system-ui,
-      -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
-      sans-serif
-    );
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      "Roboto", sans-serif;
     scroll-behavior: smooth;
   }
 
@@ -1198,7 +1192,67 @@
     opacity: 0.6;
   }
 
+  /**
+   * TYPOGRAPHY SYSTEM
+   *
+   * The CDBL LMS uses a unified system-first typography approach with fallback fonts.
+   * This ensures optimal performance and native appearance across all devices.
+   *
+   * FONT STACK (unified across web, emails, and components):
+   * Sans-serif: system-ui → -apple-system → BlinkMacSystemFont → Segoe UI → Roboto → sans-serif
+   * Monospace: ui-monospace → Monaco → Menlo → monospace
+   *
+   * TYPOGRAPHY HIERARCHY:
+   *
+   * Display (Hero/Page Titles):
+   *   - .text-display-2xl: 7xl, bold (700), line 1.0, tight tracking
+   *   - .text-display-xl:  6xl, bold (700), line 1.0, tight tracking
+   *   - .text-display-lg:  5xl, bold (700), line 1.25, tight tracking
+   *   - .text-display-md:  4xl, semibold (600), line 1.25, tight tracking
+   *   - .text-display-sm:  3xl, semibold (600), line 1.375, normal tracking
+   *
+   * Heading (Section/Subsection Titles):
+   *   - .text-heading-xl: 2xl, semibold (600), line 1.375, tight tracking
+   *   - .text-heading-lg: xl, semibold (600), line 1.375, tight tracking
+   *   - .text-heading-md: lg, semibold (600), line 1.5, normal tracking
+   *   - .text-heading-sm: base, medium (500), line 1.5, normal tracking
+   *
+   * Body (Content Text):
+   *   - .text-body-lg: lg, regular (400), line 1.625, normal tracking
+   *   - .text-body-md: base, regular (400), line 1.5, normal tracking
+   *   - .text-body-sm: sm, regular (400), line 1.5, normal tracking
+   *
+   * Caption (Metadata):
+   *   - .text-caption: xs, medium (500), line 1.25, wide tracking, uppercase
+   *
+   * WEIGHT PROGRESSION (for consistent hierarchy):
+   * Display: 700 (bold) → 700 → 700 → 600 (semibold) → 600
+   * Heading: 600 (semibold) → 600 → 600 → 500 (medium)
+   * Body:    400 (regular)
+   *
+   * USAGE EXAMPLES:
+   * - Page title: use .text-display-lg or .text-display-2xl
+   * - Section heading: use .text-heading-lg or .text-heading-xl
+   * - Subsection: use .text-heading-md
+   * - Body content: use .text-body-md
+   * - Small labels: use .text-body-sm or .text-caption
+   *
+   * REACT COMPONENTS:
+   * - <Heading size="lg" /> - semantic h2 with typography class
+   * - <Text size="md" /> - semantic p with typography class
+   * - <Text variant="muted" /> - secondary text with reduced opacity
+   *
+   * LINE HEIGHT & TRACKING RULES:
+   * - Larger text (3xl+): tighter line-height for visual balance
+   * - Smaller text (<base): wider line-height for readability
+   * - Tracking (letter-spacing):
+   *   - Display/Heading: tighter (-0.025em) for visual prominence
+   *   - Body: normal (0) for natural reading
+   *   - Caption: wider (+0.025em) for uppercase labels
+   */
+
   /* Enhanced Typography Utilities */
+  /* Display Styles - Large, prominent text for page titles and major sections */
   .text-display-2xl {
     font-size: var(--text-7xl);
     line-height: var(--leading-none);
@@ -1217,7 +1271,7 @@
     font-size: var(--text-5xl);
     line-height: var(--leading-tight);
     letter-spacing: var(--tracking-tight);
-    font-weight: var(--font-semibold);
+    font-weight: var(--font-bold);
   }
 
   .text-display-md {
@@ -1231,9 +1285,10 @@
     font-size: var(--text-3xl);
     line-height: var(--leading-snug);
     letter-spacing: var(--tracking-normal);
-    font-weight: var(--font-medium);
+    font-weight: var(--font-semibold);
   }
 
+  /* Heading Styles - Section headers and subsection titles */
   .text-heading-xl {
     font-size: var(--text-2xl);
     line-height: var(--leading-snug);
@@ -1252,7 +1307,7 @@
     font-size: var(--text-lg);
     line-height: var(--leading-normal);
     letter-spacing: var(--tracking-normal);
-    font-weight: var(--font-medium);
+    font-weight: var(--font-semibold);
   }
 
   .text-heading-sm {

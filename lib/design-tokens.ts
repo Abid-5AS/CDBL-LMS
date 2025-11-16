@@ -132,8 +132,8 @@ export const shadowTokens = {
 
 export const typographyTokens = {
   fontFamily: {
-    sans: "var(--font-geist-sans, 'Inter', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif)",
-    mono: "var(--font-geist-mono, 'IBM Plex Mono', 'Fira Code', monospace)",
+    sans: "var(--font-geist-sans, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif)",
+    mono: "var(--font-geist-mono, ui-monospace, 'Monaco', 'Menlo', monospace)",
   },
   fontSize: {
     xs: "0.75rem",
