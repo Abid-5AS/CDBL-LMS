@@ -49,7 +49,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
 
-interface HRAdminStats {
+export interface HRAdminStats {
   // Core KPIs
   employeesOnLeave: number;
   pendingRequests: number;
@@ -80,6 +80,11 @@ interface HRAdminStats {
   }>;
 }
 
+type HRAdminDashboardClientProps = {
+  initialStats?: HRAdminStats | null;
+  initialKpis?: HRAdminStats | null;
+};
+
 // Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -103,7 +108,10 @@ const itemVariants = {
   },
 };
 
-function HRAdminDashboardClientImpl() {
+function HRAdminDashboardClientImpl({
+  initialStats,
+  initialKpis,
+}: HRAdminDashboardClientProps) {
   // Track hydration state to prevent hydration mismatches from animations
   const [isHydrated, setIsHydrated] = useState(false);
   useEffect(() => {
@@ -120,6 +128,7 @@ function HRAdminDashboardClientImpl() {
     dedupingInterval: 10000,
     revalidateOnReconnect: true,
     keepPreviousData: true,
+    fallbackData: initialKpis ?? undefined,
   });
 
   // Fetch full displayStats in background (includes charts/analytics)
@@ -133,18 +142,19 @@ function HRAdminDashboardClientImpl() {
     dedupingInterval: 10000,
     revalidateOnReconnect: true,
     keepPreviousData: true,
+    fallbackData: initialStats ?? undefined,
   });
 
   // Use KPI data if available, fall back to full stats
-  const displayStats = kpiData || stats;
-  const isLoading = isKPILoading && !displayStats;
+  const displayStats = stats || kpiData || initialStats || initialKpis || null;
+  const isLoading = isKPILoading && !kpiData;
 
   if (error) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-data-error/20 bg-data-error/5 p-6 text-center glass-card"
+        className="surface-card border border-data-error/30 bg-data-error/5 p-6 text-center"
       >
         <AlertCircle className="h-12 w-12 mx-auto mb-3 text-data-error" />
         <p className="text-sm text-data-error font-medium">
@@ -317,7 +327,7 @@ function HRAdminDashboardClientImpl() {
                 {[...Array(3)].map((_, i) => (
                   <div
                     key={i}
-                    className="glass-card rounded-2xl border-border h-full min-h-[170px] flex flex-col p-6"
+                    className="surface-card rounded-2xl h-full min-h-[170px] flex flex-col p-6"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1 space-y-3">
@@ -333,7 +343,7 @@ function HRAdminDashboardClientImpl() {
             ) : (
               <>
                 <motion.div variants={itemVariants} className="h-full">
-                  <Card className="glass-card rounded-2xl border-border hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+                  <Card className="surface-card rounded-2xl hover:shadow-lg transition-all duration-300 h-full flex flex-col">
                     <CardHeader className="pb-3">
                       <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                         <Target className="h-4 w-4" />
@@ -478,7 +488,7 @@ function HRAdminDashboardClientImpl() {
           <ResponsiveDashboardGrid columns="1:1:2:3" gap="md" animate={true}>
             {/* Quick Stats Summary */}
             <motion.div variants={itemVariants}>
-              <Card className="glass-card rounded-2xl border-border hover:shadow-lg transition-all duration-300 h-full">
+              <Card className="surface-card rounded-2xl hover:shadow-lg transition-all duration-300 h-full">
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2">
                     <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -602,7 +612,7 @@ function HRAdminDashboardClientImpl() {
 
         {/* Cancellation Requests - Full Width */}
         <motion.div variants={itemVariants}>
-          <Card className="glass-card rounded-2xl hover:shadow-lg transition-all duration-300">
+          <Card className="surface-card rounded-2xl hover:shadow-lg transition-all duration-300">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Cancellation Requests</CardTitle>

@@ -45,7 +45,7 @@ export function PendingLeaveCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.2, delay: index * 0.03 }}
-      className="glass-card p-4 rounded-xl border border-border-strong/50 dark:border-border-strong/50 cursor-pointer hover:shadow-md transition-all"
+      className="surface-card-interactive p-4 rounded-xl border border-border-strong/50 dark:border-border-strong/50 cursor-pointer transition-all"
       onClick={() => onRowClick(leave)}
     >
       <div className="flex items-start justify-between mb-3">

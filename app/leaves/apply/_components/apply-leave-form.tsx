@@ -87,6 +87,17 @@ export function ApplyLeaveForm() {
   } = useApplyLeaveForm();
   const router = useRouter();
 
+  const today = new Date();
+  const todayLabel = today.toLocaleDateString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+  const policyHint =
+    (type && POLICY_TOOLTIPS[type as LeaveType]) ||
+    POLICY_TOOLTIPS.EARNED ||
+    null;
+
   const heroStats = [
     {
       label: "Current Balance",
@@ -114,40 +125,53 @@ export function ApplyLeaveForm() {
 
   return (
     <div className="space-y-6">
-      <div className="mx-auto max-w-[1400px] space-y-10">
-        {/* Header */}
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold text-foreground">
-              Apply for Leave
-            </h1>
-            <p className="text-sm text-muted-foreground leading-6 max-w-2xl">
-              Share your leave details, attach supporting documents, and track
-              balances in real time before submitting.
-            </p>
+      <div className="mx-auto max-w-[1400px] space-y-8">
+        <div className="surface-card p-6 space-y-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
+                Leave Request
+              </p>
+              <h1 className="text-3xl font-semibold text-foreground">
+                Apply for Leave
+              </h1>
+              <p className="text-sm text-muted-foreground leading-6 max-w-2xl">
+                Share your leave details, attach supporting documents, and track balances in
+                real time before submitting.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border/60 px-4 py-3 text-sm text-muted-foreground">
+              <p className="text-xs uppercase tracking-widest">Today</p>
+              <p className="text-xl font-semibold text-foreground">{todayLabel}</p>
+            </div>
           </div>
-          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-3 w-full lg:w-auto">
+          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-3">
             {heroStats.map((stat) => (
-              <Card
+              <div
                 key={stat.label}
-                className="rounded-2xl border border-border bg-card/90 shadow-sm"
+                className="rounded-2xl border border-border/70 px-4 py-3"
               >
-                <CardContent className="p-4">
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                    {stat.label}
-                  </p>
-                  <p
-                    className={cn(
-                      "text-lg font-semibold text-foreground",
-                      stat.state
-                    )}
-                  >
-                    {stat.value}
-                  </p>
-                </CardContent>
-              </Card>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  {stat.label}
+                </p>
+                <p className={cn("text-lg font-semibold text-foreground", stat.state)}>
+                  {stat.value}
+                </p>
+              </div>
             ))}
           </div>
+          {policyHint && (
+            <div className="rounded-2xl border border-border/70 px-4 py-3 flex gap-3 items-start bg-muted/30">
+              <Info className="h-4 w-4 text-muted-foreground mt-1" />
+              <div>
+                <p className="text-sm font-semibold text-foreground">Policy Reminder</p>
+                <p className="text-sm text-muted-foreground">
+                  {policyHint.description ||
+                    "Keep an eye on notice periods and required documents before submitting."}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Two-column responsive layout */}

@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
+    "dev:turbo": "next dev --turbopack",
     "build": "prisma generate && next build --turbopack",
     "start": "next start",
     "lint": "eslint",
@@ -15,6 +16,7 @@
     "test:unit": "vitest run tests/unit tests/lib tests/components",
     "test:integration": "vitest run tests/integration tests/api tests/jobs",
     "test": "vitest run",
+    "test:workflow": "tsx scripts/verify-approval-workflow.ts",
     "verify:demo": "tsx scripts/verify-demo-data.ts",
     "verify:deployment": "tsx scripts/verify-deployment.ts",
     "jobs:scheduler": "tsx scripts/scheduler.ts",

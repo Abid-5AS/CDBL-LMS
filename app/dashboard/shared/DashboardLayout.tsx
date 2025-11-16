@@ -2,6 +2,7 @@ import { ReactNode, CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 import type { Role } from "@prisma/client";
 import { getRoleAccentColor, getRoleSoftColor } from "@/constants/colors";
+import { Heading, Text } from "@/components/ui/typography";
 
 type DashboardLayoutProps = {
   children: ReactNode;
@@ -79,14 +80,22 @@ export function DashboardLayout({
                 </span>
               )}
               {title && (
-                <h1 className="page-shell__title">
+                <Heading
+                  as="h1"
+                  size="lg"
+                  className="page-shell__title"
+                >
                   {title}
-                </h1>
+                </Heading>
               )}
               {description && (
-                <p className="page-shell__subtitle text-base">
+                <Text
+                  size="lg"
+                  variant="muted"
+                  className="page-shell__subtitle text-base"
+                >
                   {description}
-                </p>
+                </Text>
               )}
             </div>
             {actions && (

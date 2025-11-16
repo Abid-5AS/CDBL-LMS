@@ -178,6 +178,7 @@ export {
   ModalStackProvider,
   useModalStack,
 } from "./enhanced-modal";
+export { Heading, Text } from "./typography";
 export {
   Drawer,
   DrawerHeader,

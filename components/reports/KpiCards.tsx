@@ -78,7 +78,7 @@ export function KpiCards({ kpis, duration, isLoading }: KpiCardsProps) {
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {Array.from({ length: 5 }).map((_, i) => (
-          <Card key={i} className="glass-card">
+          <Card key={i} className="surface-card">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div className="h-4 w-24 bg-muted animate-pulse rounded" />
               <div className="h-4 w-4 bg-muted animate-pulse rounded" />
@@ -103,7 +103,7 @@ export function KpiCards({ kpis, duration, isLoading }: KpiCardsProps) {
           animate="visible"
           transition={{ duration: 0.3, delay: index * 0.1 }}
         >
-          <Card className="glass-card hover:shadow-lg transition-all duration-300">
+          <Card className="surface-card hover:shadow-lg transition-all duration-300">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {card.title}

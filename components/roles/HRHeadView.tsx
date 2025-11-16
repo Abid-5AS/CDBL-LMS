@@ -2,7 +2,7 @@
 
 import type { EmployeeDashboardData } from "@/lib/employee";
 import type { AppRole } from "@/lib/rbac";
-import { EmployeeDetailView } from "@/components/shared";
+import { EmployeeManagementProfile } from "@/app/employees/components/EmployeeManagementProfile";
 
 type HRHeadViewProps = {
   employee: EmployeeDashboardData;
@@ -11,10 +11,6 @@ type HRHeadViewProps = {
 
 export function HRHeadView({ employee, viewerRole }: HRHeadViewProps) {
   return (
-    <EmployeeDetailView
-      employee={employee}
-      viewerRole={viewerRole}
-      breadcrumbLabel="Employee Directory"
-    />
+    <EmployeeManagementProfile employee={employee} viewerRole={viewerRole} />
   );
 }

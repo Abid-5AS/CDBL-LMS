@@ -1,10 +1,15 @@
 "use client";
 
-import { HRAdminDashboardClient } from "./HRAdminDashboardClient";
+import {
+  HRAdminDashboardClient,
+  type HRAdminStats,
+} from "./HRAdminDashboardClient";
 import { DashboardErrorBoundary } from "@/components/shared/ErrorBoundary";
 
 type HRAdminDashboardProps = {
   username: string;
+  initialStats: HRAdminStats;
+  initialKpis: HRAdminStats;
 };
 
 /**
@@ -15,10 +20,17 @@ type HRAdminDashboardProps = {
  * All KPIs now pull real-time data from /api/dashboard/hr-admin/stats
  * Auto-refreshes every 60 seconds
  */
-export function HRAdminDashboard({ username }: HRAdminDashboardProps) {
+export function HRAdminDashboard({
+  username,
+  initialStats,
+  initialKpis,
+}: HRAdminDashboardProps) {
   return (
     <DashboardErrorBoundary role="HR_ADMIN">
-      <HRAdminDashboardClient />
+      <HRAdminDashboardClient
+        initialStats={initialStats}
+        initialKpis={initialKpis}
+      />
     </DashboardErrorBoundary>
   );
 }

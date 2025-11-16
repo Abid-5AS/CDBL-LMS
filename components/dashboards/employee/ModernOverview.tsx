@@ -18,6 +18,7 @@ import { Button, Card, CardContent, Skeleton } from "@/components/ui";
 import { useApiQuery } from "@/lib/apiClient";
 import { useLeaveRequests } from "@/hooks";
 import { leaveTypeLabel } from "@/lib/ui";
+import { formatDate } from "@/lib/utils";
 import { RoleBasedDashboard, RoleKPICard } from "../shared/RoleBasedDashboard";
 import {
   ResponsiveDashboardGrid,
@@ -145,6 +146,76 @@ export function ModernEmployeeDashboard({
           animate="visible"
           className="space-y-6 lg:space-y-8"
         >
+          <motion.section variants={itemVariants}>
+            <div className="surface-card p-6 space-y-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
+                    Welcome back
+                  </p>
+                  <h1 className="text-2xl font-semibold text-foreground">
+                    Good day, {username}
+                  </h1>
+                  <p className="text-sm text-muted-foreground">
+                    Stay on top of your leave plans and next actions.
+                  </p>
+                </div>
+                <div className="rounded-xl border border-border/60 px-4 py-2 text-sm text-muted-foreground">
+                  <p className="text-xs uppercase tracking-widest">Today</p>
+                  <p className="text-lg font-semibold text-foreground">
+                    {new Date().toLocaleDateString(undefined, {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </p>
+                </div>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-border/60 px-4 py-3">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    Next leave
+                  </p>
+                  {dashboardData.nextScheduledLeave ? (
+                    <>
+                      <p className="text-lg font-semibold text-foreground">
+                        {formatDate(dashboardData.nextScheduledLeave.startDate)} →{" "}
+                        {formatDate(dashboardData.nextScheduledLeave.endDate)}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {leaveTypeLabel[dashboardData.nextScheduledLeave.type] ||
+                          dashboardData.nextScheduledLeave.type} ·{" "}
+                        {dashboardData.nextScheduledLeave.workingDays} days
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      No upcoming leave booked.
+                    </p>
+                  )}
+                </div>
+                <div className="rounded-xl border border-border/60 px-4 py-3 flex flex-col gap-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                      Quick action
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Need a break? Start a new leave request instantly.
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => router.push("/leaves/apply")}
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Apply for Leave
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </motion.section>
+
           {/* Quick Stats Grid */}
           <DashboardSection
             title="Leave Metrics"

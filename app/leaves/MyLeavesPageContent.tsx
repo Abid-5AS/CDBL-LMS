@@ -244,55 +244,69 @@ export function MyLeavesPageContent() {
     apiFetcher,
     { revalidateOnFocus: false }
   );
+  const todayLabel = new Date().toLocaleDateString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 py-8">
-      {/* Header */}
-      <header className="flex justify-between items-start mb-4">
-        <div>
-          <h1 className="text-xl font-semibold text-text-primary mb-1">
-            My Leave Requests
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Track your submitted leave applications and manage requests.
-          </p>
+      <div className="surface-card p-6 space-y-4">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
+              History
+            </p>
+            <h1 className="text-2xl font-semibold text-foreground">
+              My Leave Requests
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Track submissions, manage pending approvals, and see live updates.
+            </p>
+          </div>
+          <div className="rounded-xl border border-border/70 px-4 py-3 text-sm text-muted-foreground">
+            <p className="text-xs uppercase tracking-widest">Today</p>
+            <p className="text-xl font-semibold text-foreground">{todayLabel}</p>
+          </div>
         </div>
-      </header>
+      </div>
 
-      {/* Balance Strip */}
       {!balanceLoading && balanceData && (
-        <Card className="bg-gradient-to-r from-primary/5 via-primary/3 to-transparent border-primary/20">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Wallet className="size-4 text-primary" aria-hidden="true" />
-                </div>
-                <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">Earned:</span>
-                    <span className="font-semibold text-text-primary">{balanceData.EARNED || 0}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">Casual:</span>
-                    <span className="font-semibold text-text-primary">{balanceData.CASUAL || 0}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">Medical:</span>
-                    <span className="font-semibold text-text-primary">{balanceData.MEDICAL || 0}</span>
-                  </div>
-                </div>
-              </div>
-              <Link
-                href="/balance"
-                className="text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
-              >
-                View Details
-                <ArrowRight className="size-3" aria-hidden="true" />
-              </Link>
+        <div className="surface-card px-4 py-4 flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Wallet className="size-4 text-primary" aria-hidden="true" />
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex flex-wrap items-center gap-4 text-sm">
+              <span className="text-muted-foreground">
+                Earned:{" "}
+                <span className="font-semibold text-foreground">
+                  {balanceData.EARNED || 0}
+                </span>
+              </span>
+              <span className="text-muted-foreground">
+                Casual:{" "}
+                <span className="font-semibold text-foreground">
+                  {balanceData.CASUAL || 0}
+                </span>
+              </span>
+              <span className="text-muted-foreground">
+                Medical:{" "}
+                <span className="font-semibold text-foreground">
+                  {balanceData.MEDICAL || 0}
+                </span>
+              </span>
+            </div>
+          </div>
+          <Link
+            href="/balance"
+            className="ml-auto text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
+          >
+            View balance details
+            <ArrowRight className="size-3" aria-hidden="true" />
+          </Link>
+        </div>
       )}
 
       {/* Status Filter Tabs */}
@@ -310,13 +324,13 @@ export function MyLeavesPageContent() {
       {/* Requests Table */}
       <AnimatePresence mode="wait">
         {isLoading ? (
-          <Card>
-            <CardContent className="p-8 text-center text-sm text-text-secondary">
+          <Card className="surface-card">
+            <CardContent className="p-8 text-center text-sm text-muted-foreground">
               Loading...
             </CardContent>
           </Card>
         ) : error ? (
-          <Card>
+          <Card className="surface-card">
             <CardContent
               className="p-8 text-center text-sm text-data-error dark:text-data-error-strong"
               role="alert"
@@ -325,7 +339,7 @@ export function MyLeavesPageContent() {
             </CardContent>
           </Card>
         ) : filteredRows.length === 0 ? (
-          <Card>
+          <Card className="surface-card">
             <CardContent className="p-0">
               <EmptyState
                 icon={ClipboardCheck}
@@ -347,62 +361,59 @@ export function MyLeavesPageContent() {
             </CardContent>
           </Card>
         ) : (
-          <motion.div
-            key={selectedFilter}
-            initial={{ 
-              opacity: 0, 
-              x: animationDirection > 0 ? 100 : -100
-            }}
-            animate={{ 
-              opacity: 1, 
-              x: 0
-            }}
-            exit={{ 
-              opacity: 0, 
-              x: animationDirection < 0 ? 100 : -100
-            }}
-            transition={{ 
-              duration: 0.4,
-              ease: [0.32, 0.72, 0, 1]
-            }}
-          >
-            <div className="max-h-[450px] overflow-y-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-xs font-medium">
-                      Type
-                    </TableHead>
-                    <TableHead className="hidden sm:table-cell text-xs font-medium">
-                      Dates
-                    </TableHead>
-                    <TableHead className="hidden md:table-cell text-xs font-medium">
-                      Days
-                    </TableHead>
-                    <TableHead className="text-xs font-medium">
-                      Status
-                    </TableHead>
-                    <TableHead className="hidden lg:table-cell text-xs font-medium">
-                      Updated
-                    </TableHead>
-                    <TableHead className="text-right text-xs font-medium">
-                      Action
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                      {paginatedRows.map((row, index) => (
-                        <TableRow
-                          key={row.id}
-                          className={cn(
-                            "hover:bg-muted/40 cursor-pointer transition-colors",
-                            index % 2 === 0 && "bg-bg-primary dark:bg-bg-secondary/50"
-                          )}
-                          onClick={() => {
-                            setSelectedLeave(row);
-                            setModalOpen(true);
-                          }}
-                        >
+          <Card className="surface-card p-0 overflow-hidden">
+            <motion.div
+              key={selectedFilter}
+              initial={{
+                opacity: 0,
+                x: animationDirection > 0 ? 100 : -100,
+              }}
+              animate={{
+                opacity: 1,
+                x: 0,
+              }}
+              exit={{
+                opacity: 0,
+                x: animationDirection < 0 ? 100 : -100,
+              }}
+              transition={{
+                duration: 0.4,
+                ease: [0.32, 0.72, 0, 1],
+              }}
+            >
+              <div className="max-h-[450px] overflow-y-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs font-medium">Type</TableHead>
+                      <TableHead className="hidden sm:table-cell text-xs font-medium">
+                        Dates
+                      </TableHead>
+                      <TableHead className="hidden md:table-cell text-xs font-medium">
+                        Days
+                      </TableHead>
+                      <TableHead className="text-xs font-medium">Status</TableHead>
+                      <TableHead className="hidden lg:table-cell text-xs font-medium">
+                        Updated
+                      </TableHead>
+                      <TableHead className="text-right text-xs font-medium">
+                        Action
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedRows.map((row, index) => (
+                      <TableRow
+                        key={row.id}
+                        className={cn(
+                          "hover:bg-muted/40 cursor-pointer transition-colors",
+                          index % 2 === 0 && "bg-bg-primary dark:bg-bg-secondary/50"
+                        )}
+                        onClick={() => {
+                          setSelectedLeave(row);
+                          setModalOpen(true);
+                        }}
+                      >
                           <TableCell className="font-medium text-sm text-text-secondary dark:text-text-secondary">
                             {leaveTypeLabel[row.type] ?? row.type}
                           </TableCell>
@@ -529,6 +540,7 @@ export function MyLeavesPageContent() {
               </div>
             )}
           </motion.div>
+          </Card>
         )}
       </AnimatePresence>
 

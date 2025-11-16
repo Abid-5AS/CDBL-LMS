@@ -3,7 +3,23 @@
  * Shared utilities for consistent UI styling across the application
  */
 
-export type AppRole = "EMPLOYEE" | "DEPT_HEAD" | "HR_ADMIN" | "HR_HEAD" | "CEO" | "SYSTEM_ADMIN";
+import type { LucideIcon } from "lucide-react";
+import {
+  ClipboardList,
+  Crown,
+  ShieldCheck,
+  Target,
+  UserRound,
+  UsersRound,
+} from "lucide-react";
+
+export type AppRole =
+  | "EMPLOYEE"
+  | "DEPT_HEAD"
+  | "HR_ADMIN"
+  | "HR_HEAD"
+  | "CEO"
+  | "SYSTEM_ADMIN";
 
 /**
  * Get consistent role badge CSS classes based on role
@@ -39,17 +55,17 @@ export function getRoleLabel(role: AppRole): string {
 }
 
 /**
- * Get role icon/emoji for visual distinction
+ * Get role icon for visual distinction
  */
-export function getRoleIcon(role: AppRole): string {
-  const icons: Record<AppRole, string> = {
-    CEO: "👔",
-    HR_HEAD: "🎯",
-    HR_ADMIN: "📋",
-    DEPT_HEAD: "📊",
-    EMPLOYEE: "👤",
-    SYSTEM_ADMIN: "⚙️",
+export function getRoleIcon(role: AppRole): LucideIcon {
+  const icons: Record<AppRole, LucideIcon> = {
+    CEO: Crown,
+    HR_HEAD: Target,
+    HR_ADMIN: ClipboardList,
+    DEPT_HEAD: UsersRound,
+    EMPLOYEE: UserRound,
+    SYSTEM_ADMIN: ShieldCheck,
   };
 
-  return icons[role] || "👤";
+  return icons[role] || UserRound;
 }

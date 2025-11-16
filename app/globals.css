@@ -47,6 +47,113 @@
   border-color: var(--color-interactive-hover-border);
 }
 
+@media (prefers-reduced-transparency: reduce) {
+  .glass-card {
+    background: var(--color-card-elevated);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-color: color-mix(in srgb, var(--shell-card-border) 70%, transparent);
+    box-shadow: var(--shadow-1);
+  }
+}
+
+.surface-card {
+  background: var(--color-card-elevated);
+  border-radius: 1rem;
+  border: 1px solid var(--shell-card-border);
+  box-shadow: var(--shadow-1);
+  transition: transform var(--transition-duration-short)
+      var(--transition-ease-out),
+    box-shadow var(--transition-duration-short) var(--transition-ease-out),
+    border-color var(--transition-duration-short) var(--transition-ease-out);
+}
+
+.surface-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--shell-border) 60%, transparent);
+  box-shadow: var(--shadow-2);
+}
+
+.dark .surface-card {
+  background: rgba(12, 16, 32, 0.92);
+  border-color: color-mix(in srgb, var(--shell-card-border) 60%, transparent);
+  box-shadow: var(--shadow-1);
+}
+
+.shell-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.shell-bg__layer {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.shell-bg__layer--gradient {
+  background-image: var(--shell-gradient);
+  opacity: 0.8;
+  filter: saturate(110%);
+}
+
+.shell-bg__layer--grid {
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent calc(var(--shell-grid-size) - 1px),
+      var(--shell-grid-color)
+    ),
+    linear-gradient(
+      0deg,
+      transparent calc(var(--shell-grid-size) - 1px),
+      var(--shell-grid-color)
+    );
+  background-size: var(--shell-grid-size) var(--shell-grid-size);
+  mix-blend-mode: soft-light;
+  opacity: 0.25;
+}
+
+.shell-bg__blob {
+  position: absolute;
+  width: clamp(220px, 28vw, 420px);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.6;
+}
+
+.shell-bg__blob--left {
+  top: 5%;
+  left: max(-10%, -120px);
+  background: radial-gradient(circle, rgba(91, 94, 252, 0.55), transparent 60%);
+}
+
+.shell-bg__blob--right {
+  bottom: -10%;
+  right: max(-10%, -140px);
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.45), transparent 65%);
+}
+
+.dark .shell-bg__layer--gradient {
+  opacity: 0.9;
+}
+
+.dark .shell-bg__layer--grid {
+  opacity: 0.35;
+}
+
+.dark .shell-bg__blob--left {
+  background: radial-gradient(circle, rgba(91, 94, 252, 0.4), transparent 65%);
+}
+
+.dark .shell-bg__blob--right {
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.35), transparent 70%);
+}
+
 /* ===== Interactive State Utilities ===== */
 /* Hover state for cards */
 .card-interactive {

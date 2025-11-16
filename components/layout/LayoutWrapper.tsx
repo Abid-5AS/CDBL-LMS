@@ -15,7 +15,14 @@ type LayoutWrapperProps = {
 };
 
 function ShellBackground() {
-  return null;
+  return (
+    <div className="shell-bg" aria-hidden="true">
+      <div className="shell-bg__layer shell-bg__layer--gradient" />
+      <div className="shell-bg__layer shell-bg__layer--grid" />
+      <div className="shell-bg__blob shell-bg__blob--left" />
+      <div className="shell-bg__blob shell-bg__blob--right" />
+    </div>
+  );
 }
 
 export function LayoutWrapper({ children }: LayoutWrapperProps) {

@@ -2,7 +2,7 @@
 
 import type { EmployeeDashboardData } from "@/lib/employee";
 import type { AppRole } from "@/lib/rbac";
-import { EmployeeDetailView } from "@/components/shared";
+import { EmployeeManagementProfile } from "@/app/employees/components/EmployeeManagementProfile";
 
 type ManagerViewProps = {
   employee: EmployeeDashboardData;
@@ -11,10 +11,6 @@ type ManagerViewProps = {
 
 export function ManagerView({ employee, viewerRole }: ManagerViewProps) {
   return (
-    <EmployeeDetailView
-      employee={employee}
-      viewerRole={viewerRole}
-      breadcrumbLabel="Team"
-    />
+    <EmployeeManagementProfile employee={employee} viewerRole={viewerRole} />
   );
 }

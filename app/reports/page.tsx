@@ -17,11 +17,25 @@ export default async function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-border backdrop-blur-xl bg-card/90 p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold">Reports & Analytics</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          View leave statistics, departmental summaries, and generate exportable insights
-        </p>
+      <section className="surface-card p-6 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">
+              Strategic Insights
+            </p>
+            <h1 className="text-2xl font-semibold">Reports & Analytics</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Monitor organizational leave health, spot risk early, and export data for board reviews.
+            </p>
+          </div>
+          <div className="rounded-xl border border-border px-4 py-2 text-sm text-muted-foreground">
+            {new Date().toLocaleDateString(undefined, {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+            })}
+          </div>
+        </div>
       </section>
       <Suspense fallback={<ReportsFallback />}>
         <ReportsContent />

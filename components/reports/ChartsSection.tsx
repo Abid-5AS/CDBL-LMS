@@ -21,6 +21,10 @@ export function ChartsSection({
     monthlyTrend,
     typeDistribution,
   });
+  const maxDeptValue =
+    departmentSummary.length > 0
+      ? Math.max(...departmentSummary.map((dept) => dept.count))
+      : 0;
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -44,7 +48,6 @@ export function ChartsSection({
         <TypePie data={slices} height={300} />
       </ChartContainer>
 
-      {/* Department Summary - keep existing for now, can be refactored later */}
       <ChartContainer
         title="Department-wise Leave Summary"
         subtitle="Top departments by leave usage"
@@ -53,12 +56,38 @@ export function ChartsSection({
         className="lg:col-span-2"
         height={300}
       >
-        {/* TODO: Create DepartmentChart component if needed */}
-        <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-          Department chart placeholder
+        <div className="max-h-[280px] space-y-3 overflow-auto pr-2">
+          {departmentSummary.map((dept, index) => (
+            <div
+              key={`${dept.name}-${index}`}
+              className="flex items-center gap-4 rounded-xl border border-border/60 px-4 py-3"
+            >
+              <div className="w-10 text-sm font-semibold text-muted-foreground">
+                #{index + 1}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{dept.name}</p>
+                <div className="mt-2 h-2 w-full rounded-full bg-muted relative overflow-hidden">
+                  <span
+                    className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500"
+                    style={{
+                      width: maxDeptValue
+                        ? `${Math.max(
+                            (dept.count / maxDeptValue) * 100,
+                            4
+                          )}%`
+                        : "4%",
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="text-sm font-semibold text-muted-foreground">
+                {dept.count} days
+              </div>
+            </div>
+          ))}
         </div>
       </ChartContainer>
     </div>
   );
 }
-

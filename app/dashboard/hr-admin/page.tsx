@@ -4,6 +4,10 @@ import { redirect } from "next/navigation";
 import { HRAdminDashboard } from "@/components/dashboards";
 import { DashboardLoadingFallback } from "../shared/LoadingFallback";
 import { DashboardLayout } from "../shared/DashboardLayout";
+import {
+  getHRAdminKPIData,
+  getHRAdminStatsData,
+} from "@/lib/dashboard/hr-admin-data";
 
 async function HRAdminDashboardContent() {
   const user = await getCurrentUser();
@@ -18,6 +22,10 @@ async function HRAdminDashboardContent() {
   }
 
   const username = user.name ?? "HR Admin";
+  const [initialKpis, initialStats] = await Promise.all([
+    getHRAdminKPIData(user),
+    getHRAdminStatsData({ user }),
+  ]);
 
   return (
     <DashboardLayout
@@ -25,7 +33,11 @@ async function HRAdminDashboardContent() {
       title={`Welcome, ${username}`}
       description="Operational leave management and forwarding"
     >
-      <HRAdminDashboard username={username} />
+      <HRAdminDashboard
+        username={username}
+        initialKpis={initialKpis}
+        initialStats={initialStats}
+      />
     </DashboardLayout>
   );
 }
@@ -37,4 +49,3 @@ export default function HRAdminDashboardPage() {
     </Suspense>
   );
 }
-

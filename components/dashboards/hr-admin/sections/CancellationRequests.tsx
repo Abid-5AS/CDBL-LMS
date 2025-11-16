@@ -49,7 +49,7 @@ export function CancellationRequestsPanel() {
 
   if (isLoading) {
     return (
-      <div className="glass-card rounded-2xl p-12 text-center text-sm text-muted-foreground">
+      <div className="surface-card rounded-2xl p-12 text-center text-sm text-muted-foreground">
         Loading...
       </div>
     );
@@ -57,7 +57,7 @@ export function CancellationRequestsPanel() {
 
   if (error) {
     return (
-      <div className="glass-card rounded-2xl p-12 text-center text-sm text-data-error">
+      <div className="surface-card rounded-2xl p-12 text-center text-sm text-data-error">
         Failed to load cancellation requests
       </div>
     );
@@ -65,7 +65,7 @@ export function CancellationRequestsPanel() {
 
   if (cancellationRequests.length === 0) {
     return (
-      <div className="glass-card rounded-2xl overflow-hidden">
+      <div className="surface-card rounded-2xl overflow-hidden">
         <div className="px-6 pt-6">
           <div className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5" />
@@ -89,7 +89,7 @@ export function CancellationRequestsPanel() {
   }
 
   return (
-    <div className="glass-card rounded-2xl overflow-hidden">
+    <div className="surface-card rounded-2xl overflow-hidden">
       <div className="px-6 pt-6">
         <div className="flex items-center gap-2">
           <AlertCircle className="h-5 w-5 text-data-warning" />

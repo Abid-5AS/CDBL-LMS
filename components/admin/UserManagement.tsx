@@ -44,6 +44,8 @@ import {
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
+import { RoleBadge } from "@/components/shared/RoleIndicator";
+import type { AppRole } from "@/lib/ui-utils";
 
 // ============================================
 // Types
@@ -198,22 +200,6 @@ export function UserManagement() {
     });
   };
 
-  // Get role badge color
-  const getRoleBadgeVariant = (role: string) => {
-    switch (role) {
-      case "CEO":
-      case "SYSTEM_ADMIN":
-        return "destructive";
-      case "HR_HEAD":
-      case "HR_ADMIN":
-        return "default";
-      case "DEPT_HEAD":
-        return "secondary";
-      default:
-        return "outline";
-    }
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -325,9 +311,7 @@ export function UserManagement() {
                     <TableCell className="font-medium">{user.name}</TableCell>
                     <TableCell className="text-muted-foreground">{user.email}</TableCell>
                     <TableCell>
-                      <Badge variant={getRoleBadgeVariant(user.role)}>
-                        {user.role.replace("_", " ")}
-                      </Badge>
+                      <RoleBadge role={user.role as AppRole} />
                     </TableCell>
                     <TableCell>
                       {user.department ? (

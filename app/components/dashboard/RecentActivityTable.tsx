@@ -136,9 +136,9 @@ export function RecentActivityTable({
   };
 
   return (
-    <Card className={cn("bg-white dark:bg-slate-900 border-gray-200 dark:border-gray-700", className)}>
+    <Card className={cn("surface-card", className)}>
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
             <CardTitle className="text-lg font-semibold">{title}</CardTitle>
             {description && (
@@ -148,11 +148,13 @@ export function RecentActivityTable({
             )}
           </div>
           {!isLoading && rows.length > 0 && (
-            <Badge variant="secondary">{rows.length} items</Badge>
+            <Badge variant="outline" className="rounded-full">
+              {rows.length} items
+            </Badge>
           )}
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
         {isLoading ? (
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
@@ -185,99 +187,110 @@ export function RecentActivityTable({
           </div>
         ) : (
           <>
-            <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-gray-50 dark:bg-slate-800/50 hover:bg-gray-50 dark:hover:bg-slate-800/50">
-                    {columns.map((column) => (
-                      <TableHead
-                        key={column.key}
-                        className={cn(
-                          "font-semibold text-gray-700 dark:text-gray-300",
-                          column.sortable && "cursor-pointer select-none hover:text-gray-900 dark:hover:text-gray-100",
-                          column.className
-                        )}
-                        onClick={() => column.sortable && handleSort(column.key)}
-                      >
-                        <div className="flex items-center gap-2">
-                          {column.label}
-                          {column.sortable && (
-                            <span className="inline-flex">
-                              {sortBy === column.key ? (
-                                sortDirection === "asc" ? (
-                                  <ChevronUp className="h-4 w-4" />
-                                ) : (
-                                  <ChevronDown className="h-4 w-4" />
-                                )
-                              ) : (
-                                <ArrowUpDown className="h-4 w-4 opacity-40" />
-                              )}
-                            </span>
-                          )}
-                        </div>
-                      </TableHead>
-                    ))}
-                    {onRowClick && <TableHead className="w-10" />}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paginatedRows.map((row, index) => (
-                    <motion.tr
-                      key={row.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.03 }}
-                      className={cn(
-                        "border-b border-gray-200 dark:border-gray-700 transition-colors",
-                        onRowClick &&
-                          "cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50"
-                      )}
-                      onClick={() => handleRowClick(row)}
-                      role={onRowClick ? "button" : undefined}
-                      tabIndex={onRowClick ? 0 : undefined}
-                      onKeyDown={
-                        onRowClick
-                          ? (e) => {
-                              if (e.key === "Enter" || e.key === " ") {
-                                e.preventDefault();
-                                handleRowClick(row);
-                              }
-                            }
-                          : undefined
-                      }
-                    >
+            <div className="rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+              <div className="max-h-[520px] overflow-auto">
+                <Table>
+                  <TableHeader className="sticky top-0 z-10">
+                    <TableRow className="bg-white/95 dark:bg-slate-900/90 backdrop-blur">
                       {columns.map((column) => (
-                        <TableCell
-                          key={`${row.id}-${column.key}`}
-                          className={cn("text-sm", column.className)}
+                        <TableHead
+                          key={column.key}
+                          className={cn(
+                            "font-semibold text-gray-700 dark:text-gray-300",
+                            column.sortable &&
+                              "cursor-pointer select-none hover:text-gray-900 dark:hover:text-gray-100",
+                            column.className
+                          )}
+                          onClick={() => column.sortable && handleSort(column.key)}
                         >
-                          {column.render
-                            ? column.render(row[column.key], row)
-                            : row[column.key]}
-                        </TableCell>
+                          <div className="flex items-center gap-2">
+                            {column.label}
+                            {column.sortable && (
+                              <span className="inline-flex">
+                                {sortBy === column.key ? (
+                                  sortDirection === "asc" ? (
+                                    <ChevronUp className="h-4 w-4" />
+                                  ) : (
+                                    <ChevronDown className="h-4 w-4" />
+                                  )
+                                ) : (
+                                  <ArrowUpDown className="h-4 w-4 opacity-40" />
+                                )}
+                              </span>
+                            )}
+                          </div>
+                        </TableHead>
                       ))}
-                      {onRowClick && (
-                        <TableCell className="text-right">
-                          <ExternalLink className="h-4 w-4 text-gray-400 dark:text-gray-600" />
-                        </TableCell>
-                      )}
-                    </motion.tr>
-                  ))}
-                </TableBody>
-              </Table>
+                      {onRowClick && <TableHead className="w-10" />}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedRows.map((row, index) => {
+                      const zebra =
+                        (startIndex + index) % 2 === 0
+                          ? "bg-white dark:bg-slate-950/40"
+                          : "bg-muted/40 dark:bg-slate-900/40";
+
+                      return (
+                        <motion.tr
+                          key={row.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.03 }}
+                          className={cn(
+                            "border-b border-gray-200 dark:border-gray-800 transition-colors",
+                            zebra,
+                            onRowClick &&
+                              "cursor-pointer hover:bg-gray-50/80 dark:hover:bg-slate-800/60"
+                          )}
+                          onClick={() => handleRowClick(row)}
+                          role={onRowClick ? "button" : undefined}
+                          tabIndex={onRowClick ? 0 : undefined}
+                          onKeyDown={
+                            onRowClick
+                              ? (e) => {
+                                  if (e.key === "Enter" || e.key === " ") {
+                                    e.preventDefault();
+                                    handleRowClick(row);
+                                  }
+                                }
+                              : undefined
+                          }
+                        >
+                          {columns.map((column) => (
+                            <TableCell
+                              key={`${row.id}-${column.key}`}
+                              className={cn("text-sm", column.className)}
+                            >
+                              {column.render
+                                ? column.render(row[column.key], row)
+                                : row[column.key]}
+                            </TableCell>
+                          ))}
+                          {onRowClick && (
+                            <TableCell className="text-right">
+                              <ExternalLink className="h-4 w-4 text-gray-400 dark:text-gray-600" />
+                            </TableCell>
+                          )}
+                        </motion.tr>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
 
             {showPagination && totalPages > 1 && (
-              <div className="flex items-center justify-between mt-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 pt-4 dark:border-gray-800">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Showing {startIndex + 1}-{Math.min(startIndex + pageSize, rows.length)} of{" "}
-                  {rows.length}
+                  Showing {startIndex + 1}-
+                  {Math.min(startIndex + pageSize, rows.length)} of {rows.length}
                 </p>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <button
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className="px-3 py-1 text-sm rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-3 py-1.5 text-sm rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     aria-label="Previous page"
                   >
                     Previous
@@ -288,7 +301,7 @@ export function RecentActivityTable({
                   <button
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
-                    className="px-3 py-1 text-sm rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-3 py-1.5 text-sm rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     aria-label="Next page"
                   >
                     Next
@@ -308,7 +321,7 @@ export function RecentActivityTable({
  */
 export function RecentActivityTableSkeleton({ className }: { className?: string }) {
   return (
-    <Card className={cn("bg-white dark:bg-slate-900 border-gray-200 dark:border-gray-700", className)}>
+    <Card className={cn("surface-card", className)}>
       <CardHeader className="pb-3">
         <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
       </CardHeader>

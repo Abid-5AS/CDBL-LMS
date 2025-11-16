@@ -42,7 +42,7 @@ export function DeptHeadTeamOverview() {
 
   if (isLoading) {
     return (
-      <Card className="rounded-2xl border-muted/60 shadow-sm">
+      <Card className="surface-card">
         <CardHeader>
           <Skeleton className="h-6 w-32" />
         </CardHeader>
@@ -56,7 +56,7 @@ export function DeptHeadTeamOverview() {
 
   if (error || !data) {
     return (
-      <Card className="rounded-2xl border-muted/60 shadow-sm">
+      <Card className="surface-card">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <Users className="h-4 w-4" />
@@ -74,7 +74,7 @@ export function DeptHeadTeamOverview() {
   }
 
   return (
-    <Card className="rounded-2xl border-muted/60 shadow-sm">
+    <Card className="surface-card">
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
           <Users className="h-4 w-4" />

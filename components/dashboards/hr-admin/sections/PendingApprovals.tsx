@@ -159,7 +159,7 @@ export function PendingLeaveRequestsTable({
   // Loading state
   if (isLoading) {
     return (
-      <div className="glass-card rounded-2xl p-12">
+      <div className="surface-card rounded-2xl p-12">
         <LoadingSpinner message="Loading requests..." />
       </div>
     );
@@ -168,7 +168,7 @@ export function PendingLeaveRequestsTable({
   // Error state
   if (error) {
     return (
-      <div className="glass-card rounded-2xl">
+      <div className="surface-card rounded-2xl">
         <ErrorState
           title="Failed to load requests"
           message="There was an error loading the approval queue. Please try again."
@@ -180,7 +180,7 @@ export function PendingLeaveRequestsTable({
   // Empty state
   if (allLeaves.length === 0 && !searchInput) {
     return (
-      <div className="glass-card rounded-2xl overflow-hidden">
+      <div className="surface-card rounded-2xl overflow-hidden">
         <AllClearState
           title="No pending requests"
           description="All leave requests have been processed."
@@ -191,7 +191,7 @@ export function PendingLeaveRequestsTable({
 
   return (
     <TooltipProvider>
-      <div className="glass-card rounded-2xl overflow-hidden backdrop-blur-lg bg-bg-primary/60 border border-bg-muted shadow-lg">
+      <div className="surface-card rounded-2xl overflow-hidden">
         <div className="space-y-4 p-6">
           {/* Header */}
           <div className="flex items-center justify-between">
@@ -241,7 +241,7 @@ export function PendingLeaveRequestsTable({
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="glass-card rounded-xl p-12 text-center"
+              className="surface-card rounded-xl p-12 text-center"
             >
               <p className="text-sm text-muted-foreground">
                 No matching requests found

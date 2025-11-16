@@ -8,6 +8,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Badge,
 } from "@/components/ui";
 import { Filter } from "lucide-react";
 import useSWR from "swr";
@@ -33,6 +34,12 @@ const LEAVE_TYPES = [
   { value: "QUARANTINE", label: "Quarantine Leave" },
 ];
 
+const DURATION_OPTIONS: Record<string, string> = {
+  month: "This Month",
+  quarter: "This Quarter",
+  year: "This Year",
+};
+
 export function FilterBar({
   duration,
   department,
@@ -47,17 +54,37 @@ export function FilterBar({
   );
   const departments = departmentsData?.departments || [];
 
-  return (
-    <Card className="glass-card">
-      <CardContent className="pt-6">
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Filter className="h-4 w-4" />
-            <span className="text-sm font-medium">Filters</span>
-          </div>
+  const departmentLabel =
+    department && department !== "all"
+      ? departments.find((dept: any) => String(dept.id) === department)?.name
+      : null;
 
+  const leaveTypeLabel =
+    leaveType && leaveType !== "all"
+      ? LEAVE_TYPES.find((type) => type.value === leaveType)?.label
+      : null;
+
+  const activeFilterLabels = [
+    departmentLabel ? `Dept: ${departmentLabel}` : null,
+    leaveTypeLabel ? `Type: ${leaveTypeLabel}` : null,
+  ].filter(Boolean) as string[];
+
+  return (
+    <Card className="surface-card">
+      <CardContent className="pt-6 space-y-4">
+        <div className="flex flex-wrap items-center gap-3 text-muted-foreground">
+          <Filter className="h-4 w-4" aria-hidden="true" />
+          <span className="text-sm font-medium uppercase tracking-wide">
+            Filters
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {DURATION_OPTIONS[duration] ?? "Custom range"}
+          </span>
+        </div>
+
+        <div className="grid w-full gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Select value={duration} onValueChange={onDurationChange}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Duration" />
             </SelectTrigger>
             <SelectContent>
@@ -73,7 +100,7 @@ export function FilterBar({
               onDepartmentChange(value === "all" ? null : value)
             }
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="All Departments" />
             </SelectTrigger>
             <SelectContent>
@@ -92,7 +119,7 @@ export function FilterBar({
               onLeaveTypeChange(value === "all" ? null : value)
             }
           >
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="All Leave Types" />
             </SelectTrigger>
             <SelectContent>
@@ -103,6 +130,27 @@ export function FilterBar({
               ))}
             </SelectContent>
           </Select>
+
+          <div className="hidden lg:block" aria-hidden="true" />
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {activeFilterLabels.length > 0 ? (
+            <>
+              <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Active
+              </span>
+              {activeFilterLabels.map((label) => (
+                <Badge key={label} variant="outline">
+                  {label}
+                </Badge>
+              ))}
+            </>
+          ) : (
+            <span className="text-xs text-muted-foreground">
+              Showing all departments and leave types.
+            </span>
+          )}
         </div>
       </CardContent>
     </Card>
