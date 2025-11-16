@@ -88,12 +88,8 @@ export function EmployeeActionCenter({
                   ? "bg-amber-50/50 dark:bg-amber-900/10 border-amber-200/50 dark:border-amber-800/30"
                   : "bg-blue-50/50 dark:bg-blue-900/10 border-blue-200/50 dark:border-blue-800/30";
 
-              const buttonColor =
-                item.variant === "destructive"
-                  ? "bg-red-600 hover:bg-red-700"
-                  : item.variant === "warning"
-                  ? "bg-amber-600 hover:bg-amber-700"
-                  : "bg-blue-600 hover:bg-blue-700";
+              const buttonVariant =
+                item.variant === "destructive" ? "destructive" : "default";
 
               return (
                 <motion.div
@@ -116,8 +112,9 @@ export function EmployeeActionCenter({
                   </div>
                   <Button
                     size="sm"
+                    variant={buttonVariant as "default" | "destructive"}
+                    className="shrink-0 text-xs px-4"
                     onClick={() => router.push(item.actionLink)}
-                    className={cn("text-white shrink-0 text-xs", buttonColor)}
                   >
                     {item.action}
                   </Button>

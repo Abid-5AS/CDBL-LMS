@@ -51,7 +51,7 @@ import { CANCELABLE_STATUSES } from "@/hooks/useLeaveRequests";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
 import Link from "next/link";
-import { Wallet, ArrowRight } from "lucide-react";
+import { Wallet, ArrowRight, CalendarPlus } from "lucide-react";
 import { SortedTimelineAdapter } from "@/components/shared/timeline-adapters";
 
 type LeaveRow = {
@@ -336,11 +336,13 @@ export function MyLeavesPageContent() {
               Track accruals, carry forward rules, and conversions from there.
             </p>
           </div>
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/balance">
-              View Balance
-              <ArrowRight className="size-4 ml-2" aria-hidden="true" />
-            </Link>
+          <Button
+            variant="outline"
+            size="sm"
+            leftIcon={<Wallet className="size-4" aria-hidden="true" />}
+            onClick={() => router.push("/balance")}
+          >
+            View Balance
           </Button>
         </div>
       )}

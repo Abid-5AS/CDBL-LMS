@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/accordion";
 import { EmployeePageHero } from "@/components/employee/PageHero";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 // ============================================
 // FAQ Data
@@ -178,6 +178,14 @@ const totalFaqCount = Object.values(faqData).reduce(
   (sum, faqs) => sum + faqs.length,
   0
 );
+const categoryTabMap: Record<string, string> = {
+  general: "general",
+  casualLeave: "casual",
+  earnedLeave: "earned",
+  medicalLeave: "medical",
+  modifications: "modifications",
+  technical: "technical",
+};
 
 // ============================================
 // FAQ Accordion Component
@@ -214,7 +222,9 @@ function FAQAccordion({ faqs, category }: FAQAccordionProps) {
 // ============================================
 
 export function FAQPageContent() {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [activeTab, setActiveTab] = React.useState("general");
 
   // Filter FAQs based on search
   const filteredFAQs = React.useMemo(() => {
@@ -242,6 +252,20 @@ export function FAQPageContent() {
     0 as number
   );
 
+  const suggestionList = React.useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (term.length < 2) return [];
+    const matches: Array<{ category: string; question: string }> = [];
+    Object.entries(faqData).forEach(([category, faqs]) => {
+      faqs.forEach((faq) => {
+        if (faq.question.toLowerCase().includes(term)) {
+          matches.push({ category, question: faq.question });
+        }
+      });
+    });
+    return matches.slice(0, 5);
+  }, [searchTerm]);
+
   const heroStats = [
     { label: "FAQ Categories", value: Object.keys(faqData).length },
     { label: "Answers Documented", value: totalFaqCount },
@@ -256,8 +280,12 @@ export function FAQPageContent() {
         description="Search curated answers about applying for leave, balances, policy compliance, and troubleshooting."
         stats={heroStats}
         actions={
-          <Button asChild size="sm">
-            <Link href="/help">Contact Support</Link>
+          <Button
+            size="sm"
+            leftIcon={<Mail className="size-4" aria-hidden="true" />}
+            onClick={() => router.push("/help")}
+          >
+            Contact Support
           </Button>
         }
       />
@@ -273,6 +301,28 @@ export function FAQPageContent() {
             className="pl-10 h-12 text-base"
           />
         </div>
+        {suggestionList.length > 0 && (
+          <div className="mt-3 rounded-2xl border border-border/60 bg-muted/30 p-3 space-y-2">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              Suggested matches
+            </p>
+            <div className="flex flex-col gap-1.5">
+              {suggestionList.map((suggestion, index) => (
+                <button
+                  key={`${suggestion.category}-${suggestion.question}-${index}`}
+                  type="button"
+                  className="text-left text-sm text-foreground hover:text-primary transition-colors"
+                  onClick={() => {
+                    setActiveTab(categoryTabMap[suggestion.category] ?? "general");
+                    setSearchTerm(suggestion.question);
+                  }}
+                >
+                  {suggestion.question}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Search Results Count */}
@@ -288,7 +338,11 @@ export function FAQPageContent() {
       )}
 
       {/* FAQ Categories */}
-      <Tabs defaultValue="general" className="w-full surface-card p-4 rounded-3xl">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="w-full surface-card p-4 rounded-3xl"
+      >
         <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 bg-muted/50 rounded-2xl">
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="casual">Casual Leave</TabsTrigger>
@@ -410,9 +464,10 @@ export function FAQPageContent() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link
-              href="/policies"
-              className="neo-card group block p-6 cursor-pointer"
+            <button
+              type="button"
+              onClick={() => router.push("/policies")}
+              className="neo-card group block p-6 text-left cursor-pointer"
             >
               <BookOpen className="size-6 mb-3 text-primary" />
               <h4 className="font-semibold mb-2 text-foreground">
@@ -421,10 +476,11 @@ export function FAQPageContent() {
               <p className="text-sm text-muted-foreground">
                 Complete policy documentation
               </p>
-            </Link>
-            <Link
-              href="/leaves/apply"
-              className="neo-card group block p-6 cursor-pointer"
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/leaves/apply")}
+              className="neo-card group block p-6 text-left cursor-pointer"
             >
               <Calendar className="size-6 mb-3 text-primary" />
               <h4 className="font-semibold mb-2 text-foreground">
@@ -433,7 +489,7 @@ export function FAQPageContent() {
               <p className="text-sm text-muted-foreground">
                 Start a new leave request
               </p>
-            </Link>
+            </button>
             <a
               href="mailto:hr@cdbl.com"
               className="neo-card group block p-6 cursor-pointer"

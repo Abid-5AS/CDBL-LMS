@@ -12,6 +12,8 @@ import {
   Users,
   ChevronDown,
   ChevronUp,
+  HelpCircle,
+  CalendarPlus,
 } from "lucide-react";
 import {
   Card,
@@ -26,7 +28,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 import { EmployeePageHero } from "@/components/employee/PageHero";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 // ============================================
 // Policy Data
@@ -409,6 +411,7 @@ const criticalRules = policySections.reduce(
 const totalExamples = policySections.reduce((sum, policy) => sum + policy.examples.length, 0);
 
 export function PolicyPageContent() {
+  const router = useRouter();
   const heroStats = [
     { label: "Policy Sections", value: policySections.length },
     { label: "Rules Documented", value: totalRules },
@@ -423,9 +426,23 @@ export function PolicyPageContent() {
         description="Understand every leave type, escalation rule, and compliance requirement before you apply."
         stats={heroStats}
         actions={
-          <Button asChild size="sm">
-            <Link href="/reports">Download PDF</Link>
-          </Button>
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<HelpCircle className="size-4" aria-hidden="true" />}
+              onClick={() => router.push("/faq")}
+            >
+              FAQ
+            </Button>
+            <Button
+              size="sm"
+              leftIcon={<CalendarPlus className="size-4" aria-hidden="true" />}
+              onClick={() => router.push("/leaves/apply")}
+            >
+              Apply Leave
+            </Button>
+          </>
         }
       />
 
@@ -488,17 +505,22 @@ export function PolicyPageContent() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Link href="/faq" className="neo-card group block p-6 cursor-pointer">
+            <button
+              type="button"
+              onClick={() => router.push("/faq")}
+              className="neo-card group block p-6 text-left cursor-pointer"
+            >
               <h4 className="font-semibold mb-2 text-foreground">
                 Frequently Asked Questions
               </h4>
               <p className="text-sm text-muted-foreground">
                 Common questions about leave policies and procedures
               </p>
-            </Link>
-            <Link
-              href="/leaves/apply"
-              className="neo-card group block p-6 cursor-pointer"
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/leaves/apply")}
+              className="neo-card group block p-6 text-left cursor-pointer"
             >
               <h4 className="font-semibold mb-2 text-foreground">
                 Apply for Leave
@@ -506,7 +528,7 @@ export function PolicyPageContent() {
               <p className="text-sm text-muted-foreground">
                 Start a new leave request following these policies
               </p>
-            </Link>
+            </button>
           </div>
         </CardContent>
       </Card>

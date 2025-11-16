@@ -12,6 +12,7 @@ import {
   Activity,
   Settings,
   Plus,
+  CalendarPlus,
 } from "lucide-react";
 
 import { Button, Card, CardContent, Skeleton } from "@/components/ui";
@@ -196,7 +197,7 @@ export function ModernEmployeeDashboard({
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="px-0 text-primary"
+                        leftIcon={<CalendarPlus className="size-4" aria-hidden="true" />}
                         onClick={() => router.push("/leaves/apply")}
                       >
                         Schedule leave
@@ -216,9 +217,9 @@ export function ModernEmployeeDashboard({
                   <Button
                     variant="outline"
                     className="w-full"
+                    leftIcon={<Plus className="h-4 w-4" aria-hidden="true" />}
                     onClick={() => router.push("/leaves/apply")}
                   >
-                    <Plus className="mr-2 h-4 w-4" />
                     Apply for Leave
                   </Button>
                 </div>

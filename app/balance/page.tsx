@@ -1,7 +1,7 @@
 "use client";
 
-import { Calendar, Clock, TrendingUp, AlertCircle } from "lucide-react";
-import Link from "next/link";
+import { Calendar, Clock, TrendingUp, AlertCircle, BookOpen, CalendarPlus, FileDown, History } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -59,6 +59,7 @@ function BalanceContent() {
       revalidateOnFocus: false,
     }
   );
+  const router = useRouter();
 
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
@@ -99,11 +100,20 @@ function BalanceContent() {
         stats={heroStats}
         actions={
           <>
-            <Button variant="outline" asChild size="sm">
-              <Link href="/policies">View Policies</Link>
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<BookOpen className="size-4" aria-hidden="true" />}
+              onClick={() => router.push("/policies")}
+            >
+              View Policies
             </Button>
-            <Button asChild size="sm">
-              <Link href="/leaves/apply">Apply Leave</Link>
+            <Button
+              size="sm"
+              leftIcon={<CalendarPlus className="size-4" aria-hidden="true" />}
+              onClick={() => router.push("/leaves/apply")}
+            >
+              Apply Leave
             </Button>
           </>
         }
@@ -124,11 +134,21 @@ function BalanceContent() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2 justify-start md:justify-end">
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/reports">Download statement</Link>
+          <Button
+            variant="outline"
+            size="sm"
+            leftIcon={<FileDown className="size-4" aria-hidden="true" />}
+            onClick={() => router.push("/reports")}
+          >
+            Download statement
           </Button>
-          <Button variant="secondary" size="sm" asChild>
-            <Link href="/leaves">View history</Link>
+          <Button
+            variant="secondary"
+            size="sm"
+            leftIcon={<History className="size-4" aria-hidden="true" />}
+            onClick={() => router.push("/leaves")}
+          >
+            View history
           </Button>
         </div>
       </div>
