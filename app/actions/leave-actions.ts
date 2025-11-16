@@ -10,6 +10,7 @@ import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { LeaveService } from "@/lib/services/leave.service";
+import { NotificationService } from "@/lib/services/notification.service";
 import type { LeaveType } from "@prisma/client";
 
 /**
@@ -124,6 +125,13 @@ export async function forwardLeaveRequest(leaveId: number) {
           decision: "PENDING",
         },
       });
+
+      // Send notification email to new approver
+      await NotificationService.notifyLeaveForwarded(
+        leaveId,
+        nextApprover.id,
+        user.name
+      );
     }
 
     // Automatic cache invalidation
@@ -208,6 +216,13 @@ export async function rejectLeaveRequest(leaveId: number, comment?: string) {
       data: { status: "REJECTED" },
     });
 
+    // Send notification email to requester
+    await NotificationService.notifyLeaveRejected(
+      leaveId,
+      user.name,
+      comment
+    );
+
     // Automatic cache invalidation
     revalidatePath("/approvals");
     revalidatePath("/dashboard");
@@ -261,6 +276,13 @@ export async function returnLeaveForModification(
       where: { id: leaveId },
       data: { status: "RETURNED" },
     });
+
+    // Send notification email to requester
+    await NotificationService.notifyLeaveReturned(
+      leaveId,
+      user.name,
+      comment
+    );
 
     // Automatic cache invalidation
     revalidatePath("/approvals");

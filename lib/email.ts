@@ -281,6 +281,42 @@ export async function sendLeaveReturnedEmail(
 }
 
 /**
+ * Send leave forwarded notification email to new approver
+ */
+export async function sendLeaveForwardedEmail(
+  to: string,
+  recipientName: string,
+  requesterName: string,
+  forwarderName: string,
+  leaveType: string,
+  startDate: string,
+  endDate: string,
+  workingDays: number,
+  leaveId: number
+): Promise<boolean> {
+  try {
+    const actualRecipient = DEV_EMAIL_OVERRIDE || to;
+    const isOverridden = DEV_EMAIL_OVERRIDE && DEV_EMAIL_OVERRIDE !== to;
+
+    const mailOptions = {
+      from: EMAIL_FROM,
+      to: actualRecipient,
+      subject: isOverridden
+        ? `CDBL LMS - Leave Approval Forwarded for ${to}`
+        : "CDBL LMS - Leave Approval Forwarded to You",
+      html: getLeaveForwardedTemplate(recipientName, requesterName, forwarderName, leaveType, startDate, endDate, workingDays, leaveId, isOverridden ? to : undefined),
+      text: `Dear ${recipientName},\n\n${forwarderName} has forwarded ${requesterName}'s ${leaveType} leave request to you for approval.\n\nDates: ${startDate} to ${endDate} (${workingDays} working days)\n\nPlease log in to CDBL LMS to review this request.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    return true;
+  } catch (error) {
+    console.error("Failed to send leave forwarded email:", error);
+    return false;
+  }
+}
+
+/**
  * Verify email configuration on app startup
  */
 export async function verifyEmailConnection(): Promise<boolean> {
@@ -498,6 +534,66 @@ function getLeaveReturnedTemplate(
               <p style="margin: 0 0 24px; color: #475569; font-size: 16px;">Please update your request and resubmit it.</p>
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr><td align="center" style="padding: 16px 0;"><a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/leaves/${leaveId}" style="display: inline-block; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">Modify Request</a></td></tr>
+              </table>
+            </td>
+          </tr>
+          <tr><td style="padding: 24px 40px 40px; border-top: 1px solid #e2e8f0;"><p style="margin: 0; color: #94a3b8; font-size: 12px; text-align: center;">© ${new Date().getFullYear()} CDBL | Automated notification</p></td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
+}
+
+function getLeaveForwardedTemplate(
+  recipientName: string,
+  requesterName: string,
+  forwarderName: string,
+  leaveType: string,
+  startDate: string,
+  endDate: string,
+  workingDays: number,
+  leaveId: number,
+  originalEmail?: string
+): string {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CDBL LMS - Leave Forwarded</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          <tr>
+            <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); border-radius: 16px 16px 0 0;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">➡️ Leave Approval Forwarded</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 40px;">
+              ${originalEmail ? `<div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 16px; margin: 0 0 24px;"><p style="margin: 0; color: #78350f; font-size: 14px;">🔐 Dev Mode - Email for: <strong>${originalEmail}</strong></p></div>` : ''}
+              <h2 style="margin: 0 0 16px; color: #0f172a; font-size: 24px;">Dear ${recipientName},</h2>
+              <p style="margin: 0 0 24px; color: #475569; font-size: 16px; line-height: 1.6;">
+                <strong>${forwarderName}</strong> has forwarded <strong>${requesterName}</strong>'s leave request to you for approval.
+              </p>
+              <div style="background-color: #f1f5f9; border-radius: 12px; padding: 24px; margin: 0 0 24px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                  <tr><td style="padding: 8px 0;"><strong style="color: #475569;">Leave Type:</strong></td><td style="padding: 8px 0; text-align: right; color: #0f172a; font-weight: 600;">${leaveType}</td></tr>
+                  <tr><td style="padding: 8px 0;"><strong style="color: #475569;">Start Date:</strong></td><td style="padding: 8px 0; text-align: right; color: #0f172a;">${startDate}</td></tr>
+                  <tr><td style="padding: 8px 0;"><strong style="color: #475569;">End Date:</strong></td><td style="padding: 8px 0; text-align: right; color: #0f172a;">${endDate}</td></tr>
+                  <tr><td style="padding: 8px 0;"><strong style="color: #475569;">Working Days:</strong></td><td style="padding: 8px 0; text-align: right; color: #0f172a; font-weight: 600;">${workingDays} days</td></tr>
+                  <tr><td style="padding: 8px 0;"><strong style="color: #475569;">Forwarded By:</strong></td><td style="padding: 8px 0; text-align: right; color: #0f172a;">${forwarderName}</td></tr>
+                </table>
+              </div>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr><td align="center" style="padding: 16px 0;"><a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/leaves/${leaveId}" style="display: inline-block; background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">Review Request</a></td></tr>
               </table>
             </td>
           </tr>

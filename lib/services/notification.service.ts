@@ -10,6 +10,7 @@ import {
   sendLeaveApprovedEmail,
   sendLeaveRejectedEmail,
   sendLeaveReturnedEmail,
+  sendLeaveForwardedEmail,
 } from "@/lib/email";
 
 export type ServiceResult<T> = {
@@ -482,6 +483,29 @@ export class NotificationService {
         link: `/leaves/${leaveId}`,
         leaveId: leaveId,
       });
+
+      // Send email to new approver
+      const newApprover = await prisma.user.findUnique({
+        where: { id: newApproverId },
+        select: { email: true, name: true },
+      });
+
+      if (newApprover) {
+        sendLeaveForwardedEmail(
+          newApprover.email,
+          newApprover.name,
+          leave.requester.name,
+          forwarderName,
+          leave.type,
+          leave.startDate.toLocaleDateString(),
+          leave.endDate.toLocaleDateString(),
+          leave.workingDays,
+          leaveId
+        ).catch((err) => {
+          console.error("Failed to send leave forwarded email:", err);
+          // Don't fail the notification if email fails
+        });
+      }
 
       return { success: true };
     } catch (error) {
