@@ -577,17 +577,19 @@ export class LeaveService {
     userId: number,
     role: string
   ): Promise<{ id: number } | null> {
-    // Find user's department head or role-based approver
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { deptHeadId: true },
-    });
+    // Special case: For DEPT_HEAD role, use the employee's assigned department head
+    if (role === "DEPT_HEAD") {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { deptHeadId: true },
+      });
 
-    if (user?.deptHeadId) {
-      return { id: user.deptHeadId };
+      if (user?.deptHeadId) {
+        return { id: user.deptHeadId };
+      }
     }
 
-    // Fallback: find first user with the role
+    // For all other roles (HR_ADMIN, HR_HEAD, CEO), find by role
     const approver = await prisma.user.findFirst({
       where: { role },
       select: { id: true },

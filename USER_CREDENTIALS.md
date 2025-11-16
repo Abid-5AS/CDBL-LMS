@@ -2,7 +2,7 @@
 
 **Last Updated:** November 16, 2025  
 **System:** CDBL Leave Management System (LMS)  
-**Environment:** Development/Demo  
+**Environment:** Development/Demo
 
 ---
 
@@ -18,10 +18,10 @@ demo123
 
 ### 1️⃣ System Administrators
 
-| Name | Email | Password | Employee Code | Department |
-|------|-------|----------|----------------|------------|
-| System Administrator | `sysadmin@cdbl.local` | `demo123` | SYS001 | IT |
-| Abid Shahriar | `abidshahriar@iut-dhaka.edu` | `demo123` | SYS-002 | IT |
+| Name                 | Email                        | Password  | Employee Code | Department |
+| -------------------- | ---------------------------- | --------- | ------------- | ---------- |
+| System Administrator | `sysadmin@cdbl.local`        | `demo123` | SYS001        | IT         |
+| Abid Shahriar        | `abidshahriar@iut-dhaka.edu` | `demo123` | SYS-002       | IT         |
 
 **Permissions:** Full system access, user management, policy configuration, audit logs
 
@@ -29,9 +29,9 @@ demo123
 
 ### 2️⃣ Executive Level
 
-| Name | Email | Password | Employee Code | Department |
-|------|-------|----------|----------------|------------|
-| CEO One | `ceo@demo.local` | `demo123` | CEO001 | Executive |
+| Name    | Email            | Password  | Employee Code | Department |
+| ------- | ---------------- | --------- | ------------- | ---------- |
+| CEO One | `ceo@demo.local` | `demo123` | CEO001        | Executive  |
 
 **Permissions:** View all reports, final approval authority, admin console access
 
@@ -39,12 +39,13 @@ demo123
 
 ### 3️⃣ HR Leadership
 
-| Name | Email | Password | Employee Code | Department |
-|------|-------|----------|----------------|------------|
-| HR Head | `hrhead@demo.local` | `demo123` | HRH001 | HR |
-| HR Admin | `hradmin@demo.local` | `demo123` | HRA01 | HR |
+| Name     | Email                | Password  | Employee Code | Department |
+| -------- | -------------------- | --------- | ------------- | ---------- |
+| HR Head  | `hrhead@demo.local`  | `demo123` | HRH001        | HR         |
+| HR Admin | `hradmin@demo.local` | `demo123` | HRA01         | HR         |
 
 **Permissions:**
+
 - **HR Head:** Approve leaves, view all employee data, manage audit logs
 - **HR Admin:** Process leave requests, manage employees, configure holidays
 
@@ -52,11 +53,11 @@ demo123
 
 ### 4️⃣ Department Heads
 
-| Name | Email | Password | Employee Code | Department |
-|------|-------|----------|----------------|------------|
-| IT Department Head | `manager@demo.local` | `demo123` | ITDH01 | IT |
-| HR Operations Lead | `depthead.hr@cdbl.local` | `demo123` | HRDH01 | HR |
-| Finance Controller | `depthead.finance@cdbl.local` | `demo123` | FINDH01 | Finance |
+| Name               | Email                         | Password  | Employee Code | Department |
+| ------------------ | ----------------------------- | --------- | ------------- | ---------- |
+| IT Department Head | `manager@demo.local`          | `demo123` | ITDH01        | IT         |
+| HR Operations Lead | `depthead.hr@cdbl.local`      | `demo123` | HRDH01        | HR         |
+| Finance Controller | `depthead.finance@cdbl.local` | `demo123` | FINDH01       | Finance    |
 
 **Permissions:** Approve team member leave requests, view department reports
 
@@ -66,26 +67,29 @@ demo123
 
 #### **Featured Employees**
 
-| Name | Email | Password | Employee Code | Department |
-|------|-------|----------|----------------|------------|
-| Employee One | `employee1@demo.local` | `demo123` | IT001 | IT |
-| Employee Two | `employee2@demo.local` | `demo123` | FIN001 | Finance |
-| Employee Three | `employee3@demo.local` | `demo123` | HR001 | HR |
-| Employee Four | `employee4@demo.local` | `demo123` | FIN002 | Finance |
+| Name           | Email                  | Password  | Employee Code | Department |
+| -------------- | ---------------------- | --------- | ------------- | ---------- |
+| Employee One   | `employee1@demo.local` | `demo123` | IT001         | IT         |
+| Employee Two   | `employee2@demo.local` | `demo123` | FIN001        | Finance    |
+| Employee Three | `employee3@demo.local` | `demo123` | HR001         | HR         |
+| Employee Four  | `employee4@demo.local` | `demo123` | FIN002        | Finance    |
 
 #### **Additional Generated Employees**
 
 The system auto-generates additional employee accounts following this pattern:
 
 **IT Department:**
+
 - `it.employee01@cdbl.local` to `it.employee08@cdbl.local` (Employee Codes: IT002-IT008)
 - All password: `demo123`
 
 **HR Department:**
+
 - `hr.employee01@cdbl.local` to `hr.employee08@cdbl.local` (Employee Codes: HR002-HR008)
 - All password: `demo123`
 
 **Finance Department:**
+
 - `finance.employee01@cdbl.local` to `finance.employee08@cdbl.local` (Employee Codes: FIN003-FIN008)
 - All password: `demo123`
 
@@ -97,11 +101,11 @@ The system auto-generates additional employee accounts following this pattern:
 
 All employees have been provisioned with the following annual leave balances for the current year:
 
-| Leave Type | Accrued Days | Typical Usage |
-|-----------|--------------|--------------|
-| Earned Leave (EL) | 24 days | 2-8 days (varies) |
-| Casual Leave (CL) | 10 days | 2-6 days (varies) |
-| Medical Leave (ML) | 14 days | 1-4 days (varies) |
+| Leave Type         | Accrued Days | Typical Usage     |
+| ------------------ | ------------ | ----------------- |
+| Earned Leave (EL)  | 24 days      | 2-8 days (varies) |
+| Casual Leave (CL)  | 10 days      | 2-6 days (varies) |
+| Medical Leave (ML) | 14 days      | 1-4 days (varies) |
 
 **Note:** Non-management roles (SYSTEM_ADMIN, CEO, HR_HEAD, HR_ADMIN, DEPT_HEAD) have **zero used days** to reflect administrative positions.
 
@@ -193,11 +197,13 @@ The system includes major Bangladesh holidays:
 ## ⚙️ Technical Details
 
 ### Password Hash Algorithm
+
 - **Method:** bcryptjs
 - **Cost Factor:** 10
 - **All Demo Passwords:** Hashed version of `demo123`
 
 ### Employee Code Format
+
 - **System Admin:** `SYS001`, `SYS-002`
 - **CEO:** `CEO001`
 - **HR Head:** `HRH001`
@@ -206,6 +212,7 @@ The system includes major Bangladesh holidays:
 - **Employees:** `{DEPT}{SEQ}` (e.g., `IT001`, `HR001`, `FIN001`)
 
 ### Department Codes
+
 - **IT:** Information Technology
 - **HR:** Human Resources
 - **Finance:** Finance & Accounts
@@ -230,21 +237,25 @@ The system includes major Bangladesh holidays:
 ### Quick Login Tests
 
 1. **HR Admin View:** Login as `hradmin@demo.local` / `demo123`
+
    - View all pending leaves
    - Process employee requests
    - Access audit logs
 
 2. **Department Head Approval:** Login as `manager@demo.local` / `demo123`
+
    - View team member requests
    - Approve/Reject leaves
    - Check team leave balance
 
 3. **Employee Self-Service:** Login as `employee1@demo.local` / `demo123`
+
    - Submit new leave request
    - View personal leave balance
    - Check request history
 
 4. **CEO Dashboard:** Login as `ceo@demo.local` / `demo123`
+
    - Access executive reports
    - View organization-wide analytics
    - Final approval authority
