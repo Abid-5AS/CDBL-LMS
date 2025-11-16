@@ -56,8 +56,9 @@ export function ToastContainer({
 
   return (
     <div
-      className={`fixed ${positionClasses[position]} flex flex-col gap-2 z-50 ${maxWidth}`}
+      role="region"
       aria-label="Notifications"
+      className={`fixed ${positionClasses[position]} flex flex-col gap-2 z-50 ${maxWidth}`}
     >
       {notifications.map(notification => (
         <ErrorToast
