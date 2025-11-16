@@ -2,17 +2,17 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
-import { glassCard } from "@/lib/neo-design";
+import { getGlassCard } from "@/lib/neo-design";
 
 const cardVariants = cva(
   "flex flex-col text-card-foreground transition-all duration-300",
   {
     variants: {
       variant: {
-        default: glassCard.base,
-        elevated: glassCard.elevated,
-        glass: glassCard.interactive,
-        subtle: glassCard.subtle,
+        default: getGlassCard("base"),
+        elevated: getGlassCard("elevated"),
+        glass: getGlassCard("interactive"),
+        subtle: getGlassCard("subtle"),
         outline:
           "bg-transparent border-2 border-border hover:border-primary/40 shadow-sm hover:shadow-md",
         ghost: "bg-transparent border-none shadow-none hover:bg-muted/40",
