@@ -52,9 +52,7 @@ export function HolidaysList({ holidays }: HolidaysListProps) {
             animate="visible"
             transition={{ delay: index * 0.05 }}
             className={cn(
-              "group flex items-center justify-between p-4 rounded-xl border transition-all duration-300",
-              "bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border-white/20 dark:border-slate-700/50",
-              "hover:shadow-lg hover:scale-[1.01] cursor-pointer",
+              "neo-card group flex items-center justify-between p-4 cursor-pointer",
               isPast && "opacity-75"
             )}
           >
