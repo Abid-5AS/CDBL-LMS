@@ -6,6 +6,7 @@ import { ThemeProvider } from "next-themes";
 import { ErrorBoundary } from "@/components/errors";
 import { NotificationProvider } from "@/context/NotificationContext";
 import { ToastContainer } from "@/components/notifications";
+import { HydrationWarningSuppress } from "@/components/HydrationWarningSuppress";
 
 export const metadata: Metadata = {
   title: "CDBL LMS - Leave Management System",
@@ -28,6 +29,8 @@ export default function RootLayout({
         className="antialiased"
         suppressHydrationWarning
       >
+        {/* Suppress benign hydration warnings from browser extensions and animations */}
+        <HydrationWarningSuppress />
         {/* Skip Navigation for Accessibility */}
         <a
           href="#main-content"
