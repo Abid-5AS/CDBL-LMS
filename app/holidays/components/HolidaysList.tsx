@@ -25,7 +25,10 @@ export function HolidaysList({ holidays }: HolidaysListProps) {
   if (holidays.length === 0) {
     return (
       <div className="text-center py-12">
-        <Calendar className="size-12 text-muted-foreground mx-auto mb-4" aria-hidden="true" />
+        <Calendar
+          className="size-12 text-muted-foreground mx-auto mb-4"
+          aria-hidden="true"
+        />
         <p className="text-muted-foreground">No holidays found</p>
         <p className="text-sm text-muted-foreground mt-1">
           Try adjusting your filters to see more holidays
@@ -59,7 +62,10 @@ export function HolidaysList({ holidays }: HolidaysListProps) {
             {/* Left side - Holiday info */}
             <div className="flex items-center gap-4 flex-1 min-w-0">
               <div className="p-2 bg-data-info/10 rounded-lg shrink-0">
-                <Calendar className="size-5 text-data-info" aria-hidden="true" />
+                <Calendar
+                  className="size-5 text-data-info"
+                  aria-hidden="true"
+                />
               </div>
 
               <div className="flex-1 min-w-0">
@@ -105,13 +111,19 @@ export function HolidaysList({ holidays }: HolidaysListProps) {
               )}
 
               {!isPast && daysUntil <= 7 && daysUntil > 0 && (
-                <Badge variant="default" className="text-xs bg-data-warning/90 text-white">
+                <Badge
+                  variant="default"
+                  className="text-xs bg-data-warning/90 text-white"
+                >
                   <Clock className="size-3 mr-1" aria-hidden="true" />
                   {daysUntil}d
                 </Badge>
               )}
 
-              <ChevronRight className="size-4 text-muted-foreground group-hover:text-foreground transition-colors" aria-hidden="true" />
+              <ChevronRight
+                className="size-4 text-muted-foreground group-hover:text-foreground transition-colors"
+                aria-hidden="true"
+              />
             </div>
           </motion.div>
         );

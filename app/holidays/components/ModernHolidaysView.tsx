@@ -39,11 +39,7 @@ export function ModernHolidaysView({ role }: ModernHolidaysViewProps) {
   } = useHolidaysData();
 
   const headerActions = (
-    <PDFExportButton
-      variant="outline"
-      size="sm"
-      className="gap-2 rounded-xl"
-    />
+    <PDFExportButton variant="outline" size="sm" className="gap-2 rounded-xl" />
   );
 
   const viewingYearDescription =

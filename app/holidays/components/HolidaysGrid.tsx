@@ -75,10 +75,7 @@ export function HolidaysGrid({ holidays }: HolidaysGridProps) {
                     </Badge>
                   )}
                   {!isPast && daysUntil <= 7 && daysUntil > 0 && (
-                    <Badge
-                      variant="default"
-                      className="text-xs bg-orange-500"
-                    >
+                    <Badge variant="default" className="text-xs bg-orange-500">
                       <Clock className="w-3 h-3 mr-1" />
                       {daysUntil}d
                     </Badge>

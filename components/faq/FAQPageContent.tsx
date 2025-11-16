@@ -11,7 +11,13 @@ import {
   FileText,
   Mail,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -259,7 +265,8 @@ export function FAQPageContent() {
         <Alert>
           <Search className="size-4" />
           <AlertDescription>
-            Found {totalResults} result{totalResults !== 1 ? "s" : ""} for &quot;
+            Found {totalResults} result{totalResults !== 1 ? "s" : ""} for
+            &quot;
             {searchTerm}&quot;
           </AlertDescription>
         </Alert>
@@ -278,7 +285,9 @@ export function FAQPageContent() {
 
         <TabsContent value="general" className="mt-6 space-y-4">
           <div className="flex items-center gap-2 mb-4">
-            <Badge variant="secondary">{filteredFAQs.general?.length || 0} Questions</Badge>
+            <Badge variant="secondary">
+              {filteredFAQs.general?.length || 0} Questions
+            </Badge>
           </div>
           {filteredFAQs.general && filteredFAQs.general.length > 0 ? (
             <FAQAccordion faqs={filteredFAQs.general} category="general" />
@@ -296,7 +305,10 @@ export function FAQPageContent() {
             </Badge>
           </div>
           {filteredFAQs.casualLeave && filteredFAQs.casualLeave.length > 0 ? (
-            <FAQAccordion faqs={filteredFAQs.casualLeave} category="casualLeave" />
+            <FAQAccordion
+              faqs={filteredFAQs.casualLeave}
+              category="casualLeave"
+            />
           ) : (
             <p className="text-center py-8 text-muted-foreground">
               No questions found in this category
@@ -311,7 +323,10 @@ export function FAQPageContent() {
             </Badge>
           </div>
           {filteredFAQs.earnedLeave && filteredFAQs.earnedLeave.length > 0 ? (
-            <FAQAccordion faqs={filteredFAQs.earnedLeave} category="earnedLeave" />
+            <FAQAccordion
+              faqs={filteredFAQs.earnedLeave}
+              category="earnedLeave"
+            />
           ) : (
             <p className="text-center py-8 text-muted-foreground">
               No questions found in this category
@@ -326,7 +341,10 @@ export function FAQPageContent() {
             </Badge>
           </div>
           {filteredFAQs.medicalLeave && filteredFAQs.medicalLeave.length > 0 ? (
-            <FAQAccordion faqs={filteredFAQs.medicalLeave} category="medicalLeave" />
+            <FAQAccordion
+              faqs={filteredFAQs.medicalLeave}
+              category="medicalLeave"
+            />
           ) : (
             <p className="text-center py-8 text-muted-foreground">
               No questions found in this category
@@ -340,8 +358,12 @@ export function FAQPageContent() {
               {filteredFAQs.modifications?.length || 0} Questions
             </Badge>
           </div>
-          {filteredFAQs.modifications && filteredFAQs.modifications.length > 0 ? (
-            <FAQAccordion faqs={filteredFAQs.modifications} category="modifications" />
+          {filteredFAQs.modifications &&
+          filteredFAQs.modifications.length > 0 ? (
+            <FAQAccordion
+              faqs={filteredFAQs.modifications}
+              category="modifications"
+            />
           ) : (
             <p className="text-center py-8 text-muted-foreground">
               No questions found in this category
@@ -378,7 +400,9 @@ export function FAQPageContent() {
               className="neo-card group block p-6 cursor-pointer"
             >
               <BookOpen className="size-6 mb-3 text-primary" />
-              <h4 className="font-semibold mb-2 text-foreground">Leave Policies</h4>
+              <h4 className="font-semibold mb-2 text-foreground">
+                Leave Policies
+              </h4>
               <p className="text-sm text-muted-foreground">
                 Complete policy documentation
               </p>
@@ -388,7 +412,9 @@ export function FAQPageContent() {
               className="neo-card group block p-6 cursor-pointer"
             >
               <Calendar className="size-6 mb-3 text-primary" />
-              <h4 className="font-semibold mb-2 text-foreground">Apply for Leave</h4>
+              <h4 className="font-semibold mb-2 text-foreground">
+                Apply for Leave
+              </h4>
               <p className="text-sm text-muted-foreground">
                 Start a new leave request
               </p>

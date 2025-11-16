@@ -13,7 +13,13 @@ import {
   TrendingUp,
   Clock,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { HolidayCalendarManager } from "@/components/admin/HolidayCalendarManager";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,8 +30,18 @@ interface AdminToolsContentProps {
 
 export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
   const canManageUsers = ["CEO", "SYSTEM_ADMIN"].includes(userRole);
-  const canManageHolidays = ["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"].includes(userRole);
-  const canViewAnalytics = ["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"].includes(userRole);
+  const canManageHolidays = [
+    "HR_ADMIN",
+    "HR_HEAD",
+    "CEO",
+    "SYSTEM_ADMIN",
+  ].includes(userRole);
+  const canViewAnalytics = [
+    "HR_ADMIN",
+    "HR_HEAD",
+    "CEO",
+    "SYSTEM_ADMIN",
+  ].includes(userRole);
 
   return (
     <div className="space-y-6">
@@ -53,7 +69,9 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
                 <BarChart3 className="size-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold mb-1 text-foreground">Leave Analytics</h3>
+                <h3 className="font-semibold mb-1 text-foreground">
+                  Leave Analytics
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   View trends, department utilization, and detailed reports
                 </p>
@@ -72,7 +90,9 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
               <BookOpen className="size-6 text-blue-600" />
             </div>
             <div>
-              <h3 className="font-semibold mb-1 text-foreground">Leave Policies</h3>
+              <h3 className="font-semibold mb-1 text-foreground">
+                Leave Policies
+              </h3>
               <p className="text-sm text-muted-foreground">
                 Comprehensive policy documentation for all leave types
               </p>
@@ -81,10 +101,7 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
         </Link>
 
         {/* FAQ */}
-        <Link
-          href="/faq"
-          className="neo-card group block p-6 cursor-pointer"
-        >
+        <Link href="/faq" className="neo-card group block p-6 cursor-pointer">
           <div className="flex items-start gap-4">
             <div className="p-3 rounded-lg bg-green-500/10">
               <HelpCircle className="size-6 text-green-600" />
@@ -108,7 +125,9 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
               <Users className="size-6 text-purple-600" />
             </div>
             <div>
-              <h3 className="font-semibold mb-1 text-foreground">Employee Directory</h3>
+              <h3 className="font-semibold mb-1 text-foreground">
+                Employee Directory
+              </h3>
               <p className="text-sm text-muted-foreground">
                 Browse all employees, balances, and leave history
               </p>
@@ -144,7 +163,9 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
               <Clock className="size-6 text-yellow-600" />
             </div>
             <div>
-              <h3 className="font-semibold mb-1 text-foreground">Pending Approvals</h3>
+              <h3 className="font-semibold mb-1 text-foreground">
+                Pending Approvals
+              </h3>
               <p className="text-sm text-muted-foreground">
                 Review and process leave approval requests
               </p>
@@ -154,10 +175,17 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
       </div>
 
       {/* Management Tools */}
-      <Tabs defaultValue={canManageUsers ? "users" : "holidays"} className="w-full">
+      <Tabs
+        defaultValue={canManageUsers ? "users" : "holidays"}
+        className="w-full"
+      >
         <TabsList className="grid w-full grid-cols-2">
-          {canManageUsers && <TabsTrigger value="users">User Management</TabsTrigger>}
-          {canManageHolidays && <TabsTrigger value="holidays">Holiday Calendar</TabsTrigger>}
+          {canManageUsers && (
+            <TabsTrigger value="users">User Management</TabsTrigger>
+          )}
+          {canManageHolidays && (
+            <TabsTrigger value="holidays">Holiday Calendar</TabsTrigger>
+          )}
         </TabsList>
 
         {canManageUsers && (
