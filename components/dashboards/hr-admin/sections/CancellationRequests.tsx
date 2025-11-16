@@ -35,10 +35,11 @@ type LeaveRequest = {
 
 export function CancellationRequestsPanel() {
   const { data, isLoading, error } = useSWR<{ items: LeaveRequest[] }>(
-    "/api/leaves?status=CANCELLATION_REQUESTED",
+    "/api/leaves?status=CANCELLATION_REQUESTED&limit=10",
     apiFetcher,
     {
-      revalidateOnFocus: true,
+      revalidateOnFocus: false, // Prevent unnecessary refetches
+      dedupingInterval: 30000, // Cache results for 30 seconds
     }
   );
 

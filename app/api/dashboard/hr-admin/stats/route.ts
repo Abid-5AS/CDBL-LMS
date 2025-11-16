@@ -164,7 +164,7 @@ export async function GET(req: NextRequest) {
         },
       }),
 
-      // Monthly trend data
+      // Monthly trend data - fetch only last 6 months, limited to prevent memory issues
       prisma.leaveRequest.findMany({
         where: {
           createdAt: {
@@ -173,6 +173,9 @@ export async function GET(req: NextRequest) {
         },
         select: {
           createdAt: true,
+        },
+        orderBy: {
+          createdAt: "desc",
         },
       }),
     ]);

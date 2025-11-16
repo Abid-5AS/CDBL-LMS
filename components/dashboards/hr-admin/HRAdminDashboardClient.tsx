@@ -1,6 +1,7 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, lazy, memo } from "react";
+import dynamic from "next/dynamic";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
 import {
@@ -28,6 +29,18 @@ import {
 } from "@/components/shared/LeaveCharts";
 import { PendingLeaveRequestsTable } from "./sections/PendingApprovals";
 import { CancellationRequestsPanel } from "./sections/CancellationRequests";
+
+// Lazy load chart components to improve initial page load
+const LazyTypePie = lazy(() =>
+  import("@/components/shared/LeaveCharts").then((mod) => ({
+    default: mod.TypePie,
+  }))
+);
+const LazyTrendChart = lazy(() =>
+  import("@/components/shared/LeaveCharts").then((mod) => ({
+    default: mod.TrendChart,
+  }))
+);
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardCardSkeleton } from "@/app/dashboard/shared/LoadingFallback";
 import { Separator } from "@/components/ui/separator";
@@ -94,7 +107,7 @@ const itemVariants = {
   },
 };
 
-export function HRAdminDashboardClient() {
+function HRAdminDashboardClientImpl() {
   const {
     data: stats,
     isLoading,
@@ -522,15 +535,17 @@ export function HRAdminDashboardClient() {
                 height={400}
                 className="hover:shadow-xl transition-all duration-300 h-full"
               >
-                <TypePie
-                  data={
-                    stats?.leaveTypeBreakdown?.map((item) => ({
-                      name: item.type,
-                      value: item.count,
-                    })) || []
-                  }
-                  height={360}
-                />
+                <Suspense fallback={<div className="h-[360px] bg-muted/20 animate-pulse rounded" />}>
+                  <LazyTypePie
+                    data={
+                      stats?.leaveTypeBreakdown?.map((item) => ({
+                        name: item.type,
+                        value: item.count,
+                      })) || []
+                    }
+                    height={360}
+                  />
+                </Suspense>
               </ChartContainer>
             </motion.div>
 
@@ -550,14 +565,16 @@ export function HRAdminDashboardClient() {
                     height={400}
                     className="hover:shadow-xl transition-all duration-300 h-full"
                   >
-                    <TrendChart
-                      data={stats.monthlyTrend.map((item) => ({
-                        month: item.month,
-                        leaves: item.count,
-                      }))}
-                      height={360}
-                      dataKey="leaves"
-                    />
+                    <Suspense fallback={<div className="h-[360px] bg-muted/20 animate-pulse rounded" />}>
+                      <LazyTrendChart
+                        data={stats.monthlyTrend.map((item) => ({
+                          month: item.month,
+                          leaves: item.count,
+                        }))}
+                        height={360}
+                        dataKey="leaves"
+                      />
+                    </Suspense>
                   </ChartContainer>
                 </motion.div>
               )}
@@ -583,3 +600,6 @@ export function HRAdminDashboardClient() {
     </TooltipProvider>
   );
 }
+
+// Memoize to prevent unnecessary re-renders from parent component changes
+export const HRAdminDashboardClient = memo(HRAdminDashboardClientImpl);

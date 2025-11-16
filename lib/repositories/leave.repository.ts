@@ -60,7 +60,7 @@ export class LeaveRepository {
   /**
    * Find all leaves for a user
    */
-  static async findByUserId(userId: number, status?: LeaveStatus): Promise<LeaveRequestWithRelations[]> {
+  static async findByUserId(userId: number, status?: LeaveStatus, options?: { limit?: number }): Promise<LeaveRequestWithRelations[]> {
     return prisma.leaveRequest.findMany({
       where: {
         requesterId: userId,
@@ -68,6 +68,7 @@ export class LeaveRepository {
       },
       include: DEFAULT_INCLUDES,
       orderBy: { createdAt: "desc" },
+      ...(options?.limit && { take: options.limit }),
     });
   }
 
@@ -117,11 +118,14 @@ export class LeaveRepository {
     status?: LeaveStatus;
     type?: LeaveType;
     requesterId?: number;
+    limit?: number;
   }): Promise<LeaveRequestWithRelations[]> {
+    const { limit, ...whereFilters } = filters || {};
     return prisma.leaveRequest.findMany({
-      where: filters,
+      where: whereFilters,
       include: DEFAULT_INCLUDES,
       orderBy: { createdAt: "desc" },
+      ...(limit && { take: limit }),
     });
   }
 

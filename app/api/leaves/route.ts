@@ -40,6 +40,7 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const statusFilter = url.searchParams.get("status");
   const mine = url.searchParams.get("mine") === "1";
+  const limit = Math.min(parseInt(url.searchParams.get("limit") || "50"), 100); // Cap at 100 for performance
 
   try {
     let items;
@@ -47,14 +48,15 @@ export async function GET(req: Request) {
     if (mine) {
       // Use repository method for user-specific queries
       if (statusFilter && statusFilter !== "all") {
-        items = await LeaveRepository.findByUserId(me.id, statusFilter as any);
+        items = await LeaveRepository.findByUserId(me.id, statusFilter as any, { limit });
       } else {
-        items = await LeaveRepository.findByUserId(me.id);
+        items = await LeaveRepository.findByUserId(me.id, undefined, { limit });
       }
     } else {
       // Use repository method for all queries
       items = await LeaveRepository.findAll({
         status: statusFilter && statusFilter !== "all" ? statusFilter as any : undefined,
+        limit,
       });
     }
 
