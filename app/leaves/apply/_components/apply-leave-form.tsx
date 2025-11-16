@@ -9,6 +9,7 @@ import {
   Paperclip,
   Send,
   CheckCircle2,
+  Save,
 } from "lucide-react";
 
 // UI Components (barrel export)
@@ -81,6 +82,7 @@ export function ApplyLeaveForm() {
     clearErrors,
     handleReviewSubmit,
     handleConfirmSubmit,
+    handleManualSave,
     initiateReview,
   } = useApplyLeaveForm();
   const router = useRouter();
@@ -363,6 +365,16 @@ export function ApplyLeaveForm() {
                     className="transition-transform hover:scale-[1.02]"
                   >
                     Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={handleManualSave}
+                    disabled={submitting}
+                    className="transition-transform hover:scale-[1.02]"
+                    leftIcon={<Save className="size-4" aria-hidden="true" />}
+                  >
+                    Save Draft
                   </Button>
                   <Button
                     type="submit"

@@ -88,7 +88,7 @@ export function useApplyLeaveForm() {
 
   const { holidays } = useHolidays();
 
-  const { lastSaved, loadDraft, clearDraft } = useDraftAutosave({
+  const { lastSaved, loadDraft, clearDraft, saveDraft } = useDraftAutosave({
     type,
     startDate: dateRange.start,
     endDate: dateRange.end,
@@ -368,6 +368,11 @@ export function useApplyLeaveForm() {
     return true;
   };
 
+  const handleManualSave = () => {
+    saveDraft();
+    toast.success("Draft saved successfully");
+  };
+
   const handleReviewSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     initiateReview();
@@ -517,6 +522,7 @@ export function useApplyLeaveForm() {
     clearErrors,
     handleReviewSubmit,
     handleConfirmSubmit,
+    handleManualSave,
     initiateReview,
   };
 }
