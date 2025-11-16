@@ -331,6 +331,9 @@ export class LeaveService {
         };
       }
 
+      // Get next approver first to determine toRole
+      const nextApprover = await this.getNextApprover(leave);
+
       // Update current approval
       await prisma.approval.updateMany({
         where: {
@@ -340,13 +343,13 @@ export class LeaveService {
         },
         data: {
           decision: ApprovalDecision.FORWARDED,
+          toRole: nextApprover?.role || null,
           comment,
           decidedAt: new Date(),
         },
       });
 
       // Create next approval
-      const nextApprover = await this.getNextApprover(leave);
       if (nextApprover) {
         const currentStep = await this.getCurrentStep(leaveId);
         await prisma.approval.create({
@@ -409,6 +412,8 @@ export class LeaveService {
     reason: string
   ): Promise<ServiceResult<any>> {
     try {
+      // Update existing pending approval to FORWARDED with toRole: null
+      // This indicates the leave is being sent back to employee for modification
       await prisma.approval.updateMany({
         where: {
           leaveId: leaveId,
@@ -416,7 +421,8 @@ export class LeaveService {
           decision: ApprovalDecision.PENDING,
         },
         data: {
-          decision: "RETURNED" as any,
+          decision: ApprovalDecision.FORWARDED,
+          toRole: null, // Returning to employee (no next role)
           comment: reason,
           decidedAt: new Date(),
         },
@@ -612,10 +618,11 @@ export class LeaveService {
 
   private static async getNextApprover(
     leave: any
-  ): Promise<{ id: number } | null> {
+  ): Promise<{ id: number; role: string } | null> {
     // Simplified - would use workflow strategies in production
     const nextRole = "HR_HEAD"; // This should come from workflow strategy
-    return this.findApprover(leave.requesterId, nextRole);
+    const approver = await this.findApprover(leave.requesterId, nextRole);
+    return approver ? { id: approver.id, role: nextRole } : null;
   }
 
   private static async deductFromBalance(
