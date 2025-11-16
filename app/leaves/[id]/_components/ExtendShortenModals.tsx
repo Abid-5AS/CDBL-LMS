@@ -16,6 +16,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { glassCard, neoButton, neoInput } from "@/lib/neo-design";
+import { cn } from "@/lib/utils";
 
 type ExtendModalProps = {
   open: boolean;
@@ -84,9 +86,9 @@ export function ExtendLeaveModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className={cn("sm:max-w-[500px]", glassCard.elevated)}>
         <DialogHeader>
-          <DialogTitle>Extend Leave Request</DialogTitle>
+          <DialogTitle className="text-xl">Extend Leave Request</DialogTitle>
           <DialogDescription>
             Extend your approved leave. The extension will go through the approval process.
           </DialogDescription>
@@ -94,25 +96,25 @@ export function ExtendLeaveModal({
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label>Current End Date</Label>
-            <div className="text-sm font-medium text-muted-foreground">
+            <Label className="font-semibold">Current End Date</Label>
+            <div className="text-sm font-medium text-muted-foreground bg-muted/50 p-3 rounded-lg backdrop-blur-sm">
               {format(currentEndDate, "PPP")}
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label>New End Date *</Label>
+            <Label className="font-semibold">New End Date *</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-left font-normal"
+                  className={cn("w-full justify-start text-left font-normal", neoInput.base)}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {newEndDate ? format(newEndDate, "PPP") : "Select new end date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
+              <PopoverContent className={cn("w-auto p-0", glassCard.base)}>
                 <Calendar
                   mode="single"
                   selected={newEndDate}
@@ -125,13 +127,13 @@ export function ExtendLeaveModal({
           </div>
 
           <div className="space-y-2">
-            <Label>Reason for Extension *</Label>
+            <Label className="font-semibold">Reason for Extension *</Label>
             <Textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Explain why you need to extend your leave..."
               rows={4}
-              className="resize-none"
+              className={cn("resize-none", neoInput.base)}
             />
             <p className="text-xs text-muted-foreground">
               Minimum 10 characters ({reason.length}/10)
@@ -139,21 +141,26 @@ export function ExtendLeaveModal({
           </div>
 
           {error && (
-            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+            <div className={cn("text-sm text-white p-3 rounded-lg", "bg-gradient-to-br from-red-500/90 to-red-600/70 shadow-lg shadow-red-500/30")}>
               {error}
             </div>
           )}
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="gap-2">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isSubmitting}
+            className={neoButton.glass}
           >
             Cancel
           </Button>
-          <Button onClick={handleSubmit} disabled={isSubmitting}>
+          <Button
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className={neoButton.primary}
+          >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -223,9 +230,9 @@ export function ShortenLeaveModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className={cn("sm:max-w-[500px]", glassCard.elevated)}>
         <DialogHeader>
-          <DialogTitle>Shorten Leave Request</DialogTitle>
+          <DialogTitle className="text-xl">Shorten Leave Request</DialogTitle>
           <DialogDescription>
             Return to work earlier than planned. Days will be restored to your balance.
           </DialogDescription>
@@ -233,25 +240,25 @@ export function ShortenLeaveModal({
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label>Current End Date</Label>
-            <div className="text-sm font-medium text-muted-foreground">
+            <Label className="font-semibold">Current End Date</Label>
+            <div className="text-sm font-medium text-muted-foreground bg-muted/50 p-3 rounded-lg backdrop-blur-sm">
               {format(currentEndDate, "PPP")}
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label>New End Date *</Label>
+            <Label className="font-semibold">New End Date *</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-left font-normal"
+                  className={cn("w-full justify-start text-left font-normal", neoInput.base)}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {newEndDate ? format(newEndDate, "PPP") : "Select new end date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
+              <PopoverContent className={cn("w-auto p-0", glassCard.base)}>
                 <Calendar
                   mode="single"
                   selected={newEndDate}
@@ -271,13 +278,13 @@ export function ShortenLeaveModal({
           </div>
 
           <div className="space-y-2">
-            <Label>Reason for Shortening *</Label>
+            <Label className="font-semibold">Reason for Shortening *</Label>
             <Textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Explain why you're returning earlier..."
               rows={4}
-              className="resize-none"
+              className={cn("resize-none", neoInput.base)}
             />
             <p className="text-xs text-muted-foreground">
               Minimum 10 characters ({reason.length}/10)
@@ -285,21 +292,26 @@ export function ShortenLeaveModal({
           </div>
 
           {error && (
-            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+            <div className={cn("text-sm text-white p-3 rounded-lg", "bg-gradient-to-br from-red-500/90 to-red-600/70 shadow-lg shadow-red-500/30")}>
               {error}
             </div>
           )}
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="gap-2">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isSubmitting}
+            className={neoButton.glass}
           >
             Cancel
           </Button>
-          <Button onClick={handleSubmit} disabled={isSubmitting}>
+          <Button
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className={neoButton.success}
+          >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

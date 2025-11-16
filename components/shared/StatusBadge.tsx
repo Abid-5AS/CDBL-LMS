@@ -13,6 +13,7 @@ import clsx from "clsx";
 
 type Status = LeaveStatus;
 
+// Professional Neo + Glassmorphism Status Configuration
 const STATUS_CONFIG: Record<
   Status,
   {
@@ -24,58 +25,50 @@ const STATUS_CONFIG: Record<
 > = {
   DRAFT: {
     label: "Draft",
-    className: "bg-status-draft/10 text-status-draft border-status-draft/20",
+    className: "bg-gradient-to-br from-gray-400/90 to-gray-500/70 text-white shadow-md shadow-gray-400/30 backdrop-blur-sm border border-white/20",
     icon: getIcon(leaveStatusIcons.DRAFT),
   },
   SUBMITTED: {
     label: "Submitted",
-    className:
-      "bg-status-submitted/10 text-status-submitted border-status-submitted/20",
+    className: "bg-gradient-to-br from-blue-500/90 to-blue-600/70 text-white shadow-md shadow-blue-500/30 backdrop-blur-sm border border-white/20",
     icon: getIcon(leaveStatusIcons.SUBMITTED),
   },
   PENDING: {
     label: "Pending",
-    className:
-      "bg-data-warning/15 text-data-warning border-data-warning/30",
+    className: "bg-gradient-to-br from-amber-500/90 to-amber-600/70 text-white shadow-md shadow-amber-500/30 backdrop-blur-sm border border-white/20",
     icon: getIcon(leaveStatusIcons.PENDING),
   },
   APPROVED: {
     label: "Approved",
-    className:
-      "bg-status-approved/10 text-status-approved border-status-approved/20",
+    className: "bg-gradient-to-br from-emerald-500/90 to-emerald-600/70 text-white shadow-md shadow-emerald-500/30 backdrop-blur-sm border border-white/20",
     icon: getIcon(leaveStatusIcons.APPROVED),
   },
   REJECTED: {
     label: "Rejected",
-    className:
-      "bg-status-rejected/10 text-status-rejected border-status-rejected/20",
+    className: "bg-gradient-to-br from-red-500/90 to-red-600/70 text-white shadow-md shadow-red-500/30 backdrop-blur-sm border border-white/20",
     icon: getIcon(leaveStatusIcons.REJECTED),
   },
   CANCELLED: {
     label: "Cancelled",
-    className:
-      "bg-status-cancelled/10 text-status-cancelled border-status-cancelled/20",
+    className: "bg-gradient-to-br from-slate-500/90 to-slate-600/70 text-white shadow-md shadow-slate-500/30 backdrop-blur-sm border border-white/20",
     icon: getIcon(leaveStatusIcons.CANCELLED),
   },
   RETURNED: {
     label: "Returned",
-    className:
-      "bg-status-returned/10 text-status-returned border-status-returned/20",
+    className: "bg-gradient-to-br from-orange-500/90 to-orange-600/70 text-white shadow-md shadow-orange-500/30 backdrop-blur-sm border border-white/20",
     icon: getIcon(leaveStatusIcons.PENDING),
     tooltip:
       "Returned to employee for modification. Please update and resubmit.",
   },
   CANCELLATION_REQUESTED: {
     label: "Cancellation Requested",
-    className:
-      "bg-data-warning/15 text-data-warning border-data-warning/30",
+    className: "bg-gradient-to-br from-amber-500/90 to-amber-600/70 text-white shadow-md shadow-amber-500/30 backdrop-blur-sm border border-white/20",
     icon: getIcon(leaveStatusIcons.PENDING),
     tooltip: "Cancellation request submitted and pending HR approval.",
   },
   RECALLED: {
     label: "Recalled",
-    className:
-      "bg-card-summary-soft text-card-summary border-card-summary-soft",
+    className: "bg-gradient-to-br from-purple-500/90 to-purple-600/70 text-white shadow-md shadow-purple-500/30 backdrop-blur-sm border border-white/20",
     icon: getIcon(leaveStatusIcons.PENDING),
     tooltip: "Employee recalled from leave by HR. Remaining balance restored.",
   },

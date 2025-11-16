@@ -224,7 +224,7 @@ export function EnhancedDataTable<T extends Record<string, any>>({
   const visibleColumns = React.useMemo(() => {
     return columns.filter(
       (column) =>
-        currentState.columnVisibility[column.id] !== false && !column.hidden
+        currentState.columnVisibility?.[column.id] !== false && !column.hidden
     );
   }, [columns, currentState.columnVisibility]);
 
@@ -232,23 +232,24 @@ export function EnhancedDataTable<T extends Record<string, any>>({
   const globalFilteredData = React.useMemo(() => {
     if (!enableGlobalFilter || !currentState.globalFilter) return data;
 
+    const filterValue = currentState.globalFilter.toLowerCase();
     return data.filter((row) =>
       Object.values(row).some((value) =>
         String(value)
           .toLowerCase()
-          .includes(currentState.globalFilter.toLowerCase())
+          .includes(filterValue)
       )
     );
   }, [data, currentState.globalFilter, enableGlobalFilter]);
 
   // Apply column filters
   const columnFilteredData = React.useMemo(() => {
-    if (!enableColumnFilters || currentState.columnFilters.length === 0) {
+    if (!enableColumnFilters || !currentState.columnFilters || currentState.columnFilters.length === 0) {
       return globalFilteredData;
     }
 
     return globalFilteredData.filter((row) => {
-      return currentState.columnFilters.every((filter) => {
+      return currentState.columnFilters!.every((filter) => {
         const column = columns.find((col) => col.id === filter.id);
         if (!column || !column.accessorKey) return true;
 
@@ -267,12 +268,12 @@ export function EnhancedDataTable<T extends Record<string, any>>({
 
   // Apply sorting
   const sortedData = React.useMemo(() => {
-    if (!enableSorting || currentState.sorting.length === 0) {
+    if (!enableSorting || !currentState.sorting || currentState.sorting.length === 0) {
       return columnFilteredData;
     }
 
     return [...columnFilteredData].sort((a, b) => {
-      for (const sort of currentState.sorting) {
+      for (const sort of currentState.sorting!) {
         const column = columns.find((col) => col.id === sort.id);
         if (!column || !column.accessorKey) continue;
 

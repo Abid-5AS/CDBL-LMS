@@ -37,6 +37,8 @@ import {
 } from "@/lib";
 import type { AppRole } from "@/lib/rbac";
 import { LEAVE_TYPE_OPTIONS } from "@/lib/constants";
+import { glassCard, neoButton, neoInput } from "@/lib/neo-design";
+import { cn } from "@/lib/utils";
 
 // Local imports
 import { HRApprovalItem } from "./types";
@@ -264,7 +266,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     setIsBulkApproving(true);
     try {
       const ids = Array.from(selectedIds).map(Number);
-      const response = await apiPost("/api/leaves/bulk/approve", { ids });
+      const response = await apiPost<{ success: boolean; approved: number; failed: number }>("/api/leaves/bulk/approve", { ids });
 
       if (response.success) {
         toast.success(
@@ -294,7 +296,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className={cn(glassCard.elevated, "rounded-2xl")}>
         <CardContent>
           <EmptyState
             icon={Loader2}
@@ -309,7 +311,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
   if (error) {
     return (
-      <Card>
+      <Card className={cn(glassCard.elevated, "rounded-2xl")}>
         <CardContent>
           <EmptyState
             title="Unable to load approvals"
@@ -327,7 +329,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
   if (!items.length && allItems.length === 0) {
     return (
-      <Card>
+      <Card className={cn(glassCard.elevated, "rounded-2xl")}>
         <CardContent>
           <EmptyState
             icon={CheckCircle}
@@ -365,7 +367,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
       {/* Bulk Actions Bar */}
       {selectedIds.size > 0 && (
-        <Card className="bg-primary/5 border-primary/20">
+        <Card className={cn(glassCard.elevated, "rounded-2xl bg-primary/5 border-primary/20")}>
           <CardContent className="flex items-center justify-between py-3">
             <div className="flex items-center gap-2">
               <Checkbox
@@ -381,7 +383,10 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
               <button
                 onClick={handleBulkApprove}
                 disabled={isBulkApproving}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-600/50 text-white text-sm font-medium rounded-md transition-colors"
+                className={cn(
+                  "inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md",
+                  neoButton.success
+                )}
               >
                 {isBulkApproving ? (
                   <>
@@ -407,7 +412,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
       )}
 
       {items.length === 0 && allItems.length > 0 ? (
-        <Card>
+        <Card className={cn(glassCard.elevated, "rounded-2xl")}>
           <CardContent>
             <EmptyState
               icon={FilterX}
@@ -568,7 +573,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         open={dialogState.type === "reject"}
         onOpenChange={(open) => !open && closeDialog()}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className={cn(glassCard.elevated, "rounded-2xl")}>
           <AlertDialogHeader>
             <AlertDialogTitle>Reject Leave Request?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -578,14 +583,16 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={closeDialog}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={closeDialog} className={neoButton.glass}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (dialogState.itemId) {
                   executeDecision(dialogState.itemId, "reject");
                 }
               }}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className={cn(neoButton.danger, "bg-destructive text-destructive-foreground hover:bg-destructive/90")}
             >
               Reject Request
             </AlertDialogAction>
@@ -598,7 +605,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         open={dialogState.type === "return"}
         onOpenChange={(open) => !open && closeDialog()}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className={cn(glassCard.elevated, "rounded-2xl")}>
           <AlertDialogHeader>
             <AlertDialogTitle>Return for Modification</AlertDialogTitle>
             <AlertDialogDescription>
@@ -619,7 +626,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
               value={returnComment}
               onChange={(e) => setReturnComment(e.target.value)}
               placeholder="Please provide a clear reason for returning this request (minimum 5 characters)..."
-              className="min-h-[100px]"
+              className={cn("min-h-[100px]", neoInput.base)}
               aria-required="true"
               aria-describedby="return-comment-error"
             />
@@ -634,7 +641,9 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
             )}
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={closeDialog}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={closeDialog} className={neoButton.glass}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (dialogState.itemId && returnComment.length >= 5) {

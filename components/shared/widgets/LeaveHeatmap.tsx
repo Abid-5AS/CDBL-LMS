@@ -162,7 +162,7 @@ export function LeaveHeatmap({
     return "var(--color-card)";
   };
 
-  if (grid.length === 0 || buckets.length === 0) {
+  if (grid.length === 0) {
     return renderEmptyState();
   }
 

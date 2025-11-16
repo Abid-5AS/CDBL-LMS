@@ -404,12 +404,10 @@ export function RoleKPICard({
             style={{
               background:
                 "linear-gradient(135deg, var(--role-kpi-accent-soft), transparent)",
+              color: "var(--role-kpi-accent)",
             }}
           >
-            <Icon
-              className="h-6 w-6"
-              style={{ color: "var(--role-kpi-accent)" }}
-            />
+            <Icon className="h-6 w-6" />
           </div>
         )}
       </div>
