@@ -130,14 +130,19 @@ export async function getHRAdminKPIData(user?: MinimalUser): Promise<HRAdminDash
   return {
     employeesOnLeave,
     pendingRequests,
+    // PLACEHOLDER: Fast endpoint returns estimated value, use /stats for accurate calculation
     avgApprovalTime: 2.5,
+    // NOT IMPLEMENTED: Encashment tracking not yet available
     encashmentPending: 0,
     totalLeavesThisYear,
     processedToday,
     dailyTarget,
     dailyProgress,
+    // PLACEHOLDER: Fast endpoint returns estimated value, use /stats for accurate calculation
     teamUtilization: 85,
+    // PLACEHOLDER: Compliance score calculation not yet implemented
     complianceScore: 94,
+    // Empty arrays in fast endpoint, populated in /stats
     leaveTypeBreakdown: [],
     monthlyTrend: [],
   };

@@ -246,9 +246,9 @@ function HRAdminDashboardClientImpl({
                     </TooltipTrigger>
                     <TooltipContent side="bottom" className="max-w-xs">
                       <p className="text-sm">
-                        Leave requests awaiting approval from department heads,
-                        HR, or CEO. High counts may indicate approval
-                        bottlenecks.
+                        Leave requests awaiting YOUR action. This shows only
+                        requests in your personal approval queue, not
+                        organization-wide pending requests.
                       </p>
                     </TooltipContent>
                   </Tooltip>
@@ -288,9 +288,9 @@ function HRAdminDashboardClientImpl({
                     </TooltipTrigger>
                     <TooltipContent side="bottom" className="max-w-xs">
                       <p className="text-sm">
-                        Average time (in days) from leave request submission to
-                        final approval/rejection. Target is ≤3 days for optimal
-                        processing.
+                        Organization-wide average time (in days) from leave
+                        request submission to final approval/rejection across all
+                        approvers. Target is ≤3 days for optimal processing.
                       </p>
                     </TooltipContent>
                   </Tooltip>
