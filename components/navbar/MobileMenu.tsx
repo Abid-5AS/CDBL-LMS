@@ -21,6 +21,8 @@ type MobileMenuProps = Pick<
   | "isActive"
   | "isMobileMenuOpen"
   | "closeMobileMenu"
+  | "logout"
+  | "loggingOut"
 >;
 
 const menuVariants = {
@@ -67,6 +69,8 @@ export function MobileMenu({
   isActive,
   isMobileMenuOpen,
   closeMobileMenu,
+  logout,
+  loggingOut,
 }: MobileMenuProps) {
   const { openSearch } = useSearch();
 
@@ -208,10 +212,15 @@ export function MobileMenu({
                       variant="destructive"
                       size="sm"
                       className="justify-start"
-                      onClick={() => router.push("/api/auth/logout")}
+                      disabled={loggingOut}
+                      aria-busy={loggingOut}
+                      onClick={() => {
+                        closeMobileMenu();
+                        logout();
+                      }}
                     >
                       <LogOut className="mr-2 h-4 w-4" />
-                      Logout
+                      {loggingOut ? "Signing out..." : "Logout"}
                     </Button>
                   </div>
                 </div>

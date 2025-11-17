@@ -11,7 +11,13 @@ import { ProfileMenu } from "./ProfileMenu";
 
 type MobileBarProps = Pick<
   NavbarState,
-  "toggleMobileMenu" | "isMobileMenuOpen" | "router" | "user" | "scrolled"
+  | "toggleMobileMenu"
+  | "isMobileMenuOpen"
+  | "router"
+  | "user"
+  | "scrolled"
+  | "logout"
+  | "loggingOut"
 >;
 
 export function MobileBar({
@@ -20,6 +26,8 @@ export function MobileBar({
   router,
   user,
   scrolled,
+  logout,
+  loggingOut,
 }: MobileBarProps) {
   if (!user) return null;
   const navHeight = scrolled ? 72 : 88;
@@ -56,7 +64,8 @@ export function MobileBar({
         >
           <Button
             size="sm"
-            className="gap-1.5 backdrop-blur-md bg-background/80 dark:bg-background/40 border border-border hover:bg-background/90 dark:hover:bg-background/50 shadow-sm"
+            variant="default"
+            className="gap-1.5 shadow-md hover:shadow-lg"
             leftIcon={<CalendarPlus className="h-4 w-4" />}
             onClick={() => router.push("/leaves/apply")}
             aria-label="Apply for leave"
@@ -73,7 +82,8 @@ export function MobileBar({
         >
           <ProfileMenu
             user={user}
-            onLogout={() => router.push("/api/auth/logout")}
+            onLogout={logout}
+            isLoggingOut={loggingOut}
           />
         </motion.div>
 

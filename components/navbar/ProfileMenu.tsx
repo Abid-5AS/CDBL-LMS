@@ -22,7 +22,8 @@ import type { NavbarState } from "./use-navbar-state";
 
 type ProfileMenuProps = {
   user: NonNullable<NavbarState["user"]>;
-  onLogout: () => void;
+  onLogout: () => void | Promise<void>;
+  isLoggingOut?: boolean;
 };
 
 interface MenuItem {
@@ -32,7 +33,7 @@ interface MenuItem {
   badge?: string;
 }
 
-export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
+export function ProfileMenu({ user, onLogout, isLoggingOut }: ProfileMenuProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   // Role-based badge
@@ -95,6 +96,12 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
       .join("")
       .toUpperCase()
       .slice(0, 2) ?? "U";
+
+  const handleLogout = () => {
+    if (isLoggingOut) return;
+    setIsOpen(false);
+    void onLogout();
+  };
 
   return (
     <div className="relative">
@@ -216,12 +223,14 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
             <DropdownMenuItem asChild>
               <button
                 type="button"
-                onClick={onLogout}
-                className="w-full flex items-center gap-3 p-3 duration-200 bg-destructive/10 rounded-xl hover:bg-destructive/20 cursor-pointer border border-transparent hover:border-destructive/30 hover:shadow-sm transition-all group"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                aria-busy={isLoggingOut}
+                className="w-full flex items-center gap-3 p-3 duration-200 bg-destructive/10 rounded-xl hover:bg-destructive/20 cursor-pointer border border-transparent hover:border-destructive/30 hover:shadow-sm transition-all group disabled:opacity-60 disabled:pointer-events-none"
               >
                 <LogOut className="size-4 text-destructive group-hover:text-destructive/80 transition-colors" aria-hidden="true" />
                 <span className="text-sm font-medium text-destructive group-hover:text-destructive/80 transition-colors">
-                  Sign Out
+                  {isLoggingOut ? "Signing out..." : "Sign Out"}
                 </span>
               </button>
             </DropdownMenuItem>

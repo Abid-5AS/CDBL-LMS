@@ -17,7 +17,7 @@ import { ProfileMenu } from "./ProfileMenu";
 
 type DesktopNavProps = Pick<
   NavbarState,
-  "user" | "router" | "navLinks" | "isActive" | "scrolled"
+  "user" | "router" | "navLinks" | "isActive" | "scrolled" | "logout" | "loggingOut"
 >;
 
 export function DesktopNav({
@@ -26,6 +26,8 @@ export function DesktopNav({
   navLinks,
   isActive,
   scrolled,
+  logout,
+  loggingOut,
 }: DesktopNavProps) {
   const { openSearch } = useSearch();
   const navHeight = scrolled ? 72 : 88;
@@ -120,37 +122,42 @@ export function DesktopNav({
         transition={{ duration: 0.4, delay: 0.3 }}
         className="flex shrink-0 flex-nowrap items-center gap-2"
       >
-        <Button
-          variant="ghost"
-          size="sm"
-          className="hidden lg:inline-flex gap-2"
-          onClick={openSearch}
-          leftIcon={<Search className="h-4 w-4" />}
-          aria-label="Search leaves and related information"
-        >
-          Search
-          <kbd className="ml-1 hidden xl:inline-flex items-center gap-1 rounded-md border border-border bg-muted px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground">
-            <Command className="h-3 w-3" />K
-          </kbd>
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          className="lg:hidden"
-          onClick={openSearch}
-          aria-label="Open search dialog"
-        >
-          <Search className="h-4 w-4" />
-        </Button>
+        <div className="hidden lg:flex">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-2 text-foreground dark:text-foreground"
+            onClick={openSearch}
+            leftIcon={<Search className="h-4 w-4" />}
+            aria-label="Search leaves and related information"
+          >
+            Search
+            <kbd className="ml-1 hidden xl:inline-flex items-center gap-1 rounded-md border border-border bg-muted px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground">
+              <Command className="h-3 w-3" />K
+            </kbd>
+          </Button>
+        </div>
+        <div className="flex lg:hidden">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="text-foreground dark:text-foreground"
+            onClick={openSearch}
+            aria-label="Open search dialog"
+          >
+            <Search className="h-4 w-4" />
+          </Button>
+        </div>
 
         <Button
           size="sm"
-          className="gap-1.5 backdrop-blur-md bg-background/80 dark:bg-background/40 border border-border hover:bg-background/90 dark:hover:bg-background/50 shadow-sm"
+          variant="default"
+          className="gap-1.5 shadow-md hover:shadow-lg"
           leftIcon={<CalendarPlus className="h-4 w-4" />}
           onClick={() => router.push("/leaves/apply")}
           aria-label="Apply for leave"
         >
-          Apply
+          Apply Leave
         </Button>
 
         <div className="flex items-center gap-1 rounded-full border border-border bg-background/80 px-2 py-1 shadow-sm backdrop-blur-xl dark:bg-background/40">
@@ -160,7 +167,8 @@ export function DesktopNav({
           <div className="h-5 w-px bg-border" />
           <ProfileMenu
             user={user}
-            onLogout={() => router.push("/api/auth/logout")}
+            onLogout={logout}
+            isLoggingOut={loggingOut}
           />
         </div>
       </motion.div>

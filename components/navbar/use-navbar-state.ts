@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import { useUser } from "@/lib/user-context";
 import { getNavItemsForRole, type UserRole } from "@/lib/navigation";
@@ -15,6 +16,8 @@ export type NavbarState = {
   toggleMobileMenu: () => void;
   closeMobileMenu: () => void;
   isActive: (href: string) => boolean;
+  logout: () => Promise<void>;
+  loggingOut: boolean;
 };
 
 export function useNavbarState(): NavbarState {
@@ -23,6 +26,7 @@ export function useNavbarState(): NavbarState {
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -74,6 +78,27 @@ export function useNavbarState(): NavbarState {
 
   const closeMobileMenu = useCallback(() => setIsMobileMenuOpen(false), []);
 
+  const logout = useCallback(async () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+      const res = await fetch("/api/logout", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+      if (!res.ok) {
+        throw new Error("logout_failed");
+      }
+      router.replace("/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("Unable to log out. Please try again.");
+    } finally {
+      setLoggingOut(false);
+    }
+  }, [loggingOut, router]);
+
   return {
     user,
     router,
@@ -83,5 +108,7 @@ export function useNavbarState(): NavbarState {
     toggleMobileMenu,
     closeMobileMenu,
     isActive,
+    logout,
+    loggingOut,
   };
 }
