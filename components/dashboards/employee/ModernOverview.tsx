@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
@@ -115,9 +116,13 @@ export function ModernEmployeeDashboard({
   username,
 }: EmployeeDashboardContentProps) {
   const router = useRouter();
+  const [activeLeaveTab, setActiveLeaveTab] = useState<string>("overview");
 
-  // Scroll to specific section
-  const scrollToSection = (sectionId: string) => {
+  // Scroll to specific section and optionally switch tabs
+  const scrollToSection = (sectionId: string, tabId?: string) => {
+    if (tabId) {
+      setActiveLeaveTab(tabId);
+    }
     setTimeout(() => {
       const element = document.getElementById(sectionId);
       if (element) {
@@ -311,7 +316,7 @@ export function ModernEmployeeDashboard({
                 icon={Calendar}
                 role="EMPLOYEE"
                 animate={true}
-                onClick={() => scrollToSection("leave-details")}
+                onClick={() => scrollToSection("leave-details", "balance")}
                 clickLabel="View detailed balance breakdown in Leave Details"
               />
 
@@ -350,7 +355,7 @@ export function ModernEmployeeDashboard({
                 icon={BarChart3}
                 role="EMPLOYEE"
                 animate={true}
-                onClick={() => scrollToSection("leave-details")}
+                onClick={() => scrollToSection("leave-details", "activity")}
                 clickLabel="View leave usage history in Leave Details"
               />
 
@@ -453,6 +458,8 @@ export function ModernEmployeeDashboard({
                 <TabbedContent
                   title="Leave Details"
                   defaultTab="overview"
+                  value={activeLeaveTab}
+                  onValueChange={setActiveLeaveTab}
                   tabs={[
                     {
                       id: "overview",
