@@ -136,6 +136,14 @@ async function createUsers(): Promise<SeedUser[]> {
   const deptEmployeeCounters = new Map<string, number>();
   const usedEmpCodes = new Set<string>();
 
+  // Default joinDate: 2 years ago for all seeded users
+  const defaultJoinDate = new Date();
+  defaultJoinDate.setFullYear(defaultJoinDate.getFullYear() - 2);
+
+  // Default retirementDate: 30 years from join date
+  const defaultRetirementDate = new Date(defaultJoinDate);
+  defaultRetirementDate.setFullYear(defaultRetirementDate.getFullYear() + 30);
+
   const upsertUser = async (data: {
     name: string;
     email: string;
@@ -154,6 +162,8 @@ async function createUsers(): Promise<SeedUser[]> {
         empCode: data.empCode,
         deptHeadId: data.deptHeadId ?? null,
         password: passwordHash,
+        joinDate: defaultJoinDate,
+        retirementDate: defaultRetirementDate,
       },
       create: {
         name: data.name,
@@ -163,6 +173,8 @@ async function createUsers(): Promise<SeedUser[]> {
         empCode: data.empCode,
         deptHeadId: data.deptHeadId ?? null,
         password: passwordHash,
+        joinDate: defaultJoinDate,
+        retirementDate: defaultRetirementDate,
       },
     });
     createdUsers.push({

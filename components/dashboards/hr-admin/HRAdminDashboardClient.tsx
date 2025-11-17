@@ -37,7 +37,7 @@ const LazyTrendChart = lazy(() =>
   }))
 );
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DashboardCardSkeleton } from "@/app/dashboard/shared/LoadingFallback";
+import { DashboardCardSkeleton } from "@/components/shared/skeletons";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import {

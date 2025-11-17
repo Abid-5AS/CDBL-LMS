@@ -1,4 +1,8 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  DashboardCardSkeleton,
+  KPICardSkeleton,
+} from "@/components/shared/skeletons";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 /**
@@ -33,28 +37,6 @@ export function DashboardLoadingFallback() {
 }
 
 /**
- * Enhanced loading skeleton for dashboard cards with shimmer effect
- */
-export function DashboardCardSkeleton() {
-  return (
-    <Card className="relative overflow-hidden animate-in fade-in duration-300">
-      <div className="absolute inset-0 shimmer-effect" />
-      <CardHeader>
-        <Skeleton className="h-6 w-48 mb-2" />
-        <Skeleton className="h-4 w-32" />
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <Skeleton className="h-24 w-full rounded-lg" />
-        <div className="flex gap-2">
-          <Skeleton className="h-8 w-20" />
-          <Skeleton className="h-8 w-24" />
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-/**
  * Enhanced loading skeleton for table/list views with staggered animation
  */
 export function DashboardTableSkeleton({ rows = 5 }: { rows?: number }) {
@@ -81,27 +63,4 @@ export function DashboardTableSkeleton({ rows = 5 }: { rows?: number }) {
   );
 }
 
-/**
- * Loading skeleton for KPI cards with proper structure
- */
-export function KPICardSkeleton() {
-  return (
-    <div className="neo-card relative flex h-full min-h-[190px] flex-col px-5 py-5 sm:px-6 sm:py-6 overflow-hidden">
-      <div className="absolute inset-0 shimmer-effect" />
-      <div className="relative flex items-start justify-between gap-4">
-        <div className="flex-1 space-y-3">
-          <Skeleton className="h-3 w-32" />
-          <Skeleton className="h-10 w-20" />
-          <Skeleton className="h-4 w-40" />
-        </div>
-        <Skeleton className="h-12 w-12 rounded-2xl" />
-      </div>
-    </div>
-  );
-}
-
-
-
-
-
-
+export { DashboardCardSkeleton, KPICardSkeleton };

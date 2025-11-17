@@ -4,7 +4,7 @@ import { Role } from "@prisma/client";
 
 import { Button } from "@/components/ui/button";
 import { DashboardSection } from "@/app/dashboard/shared/DashboardLayout";
-import { DashboardCardSkeleton } from "@/app/dashboard/shared/LoadingFallback";
+import { DashboardCardSkeleton } from "@/components/shared/skeletons";
 import { RecentAuditLogs } from "@/components/shared/widgets/RecentAuditLogs";
 import {
   SystemAdminHeader,

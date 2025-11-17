@@ -15,6 +15,19 @@ export const policy = {
     MEDICAL: true,
   },
   maxBackdateDays: { EL: 30, ML: 30, EARNED: 30, MEDICAL: 30 },
+  maxContinuousDays: {
+    CASUAL: 3, // Policy 6.20: max 3 consecutive days per spell
+    EARNED: 60, // Can use up to balance limit
+    MEDICAL: 14, // Policy 6.21.c: beyond 14 days, deduct from EL
+    MATERNITY: 56, // Policy 6.23.a: 8 weeks (56 days)
+    PATERNITY: 7, // Policy 6.24: 7 working days
+    QUARANTINE: 30, // Policy 6.28.b: up to 30 days with CEO approval for >21
+    SPECIAL_DISABILITY: 180, // Policy 6.27.c: maximum 6 months
+    STUDY: 365, // Policy 6.25.b: 1 year initially, extendable to 2 years
+    EXTRAWITHPAY: 365, // Policy 6.22: 6-12 months based on service
+    EXTRAWITHOUTPAY: 365, // Policy 6.22: 6-12 months based on service
+    SPECIAL: 60, // Transferred from EL excess, same as EL usage limit
+  } as Record<string, number>,
   elMinNoticeDays: 5, // hard requirement: ≥5 working days per Policy 6.11 (for EL only)
   clMaxConsecutiveDays: 3, // Policy: max 3 days per spell
   // IMPORTANT: CL and Quarantine leave are EXEMPT from notice requirements per Policy 6.11.a

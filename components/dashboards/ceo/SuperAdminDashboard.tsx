@@ -1,6 +1,6 @@
 "use client";
 
-import { CEODashboardClient } from "./CEODashboardClient";
+import { CEODashboard } from "./CEODashboard";
 import { DashboardErrorBoundary } from "@/components/shared/ErrorBoundary";
 
 type SuperAdminDashboardProps = {
@@ -19,7 +19,7 @@ type SuperAdminDashboardProps = {
 export function SuperAdminDashboard({ username }: SuperAdminDashboardProps) {
   return (
     <DashboardErrorBoundary role="CEO">
-      <CEODashboardClient />
+      <CEODashboard />
     </DashboardErrorBoundary>
   );
 }

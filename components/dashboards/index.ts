@@ -2,13 +2,13 @@
 export { SystemAdminDashboard } from "./admin/Overview";
 
 // CEO Dashboard
-export { SuperAdminDashboard } from "./ceo/Overview";
+export { SuperAdminDashboard } from "./ceo/SuperAdminDashboard";
 
 // Dept Head Dashboard
 export { DeptHeadDashboardWrapper } from "./dept-head/Overview";
 
 // Employee Dashboard
-export { ModernEmployeeDashboard } from "./employee/ModernOverview";
+export { ModernEmployeeDashboard } from "./employee/ModernEmployeeDashboard";
 export { EmployeeDashboardContent as EmployeeDashboard } from "./employee/Overview";
 
 // HR Admin Dashboard

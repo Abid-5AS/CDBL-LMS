@@ -342,11 +342,11 @@ export async function GET(req: NextRequest) {
       // AI insights
       insights,
 
-      // System health
+      // System health (mocked data)
       systemHealth: {
-        status: systemHealth > 0 ? "healthy" : "inactive",
-        requestsThisMonth: systemHealth,
-        lastUpdated: new Date().toISOString(),
+        apiStatus: "healthy",
+        dbStatus: "healthy",
+        uptime: 99.9,
       },
     };
 

@@ -49,6 +49,8 @@ import { FloatingQuickActions } from "./components/FloatingQuickActions";
 import { ConversionSummaryCard } from "@/components/leaves/ConversionHistory";
 
 // Extracted hooks and utils
+import { KPIGridSkeleton } from "@/components/shared/skeletons";
+import { useMounted } from "@/hooks/use-mounted";
 import { useEmployeeDashboardData } from "./hooks/useEmployeeDashboardData";
 import { WhosOutToday } from "@/app/dashboard/shared/WhosOutToday";
 
@@ -78,45 +80,13 @@ const itemVariants = {
   },
 };
 
-/**
- * Enhanced skeleton loader for KPI cards with shimmer effect
- */
-function KPICardSkeleton() {
-  return (
-    <div className="neo-card relative flex h-full min-h-[190px] flex-col px-5 py-5 sm:px-6 sm:py-6 overflow-hidden animate-fade-in">
-      <div className="absolute inset-0 shimmer-effect" />
-      <div className="relative flex items-start justify-between gap-4">
-        <div className="flex-1 space-y-3">
-          <Skeleton className="h-3 w-32" />
-          <Skeleton className="h-10 w-20" />
-          <Skeleton className="h-4 w-40" />
-        </div>
-        <Skeleton className="h-12 w-12 rounded-2xl" />
-      </div>
-    </div>
-  );
-}
-
-/**
- * Grid of skeleton loaders for KPI section with staggered animation
- */
-function KPIGridSkeleton() {
-  return (
-    <ResponsiveDashboardGrid columns="2:2:4:4" gap="md" animate={false}>
-      {[...Array(4)].map((_, i) => (
-        <div key={i} style={{ animationDelay: `${i * 100}ms` }}>
-          <KPICardSkeleton />
-        </div>
-      ))}
-    </ResponsiveDashboardGrid>
-  );
-}
-
 export function ModernEmployeeDashboard({
   username,
 }: EmployeeDashboardContentProps) {
   const router = useRouter();
   const [activeLeaveTab, setActiveLeaveTab] = useState<string>("overview");
+  const mounted = useMounted();
+
   const infoButtonClasses =
     "inline-flex h-7 w-7 items-center justify-center rounded-full border border-border/60 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60";
 
@@ -198,12 +168,14 @@ export function ModernEmployeeDashboard({
                     {username}
                   </h1>
                   <p className="text-sm text-muted-foreground">
-                    {new Date().toLocaleDateString("en-GB", {
-                      weekday: "long",
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
+                    {mounted
+                      ? new Date().toLocaleDateString("en-GB", {
+                          weekday: "long",
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })
+                      : "..."}
                   </p>
                 </div>
                 <Button

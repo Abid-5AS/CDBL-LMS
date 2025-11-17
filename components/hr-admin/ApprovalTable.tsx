@@ -264,20 +264,24 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     comment?: string
   ) => {
     if (viewMode !== "queue") return;
-    // Instant UI update with useOptimistic
-    setOptimisticItems(id);
 
-    // Remove from selection immediately
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
+    // Wrap all state updates in startTransition
+    startTransition(() => {
+      // Instant UI update with useOptimistic
+      setOptimisticItems(id);
+
+      // Remove from selection immediately
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+
+      // Close dialog immediately
+      closeDialog();
     });
 
-    // Close dialog immediately
-    closeDialog();
-
-    // Execute Server Action with useTransition
+    // Execute Server Action
     startTransition(async () => {
       let result;
 
@@ -319,7 +323,9 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         }
 
         // Server Actions auto-revalidate via revalidatePath
-        // But we still revalidate SWR cache for consistency
+        // Refresh router cache for instant UI update
+        router.refresh();
+        // Also revalidate SWR cache for consistency
         await mutate();
       } catch (err) {
         const message =
@@ -390,16 +396,17 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
         if (result.success) {
           toast.success(
-            `Successfully approved ${result.approved} leave request(s)`,
+            `Successfully rejected ${result.rejected} leave request(s)`,
             {
               description:
                 result.failed > 0
-                  ? `${result.failed} request(s) could not be approved`
+                  ? `${result.failed} request(s) could not be rejected`
                   : undefined,
             }
           );
 
-          // Server Actions auto-revalidate, but refresh SWR cache too
+          // Server Actions auto-revalidate, refresh router and SWR cache
+          router.refresh();
           await mutate();
         } else {
           toast.error(result.error || "Failed to approve selected requests");

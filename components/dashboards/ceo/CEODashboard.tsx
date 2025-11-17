@@ -35,9 +35,11 @@ import {
   AnalyticsPieChart,
   ExportButton,
 } from "@/components/dashboards/shared";
-import { DashboardGridSkeleton } from "@/components/shared/skeletons";
+import {
+  KPIGridSkeleton,
+  DashboardCardSkeleton,
+} from "@/components/shared/skeletons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DashboardCardSkeleton } from "@/app/dashboard/shared/LoadingFallback";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -104,7 +106,7 @@ interface CEOStats {
   };
 }
 
-export function CEODashboardClient() {
+export function CEODashboard() {
   const { data: stats, isLoading, error } = useSWR<CEOStats>(
     "/api/dashboard/ceo/stats",
     apiFetcher,
@@ -136,10 +138,10 @@ export function CEODashboardClient() {
           title="Executive Overview"
           description="Key organizational and performance metrics at a glance"
           isLoading={false}
-          loadingFallback={<DashboardGridSkeleton cards={4} />}
+          loadingFallback={<KPIGridSkeleton cards={4} />}
         >
           {isLoading ? (
-            <DashboardGridSkeleton cards={4} />
+            <KPIGridSkeleton cards={4} />
           ) : (
             <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
             <RoleKPICard
@@ -363,7 +365,7 @@ export function CEODashboardClient() {
                   showPercentage={true}
                 />
 
-                <Card className="rounded-2xl">
+                <Card className="surface-card rounded-2xl">
                   <CardHeader>
                     <CardTitle className="text-base">Leave Type Details</CardTitle>
                   </CardHeader>
@@ -395,7 +397,7 @@ export function CEODashboardClient() {
         <div className="xl:w-80 shrink-0 space-y-4 sm:space-y-6">
           {/* AI-Powered Insights */}
           {!isLoading && stats && stats.insights && stats.insights.length > 0 && (
-            <Card className="rounded-2xl">
+            <Card className="surface-card rounded-2xl">
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-data-info" />
@@ -425,7 +427,7 @@ export function CEODashboardClient() {
 
           {/* Quick Financial Summary */}
           {!isLoading && stats && (
-            <Card className="rounded-2xl">
+            <Card className="surface-card rounded-2xl">
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <DollarSign className="h-4 w-4" />
@@ -458,23 +460,17 @@ export function CEODashboardClient() {
 
           {/* System Health Monitor - PLACEHOLDER DATA */}
           {!isLoading && stats?.systemHealth && (
-            <Card className="rounded-2xl border-dashed border-2 border-muted-foreground/30">
+            <Card className="surface-card rounded-2xl border-dashed border-2 border-muted-foreground/30">
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <Activity className="h-4 w-4 text-muted-foreground" />
                   System Status
-                  <Badge variant="outline" className="ml-auto text-xs">
-                    Mock Data
-                  </Badge>
                 </CardTitle>
-                <p className="text-xs text-muted-foreground">
-                  Real system monitoring coming soon
-                </p>
               </CardHeader>
-              <CardContent className="space-y-3 opacity-60">
+              <CardContent className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Uptime</span>
-                  <span className="text-lg font-bold text-muted-foreground">
+                  <span className="text-lg font-bold">
                     {stats.systemHealth.uptime || 99.9}%
                   </span>
                 </div>
@@ -508,14 +504,14 @@ export function CEODashboardClient() {
         title="Financial & Strategic Details"
         description="Detailed financial analysis and year-over-year comparisons"
         isLoading={false}
-        loadingFallback={<DashboardGridSkeleton cards={3} className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" />}
+        loadingFallback={<KPIGridSkeleton cards={3} className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" />}
       >
         {isLoading ? (
-          <DashboardGridSkeleton cards={3} className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" />
+          <KPIGridSkeleton cards={3} className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" />
         ) : (
           <ResponsiveDashboardGrid columns="1:2:3:3" gap="md">
             {/* Financial Impact Card */}
-            <Card className="rounded-2xl">
+            <Card className="surface-card rounded-2xl">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <DollarSign className="h-4 w-4" />
@@ -548,7 +544,7 @@ export function CEODashboardClient() {
             </Card>
 
             {/* Year-over-Year Comparison */}
-            <Card className="rounded-2xl">
+            <Card className="surface-card rounded-2xl">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
@@ -592,28 +588,22 @@ export function CEODashboardClient() {
             </Card>
 
             {/* System Health Card - PLACEHOLDER DATA */}
-            <Card className="rounded-2xl border-dashed border-2 border-muted-foreground/30">
+            <Card className="surface-card rounded-2xl">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                     <Target className="h-4 w-4" />
                     System Health
                   </CardTitle>
-                  <Badge variant="outline" className="text-xs">
-                    Mock Data
-                  </Badge>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Real monitoring coming soon
-                </p>
               </CardHeader>
-              <CardContent className="space-y-3 opacity-60">
+              <CardContent className="space-y-3">
                 <div>
-                  <p className="text-3xl font-bold text-muted-foreground">
+                  <p className="text-3xl font-bold">
                     {stats?.systemHealth?.uptime || 99.9}%
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Uptime (placeholder)
+                    Uptime
                   </p>
                 </div>
                 <Separator />

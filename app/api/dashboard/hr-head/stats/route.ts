@@ -138,7 +138,7 @@ export async function GET(req: NextRequest) {
       }),
 
       // Approval statistics (this month)
-      prisma.approval.aggregate({
+      prisma.approval.findMany({
         where: {
           decidedAt: {
             gte: firstDayOfMonth,
@@ -148,8 +148,12 @@ export async function GET(req: NextRequest) {
             in: ["APPROVED", "REJECTED"],
           },
         },
-        _count: {
-          id: true,
+        include: {
+          leave: {
+            select: {
+              createdAt: true,
+            },
+          },
         },
       }),
     ]);
@@ -207,13 +211,18 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // PLACEHOLDER: Compliance score calculation not yet implemented
-    // TODO: Calculate actual compliance based on:
-    //   - On-time processing (≤3 days from submission)
-    //   - Proper documentation requirements
-    //   - Policy violation tracking
-    const totalProcessed = approvalStats._count.id || 1; // Avoid division by zero
-    const complianceScore = totalProcessed > 0 ? 94 : 100; // HARDCODED - replace with real calculation
+    // Calculate compliance score based on on-time processing
+    const totalProcessed = approvalStats.length;
+    const onTimeApprovals = approvalStats.filter((approval) => {
+      const createdAt = new Date(approval.leave.createdAt);
+      const decidedAt = new Date(approval.decidedAt!);
+      const diffInDays = (decidedAt.getTime() - createdAt.getTime()) / (1000 * 3600 * 24);
+      return diffInDays <= 3;
+    }).length;
+
+    const complianceScore = totalProcessed > 0
+      ? Math.round((onTimeApprovals / totalProcessed) * 100)
+      : 100;
 
     const stats = {
       // Core KPIs
@@ -229,7 +238,7 @@ export async function GET(req: NextRequest) {
 
       // Organization metrics
       totalEmployees,
-      processedThisMonth: approvalStats._count.id || 0,
+      processedThisMonth: totalProcessed,
       complianceScore,
 
       // Recent activity

@@ -12,36 +12,13 @@ import {
   ExportButton,
 } from "@/components/dashboards/shared";
 import {
+  KPIGridSkeleton
+} from "@/components/shared/skeletons";
+import {
   PendingApprovals as PendingLeaveRequestsTable,
   CancellationRequests as CancellationRequestsPanel,
   ReturnedRequests as ReturnedRequestsPanel,
 } from "@/components/dashboards";
-
-// Skeleton components for loading states
-function CardSkeleton() {
-  return (
-    <div className="surface-card p-6">
-      <div className="flex items-start justify-between">
-        <div className="flex-1 space-y-3">
-          <div className="h-4 w-24 bg-muted/50 animate-pulse rounded" />
-          <div className="h-8 w-20 bg-muted/50 animate-pulse rounded" />
-          <div className="h-4 w-32 bg-muted/50 animate-pulse rounded" />
-        </div>
-        <div className="h-12 w-12 bg-muted/50 animate-pulse rounded-xl" />
-      </div>
-    </div>
-  );
-}
-
-function KPIGridSkeleton() {
-  return (
-    <ResponsiveDashboardGrid columns="1:1:3:3" gap="md">
-      <CardSkeleton />
-      <CardSkeleton />
-      <CardSkeleton />
-    </ResponsiveDashboardGrid>
-  );
-}
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { DashboardCardSkeleton } from "@/app/dashboard/shared/LoadingFallback";
@@ -431,36 +408,20 @@ export function HRHeadDashboardClient() {
               } : undefined}
             />
             <RoleKPICard
-              title={
-                <div className="flex items-center gap-2">
-                  <span>Policy Compliance</span>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        aria-label="Information about policy compliance"
-                        className="hover:opacity-70 transition-opacity"
-                      >
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom" className="max-w-xs">
-                      <p className="text-sm font-semibold mb-1 text-amber-500">⚠️ Placeholder Data</p>
-                      <p className="text-sm mb-2">
-                        This metric is currently hardcoded. Real compliance tracking is coming soon.
-                      </p>
-                      <p className="text-sm font-semibold mb-1">Future implementation:</p>
-                      <p className="text-xs text-muted-foreground">
-                        Will track on-time processing (≤3 days), proper documentation, and policy violations.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              }
+              title="Policy Compliance"
               value={`${stats?.complianceScore || 0}%`}
-              subtitle="Meeting SLA targets (mock)"
+              subtitle="Meeting SLA targets"
               icon={CheckCircle2}
               role="HR_HEAD"
-              trend={undefined}
+              trend={
+                stats && stats.complianceScore
+                  ? {
+                      value: stats.complianceScore >= 95 ? 5 : -5,
+                      label: "vs target",
+                      direction: stats.complianceScore >= 95 ? "up" : "down",
+                    }
+                  : undefined
+              }
             />
         </ResponsiveDashboardGrid>
       </DashboardSection>

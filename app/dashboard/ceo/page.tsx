@@ -3,11 +3,11 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { SuperAdminDashboard } from "@/components/dashboards";
 import { DashboardLoadingFallback } from "../shared/LoadingFallback";
-import { DashboardLayout } from "../shared/DashboardLayout";
+import { RoleBasedDashboard } from "@/components/dashboards/shared/RoleBasedDashboard";
 
 async function CEODashboardContent() {
   const user = await getCurrentUser();
-  
+
   if (!user) {
     redirect("/login");
   }
@@ -20,9 +20,14 @@ async function CEODashboardContent() {
   const username = user.name ?? "Executive";
 
   return (
-    <DashboardLayout>
+    <RoleBasedDashboard
+      role="CEO"
+      title={`Welcome, ${username}`}
+      description="Executive dashboard for strategic insights and organization-wide leave management."
+      animate={true}
+    >
       <SuperAdminDashboard username={username} />
-    </DashboardLayout>
+    </RoleBasedDashboard>
   );
 }
 
@@ -33,4 +38,3 @@ export default function CEODashboardPage() {
     </Suspense>
   );
 }
-

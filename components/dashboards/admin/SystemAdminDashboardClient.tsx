@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { KPICard } from "@/components/cards/KPICard";
 import { QuickActions } from "@/components/shared/QuickActions";
 import { DashboardSection } from "@/app/dashboard/shared/DashboardLayout";
-import { DashboardCardSkeleton } from "@/app/dashboard/shared/LoadingFallback";
+import { DashboardCardSkeleton } from "@/components/shared/skeletons";
 import { RoleBasedDashboard } from "@/components/dashboards/shared/RoleBasedDashboard";
 
 type SystemStats = {
