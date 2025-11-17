@@ -12,16 +12,19 @@ import { router } from "expo-router";
 import { ThemedCard } from "@/src/components/shared/ThemedCard";
 import { ThemedButton } from "@/src/components/shared/ThemedButton";
 import { useTheme } from "@/src/providers/ThemeProvider";
+import { useAuthStore } from "@/src/store/authStore";
 import { useUserProfile } from "@/src/hooks/useUserProfile";
 import { useLeaveBalances } from "@/src/hooks/useLeaveBalances";
 import { useLeaveApplications } from "@/src/hooks/useLeaveApplications";
 import { syncService } from "@/src/sync/SyncService";
 import { SyncStatusBanner } from "@/src/components/shared/SyncStatusBanner";
+import { ManagerDashboard } from "@/src/components/dashboard/ManagerDashboard";
 import { useState } from "react";
 import { FileText, Calendar, Clock, TrendingUp } from "lucide-react-native";
 
 export default function HomeScreen() {
   const { colors, isDark } = useTheme();
+  const user = useAuthStore((state) => state.user);
   const { profile, isLoading: profileLoading, refresh: refreshProfile } = useUserProfile();
   const { balances, isLoading: balancesLoading, getTotalAvailable, refresh: refreshBalances } = useLeaveBalances();
   const { applications, isLoading: appsLoading, refresh: refreshApps } = useLeaveApplications();
@@ -46,6 +49,10 @@ export default function HomeScreen() {
   // Get top 3 leave balances
   const topBalances = balances.slice(0, 3);
 
+  // Determine if user is a manager/approver (MANAGER, HR, CEO)
+  const userRole = user?.role || profile?.role || 'EMPLOYEE';
+  const isApprover = ['MANAGER', 'HR', 'CEO'].includes(userRole.toUpperCase());
+
   return (
     <>
       <SyncStatusBanner />
@@ -61,7 +68,14 @@ export default function HomeScreen() {
           />
         }
       >
-        <View style={styles.header}>
+        {isApprover ? (
+          <ManagerDashboard
+            userName={user?.name || profile?.name || 'Manager'}
+            userRole={userRole}
+          />
+        ) : (
+          <>
+            <View style={styles.header}>
         <Text
           style={[
             styles.greeting,
@@ -377,8 +391,8 @@ export default function HomeScreen() {
                 : "Android Material 3"}
             </Text>
           </View>
-        </>
-      )}
+          </>
+        )}
       </ScrollView>
     </>
   );
