@@ -129,15 +129,15 @@ export function ModernEmployeeDashboard({
   const { data: balanceData, isLoading: isLoadingBalance } =
     useApiQuery<Record<string, number>>("/api/balance/mine");
 
-  // Fetch team data
-  const { data: teamData, isLoading: isLoadingTeam } = useSWR(
-    "/api/team/status",
-    apiFetcher
-  );
+  // Fetch team data - remove unused API call
+  // const { data: teamData, isLoading: isLoadingTeam } = useSWR(
+  //   "/api/team/status",
+  //   apiFetcher
+  // );
 
   // Fetch holidays data
   const { data: holidaysData, isLoading: isLoadingHolidays } = useSWR(
-    "/api/holidays/upcoming",
+    "/api/holidays?upcoming=true",
     apiFetcher
   );
 
