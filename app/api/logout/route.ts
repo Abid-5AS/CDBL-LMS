@@ -40,8 +40,10 @@ export async function POST(req: Request) {
     }
   }
   
-  // Delete the session token
+  // Delete all auth-related cookies
   res.cookies.delete(getJwtCookieName());
+  res.cookies.delete("auth_user_email");
+  res.cookies.delete("auth_user_name");
   
   return res;
 }
