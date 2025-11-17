@@ -386,9 +386,9 @@ export function RoleKPICard({
       />
       <div className="relative flex items-start justify-between gap-4">
         <div className="flex-1 space-y-3">
-          <p className="text-[0.7rem] font-semibold uppercase tracking-[0.35em] text-[color:var(--color-foreground-subtle)]">
+          <div className="text-[0.7rem] font-semibold uppercase tracking-[0.35em] text-[color:var(--color-foreground-subtle)]">
             {title}
-          </p>
+          </div>
           <div>
             <p className="text-3xl font-semibold text-foreground sm:text-4xl">
               {value}
