@@ -15,6 +15,8 @@ import {
   ChevronRight,
   LogOut,
   Sparkles,
+  Users,
+  BarChart3,
 } from 'lucide-react-native';
 
 export default function MoreScreen() {
@@ -58,6 +60,24 @@ export default function MoreScreen() {
           label: 'Settings',
           description: 'App preferences and security',
           onPress: () => router.push('/settings'),
+        },
+      ],
+    },
+    {
+      title: 'MANAGEMENT',
+      items: [
+        {
+          icon: Users,
+          label: 'User Management',
+          description: 'Manage users, roles, and permissions',
+          onPress: () => router.push('/admin/users'),
+          adminOnly: true,
+        },
+        {
+          icon: BarChart3,
+          label: 'Analytics Dashboard',
+          description: 'View leave reports and insights',
+          onPress: () => router.push('/reports'),
         },
       ],
     },

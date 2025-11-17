@@ -25,11 +25,14 @@ import {
   ChevronRight,
   Bell,
   BellOff,
+  User,
+  Lock,
+  Edit3,
 } from 'lucide-react-native';
 
 export default function SettingsScreen() {
   const { colors, isDark, mode, setMode } = useTheme();
-  const { logout, biometricEnabled, setBiometricEnabled } = useAuthStore();
+  const { user, logout, biometricEnabled, setBiometricEnabled } = useAuthStore();
   const { preferences, updatePreferences, isInitialized } = useNotifications();
   const [isTogglingBiometric, setIsTogglingBiometric] = useState(false);
 
@@ -124,6 +127,83 @@ export default function SettingsScreen() {
         >
           Customize your experience
         </Text>
+      </View>
+
+      {/* Profile Section */}
+      <View style={styles.section}>
+        <Text
+          style={[
+            styles.sectionTitle,
+            {
+              color:
+                'textSecondary' in colors
+                  ? colors.textSecondary
+                  : colors.onSurfaceVariant,
+            },
+          ]}
+        >
+          PROFILE
+        </Text>
+
+        <ThemedCard style={styles.card}>
+          <View style={styles.profileContainer}>
+            <View
+              style={[
+                styles.profileAvatar,
+                { backgroundColor: colors.primary + '20' },
+              ]}
+            >
+              <User size={32} color={colors.primary} />
+            </View>
+            <View style={styles.profileInfo}>
+              <Text
+                style={[
+                  styles.profileName,
+                  { color: 'text' in colors ? colors.text : colors.onSurface },
+                ]}
+              >
+                {user?.name || 'User'}
+              </Text>
+              <Text
+                style={[
+                  styles.profileEmail,
+                  {
+                    color:
+                      'textSecondary' in colors
+                        ? colors.textSecondary
+                        : colors.onSurfaceVariant,
+                  },
+                ]}
+              >
+                {user?.email || 'user@example.com'}
+              </Text>
+              {user?.department && (
+                <Text
+                  style={[
+                    styles.profileDepartment,
+                    {
+                      color:
+                        'textSecondary' in colors
+                          ? colors.textSecondary
+                          : colors.onSurfaceVariant,
+                    },
+                  ]}
+                >
+                  {user.department}
+                </Text>
+              )}
+            </View>
+            <TouchableOpacity
+              style={[
+                styles.editProfileButton,
+                { backgroundColor: colors.primary + '15' },
+              ]}
+              onPress={() => router.push('/profile')}
+            >
+              <Edit3 size={18} color={colors.primary} />
+            </TouchableOpacity>
+          </View>
+        </ThemedCard>
       </View>
 
       {/* Appearance Section */}
@@ -257,6 +337,58 @@ export default function SettingsScreen() {
               thumbColor={biometricEnabled ? colors.primary : '#FFFFFF'}
             />
           </View>
+
+          <View style={[styles.divider, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }]} />
+
+          {/* Change Password */}
+          <TouchableOpacity
+            style={styles.settingRow}
+            onPress={() =>
+              Alert.alert(
+                'Change Password',
+                'Password change feature coming soon! Please contact HR for password reset.',
+                [{ text: 'OK' }]
+              )
+            }
+          >
+            <View style={styles.settingInfo}>
+              <Lock
+                size={24}
+                color={'text' in colors ? colors.text : colors.onSurface}
+              />
+              <View style={styles.settingText}>
+                <Text
+                  style={[
+                    styles.settingTitle,
+                    { color: 'text' in colors ? colors.text : colors.onSurface },
+                  ]}
+                >
+                  Change Password
+                </Text>
+                <Text
+                  style={[
+                    styles.settingDescription,
+                    {
+                      color:
+                        'textSecondary' in colors
+                          ? colors.textSecondary
+                          : colors.onSurfaceVariant,
+                    },
+                  ]}
+                >
+                  Update your password
+                </Text>
+              </View>
+            </View>
+            <ChevronRight
+              size={20}
+              color={
+                'textSecondary' in colors
+                  ? colors.textSecondary
+                  : colors.onSurfaceVariant
+              }
+            />
+          </TouchableOpacity>
         </ThemedCard>
       </View>
 
@@ -496,14 +628,30 @@ export default function SettingsScreen() {
         </ThemedCard>
       </View>
 
-      {/* Logout Button */}
-      <View style={styles.logoutContainer}>
+      {/* Danger Zone - Logout Button */}
+      <View style={styles.section}>
+        <Text
+          style={[
+            styles.sectionTitle,
+            {
+              color: '#F44336',
+            },
+          ]}
+        >
+          DANGER ZONE
+        </Text>
+
         <ThemedButton
           variant="outline"
           onPress={handleLogout}
           style={[styles.logoutButton, { borderColor: '#F44336' }]}
         >
-          Logout
+          <View style={styles.logoutButtonContent}>
+            <LogOut size={20} color="#F44336" />
+            <Text style={[styles.logoutButtonText, { color: '#F44336' }]}>
+              Logout
+            </Text>
+          </View>
         </ThemedButton>
       </View>
 
@@ -627,11 +775,54 @@ const styles = StyleSheet.create({
     height: 1,
     marginVertical: 12,
   },
-  logoutContainer: {
-    marginTop: 24,
+  profileContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  profileAvatar: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  profileName: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  profileEmail: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+  profileDepartment: {
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  editProfileButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   logoutButton: {
     borderWidth: 2,
+    marginHorizontal: 20,
+  },
+  logoutButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  logoutButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
   },
   footer: {
     marginTop: 40,

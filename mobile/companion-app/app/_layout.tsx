@@ -60,6 +60,18 @@ function RootLayoutNav() {
         name="modal"
         options={{ presentation: "modal", title: "Modal" }}
       />
+      <Stack.Screen name="settings" options={{ headerShown: false }} />
+      <Stack.Screen name="profile" options={{ headerShown: false }} />
+      <Stack.Screen name="ai-assistant" options={{ headerShown: false }} />
+      <Stack.Screen name="approvals/index" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="admin/users/index"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="reports/index"
+        options={{ headerShown: false }}
+      />
     </Stack>
   );
 }
