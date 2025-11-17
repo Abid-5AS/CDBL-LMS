@@ -118,10 +118,17 @@ export function ModernEmployeeDashboard({
 
   // Scroll to specific section
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        const offset = 100; // Account for fixed header
+        const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({
+          top: elementPosition - offset,
+          behavior: "smooth",
+        });
+      }
+    }, 100);
   };
   const { allRows: leaves, isLoading: isLoadingLeaves } = useLeaveRequests({
     enableSelection: false,

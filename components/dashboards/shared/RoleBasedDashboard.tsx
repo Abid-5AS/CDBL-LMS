@@ -438,6 +438,8 @@ export function RoleKPICard({
         variants={itemVariants}
         whileHover={{ scale: 1.02 }}
         transition={{ duration: 0.2 }}
+        onClick={onClick}
+        style={{ cursor: onClick ? "pointer" : "default" }}
       >
         {content}
       </motion.div>
