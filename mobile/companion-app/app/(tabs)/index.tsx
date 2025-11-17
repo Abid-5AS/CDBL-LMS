@@ -417,12 +417,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 20,
+    padding: 16,
     paddingBottom: 100,
   },
   header: {
-    marginBottom: 24,
-    paddingTop: 20,
+    marginBottom: 20,
+    paddingTop: 16,
   },
   greeting: {
     fontSize: 16,
@@ -441,11 +441,11 @@ const styles = StyleSheet.create({
   statsGrid: {
     flexDirection: "row",
     gap: 12,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   statCard: {
     flex: 1,
-    padding: 16,
+    padding: 12,
     alignItems: "center",
   },
   statIcon: {
@@ -467,14 +467,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   card: {
-    marginBottom: 16,
+    marginBottom: 12,
     padding: 16,
   },
   cardHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: 12,
   },
   cardTitle: {
     fontSize: 20,
