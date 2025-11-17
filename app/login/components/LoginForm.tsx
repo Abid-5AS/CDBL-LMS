@@ -271,7 +271,7 @@ export function LoginForm() {
       const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, skipOtp }),
         credentials: "same-origin",
       });
 
@@ -294,8 +294,8 @@ export function LoginForm() {
         return;
       }
 
-      // Check if OTP is required (skip if testing toggle is enabled)
-      if (data.requiresOtp && !skipOtp) {
+      // Check if OTP is required
+      if (data.requiresOtp) {
         setShowOtpStep(true);
         setOtpExpiry(data.expiresIn || 600);
         toast.success("Verification code sent to your email!");
@@ -303,7 +303,7 @@ export function LoginForm() {
         return;
       }
 
-      // Direct login flow (when OTP is skipped or not required)
+      // Direct login flow (when OTP is skipped via testing mode)
       toast.success(
         "Login successful!" + (skipOtp ? " (OTP verification skipped)" : "")
       );

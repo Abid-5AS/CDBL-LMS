@@ -25,10 +25,13 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { email, password } = body;
+    const { email, password, skipOtp } = body;
 
     if (!email || !password) {
-      return NextResponse.json({ error: "Missing email or password" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing email or password" },
+        { status: 400 }
+      );
     }
 
     // Find user by email
@@ -37,7 +40,10 @@ export async function POST(req: Request) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Invalid email or password" },
+        { status: 401 }
+      );
     }
 
     // Check if user has a password set
@@ -52,7 +58,36 @@ export async function POST(req: Request) {
     const valid = await bcrypt.compare(password, user.password);
 
     if (!valid) {
-      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Invalid email or password" },
+        { status: 401 }
+      );
+    }
+
+    // Check if OTP should be skipped (testing mode)
+    if (skipOtp === true) {
+      // Direct login without OTP - create session cookies immediately
+      const res = NextResponse.json({
+        ok: true,
+        requiresOtp: false,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        },
+      });
+
+      // Set authentication cookies
+      res.cookies.set(
+        "session_token",
+        `session_${user.id}_${Date.now()}`,
+        COOKIE_OPTIONS
+      );
+      res.cookies.set("auth_user_email", user.email, COOKIE_OPTIONS);
+      res.cookies.set("auth_user_name", user.name, COOKIE_OPTIONS);
+
+      return res;
     }
 
     // Generate and send OTP code
@@ -86,6 +121,9 @@ export async function POST(req: Request) {
     }
   } catch (error) {
     console.error("login error", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
