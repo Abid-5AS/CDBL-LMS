@@ -209,14 +209,39 @@ function HRAdminDashboardClientImpl({
               </>
             ) : (
               <>
-                <RoleKPICard
-                  title="Employees on Leave"
-                  value={displayStats?.employeesOnLeave || 0}
-                  subtitle="Currently absent"
-                  icon={Users}
-                  role="HR_ADMIN"
-                  animate={true}
-                />
+                <div className="relative">
+                  <RoleKPICard
+                    title="Employees on Leave"
+                    value={displayStats?.employeesOnLeave || 0}
+                    subtitle="Currently absent today"
+                    icon={Users}
+                    role="HR_ADMIN"
+                    animate={true}
+                  />
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        aria-label="Information about employees on leave"
+                        className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+                      >
+                        <Info className="h-4 w-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs">
+                      <p className="text-sm font-semibold mb-1">
+                        What this shows:
+                      </p>
+                      <p className="text-sm mb-2">
+                        Number of employees who have approved leave today. Helps
+                        you track workforce availability and capacity.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Calculation: Counts leaves where today falls between
+                        start and end date with APPROVED status.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <div className="relative">
                   <RoleKPICard
                     title="Pending Requests"
@@ -245,10 +270,23 @@ function HRAdminDashboardClientImpl({
                       </button>
                     </TooltipTrigger>
                     <TooltipContent side="bottom" className="max-w-xs">
-                      <p className="text-sm">
-                        Leave requests awaiting YOUR action. This shows only
-                        requests in your personal approval queue, not
-                        organization-wide pending requests.
+                      <p className="text-sm font-semibold mb-1">
+                        What this shows:
+                      </p>
+                      <p className="text-sm mb-2">
+                        Leave requests awaiting YOUR action. This is your personal
+                        work queue - not organization-wide pending requests.
+                      </p>
+                      <p className="text-sm font-semibold mb-1">
+                        What to do:
+                      </p>
+                      <p className="text-sm mb-2">
+                        Review each request and Forward to DEPT_HEAD, Return for
+                        modification, or Reject if invalid.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Calculation: Counts approvals where you are the approver
+                        and decision is still PENDING.
                       </p>
                     </TooltipContent>
                   </Tooltip>
@@ -287,22 +325,68 @@ function HRAdminDashboardClientImpl({
                       </button>
                     </TooltipTrigger>
                     <TooltipContent side="bottom" className="max-w-xs">
-                      <p className="text-sm">
-                        Organization-wide average time (in days) from leave
-                        request submission to final approval/rejection across all
-                        approvers. Target is ≤3 days for optimal processing.
+                      <p className="text-sm font-semibold mb-1">
+                        What this shows:
+                      </p>
+                      <p className="text-sm mb-2">
+                        Organization-wide average time from submission to final
+                        decision. Shows overall system efficiency.
+                      </p>
+                      <p className="text-sm font-semibold mb-1">
+                        Why it matters:
+                      </p>
+                      <p className="text-sm mb-2">
+                        Target is ≤3 days. Longer times indicate bottlenecks in
+                        the approval chain and may frustrate employees.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Calculation: Average of (updatedAt - createdAt) for last
+                        100 processed requests in past 30 days.
                       </p>
                     </TooltipContent>
                   </Tooltip>
                 </div>
-                <RoleKPICard
-                  title="Total Leaves (YTD)"
-                  value={displayStats?.totalLeavesThisYear || 0}
-                  subtitle="This year"
-                  icon={Calendar}
-                  role="HR_ADMIN"
-                  animate={true}
-                />
+                <div className="relative">
+                  <RoleKPICard
+                    title="Total Leaves (YTD)"
+                    value={displayStats?.totalLeavesThisYear || 0}
+                    subtitle="Approved this year"
+                    icon={Calendar}
+                    role="HR_ADMIN"
+                    animate={true}
+                  />
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        aria-label="Information about total leaves"
+                        className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+                      >
+                        <Info className="h-4 w-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs">
+                      <p className="text-sm font-semibold mb-1">
+                        What this shows:
+                      </p>
+                      <p className="text-sm mb-2">
+                        Total number of approved leave requests this year. Helps
+                        track overall leave volume and trends.
+                      </p>
+                      <p className="text-sm font-semibold mb-1">
+                        Why it matters:
+                      </p>
+                      <p className="text-sm mb-2">
+                        Higher numbers may indicate seasonal patterns, high
+                        employee utilization of benefits, or potential
+                        understaffing concerns.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Calculation: Counts all APPROVED leaves where start date
+                        is in current year.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
               </>
             )}
           </ResponsiveDashboardGrid>
@@ -360,10 +444,23 @@ function HRAdminDashboardClientImpl({
                         </button>
                       </TooltipTrigger>
                       <TooltipContent side="bottom" className="max-w-xs">
-                        <p className="text-sm">
+                        <p className="text-sm font-semibold mb-1">
+                          What this shows:
+                        </p>
+                        <p className="text-sm mb-2">
                           Organization-wide count of leave requests approved or
-                          rejected today. Target of 10 requests per day is a
-                          general productivity metric, not a strict requirement.
+                          rejected today. Tracks daily processing momentum.
+                        </p>
+                        <p className="text-sm font-semibold mb-1">
+                          Why it matters:
+                        </p>
+                        <p className="text-sm mb-2">
+                          Target of 10 per day is a general productivity benchmark
+                          (not mandatory). Helps identify slow processing days.
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Calculation: Counts all requests with APPROVED or
+                          REJECTED status updated today, across all approvers.
                         </p>
                       </TooltipContent>
                     </Tooltip>
@@ -431,10 +528,24 @@ function HRAdminDashboardClientImpl({
                       </button>
                     </TooltipTrigger>
                     <TooltipContent side="bottom" className="max-w-xs">
-                      <p className="text-sm">
-                        Percentage of workforce currently available (not on
-                        leave). Calculated as 100% minus the average leave
-                        utilization ratio. Target: ≥85%.
+                      <p className="text-sm font-semibold mb-1">
+                        What this shows:
+                      </p>
+                      <p className="text-sm mb-2">
+                        Percentage of employees available for work today (not on
+                        approved leave). Real-time workforce capacity indicator.
+                      </p>
+                      <p className="text-sm font-semibold mb-1">
+                        Why it matters:
+                      </p>
+                      <p className="text-sm mb-2">
+                        Target: ≥85%. Below this means too many people are on
+                        leave, which may impact operations and require workload
+                        adjustments.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Calculation: (Total employees - On leave today) / Total
+                        employees × 100%.
                       </p>
                     </TooltipContent>
                   </Tooltip>
@@ -469,10 +580,26 @@ function HRAdminDashboardClientImpl({
                       </button>
                     </TooltipTrigger>
                     <TooltipContent side="bottom" className="max-w-xs">
-                      <p className="text-sm">
-                        Measures adherence to leave policies, including proper
-                        documentation, approval workflow compliance, and policy
-                        violations. Target: ≥90%.
+                      <p className="text-sm font-semibold mb-1">
+                        What this shows:
+                      </p>
+                      <p className="text-sm mb-2">
+                        Measures how well the organization follows leave policies
+                        - proper documentation, timely processing, and workflow
+                        adherence.
+                      </p>
+                      <p className="text-sm font-semibold mb-1">
+                        Why it matters:
+                      </p>
+                      <p className="text-sm mb-2">
+                        Target: ≥90%. Low scores indicate policy violations,
+                        documentation issues, or processing delays that need
+                        attention.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Note: Currently using placeholder value. Real calculation
+                        coming soon (on-time processing + documentation + policy
+                        adherence).
                       </p>
                     </TooltipContent>
                   </Tooltip>
