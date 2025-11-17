@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, useOptimistic, useTransition } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useOptimistic,
+  useTransition,
+} from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import useSWR, { mutate as globalMutate } from "swr";
 import { toast } from "sonner";
@@ -25,7 +32,11 @@ import {
 import { CheckCircle, FilterX, Loader2, XCircle } from "lucide-react";
 
 // Shared Components (barrel export)
-import { FilterBar, ApprovalActionButtons, EmptyState } from "@/components/shared";
+import {
+  FilterBar,
+  ApprovalActionButtons,
+  EmptyState,
+} from "@/components/shared";
 import type { ApprovalAction } from "@/components/shared";
 
 // Lib utilities (barrel export)
@@ -91,10 +102,18 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const initialViewMode = searchParams.get("view") === "history" ? "history" : "queue";
-  const initialHistoryDecision = (searchParams.get("decision") || "ALL").toUpperCase();
-  const validHistoryValues = ["ALL", ...HISTORY_STATUS_OPTIONS.map((opt) => opt.value)];
-  const [viewMode, setViewMode] = useState<"queue" | "history">(initialViewMode);
+  const initialViewMode =
+    searchParams.get("view") === "history" ? "history" : "queue";
+  const initialHistoryDecision = (
+    searchParams.get("decision") || "ALL"
+  ).toUpperCase();
+  const validHistoryValues = [
+    "ALL",
+    ...HISTORY_STATUS_OPTIONS.map((opt) => opt.value),
+  ];
+  const [viewMode, setViewMode] = useState<"queue" | "history">(
+    initialViewMode
+  );
   const [historyDecision, setHistoryDecision] = useState<HistoryDecision>(
     validHistoryValues.includes(initialHistoryDecision)
       ? (initialHistoryDecision as HistoryDecision)
@@ -240,16 +259,15 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   }, [items, onDataChange, viewMode]);
 
   // Open confirmation dialog for destructive actions
-  const openConfirmDialog = useCallback((
-    id: string,
-    action: "reject" | "return",
-    employeeName: string
-  ) => {
-    setDialogState({ type: action, itemId: id, employeeName });
-    if (action === "return") {
-      setReturnComment(""); // Reset comment field
-    }
-  }, []);
+  const openConfirmDialog = useCallback(
+    (id: string, action: "reject" | "return", employeeName: string) => {
+      setDialogState({ type: action, itemId: id, employeeName });
+      if (action === "return") {
+        setReturnComment(""); // Reset comment field
+      }
+    },
+    []
+  );
 
   // Close dialog and reset state
   const closeDialog = useCallback(() => {
@@ -258,125 +276,137 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   }, []);
 
   // Execute decision using Server Actions with useTransition
-  const executeDecision = useCallback(async (
-    id: string,
-    action: "approve" | "reject" | "forward" | "return",
-    comment?: string
-  ) => {
-    if (viewMode !== "queue") return;
+  const executeDecision = useCallback(
+    async (
+      id: string,
+      action: "approve" | "reject" | "forward" | "return",
+      comment?: string
+    ) => {
+      if (viewMode !== "queue") return;
 
-    // Wrap all state updates in startTransition
-    startTransition(() => {
-      // Instant UI update with useOptimistic
-      setOptimisticItems(id);
+      // Wrap all state updates in startTransition
+      startTransition(() => {
+        // Instant UI update with useOptimistic
+        setOptimisticItems(id);
 
-      // Remove from selection immediately
-      setSelectedIds((prev) => {
-        const next = new Set(prev);
-        next.delete(id);
-        return next;
+        // Remove from selection immediately
+        setSelectedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+
+        // Close dialog immediately
+        closeDialog();
       });
 
-      // Close dialog immediately
-      closeDialog();
-    });
+      // Execute Server Action
+      startTransition(async () => {
+        let result;
 
-    // Execute Server Action
-    startTransition(async () => {
-      let result;
+        try {
+          const numericId = Number(id);
 
-      try {
-        const numericId = Number(id);
-
-        if (action === "forward") {
-          result = await forwardLeaveRequest(numericId);
-          if (result.success) {
-            toast.success("Request forwarded successfully");
+          if (action === "forward") {
+            result = await forwardLeaveRequest(numericId);
+            if (result.success) {
+              toast.success("Request forwarded successfully");
+            }
+          } else if (action === "return") {
+            if (!comment || comment.length < 5) {
+              toast.error("Comment must be at least 5 characters");
+              // Revert optimistic update
+              await mutate();
+              return;
+            }
+            result = await returnLeaveForModification(numericId, comment);
+            if (result.success) {
+              toast.success("Request returned for modification");
+            }
+          } else if (action === "approve") {
+            result = await approveLeaveRequest(numericId, comment);
+            if (result.success) {
+              toast.success(SUCCESS_MESSAGES.leave_approved);
+            }
+          } else if (action === "reject") {
+            result = await rejectLeaveRequest(numericId, comment);
+            if (result.success) {
+              toast.success(SUCCESS_MESSAGES.leave_rejected);
+            }
           }
-        } else if (action === "return") {
-          if (!comment || comment.length < 5) {
-            toast.error("Comment must be at least 5 characters");
-            // Revert optimistic update
+
+          if (result && !result.success) {
+            toast.error(result.error || "Failed to update request");
+            // Revert optimistic update on error
             await mutate();
-            return;
           }
-          result = await returnLeaveForModification(numericId, comment);
-          if (result.success) {
-            toast.success("Request returned for modification");
-          }
-        } else if (action === "approve") {
-          result = await approveLeaveRequest(numericId, comment);
-          if (result.success) {
-            toast.success(SUCCESS_MESSAGES.leave_approved);
-          }
-        } else if (action === "reject") {
-          result = await rejectLeaveRequest(numericId, comment);
-          if (result.success) {
-            toast.success(SUCCESS_MESSAGES.leave_rejected);
-          }
-        }
 
-        if (result && !result.success) {
-          toast.error(result.error || "Failed to update request");
+          // Server Actions auto-revalidate via revalidatePath
+          // Refresh router cache for instant UI update
+          router.refresh();
+          // Also revalidate SWR cache for consistency
+          await mutate();
+        } catch (err) {
+          const message =
+            err instanceof Error
+              ? getToastMessage(err.message, err.message)
+              : getToastMessage("approval_failed", "Failed to update request");
+          toast.error(message);
+
           // Revert optimistic update on error
           await mutate();
         }
-
-        // Server Actions auto-revalidate via revalidatePath
-        // Refresh router cache for instant UI update
-        router.refresh();
-        // Also revalidate SWR cache for consistency
-        await mutate();
-      } catch (err) {
-        const message =
-          err instanceof Error
-            ? getToastMessage(err.message, err.message)
-            : getToastMessage("approval_failed", "Failed to update request");
-        toast.error(message);
-
-        // Revert optimistic update on error
-        await mutate();
-      }
-    });
-  }, [setOptimisticItems, closeDialog, startTransition, mutate, viewMode]);
+      });
+    },
+    [setOptimisticItems, closeDialog, startTransition, mutate, viewMode]
+  );
 
   // Handle decision routing - open dialog for destructive actions
-  const handleDecision = useCallback(async (
-    id: string,
-    action: "approve" | "reject" | "forward" | "return",
-    employeeName: string = "this employee"
-  ) => {
-    // Destructive actions require confirmation
-    if (action === "reject" || action === "return") {
-      openConfirmDialog(id, action, employeeName);
-      return;
-    }
-
-    // Non-destructive actions execute immediately
-    await executeDecision(id, action);
-  }, [openConfirmDialog, executeDecision]);
-
-  const handleSelectRow = useCallback((itemId: string, checked: boolean) => {
-    if (viewMode !== "queue") return;
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (checked) {
-        next.add(itemId);
-      } else {
-        next.delete(itemId);
+  const handleDecision = useCallback(
+    async (
+      id: string,
+      action: "approve" | "reject" | "forward" | "return",
+      employeeName: string = "this employee"
+    ) => {
+      // Destructive actions require confirmation
+      if (action === "reject" || action === "return") {
+        openConfirmDialog(id, action, employeeName);
+        return;
       }
-      return next;
-    });
-  }, [viewMode]);
 
-  const handleSelectAll = useCallback((checked: boolean) => {
-    if (viewMode !== "queue") return;
-    if (checked) {
-      setSelectedIds(new Set(items.map((item) => item.id)));
-    } else {
-      setSelectedIds(new Set());
-    }
-  }, [items, viewMode]);
+      // Non-destructive actions execute immediately
+      await executeDecision(id, action);
+    },
+    [openConfirmDialog, executeDecision]
+  );
+
+  const handleSelectRow = useCallback(
+    (itemId: string, checked: boolean) => {
+      if (viewMode !== "queue") return;
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        if (checked) {
+          next.add(itemId);
+        } else {
+          next.delete(itemId);
+        }
+        return next;
+      });
+    },
+    [viewMode]
+  );
+
+  const handleSelectAll = useCallback(
+    (checked: boolean) => {
+      if (viewMode !== "queue") return;
+      if (checked) {
+        setSelectedIds(new Set(items.map((item) => item.id)));
+      } else {
+        setSelectedIds(new Set());
+      }
+    },
+    [items, viewMode]
+  );
 
   const handleBulkApprove = useCallback(async () => {
     if (viewMode !== "queue") return;
@@ -425,7 +455,11 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
   const handleBulkReject = useCallback(async () => {
     if (viewMode !== "queue") return;
-    if (selectedIds.size === 0 || !bulkRejectReason.trim() || bulkRejectReason.trim().length < 5) {
+    if (
+      selectedIds.size === 0 ||
+      !bulkRejectReason.trim() ||
+      bulkRejectReason.trim().length < 5
+    ) {
       toast.error("Please provide a rejection reason (minimum 5 characters)");
       return;
     }
@@ -443,18 +477,24 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     startTransition(async () => {
       try {
         const ids = idsToReject.map(Number);
-        const result = await bulkRejectLeaveRequests(ids, bulkRejectReason.trim());
+        const result = await bulkRejectLeaveRequests(
+          ids,
+          bulkRejectReason.trim()
+        );
 
         if (result.success) {
           toast.success(
-            `Successfully rejected ${result.rejected} leave request${result.rejected > 1 ? "s" : ""}` +
-            (result.failed > 0 ? `. ${result.failed} failed.` : "")
+            `Successfully rejected ${result.rejected} leave request${
+              result.rejected > 1 ? "s" : ""
+            }` + (result.failed > 0 ? `. ${result.failed} failed.` : "")
           );
 
           // Revalidate data
           await mutate();
         } else {
-          toast.error(result.error || "Failed to reject selected leave requests");
+          toast.error(
+            result.error || "Failed to reject selected leave requests"
+          );
 
           // Revert optimistic update on error
           await mutate();
@@ -467,12 +507,23 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         await mutate();
       }
     });
-  }, [selectedIds, bulkRejectReason, setOptimisticItems, startTransition, mutate, viewMode]);
+  }, [
+    selectedIds,
+    bulkRejectReason,
+    setOptimisticItems,
+    startTransition,
+    mutate,
+    viewMode,
+  ]);
 
   const allSelected =
-    viewMode === "queue" && items.length > 0 && selectedIds.size === items.length;
+    viewMode === "queue" &&
+    items.length > 0 &&
+    selectedIds.size === items.length;
   const someSelected =
-    viewMode === "queue" && selectedIds.size > 0 && selectedIds.size < items.length;
+    viewMode === "queue" &&
+    selectedIds.size > 0 &&
+    selectedIds.size < items.length;
 
   if (isLoading) {
     return (
@@ -513,7 +564,11 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         <CardContent>
           <EmptyState
             icon={CheckCircle}
-            title={viewMode === "history" ? "No past approvals" : "No pending requests"}
+            title={
+              viewMode === "history"
+                ? "No past approvals"
+                : "No pending requests"
+            }
             description={
               viewMode === "history"
                 ? "You have not processed any approvals with the current filters."
@@ -571,7 +626,8 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         statusFilter={{
           value: statusFilterValue,
           onChange: handleStatusFilterChange,
-          options: viewMode === "history" ? HISTORY_STATUS_OPTIONS : STATUS_OPTIONS,
+          options:
+            viewMode === "history" ? HISTORY_STATUS_OPTIONS : STATUS_OPTIONS,
         }}
         typeFilter={{
           value: typeFilter,
@@ -583,7 +639,12 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
       {/* Bulk Actions Bar */}
       {viewMode === "queue" && selectedIds.size > 0 && (
-        <Card className={cn(glassCard.elevated, "rounded-2xl bg-primary/5 border-primary/20")}>
+        <Card
+          className={cn(
+            glassCard.elevated,
+            "rounded-2xl bg-primary/5 border-primary/20"
+          )}
+        >
           <CardContent className="flex items-center justify-between py-3">
             <div className="flex items-center gap-2">
               <Checkbox
@@ -592,7 +653,8 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                 className="data-[state=checked]:bg-primary"
               />
               <span className="text-sm font-medium">
-                {selectedIds.size} leave request{selectedIds.size > 1 ? "s" : ""} selected
+                {selectedIds.size} leave request
+                {selectedIds.size > 1 ? "s" : ""} selected
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -643,7 +705,11 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
           <CardContent>
             <EmptyState
               icon={FilterX}
-              title={viewMode === "history" ? "No matching decisions" : "No matching requests"}
+              title={
+                viewMode === "history"
+                  ? "No matching decisions"
+                  : "No matching requests"
+              }
               description={
                 viewMode === "history"
                   ? "No past approvals match your current filters. Adjust the status or search term."
@@ -658,164 +724,186 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
           </CardContent>
         </Card>
       ) : (
-            <ModernTable>
-              <ModernTable.Header>
-                <ModernTable.Row>
-                  {viewMode === "queue" && (
-                    <ModernTable.Head className="w-12">
-                      <Checkbox
-                        checked={allSelected}
-                        onCheckedChange={(checked) =>
-                          handleSelectAll(checked === true)
-                        }
-                        aria-label="Select all rows"
-                        className={
-                          someSelected
-                            ? "data-[state=checked]:bg-card-action"
-                            : ""
-                        }
-                      />
-                    </ModernTable.Head>
+        <ModernTable>
+          <ModernTable.Header>
+            <ModernTable.Row>
+              {viewMode === "queue" && (
+                <ModernTable.Head className="w-12">
+                  <Checkbox
+                    checked={allSelected}
+                    onCheckedChange={(checked) =>
+                      handleSelectAll(checked === true)
+                    }
+                    aria-label="Select all rows"
+                    className={
+                      someSelected ? "data-[state=checked]:bg-card-action" : ""
+                    }
+                  />
+                </ModernTable.Head>
+              )}
+              <ModernTable.Head>Employee</ModernTable.Head>
+              <ModernTable.Head>Type</ModernTable.Head>
+              <ModernTable.Head>Dates</ModernTable.Head>
+              <ModernTable.Head>Days</ModernTable.Head>
+              <ModernTable.Head>Reason</ModernTable.Head>
+              {viewMode === "queue" ? (
+                <>
+                  <ModernTable.Head>Stage</ModernTable.Head>
+                  <ModernTable.Head className="text-right">
+                    Actions
+                  </ModernTable.Head>
+                </>
+              ) : (
+                <>
+                  <ModernTable.Head>Decision</ModernTable.Head>
+                  <ModernTable.Head>Processed On</ModernTable.Head>
+                </>
+              )}
+            </ModernTable.Row>
+          </ModernTable.Header>
+          <ModernTable.Body>
+            {items.map((item) => {
+              const start = formatDate(item.start);
+              const end = formatDate(item.end);
+              const stage =
+                item.approvals?.[item.currentStageIndex]?.status ?? item.status;
+              const decisionMeta = item.approvals?.[0];
+              return (
+                <ModernTable.Row
+                  key={item.id}
+                  className={clsx(
+                    "cursor-pointer transition",
+                    statusStyle(item.status),
+                    selectedIds.has(item.id) &&
+                      "bg-card-action dark:bg-card-action/20"
                   )}
-                  <ModernTable.Head>Employee</ModernTable.Head>
-                  <ModernTable.Head>Type</ModernTable.Head>
-                  <ModernTable.Head>Dates</ModernTable.Head>
-                  <ModernTable.Head>Days</ModernTable.Head>
-                  <ModernTable.Head>Reason</ModernTable.Head>
+                  onClick={(e) => {
+                    // Don't trigger onSelect if clicking on checkbox
+                    if (
+                      !(e.target as HTMLElement).closest(
+                        'input[type="checkbox"]'
+                      )
+                    ) {
+                      onSelect?.(item);
+                    }
+                  }}
+                >
+                  {viewMode === "queue" && (
+                    <ModernTable.Cell>
+                      <Checkbox
+                        checked={selectedIds.has(item.id)}
+                        onCheckedChange={(checked) =>
+                          handleSelectRow(item.id, checked === true)
+                        }
+                        onClick={(e) => e.stopPropagation()}
+                        aria-label={`Select row ${item.id}`}
+                      />
+                    </ModernTable.Cell>
+                  )}
+                  <ModernTable.Cell>
+                    <div className="font-medium text-text-primary">
+                      {item.requestedByName}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {item.requestedByEmail ?? "—"}
+                    </div>
+                  </ModernTable.Cell>
+                  <ModernTable.Cell className="text-sm text-text-secondary">
+                    {leaveTypeLabel[item.type] ?? item.type}
+                  </ModernTable.Cell>
+                  <ModernTable.Cell className="text-sm text-text-secondary">
+                    <div>{start}</div>
+                    {start !== end && (
+                      <div className="text-xs text-muted-foreground">
+                        to {end}
+                      </div>
+                    )}
+                  </ModernTable.Cell>
+                  <ModernTable.Cell className="text-sm text-text-secondary">
+                    {item.requestedDays}
+                  </ModernTable.Cell>
+                  <ModernTable.Cell className="max-w-xs text-sm text-text-secondary">
+                    <p className="whitespace-pre-wrap wrap-break-word">
+                      {item.reason}
+                    </p>
+                  </ModernTable.Cell>
                   {viewMode === "queue" ? (
                     <>
-                      <ModernTable.Head>Stage</ModernTable.Head>
-                      <ModernTable.Head className="text-right">
-                        Actions
-                      </ModernTable.Head>
+                      <ModernTable.Cell className="text-sm font-medium capitalize text-text-secondary">
+                        {stage.toLowerCase()}
+                      </ModernTable.Cell>
+                      <ModernTable.Cell className="text-right">
+                        <div
+                          className="flex justify-end"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <ApprovalActionButtons
+                            ceoMode={
+                              userRole === "CEO" || userRole === "HR_HEAD"
+                            }
+                            onForward={
+                              userRole === "HR_ADMIN" ||
+                              userRole === "DEPT_HEAD"
+                                ? () =>
+                                    handleDecision(
+                                      item.id,
+                                      "forward",
+                                      item.requestedByName || undefined
+                                    )
+                                : undefined
+                            }
+                            onReturn={
+                              userRole === "HR_ADMIN" ||
+                              userRole === "DEPT_HEAD"
+                                ? () =>
+                                    handleDecision(
+                                      item.id,
+                                      "return",
+                                      item.requestedByName || undefined
+                                    )
+                                : undefined
+                            }
+                            onCancel={() =>
+                              handleDecision(
+                                item.id,
+                                "reject",
+                                item.requestedByName || undefined
+                              )
+                            }
+                            onApprove={
+                              userRole === "CEO" || userRole === "HR_HEAD"
+                                ? () =>
+                                    handleDecision(
+                                      item.id,
+                                      "approve",
+                                      item.requestedByName || undefined
+                                    )
+                                : undefined
+                            }
+                            disabled={isPending}
+                            loading={isPending}
+                            loadingAction={null}
+                          />
+                        </div>
+                      </ModernTable.Cell>
                     </>
                   ) : (
                     <>
-                      <ModernTable.Head>Decision</ModernTable.Head>
-                      <ModernTable.Head>Processed On</ModernTable.Head>
+                      <ModernTable.Cell className="text-sm font-semibold capitalize text-text-secondary">
+                        {item.status.toLowerCase()}
+                      </ModernTable.Cell>
+                      <ModernTable.Cell className="text-sm text-text-secondary">
+                        {decisionMeta?.decidedAt
+                          ? formatDate(decisionMeta.decidedAt)
+                          : "—"}
+                      </ModernTable.Cell>
                     </>
                   )}
                 </ModernTable.Row>
-              </ModernTable.Header>
-              <ModernTable.Body>
-                {items.map((item) => {
-                  const start = formatDate(item.start);
-                  const end = formatDate(item.end);
-                  const stage =
-                    item.approvals?.[item.currentStageIndex]?.status ??
-                    item.status;
-                  const decisionMeta = item.approvals?.[0];
-                  return (
-                    <ModernTable.Row
-                      key={item.id}
-                      className={clsx(
-                        "cursor-pointer transition",
-                        statusStyle(item.status),
-                        selectedIds.has(item.id) &&
-                          "bg-card-action dark:bg-card-action/20"
-                      )}
-                      onClick={(e) => {
-                        // Don't trigger onSelect if clicking on checkbox
-                        if (
-                          !(e.target as HTMLElement).closest(
-                            'input[type="checkbox"]'
-                          )
-                        ) {
-                          onSelect?.(item);
-                        }
-                      }}
-                    >
-                      {viewMode === "queue" && (
-                        <ModernTable.Cell>
-                          <Checkbox
-                            checked={selectedIds.has(item.id)}
-                            onCheckedChange={(checked) =>
-                              handleSelectRow(item.id, checked === true)
-                            }
-                            onClick={(e) => e.stopPropagation()}
-                            aria-label={`Select row ${item.id}`}
-                          />
-                        </ModernTable.Cell>
-                      )}
-                      <ModernTable.Cell>
-                        <div className="font-medium text-text-primary">
-                          {item.requestedByName}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {item.requestedByEmail ?? "—"}
-                        </div>
-                      </ModernTable.Cell>
-                      <ModernTable.Cell className="text-sm text-text-secondary">
-                        {leaveTypeLabel[item.type] ?? item.type}
-                      </ModernTable.Cell>
-                      <ModernTable.Cell className="text-sm text-text-secondary">
-                        <div>{start}</div>
-                        {start !== end && (
-                          <div className="text-xs text-muted-foreground">
-                            to {end}
-                          </div>
-                        )}
-                      </ModernTable.Cell>
-                      <ModernTable.Cell className="text-sm text-text-secondary">
-                        {item.requestedDays}
-                      </ModernTable.Cell>
-                      <ModernTable.Cell className="max-w-xs text-sm text-text-secondary">
-                        <p className="whitespace-pre-wrap wrap-break-word">
-                          {item.reason}
-                        </p>
-                      </ModernTable.Cell>
-                      {viewMode === "queue" ? (
-                        <>
-                          <ModernTable.Cell className="text-sm font-medium capitalize text-text-secondary">
-                            {stage.toLowerCase()}
-                          </ModernTable.Cell>
-                          <ModernTable.Cell className="text-right">
-                            <div
-                              className="flex justify-end"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <ApprovalActionButtons
-                                ceoMode={userRole === "CEO" || userRole === "HR_HEAD"}
-                                onForward={
-                                  userRole === "HR_ADMIN" || userRole === "DEPT_HEAD"
-                                    ? () => handleDecision(item.id, "forward", item.requestedByName || undefined)
-                                    : undefined
-                                }
-                                onReturn={
-                                  userRole === "HR_ADMIN" || userRole === "DEPT_HEAD"
-                                    ? () => handleDecision(item.id, "return", item.requestedByName || undefined)
-                                    : undefined
-                                }
-                                onCancel={() => handleDecision(item.id, "reject", item.requestedByName || undefined)}
-                                onApprove={
-                                  userRole === "CEO" || userRole === "HR_HEAD"
-                                    ? () => handleDecision(item.id, "approve", item.requestedByName || undefined)
-                                    : undefined
-                                }
-                                disabled={isPending}
-                                loading={isPending}
-                                loadingAction={null}
-                              />
-                            </div>
-                          </ModernTable.Cell>
-                        </>
-                      ) : (
-                        <>
-                          <ModernTable.Cell className="text-sm font-semibold capitalize text-text-secondary">
-                            {item.status.toLowerCase()}
-                          </ModernTable.Cell>
-                          <ModernTable.Cell className="text-sm text-text-secondary">
-                            {decisionMeta?.decidedAt
-                              ? formatDate(decisionMeta.decidedAt)
-                              : "—"}
-                          </ModernTable.Cell>
-                        </>
-                      )}
-                    </ModernTable.Row>
-                  );
-                })}
-              </ModernTable.Body>
-            </ModernTable>
+              );
+            })}
+          </ModernTable.Body>
+        </ModernTable>
       )}
       {items.length !== displayedItems.length && displayedItems.length > 0 && (
         <p className="text-sm text-muted-foreground text-center">
@@ -834,12 +922,15 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
             <AlertDialogTitle>Reject Leave Request?</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to reject the leave request from{" "}
-              <strong>{dialogState.employeeName}</strong>? This action cannot be undone,
-              and the employee will be notified of the rejection.
+              <strong>{dialogState.employeeName}</strong>? This action cannot be
+              undone, and the employee will be notified of the rejection.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={closeDialog} className={neoButton.glass}>
+            <AlertDialogCancel
+              onClick={closeDialog}
+              className={neoButton.glass}
+            >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
@@ -848,7 +939,10 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                   executeDecision(dialogState.itemId, "reject");
                 }
               }}
-              className={cn(neoButton.danger, "bg-destructive text-destructive-foreground hover:bg-destructive/90")}
+              className={cn(
+                neoButton.danger,
+                "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              )}
             >
               Reject Request
             </AlertDialogAction>
@@ -897,7 +991,10 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
             )}
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={closeDialog} className={neoButton.glass}>
+            <AlertDialogCancel
+              onClick={closeDialog}
+              className={neoButton.glass}
+            >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
@@ -929,9 +1026,10 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Bulk Reject Leave Requests?</AlertDialogTitle>
             <AlertDialogDescription>
-              You are about to reject <strong>{selectedIds.size}</strong> leave request
-              {selectedIds.size > 1 ? "s" : ""}. This action cannot be undone, and all
-              affected employees will be notified.
+              You are about to reject <strong>{selectedIds.size}</strong> leave
+              request
+              {selectedIds.size > 1 ? "s" : ""}. This action cannot be undone,
+              and all affected employees will be notified.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-4">
@@ -966,7 +1064,9 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
             <AlertDialogAction
               onClick={handleBulkReject}
               className="bg-red-600 hover:bg-red-700 text-white"
-              disabled={!bulkRejectReason.trim() || bulkRejectReason.trim().length < 5}
+              disabled={
+                !bulkRejectReason.trim() || bulkRejectReason.trim().length < 5
+              }
             >
               Reject All Selected
             </AlertDialogAction>
