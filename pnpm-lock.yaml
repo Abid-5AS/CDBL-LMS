@@ -24,7 +24,7 @@ importers:
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.66.0(react@19.2.0))
       '@prisma/client':
-        specifier: ^6.17.1
+        specifier: 6.19.0
         version: 6.19.0(prisma@6.19.0(typescript@5.9.3))(typescript@5.9.3)
       '@radix-ui/react-accordion':
         specifier: ^1.2.12
@@ -235,7 +235,7 @@ importers:
         specifier: ^0.2.1
         version: 0.2.6(@swc/helpers@0.5.17)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
       prisma:
-        specifier: ^6.17.1
+        specifier: 6.19.0
         version: 6.19.0(typescript@5.9.3)
       shadcn:
         specifier: ^3.5.0

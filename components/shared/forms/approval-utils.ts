@@ -1,9 +1,8 @@
-import { APPROVAL_CHAIN } from "@/lib/workflow";
 import { formatDate } from "@/lib/utils";
 
 type ApprovalRecord = {
   step?: number;
-  approver?: string | { name: string | null } | null;
+  approver?: string | { name: string | null; role?: string } | null;
   decision: string;
   comment?: string | null;
   decidedAt?: string | null;
@@ -11,16 +10,32 @@ type ApprovalRecord = {
 };
 
 /**
+ * Get workflow stages based on requester role
+ */
+function getWorkflowStages(requesterRole?: string): string[] {
+  if (requesterRole === "DEPT_HEAD") {
+    return ["Submitted", "HR Admin", "HR Head", "CEO"];
+  }
+  // Default for regular employees
+  return ["Submitted", "HR Admin", "HR Head", "Dept Head"];
+}
+
+/**
  * Calculate the current stage index for the approval stepper
- * Returns 0-4: 0=Submitted, 1=HR Admin, 2=Dept Head, 3=HR Head, 4=CEO
+ * Updated for new workflow: Employee → HR_ADMIN → HR_HEAD → DEPT_HEAD
+ *                           Dept Head → HR_ADMIN → HR_HEAD → CEO
  */
 export function calculateCurrentStageIndex(
   approvals: ApprovalRecord[],
-  status?: string
+  status?: string,
+  requesterRole?: string
 ): number {
-  // If final status, we're at the last stage (CEO = index 4)
+  const stages = getWorkflowStages(requesterRole);
+  const maxIndex = stages.length - 1;
+
+  // If final status, we're at the last stage
   if (status === "APPROVED" || status === "REJECTED" || status === "CANCELLED") {
-    return 4;
+    return maxIndex;
   }
 
   // Find all completed steps (APPROVED or FORWARDED)
@@ -35,28 +50,28 @@ export function calculateCurrentStageIndex(
   }
 
   const highestStep = completedSteps[0];
-  
+
   // Check if the highest step was approved (final approval at any stage)
   const highestApproval = approvals.find((a) => a.step === highestStep);
   if (highestApproval?.decision === "APPROVED") {
-    // Approved at this stage means we're done (all approvals complete)
-    return 4;
+    // Approved at this stage means we're done
+    return maxIndex;
   }
 
   // If highest step was FORWARDED, the next step is current
-  // Step 1 (HR Admin) -> index 2 (Dept Head)
-  // Step 2 (Dept Head) -> index 3 (HR Head)
-  // Step 3 (HR Head) -> index 4 (CEO)
-  return Math.min(highestStep + 1, 4);
+  // Step corresponds to index in workflow (step 1 = index 1, step 2 = index 2, etc.)
+  return Math.min(highestStep + 1, maxIndex);
 }
 
 /**
  * Get the next approver role based on current stage
  */
-export function getNextApproverRole(currentIndex: number): string | null {
-  if (currentIndex >= 4) return null; // At CEO or beyond
-  
-  const roles = ["HR Admin", "Dept Head", "HR Head", "CEO"];
+export function getNextApproverRole(currentIndex: number, requesterRole?: string): string | null {
+  const stages = getWorkflowStages(requesterRole);
+  if (currentIndex >= stages.length - 1) return null; // At last stage
+
+  // Skip "Submitted" at index 0, roles start at index 1
+  const roles = stages.slice(1); // ["HR Admin", "HR Head", "Dept Head"] or ["HR Admin", "HR Head", "CEO"]
   return roles[currentIndex] || null;
 }
 

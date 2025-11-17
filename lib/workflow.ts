@@ -2,25 +2,31 @@ import type { AppRole } from "./rbac";
 import type { LeaveType } from "@prisma/client";
 
 /**
- * Per-type approval chains as per Policy 6.10 and Master Specification
- * All leave types follow the full approval chain: HR_ADMIN → DEPT_HEAD → HR_HEAD → CEO
- * Policy 6.10(d) exception for CL refers to form/notice requirements, NOT workflow reduction
- * Clarified 2025-11-14: CL uses FULL chain for audit compliance and CEO final approval
+ * Per-type approval chains - Updated 2025-11-17
+ * New approval flow: Employee → HR_ADMIN → HR_HEAD → DEPT_HEAD (final approval for employees)
+ * Special case: DEPT_HEAD → HR_ADMIN → HR_HEAD → CEO (when dept head applies for leave)
+ * All cancellation requests (including partial) follow the same approval flow
  */
 export const WORKFLOW_CHAINS: Record<LeaveType | "DEFAULT", AppRole[]> = {
-  DEFAULT: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"], // Default chain for EL, ML, etc.
-  EARNED: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
-  CASUAL: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"], // CL uses full chain (clarified 2025-11-14)
-  MEDICAL: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
-  EXTRAWITHPAY: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
-  EXTRAWITHOUTPAY: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
-  MATERNITY: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
-  PATERNITY: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
-  STUDY: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
-  SPECIAL_DISABILITY: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
-  QUARANTINE: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"],
-  SPECIAL: ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"], // EL overflow >60 days (Policy 6.19.c)
+  DEFAULT: ["HR_ADMIN", "HR_HEAD", "DEPT_HEAD"], // Default chain for regular employees
+  EARNED: ["HR_ADMIN", "HR_HEAD", "DEPT_HEAD"],
+  CASUAL: ["HR_ADMIN", "HR_HEAD", "DEPT_HEAD"],
+  MEDICAL: ["HR_ADMIN", "HR_HEAD", "DEPT_HEAD"],
+  EXTRAWITHPAY: ["HR_ADMIN", "HR_HEAD", "DEPT_HEAD"],
+  EXTRAWITHOUTPAY: ["HR_ADMIN", "HR_HEAD", "DEPT_HEAD"],
+  MATERNITY: ["HR_ADMIN", "HR_HEAD", "DEPT_HEAD"],
+  PATERNITY: ["HR_ADMIN", "HR_HEAD", "DEPT_HEAD"],
+  STUDY: ["HR_ADMIN", "HR_HEAD", "DEPT_HEAD"],
+  SPECIAL_DISABILITY: ["HR_ADMIN", "HR_HEAD", "DEPT_HEAD"],
+  QUARANTINE: ["HR_ADMIN", "HR_HEAD", "DEPT_HEAD"],
+  SPECIAL: ["HR_ADMIN", "HR_HEAD", "DEPT_HEAD"], // EL overflow >60 days (Policy 6.19.c)
 };
+
+/**
+ * Approval chain for department heads applying for leave
+ * Dept Head → HR_ADMIN → HR_HEAD → CEO (final approval)
+ */
+export const DEPT_HEAD_WORKFLOW_CHAIN: AppRole[] = ["HR_ADMIN", "HR_HEAD", "CEO"];
 
 /**
  * Legacy APPROVAL_CHAIN for backward compatibility
@@ -33,17 +39,29 @@ export type LeaveStatus = "DRAFT" | "SUBMITTED" | "PENDING" | "APPROVED" | "REJE
 export type ApprovalAction = "FORWARD" | "APPROVE" | "REJECT" | "RETURN";
 
 /**
- * Get the approval chain for a specific leave type
+ * Get the approval chain for a specific leave type and requester role
+ * @param type - The leave type
+ * @param requesterRole - The role of the person requesting leave (optional)
+ * @returns The appropriate approval chain
  */
-export function getChainFor(type: LeaveType): AppRole[] {
+export function getChainFor(type: LeaveType, requesterRole?: AppRole): AppRole[] {
+  // Special case: If dept head is applying for leave, use CEO approval chain
+  if (requesterRole === "DEPT_HEAD") {
+    return DEPT_HEAD_WORKFLOW_CHAIN;
+  }
+
   return WORKFLOW_CHAINS[type] ?? WORKFLOW_CHAINS.DEFAULT;
 }
 
 /**
  * Get the next role in the approval chain after the current role for a specific leave type
+ * @param currentRole - The current approver's role
+ * @param type - The leave type (optional)
+ * @param requesterRole - The role of the person requesting leave (optional)
+ * @returns The next role in the chain, or null if at the end
  */
-export function getNextRoleInChain(currentRole: AppRole, type?: LeaveType): AppRole | null {
-  const chain = type ? getChainFor(type) : APPROVAL_CHAIN;
+export function getNextRoleInChain(currentRole: AppRole, type?: LeaveType, requesterRole?: AppRole): AppRole | null {
+  const chain = type ? getChainFor(type, requesterRole) : APPROVAL_CHAIN;
   const currentIndex = chain.indexOf(currentRole);
   if (currentIndex === -1 || currentIndex >= chain.length - 1) {
     return null; // No next role (current role is last or not in chain)
@@ -53,18 +71,26 @@ export function getNextRoleInChain(currentRole: AppRole, type?: LeaveType): AppR
 
 /**
  * Get the step number for a role in the approval chain for a specific leave type
+ * @param role - The role to check
+ * @param type - The leave type (optional)
+ * @param requesterRole - The role of the person requesting leave (optional)
+ * @returns The step number (1-indexed), or 0 if not in chain
  */
-export function getStepForRole(role: AppRole, type?: LeaveType): number {
-  const chain = type ? getChainFor(type) : APPROVAL_CHAIN;
+export function getStepForRole(role: AppRole, type?: LeaveType, requesterRole?: AppRole): number {
+  const chain = type ? getChainFor(type, requesterRole) : APPROVAL_CHAIN;
   const index = chain.indexOf(role);
   return index === -1 ? 0 : index + 1; // Steps are 1-indexed
 }
 
 /**
  * Check if a role is the final approver in the chain for a specific leave type
+ * @param role - The role to check
+ * @param type - The leave type
+ * @param requesterRole - The role of the person requesting leave (optional)
+ * @returns True if this role is the final approver
  */
-export function isFinalApprover(role: AppRole, type: LeaveType): boolean {
-  const chain = getChainFor(type);
+export function isFinalApprover(role: AppRole, type: LeaveType, requesterRole?: AppRole): boolean {
+  const chain = getChainFor(type, requesterRole);
   return chain.length > 0 && chain[chain.length - 1] === role;
 }
 
@@ -73,13 +99,17 @@ export function isFinalApprover(role: AppRole, type: LeaveType): boolean {
  * Rules:
  * - FORWARD: Allowed if not final approver (intermediate steps)
  * - APPROVE/REJECT: Allowed only if final approver
+ * @param role - The role to check
+ * @param action - The action to perform
+ * @param type - The leave type (optional)
+ * @param requesterRole - The role of the person requesting leave (optional)
  */
-export function canPerformAction(role: AppRole, action: ApprovalAction, type?: LeaveType): boolean {
+export function canPerformAction(role: AppRole, action: ApprovalAction, type?: LeaveType, requesterRole?: AppRole): boolean {
   // If type is provided, use per-type chain logic
   if (type) {
-    const chain = getChainFor(type);
+    const chain = getChainFor(type, requesterRole);
     const isFinal = chain.length > 0 && chain[chain.length - 1] === role;
-    
+
     switch (action) {
       case "FORWARD":
         return !isFinal && chain.includes(role); // Can forward if not final
@@ -93,15 +123,16 @@ export function canPerformAction(role: AppRole, action: ApprovalAction, type?: L
         return false;
     }
   }
-  
+
   // Fallback to legacy logic for backward compatibility
   switch (action) {
     case "FORWARD":
-      return role === "HR_ADMIN" || role === "DEPT_HEAD";
+      return role === "HR_ADMIN" || role === "HR_HEAD";
     case "APPROVE":
     case "REJECT":
-      // HR_ADMIN removed from approve/reject (moved to HR_HEAD/CEO)
-      return role === "HR_HEAD" || role === "CEO" || role === "SYSTEM_ADMIN";
+      // Updated: DEPT_HEAD can now approve/reject as final approver
+      // CEO can approve/reject for dept head leave requests
+      return role === "DEPT_HEAD" || role === "CEO" || role === "SYSTEM_ADMIN";
     case "RETURN":
       // HR_ADMIN can return requests for modification
       return role === "HR_ADMIN" || role === "HR_HEAD" || role === "CEO" || role === "DEPT_HEAD" || role === "SYSTEM_ADMIN";
@@ -112,9 +143,13 @@ export function canPerformAction(role: AppRole, action: ApprovalAction, type?: L
 
 /**
  * Check if a role can forward to a target role (must be next in chain for the leave type)
+ * @param actorRole - The role doing the forwarding
+ * @param targetRole - The target role to forward to
+ * @param type - The leave type (optional)
+ * @param requesterRole - The role of the person requesting leave (optional)
  */
-export function canForwardTo(actorRole: AppRole, targetRole: AppRole, type?: LeaveType): boolean {
-  const nextRole = getNextRoleInChain(actorRole, type);
+export function canForwardTo(actorRole: AppRole, targetRole: AppRole, type?: LeaveType, requesterRole?: AppRole): boolean {
+  const nextRole = getNextRoleInChain(actorRole, type, requesterRole);
   return nextRole === targetRole;
 }
 

@@ -153,19 +153,18 @@ export class LeaveService {
       });
 
       // 8. Create initial approval record
-      const approverRole = this.getInitialApproverRole(dto.type, user.role);
-      if (approverRole) {
-        const approver = await this.findApprover(userId, approverRole);
-        if (approver) {
-          await prisma.approval.create({
-            data: {
-              leaveId: leaveRequest.id,
-              approverId: approver.id,
-              step: 1,
-              decision: ApprovalDecision.PENDING,
-            },
-          });
-        }
+      // First approver is always HR_ADMIN (step 1)
+      const approverRole = "HR_ADMIN";
+      const approver = await this.findApprover(userId, approverRole);
+      if (approver) {
+        await prisma.approval.create({
+          data: {
+            leaveId: leaveRequest.id,
+            approverId: approver.id,
+            step: 1,
+            decision: ApprovalDecision.PENDING,
+          },
+        });
       }
 
       // 9. Log the creation
@@ -588,17 +587,6 @@ export class LeaveService {
     }
   }
 
-  private static getInitialApproverRole(
-    leaveType: LeaveType,
-    userRole: string
-  ): string | null {
-    // For all employees, first approver is HR_ADMIN per the approval chain:
-    // Employee → HR_ADMIN → DEPT_HEAD → HR_HEAD → CEO
-    if (userRole === "EMPLOYEE") {
-      return "HR_ADMIN";
-    }
-    return null;
-  }
 
   private static async findApprover(
     userId: number,
@@ -626,14 +614,39 @@ export class LeaveService {
   }
 
   private static async isFinalApproval(leaveId: number): Promise<boolean> {
-    const pendingApprovals = await prisma.approval.count({
-      where: {
-        leaveId: leaveId,
-        decision: ApprovalDecision.PENDING,
+    // Get the leave request with requester info
+    const leave = await prisma.leaveRequest.findUnique({
+      where: { id: leaveId },
+      include: {
+        requester: { select: { role: true } },
+        approvals: {
+          include: {
+            approver: { select: { role: true } },
+          },
+          orderBy: { step: 'desc' },
+        },
       },
     });
 
-    return pendingApprovals === 0;
+    if (!leave) {
+      return false;
+    }
+
+    // Get the appropriate workflow chain based on requester role
+    const { getChainFor } = await import('@/lib/workflow');
+    const chain = getChainFor(leave.type, leave.requester.role as any);
+
+    // Check if we have an approval from the final approver in the chain
+    const finalRole = chain[chain.length - 1];
+
+    // Find if there's an approved approval from the final approver
+    const finalApproval = leave.approvals.find(
+      (approval) =>
+        approval.approver.role === finalRole &&
+        approval.decision === 'APPROVED'
+    );
+
+    return !!finalApproval;
   }
 
   private static async getCurrentStep(leaveId: number): Promise<number> {
@@ -649,8 +662,46 @@ export class LeaveService {
   private static async getNextApprover(
     leave: any
   ): Promise<{ id: number; role: string } | null> {
-    // Simplified - would use workflow strategies in production
-    const nextRole = "HR_HEAD"; // This should come from workflow strategy
+    // Get requester to determine the workflow chain
+    const requester = await prisma.user.findUnique({
+      where: { id: leave.requesterId },
+      select: { role: true },
+    });
+
+    if (!requester) {
+      return null;
+    }
+
+    // Get current approval step
+    const currentApproval = await prisma.approval.findFirst({
+      where: {
+        leaveId: leave.id,
+        decision: ApprovalDecision.PENDING,
+      },
+      orderBy: { step: 'desc' },
+      include: {
+        approver: { select: { role: true } },
+      },
+    });
+
+    if (!currentApproval) {
+      return null;
+    }
+
+    // Import workflow functions
+    const { getNextRoleInChain } = await import('@/lib/workflow');
+
+    // Get next role in chain based on current approver's role and requester's role
+    const nextRole = getNextRoleInChain(
+      currentApproval.approver.role as any,
+      leave.type,
+      requester.role as any
+    );
+
+    if (!nextRole) {
+      return null;
+    }
+
     const approver = await this.findApprover(leave.requesterId, nextRole);
     return approver ? { id: approver.id, role: nextRole } : null;
   }

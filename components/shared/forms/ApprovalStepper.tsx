@@ -3,19 +3,36 @@
 import { CheckCircle2, Circle } from "lucide-react";
 import clsx from "clsx";
 
-type Stage = "Submitted" | "HR Admin" | "Dept Head" | "HR Head" | "CEO";
+type Stage = "Submitted" | "HR Admin" | "HR Head" | "Dept Head" | "CEO";
 
 type ApprovalStepperProps = {
   stages?: Stage[];
   currentIndex: number;
   className?: string;
+  requesterRole?: "EMPLOYEE" | "DEPT_HEAD" | "HR_ADMIN" | "HR_HEAD" | "CEO";
 };
 
+/**
+ * Get approval stages based on requester role
+ * Regular employees: Submitted → HR Admin → HR Head → Dept Head
+ * Dept heads: Submitted → HR Admin → HR Head → CEO
+ */
+function getStagesForRole(role?: string): Stage[] {
+  if (role === "DEPT_HEAD") {
+    return ["Submitted", "HR Admin", "HR Head", "CEO"];
+  }
+  // Default for employees and other roles
+  return ["Submitted", "HR Admin", "HR Head", "Dept Head"];
+}
+
 export function ApprovalStepper({
-  stages = ["Submitted", "HR Admin", "Dept Head", "HR Head", "CEO"],
+  stages,
   currentIndex,
   className,
+  requesterRole,
 }: ApprovalStepperProps) {
+  // Use provided stages or determine from requester role
+  const displayStages = stages || getStagesForRole(requesterRole);
 
   return (
     <div className={clsx("w-full", className)}>
@@ -24,7 +41,7 @@ export function ApprovalStepper({
         role="list"
         aria-label="Approval progress"
       >
-        {stages.map((label, i) => {
+        {displayStages.map((label, i) => {
           const isCurrent = i === currentIndex;
 
           return (
@@ -77,7 +94,7 @@ export function ApprovalStepper({
       {/* Progress indicator */}
       <div className="mt-1.5 text-center">
         <span className="text-[10px] text-muted-foreground">
-          Step {currentIndex + 1} of {stages.length}
+          Step {currentIndex + 1} of {displayStages.length}
         </span>
       </div>
     </div>
