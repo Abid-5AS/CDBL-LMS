@@ -13,9 +13,11 @@ import {
   Alert,
   RefreshControl,
 } from 'react-native';
+import Animated, { FadeOutUp, LinearTransition, FadeInDown } from 'react-native-reanimated';
 import { router } from 'expo-router';
 import { ThemedCard } from '@/src/components/shared/ThemedCard';
 import { ThemedButton } from '@/src/components/shared/ThemedButton';
+import { SkeletonCard } from '@/src/components/shared/SkeletonLoader';
 import { useTheme } from '@/src/providers/ThemeProvider';
 import { useApprovals } from '@/src/hooks/useApprovals';
 import { format } from 'date-fns';
@@ -138,20 +140,9 @@ export default function ApprovalsScreen() {
       {/* Loading State */}
       {isLoading && !refreshing ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text
-            style={[
-              styles.loadingText,
-              {
-                color:
-                  'textSecondary' in colors
-                    ? colors.textSecondary
-                    : colors.onSurfaceVariant,
-              },
-            ]}
-          >
-            Loading approvals...
-          </Text>
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
         </View>
       ) : error ? (
         /* Error State */
@@ -205,11 +196,17 @@ export default function ApprovalsScreen() {
       ) : (
         /* Approvals List */
         <View style={styles.approvalsList}>
-          {approvals.map((approval) => {
+          {approvals.map((approval, index) => {
             const isBeingProcessed = processingId === approval.id;
 
             return (
-              <ThemedCard key={approval.id} style={styles.approvalCard}>
+              <Animated.View
+                key={approval.id}
+                entering={FadeInDown.delay(index * 100).springify()}
+                exiting={FadeOutUp.springify()}
+                layout={LinearTransition.springify()}
+              >
+                <ThemedCard style={styles.approvalCard}>
                 {/* Employee Info */}
                 <View style={styles.employeeInfo}>
                   <View
@@ -414,6 +411,7 @@ export default function ApprovalsScreen() {
                   </ThemedButton>
                 </View>
               </ThemedCard>
+              </Animated.View>
             );
           })}
         </View>

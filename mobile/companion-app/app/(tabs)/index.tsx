@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
+import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 import { router } from "expo-router";
 import { ThemedCard } from "@/src/components/shared/ThemedCard";
 import { ThemedButton } from "@/src/components/shared/ThemedButton";
@@ -75,7 +76,10 @@ export default function HomeScreen() {
           />
         ) : (
           <>
-            <View style={styles.header}>
+            <Animated.View
+              style={styles.header}
+              entering={FadeIn.duration(600)}
+            >
         <Text
           style={[
             styles.greeting,
@@ -112,7 +116,7 @@ export default function HomeScreen() {
             {profile.department} • {profile.role || "Employee"}
           </Text>
         )}
-      </View>
+      </Animated.View>
 
       {isLoading && !refreshing ? (
         <View style={styles.loadingContainer}>
@@ -121,7 +125,10 @@ export default function HomeScreen() {
       ) : (
         <>
           {/* Quick Stats */}
-          <View style={styles.statsGrid}>
+          <Animated.View
+            style={styles.statsGrid}
+            entering={FadeInDown.delay(200).springify()}
+          >
             <ThemedCard style={styles.statCard}>
               <View style={[styles.statIcon, { backgroundColor: colors.primary + "20" }]}>
                 <TrendingUp size={24} color={colors.primary} />
@@ -165,10 +172,11 @@ export default function HomeScreen() {
                 Pending
               </Text>
             </ThemedCard>
-          </View>
+          </Animated.View>
 
           {/* Leave Balances Overview */}
-          <ThemedCard style={styles.card}>
+          <Animated.View entering={FadeInDown.delay(400).springify()}>
+            <ThemedCard style={styles.card}>
             <View style={styles.cardHeader}>
               <Text
                 style={[
@@ -234,10 +242,12 @@ export default function HomeScreen() {
               </Text>
             )}
           </ThemedCard>
+          </Animated.View>
 
           {/* Recent Applications */}
           {pendingApplications.length > 0 && (
-            <ThemedCard style={styles.card}>
+            <Animated.View entering={FadeInDown.delay(500).springify()}>
+              <ThemedCard style={styles.card}>
               <View style={styles.cardHeader}>
                 <Text
                   style={[
@@ -314,10 +324,12 @@ export default function HomeScreen() {
                 ))}
               </View>
             </ThemedCard>
+            </Animated.View>
           )}
 
           {/* Quick Actions */}
-          <ThemedCard style={styles.card}>
+          <Animated.View entering={FadeInDown.delay(600).springify()}>
+            <ThemedCard style={styles.card}>
             <Text
               style={[
                 styles.cardTitle,
@@ -372,6 +384,7 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </View>
           </ThemedCard>
+          </Animated.View>
 
           {/* Platform Info */}
           <View style={styles.platformInfo}>

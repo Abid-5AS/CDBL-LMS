@@ -6,7 +6,9 @@ import {
   Platform,
   ViewStyle,
   TextStyle,
+  Pressable,
 } from "react-native";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { Button as PaperButton } from "react-native-paper";
 import { useTheme } from "../../providers/ThemeProvider";
 
@@ -32,6 +34,29 @@ export function ThemedButton({
   disabled = false,
 }: ThemedButtonProps) {
   const { colors, isDark } = useTheme();
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: scale.value }],
+    };
+  });
+
+  const handlePressIn = () => {
+    if (!disabled) {
+      scale.value = withSpring(0.96, {
+        damping: 15,
+        stiffness: 400,
+      });
+    }
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, {
+      damping: 15,
+      stiffness: 400,
+    });
+  };
 
   if (Platform.OS === "android") {
     const mode =
@@ -42,18 +67,28 @@ export function ThemedButton({
         : "contained";
 
     return (
-      <PaperButton
-        mode={mode}
-        onPress={onPress}
-        disabled={disabled}
-        style={style}
-      >
-        {children}
-      </PaperButton>
+      <Animated.View style={animatedStyle}>
+        <Pressable
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          onPress={onPress}
+          disabled={disabled}
+          android_ripple={{ color: 'rgba(255, 255, 255, 0.2)' }}
+        >
+          <PaperButton
+            mode={mode}
+            onPress={() => {}}
+            disabled={disabled}
+            style={style}
+          >
+            {children}
+          </PaperButton>
+        </Pressable>
+      </Animated.View>
     );
   }
 
-  // iOS: Custom Liquid Glass button
+  // iOS: Custom Liquid Glass button with scale animation
   const getButtonStyle = (): ViewStyle => {
     const baseStyle: ViewStyle = {
       paddingVertical: 14,
@@ -111,14 +146,17 @@ export function ThemedButton({
   };
 
   return (
-    <TouchableOpacity
-      style={[getButtonStyle(), style, disabled && styles.disabled]}
-      onPress={onPress}
-      disabled={disabled}
-      activeOpacity={0.7}
-    >
-      <Text style={[styles.text, getTextStyle()]}>{children}</Text>
-    </TouchableOpacity>
+    <Animated.View style={animatedStyle}>
+      <Pressable
+        style={[getButtonStyle(), style, disabled && styles.disabled]}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        onPress={onPress}
+        disabled={disabled}
+      >
+        <Text style={[styles.text, getTextStyle()]}>{children}</Text>
+      </Pressable>
+    </Animated.View>
   );
 }
 

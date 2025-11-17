@@ -8,9 +8,11 @@ import {
   ActivityIndicator,
   FlatList,
 } from "react-native";
+import Animated, { FadeInDown, FadeOutDown, LinearTransition } from 'react-native-reanimated';
 import { useState, useMemo } from "react";
 import { ThemedCard } from "@/src/components/shared/ThemedCard";
 import { ThemedButton } from "@/src/components/shared/ThemedButton";
+import { SkeletonCard } from "@/src/components/shared/SkeletonLoader";
 import { useTheme } from "@/src/providers/ThemeProvider";
 import { useLeaveHistory } from "@/src/hooks/useLeaveHistory";
 import { syncService } from "@/src/sync/SyncService";
@@ -158,20 +160,9 @@ export default function HistoryScreen() {
 
       {isLoading && !refreshing ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text
-            style={[
-              styles.loadingText,
-              {
-                color:
-                  "textSecondary" in colors
-                    ? colors.textSecondary
-                    : colors.onSurfaceVariant,
-              },
-            ]}
-          >
-            Loading leave history...
-          </Text>
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
         </View>
       ) : error ? (
         <View style={styles.errorState}>
@@ -209,8 +200,13 @@ export default function HistoryScreen() {
           <FlatList
             data={filteredLeaves}
             keyExtractor={(item) => item.id}
-            renderItem={({ item: leave }) => (
-              <ThemedCard style={styles.leaveCard}>
+            renderItem={({ item: leave, index }) => (
+              <Animated.View
+                entering={FadeInDown.delay(index * 50).springify()}
+                exiting={FadeOutDown.springify()}
+                layout={LinearTransition.springify()}
+              >
+                <ThemedCard style={styles.leaveCard}>
                 <View style={styles.leaveHeader}>
                   <View style={{ flex: 1 }}>
                     <Text
@@ -364,6 +360,7 @@ export default function HistoryScreen() {
                   )}
                 </View>
               </ThemedCard>
+              </Animated.View>
             )}
             ListEmptyComponent={
               !isLoading ? (
