@@ -20,3 +20,5 @@ export {
   RoleDashboardCard,
   RoleKPICard,
 } from "./RoleBasedDashboard";
+
+export { TeamBreakdownWidget } from "./TeamBreakdownWidget";

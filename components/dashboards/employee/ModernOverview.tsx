@@ -78,32 +78,35 @@ const itemVariants = {
 };
 
 /**
- * Skeleton loader for KPI cards
+ * Enhanced skeleton loader for KPI cards with shimmer effect
  */
 function KPICardSkeleton() {
   return (
-    <Card className="rounded-xl border-border/50 shadow-sm">
-      <CardContent className="p-4 sm:p-6">
-        <div className="space-y-4">
-          <Skeleton className="h-4 w-24 rounded" />
-          <Skeleton className="h-8 w-16 rounded" />
-          <Skeleton className="h-3 w-32 rounded" />
+    <div className="neo-card relative flex h-full min-h-[190px] flex-col px-5 py-5 sm:px-6 sm:py-6 overflow-hidden animate-fade-in">
+      <div className="absolute inset-0 shimmer-effect" />
+      <div className="relative flex items-start justify-between gap-4">
+        <div className="flex-1 space-y-3">
+          <Skeleton className="h-3 w-32" />
+          <Skeleton className="h-10 w-20" />
+          <Skeleton className="h-4 w-40" />
         </div>
-      </CardContent>
-    </Card>
+        <Skeleton className="h-12 w-12 rounded-2xl" />
+      </div>
+    </div>
   );
 }
 
 /**
- * Grid of skeleton loaders for KPI section
+ * Grid of skeleton loaders for KPI section with staggered animation
  */
 function KPIGridSkeleton() {
   return (
     <ResponsiveDashboardGrid columns="2:2:4:4" gap="md" animate={false}>
-      <KPICardSkeleton />
-      <KPICardSkeleton />
-      <KPICardSkeleton />
-      <KPICardSkeleton />
+      {[...Array(4)].map((_, i) => (
+        <div key={i} style={{ animationDelay: `${i * 100}ms` }}>
+          <KPICardSkeleton />
+        </div>
+      ))}
     </ResponsiveDashboardGrid>
   );
 }
