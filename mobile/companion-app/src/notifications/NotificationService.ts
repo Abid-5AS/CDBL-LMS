@@ -7,7 +7,25 @@
  */
 
 import { Platform } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Safely import AsyncStorage with fallback
+let AsyncStorage: any;
+try {
+  AsyncStorage = require('@react-native-async-storage/async-storage').default;
+} catch (error) {
+  console.warn('[NotificationService] AsyncStorage not available, using in-memory fallback');
+  const memoryStore: { [key: string]: string } = {};
+  AsyncStorage = {
+    getItem: async (key: string) => memoryStore[key] || null,
+    setItem: async (key: string, value: string) => {
+      memoryStore[key] = value;
+    },
+    removeItem: async (key: string) => {
+      delete memoryStore[key];
+    },
+  };
+}
+
 import {
   NotificationType,
   NotificationContent,
