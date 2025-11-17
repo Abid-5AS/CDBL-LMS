@@ -55,10 +55,11 @@ export async function GET(req: NextRequest) {
       totalEmployees,
       approvalStats,
     ] = await Promise.all([
-      // Pending requests
-      prisma.leaveRequest.count({
+      // Fixed: Count only approvals pending for this specific user
+      prisma.approval.count({
         where: {
-          status: "PENDING",
+          approverId: user.id,
+          decision: "PENDING",
         },
       }),
 

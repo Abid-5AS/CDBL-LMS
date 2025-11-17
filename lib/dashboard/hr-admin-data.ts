@@ -73,7 +73,7 @@ let hasCachedStats = false;
 const STATS_CACHE_TTL = 60 * 1000;
 
 export async function getHRAdminKPIData(user?: MinimalUser): Promise<HRAdminDashboardStats> {
-  await resolveAuthorizedUser(user);
+  const resolvedUser = await resolveAuthorizedUser(user);
 
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -92,8 +92,12 @@ export async function getHRAdminKPIData(user?: MinimalUser): Promise<HRAdminDash
           endDate: { gte: today },
         },
       }),
-      prisma.leaveRequest.count({
-        where: { status: "PENDING" },
+      // Fixed: Count only approvals pending for this specific user
+      prisma.approval.count({
+        where: {
+          approverId: resolvedUser.id,
+          decision: "PENDING",
+        },
       }),
       prisma.leaveRequest.count({
         where: {
@@ -147,7 +151,7 @@ type StatsOptions = {
 export async function getHRAdminStatsData(
   options: StatsOptions = {}
 ): Promise<HRAdminDashboardStats> {
-  await resolveAuthorizedUser(options.user);
+  const resolvedUser = await resolveAuthorizedUser(options.user);
   const nowTs = Date.now();
   if (
     !options.skipCache &&
@@ -180,8 +184,12 @@ export async function getHRAdminStatsData(
         endDate: { gte: today },
       },
     }),
-    prisma.leaveRequest.count({
-      where: { status: "PENDING" },
+    // Fixed: Count only approvals pending for this specific user
+    prisma.approval.count({
+      where: {
+        approverId: resolvedUser.id,
+        decision: "PENDING",
+      },
     }),
     prisma.leaveRequest.count({
       where: {

@@ -143,15 +143,18 @@ export function DesktopNav({
           <Search className="h-4 w-4" />
         </Button>
 
-        <Button
-          size="sm"
-          className="gap-1.5 backdrop-blur-md bg-background/80 dark:bg-background/40 border border-border hover:bg-background/90 dark:hover:bg-background/50 shadow-sm"
-          leftIcon={<CalendarPlus className="h-4 w-4" />}
-          onClick={() => router.push("/leaves/apply")}
-          aria-label="Apply for leave"
-        >
-          Apply
-        </Button>
+        {/* Apply Leave button - Only for EMPLOYEE and DEPT_HEAD roles */}
+        {(user.role === "EMPLOYEE" || user.role === "DEPT_HEAD") && (
+          <Button
+            size="sm"
+            className="gap-1.5 backdrop-blur-md bg-background/80 dark:bg-background/40 border border-border hover:bg-background/90 dark:hover:bg-background/50 shadow-sm"
+            leftIcon={<CalendarPlus className="h-4 w-4" />}
+            onClick={() => router.push("/leaves/apply")}
+            aria-label="Apply for leave"
+          >
+            Apply
+          </Button>
+        )}
 
         <div className="flex items-center gap-1 rounded-full border border-border bg-background/80 px-2 py-1 shadow-sm backdrop-blur-xl dark:bg-background/40">
           <NotificationDropdown />
