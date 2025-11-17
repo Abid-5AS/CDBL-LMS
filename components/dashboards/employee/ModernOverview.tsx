@@ -127,7 +127,8 @@ export function ModernEmployeeDashboard({
       const element = document.getElementById(sectionId);
       if (element) {
         const offset = 100; // Account for fixed header
-        const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+        const elementPosition =
+          element.getBoundingClientRect().top + window.scrollY;
         window.scrollTo({
           top: elementPosition - offset,
           behavior: "smooth",
@@ -188,10 +189,11 @@ export function ModernEmployeeDashboard({
                     {username}
                   </h1>
                   <p className="text-sm text-muted-foreground">
-                    {new Date().toLocaleDateString(undefined, {
+                    {new Date().toLocaleDateString("en-GB", {
                       weekday: "long",
-                      month: "long",
                       day: "numeric",
+                      month: "long",
+                      year: "numeric",
                     })}
                   </p>
                 </div>
@@ -215,8 +217,8 @@ export function ModernEmployeeDashboard({
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {leaveTypeLabel[dashboardData.nextScheduledLeave.type] ||
-                      dashboardData.nextScheduledLeave.type} ·{" "}
-                    {dashboardData.nextScheduledLeave.workingDays} days
+                      dashboardData.nextScheduledLeave.type}{" "}
+                    · {dashboardData.nextScheduledLeave.workingDays} days
                   </p>
                 </div>
               )}
@@ -253,16 +255,24 @@ export function ModernEmployeeDashboard({
                         </button>
                       </TooltipTrigger>
                       <TooltipContent side="bottom" className="max-w-xs">
-                        <p className="text-sm font-semibold mb-1">What this shows:</p>
-                        <p className="text-sm mb-2">
-                          Your leave requests currently going through the approval process.
+                        <p className="text-sm font-semibold mb-1">
+                          What this shows:
                         </p>
-                        <p className="text-sm font-semibold mb-1">Current stage:</p>
                         <p className="text-sm mb-2">
-                          The subtitle shows which approver (Department Head, HR Admin, HR Head, or CEO) is currently reviewing your request and the average wait time.
+                          Your leave requests currently going through the
+                          approval process.
+                        </p>
+                        <p className="text-sm font-semibold mb-1">
+                          Current stage:
+                        </p>
+                        <p className="text-sm mb-2">
+                          The subtitle shows which approver (Department Head, HR
+                          Admin, HR Head, or CEO) is currently reviewing your
+                          request and the average wait time.
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          You can cancel pending requests anytime from the Action Center below.
+                          You can cancel pending requests anytime from the
+                          Action Center below.
                         </p>
                       </TooltipContent>
                     </Tooltip>
@@ -296,16 +306,24 @@ export function ModernEmployeeDashboard({
                         </button>
                       </TooltipTrigger>
                       <TooltipContent side="bottom" className="max-w-xs">
-                        <p className="text-sm font-semibold mb-1">What this shows:</p>
-                        <p className="text-sm mb-2">
-                          Total leave days available to you across all leave types (Earned, Casual, Medical).
+                        <p className="text-sm font-semibold mb-1">
+                          What this shows:
                         </p>
-                        <p className="text-sm font-semibold mb-1">How it's calculated:</p>
                         <p className="text-sm mb-2">
-                          Sum of remaining days in each leave category. This includes carried-over balance and annual allocation minus any used or pending days.
+                          Total leave days available to you across all leave
+                          types (Earned, Casual, Medical).
+                        </p>
+                        <p className="text-sm font-semibold mb-1">
+                          How it's calculated:
+                        </p>
+                        <p className="text-sm mb-2">
+                          Sum of remaining days in each leave category. This
+                          includes carried-over balance and annual allocation
+                          minus any used or pending days.
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          View detailed breakdown in the "Leave Balance" tab below.
+                          View detailed breakdown in the "Leave Balance" tab
+                          below.
                         </p>
                       </TooltipContent>
                     </Tooltip>
@@ -335,16 +353,22 @@ export function ModernEmployeeDashboard({
                         </button>
                       </TooltipTrigger>
                       <TooltipContent side="bottom" className="max-w-xs">
-                        <p className="text-sm font-semibold mb-1">What this shows:</p>
+                        <p className="text-sm font-semibold mb-1">
+                          What this shows:
+                        </p>
                         <p className="text-sm mb-2">
-                          Total number of leave days you've taken this calendar year across all leave types.
+                          Total number of leave days you've taken this calendar
+                          year across all leave types.
                         </p>
                         <p className="text-sm font-semibold mb-1">Includes:</p>
                         <p className="text-sm mb-2">
-                          Only approved leaves that have been taken. Pending requests and future approved leaves are not counted until they occur.
+                          Only approved leaves that have been taken. Pending
+                          requests and future approved leaves are not counted
+                          until they occur.
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          Check "Recent Activity" tab to see breakdown by leave type.
+                          Check "Recent Activity" tab to see breakdown by leave
+                          type.
                         </p>
                       </TooltipContent>
                     </Tooltip>
@@ -378,16 +402,24 @@ export function ModernEmployeeDashboard({
                         </button>
                       </TooltipTrigger>
                       <TooltipContent side="bottom" className="max-w-xs">
-                        <p className="text-sm font-semibold mb-1">What this shows:</p>
-                        <p className="text-sm mb-2">
-                          Your next scheduled leave that has been fully approved and is confirmed. Shows how many days until it starts.
+                        <p className="text-sm font-semibold mb-1">
+                          What this shows:
                         </p>
-                        <p className="text-sm font-semibold mb-1">Important distinction:</p>
                         <p className="text-sm mb-2">
-                          This shows APPROVED leaves only - not pending requests. Pending requests appear in "Pending Requests" card above.
+                          Your next scheduled leave that has been fully approved
+                          and is confirmed. Shows how many days until it starts.
+                        </p>
+                        <p className="text-sm font-semibold mb-1">
+                          Important distinction:
+                        </p>
+                        <p className="text-sm mb-2">
+                          This shows APPROVED leaves only - not pending
+                          requests. Pending requests appear in "Pending
+                          Requests" card above.
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          You can request cancellation of approved leaves from the Action Center.
+                          You can request cancellation of approved leaves from
+                          the Action Center.
                         </p>
                       </TooltipContent>
                     </Tooltip>
@@ -454,57 +486,57 @@ export function ModernEmployeeDashboard({
           >
             <div id="leave-details">
               <DashboardWithSidebar>
-              <motion.div variants={itemVariants} className="flex-1">
-                <TabbedContent
-                  title="Leave Details"
-                  defaultTab="overview"
-                  value={activeLeaveTab}
-                  onValueChange={setActiveLeaveTab}
-                  tabs={[
-                    {
-                      id: "overview",
-                      label: "Overview",
-                      icon: Activity,
-                      badge: dashboardData.pendingCount.toString(),
-                      content: (
-                        <div className="flex flex-col items-center justify-center gap-2 py-6 sm:py-8">
-                          <p className="text-base font-medium">
-                            You&apos;re all caught up on leave details.
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            Use the Leave Balance and Recent Activity tabs to
-                            explore your data.
-                          </p>
-                        </div>
-                      ),
-                    },
-                    {
-                      id: "balance",
-                      label: "Leave Balance",
-                      icon: PieChart,
-                      badge: dashboardData.totalBalance.toString(),
-                      content: (
-                        <EmployeeLeaveBalance
-                          balanceData={dashboardData.balanceData}
-                          isLoading={isLoadingBalance}
-                        />
-                      ),
-                    },
-                    {
-                      id: "activity",
-                      label: "Recent Activity",
-                      icon: Activity,
-                      badge: dashboardData.recentLeaves.length.toString(),
-                      content: (
-                        <EmployeeRecentActivity
-                          leaves={dashboardData.recentLeaves}
-                          isLoading={isLoadingLeaves}
-                        />
-                      ),
-                    },
-                  ]}
-                />
-              </motion.div>
+                <motion.div variants={itemVariants} className="flex-1">
+                  <TabbedContent
+                    title="Leave Details"
+                    defaultTab="overview"
+                    value={activeLeaveTab}
+                    onValueChange={setActiveLeaveTab}
+                    tabs={[
+                      {
+                        id: "overview",
+                        label: "Overview",
+                        icon: Activity,
+                        badge: dashboardData.pendingCount.toString(),
+                        content: (
+                          <div className="flex flex-col items-center justify-center gap-2 py-6 sm:py-8">
+                            <p className="text-base font-medium">
+                              You&apos;re all caught up on leave details.
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              Use the Leave Balance and Recent Activity tabs to
+                              explore your data.
+                            </p>
+                          </div>
+                        ),
+                      },
+                      {
+                        id: "balance",
+                        label: "Leave Balance",
+                        icon: PieChart,
+                        badge: dashboardData.totalBalance.toString(),
+                        content: (
+                          <EmployeeLeaveBalance
+                            balanceData={dashboardData.balanceData}
+                            isLoading={isLoadingBalance}
+                          />
+                        ),
+                      },
+                      {
+                        id: "activity",
+                        label: "Recent Activity",
+                        icon: Activity,
+                        badge: dashboardData.recentLeaves.length.toString(),
+                        content: (
+                          <EmployeeRecentActivity
+                            leaves={dashboardData.recentLeaves}
+                            isLoading={isLoadingLeaves}
+                          />
+                        ),
+                      },
+                    ]}
+                  />
+                </motion.div>
               </DashboardWithSidebar>
             </div>
           </DashboardSection>

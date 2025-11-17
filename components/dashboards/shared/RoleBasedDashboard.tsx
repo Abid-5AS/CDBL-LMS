@@ -360,19 +360,24 @@ export function RoleKPICard({
       className={cn(
         "neo-card group relative flex h-full min-h-[190px] flex-col overflow-hidden",
         "px-5 py-5 sm:px-6 sm:py-6",
-        onClick && "cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]",
+        onClick &&
+          "cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]",
         className
       )}
       style={accentVars}
       onClick={onClick}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
-      onKeyDown={onClick ? (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onClick();
-        }
-      } : undefined}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
       title={onClick && clickLabel ? clickLabel : undefined}
       aria-label={onClick && clickLabel ? clickLabel : undefined}
     >

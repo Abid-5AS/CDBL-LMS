@@ -159,7 +159,7 @@ const faqData = {
     {
       question: "How are working days calculated?",
       answer:
-        "The system automatically calculates working days by excluding weekends (Saturday-Sunday) and public holidays from your date range. Only actual working days count toward your leave balance.",
+        "The system automatically calculates working days by excluding weekends (Friday-Saturday) and public holidays from your date range. Only actual working days count toward your leave balance.",
     },
     {
       question: "What notifications will I receive?",
@@ -313,7 +313,9 @@ export function FAQPageContent() {
                   type="button"
                   className="text-left text-sm text-foreground hover:text-primary transition-colors"
                   onClick={() => {
-                    setActiveTab(categoryTabMap[suggestion.category] ?? "general");
+                    setActiveTab(
+                      categoryTabMap[suggestion.category] ?? "general"
+                    );
                     setSearchTerm(suggestion.question);
                   }}
                 >

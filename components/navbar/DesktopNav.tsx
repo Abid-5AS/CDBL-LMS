@@ -17,7 +17,13 @@ import { ProfileMenu } from "./ProfileMenu";
 
 type DesktopNavProps = Pick<
   NavbarState,
-  "user" | "router" | "navLinks" | "isActive" | "scrolled" | "logout" | "loggingOut"
+  | "user"
+  | "router"
+  | "navLinks"
+  | "isActive"
+  | "scrolled"
+  | "logout"
+  | "loggingOut"
 >;
 
 export function DesktopNav({
@@ -57,7 +63,11 @@ export function DesktopNav({
           transition={{ duration: 0.4, delay: 0.2 }}
           className="relative hidden md:flex flex-1 min-w-0 max-w-full items-center justify-center overflow-hidden rounded-full border border-border bg-background/80 p-1.5 shadow-sm backdrop-blur-xl dark:border-border dark:bg-background/30"
         >
-          <nav role="navigation" aria-label="Primary navigation" className="w-full min-w-0">
+          <nav
+            role="navigation"
+            aria-label="Primary navigation"
+            className="w-full min-w-0"
+          >
             <ul className="flex w-full flex-nowrap items-center gap-0.5">
               {navLinks.map((link, index) => {
                 const Icon = link.icon;
@@ -112,7 +122,6 @@ export function DesktopNav({
             </ul>
           </nav>
         </motion.div>
-
       </div>
 
       {/* Actions Section */}

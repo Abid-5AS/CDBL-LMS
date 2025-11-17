@@ -87,10 +87,11 @@ export function ApplyLeaveForm() {
   const router = useRouter();
 
   const today = new Date();
-  const todayLabel = today.toLocaleDateString(undefined, {
+  const todayLabel = today.toLocaleDateString("en-GB", {
     weekday: "short",
-    month: "short",
     day: "numeric",
+    month: "short",
+    year: "numeric",
   });
   const policyHint =
     (type && POLICY_TOOLTIPS[type as LeaveType]) ||
@@ -135,13 +136,15 @@ export function ApplyLeaveForm() {
                 Apply for Leave
               </h1>
               <p className="text-sm text-muted-foreground leading-6 max-w-2xl">
-                Share your leave details, attach supporting documents, and track balances in
-                real time before submitting.
+                Share your leave details, attach supporting documents, and track
+                balances in real time before submitting.
               </p>
             </div>
             <div className="rounded-xl border border-border/60 px-4 py-3 text-sm text-muted-foreground">
               <p className="text-xs uppercase tracking-widest">Today</p>
-              <p className="text-xl font-semibold text-foreground">{todayLabel}</p>
+              <p className="text-xl font-semibold text-foreground">
+                {todayLabel}
+              </p>
             </div>
           </div>
           <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-3">
@@ -153,7 +156,12 @@ export function ApplyLeaveForm() {
                 <p className="text-xs uppercase tracking-wide text-muted-foreground">
                   {stat.label}
                 </p>
-                <p className={cn("text-lg font-semibold text-foreground", stat.state)}>
+                <p
+                  className={cn(
+                    "text-lg font-semibold text-foreground",
+                    stat.state
+                  )}
+                >
                   {stat.value}
                 </p>
               </div>
@@ -368,8 +376,13 @@ export function ApplyLeaveForm() {
 
                 {/* Actions inside form */}
                 <div className="flex flex-col gap-4 pt-6 border-t border-muted mt-6 px-6 pb-6">
-                  <div className="text-xs text-muted-foreground" aria-live="polite">
-                    <p className="font-semibold text-foreground text-sm">Form status</p>
+                  <div
+                    className="text-xs text-muted-foreground"
+                    aria-live="polite"
+                  >
+                    <p className="font-semibold text-foreground text-sm">
+                      Form status
+                    </p>
                     <p>
                       {submitting
                         ? "Submitting request…"

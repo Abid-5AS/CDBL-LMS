@@ -1,11 +1,19 @@
 import { normalizeToDhakaMidnight } from "./date-utils";
+import { formatDate } from "./utils";
 
 export const policy = {
   version: "v2.0",
   accrual: { EL_PER_YEAR: 24, CL_PER_YEAR: 10, ML_PER_YEAR: 14 }, // EL: 24 days/year (2 × 12) per Policy 6.19
   carryForward: { EL: true, EARNED: true },
   carryForwardCap: { EL: 60, EARNED: 60 }, // cap total carry at 60
-  allowBackdate: { EL: true, CL: false, ML: true, EARNED: true, CASUAL: false, MEDICAL: true },
+  allowBackdate: {
+    EL: true,
+    CL: false,
+    ML: true,
+    EARNED: true,
+    CASUAL: false,
+    MEDICAL: true,
+  },
   maxBackdateDays: { EL: 30, ML: 30, EARNED: 30, MEDICAL: 30 },
   elMinNoticeDays: 5, // hard requirement: ≥5 working days per Policy 6.11 (for EL only)
   clMaxConsecutiveDays: 3, // Policy: max 3 days per spell
@@ -21,7 +29,10 @@ export function daysInclusive(start: Date, end: Date): number {
   return Math.floor(ms / 86400000) + 1;
 }
 
-export function needsMedicalCertificate(type: LeaveKind | string, days: number) {
+export function needsMedicalCertificate(
+  type: LeaveKind | string,
+  days: number
+) {
   return String(type) === "MEDICAL" && days > 3;
 }
 
@@ -31,14 +42,21 @@ export function canBackdate(type: LeaveKind | string) {
   return !!map[key];
 }
 
-export function withinBackdateLimit(type: LeaveKind | string, applyDate: Date, start: Date) {
+export function withinBackdateLimit(
+  type: LeaveKind | string,
+  applyDate: Date,
+  start: Date
+) {
   const key = String(type) as "EARNED" | "MEDICAL" | "CASUAL";
   // CL backdate is disallowed anyway
   const normalizedApply = normalizeToDhakaMidnight(applyDate);
   const normalizedStart = normalizeToDhakaMidnight(start);
   if (key === "CASUAL") return normalizedStart >= normalizedApply;
-  const max = key === "EARNED" ? policy.maxBackdateDays.EL : policy.maxBackdateDays.ML;
-  const diffDays = Math.floor((normalizedApply.getTime() - normalizedStart.getTime()) / 86400000);
+  const max =
+    key === "EARNED" ? policy.maxBackdateDays.EL : policy.maxBackdateDays.ML;
+  const diffDays = Math.floor(
+    (normalizedApply.getTime() - normalizedStart.getTime()) / 86400000
+  );
   return diffDays <= max;
 }
 
@@ -50,7 +68,9 @@ export type PolicyWarnings = {
 };
 
 export function elNoticeWarning(applyDate: Date, start: Date) {
-  const diff = Math.floor((start.setHours(0, 0, 0, 0) - applyDate.setHours(0, 0, 0, 0)) / 86400000);
+  const diff = Math.floor(
+    (start.setHours(0, 0, 0, 0) - applyDate.setHours(0, 0, 0, 0)) / 86400000
+  );
   return diff < policy.elMinNoticeDays;
 }
 
@@ -65,14 +85,24 @@ export function clNoticeWarning(applyDate: Date, start: Date): boolean {
   return false;
 }
 
-export function makeWarnings(type: LeaveKind | string, applyDate: Date, start: Date): PolicyWarnings {
+export function makeWarnings(
+  type: LeaveKind | string,
+  applyDate: Date,
+  start: Date
+): PolicyWarnings {
   const warnings: PolicyWarnings = {};
   // Note: CL is exempt from notice requirements per Policy 6.11.a
-  if ((String(type) === "EARNED" || String(type) === "EL") && elNoticeWarning(applyDate, start)) {
+  if (
+    (String(type) === "EARNED" || String(type) === "EL") &&
+    elNoticeWarning(applyDate, start)
+  ) {
     warnings.elInsufficientNotice = true;
   }
   // CL is exempt, but we can include it for API consistency (will always be false)
-  if ((String(type) === "CASUAL" || String(type) === "CL") && clNoticeWarning(applyDate, start)) {
+  if (
+    (String(type) === "CASUAL" || String(type) === "CL") &&
+    clNoticeWarning(applyDate, start)
+  ) {
     warnings.clShortNotice = true;
   }
   return warnings;
@@ -136,13 +166,17 @@ export function checkLeaveEligibility(
   }
 
   if (serviceYears < requiredYears) {
-    const yearsLabel = requiredYears === 1 ? "year" : requiredYears < 1 ? "months" : "years";
-    const displayValue = requiredYears < 1 ? Math.round(requiredYears * 12) : requiredYears;
+    const yearsLabel =
+      requiredYears === 1 ? "year" : requiredYears < 1 ? "months" : "years";
+    const displayValue =
+      requiredYears < 1 ? Math.round(requiredYears * 12) : requiredYears;
     const displayUnit = requiredYears < 1 ? "months" : yearsLabel;
 
     return {
       eligible: false,
-      reason: `Requires ${displayValue} ${displayUnit} of continuous service. You have ${serviceYears.toFixed(1)} years.`,
+      reason: `Requires ${displayValue} ${displayUnit} of continuous service. You have ${serviceYears.toFixed(
+        1
+      )} years.`,
       requiredYears,
     };
   }
@@ -173,7 +207,9 @@ export function calculateMaternityLeaveDays(joinDate: Date): {
   }
 
   // Pro-rate for employees with less than 6 months service
-  const proratedDays = Math.floor((serviceMonths / MINIMUM_MONTHS) * FULL_MATERNITY_DAYS);
+  const proratedDays = Math.floor(
+    (serviceMonths / MINIMUM_MONTHS) * FULL_MATERNITY_DAYS
+  );
 
   return {
     days: proratedDays,
@@ -201,7 +237,8 @@ export function validateQuarantineLeaveDuration(days: number): {
     return {
       valid: true,
       requiresExceptionalApproval: true,
-      reason: "Quarantine leave exceeding 21 days requires exceptional approval from CEO (Policy 6.28.b)",
+      reason:
+        "Quarantine leave exceeding 21 days requires exceptional approval from CEO (Policy 6.28.b)",
     };
   }
 
@@ -252,7 +289,9 @@ export function validateExtraordinaryLeaveDuration(
   if (days > maxDays) {
     return {
       valid: false,
-      reason: `Extraordinary leave cannot exceed ${maxLabel} for employees with ${serviceYears.toFixed(1)} years of service (Policy 6.22). Requested: ${days} days.`,
+      reason: `Extraordinary leave cannot exceed ${maxLabel} for employees with ${serviceYears.toFixed(
+        1
+      )} years of service (Policy 6.22). Requested: ${days} days.`,
       maxAllowed: maxDays,
     };
   }
@@ -282,7 +321,9 @@ export function checkMedicalLeaveAnnualLimit(
       withinLimit: false,
       totalUsage,
       exceedsDays,
-      warning: `This request would exceed annual medical leave limit of ${ML_ANNUAL_LIMIT} days. You have used ${usedThisYear} days and are requesting ${requestedDays} days (total: ${totalUsage} days). Per Policy 6.21.c, medical leave beyond ${ML_ANNUAL_LIMIT} days should be deducted from Earned/Special leave. Consider applying for ${requestedDays - exceedsDays} days as Medical Leave and ${exceedsDays} days as Earned Leave instead.`,
+      warning: `This request would exceed annual medical leave limit of ${ML_ANNUAL_LIMIT} days. You have used ${usedThisYear} days and are requesting ${requestedDays} days (total: ${totalUsage} days). Per Policy 6.21.c, medical leave beyond ${ML_ANNUAL_LIMIT} days should be deducted from Earned/Special leave. Consider applying for ${
+        requestedDays - exceedsDays
+      } days as Medical Leave and ${exceedsDays} days as Earned Leave instead.`,
     };
   }
 
@@ -368,7 +409,9 @@ export function validateStudyLeaveDuration(
   totalDays: number;
 } {
   const isExtension = !!previousStudyLeaveDays && previousStudyLeaveDays > 0;
-  const totalDays = isExtension ? (previousStudyLeaveDays ?? 0) + requestedDays : requestedDays;
+  const totalDays = isExtension
+    ? (previousStudyLeaveDays ?? 0) + requestedDays
+    : requestedDays;
 
   if (!isExtension) {
     // Initial study leave: Maximum 365 days (1 year)
@@ -430,18 +473,27 @@ export function validateStudyLeaveRetirement(
     // For now, we'll return a warning but allow it
     return {
       valid: true,
-      reason: "Retirement date not set. Please ensure employee has at least 5 years until retirement per Policy 6.25.a",
+      reason:
+        "Retirement date not set. Please ensure employee has at least 5 years until retirement per Policy 6.25.a",
     };
   }
 
   // Calculate years between study leave end and retirement
   const millisecondsPerYear = 1000 * 60 * 60 * 24 * 365.25;
-  const yearsUntilRetirement = (retirementDate.getTime() - studyLeaveEndDate.getTime()) / millisecondsPerYear;
+  const yearsUntilRetirement =
+    (retirementDate.getTime() - studyLeaveEndDate.getTime()) /
+    millisecondsPerYear;
 
   if (yearsUntilRetirement < 5) {
     return {
       valid: false,
-      reason: `Study leave cannot be granted if less than 5 years until retirement. Retirement: ${retirementDate.toLocaleDateString()}, Study leave end: ${studyLeaveEndDate.toLocaleDateString()}, Years until retirement: ${yearsUntilRetirement.toFixed(1)} years (Policy 6.25.a)`,
+      reason: `Study leave cannot be granted if less than 5 years until retirement. Retirement: ${formatDate(
+        retirementDate
+      )}, Study leave end: ${formatDate(
+        studyLeaveEndDate
+      )}, Years until retirement: ${yearsUntilRetirement.toFixed(
+        1
+      )} years (Policy 6.25.a)`,
       yearsUntilRetirement,
     };
   }
@@ -525,7 +577,9 @@ export function validateSpecialDisabilityIncidentDate(
   if (normalizedIncident > today) {
     return {
       valid: false,
-      reason: `Incident date cannot be in the future. Incident date: ${normalizedIncident.toLocaleDateString()}, Today: ${today.toLocaleDateString()}`,
+      reason: `Incident date cannot be in the future. Incident date: ${formatDate(
+        normalizedIncident
+      )}, Today: ${formatDate(today)}`,
     };
   }
 
@@ -536,13 +590,18 @@ export function validateSpecialDisabilityIncidentDate(
   // Check if incident is within 3 months of start date
   if (normalizedIncident < threeMonthsAgo) {
     const daysSinceIncident = Math.floor(
-      (normalizedStart.getTime() - normalizedIncident.getTime()) / (1000 * 60 * 60 * 24)
+      (normalizedStart.getTime() - normalizedIncident.getTime()) /
+        (1000 * 60 * 60 * 24)
     );
     const monthsSinceIncident = daysSinceIncident / 30.44;
 
     return {
       valid: false,
-      reason: `Special Disability Leave must be taken within 3 months of the disabling incident (Policy 6.22). Incident occurred ${monthsSinceIncident.toFixed(1)} months before leave start. Valid date range: ${threeMonthsAgo.toLocaleDateString()} to ${normalizedStart.toLocaleDateString()}`,
+      reason: `Special Disability Leave must be taken within 3 months of the disabling incident (Policy 6.22). Incident occurred ${monthsSinceIncident.toFixed(
+        1
+      )} months before leave start. Valid date range: ${formatDate(
+        threeMonthsAgo
+      )} to ${formatDate(normalizedStart)}`,
       monthsSinceIncident,
       validDateRange: {
         earliest: threeMonthsAgo,
@@ -555,12 +614,15 @@ export function validateSpecialDisabilityIncidentDate(
   if (normalizedIncident > normalizedStart) {
     return {
       valid: false,
-      reason: `Incident date cannot be after leave start date. Incident: ${normalizedIncident.toLocaleDateString()}, Start: ${normalizedStart.toLocaleDateString()}`,
+      reason: `Incident date cannot be after leave start date. Incident: ${formatDate(
+        normalizedIncident
+      )}, Start: ${formatDate(normalizedStart)}`,
     };
   }
 
   const daysSinceIncident = Math.floor(
-    (normalizedStart.getTime() - normalizedIncident.getTime()) / (1000 * 60 * 60 * 24)
+    (normalizedStart.getTime() - normalizedIncident.getTime()) /
+      (1000 * 60 * 60 * 24)
   );
   const monthsSinceIncident = daysSinceIncident / 30.44;
 

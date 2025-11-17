@@ -304,7 +304,9 @@ export function LoginForm() {
       }
 
       // Direct login flow (when OTP is skipped or not required)
-      toast.success("Login successful!" + (skipOtp ? " (OTP verification skipped)" : ""));
+      toast.success(
+        "Login successful!" + (skipOtp ? " (OTP verification skipped)" : "")
+      );
       const role = data?.user?.role;
       if (typeof window !== "undefined") {
         const destination = getHomePageForRole(role as any) || "/dashboard";
@@ -495,14 +497,14 @@ export function LoginForm() {
               step.state === "active"
                 ? "border-card-action/60 bg-card-action/10 text-card-action"
                 : step.state === "completed"
-                  ? "border-data-success/50 bg-data-success/10 text-data-success"
-                  : "border-border/40 bg-bg-secondary/40 text-muted-foreground";
+                ? "border-data-success/50 bg-data-success/10 text-data-success"
+                : "border-border/40 bg-bg-secondary/40 text-muted-foreground";
             const stateLabel =
               step.state === "completed"
                 ? "Completed"
                 : step.state === "active"
-                  ? "In progress"
-                  : "Up next";
+                ? "In progress"
+                : "Up next";
             return (
               <div
                 key={step.label}
@@ -512,9 +514,15 @@ export function LoginForm() {
                   stateStyles
                 )}
               >
-                <p className="text-[10px] uppercase tracking-[0.3em]">{stateLabel}</p>
-                <p className="text-sm font-semibold text-foreground">{step.label}</p>
-                <p className="text-xs text-muted-foreground">{step.description}</p>
+                <p className="text-[10px] uppercase tracking-[0.3em]">
+                  {stateLabel}
+                </p>
+                <p className="text-sm font-semibold text-foreground">
+                  {step.label}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {step.description}
+                </p>
               </div>
             );
           })}
@@ -621,7 +629,9 @@ export function LoginForm() {
             >
               <div className="flex items-center justify-between rounded-2xl border border-border/40 bg-bg-secondary/40 px-4 py-3 backdrop-blur-md">
                 <div>
-                  <p className="text-sm font-semibold text-foreground">Trust this device</p>
+                  <p className="text-sm font-semibold text-foreground">
+                    Trust this device
+                  </p>
                   <p className="text-xs text-muted-foreground">
                     {rememberDevice
                       ? "We will minimize OTP prompts for 30 days."
@@ -635,17 +645,19 @@ export function LoginForm() {
                   className="data-[state=checked]:bg-card-action data-[state=unchecked]:bg-border"
                 />
               </div>
-              </motion.div>
+            </motion.div>
 
-              {/* Testing Toggle - Skip OTP */}
-              <motion.div
+            {/* Testing Toggle - Skip OTP */}
+            <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.76 }}
             >
               <div className="flex items-center justify-between rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 backdrop-blur-md">
                 <div>
-                  <p className="text-sm font-semibold text-amber-600 dark:text-amber-400">Skip OTP (Testing Mode)</p>
+                  <p className="text-sm font-semibold text-amber-600 dark:text-amber-400">
+                    Skip OTP (Testing Mode)
+                  </p>
                   <p className="text-xs text-amber-600/70 dark:text-amber-400/70">
                     {skipOtp
                       ? "⚠️ OTP verification disabled - for testing only"
@@ -659,23 +671,26 @@ export function LoginForm() {
                   className="data-[state=checked]:bg-amber-500 data-[state=unchecked]:bg-border"
                 />
               </div>
-              </motion.div>
+            </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-start gap-3 rounded-2xl border border-border/40 bg-bg-secondary/40 p-4 text-left backdrop-blur-md"
-              >
-                <ShieldCheck className="size-5 text-data-success" />
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Session protected</p>
-                  <p className="text-xs text-muted-foreground">
-                    Codes are valid for a single attempt and never shared via SMS. Keep your inbox handy.
-                  </p>
-                </div>
-              </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-start gap-3 rounded-2xl border border-border/40 bg-bg-secondary/40 p-4 text-left backdrop-blur-md"
+            >
+              <ShieldCheck className="size-5 text-data-success" />
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  Session protected
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Codes are valid for a single attempt and never shared via SMS.
+                  Keep your inbox handy.
+                </p>
+              </div>
+            </motion.div>
 
-              <AnimatePresence>
+            <AnimatePresence>
               {error && (
                 <motion.div
                   id="login-error"
@@ -686,7 +701,10 @@ export function LoginForm() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                 >
-                  <AlertCircle className="size-4 flex-shrink-0" aria-hidden="true" />
+                  <AlertCircle
+                    className="size-4 flex-shrink-0"
+                    aria-hidden="true"
+                  />
                   <span>{error}</span>
                 </motion.div>
               )}
@@ -714,9 +732,18 @@ export function LoginForm() {
                     ease: "linear",
                   }}
                 />
-                {loading && <Loader2 className="size-5 animate-spin" aria-hidden="true" />}
-                <span className="relative z-10">{loading ? "Signing in..." : "Sign In"}</span>
-                {!loading && <ArrowRight className="size-5 relative z-10" aria-hidden="true" />}
+                {loading && (
+                  <Loader2 className="size-5 animate-spin" aria-hidden="true" />
+                )}
+                <span className="relative z-10">
+                  {loading ? "Signing in..." : "Sign In"}
+                </span>
+                {!loading && (
+                  <ArrowRight
+                    className="size-5 relative z-10"
+                    aria-hidden="true"
+                  />
+                )}
               </Button>
             </motion.div>
 
@@ -728,9 +755,12 @@ export function LoginForm() {
             >
               <Smartphone className="size-5 text-card-action" />
               <div>
-                <p className="text-sm font-semibold text-foreground">Corporate email only</p>
+                <p className="text-sm font-semibold text-foreground">
+                  Corporate email only
+                </p>
                 <p className="text-xs text-muted-foreground">
-                  OTPs are issued to your official mailbox. Keep it open so you can verify instantly.
+                  OTPs are issued to your official mailbox. Keep it open so you
+                  can verify instantly.
                 </p>
               </div>
             </motion.div>
@@ -753,7 +783,9 @@ export function LoginForm() {
               >
                 <div className="flex items-center justify-center gap-2">
                   <Sparkles className="size-5 text-data-info animate-pulse" />
-                  <Label className="text-xl font-bold">Verify Your Identity</Label>
+                  <Label className="text-xl font-bold">
+                    Verify Your Identity
+                  </Label>
                   <Sparkles className="size-5 text-data-info animate-pulse" />
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -892,11 +924,18 @@ export function LoginForm() {
                     ease: "linear",
                   }}
                 />
-                {loading && <Loader2 className="size-5 animate-spin relative z-10" />}
-                <span className="relative z-10">{loading ? "Verifying..." : "Verify & Login"}</span>
+                {loading && (
+                  <Loader2 className="size-5 animate-spin relative z-10" />
+                )}
+                <span className="relative z-10">
+                  {loading ? "Verifying..." : "Verify & Login"}
+                </span>
                 {!loading && <ArrowRight className="size-5 relative z-10" />}
               </Button>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
                 <Button
                   type="button"
                   variant="ghost"

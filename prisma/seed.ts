@@ -27,13 +27,13 @@ type SeedUser = {
 
 type SeedHoliday = { date: string; name: string };
 
-const YEAR = new Date().getFullYear();
+const YEAR = 2025; // Fixed to 2025 for accurate holiday data
 const DEMO_PASSWORD = "demo123";
 const SEED_RESET =
   ["true", "1", "yes"].includes(
     (process.env.SEED_RESET ?? "").trim().toLowerCase()
   ) || false;
-const EMPLOYEES_PER_DEPT = 8; // Realistic for testing (24 total employees)
+const EMPLOYEES_PER_DEPT = 12; // Increased for comprehensive testing (36 total employees across 3 depts)
 const UPLOAD_ROOT = path.join(process.cwd(), "private", "uploads");
 
 const nameRng = new SeededRandom(3101);
@@ -41,7 +41,7 @@ const balanceRng = new SeededRandom(4201);
 const leaveRng = new SeededRandom(5201);
 const pendingRng = new SeededRandom(6201);
 
-const departments = ["IT", "HR", "Finance"] as const;
+const departments = ["IT", "HR", "Finance", "Operations", "Marketing"] as const;
 const featuredEmployees: Array<{
   name: string;
   email: string;
@@ -58,6 +58,26 @@ const featuredEmployees: Array<{
     name: "Employee Four",
     email: "employee4@demo.local",
     department: "Finance",
+  },
+  {
+    name: "Rafiq Ahmed",
+    email: "rafiq.ahmed@cdbl.local",
+    department: "Operations",
+  },
+  {
+    name: "Nasreen Akter",
+    email: "nasreen.akter@cdbl.local",
+    department: "Marketing",
+  },
+  {
+    name: "Kamal Hossain",
+    email: "kamal.hossain@cdbl.local",
+    department: "IT",
+  },
+  {
+    name: "Fatima Begum",
+    email: "fatima.begum@cdbl.local",
+    department: "Operations",
   },
 ];
 
@@ -90,7 +110,7 @@ async function resetDatabase() {
     return;
   }
 
-  console.log("🗑️  Resetting transactional tables...");
+  console.log("🗑️  Resetting all tables for fresh seed...");
   await prisma.$transaction([
     prisma.approval.deleteMany(),
     prisma.leaveComment.deleteMany(),
@@ -101,8 +121,9 @@ async function resetDatabase() {
     prisma.policyConfig.deleteMany(),
     prisma.auditLog.deleteMany(),
     prisma.orgSettings.deleteMany(),
+    prisma.user.deleteMany(), // Delete users to avoid empCode conflicts
   ]);
-  console.log("✅ Tables cleared (users preserved)");
+  console.log("✅ All tables cleared - fresh seed ready");
 }
 
 async function createUsers(): Promise<SeedUser[]> {
@@ -196,7 +217,7 @@ async function createUsers(): Promise<SeedUser[]> {
     empCode: makeEmpCode(Role.HR_ADMIN, "HR", 1),
   });
 
-  // Dept heads
+  // Dept heads for all departments
   const deptHeadSeeds = [
     {
       name: "IT Department Head",
@@ -212,6 +233,16 @@ async function createUsers(): Promise<SeedUser[]> {
       name: "Finance Controller",
       email: "depthead.finance@cdbl.local",
       department: "Finance",
+    },
+    {
+      name: "Operations Manager",
+      email: "depthead.operations@cdbl.local",
+      department: "Operations",
+    },
+    {
+      name: "Marketing Director",
+      email: "depthead.marketing@cdbl.local",
+      department: "Marketing",
     },
   ];
 
@@ -365,30 +396,51 @@ async function createBalances(users: SeedUser[]) {
 }
 
 async function createHolidays(): Promise<SeedHoliday[]> {
-  const baseHolidays: Array<{ month: number; day: number; name: string }> = [
+  // 2025 Bangladesh Holidays from official calendar
+  const holidays2025: Array<{
+    month: number;
+    day: number;
+    name: string;
+    duration?: number;
+  }> = [
     { month: 1, day: 1, name: "New Year's Day" },
-    { month: 2, day: 21, name: "Shaheed Day & Intl. Mother Language Day" },
-    { month: 3, day: 17, name: "Bangabandhu's Birthday" },
+    { month: 2, day: 15, name: "Shab-e-Barat" },
+    {
+      month: 2,
+      day: 21,
+      name: "Shaheed Day & International Mother Language Day",
+    },
+    {
+      month: 3,
+      day: 17,
+      name: "Bangabandhu's Birthday & National Children's Day",
+    },
     { month: 3, day: 26, name: "Independence & National Day" },
-    { month: 4, day: 14, name: "Bengali New Year" },
+    // Eid-ul-Fitr (March 29 - April 2, 2025) - 6 days
+    { month: 3, day: 29, name: "Eid-ul-Fitr" },
+    { month: 3, day: 30, name: "Eid-ul-Fitr Holiday" },
+    { month: 3, day: 31, name: "Eid-ul-Fitr Holiday" },
+    { month: 4, day: 1, name: "Eid-ul-Fitr Holiday" },
+    { month: 4, day: 2, name: "Eid-ul-Fitr Holiday" },
+    { month: 4, day: 3, name: "Eid-ul-Fitr Holiday" },
+    { month: 4, day: 14, name: "Bengali New Year (Pahela Baishakh)" },
     { month: 5, day: 1, name: "May Day" },
-    { month: 6, day: 16, name: "Eid-ul-Azha" },
-    { month: 6, day: 17, name: "Eid-ul-Azha Holiday" },
+    // Eid-ul-Azha (June 5-10, 2025) - 6 days
+    { month: 6, day: 5, name: "Eid-ul-Azha" },
+    { month: 6, day: 6, name: "Eid-ul-Azha Holiday" },
+    { month: 6, day: 7, name: "Eid-ul-Azha Holiday" },
+    { month: 6, day: 8, name: "Eid-ul-Azha Holiday" },
+    { month: 6, day: 9, name: "Eid-ul-Azha Holiday" },
+    { month: 6, day: 10, name: "Eid-ul-Azha Holiday" },
     { month: 7, day: 1, name: "Bank Holiday" },
     { month: 8, day: 15, name: "National Mourning Day" },
-    { month: 10, day: 2, name: "Durga Puja" },
-    { month: 10, day: 12, name: "Eid-e-Milad-un-Nabi" },
+    { month: 9, day: 4, name: "Eid-e-Milad-un-Nabi (Jashne Juloos)" },
+    { month: 10, day: 3, name: "Durga Puja" },
     { month: 12, day: 16, name: "Victory Day" },
     { month: 12, day: 25, name: "Christmas Day" },
   ];
 
-  const eidUlFitr = [
-    { month: 4, day: 9, name: "Eid-ul-Fitr" },
-    { month: 4, day: 10, name: "Eid-ul-Fitr Holiday" },
-    { month: 4, day: 11, name: "Eid-ul-Fitr Holiday" },
-  ];
-
-  const yearHolidays = [...baseHolidays, ...eidUlFitr].map((holiday) => ({
+  const yearHolidays = holidays2025.map((holiday) => ({
     date: normalizeToDhakaMidnight(
       new Date(Date.UTC(YEAR, holiday.month - 1, holiday.day))
     )
@@ -397,11 +449,17 @@ async function createHolidays(): Promise<SeedHoliday[]> {
     name: holiday.name,
   }));
 
+  // Add early 2026 holidays for continuity
   const nextYearExtras = [
     { date: `${YEAR + 1}-01-01`, name: "New Year's Day" },
+    { date: `${YEAR + 1}-02-15`, name: "Shab-e-Barat" },
     {
       date: `${YEAR + 1}-02-21`,
-      name: "Shaheed Day & Intl. Mother Language Day",
+      name: "Shaheed Day & International Mother Language Day",
+    },
+    {
+      date: `${YEAR + 1}-03-17`,
+      name: "Bangabandhu's Birthday & National Children's Day",
     },
     { date: `${YEAR + 1}-03-26`, name: "Independence & National Day" },
   ];
@@ -419,7 +477,9 @@ async function createHolidays(): Promise<SeedHoliday[]> {
   }
 
   console.log(
-    `✅ Holidays created: ${yearHolidays.length + nextYearExtras.length}`
+    `✅ Holidays created: ${
+      yearHolidays.length + nextYearExtras.length
+    } (2025-2026)`
   );
   return yearHolidays;
 }
@@ -580,8 +640,9 @@ async function createLeaveRequests(users: SeedUser[], holidays: SeedHoliday[]) {
     const deptHead = employee.department && deptHeads.get(employee.department);
     if (!deptHead) continue;
 
-    // 10-15 requests per employee for realistic testing (240-360 total across 24 employees)
-    const numRequests = leaveRng.nextInt(10, 15);
+    // 12-18 requests per employee for comprehensive testing (432-648 total across 36 employees per dept)
+    // This ensures good data distribution across all 12 months
+    const numRequests = leaveRng.nextInt(12, 18);
     for (let i = 0; i < numRequests; i++) {
       const leaveType = leaveRng.pick([
         LeaveType.EARNED,
@@ -637,15 +698,14 @@ async function createLeaveRequests(users: SeedUser[], holidays: SeedHoliday[]) {
         },
       });
 
-      if (
-        [
-          LeaveStatus.APPROVED,
-          LeaveStatus.REJECTED,
-          LeaveStatus.PENDING,
-        ].includes(status) ||
-        status === LeaveStatus.RETURNED ||
-        status === LeaveStatus.CANCELLATION_REQUESTED
-      ) {
+      const statusesNeedingApproval: LeaveStatus[] = [
+        LeaveStatus.APPROVED,
+        LeaveStatus.REJECTED,
+        LeaveStatus.PENDING,
+        LeaveStatus.RETURNED,
+        LeaveStatus.CANCELLATION_REQUESTED,
+      ];
+      if (statusesNeedingApproval.includes(status)) {
         await createApprovalTrail({
           leave,
           employee,
@@ -817,79 +877,226 @@ async function createPendingRequestsForITDeptHead(
   users: SeedUser[],
   holidays: SeedHoliday[]
 ) {
-  const itDeptHead = users.find(
-    (user) => user.role === Role.DEPT_HEAD && user.department === "IT"
-  );
   const hrAdmin = users.find((user) => user.role === Role.HR_ADMIN);
-  if (!itDeptHead || !hrAdmin) {
-    console.warn(
-      "⚠️  Missing IT Dept Head or HR Admin; skipping targeted pending requests"
-    );
+  const hrHead = users.find((user) => user.role === Role.HR_HEAD);
+  const ceo = users.find((user) => user.role === Role.CEO);
+
+  if (!hrAdmin || !hrHead || !ceo) {
+    console.warn("⚠️  Missing approvers; skipping targeted pending requests");
     return;
   }
 
-  const itEmployees = users.filter(
-    (user) => user.role === Role.EMPLOYEE && user.department === "IT"
-  );
-  const pendingEmployees = itEmployees.slice(
-    0,
-    Math.min(6, itEmployees.length)
-  );
-  for (const employee of pendingEmployees) {
-    const leaveType = pendingRng.pick([LeaveType.EARNED, LeaveType.MEDICAL]);
-    const startDate = ensureWorkingDay(
-      new Date(Date.now() + pendingRng.nextInt(14, 21) * 24 * 60 * 60 * 1000),
-      holidays
+  // Create diverse pending requests across all departments at different approval stages
+  for (const dept of departments) {
+    const deptHead = users.find(
+      (user) => user.role === Role.DEPT_HEAD && user.department === dept
     );
-    const endDate = addWorkingDays(
-      startDate,
-      leaveType === LeaveType.EARNED
-        ? pendingRng.nextInt(4, 7)
-        : pendingRng.nextInt(2, 4),
-      holidays
-    );
-    const workingDays = countWorkingDaysSync(startDate, endDate, holidays);
+    if (!deptHead) continue;
 
-    const leave = await prisma.leaveRequest.create({
-      data: {
-        requesterId: employee.id,
-        type: leaveType,
+    const deptEmployees = users.filter(
+      (user) => user.role === Role.EMPLOYEE && user.department === dept
+    );
+
+    // Create 3-5 pending requests per department at various stages
+    const pendingCount = pendingRng.nextInt(3, 5);
+    const pendingEmployees = deptEmployees.slice(
+      0,
+      Math.min(pendingCount, deptEmployees.length)
+    );
+
+    for (const [index, employee] of pendingEmployees.entries()) {
+      const leaveType = pendingRng.pick([
+        LeaveType.EARNED,
+        LeaveType.MEDICAL,
+        LeaveType.CASUAL,
+      ]);
+      const startDate = ensureWorkingDay(
+        new Date(Date.now() + pendingRng.nextInt(14, 45) * 24 * 60 * 60 * 1000),
+        holidays
+      );
+      const endDate = addWorkingDays(
         startDate,
-        endDate,
-        workingDays,
-        reason: randomReason(leaveType, pendingRng),
-        status: LeaveStatus.PENDING,
-        policyVersion: "v2.0",
-        needsCertificate: leaveType === LeaveType.MEDICAL && workingDays > 3,
-      },
-    });
+        leaveType === LeaveType.EARNED
+          ? pendingRng.nextInt(4, 8)
+          : leaveType === LeaveType.CASUAL
+          ? pendingRng.nextInt(1, 2)
+          : pendingRng.nextInt(2, 5),
+        holidays
+      );
+      const workingDays = countWorkingDaysSync(startDate, endDate, holidays);
 
-    await prisma.approval.create({
-      data: {
-        leaveId: leave.id,
-        step: 1,
-        approverId: hrAdmin.id,
-        decision: ApprovalDecision.FORWARDED,
-        toRole: "DEPT_HEAD",
-        comment: "Forwarded to Department Head",
-        decidedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      },
-    });
-
-    await prisma.auditLog.create({
-      data: {
-        actorEmail: hrAdmin.email,
-        action: "LEAVE_FORWARD",
-        targetEmail: employee.email,
-        details: {
-          leaveId: leave.id,
-          toRole: "DEPT_HEAD",
+      const leave = await prisma.leaveRequest.create({
+        data: {
+          requesterId: employee.id,
+          type: leaveType,
+          startDate,
+          endDate,
+          workingDays,
+          reason: randomReason(leaveType, pendingRng),
+          status: LeaveStatus.PENDING,
+          policyVersion: "v2.0",
+          needsCertificate: leaveType === LeaveType.MEDICAL && workingDays > 3,
         },
-      },
-    });
+      });
+
+      // Create different approval stages for each pending request
+      const approvalStage = index % 4; // Cycle through 4 different stages
+
+      if (approvalStage === 0) {
+        // Stage 1: Just submitted, pending with HR Admin (no approvals yet)
+        await prisma.auditLog.create({
+          data: {
+            actorEmail: employee.email,
+            action: "LEAVE_SUBMITTED",
+            targetEmail: hrAdmin.email,
+            details: {
+              leaveId: leave.id,
+              type: leaveType,
+              status: "PENDING",
+            },
+          },
+        });
+      } else if (approvalStage === 1) {
+        // Stage 2: HR Admin forwarded to Dept Head
+        await prisma.approval.create({
+          data: {
+            leaveId: leave.id,
+            step: 1,
+            approverId: hrAdmin.id,
+            decision: ApprovalDecision.FORWARDED,
+            toRole: "DEPT_HEAD",
+            comment: "Forwarded to Department Head for review",
+            decidedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+          },
+        });
+        await prisma.auditLog.create({
+          data: {
+            actorEmail: hrAdmin.email,
+            action: "LEAVE_FORWARD",
+            targetEmail: employee.email,
+            details: {
+              leaveId: leave.id,
+              toRole: "DEPT_HEAD",
+            },
+          },
+        });
+      } else if (approvalStage === 2) {
+        // Stage 3: Dept Head forwarded to HR Head
+        await prisma.approval.createMany({
+          data: [
+            {
+              leaveId: leave.id,
+              step: 1,
+              approverId: hrAdmin.id,
+              decision: ApprovalDecision.FORWARDED,
+              toRole: "DEPT_HEAD",
+              comment: "Forwarded to Department Head",
+              decidedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+            },
+            {
+              leaveId: leave.id,
+              step: 2,
+              approverId: deptHead.id,
+              decision: ApprovalDecision.FORWARDED,
+              toRole: "HR_HEAD",
+              comment: "Approved by department, forwarding to HR Head",
+              decidedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+            },
+          ],
+        });
+        await prisma.auditLog.createMany({
+          data: [
+            {
+              actorEmail: hrAdmin.email,
+              action: "LEAVE_FORWARD",
+              targetEmail: employee.email,
+              details: {
+                leaveId: leave.id,
+                toRole: "DEPT_HEAD",
+              },
+            },
+            {
+              actorEmail: deptHead.email,
+              action: "LEAVE_FORWARD",
+              targetEmail: employee.email,
+              details: {
+                leaveId: leave.id,
+                toRole: "HR_HEAD",
+              },
+            },
+          ],
+        });
+      } else {
+        // Stage 4: HR Head forwarded to CEO (final stage for long leaves)
+        await prisma.approval.createMany({
+          data: [
+            {
+              leaveId: leave.id,
+              step: 1,
+              approverId: hrAdmin.id,
+              decision: ApprovalDecision.FORWARDED,
+              toRole: "DEPT_HEAD",
+              comment: "Initial review complete",
+              decidedAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
+            },
+            {
+              leaveId: leave.id,
+              step: 2,
+              approverId: deptHead.id,
+              decision: ApprovalDecision.FORWARDED,
+              toRole: "HR_HEAD",
+              comment: "Department approval granted",
+              decidedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+            },
+            {
+              leaveId: leave.id,
+              step: 3,
+              approverId: hrHead.id,
+              decision: ApprovalDecision.FORWARDED,
+              toRole: "CEO",
+              comment: "HR Head forwarding to CEO for final approval",
+              decidedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+            },
+          ],
+        });
+        await prisma.auditLog.createMany({
+          data: [
+            {
+              actorEmail: hrAdmin.email,
+              action: "LEAVE_FORWARD",
+              targetEmail: employee.email,
+              details: {
+                leaveId: leave.id,
+                toRole: "DEPT_HEAD",
+              },
+            },
+            {
+              actorEmail: deptHead.email,
+              action: "LEAVE_FORWARD",
+              targetEmail: employee.email,
+              details: {
+                leaveId: leave.id,
+                toRole: "HR_HEAD",
+              },
+            },
+            {
+              actorEmail: hrHead.email,
+              action: "LEAVE_FORWARD",
+              targetEmail: employee.email,
+              details: {
+                leaveId: leave.id,
+                toRole: "CEO",
+              },
+            },
+          ],
+        });
+      }
+    }
   }
 
-  console.log("✅ Targeted pending IT requests created");
+  console.log(
+    "✅ Diverse pending requests created across all departments at various stages"
+  );
 }
 
 function buildDateRange(
@@ -900,7 +1107,7 @@ function buildDateRange(
   const today = normalizeToDhakaMidnight(new Date());
   let startDate = new Date(today);
   let endDate = new Date(today);
-  const futureStatuses = [
+  const futureStatuses: LeaveStatus[] = [
     LeaveStatus.APPROVED,
     LeaveStatus.PENDING,
     LeaveStatus.SUBMITTED,

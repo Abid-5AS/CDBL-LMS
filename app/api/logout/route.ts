@@ -5,16 +5,16 @@ import { getJwtCookieName, verifyJwt } from "@/lib/auth-jwt";
 
 export async function POST(req: Request) {
   const res = NextResponse.json({ ok: true });
-  
+
   // Try to get user info from JWT for audit logging
   const store = await cookies();
   const token = store.get(getJwtCookieName())?.value;
-  
+
   if (token) {
     try {
       const claims = await verifyJwt(token);
       const email = claims.email;
-      
+
       if (email) {
         // Log logout event to audit trail
         try {
@@ -39,11 +39,11 @@ export async function POST(req: Request) {
       console.error("Failed to verify JWT during logout:", error);
     }
   }
-  
+
   // Delete all auth-related cookies
   res.cookies.delete(getJwtCookieName());
   res.cookies.delete("auth_user_email");
   res.cookies.delete("auth_user_name");
-  
+
   return res;
 }

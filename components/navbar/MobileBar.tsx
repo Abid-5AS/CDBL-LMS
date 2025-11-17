@@ -121,7 +121,10 @@ export function MobileBar({
                 exit={{ rotate: -90, opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <Menu size={20} className="text-foreground dark:text-foreground" />
+                <Menu
+                  size={20}
+                  className="text-foreground dark:text-foreground"
+                />
               </motion.div>
             )}
           </AnimatePresence>

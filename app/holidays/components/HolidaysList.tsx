@@ -85,7 +85,7 @@ export function HolidaysList({ holidays }: HolidaysListProps) {
                   <span>{formatDate(holiday.date)}</span>
                   <span>•</span>
                   <span>
-                    {holidayDate.toLocaleDateString("en-US", {
+                    {holidayDate.toLocaleDateString("en-GB", {
                       weekday: "long",
                     })}
                   </span>

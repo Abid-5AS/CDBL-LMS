@@ -6,7 +6,10 @@ import {
   type Holiday,
 } from "./date-utils";
 
-export async function fetchHolidaysInRange(start: Date, end: Date): Promise<Holiday[]> {
+export async function fetchHolidaysInRange(
+  start: Date,
+  end: Date
+): Promise<Holiday[]> {
   const normalizedStart = normalizeToDhakaMidnight(start);
   const normalizedEnd = normalizeToDhakaMidnight(end);
 
@@ -62,8 +65,7 @@ export async function violatesCasualLeaveSideTouch(
   const rangeEnd = addDays(normalizedEnd, 1);
 
   const holidays =
-    options.holidays ??
-    (await fetchHolidaysInRange(rangeStart, rangeEnd));
+    options.holidays ?? (await fetchHolidaysInRange(rangeStart, rangeEnd));
 
   // Rule A: Check EVERY day in CL range is a working day (no holidays/weekends within CL)
   let currentDate = new Date(normalizedStart);
@@ -120,10 +122,10 @@ export async function violatesCasualLeaveCombination(
         {
           AND: [
             { startDate: { lte: normalizedEnd } },
-            { endDate: { gte: normalizedStart } }
-          ]
-        }
-      ]
+            { endDate: { gte: normalizedStart } },
+          ],
+        },
+      ],
     },
     select: {
       id: true,
@@ -160,10 +162,13 @@ export async function violatesCasualLeaveCombination(
  * @param today - Current date (defaults to now)
  * @returns Object with canCancel boolean and reason if blocked
  */
-export function canCancelMaternityLeave(leave: {
-  type: string;
-  startDate: Date;
-}, today: Date = new Date()): {
+export function canCancelMaternityLeave(
+  leave: {
+    type: string;
+    startDate: Date;
+  },
+  today: Date = new Date()
+): {
   canCancel: boolean;
   reason?: string;
 } {
@@ -179,7 +184,8 @@ export function canCancelMaternityLeave(leave: {
   const hasStarted = normalizedStartDate <= normalizedToday;
 
   if (hasStarted) {
-    const leaveTypeName = leave.type === "MATERNITY" ? "Maternity" : "Special Disability";
+    const leaveTypeName =
+      leave.type === "MATERNITY" ? "Maternity" : "Special Disability";
     return {
       canCancel: false,
       reason: `${leaveTypeName} leave cannot be cancelled after it has started (Policy - Master Specification). Please contact HR for assistance.`,
@@ -222,7 +228,8 @@ export async function validatePaternityLeaveEligibility(
   if (previousPaternity.length >= 2) {
     return {
       valid: false,
-      reason: "Maximum 2 paternity leave occasions allowed during entire service life (Policy 6.24.b)",
+      reason:
+        "Maximum 2 paternity leave occasions allowed during entire service life (Policy 6.24.b)",
       previousLeaves: previousPaternity.length,
     };
   }
@@ -234,12 +241,24 @@ export async function validatePaternityLeaveEligibility(
     const proposedStart = normalizeToDhakaMidnight(startDate);
 
     // Calculate months between first leave end and proposed start
-    const monthsDiff = (proposedStart.getTime() - firstLeaveEnd.getTime()) / (1000 * 60 * 60 * 24 * 30.44);
+    const monthsDiff =
+      (proposedStart.getTime() - firstLeaveEnd.getTime()) /
+      (1000 * 60 * 60 * 24 * 30.44);
 
     if (monthsDiff < 36) {
+      const formatDate = (d: Date) =>
+        d.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        });
       return {
         valid: false,
-        reason: `Minimum 36-month interval required between first and second paternity leave (Policy 6.24.b). Last paternity leave ended on ${firstLeaveEnd.toLocaleDateString()}. ${monthsDiff.toFixed(1)} months have passed, need ${(36 - monthsDiff).toFixed(1)} more months.`,
+        reason: `Minimum 36-month interval required between first and second paternity leave (Policy 6.24.b). Last paternity leave ended on ${formatDate(
+          firstLeaveEnd
+        )}. ${monthsDiff.toFixed(1)} months have passed, need ${(
+          36 - monthsDiff
+        ).toFixed(1)} more months.`,
         previousLeaves: previousPaternity.length,
         monthsSinceFirst: monthsDiff,
       };
@@ -284,9 +303,9 @@ export async function validateExtraordinaryLeavePrerequisite(
 }> {
   // Define thresholds for each mandatory leave type
   const THRESHOLDS = {
-    CASUAL: 2,      // Allow ≤2 days remaining
-    EARNED: 0,      // Must be fully exhausted
-    MEDICAL: 5,     // Allow ≤5 days buffer
+    CASUAL: 2, // Allow ≤2 days remaining
+    EARNED: 0, // Must be fully exhausted
+    MEDICAL: 5, // Allow ≤5 days buffer
   };
 
   // Fetch all balances for the requested year
@@ -316,7 +335,10 @@ export async function validateExtraordinaryLeavePrerequisite(
     if (record.closing !== null && record.closing !== undefined) {
       return record.closing;
     }
-    return Math.max((record.opening ?? 0) + (record.accrued ?? 0) - (record.used ?? 0), 0);
+    return Math.max(
+      (record.opening ?? 0) + (record.accrued ?? 0) - (record.used ?? 0),
+      0
+    );
   };
 
   const casualBalance = getRemaining("CASUAL");
@@ -358,9 +380,10 @@ export async function validateExtraordinaryLeavePrerequisite(
   if (violations.length > 0) {
     const violationDetails = violations
       .map((v) => {
-        const leaveTypeName = v.type === "CASUAL"
-          ? "Casual Leave"
-          : v.type === "EARNED"
+        const leaveTypeName =
+          v.type === "CASUAL"
+            ? "Casual Leave"
+            : v.type === "EARNED"
             ? "Earned Leave"
             : "Medical Leave";
         return `${leaveTypeName}: ${v.balance} days remaining (threshold: ${v.threshold})`;
@@ -390,5 +413,3 @@ export async function validateExtraordinaryLeavePrerequisite(
     },
   };
 }
-
-

@@ -38,6 +38,7 @@ export interface HolidayCalendarProps {
 }
 
 const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+// Bangladesh weekends: Friday (5) and Saturday (6)
 const MONTHS = [
   "January",
   "February",
@@ -79,7 +80,11 @@ export function HolidayCalendar({
 }: HolidayCalendarProps) {
   const today = new Date();
   const [currentDate, setCurrentDate] = useState(
-    new Date(initialYear || today.getFullYear(), initialMonth || today.getMonth(), 1)
+    new Date(
+      initialYear || today.getFullYear(),
+      initialMonth || today.getMonth(),
+      1
+    )
   );
 
   // Normalize holidays to Date objects
@@ -117,7 +122,7 @@ export function HolidayCalendar({
         date,
         isCurrentMonth: false,
         isToday: false,
-        isWeekend: date.getDay() === 0 || date.getDay() === 6,
+        isWeekend: date.getDay() === 5 || date.getDay() === 6, // Friday & Saturday
         holidays: [],
       });
     }
@@ -139,7 +144,7 @@ export function HolidayCalendar({
           date.getDate() === today.getDate() &&
           date.getMonth() === today.getMonth() &&
           date.getFullYear() === today.getFullYear(),
-        isWeekend: date.getDay() === 0 || date.getDay() === 6,
+        isWeekend: date.getDay() === 5 || date.getDay() === 6, // Friday & Saturday
         holidays: dayHolidays,
       });
     }
@@ -152,7 +157,7 @@ export function HolidayCalendar({
         date,
         isCurrentMonth: false,
         isToday: false,
-        isWeekend: date.getDay() === 0 || date.getDay() === 6,
+        isWeekend: date.getDay() === 5 || date.getDay() === 6, // Friday & Saturday
         holidays: [],
       });
     }
@@ -161,11 +166,15 @@ export function HolidayCalendar({
   }, [currentDate, normalizedHolidays, today]);
 
   const goToPreviousMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
+    );
   };
 
   const goToNextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
+    );
   };
 
   const goToToday = () => {
@@ -258,7 +267,9 @@ export function HolidayCalendar({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div
-                      onClick={() => day.isCurrentMonth && handleDateClick(day.date)}
+                      onClick={() =>
+                        day.isCurrentMonth && handleDateClick(day.date)
+                      }
                       className={cn(
                         "min-h-[80px] border-r border-b last:border-r-0 border-border p-2 transition-colors",
                         day.isCurrentMonth
@@ -320,7 +331,9 @@ export function HolidayCalendar({
                               )}
                             />
                             <div>
-                              <p className="font-medium text-sm">{holiday.name}</p>
+                              <p className="font-medium text-sm">
+                                {holiday.name}
+                              </p>
                               <p className="text-xs text-muted-foreground">
                                 {categoryLabels[holiday.category || "public"]}
                                 {holiday.isOptional && " (Optional)"}

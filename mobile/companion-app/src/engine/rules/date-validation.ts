@@ -88,7 +88,8 @@ export const dateRules: Rule[] = [
           suggestions: [
             {
               type: "SWAP_DATES",
-              reasoning: "The dates appear to be reversed. Please check and correct the start and end dates.",
+              reasoning:
+                "The dates appear to be reversed. Please check and correct the start and end dates.",
               priority: 100,
             },
           ],
@@ -137,7 +138,8 @@ export const dateRules: Rule[] = [
           suggestions: [
             {
               type: "WAIT",
-              reasoning: "Please wait until you're within the 90-day window to submit this leave request.",
+              reasoning:
+                "Please wait until you're within the 90-day window to submit this leave request.",
               priority: 80,
             },
           ],
@@ -184,11 +186,13 @@ export const dateRules: Rule[] = [
           passed: false,
           severity: "ERROR",
           code: "WORKING_DAYS_INVALID",
-          message: "Working days must be greater than 0. Please select valid working days.",
+          message:
+            "Working days must be greater than 0. Please select valid working days.",
           suggestions: [
             {
               type: "CHECK_DATES",
-              reasoning: "Ensure your selected dates include at least one working day (Monday-Friday, excluding holidays).",
+              reasoning:
+                "Ensure your selected dates include at least one working day (Monday-Friday, excluding holidays).",
               priority: 90,
             },
           ],
@@ -244,10 +248,7 @@ export const dateRules: Rule[] = [
         if (existing.id === id) return false;
 
         // Skip cancelled or rejected leaves
-        if (
-          existing.status === "cancelled" ||
-          existing.status === "rejected"
-        ) {
+        if (existing.status === "cancelled" || existing.status === "rejected") {
           return false;
         }
 
@@ -256,26 +257,35 @@ export const dateRules: Rule[] = [
 
         // Check for overlap
         return (
-          (isBefore(startDate, existingEnd) || startDate.getTime() === existingEnd.getTime()) &&
-          (isAfter(endDate, existingStart) || endDate.getTime() === existingStart.getTime())
+          (isBefore(startDate, existingEnd) ||
+            startDate.getTime() === existingEnd.getTime()) &&
+          (isAfter(endDate, existingStart) ||
+            endDate.getTime() === existingStart.getTime())
         );
       });
 
       if (overlaps.length > 0) {
         const overlapDetails = overlaps.map(
           (o) =>
-            `${o.type} from ${new Date(o.startDate).toLocaleDateString()} to ${new Date(o.endDate).toLocaleDateString()} (${o.status})`
+            `${o.type} from ${new Date(o.startDate).toLocaleDateString(
+              "en-GB"
+            )} to ${new Date(o.endDate).toLocaleDateString("en-GB")} (${
+              o.status
+            })`
         );
 
         return {
           passed: false,
           severity: "ERROR",
           code: "DATE_OVERLAP",
-          message: `Your requested dates overlap with existing leave application(s): ${overlapDetails.join(", ")}`,
+          message: `Your requested dates overlap with existing leave application(s): ${overlapDetails.join(
+            ", "
+          )}`,
           suggestions: [
             {
               type: "CHANGE_DATES",
-              reasoning: "Choose different dates that don't overlap with your existing leave applications.",
+              reasoning:
+                "Choose different dates that don't overlap with your existing leave applications.",
               priority: 100,
             },
           ],

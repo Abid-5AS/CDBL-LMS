@@ -21,9 +21,7 @@ import {
   ResponsiveDashboardGrid,
   DashboardSection,
 } from "@/components/dashboards/shared";
-import {
-  ChartContainer,
-} from "@/components/shared/LeaveCharts";
+import { ChartContainer } from "@/components/shared/LeaveCharts";
 import { PendingLeaveRequestsTable } from "./sections/PendingApprovals";
 import { CancellationRequestsPanel } from "./sections/CancellationRequests";
 
@@ -121,17 +119,18 @@ function HRAdminDashboardClientImpl({
   }, []);
 
   // Fetch KPIs first for instant rendering
-  const {
-    data: kpiData,
-    isLoading: isKPILoading,
-  } = useSWR<HRAdminStats>("/api/dashboard/hr-admin/kpis", apiFetcher, {
-    refreshInterval: 60000, // Refresh every minute
-    revalidateOnFocus: false,
-    dedupingInterval: 10000,
-    revalidateOnReconnect: true,
-    keepPreviousData: true,
-    fallbackData: initialKpis ?? undefined,
-  });
+  const { data: kpiData, isLoading: isKPILoading } = useSWR<HRAdminStats>(
+    "/api/dashboard/hr-admin/kpis",
+    apiFetcher,
+    {
+      refreshInterval: 60000, // Refresh every minute
+      revalidateOnFocus: false,
+      dedupingInterval: 10000,
+      revalidateOnReconnect: true,
+      keepPreviousData: true,
+      fallbackData: initialKpis ?? undefined,
+    }
+  );
 
   // Fetch full displayStats in background (includes charts/analytics)
   const {
@@ -278,12 +277,11 @@ function HRAdminDashboardClientImpl({
                         What this shows:
                       </p>
                       <p className="text-sm mb-2">
-                        Leave requests awaiting YOUR action. This is your personal
-                        work queue - not organization-wide pending requests.
+                        Leave requests awaiting YOUR action. This is your
+                        personal work queue - not organization-wide pending
+                        requests.
                       </p>
-                      <p className="text-sm font-semibold mb-1">
-                        What to do:
-                      </p>
+                      <p className="text-sm font-semibold mb-1">What to do:</p>
                       <p className="text-sm mb-2">
                         Review each request and Forward to DEPT_HEAD, Return for
                         modification, or Reject if invalid.
@@ -306,13 +304,17 @@ function HRAdminDashboardClientImpl({
                     trend={
                       displayStats && displayStats.avgApprovalTime > 3
                         ? {
-                            value: Math.round((displayStats.avgApprovalTime - 3) * 10),
+                            value: Math.round(
+                              (displayStats.avgApprovalTime - 3) * 10
+                            ),
                             label: "vs 3d target",
                             direction: "down",
                           }
                         : displayStats && displayStats.avgApprovalTime > 0
                         ? {
-                            value: Math.round((3 - displayStats.avgApprovalTime) * 10),
+                            value: Math.round(
+                              (3 - displayStats.avgApprovalTime) * 10
+                            ),
                             label: "below target",
                             direction: "up",
                           }
@@ -459,8 +461,9 @@ function HRAdminDashboardClientImpl({
                           Why it matters:
                         </p>
                         <p className="text-sm mb-2">
-                          Target of 10 per day is a general productivity benchmark
-                          (not mandatory). Helps identify slow processing days.
+                          Target of 10 per day is a general productivity
+                          benchmark (not mandatory). Helps identify slow
+                          processing days.
                         </p>
                         <p className="text-xs text-muted-foreground">
                           Calculation: Counts all requests with APPROVED or
@@ -517,7 +520,9 @@ function HRAdminDashboardClientImpl({
                             value: displayStats.teamUtilization >= 85 ? 2 : 3,
                             label: "vs target",
                             direction:
-                              displayStats.teamUtilization >= 85 ? "up" : "down",
+                              displayStats.teamUtilization >= 85
+                                ? "up"
+                                : "down",
                           }
                         : undefined
                     }
@@ -569,7 +574,9 @@ function HRAdminDashboardClientImpl({
                             value: displayStats.complianceScore >= 90 ? 1 : 2,
                             label: "this month",
                             direction:
-                              displayStats.complianceScore >= 90 ? "up" : "down",
+                              displayStats.complianceScore >= 90
+                                ? "up"
+                                : "down",
                           }
                         : undefined
                     }
@@ -588,9 +595,9 @@ function HRAdminDashboardClientImpl({
                         What this shows:
                       </p>
                       <p className="text-sm mb-2">
-                        Measures how well the organization follows leave policies
-                        - proper documentation, timely processing, and workflow
-                        adherence.
+                        Measures how well the organization follows leave
+                        policies - proper documentation, timely processing, and
+                        workflow adherence.
                       </p>
                       <p className="text-sm font-semibold mb-1">
                         Why it matters:
@@ -601,9 +608,9 @@ function HRAdminDashboardClientImpl({
                         attention.
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Note: Currently using placeholder value. Real calculation
-                        coming soon (on-time processing + documentation + policy
-                        adherence).
+                        Note: Currently using placeholder value. Real
+                        calculation coming soon (on-time processing +
+                        documentation + policy adherence).
                       </p>
                     </TooltipContent>
                   </Tooltip>
@@ -712,7 +719,11 @@ function HRAdminDashboardClientImpl({
                 height={400}
                 className="hover:shadow-xl transition-all duration-300 h-full"
               >
-                <Suspense fallback={<div className="h-[360px] bg-muted/20 animate-pulse rounded" />}>
+                <Suspense
+                  fallback={
+                    <div className="h-[360px] bg-muted/20 animate-pulse rounded" />
+                  }
+                >
                   <LazyTypePie
                     data={
                       displayStats?.leaveTypeBreakdown?.map((item) => ({
@@ -737,12 +748,17 @@ function HRAdminDashboardClientImpl({
                     loading={isLoading}
                     empty={
                       !isLoading &&
-                      (!displayStats?.monthlyTrend || displayStats.monthlyTrend.length === 0)
+                      (!displayStats?.monthlyTrend ||
+                        displayStats.monthlyTrend.length === 0)
                     }
                     height={400}
                     className="hover:shadow-xl transition-all duration-300 h-full"
                   >
-                    <Suspense fallback={<div className="h-[360px] bg-muted/20 animate-pulse rounded" />}>
+                    <Suspense
+                      fallback={
+                        <div className="h-[360px] bg-muted/20 animate-pulse rounded" />
+                      }
+                    >
                       <LazyTrendChart
                         data={displayStats.monthlyTrend.map((item) => ({
                           month: item.month,

@@ -4,6 +4,7 @@ import {
   NotificationWithRelations,
 } from "@/lib/repositories/notification.repository";
 import { LeaveType, LeaveStatus, ApprovalDecision } from "@prisma/client";
+import { formatDate } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 import {
   sendLeaveSubmittedEmail,
@@ -45,7 +46,10 @@ export class NotificationService {
     }
   ): Promise<ServiceResult<NotificationWithRelations[]>> {
     try {
-      const notifications = await NotificationRepository.findByUserId(userId, options);
+      const notifications = await NotificationRepository.findByUserId(
+        userId,
+        options
+      );
       return { success: true, data: notifications };
     } catch (error) {
       console.error("NotificationService.getForUser error:", error);
@@ -62,9 +66,15 @@ export class NotificationService {
   /**
    * Get recent notifications (last 30 days)
    */
-  static async getRecent(userId: number, limit: number = 20): Promise<ServiceResult<NotificationWithRelations[]>> {
+  static async getRecent(
+    userId: number,
+    limit: number = 20
+  ): Promise<ServiceResult<NotificationWithRelations[]>> {
     try {
-      const notifications = await NotificationRepository.findRecent(userId, limit);
+      const notifications = await NotificationRepository.findRecent(
+        userId,
+        limit
+      );
       return { success: true, data: notifications };
     } catch (error) {
       console.error("NotificationService.getRecent error:", error);
@@ -100,10 +110,15 @@ export class NotificationService {
   /**
    * Mark notification as read
    */
-  static async markAsRead(notificationId: number, userId: number): Promise<ServiceResult<NotificationWithRelations>> {
+  static async markAsRead(
+    notificationId: number,
+    userId: number
+  ): Promise<ServiceResult<NotificationWithRelations>> {
     try {
       // Verify notification belongs to user
-      const notification = await NotificationRepository.findById(notificationId);
+      const notification = await NotificationRepository.findById(
+        notificationId
+      );
       if (!notification) {
         return {
           success: false,
@@ -160,10 +175,15 @@ export class NotificationService {
   /**
    * Delete a notification
    */
-  static async delete(notificationId: number, userId: number): Promise<ServiceResult<void>> {
+  static async delete(
+    notificationId: number,
+    userId: number
+  ): Promise<ServiceResult<void>> {
     try {
       // Verify notification belongs to user
-      const notification = await NotificationRepository.findById(notificationId);
+      const notification = await NotificationRepository.findById(
+        notificationId
+      );
       if (!notification) {
         return {
           success: false,
@@ -201,7 +221,10 @@ export class NotificationService {
   /**
    * Create notification when leave is submitted
    */
-  static async notifyLeaveSubmitted(leaveId: number, requesterId: number): Promise<ServiceResult<number>> {
+  static async notifyLeaveSubmitted(
+    leaveId: number,
+    requesterId: number
+  ): Promise<ServiceResult<number>> {
     try {
       // Get leave request details
       const leave = await prisma.leaveRequest.findUnique({
@@ -218,19 +241,24 @@ export class NotificationService {
       if (!leave) {
         return {
           success: false,
-          error: { code: "leave_not_found", message: "Leave request not found" },
+          error: {
+            code: "leave_not_found",
+            message: "Leave request not found",
+          },
         };
       }
 
       // Create notifications for all pending approvers
-      const notifications: CreateNotificationData[] = leave.approvals.map((approval) => ({
-        userId: approval.approver.id,
-        type: "APPROVAL_REQUIRED",
-        title: "New Leave Approval Required",
-        message: `${leave.requester.name} has submitted a ${leave.type} leave request`,
-        link: `/leaves/${leaveId}`,
-        leaveId: leaveId,
-      }));
+      const notifications: CreateNotificationData[] = leave.approvals.map(
+        (approval) => ({
+          userId: approval.approver.id,
+          type: "APPROVAL_REQUIRED",
+          title: "New Leave Approval Required",
+          message: `${leave.requester.name} has submitted a ${leave.type} leave request`,
+          link: `/leaves/${leaveId}`,
+          leaveId: leaveId,
+        })
+      );
 
       // Also notify the requester that their leave was submitted
       notifications.push({
@@ -257,8 +285,8 @@ export class NotificationService {
             approver.name,
             leave.requester.name,
             leave.type,
-            leave.startDate.toLocaleDateString(),
-            leave.endDate.toLocaleDateString(),
+            formatDate(leave.startDate),
+            formatDate(leave.endDate),
             leave.workingDays,
             leaveId
           );
@@ -287,17 +315,25 @@ export class NotificationService {
   /**
    * Create notification when leave is approved
    */
-  static async notifyLeaveApproved(leaveId: number, approverName: string): Promise<ServiceResult<void>> {
+  static async notifyLeaveApproved(
+    leaveId: number,
+    approverName: string
+  ): Promise<ServiceResult<void>> {
     try {
       const leave = await prisma.leaveRequest.findUnique({
         where: { id: leaveId },
-        include: { requester: { select: { id: true, name: true, email: true } } },
+        include: {
+          requester: { select: { id: true, name: true, email: true } },
+        },
       });
 
       if (!leave) {
         return {
           success: false,
-          error: { code: "leave_not_found", message: "Leave request not found" },
+          error: {
+            code: "leave_not_found",
+            message: "Leave request not found",
+          },
         };
       }
 
@@ -315,8 +351,8 @@ export class NotificationService {
         leave.requester.email,
         leave.requester.name,
         leave.type,
-        leave.startDate.toLocaleDateString(),
-        leave.endDate.toLocaleDateString(),
+        formatDate(leave.startDate),
+        formatDate(leave.endDate),
         approverName,
         leaveId
       ).catch((err) => {
@@ -340,17 +376,26 @@ export class NotificationService {
   /**
    * Create notification when leave is rejected
    */
-  static async notifyLeaveRejected(leaveId: number, approverName: string, reason?: string): Promise<ServiceResult<void>> {
+  static async notifyLeaveRejected(
+    leaveId: number,
+    approverName: string,
+    reason?: string
+  ): Promise<ServiceResult<void>> {
     try {
       const leave = await prisma.leaveRequest.findUnique({
         where: { id: leaveId },
-        include: { requester: { select: { id: true, name: true, email: true } } },
+        include: {
+          requester: { select: { id: true, name: true, email: true } },
+        },
       });
 
       if (!leave) {
         return {
           success: false,
-          error: { code: "leave_not_found", message: "Leave request not found" },
+          error: {
+            code: "leave_not_found",
+            message: "Leave request not found",
+          },
         };
       }
 
@@ -372,8 +417,8 @@ export class NotificationService {
         leave.requester.email,
         leave.requester.name,
         leave.type,
-        leave.startDate.toLocaleDateString(),
-        leave.endDate.toLocaleDateString(),
+        formatDate(leave.startDate),
+        formatDate(leave.endDate),
         approverName,
         reason || "No specific reason provided",
         leaveId
@@ -398,17 +443,26 @@ export class NotificationService {
   /**
    * Create notification when leave is returned for modification
    */
-  static async notifyLeaveReturned(leaveId: number, approverName: string, comment: string): Promise<ServiceResult<void>> {
+  static async notifyLeaveReturned(
+    leaveId: number,
+    approverName: string,
+    comment: string
+  ): Promise<ServiceResult<void>> {
     try {
       const leave = await prisma.leaveRequest.findUnique({
         where: { id: leaveId },
-        include: { requester: { select: { id: true, name: true, email: true } } },
+        include: {
+          requester: { select: { id: true, name: true, email: true } },
+        },
       });
 
       if (!leave) {
         return {
           success: false,
-          error: { code: "leave_not_found", message: "Leave request not found" },
+          error: {
+            code: "leave_not_found",
+            message: "Leave request not found",
+          },
         };
       }
 
@@ -450,7 +504,11 @@ export class NotificationService {
   /**
    * Create notification when leave is forwarded
    */
-  static async notifyLeaveForwarded(leaveId: number, newApproverId: number, forwarderName: string): Promise<ServiceResult<void>> {
+  static async notifyLeaveForwarded(
+    leaveId: number,
+    newApproverId: number,
+    forwarderName: string
+  ): Promise<ServiceResult<void>> {
     try {
       const leave = await prisma.leaveRequest.findUnique({
         where: { id: leaveId },
@@ -460,7 +518,10 @@ export class NotificationService {
       if (!leave) {
         return {
           success: false,
-          error: { code: "leave_not_found", message: "Leave request not found" },
+          error: {
+            code: "leave_not_found",
+            message: "Leave request not found",
+          },
         };
       }
 
@@ -497,8 +558,8 @@ export class NotificationService {
           leave.requester.name,
           forwarderName,
           leave.type,
-          leave.startDate.toLocaleDateString(),
-          leave.endDate.toLocaleDateString(),
+          formatDate(leave.startDate),
+          formatDate(leave.endDate),
           leave.workingDays,
           leaveId
         ).catch((err) => {
@@ -523,7 +584,9 @@ export class NotificationService {
   /**
    * Create notification when leave is cancelled
    */
-  static async notifyLeaveCancelled(leaveId: number): Promise<ServiceResult<void>> {
+  static async notifyLeaveCancelled(
+    leaveId: number
+  ): Promise<ServiceResult<void>> {
     try {
       const leave = await prisma.leaveRequest.findUnique({
         where: { id: leaveId },
@@ -536,20 +599,27 @@ export class NotificationService {
       if (!leave) {
         return {
           success: false,
-          error: { code: "leave_not_found", message: "Leave request not found" },
+          error: {
+            code: "leave_not_found",
+            message: "Leave request not found",
+          },
         };
       }
 
       // Notify all approvers
-      const approverIds = [...new Set(leave.approvals.map((a) => a.approver.id))];
-      const notifications: CreateNotificationData[] = approverIds.map((approverId) => ({
-        userId: approverId,
-        type: "LEAVE_CANCELLED",
-        title: "Leave Request Cancelled",
-        message: `${leave.requester.name} has cancelled their ${leave.type} leave request`,
-        link: `/leaves/${leaveId}`,
-        leaveId: leaveId,
-      }));
+      const approverIds = [
+        ...new Set(leave.approvals.map((a) => a.approver.id)),
+      ];
+      const notifications: CreateNotificationData[] = approverIds.map(
+        (approverId) => ({
+          userId: approverId,
+          type: "LEAVE_CANCELLED",
+          title: "Leave Request Cancelled",
+          message: `${leave.requester.name} has cancelled their ${leave.type} leave request`,
+          link: `/leaves/${leaveId}`,
+          leaveId: leaveId,
+        })
+      );
 
       await NotificationRepository.createMany(notifications);
       return { success: true };
@@ -568,7 +638,10 @@ export class NotificationService {
   /**
    * Create notification when fitness certificate is required
    */
-  static async notifyFitnessCertificateRequired(leaveId: number, employeeId: number): Promise<ServiceResult<void>> {
+  static async notifyFitnessCertificateRequired(
+    leaveId: number,
+    employeeId: number
+  ): Promise<ServiceResult<void>> {
     try {
       const leave = await prisma.leaveRequest.findUnique({
         where: { id: leaveId },
@@ -578,7 +651,10 @@ export class NotificationService {
       if (!leave) {
         return {
           success: false,
-          error: { code: "leave_not_found", message: "Leave request not found" },
+          error: {
+            code: "leave_not_found",
+            message: "Leave request not found",
+          },
         };
       }
 
@@ -593,7 +669,10 @@ export class NotificationService {
 
       return { success: true };
     } catch (error) {
-      console.error("NotificationService.notifyFitnessCertificateRequired error:", error);
+      console.error(
+        "NotificationService.notifyFitnessCertificateRequired error:",
+        error
+      );
       return {
         success: false,
         error: {
@@ -607,7 +686,9 @@ export class NotificationService {
   /**
    * Create notification when fitness certificate is uploaded
    */
-  static async notifyFitnessCertificateUploaded(leaveId: number): Promise<ServiceResult<void>> {
+  static async notifyFitnessCertificateUploaded(
+    leaveId: number
+  ): Promise<ServiceResult<void>> {
     try {
       const leave = await prisma.leaveRequest.findUnique({
         where: { id: leaveId },
@@ -617,7 +698,10 @@ export class NotificationService {
       if (!leave) {
         return {
           success: false,
-          error: { code: "leave_not_found", message: "Leave request not found" },
+          error: {
+            code: "leave_not_found",
+            message: "Leave request not found",
+          },
         };
       }
 
@@ -640,7 +724,10 @@ export class NotificationService {
 
       return { success: true };
     } catch (error) {
-      console.error("NotificationService.notifyFitnessCertificateUploaded error:", error);
+      console.error(
+        "NotificationService.notifyFitnessCertificateUploaded error:",
+        error
+      );
       return {
         success: false,
         error: {
@@ -668,7 +755,10 @@ export class NotificationService {
       if (!leave) {
         return {
           success: false,
-          error: { code: "leave_not_found", message: "Leave request not found" },
+          error: {
+            code: "leave_not_found",
+            message: "Leave request not found",
+          },
         };
       }
 
@@ -694,14 +784,16 @@ export class NotificationService {
             select: { id: true },
           });
 
-          const notifications: CreateNotificationData[] = nextApprovers.map((approver) => ({
-            userId: approver.id,
-            type: "FITNESS_CERTIFICATE_REVIEW_REQUIRED",
-            title: "Fitness Certificate Review Required",
-            message: `${leave.requester.name}'s fitness certificate requires your review.`,
-            link: `/leaves/${leaveId}`,
-            leaveId: leaveId,
-          }));
+          const notifications: CreateNotificationData[] = nextApprovers.map(
+            (approver) => ({
+              userId: approver.id,
+              type: "FITNESS_CERTIFICATE_REVIEW_REQUIRED",
+              title: "Fitness Certificate Review Required",
+              message: `${leave.requester.name}'s fitness certificate requires your review.`,
+              link: `/leaves/${leaveId}`,
+              leaveId: leaveId,
+            })
+          );
 
           await NotificationRepository.createMany(notifications);
         }
@@ -709,7 +801,10 @@ export class NotificationService {
 
       return { success: true };
     } catch (error) {
-      console.error("NotificationService.notifyFitnessCertificateApproved error:", error);
+      console.error(
+        "NotificationService.notifyFitnessCertificateApproved error:",
+        error
+      );
       return {
         success: false,
         error: {
@@ -737,7 +832,10 @@ export class NotificationService {
       if (!leave) {
         return {
           success: false,
-          error: { code: "leave_not_found", message: "Leave request not found" },
+          error: {
+            code: "leave_not_found",
+            message: "Leave request not found",
+          },
         };
       }
 
@@ -745,14 +843,20 @@ export class NotificationService {
         userId: leave.requesterId,
         type: "FITNESS_CERTIFICATE_REJECTED",
         title: "Fitness Certificate Rejected",
-        message: `Your fitness certificate was rejected by ${rejectorRole.replace("_", " ")}. Reason: ${reason}. Please upload a new certificate.`,
+        message: `Your fitness certificate was rejected by ${rejectorRole.replace(
+          "_",
+          " "
+        )}. Reason: ${reason}. Please upload a new certificate.`,
         link: `/leaves/${leaveId}`,
         leaveId: leaveId,
       });
 
       return { success: true };
     } catch (error) {
-      console.error("NotificationService.notifyFitnessCertificateRejected error:", error);
+      console.error(
+        "NotificationService.notifyFitnessCertificateRejected error:",
+        error
+      );
       return {
         success: false,
         error: {
@@ -766,7 +870,9 @@ export class NotificationService {
   /**
    * Cleanup old notifications (maintenance task)
    */
-  static async cleanup(daysOld: number = 30): Promise<ServiceResult<{ readDeleted: number; expiredDeleted: number }>> {
+  static async cleanup(
+    daysOld: number = 30
+  ): Promise<ServiceResult<{ readDeleted: number; expiredDeleted: number }>> {
     try {
       const [readDeleted, expiredDeleted] = await Promise.all([
         NotificationRepository.deleteOldRead(daysOld),
