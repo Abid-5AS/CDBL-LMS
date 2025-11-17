@@ -343,13 +343,30 @@ function HRAdminDashboardClientImpl({
             ) : (
               <>
                 <motion.div variants={itemVariants} className="h-full">
-                  <Card className="surface-card rounded-2xl hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+                  <Card className="surface-card rounded-2xl hover:shadow-lg transition-all duration-300 h-full flex flex-col relative">
                     <CardHeader className="pb-3">
                       <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                         <Target className="h-4 w-4" />
                         Daily Processing
                       </CardTitle>
                     </CardHeader>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          aria-label="Information about daily processing"
+                          className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors z-10"
+                        >
+                          <Info className="h-4 w-4" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm">
+                          Organization-wide count of leave requests approved or
+                          rejected today. Target of 10 requests per day is a
+                          general productivity metric, not a strict requirement.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
                     <CardContent className="space-y-3 flex-1 flex flex-col justify-center">
                       <div className="flex items-end justify-between">
                         <div>
