@@ -13,9 +13,19 @@ import {
   Settings,
   Plus,
   CalendarPlus,
+  Info,
 } from "lucide-react";
 
-import { Button, Card, CardContent, Skeleton } from "@/components/ui";
+import {
+  Button,
+  Card,
+  CardContent,
+  Skeleton,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from "@/components/ui";
 import { useApiQuery } from "@/lib/apiClient";
 import { useLeaveRequests } from "@/hooks";
 import { leaveTypeLabel } from "@/lib/ui";
@@ -134,7 +144,7 @@ export function ModernEmployeeDashboard({
   ];
 
   return (
-    <>
+    <TooltipProvider>
       <FloatingQuickActions actions={quickActions} />
       <RoleBasedDashboard
         role="EMPLOYEE"
@@ -148,82 +158,45 @@ export function ModernEmployeeDashboard({
           className="space-y-6 lg:space-y-8"
         >
           <motion.section variants={itemVariants}>
-            <div className="surface-card p-6 space-y-4">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="surface-card p-4 sm:p-6">
+              <div className="flex items-center justify-between gap-4 mb-4">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
-                    Welcome back
-                  </p>
-                  <h1 className="text-2xl font-semibold text-foreground">
-                    Good day, {username}
+                  <h1 className="text-xl sm:text-2xl font-semibold text-foreground">
+                    {username}
                   </h1>
                   <p className="text-sm text-muted-foreground">
-                    Stay on top of your leave plans and next actions.
-                  </p>
-                </div>
-                <div className="rounded-xl border border-border/60 px-4 py-2 text-sm text-muted-foreground">
-                  <p className="text-xs uppercase tracking-widest">Today</p>
-                  <p className="text-lg font-semibold text-foreground">
                     {new Date().toLocaleDateString(undefined, {
-                      weekday: "short",
-                      month: "short",
+                      weekday: "long",
+                      month: "long",
                       day: "numeric",
                     })}
                   </p>
                 </div>
+                <Button
+                  variant="default"
+                  size="sm"
+                  leftIcon={<Plus className="h-4 w-4" aria-hidden="true" />}
+                  onClick={() => router.push("/leaves/apply")}
+                >
+                  Apply Leave
+                </Button>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-xl border border-border/60 px-4 py-3">
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                    Next leave
+              {dashboardData.nextScheduledLeave && (
+                <div className="rounded-xl border border-border/60 px-4 py-3 bg-muted/30">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
+                    Next Approved Leave
                   </p>
-                  {dashboardData.nextScheduledLeave ? (
-                    <>
-                      <p className="text-lg font-semibold text-foreground">
-                        {formatDate(dashboardData.nextScheduledLeave.startDate)} →{" "}
-                        {formatDate(dashboardData.nextScheduledLeave.endDate)}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {leaveTypeLabel[dashboardData.nextScheduledLeave.type] ||
-                          dashboardData.nextScheduledLeave.type} ·{" "}
-                        {dashboardData.nextScheduledLeave.workingDays} days
-                      </p>
-                    </>
-                  ) : (
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">
-                        You have no upcoming leave booked.
-                      </p>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        leftIcon={<CalendarPlus className="size-4" aria-hidden="true" />}
-                        onClick={() => router.push("/leaves/apply")}
-                      >
-                        Schedule leave
-                      </Button>
-                    </div>
-                  )}
+                  <p className="text-base font-semibold text-foreground">
+                    {formatDate(dashboardData.nextScheduledLeave.startDate)} →{" "}
+                    {formatDate(dashboardData.nextScheduledLeave.endDate)}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {leaveTypeLabel[dashboardData.nextScheduledLeave.type] ||
+                      dashboardData.nextScheduledLeave.type} ·{" "}
+                    {dashboardData.nextScheduledLeave.workingDays} days
+                  </p>
                 </div>
-                <div className="rounded-xl border border-border/60 px-4 py-3 flex flex-col gap-3">
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                      Quick action
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Need a break? Start a new leave request instantly.
-                    </p>
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    leftIcon={<Plus className="h-4 w-4" aria-hidden="true" />}
-                    onClick={() => router.push("/leaves/apply")}
-                  >
-                    Apply for Leave
-                  </Button>
-                </div>
-              </div>
+              )}
             </div>
           </motion.section>
 
@@ -243,7 +216,34 @@ export function ModernEmployeeDashboard({
               delayChildren={0.2}
             >
               <RoleKPICard
-                title="Pending Requests"
+                title={
+                  <div className="flex items-center gap-2">
+                    <span>Pending Requests</span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          aria-label="Information about pending requests"
+                          className="hover:opacity-70 transition-opacity"
+                        >
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">What this shows:</p>
+                        <p className="text-sm mb-2">
+                          Your leave requests currently going through the approval process.
+                        </p>
+                        <p className="text-sm font-semibold mb-1">Current stage:</p>
+                        <p className="text-sm mb-2">
+                          The subtitle shows which approver (Department Head, HR Admin, HR Head, or CEO) is currently reviewing your request and the average wait time.
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          You can cancel pending requests anytime from the Action Center below.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                }
                 value={dashboardData.pendingCount}
                 subtitle={
                   dashboardData.pendingStageInfo
@@ -256,7 +256,34 @@ export function ModernEmployeeDashboard({
               />
 
               <RoleKPICard
-                title="Total Balance"
+                title={
+                  <div className="flex items-center gap-2">
+                    <span>Total Balance</span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          aria-label="Information about total leave balance"
+                          className="hover:opacity-70 transition-opacity"
+                        >
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">What this shows:</p>
+                        <p className="text-sm mb-2">
+                          Total leave days available to you across all leave types (Earned, Casual, Medical).
+                        </p>
+                        <p className="text-sm font-semibold mb-1">How it's calculated:</p>
+                        <p className="text-sm mb-2">
+                          Sum of remaining days in each leave category. This includes carried-over balance and annual allocation minus any used or pending days.
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          View detailed breakdown in the "Leave Balance" tab below.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                }
                 value={dashboardData.totalBalance}
                 subtitle="Days available"
                 icon={Calendar}
@@ -265,7 +292,34 @@ export function ModernEmployeeDashboard({
               />
 
               <RoleKPICard
-                title="Days Used"
+                title={
+                  <div className="flex items-center gap-2">
+                    <span>Days Used</span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          aria-label="Information about days used"
+                          className="hover:opacity-70 transition-opacity"
+                        >
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">What this shows:</p>
+                        <p className="text-sm mb-2">
+                          Total number of leave days you've taken this calendar year across all leave types.
+                        </p>
+                        <p className="text-sm font-semibold mb-1">Includes:</p>
+                        <p className="text-sm mb-2">
+                          Only approved leaves that have been taken. Pending requests and future approved leaves are not counted until they occur.
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Check "Recent Activity" tab to see breakdown by leave type.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                }
                 value={dashboardData.usedThisYear}
                 subtitle="This year"
                 icon={BarChart3}
@@ -275,9 +329,36 @@ export function ModernEmployeeDashboard({
 
               <RoleKPICard
                 title={
-                  dashboardData.nextScheduledLeave
-                    ? "Next Leave"
-                    : "No Upcoming Leave"
+                  <div className="flex items-center gap-2">
+                    <span>
+                      {dashboardData.nextScheduledLeave
+                        ? "Next Approved Leave"
+                        : "No Approved Leave"}
+                    </span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          aria-label="Information about next approved leave"
+                          className="hover:opacity-70 transition-opacity"
+                        >
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">What this shows:</p>
+                        <p className="text-sm mb-2">
+                          Your next scheduled leave that has been fully approved and is confirmed. Shows how many days until it starts.
+                        </p>
+                        <p className="text-sm font-semibold mb-1">Important distinction:</p>
+                        <p className="text-sm mb-2">
+                          This shows APPROVED leaves only - not pending requests. Pending requests appear in "Pending Requests" card above.
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          You can request cancellation of approved leaves from the Action Center.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
                 }
                 value={
                   dashboardData.daysUntilNextLeave !== null
@@ -296,7 +377,7 @@ export function ModernEmployeeDashboard({
                       } (${
                         dashboardData.nextScheduledLeave.workingDays || 0
                       } days)`
-                    : "Plan your next vacation"
+                    : "Plan your time off"
                 }
                 icon={TrendingUp}
                 role="EMPLOYEE"
@@ -388,6 +469,6 @@ export function ModernEmployeeDashboard({
           </DashboardSection>
         </motion.div>
       </RoleBasedDashboard>
-    </>
+    </TooltipProvider>
   );
 }

@@ -222,7 +222,7 @@ export function DeptHeadDashboardWrapper() {
             <RoleKPICard
               title={
                 <div className="flex items-center gap-2">
-                  <span>Returned</span>
+                  <span>Returned for Modification</span>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
@@ -249,7 +249,7 @@ export function DeptHeadDashboardWrapper() {
                 </div>
               }
               value={counts.returned}
-              subtitle="Need employee action"
+              subtitle="Require employee action"
               icon={RotateCcw}
               role="DEPT_HEAD"
               trend={counts.returned > 0 ? {
