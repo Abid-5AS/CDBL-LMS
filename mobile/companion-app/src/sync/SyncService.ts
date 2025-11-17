@@ -17,7 +17,7 @@ import {
 import { networkMonitor } from './NetworkMonitor';
 import { conflictResolver, SyncConflict } from './ConflictResolver';
 import {
-  getSyncQueue,
+  getPendingSyncItems as getSyncQueue,
   markSyncItemProcessed,
   markSyncItemFailed,
   getLastSyncTime,

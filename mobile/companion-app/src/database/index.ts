@@ -349,6 +349,60 @@ export async function getSetting(key: string): Promise<string | null> {
   return result?.value || null;
 }
 
+/**
+ * Get the last sync time from the database
+ * Returns the most recent last_synced_at from user_profile table
+ */
+export async function getLastSyncTime(): Promise<string | null> {
+  const db = await getDatabase();
+  try {
+    const result = await db.getFirstAsync<{ last_synced_at: number }>(
+      "SELECT last_synced_at FROM user_profile ORDER BY last_synced_at DESC LIMIT 1"
+    );
+    if (result && result.last_synced_at) {
+      return new Date(result.last_synced_at).toISOString();
+    }
+    return null;
+  } catch (error) {
+    console.error("Error getting last sync time:", error);
+    return null;
+  }
+}
+
+/**
+ * Update the last sync time in the database
+ */
+export async function updateLastSyncTime(): Promise<void> {
+  const db = await getDatabase();
+  try {
+    await db.runAsync(
+      "INSERT OR REPLACE INTO app_settings (key, value, updated_at) VALUES (?, ?, ?)",
+      ["last_sync", Date.now().toString(), Date.now()]
+    );
+  } catch (error) {
+    console.error("Error updating last sync time:", error);
+  }
+}
+
+/**
+ * Mark sync item as failed with error
+ */
+export async function markSyncItemFailed(
+  id: number,
+  error: string
+): Promise<void> {
+  const db = await getDatabase();
+  try {
+    await db.runAsync(
+      "UPDATE sync_queue SET retry_count = retry_count + 1, last_error = ? WHERE id = ?",
+      [error, id]
+    );
+  } catch (err) {
+    console.error("Error marking sync item failed:", err);
+  }
+}
+
+
 // Clear all data (for logout)
 export async function clearAllData() {
   const db = await getDatabase();
