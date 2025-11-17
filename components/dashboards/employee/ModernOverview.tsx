@@ -112,6 +112,14 @@ export function ModernEmployeeDashboard({
   username,
 }: EmployeeDashboardContentProps) {
   const router = useRouter();
+
+  // Scroll to specific section
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
   const { allRows: leaves, isLoading: isLoadingLeaves } = useLeaveRequests({
     enableSelection: false,
   });
@@ -224,6 +232,7 @@ export function ModernEmployeeDashboard({
                         <button
                           aria-label="Information about pending requests"
                           className="hover:opacity-70 transition-opacity"
+                          onClick={(e) => e.stopPropagation()}
                         >
                           <Info className="h-4 w-4 text-muted-foreground" />
                         </button>
@@ -253,6 +262,8 @@ export function ModernEmployeeDashboard({
                 icon={dashboardData.pendingStageInfo?.icon || Clock}
                 role="EMPLOYEE"
                 animate={true}
+                onClick={() => scrollToSection("action-center")}
+                clickLabel="View your pending requests in the Action Center"
               />
 
               <RoleKPICard
@@ -264,6 +275,7 @@ export function ModernEmployeeDashboard({
                         <button
                           aria-label="Information about total leave balance"
                           className="hover:opacity-70 transition-opacity"
+                          onClick={(e) => e.stopPropagation()}
                         >
                           <Info className="h-4 w-4 text-muted-foreground" />
                         </button>
@@ -289,6 +301,8 @@ export function ModernEmployeeDashboard({
                 icon={Calendar}
                 role="EMPLOYEE"
                 animate={true}
+                onClick={() => scrollToSection("leave-details")}
+                clickLabel="View detailed balance breakdown in Leave Details"
               />
 
               <RoleKPICard
@@ -300,6 +314,7 @@ export function ModernEmployeeDashboard({
                         <button
                           aria-label="Information about days used"
                           className="hover:opacity-70 transition-opacity"
+                          onClick={(e) => e.stopPropagation()}
                         >
                           <Info className="h-4 w-4 text-muted-foreground" />
                         </button>
@@ -325,6 +340,8 @@ export function ModernEmployeeDashboard({
                 icon={BarChart3}
                 role="EMPLOYEE"
                 animate={true}
+                onClick={() => scrollToSection("leave-details")}
+                clickLabel="View leave usage history in Leave Details"
               />
 
               <RoleKPICard
@@ -340,6 +357,7 @@ export function ModernEmployeeDashboard({
                         <button
                           aria-label="Information about next approved leave"
                           className="hover:opacity-70 transition-opacity"
+                          onClick={(e) => e.stopPropagation()}
                         >
                           <Info className="h-4 w-4 text-muted-foreground" />
                         </button>
@@ -382,6 +400,8 @@ export function ModernEmployeeDashboard({
                 icon={TrendingUp}
                 role="EMPLOYEE"
                 animate={true}
+                onClick={() => router.push("/leaves")}
+                clickLabel="View all your leave requests"
               />
             </ResponsiveDashboardGrid>
           </DashboardSection>
@@ -393,9 +413,11 @@ export function ModernEmployeeDashboard({
             isLoading={isLoadingLeaves}
             animate={true}
           >
-            <motion.div variants={itemVariants}>
-              <EmployeeActionCenter actionItems={dashboardData.actionItems} />
-            </motion.div>
+            <div id="action-center">
+              <motion.div variants={itemVariants}>
+                <EmployeeActionCenter actionItems={dashboardData.actionItems} />
+              </motion.div>
+            </div>
           </DashboardSection>
 
           {/* Conversion Summary Card */}
@@ -415,7 +437,8 @@ export function ModernEmployeeDashboard({
             isLoading={isLoadingLeaves || isLoadingBalance}
             animate={true}
           >
-            <DashboardWithSidebar>
+            <div id="leave-details">
+              <DashboardWithSidebar>
               <motion.div variants={itemVariants} className="flex-1">
                 <TabbedContent
                   title="Leave Details"
@@ -465,7 +488,8 @@ export function ModernEmployeeDashboard({
                   ]}
                 />
               </motion.div>
-            </DashboardWithSidebar>
+              </DashboardWithSidebar>
+            </div>
           </DashboardSection>
         </motion.div>
       </RoleBasedDashboard>
