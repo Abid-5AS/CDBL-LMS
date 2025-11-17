@@ -31,8 +31,7 @@ export function Navbar() {
         }}
         className={cn(
           "fixed top-0 z-50 w-full border-b border-border",
-          "bg-background/90 backdrop-blur-2xl shadow-[0_15px_45px_rgba(15,23,42,0.18)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.65)]",
-          "relative overflow-x-hidden"
+          "bg-background/90 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
         )}
         role="navigation"
         aria-label="Main navigation"

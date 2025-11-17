@@ -53,7 +53,7 @@ export function DesktopNav({
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
-          className="relative hidden md:flex flex-1 min-w-0 max-w-full items-center justify-center overflow-hidden rounded-full border border-border bg-background/80 p-1.5 shadow-[0_10px_30px_rgba(15,23,42,0.08)] backdrop-blur-2xl dark:border-border dark:bg-background/30 dark:shadow-[0_10px_30px_rgba(0,0,0,0.6)]"
+          className="relative hidden md:flex flex-1 min-w-0 max-w-full items-center justify-center overflow-hidden rounded-full border border-border bg-background/80 p-1.5 shadow-sm backdrop-blur-xl dark:border-border dark:bg-background/30"
         >
           <nav role="navigation" aria-label="Primary navigation" className="w-full min-w-0">
             <ul className="flex w-full flex-nowrap items-center gap-0.5">
@@ -80,11 +80,6 @@ export function DesktopNav({
                           : "border border-transparent text-muted-foreground hover:bg-background/60 hover:text-foreground dark:text-muted-foreground dark:hover:bg-background/50 dark:hover:text-foreground"
                       )}
                     >
-                      <motion.div
-                        className="absolute inset-0 -z-10 bg-gradient-to-br from-zinc-50 to-zinc-100 opacity-0 dark:from-zinc-800 dark:to-zinc-900 group-hover/link:opacity-100"
-                        initial={false}
-                        transition={{ duration: 0.3 }}
-                      />
                       <Icon
                         className={cn(
                           "h-4 w-4 shrink-0 transition-all duration-300",
@@ -108,14 +103,6 @@ export function DesktopNav({
                           />
                         )}
                       </span>
-                      {active && (
-                        <motion.div
-                          className="absolute inset-0 -z-20 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10"
-                          initial={false}
-                          animate={{ opacity: [0.5, 0.8, 0.5] }}
-                          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                        />
-                      )}
                     </Link>
                   </motion.li>
                 );
@@ -166,7 +153,7 @@ export function DesktopNav({
           Apply
         </Button>
 
-        <div className="flex items-center gap-1 rounded-full border border-border bg-background/80 px-2 py-1 shadow-[0_5px_20px_rgba(15,23,42,0.15)] dark:bg-background/40">
+        <div className="flex items-center gap-1 rounded-full border border-border bg-background/80 px-2 py-1 shadow-sm backdrop-blur-xl dark:bg-background/40">
           <NotificationDropdown />
           <ThemeToggle />
           <AnnotationsToggle />

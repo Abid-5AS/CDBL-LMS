@@ -12,10 +12,10 @@ export function Brand({ compact = false }: { compact?: boolean }) {
       href="/dashboard"
       aria-label="Go to dashboard"
       className={cn(
-        "flex items-center gap-2.5 group focus-ring rounded-xl transition-all duration-300",
+        "relative flex items-center gap-2.5 group focus-ring rounded-xl transition-all duration-300",
         compact
           ? "hover:scale-[1.02]"
-          : "rounded-2xl bg-muted/50 dark:bg-muted/40 px-3 py-2 shadow-[0_0_20px_rgba(0,0,0,0.03)] dark:shadow-[0_0_20px_rgba(255,255,255,0.02)] backdrop-blur-xl border border-border dark:border-border hover:shadow-[0_0_30px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_0_30px_rgba(255,255,255,0.04)]"
+          : "rounded-2xl bg-muted/50 dark:bg-muted/40 px-3 py-2 shadow-sm backdrop-blur-xl border border-border dark:border-border hover:shadow-md"
       )}
     >
       {/* Logo */}
@@ -53,10 +53,12 @@ export function Brand({ compact = false }: { compact?: boolean }) {
       )}
 
       {/* Hover gradient effect */}
-      <motion.div
-        className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/5 via-accent/5 to-destructive/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"
-        initial={false}
-      />
+      {!compact && (
+        <motion.div
+          className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/5 via-accent/5 to-destructive/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 pointer-events-none"
+          initial={false}
+        />
+      )}
     </Link>
   );
 }

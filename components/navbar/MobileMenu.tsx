@@ -84,7 +84,7 @@ export function MobileMenu({
       {isMobileMenuOpen && (
         <motion.div
           id="mobile-menu"
-          ref={gestureRef as any}
+          ref={gestureRef}
           variants={menuVariants}
           initial="closed"
           animate="open"

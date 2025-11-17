@@ -84,7 +84,7 @@ export function MobileBar({
           transition={{ duration: 0.3, delay: 0.3 }}
           whileHover={{ scale: 1.05, y: -1 }}
           whileTap={{ scale: 0.95 }}
-          className="flex-shrink-0 rounded-xl border border-border bg-muted/50 p-2.5 shadow-[0_0_20px_rgba(0,0,0,0.03)] backdrop-blur-xl focus-ring transition-all duration-300 dark:border-border dark:bg-muted/40 dark:shadow-[0_0_20px_rgba(255,255,255,0.02)]"
+          className="flex-shrink-0 rounded-xl border border-border bg-muted/50 p-2.5 shadow-sm backdrop-blur-xl focus-ring transition-all duration-300 dark:border-border dark:bg-muted/40"
           onClick={toggleMobileMenu}
           aria-label="Toggle navigation menu"
           aria-expanded={isMobileMenuOpen}

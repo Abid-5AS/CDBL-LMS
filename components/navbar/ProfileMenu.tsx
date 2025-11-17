@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 import {
   LogOut,
   Settings,
-  CalendarPlus,
   HelpCircle,
 } from "lucide-react";
 
@@ -190,17 +189,6 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
                   </span>
                 </div>
               </div>
-            </div>
-
-            <div className="px-3 pb-2">
-              <Button
-                asChild
-                size="sm"
-                className="w-full gap-1.5"
-                leftIcon={<CalendarPlus className="h-4 w-4" />}
-              >
-                <Link href="/leaves/apply">Apply</Link>
-              </Button>
             </div>
 
             <div className="space-y-1">
