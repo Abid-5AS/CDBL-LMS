@@ -62,6 +62,34 @@ export const API_ENDPOINTS = {
     DECISION: (id: string) => `/api/approvals/${id}/decision`,
     HISTORY: '/api/approvals/history',
   },
+
+  // Admin - User Management
+  ADMIN_USERS: {
+    LIST: '/api/admin/users',
+    GET: (id: string) => `/api/admin/users/${id}`,
+    CREATE: '/api/admin/users',
+    UPDATE: (id: string) => `/api/admin/users/${id}`,
+    DELETE: (id: string) => `/api/admin/users/${id}`,
+    UPDATE_ROLE: (id: string) => `/api/admin/users/${id}/role`,
+    DEACTIVATE: (id: string) => `/api/admin/users/${id}/deactivate`,
+  },
+
+  // Reports & Analytics
+  REPORTS: {
+    ANALYTICS: '/api/reports/analytics',
+    LEAVE_DISTRIBUTION: '/api/reports/leave-distribution',
+    TRENDS: '/api/reports/trends',
+    SUMMARY: '/api/reports/summary',
+  },
+
+  // Settings
+  SETTINGS: {
+    PROFILE: '/api/settings/profile',
+    UPDATE_PROFILE: '/api/settings/profile',
+    CHANGE_PASSWORD: '/api/settings/change-password',
+    PREFERENCES: '/api/settings/preferences',
+    SECURITY: '/api/settings/security',
+  },
 } as const;
 
 export { API_BASE_URL };
