@@ -39,12 +39,12 @@ export async function POST(
 
   const userRole = user.role as AppRole;
 
-  // Get the leave request (need type for per-type chain resolution)
+  // Get the leave request (need type and requester role for per-type chain resolution)
   const leave = await prisma.leaveRequest.findUnique({
     where: { id: leaveId },
     include: {
       approvals: { orderBy: { step: "desc" } },
-      requester: { select: { email: true } },
+      requester: { select: { email: true, role: true } },
     },
   });
 
@@ -54,10 +54,12 @@ export async function POST(
     });
   }
 
+  const requesterRole = leave.requester.role as AppRole;
+
   // HR_ADMIN can forward (operational role) - allow without strict chain check
   // For other roles, check if they can forward for this leave type (per-type chain logic)
   if (userRole !== "HR_ADMIN") {
-    if (!canPerformAction(userRole, "FORWARD", leave.type)) {
+    if (!canPerformAction(userRole, "FORWARD", leave.type, requesterRole)) {
       return NextResponse.json(
         error("forbidden", "You cannot forward leave requests", traceId),
         { status: 403 }
@@ -77,10 +79,10 @@ export async function POST(
 
   // Get next role in chain for this leave type
   // If HR_ADMIN is not in the chain (e.g., CASUAL leave), forward to first role in chain
-  let nextRole = getNextRoleInChain(userRole, leave.type);
+  let nextRole = getNextRoleInChain(userRole, leave.type, requesterRole);
   if (!nextRole && userRole === "HR_ADMIN") {
     // HR_ADMIN not in chain - forward to first role in chain
-    const chain = getChainFor(leave.type);
+    const chain = getChainFor(leave.type, requesterRole);
     nextRole = chain.length > 0 ? chain[0] : null;
   }
   if (!nextRole) {
@@ -94,7 +96,7 @@ export async function POST(
   // HR_ADMIN can forward to any role in the chain (operational role)
   if (
     userRole !== "HR_ADMIN" &&
-    !canForwardTo(userRole, nextRole, leave.type)
+    !canForwardTo(userRole, nextRole, leave.type, requesterRole)
   ) {
     return NextResponse.json(
       error("invalid_forward_target", `Cannot forward to ${nextRole}`, traceId),
@@ -102,7 +104,7 @@ export async function POST(
     );
   }
 
-  const step = getStepForRole(userRole, leave.type);
+  const step = getStepForRole(userRole, leave.type, requesterRole);
   const newStatus = getStatusAfterAction(
     leave.status as LeaveStatus,
     "FORWARD",
@@ -148,7 +150,7 @@ export async function POST(
   }
 
   // Create PENDING approval for next role
-  const nextStep = getStepForRole(nextRole, leave.type);
+  const nextStep = getStepForRole(nextRole, leave.type, requesterRole);
   await prisma.approval.create({
     data: {
       leaveId,

@@ -48,8 +48,8 @@ export async function POST(
   // Get the leave request
   const leave = await prisma.leaveRequest.findUnique({
     where: { id: leaveId },
-    include: { 
-      requester: { select: { email: true, deptHeadId: true } },
+    include: {
+      requester: { select: { email: true, deptHeadId: true, role: true } },
       approvals: { orderBy: { step: "desc" }, take: 1 },
     },
   });
@@ -57,6 +57,8 @@ export async function POST(
   if (!leave) {
     return NextResponse.json(error("not_found", undefined, traceId), { status: 404 });
   }
+
+  const requesterRole = leave.requester.role as AppRole;
 
   // For DEPT_HEAD: verify this is a request from their team
   if (userRole === "DEPT_HEAD" && leave.requester.deptHeadId !== user.id) {
@@ -67,7 +69,7 @@ export async function POST(
   }
 
   // Check if leave is in a returnable state
-  if (!["SUBMITTED", "PENDING"].includes(leave.status)) {
+  if (!["SUBMITTED", "PENDING", "CANCELLATION_REQUESTED"].includes(leave.status)) {
     return NextResponse.json(
       error("invalid_status", undefined, traceId, { currentStatus: leave.status }),
       { status: 400 }
@@ -84,7 +86,7 @@ export async function POST(
     );
   }
 
-  const step = getStepForRole(userRole, leave.type);
+  const step = getStepForRole(userRole, leave.type, requesterRole);
 
   // Create LeaveComment for the return reason
   await prisma.leaveComment.create({
