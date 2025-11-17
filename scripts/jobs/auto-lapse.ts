@@ -12,7 +12,7 @@
 
 import { prisma } from "../../lib/prisma";
 import { normalizeToDhakaMidnight } from "../../lib/date-utils";
-import { utcToZonedTime } from "date-fns-tz";
+import { toZonedTime } from "date-fns-tz";
 import { LeaveType } from "@prisma/client";
 
 const DHAKA_TZ = "Asia/Dhaka";
@@ -34,7 +34,7 @@ interface LapseResult {
  */
 export async function processAnnualLapse(targetYear?: number): Promise<LapseResult[]> {
   const now = new Date();
-  const zonedNow = utcToZonedTime(now, DHAKA_TZ);
+  const zonedNow = toZonedTime(now, DHAKA_TZ);
   const yearToLapse = targetYear || zonedNow.getFullYear();
 
   console.log(`[Annual Leave Lapse] Processing lapse for year ${yearToLapse}`);

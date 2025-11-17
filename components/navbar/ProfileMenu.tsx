@@ -106,7 +106,7 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
               type="button"
               whileHover={{ scale: 1.02, y: -1 }}
               whileTap={{ scale: 0.98 }}
-              className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl bg-background/80 dark:bg-muted/60 border border-border hover:border-border-strong hover:bg-background dark:hover:bg-muted hover:shadow-md transition-all duration-300 focus:outline-none focus-ring"
+              className="flex items-center gap-2.5 px-2.5 py-1 rounded-xl bg-background/80 dark:bg-muted/60 border border-border hover:border-border-strong hover:bg-background dark:hover:bg-muted hover:shadow-md transition-all duration-300 focus:outline-none focus-ring"
             >
               <div className="text-left hidden sm:block">
                 <div className="text-[11px] font-semibold text-foreground tracking-tight leading-tight">

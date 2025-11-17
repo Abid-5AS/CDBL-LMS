@@ -158,7 +158,7 @@ export function DesktopNav({
 
         <Button
           size="sm"
-          className="gap-1.5"
+          className="gap-1.5 backdrop-blur-md bg-background/80 dark:bg-background/40 border border-border hover:bg-background/90 dark:hover:bg-background/50 shadow-sm"
           leftIcon={<CalendarPlus className="h-4 w-4" />}
           onClick={() => router.push("/leaves/apply")}
           aria-label="Apply for leave"

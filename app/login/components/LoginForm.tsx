@@ -14,6 +14,8 @@ import {
   AlertCircle,
   CheckSquare,
   Sparkles,
+  ShieldCheck,
+  Smartphone,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -26,8 +28,9 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { Switch } from "@/components/ui/switch";
 
-// Label Component (Upgraded with gradient text)
+// Label Component (Upgraded with gradient text and better hierarchy)
 const Label = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
@@ -35,7 +38,7 @@ const Label = React.forwardRef<
   <LabelPrimitive.Root
     ref={ref}
     className={cn(
-      "block text-sm font-medium mb-1.5 text-gradient-label",
+      "block text-sm font-semibold mb-2 bg-gradient-to-r from-foreground to-card-action/90 bg-clip-text text-transparent tracking-tight",
       className
     )}
     {...props}
@@ -43,15 +46,17 @@ const Label = React.forwardRef<
 ));
 Label.displayName = LabelPrimitive.Root.displayName;
 
-// Input Component (Enhanced)
+// Input Component (Enhanced with Glassmorphic Styling)
 const inputVariants = cva(
   [
-    "flex w-full min-w-0 rounded-xl border bg-bg-secondary/70 px-4 py-1 text-base shadow-xs",
+    "flex w-full min-w-0 rounded-xl border border-border/40 bg-bg-secondary/50 px-4 py-1 text-base shadow-sm",
+    "backdrop-blur-md",
     "transition-all duration-200 ease-out outline-none",
     "placeholder:text-text-secondary",
     "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
-    "focus-visible:border-card-action",
+    "focus-visible:border-card-action focus-visible:border-opacity-100",
     "focus-visible:ring-4 focus-visible:ring-card-action/20",
+    "hover:border-border/60 hover:bg-bg-secondary/60",
   ],
   {
     variants: {
@@ -87,7 +92,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 );
 Input.displayName = "Input";
 
-// Button Component (Enhanced)
+// Button Component (Enhanced with Glassmorphic Styling)
 const buttonVariants = cva(
   [
     "inline-flex items-center justify-center gap-2.5 whitespace-nowrap",
@@ -98,20 +103,20 @@ const buttonVariants = cva(
     "outline-none",
     "focus-visible:ring-4 focus-visible:ring-card-action/30",
     "hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]",
-    "hover:shadow-lg",
+    "hover:shadow-xl",
   ],
   {
     variants: {
       variant: {
         gradient: [
-          "text-text-inverted shadow-lg shadow-indigo-500/30",
+          "text-text-inverted shadow-lg shadow-card-action/40",
           "bg-gradient-to-r from-card-action to-data-info",
-          "hover:from-card-action hover:to-data-info",
+          "hover:from-card-action/90 hover:to-data-info/90",
         ],
         outline:
-          "border border-border-strong bg-bg-primary text-text-secondary shadow-sm hover:bg-bg-secondary",
-        ghost: "hover:bg-bg-secondary shadow-none",
-        link: "text-card-action hover:text-card-action shadow-none p-0 h-auto",
+          "border border-border-strong/40 backdrop-blur-md bg-bg-secondary/40 text-text-secondary shadow-sm hover:bg-bg-secondary/60 hover:border-border-strong/60",
+        ghost: "hover:bg-bg-secondary/40 backdrop-blur-sm shadow-none",
+        link: "text-card-action hover:text-card-action/80 shadow-none p-0 h-auto transition-colors",
       },
       size: {
         default: "h-11 px-5 py-2",
@@ -213,12 +218,19 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [rememberDevice, setRememberDevice] = useState(true);
 
   // OTP Step State
   const [showOtpStep, setShowOtpStep] = useState(false);
   const [otp, setOtp] = useState("");
   const [otpExpiry, setOtpExpiry] = useState<number>(600); // 10 minutes in seconds
   const [resendingOtp, setResendingOtp] = useState(false);
+  const emailInputRef = React.useRef<HTMLInputElement>(null);
+  const otpInputRef = React.useRef<React.ElementRef<typeof InputOTP>>(null);
+  const focusOtpInput = React.useCallback(() => {
+    if (!otpInputRef.current) return;
+    requestAnimationFrame(() => otpInputRef.current?.focus());
+  }, []);
 
   // Countdown timer for OTP expiry
   React.useEffect(() => {
@@ -230,6 +242,17 @@ export function LoginForm() {
 
     return () => clearInterval(timer);
   }, [showOtpStep, otpExpiry]);
+
+  // Auto-focus OTP input when OTP step is shown
+  React.useEffect(() => {
+    if (!showOtpStep) return;
+    focusOtpInput();
+  }, [showOtpStep, focusOtpInput]);
+
+  // Auto-focus email field on initial render
+  React.useEffect(() => {
+    emailInputRef.current?.focus();
+  }, []);
 
   // Format countdown timer
   const formatTime = (seconds: number) => {
@@ -370,6 +393,7 @@ export function LoginForm() {
       setOtp(""); // Clear the OTP input
       toast.success("New verification code sent!");
       setResendingOtp(false);
+      focusOtpInput();
     } catch (err) {
       console.error(err);
       toast.error("Network error. Please try again.");
@@ -380,9 +404,24 @@ export function LoginForm() {
   const getAnimationDelay = (index: number) => ({
     animationDelay: `${index * 100}ms`,
   });
+  const authSteps = React.useMemo(
+    () => [
+      {
+        label: "Credentials",
+        description: "Email & password",
+        state: showOtpStep ? "completed" : "active",
+      },
+      {
+        label: "Verification",
+        description: "OTP security",
+        state: showOtpStep ? "active" : "upnext",
+      },
+    ],
+    [showOtpStep]
+  );
 
   return (
-    <div className="w-full max-w-md p-8 md:p-10 animate-fade-in-up animate-duration-700ms animate-ease-out">
+    <div className="w-full max-w-md p-8 md:p-10 animate-fade-in-up animate-duration-700ms animate-ease-out rounded-2xl border border-border/30 bg-bg-secondary/40 backdrop-blur-xl shadow-2xl shadow-card-action/10">
       {/* Decorative Background Gradient */}
       <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
         <motion.div
@@ -449,6 +488,37 @@ export function LoginForm() {
           </motion.p>
         </motion.div>
 
+        <div className="grid grid-cols-2 gap-3">
+          {authSteps.map((step) => {
+            const stateStyles =
+              step.state === "active"
+                ? "border-card-action/60 bg-card-action/10 text-card-action"
+                : step.state === "completed"
+                  ? "border-data-success/50 bg-data-success/10 text-data-success"
+                  : "border-border/40 bg-bg-secondary/40 text-muted-foreground";
+            const stateLabel =
+              step.state === "completed"
+                ? "Completed"
+                : step.state === "active"
+                  ? "In progress"
+                  : "Up next";
+            return (
+              <div
+                key={step.label}
+                className={cn(
+                  "rounded-2xl border px-4 py-3 transition-all duration-200",
+                  "shadow-inner shadow-background/30 backdrop-blur-md",
+                  stateStyles
+                )}
+              >
+                <p className="text-[10px] uppercase tracking-[0.3em]">{stateLabel}</p>
+                <p className="text-sm font-semibold text-foreground">{step.label}</p>
+                <p className="text-xs text-muted-foreground">{step.description}</p>
+              </div>
+            );
+          })}
+        </div>
+
         {/* Form */}
         {!showOtpStep ? (
           // Email & Password Step
@@ -480,6 +550,8 @@ export function LoginForm() {
                   required
                   disabled={loading}
                   hasIcon
+                  ref={emailInputRef}
+                  autoComplete="username"
                   aria-invalid={!!error}
                   aria-describedby={error ? "login-error" : undefined}
                   aria-required="true"
@@ -518,6 +590,7 @@ export function LoginForm() {
                   required
                   disabled={loading}
                   hasIcon
+                  autoComplete="current-password"
                   aria-invalid={!!error}
                   aria-describedby={error ? "login-error" : undefined}
                   aria-required="true"
@@ -540,13 +613,50 @@ export function LoginForm() {
               </div>
             </motion.div>
 
-            <AnimatePresence>
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.75 }}
+            >
+              <div className="flex items-center justify-between rounded-2xl border border-border/40 bg-bg-secondary/40 px-4 py-3 backdrop-blur-md">
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Trust this device</p>
+                  <p className="text-xs text-muted-foreground">
+                    {rememberDevice
+                      ? "We will minimize OTP prompts for 30 days."
+                      : "OTP will be requested for every new sign-in."}
+                  </p>
+                </div>
+                <Switch
+                  checked={rememberDevice}
+                  onCheckedChange={setRememberDevice}
+                  aria-label="Toggle trusted device"
+                  className="data-[state=checked]:bg-card-action data-[state=unchecked]:bg-border"
+                />
+              </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-start gap-3 rounded-2xl border border-border/40 bg-bg-secondary/40 p-4 text-left backdrop-blur-md"
+              >
+                <ShieldCheck className="size-5 text-data-success" />
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Session protected</p>
+                  <p className="text-xs text-muted-foreground">
+                    Codes are valid for a single attempt and never shared via SMS. Keep your inbox handy.
+                  </p>
+                </div>
+              </motion.div>
+
+              <AnimatePresence>
               {error && (
                 <motion.div
                   id="login-error"
                   role="alert"
                   aria-live="polite"
-                  className="flex items-center gap-2 text-sm text-data-error bg-data-error/10 border border-data-error p-3 rounded-lg"
+                  className="flex items-center gap-2 text-sm text-data-error bg-data-error/10 border border-data-error/40 backdrop-blur-sm p-3 rounded-lg"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
@@ -584,6 +694,21 @@ export function LoginForm() {
                 {!loading && <ArrowRight className="size-5 relative z-10" aria-hidden="true" />}
               </Button>
             </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9 }}
+              className="flex items-start gap-3 rounded-2xl border border-border/40 bg-bg-secondary/40 px-4 py-3 text-left backdrop-blur-md"
+            >
+              <Smartphone className="size-5 text-card-action" />
+              <div>
+                <p className="text-sm font-semibold text-foreground">Corporate email only</p>
+                <p className="text-xs text-muted-foreground">
+                  OTPs are issued to your official mailbox. Keep it open so you can verify instantly.
+                </p>
+              </div>
+            </motion.div>
           </motion.form>
         ) : (
           // OTP Verification Step
@@ -594,23 +719,26 @@ export function LoginForm() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="space-y-4">
+            <div className="space-y-6">
               {/* Header with Sparkle Effect */}
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-center space-y-2"
+                className="text-center space-y-3"
               >
                 <div className="flex items-center justify-center gap-2">
                   <Sparkles className="size-5 text-data-info animate-pulse" />
-                  <Label className="text-base">Verification Code</Label>
+                  <Label className="text-xl font-bold">Verify Your Identity</Label>
                   <Sparkles className="size-5 text-data-info animate-pulse" />
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Enter the 6-digit code sent to
+                  A 6-digit verification code has been sent to:
                 </p>
-                <p className="text-sm font-semibold text-foreground bg-bg-secondary/50 rounded-lg px-3 py-1.5 inline-block">
+                <p className="text-sm font-semibold text-foreground bg-gradient-to-r from-card-action/10 to-data-info/10 border border-card-action/30 backdrop-blur-sm rounded-lg px-4 py-2.5 inline-block">
                   {email}
+                </p>
+                <p className="text-xs text-muted-foreground pt-2">
+                  📧 Check your email and enter the code below
                 </p>
               </motion.div>
 
@@ -622,38 +750,42 @@ export function LoginForm() {
                 className="flex justify-center"
               >
                 <InputOTP
+                  ref={otpInputRef}
                   maxLength={6}
                   value={otp}
                   onChange={(value) => setOtp(value)}
                   disabled={loading}
+                  autoFocus
+                  inputMode="numeric"
+                  aria-label="One-time password code"
                   className="gap-3"
                 >
                   <InputOTPGroup className="gap-2">
                     <InputOTPSlot
                       index={0}
-                      className="size-12 text-lg font-bold rounded-xl border-2 border-border-strong focus:border-card-action transition-all duration-200 bg-bg-secondary/70"
+                      className="size-12 text-lg font-bold rounded-xl border-2 border-border/60 focus:border-card-action backdrop-blur-md transition-all duration-200 bg-bg-secondary/50"
                     />
                     <InputOTPSlot
                       index={1}
-                      className="size-12 text-lg font-bold rounded-xl border-2 border-border-strong focus:border-card-action transition-all duration-200 bg-bg-secondary/70"
+                      className="size-12 text-lg font-bold rounded-xl border-2 border-border/60 focus:border-card-action backdrop-blur-md transition-all duration-200 bg-bg-secondary/50"
                     />
                     <InputOTPSlot
                       index={2}
-                      className="size-12 text-lg font-bold rounded-xl border-2 border-border-strong focus:border-card-action transition-all duration-200 bg-bg-secondary/70"
+                      className="size-12 text-lg font-bold rounded-xl border-2 border-border/60 focus:border-card-action backdrop-blur-md transition-all duration-200 bg-bg-secondary/50"
                     />
                   </InputOTPGroup>
                   <InputOTPGroup className="gap-2">
                     <InputOTPSlot
                       index={3}
-                      className="size-12 text-lg font-bold rounded-xl border-2 border-border-strong focus:border-card-action transition-all duration-200 bg-bg-secondary/70"
+                      className="size-12 text-lg font-bold rounded-xl border-2 border-border/60 focus:border-card-action backdrop-blur-md transition-all duration-200 bg-bg-secondary/50"
                     />
                     <InputOTPSlot
                       index={4}
-                      className="size-12 text-lg font-bold rounded-xl border-2 border-border-strong focus:border-card-action transition-all duration-200 bg-bg-secondary/70"
+                      className="size-12 text-lg font-bold rounded-xl border-2 border-border/60 focus:border-card-action backdrop-blur-md transition-all duration-200 bg-bg-secondary/50"
                     />
                     <InputOTPSlot
                       index={5}
-                      className="size-12 text-lg font-bold rounded-xl border-2 border-border-strong focus:border-card-action transition-all duration-200 bg-bg-secondary/70"
+                      className="size-12 text-lg font-bold rounded-xl border-2 border-border/60 focus:border-card-action backdrop-blur-md transition-all duration-200 bg-bg-secondary/50"
                     />
                   </InputOTPGroup>
                 </InputOTP>
@@ -702,7 +834,7 @@ export function LoginForm() {
             <AnimatePresence>
               {error && (
                 <motion.div
-                  className="flex items-center gap-2 text-sm text-data-error bg-data-error/10 border border-data-error p-3 rounded-lg"
+                  className="flex items-center gap-2 text-sm text-data-error bg-data-error/10 border border-data-error/40 backdrop-blur-sm p-3 rounded-lg"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
@@ -748,6 +880,7 @@ export function LoginForm() {
                     setShowOtpStep(false);
                     setOtp("");
                     setError(null);
+                    setTimeout(() => emailInputRef.current?.focus(), 200);
                   }}
                 >
                   Back to Login

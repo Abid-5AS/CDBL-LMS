@@ -14,7 +14,7 @@ import { prisma } from "../../lib/prisma";
 import { policy } from "../../lib/policy";
 import { normalizeToDhakaMidnight } from "../../lib/date-utils";
 import { startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
-import { utcToZonedTime } from "date-fns-tz";
+import { toZonedTime } from "date-fns-tz";
 
 const DHAKA_TZ = "Asia/Dhaka";
 const EL_MAX_CARRY = policy.carryForwardCap.EL; // 60 days

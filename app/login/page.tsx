@@ -5,6 +5,12 @@ import { getCurrentUser } from "@/lib/auth";
 import { getHomePageForRole } from "@/lib/navigation";
 import { LoginForm, LoginIllustration } from "./components/LoginForm";
 
+const stats = [
+  { label: "Employees onboarded", value: "3.4K+" },
+  { label: "Leaves processed monthly", value: "28K" },
+  { label: "Avg. approval time", value: "2m" },
+];
+
 export default function LoginPage() {
   return (
     <>
@@ -26,23 +32,87 @@ async function LoginGate() {
   }
 
   return (
-    <div className="min-h-screen w-full flex bg-bg-primary">
-      {/* Left Panel (40%) - Illustration */}
-      <div className="hidden lg:flex lg:w-2/5 bg-bg-secondary/70 p-12 relative items-center justify-center overflow-hidden">
-        <LoginIllustration />
+    <div className="relative min-h-screen bg-[#040916] text-white overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 opacity-60">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(43,73,255,0.25),_transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_rgba(23,173,173,0.35),_transparent_60%)]" />
+        <div className="absolute inset-0 bg-grid-white/[0.02]" />
       </div>
 
-      {/* Right Panel (60%) - Form */}
-      <div className="flex-1 lg:w-3/5 flex flex-col items-center justify-center p-8 relative">
-        <div className="flex-1 flex items-center justify-center w-full">
-          <LoginForm />
-        </div>
-        {/* Footer */}
-        <div className="mt-8 text-center">
-          <p className="text-muted-foreground text-xs">
-            v2.0 © CDBL HRD
-          </p>
-        </div>
+      <div className="relative z-10 flex min-h-screen flex-col gap-8 lg:flex-row">
+        {/* Inspiration / Highlights Panel */}
+        <section className="relative flex flex-1 flex-col justify-between px-8 py-12 lg:px-14">
+          <div className="max-w-2xl space-y-8">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs uppercase tracking-[0.2em] text-white/80">
+              <span className="inline-flex size-2 rounded-full bg-emerald-300 animate-pulse" />
+              Secure Access
+            </div>
+            <div className="space-y-4">
+              <h1 className="text-4xl font-bold leading-tight md:text-5xl">
+                Seamless leave management for every role at{" "}
+                <span className="text-card-action">CDBL</span>
+              </h1>
+              <p className="text-base text-white/70 md:text-lg">
+                Centralize approvals, real-time balances, and policy insights in one secure
+                dashboard. Continue where you left off with confidence.
+              </p>
+            </div>
+
+            <ul className="space-y-3 text-sm text-white/70">
+              <li className="flex items-start gap-3">
+                <span className="mt-1 inline-flex size-2 rounded-full bg-card-action" />
+                Unified login for HR, Department Heads, and Executives with contextual dashboards.
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="mt-1 inline-flex size-2 rounded-full bg-data-info" />
+                MFA-backed security with device trust indicators and audit-friendly reporting.
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="mt-1 inline-flex size-2 rounded-full bg-amber-400" />
+                Built-in OTP verification ensures payroll-sensitive flows stay protected.
+              </li>
+            </ul>
+
+            <dl className="grid gap-4 sm:grid-cols-3">
+              {stats.map((stat) => (
+                <div
+                  key={stat.label}
+                  className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl"
+                >
+                  <dt className="text-xs uppercase tracking-wide text-white/60">{stat.label}</dt>
+                  <dd className="text-2xl font-semibold text-white">{stat.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <div className="mt-10 flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-3xl lg:mt-0">
+            <div className="flex flex-col gap-2">
+              <p className="text-sm uppercase tracking-[0.3em] text-white/60">Live system pulse</p>
+              <p className="text-xl font-semibold text-white">
+                99.9% uptime and real-time policy alerts
+              </p>
+            </div>
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+              <div className="flex-1 text-white/70 text-sm">
+                Monitor approvals, blackout periods, and SLA adherence while your teams stay in sync.
+              </div>
+              <div className="flex flex-1 items-center justify-center rounded-2xl bg-white/10 p-4 backdrop-blur-xl">
+                <LoginIllustration />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Form Panel */}
+        <section className="flex flex-1 items-center justify-center px-6 py-12 md:px-12 lg:max-w-xl lg:px-10 lg:py-20">
+          <div className="w-full">
+            <LoginForm />
+            <div className="mt-8 text-center text-xs text-muted-foreground">
+              v2.1 · Secure by CDBL HRD
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );
