@@ -10,6 +10,10 @@ import { router } from 'expo-router';
 import { useAuthStore } from '@/src/store/authStore';
 import { BiometricAuth } from '@/src/auth/BiometricAuth';
 import { Fingerprint } from 'lucide-react-native';
+import { apiClient } from '@/src/api/client';
+import { API_ENDPOINTS } from '@/src/api/endpoints';
+import { LoginRequest, LoginResponse } from '@/src/api/types';
+import { User } from '@/src/auth/types';
 
 export default function LoginScreen() {
   const theme = useTheme();
@@ -28,10 +32,39 @@ export default function LoginScreen() {
 
     setLoading(true);
     try {
-      await login(email, password);
+      // Call the login API
+      const response = await apiClient.post<LoginResponse>(
+        API_ENDPOINTS.AUTH.LOGIN,
+        { email, password } as LoginRequest
+      );
+
+      if (!response.success || !response.data) {
+        throw new Error(response.message || 'Login failed');
+      }
+
+      const { user: userData, token } = response.data;
+
+      // Transform API user to auth store User type
+      const user: User = {
+        id: userData.id,
+        employeeId: userData.employeeId,
+        name: userData.name,
+        email: userData.email,
+        department: userData.department,
+        role: userData.role,
+      };
+
+      // Store token in the API client
+      await apiClient.setToken(token);
+
+      // Update auth store
+      await login(user, token);
+
+      // Navigate to tabs
       router.replace('/(tabs)');
     } catch (error: any) {
-      Alert.alert('Login Failed', error.message || 'Invalid credentials');
+      const errorMessage = error.message || error.error || 'Invalid credentials. Please try again.';
+      Alert.alert('Login Failed', errorMessage);
     } finally {
       setLoading(false);
     }
