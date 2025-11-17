@@ -73,7 +73,7 @@ let hasCachedStats = false;
 const STATS_CACHE_TTL = 60 * 1000;
 
 export async function getHRAdminKPIData(user?: MinimalUser): Promise<HRAdminDashboardStats> {
-  await resolveAuthorizedUser(user);
+  const resolvedUser = await resolveAuthorizedUser(user);
 
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -83,39 +83,95 @@ export async function getHRAdminKPIData(user?: MinimalUser): Promise<HRAdminDash
   const startOfYear = new Date(now.getFullYear(), 0, 1);
   const startOfNextYear = new Date(now.getFullYear() + 1, 0, 1);
 
-  const [employeesOnLeave, pendingRequests, totalLeavesThisYear, processedToday] =
-    await Promise.all([
-      prisma.leaveRequest.count({
-        where: {
-          status: "APPROVED",
-          startDate: { lte: tomorrow },
-          endDate: { gte: today },
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+  const [
+    employeesOnLeave,
+    pendingRequests,
+    totalLeavesThisYear,
+    processedToday,
+    recentApprovals,
+    totalEmployees,
+  ] = await Promise.all([
+    prisma.leaveRequest.count({
+      where: {
+        status: "APPROVED",
+        startDate: { lte: tomorrow },
+        endDate: { gte: today },
+      },
+    }),
+    // Fixed: Count only approvals pending for this specific user
+    prisma.approval.count({
+      where: {
+        approverId: resolvedUser.id,
+        decision: "PENDING",
+      },
+    }),
+    prisma.leaveRequest.count({
+      where: {
+        status: "APPROVED",
+        startDate: {
+          gte: startOfYear,
+          lt: startOfNextYear,
         },
-      }),
-      prisma.leaveRequest.count({
-        where: { status: "PENDING" },
-      }),
-      prisma.leaveRequest.count({
-        where: {
-          status: "APPROVED",
-          startDate: {
-            gte: startOfYear,
-            lt: startOfNextYear,
-          },
+      },
+    }),
+    prisma.leaveRequest.count({
+      where: {
+        status: {
+          in: ["APPROVED", "REJECTED"],
         },
-      }),
-      prisma.leaveRequest.count({
-        where: {
-          status: {
-            in: ["APPROVED", "REJECTED"],
-          },
-          updatedAt: {
-            gte: today,
-            lt: tomorrow,
-          },
+        updatedAt: {
+          gte: today,
+          lt: tomorrow,
         },
-      }),
-    ]);
+      },
+    }),
+    // Fetch recent approvals for avgApprovalTime calculation
+    prisma.leaveRequest.findMany({
+      where: {
+        status: {
+          in: ["APPROVED", "REJECTED"],
+        },
+        updatedAt: {
+          gte: thirtyDaysAgo,
+        },
+      },
+      select: {
+        createdAt: true,
+        updatedAt: true,
+      },
+      take: 100,
+      orderBy: {
+        updatedAt: "desc",
+      },
+    }),
+    // Total employees for utilization calculation
+    prisma.user.count({
+      where: {
+        role: {
+          in: ["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN"],
+        },
+      },
+    }),
+  ]);
+
+  // Calculate real avgApprovalTime
+  let avgApprovalTime = 2.5; // Default fallback
+  if (recentApprovals.length > 0) {
+    const totalTime = recentApprovals.reduce((sum, req) => {
+      const diffMs = req.updatedAt.getTime() - req.createdAt.getTime();
+      return sum + diffMs / (1000 * 60 * 60 * 24); // Convert to days
+    }, 0);
+    avgApprovalTime = totalTime / recentApprovals.length;
+  }
+
+  // Calculate real teamUtilization
+  let teamUtilization = 85; // Default fallback
+  if (totalEmployees > 0) {
+    const availableEmployees = totalEmployees - employeesOnLeave;
+    teamUtilization = Math.round((availableEmployees / totalEmployees) * 100);
+  }
 
   const dailyTarget = 10;
   const dailyProgress = Math.min(
@@ -126,14 +182,17 @@ export async function getHRAdminKPIData(user?: MinimalUser): Promise<HRAdminDash
   return {
     employeesOnLeave,
     pendingRequests,
-    avgApprovalTime: 2.5,
+    avgApprovalTime, // Now calculated from real data
+    // NOT IMPLEMENTED: Encashment tracking not yet available
     encashmentPending: 0,
     totalLeavesThisYear,
     processedToday,
     dailyTarget,
     dailyProgress,
-    teamUtilization: 85,
+    teamUtilization, // Now calculated from real data
+    // PLACEHOLDER: Compliance score calculation not yet implemented
     complianceScore: 94,
+    // Empty arrays in fast endpoint, populated in /stats
     leaveTypeBreakdown: [],
     monthlyTrend: [],
   };
@@ -147,7 +206,7 @@ type StatsOptions = {
 export async function getHRAdminStatsData(
   options: StatsOptions = {}
 ): Promise<HRAdminDashboardStats> {
-  await resolveAuthorizedUser(options.user);
+  const resolvedUser = await resolveAuthorizedUser(options.user);
   const nowTs = Date.now();
   if (
     !options.skipCache &&
@@ -180,8 +239,12 @@ export async function getHRAdminStatsData(
         endDate: { gte: today },
       },
     }),
-    prisma.leaveRequest.count({
-      where: { status: "PENDING" },
+    // Fixed: Count only approvals pending for this specific user
+    prisma.approval.count({
+      where: {
+        approverId: resolvedUser.id,
+        decision: "PENDING",
+      },
     }),
     prisma.leaveRequest.count({
       where: {

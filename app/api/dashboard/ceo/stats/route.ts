@@ -115,16 +115,11 @@ export async function GET(req: NextRequest) {
         },
       }),
 
-      // Pending approvals requiring CEO attention
-      prisma.leaveRequest.count({
+      // Fixed: Count only approvals pending for this specific CEO user
+      prisma.approval.count({
         where: {
-          status: "PENDING",
-          approvals: {
-            some: {
-              step: 4, // CEO approval step
-              decision: "PENDING",
-            },
-          },
+          approverId: user.id,
+          decision: "PENDING",
         },
       }),
 

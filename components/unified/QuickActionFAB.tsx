@@ -6,6 +6,7 @@ import Link from "next/link";
 import clsx from "clsx";
 import { Plus, Eye, TrendingUp, X } from "lucide-react";
 import { useLeaveData } from "@/components/providers";
+import { useUser } from "@/lib/user-context";
 
 type FABAction = {
   label: string;
@@ -16,6 +17,7 @@ type FABAction = {
 
 export function QuickActionFAB() {
   const pathname = usePathname();
+  const user = useUser();
   const [isOpen, setIsOpen] = useState(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("fab-open-state");
@@ -23,7 +25,7 @@ export function QuickActionFAB() {
     }
     return false;
   });
-  
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       localStorage.setItem("fab-open-state", String(isOpen));
@@ -33,6 +35,9 @@ export function QuickActionFAB() {
   // Access pending requests for context
   const { data: leavesData } = useLeaveData();
 
+  // Check if user can apply for leave (only EMPLOYEE and DEPT_HEAD)
+  const canApplyLeave = user?.role === "EMPLOYEE" || user?.role === "DEPT_HEAD";
+
   const pendingCount = Array.isArray(leavesData?.items)
     ? leavesData.items.filter((item: { status: string }) => 
         item.status === "SUBMITTED" || item.status === "PENDING"
@@ -41,17 +46,19 @@ export function QuickActionFAB() {
 
   // Context-aware actions based on current page
   const actions: FABAction[] = [];
-  
+
   if (pathname === "/dashboard") {
+    if (canApplyLeave) {
+      actions.push({ label: "Apply Leave", icon: Plus, href: "/leaves/apply" });
+    }
     actions.push(
-      { label: "Apply Leave", icon: Plus, href: "/leaves/apply" },
       { label: "Track Status", icon: Eye, href: "/leaves" },
       { label: "View Balance", icon: TrendingUp, href: "/dashboard" }
     );
   } else if (pathname === "/leaves" || pathname.startsWith("/leaves/")) {
-    actions.push(
-      { label: "Apply Leave", icon: Plus, href: "/leaves/apply" }
-    );
+    if (canApplyLeave) {
+      actions.push({ label: "Apply Leave", icon: Plus, href: "/leaves/apply" });
+    }
     if (pendingCount > 0) {
       actions.push(
         { label: "View Requests", icon: Eye, href: "/leaves", badge: pendingCount }
@@ -62,10 +69,10 @@ export function QuickActionFAB() {
     return null;
   } else {
     // Default actions for other pages
-    actions.push(
-      { label: "Apply Leave", icon: Plus, href: "/leaves/apply" },
-      { label: "Dashboard", icon: Eye, href: "/dashboard" }
-    );
+    if (canApplyLeave) {
+      actions.push({ label: "Apply Leave", icon: Plus, href: "/leaves/apply" });
+    }
+    actions.push({ label: "Dashboard", icon: Eye, href: "/dashboard" });
   }
 
   // Close on escape key

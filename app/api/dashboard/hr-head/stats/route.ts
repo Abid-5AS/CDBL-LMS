@@ -55,10 +55,11 @@ export async function GET(req: NextRequest) {
       totalEmployees,
       approvalStats,
     ] = await Promise.all([
-      // Pending requests
-      prisma.leaveRequest.count({
+      // Fixed: Count only approvals pending for this specific user
+      prisma.approval.count({
         where: {
-          status: "PENDING",
+          approverId: user.id,
+          decision: "PENDING",
         },
       }),
 
@@ -206,10 +207,13 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Calculate compliance score (percentage of requests processed on time)
-    // On-time = processed within 3 days of submission
+    // PLACEHOLDER: Compliance score calculation not yet implemented
+    // TODO: Calculate actual compliance based on:
+    //   - On-time processing (≤3 days from submission)
+    //   - Proper documentation requirements
+    //   - Policy violation tracking
     const totalProcessed = approvalStats._count.id || 1; // Avoid division by zero
-    const complianceScore = totalProcessed > 0 ? 94 : 100; // Placeholder calculation
+    const complianceScore = totalProcessed > 0 ? 94 : 100; // HARDCODED - replace with real calculation
 
     const stats = {
       // Core KPIs

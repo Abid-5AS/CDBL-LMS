@@ -18,7 +18,14 @@ import {
   Calendar,
   Building2,
   Shield,
+  Info,
 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
 import {
   RoleKPICard,
   ResponsiveDashboardGrid,
@@ -122,72 +129,181 @@ export function CEODashboardClient() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Primary Executive KPIs */}
-      <DashboardSection
-        title="Executive Overview"
-        description="Key organizational and performance metrics at a glance"
-        isLoading={false}
-        loadingFallback={<DashboardGridSkeleton cards={4} />}
-      >
-        {isLoading ? (
-          <DashboardGridSkeleton cards={4} />
-        ) : (
-          <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
-          <RoleKPICard
-              title="Total Workforce"
-              value={stats?.totalEmployees || 0}
-              subtitle={`${stats?.activeEmployees || 0} active`}
-              icon={Users}
-              role="CEO"
-            />
+    <TooltipProvider>
+      <div className="space-y-6">
+        {/* Primary Executive KPIs */}
+        <DashboardSection
+          title="Executive Overview"
+          description="Key organizational and performance metrics at a glance"
+          isLoading={false}
+          loadingFallback={<DashboardGridSkeleton cards={4} />}
+        >
+          {isLoading ? (
+            <DashboardGridSkeleton cards={4} />
+          ) : (
+            <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
             <RoleKPICard
-              title="On Leave Today"
-              value={stats?.onLeaveToday || 0}
-              subtitle={`${stats?.utilizationRate || 0}% available`}
-              icon={Activity}
-              role="CEO"
-              trend={
-                stats && stats.utilizationRate
-                  ? {
-                      value: stats.utilizationRate >= 90 ? 3 : 2,
-                      label: "vs target",
-                      direction: stats.utilizationRate >= 90 ? "up" : "down"
-                    }
-                  : undefined
-              }
-            />
-            <RoleKPICard
-              title="Pending Approvals"
-              value={stats?.pendingApprovals || 0}
-              subtitle={`${stats?.avgApprovalTime?.toFixed(1) || 0}d avg time`}
-              icon={Clock}
-              role="CEO"
-              trend={stats && stats.pendingApprovals > 20 ? {
-                value: stats.pendingApprovals - 20,
-                label: "above normal",
-                direction: "up"
-              } : undefined}
-            />
-            <RoleKPICard
-              title="Compliance Score"
-              value={`${stats?.complianceScore || 0}%`}
-              subtitle="Policy adherence"
-              icon={Shield}
-              role="CEO"
-              trend={
-                stats && stats.complianceScore
-                  ? {
-                      value: stats.complianceScore >= 90 ? 2 : 1,
-                      label: "this quarter",
-                      direction: stats.complianceScore >= 90 ? "up" : "down"
-                    }
-                  : undefined
-              }
-            />
-          </ResponsiveDashboardGrid>
-        )}
-      </DashboardSection>
+                title={
+                  <div className="flex items-center gap-2">
+                    <span>Total Workforce</span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          aria-label="Information about total workforce"
+                          className="hover:opacity-70 transition-opacity"
+                        >
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">What this shows:</p>
+                        <p className="text-sm mb-2">
+                          Total number of employees across the entire organization, including all departments and roles.
+                        </p>
+                        <p className="text-sm font-semibold mb-1">Strategic insight:</p>
+                        <p className="text-sm mb-2">
+                          Core organizational capacity metric. Track growth trends and plan for scaling HR resources accordingly.
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          "Active" count excludes system/admin accounts.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                }
+                value={stats?.totalEmployees || 0}
+                subtitle={`${stats?.activeEmployees || 0} active`}
+                icon={Users}
+                role="CEO"
+              />
+              <RoleKPICard
+                title={
+                  <div className="flex items-center gap-2">
+                    <span>On Leave Today</span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          aria-label="Information about employees on leave"
+                          className="hover:opacity-70 transition-opacity"
+                        >
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">What this shows:</p>
+                        <p className="text-sm mb-2">
+                          Number of employees on approved leave today, with workforce utilization percentage.
+                        </p>
+                        <p className="text-sm font-semibold mb-1">Strategic impact:</p>
+                        <p className="text-sm mb-2">
+                          Low utilization (below 85%) may indicate operational risks, seasonal patterns, or organizational issues requiring attention.
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Target: Maintain 90%+ utilization for optimal operations.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                }
+                value={stats?.onLeaveToday || 0}
+                subtitle={`${stats?.utilizationRate || 0}% available`}
+                icon={Activity}
+                role="CEO"
+                trend={
+                  stats && stats.utilizationRate
+                    ? {
+                        value: stats.utilizationRate >= 90 ? 3 : 2,
+                        label: "vs target",
+                        direction: stats.utilizationRate >= 90 ? "up" : "down"
+                      }
+                    : undefined
+                }
+              />
+              <RoleKPICard
+                title={
+                  <div className="flex items-center gap-2">
+                    <span>Pending Approvals</span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          aria-label="Information about pending approvals"
+                          className="hover:opacity-70 transition-opacity"
+                        >
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">What this shows:</p>
+                        <p className="text-sm mb-2">
+                          Leave requests awaiting YOUR approval as CEO, typically escalated cases requiring executive decision.
+                        </p>
+                        <p className="text-sm font-semibold mb-1">Why this matters:</p>
+                        <p className="text-sm mb-2">
+                          High backlog indicates bottleneck at executive level. Avg approval time tracks organizational efficiency.
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Target: Process within 2-3 days to avoid employee frustration.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                }
+                value={stats?.pendingApprovals || 0}
+                subtitle={`${stats?.avgApprovalTime?.toFixed(1) || 0}d avg time`}
+                icon={Clock}
+                role="CEO"
+                trend={stats && stats.pendingApprovals > 20 ? {
+                  value: stats.pendingApprovals - 20,
+                  label: "above normal",
+                  direction: "up"
+                } : undefined}
+              />
+              <RoleKPICard
+                title={
+                  <div className="flex items-center gap-2">
+                    <span>Compliance Score</span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          aria-label="Information about compliance score"
+                          className="hover:opacity-70 transition-opacity"
+                        >
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">What this shows:</p>
+                        <p className="text-sm mb-2">
+                          Percentage of leave requests processed within policy guidelines and SLA targets.
+                        </p>
+                        <p className="text-sm font-semibold mb-1">Executive concern:</p>
+                        <p className="text-sm mb-2">
+                          Low scores (below 90%) indicate process inefficiencies, policy violations, or training gaps that need executive intervention.
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Target: Maintain 95%+ for regulatory compliance and employee satisfaction.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                }
+                value={`${stats?.complianceScore || 0}%`}
+                subtitle="Policy adherence"
+                icon={Shield}
+                role="CEO"
+                trend={
+                  stats && stats.complianceScore
+                    ? {
+                        value: stats.complianceScore >= 90 ? 2 : 1,
+                        label: "this quarter",
+                        direction: stats.complianceScore >= 90 ? "up" : "down"
+                      }
+                    : undefined
+                }
+              />
+            </ResponsiveDashboardGrid>
+          )}
+        </DashboardSection>
 
       {/* Analytics & Insights - MOVED UP (Priority for strategic decision making) */}
       <DashboardSection
@@ -340,26 +456,32 @@ export function CEODashboardClient() {
             </Card>
           )}
 
-          {/* System Health Monitor */}
+          {/* System Health Monitor - PLACEHOLDER DATA */}
           {!isLoading && stats?.systemHealth && (
-            <Card className="rounded-2xl">
+            <Card className="rounded-2xl border-dashed border-2 border-muted-foreground/30">
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Activity className="h-4 w-4" />
+                  <Activity className="h-4 w-4 text-muted-foreground" />
                   System Status
+                  <Badge variant="outline" className="ml-auto text-xs">
+                    Mock Data
+                  </Badge>
                 </CardTitle>
+                <p className="text-xs text-muted-foreground">
+                  Real system monitoring coming soon
+                </p>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 opacity-60">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Uptime</span>
-                  <span className="text-lg font-bold text-data-success">
+                  <span className="text-lg font-bold text-muted-foreground">
                     {stats.systemHealth.uptime || 99.9}%
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">API</span>
                   <Badge
-                    variant={stats.systemHealth.apiStatus === "healthy" ? "default" : "destructive"}
+                    variant="outline"
                     className="text-xs"
                   >
                     {stats.systemHealth.apiStatus || "healthy"}
@@ -368,7 +490,7 @@ export function CEODashboardClient() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Database</span>
                   <Badge
-                    variant={stats.systemHealth.dbStatus === "healthy" ? "default" : "destructive"}
+                    variant="outline"
                     className="text-xs"
                   >
                     {stats.systemHealth.dbStatus || "healthy"}
@@ -469,21 +591,29 @@ export function CEODashboardClient() {
               </CardContent>
             </Card>
 
-            {/* System Health Card */}
-            <Card className="rounded-2xl">
+            {/* System Health Card - PLACEHOLDER DATA */}
+            <Card className="rounded-2xl border-dashed border-2 border-muted-foreground/30">
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Target className="h-4 w-4" />
-                  System Health
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <Target className="h-4 w-4" />
+                    System Health
+                  </CardTitle>
+                  <Badge variant="outline" className="text-xs">
+                    Mock Data
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Real monitoring coming soon
+                </p>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 opacity-60">
                 <div>
-                  <p className="text-3xl font-bold text-data-success">
+                  <p className="text-3xl font-bold text-muted-foreground">
                     {stats?.systemHealth?.uptime || 99.9}%
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Uptime (30 days)
+                    Uptime (placeholder)
                   </p>
                 </div>
                 <Separator />
@@ -491,7 +621,7 @@ export function CEODashboardClient() {
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-muted-foreground">API Status</span>
                     <Badge
-                      variant={stats?.systemHealth?.apiStatus === "healthy" ? "default" : "destructive"}
+                      variant="outline"
                       className="text-xs"
                     >
                       {stats?.systemHealth?.apiStatus || "healthy"}
@@ -500,7 +630,7 @@ export function CEODashboardClient() {
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-muted-foreground">Database</span>
                     <Badge
-                      variant={stats?.systemHealth?.dbStatus === "healthy" ? "default" : "destructive"}
+                      variant="outline"
                       className="text-xs"
                     >
                       {stats?.systemHealth?.dbStatus || "healthy"}
@@ -513,5 +643,6 @@ export function CEODashboardClient() {
         )}
       </DashboardSection>
     </div>
+    </TooltipProvider>
   );
 }

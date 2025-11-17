@@ -56,23 +56,25 @@ export function MobileBar({
           <NotificationDropdown />
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, x: 15 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-          className="flex-shrink-0"
-        >
-          <Button
-            size="sm"
-            variant="default"
-            className="gap-1.5 shadow-md hover:shadow-lg"
-            leftIcon={<CalendarPlus className="h-4 w-4" />}
-            onClick={() => router.push("/leaves/apply")}
-            aria-label="Apply for leave"
+        {/* Apply Leave button - Only for EMPLOYEE and DEPT_HEAD roles */}
+        {(user.role === "EMPLOYEE" || user.role === "DEPT_HEAD") && (
+          <motion.div
+            initial={{ opacity: 0, x: 15 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+            className="flex-shrink-0"
           >
-            Apply
-          </Button>
-        </motion.div>
+            <Button
+              size="sm"
+              className="gap-1.5 backdrop-blur-md bg-background/80 dark:bg-background/40 border border-border hover:bg-background/90 dark:hover:bg-background/50 shadow-sm"
+              leftIcon={<CalendarPlus className="h-4 w-4" />}
+              onClick={() => router.push("/leaves/apply")}
+              aria-label="Apply for leave"
+            >
+              Apply
+            </Button>
+          </motion.div>
+        )}
 
         <motion.div
           initial={{ opacity: 0, x: 20 }}
