@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 import { router } from 'expo-router';
 import { ThemedCard } from '../shared/ThemedCard';
 import { useTheme } from '../../providers/ThemeProvider';
@@ -28,7 +29,7 @@ export function ManagerDashboard({ userName, userRole }: ManagerDashboardProps) 
 
   return (
     <>
-      <View style={styles.header}>
+      <Animated.View style={styles.header} entering={FadeIn.duration(600)}>
         <Text
           style={[
             styles.greeting,
@@ -63,7 +64,7 @@ export function ManagerDashboard({ userName, userRole }: ManagerDashboardProps) 
         >
           {userRole}
         </Text>
-      </View>
+      </Animated.View>
 
       {isLoading ? (
         <View style={styles.loadingContainer}>
@@ -72,7 +73,7 @@ export function ManagerDashboard({ userName, userRole }: ManagerDashboardProps) 
       ) : (
         <>
           {/* Team Stats Grid */}
-          <View style={styles.statsGrid}>
+          <Animated.View style={styles.statsGrid} entering={FadeInDown.delay(200).springify()}>
             <ThemedCard style={styles.statCard}>
               <View style={[styles.statIcon, { backgroundColor: colors.primary + '20' }]}>
                 <Users size={24} color={colors.primary} />
@@ -138,11 +139,12 @@ export function ManagerDashboard({ userName, userRole }: ManagerDashboardProps) 
                 Approved
               </Text>
             </ThemedCard>
-          </View>
+          </Animated.View>
 
           {/* Quick Approve Section */}
           {approvals.length > 0 && (
-            <ThemedCard style={styles.card}>
+            <Animated.View entering={FadeInDown.delay(400).springify()}>
+              <ThemedCard style={styles.card}>
               <View style={styles.cardHeader}>
                 <Text
                   style={[
@@ -212,10 +214,12 @@ export function ManagerDashboard({ userName, userRole }: ManagerDashboardProps) 
                 <Text style={styles.approveAllText}>Review All Approvals</Text>
               </TouchableOpacity>
             </ThemedCard>
+            </Animated.View>
           )}
 
           {/* Who's On Leave Today */}
-          <ThemedCard style={styles.card}>
+          <Animated.View entering={FadeInDown.delay(500).springify()}>
+            <ThemedCard style={styles.card}>
             <View style={styles.cardHeader}>
               <Text
                 style={[
@@ -289,6 +293,7 @@ export function ManagerDashboard({ userName, userRole }: ManagerDashboardProps) 
               </Text>
             )}
           </ThemedCard>
+          </Animated.View>
         </>
       )}
     </>
