@@ -56,8 +56,10 @@ export async function POST(req: NextRequest) {
           continue;
         }
 
+        const requesterRole = leave.requester.role as any;
+
         // Check if user is final approver for this leave type
-        if (!isFinalApprover(user.role, leave.type)) {
+        if (!isFinalApprover(user.role, leave.type, requesterRole)) {
           results.failed.push({ id: leaveId, reason: "Not authorized to approve this leave type" });
           continue;
         }

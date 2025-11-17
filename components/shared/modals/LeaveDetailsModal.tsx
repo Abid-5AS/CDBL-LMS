@@ -60,6 +60,11 @@ type LeaveDetails = {
   reason?: string;
   createdAt?: string;
   updatedAt?: string;
+  requester?: {
+    role?: string;
+    name?: string;
+    email?: string;
+  };
   approvals?: Array<{
     step?: number;
     approver?: string | { name: string | null } | null;
@@ -124,11 +129,13 @@ export function LeaveDetailsModal({
 
   if (!leave) return null;
 
+  const requesterRole = leave.requester?.role;
   const currentIndex = calculateCurrentStageIndex(
     leave.approvals || [],
-    leave.status
+    leave.status,
+    requesterRole
   );
-  const nextApprover = getNextApproverRole(currentIndex);
+  const nextApprover = getNextApproverRole(currentIndex, requesterRole);
   const latestDate = getLatestApprovalDate(leave.approvals || []);
 
   const canNudge =
@@ -167,7 +174,10 @@ export function LeaveDetailsModal({
 
           {/* Header Row 2: Stepper */}
           <div className="mb-4">
-            <ApprovalStepper currentIndex={currentIndex} />
+            <ApprovalStepper
+              currentIndex={currentIndex}
+              requesterRole={requesterRole as any}
+            />
           </div>
 
           {/* Header Row 3: Status line */}
