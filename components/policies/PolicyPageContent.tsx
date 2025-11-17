@@ -14,6 +14,8 @@ import {
   ChevronUp,
   HelpCircle,
   CalendarPlus,
+  Settings,
+  Search,
 } from "lucide-react";
 import {
   Card,
@@ -25,10 +27,18 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
 import { EmployeePageHero } from "@/components/employee/PageHero";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/lib/user-context";
 
 // ============================================
 // Policy Data
@@ -41,6 +51,8 @@ const policyData = {
     icon: Calendar,
     color: "text-blue-600",
     availability: "10 days per year",
+    summary:
+      "Short personal leave for errands or emergencies, limited to three consecutive working days per spell.",
     rules: [
       {
         title: "Maximum Duration",
@@ -102,6 +114,8 @@ const policyData = {
     icon: CheckCircle2,
     color: "text-green-600",
     availability: "1.5 days per month (18 days/year)",
+    summary:
+      "Accrued leave that can be carried forward, with advance notice required for long breaks.",
     rules: [
       {
         title: "Accrual Rate",
@@ -156,6 +170,8 @@ const policyData = {
     icon: AlertCircle,
     color: "text-red-600",
     availability: "14 days per year",
+    summary:
+      "Sick leave that needs medical and fitness certificates after certain durations, with overflow converting to EL.",
     rules: [
       {
         title: "Annual Quota",
@@ -210,6 +226,8 @@ const policyData = {
     icon: Users,
     color: "text-pink-600",
     availability: "90 days (with pay)",
+    summary:
+      "Ninety days of protected leave split around delivery with strict notice and no cancellation once approved.",
     rules: [
       {
         title: "Duration",
@@ -252,6 +270,8 @@ const policyData = {
     icon: Users,
     color: "text-indigo-600",
     availability: "7 days (with pay)",
+    summary:
+      "Seven days of partner leave to be used within thirty days of the child's birth.",
     rules: [
       {
         title: "Duration",
@@ -283,7 +303,7 @@ const policyData = {
 // ============================================
 
 interface PolicyCardProps {
-  policy: typeof policyData.casualLeave;
+  policy: PolicySection;
 }
 
 function PolicyCard({ policy }: PolicyCardProps) {
@@ -301,6 +321,11 @@ function PolicyCard({ policy }: PolicyCardProps) {
             <div>
               <CardTitle className="text-xl">{policy.title}</CardTitle>
               <CardDescription>Policy {policy.code}</CardDescription>
+              {policy.summary && (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {policy.summary}
+                </p>
+              )}
             </div>
           </div>
           <Badge variant="secondary" className="text-sm">
@@ -315,37 +340,52 @@ function PolicyCard({ policy }: PolicyCardProps) {
           <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
             Policy Rules
           </h4>
-          {policy.rules.map((rule, index) => (
-            <Alert
-              key={index}
-              variant={
+          <Accordion type="multiple" className="space-y-2">
+            {policy.rules.map((rule, index) => {
+              const severityClass =
                 rule.type === "critical"
-                  ? "destructive"
+                  ? "border-red-500/40 bg-red-50/60 dark:bg-red-900/10"
                   : rule.type === "warning"
-                  ? "default"
-                  : "default"
-              }
-              className={cn(
-                rule.type === "warning" &&
-                  "border-yellow-500/50 dark:border-yellow-600/30 bg-yellow-50/50 dark:bg-yellow-900/20",
-                rule.type === "info" &&
-                  "border-blue-500/50 dark:border-blue-600/30 bg-blue-50/50 dark:bg-blue-900/20"
-              )}
-            >
-              {rule.type === "critical" && <XCircle className="size-4" />}
-              {rule.type === "warning" && <AlertCircle className="size-4" />}
-              {rule.type === "info" && <CheckCircle2 className="size-4" />}
-              <div>
-                <AlertTitle className="flex items-center justify-between">
-                  {rule.title}
-                  <Badge variant="outline" className="text-xs">
-                    {rule.policyRef}
-                  </Badge>
-                </AlertTitle>
-                <AlertDescription>{rule.description}</AlertDescription>
-              </div>
-            </Alert>
-          ))}
+                  ? "border-amber-500/40 bg-amber-50/50 dark:bg-amber-900/10"
+                  : "border-border/60 bg-muted/30 dark:bg-muted/20";
+              const LeadingIcon =
+                rule.type === "critical"
+                  ? XCircle
+                  : rule.type === "warning"
+                  ? AlertCircle
+                  : CheckCircle2;
+
+              return (
+                <AccordionItem
+                  key={`${policy.code}-${index}`}
+                  value={`${policy.code}-${index}`}
+                  className="border-none"
+                >
+                  <AccordionTrigger
+                    className={cn(
+                      "rounded-lg border px-3 py-2 text-left hover:no-underline focus:ring-0",
+                      severityClass
+                    )}
+                  >
+                    <div className="flex w-full items-center justify-between gap-3">
+                      <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                        <LeadingIcon className="size-4 shrink-0" />
+                        {rule.title}
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        {rule.policyRef}
+                      </Badge>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-2">
+                    <p className="text-sm text-muted-foreground">
+                      {rule.description}
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
+          </Accordion>
         </div>
 
         {/* Examples */}
@@ -353,14 +393,23 @@ function PolicyCard({ policy }: PolicyCardProps) {
           <div className="space-y-3">
             <button
               onClick={() => setExpanded(!expanded)}
-              className="flex items-center gap-2 font-semibold text-sm text-muted-foreground uppercase tracking-wide hover:text-foreground transition-colors"
+              className="flex items-center justify-between gap-2 font-semibold text-sm text-muted-foreground uppercase tracking-wide hover:text-foreground transition-colors w-full"
             >
-              Examples
-              {expanded ? (
-                <ChevronUp className="size-4" />
-              ) : (
-                <ChevronDown className="size-4" />
-              )}
+              <span>
+                Examples ({policy.examples.length})
+              </span>
+              <span className="flex items-center gap-2 text-xs font-medium normal-case text-muted-foreground">
+                {!expanded && (
+                  <span className="line-clamp-1">
+                    {policy.examples[0]?.scenario}
+                  </span>
+                )}
+                {expanded ? (
+                  <ChevronUp className="size-4" />
+                ) : (
+                  <ChevronDown className="size-4" />
+                )}
+              </span>
             </button>
 
             {expanded && (
@@ -402,7 +451,8 @@ function PolicyCard({ policy }: PolicyCardProps) {
 // Main Policy Page Component
 // ============================================
 
-const policySections = Object.values(policyData);
+type PolicySection = typeof policyData.casualLeave;
+const policySections: PolicySection[] = Object.values(policyData);
 const totalRules = policySections.reduce((sum, policy) => sum + policy.rules.length, 0);
 const criticalRules = policySections.reduce(
   (sum, policy) => sum + policy.rules.filter((rule) => rule.type === "critical").length,
@@ -412,6 +462,35 @@ const totalExamples = policySections.reduce((sum, policy) => sum + policy.exampl
 
 export function PolicyPageContent() {
   const router = useRouter();
+  const user = useUser();
+  const canManagePolicies =
+    !!user && ["HR_ADMIN", "HR_HEAD", "SYSTEM_ADMIN"].includes(user.role);
+  const [policySearch, setPolicySearch] = React.useState("");
+  const normalizedSearch = policySearch.trim().toLowerCase();
+  const matchesPolicy = React.useCallback(
+    (policy: PolicySection) => {
+      if (!normalizedSearch) return true;
+      const summaryText = policy.summary?.toLowerCase() ?? "";
+      if (
+        policy.title.toLowerCase().includes(normalizedSearch) ||
+        policy.code.toLowerCase().includes(normalizedSearch) ||
+        summaryText.includes(normalizedSearch)
+      ) {
+        return true;
+      }
+      return policy.rules.some(
+        (rule) =>
+          rule.title.toLowerCase().includes(normalizedSearch) ||
+          rule.description.toLowerCase().includes(normalizedSearch)
+      );
+    },
+    [normalizedSearch]
+  );
+  const filteredPolicies = React.useMemo(
+    () => policySections.filter((section) => matchesPolicy(section)),
+    [matchesPolicy]
+  );
+  const hasSearch = normalizedSearch.length > 0;
   const heroStats = [
     { label: "Policy Sections", value: policySections.length },
     { label: "Rules Documented", value: totalRules },
@@ -427,6 +506,16 @@ export function PolicyPageContent() {
         stats={heroStats}
         actions={
           <>
+            {canManagePolicies && (
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<Settings className="size-4" aria-hidden="true" />}
+                onClick={() => router.push("/admin")}
+              >
+                Manage Policies
+              </Button>
+            )}
             <Button
               variant="outline"
               size="sm"
@@ -457,6 +546,27 @@ export function PolicyPageContent() {
         </AlertDescription>
       </Alert>
 
+      {/* Search */}
+      <div className="surface-card p-4 rounded-3xl space-y-2">
+        <label className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
+          Search policies
+        </label>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <Input
+            value={policySearch}
+            onChange={(e) => setPolicySearch(e.target.value)}
+            placeholder="Search by title, rule, or code"
+            className="pl-10"
+          />
+        </div>
+        {hasSearch && (
+          <p className="text-xs text-muted-foreground">
+            Showing {filteredPolicies.length} of {policySections.length} policy sections
+          </p>
+        )}
+      </div>
+
       {/* Tabs for Organization */}
       <Tabs defaultValue="all" className="w-full surface-card p-4 rounded-3xl">
         <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 bg-muted/50 rounded-2xl">
@@ -469,31 +579,95 @@ export function PolicyPageContent() {
         </TabsList>
 
         <TabsContent value="all" className="space-y-6 mt-6">
-          <PolicyCard policy={policyData.casualLeave} />
-          <PolicyCard policy={policyData.earnedLeave} />
-          <PolicyCard policy={policyData.medicalLeave} />
-          <PolicyCard policy={policyData.maternityLeave} />
-          <PolicyCard policy={policyData.paternityLeave} />
+          {filteredPolicies.length > 0 ? (
+            filteredPolicies.map((policy) => (
+              <PolicyCard key={policy.code} policy={policy} />
+            ))
+          ) : (
+            <Alert variant="default">
+              <AlertTitle>No matches</AlertTitle>
+              <AlertDescription>
+                No policies match 
+                <span className="font-semibold">“{policySearch}”</span>.
+                Try another keyword.
+              </AlertDescription>
+            </Alert>
+          )}
         </TabsContent>
 
         <TabsContent value="cl" className="mt-6">
-          <PolicyCard policy={policyData.casualLeave} />
+          {matchesPolicy(policyData.casualLeave) ? (
+            <PolicyCard policy={policyData.casualLeave} />
+          ) : (
+            hasSearch && (
+              <Alert variant="default">
+                <AlertTitle>No matches</AlertTitle>
+                <AlertDescription>
+                  Casual Leave rules do not match “{policySearch}”.
+                </AlertDescription>
+              </Alert>
+            )
+          )}
         </TabsContent>
 
         <TabsContent value="el" className="mt-6">
-          <PolicyCard policy={policyData.earnedLeave} />
+          {matchesPolicy(policyData.earnedLeave) ? (
+            <PolicyCard policy={policyData.earnedLeave} />
+          ) : (
+            hasSearch && (
+              <Alert variant="default">
+                <AlertTitle>No matches</AlertTitle>
+                <AlertDescription>
+                  Earned Leave rules do not match “{policySearch}”.
+                </AlertDescription>
+              </Alert>
+            )
+          )}
         </TabsContent>
 
         <TabsContent value="ml" className="mt-6">
-          <PolicyCard policy={policyData.medicalLeave} />
+          {matchesPolicy(policyData.medicalLeave) ? (
+            <PolicyCard policy={policyData.medicalLeave} />
+          ) : (
+            hasSearch && (
+              <Alert variant="default">
+                <AlertTitle>No matches</AlertTitle>
+                <AlertDescription>
+                  Medical Leave rules do not match “{policySearch}”.
+                </AlertDescription>
+              </Alert>
+            )
+          )}
         </TabsContent>
 
         <TabsContent value="maternity" className="mt-6">
-          <PolicyCard policy={policyData.maternityLeave} />
+          {matchesPolicy(policyData.maternityLeave) ? (
+            <PolicyCard policy={policyData.maternityLeave} />
+          ) : (
+            hasSearch && (
+              <Alert variant="default">
+                <AlertTitle>No matches</AlertTitle>
+                <AlertDescription>
+                  Maternity Leave rules do not match “{policySearch}”.
+                </AlertDescription>
+              </Alert>
+            )
+          )}
         </TabsContent>
 
         <TabsContent value="paternity" className="mt-6">
-          <PolicyCard policy={policyData.paternityLeave} />
+          {matchesPolicy(policyData.paternityLeave) ? (
+            <PolicyCard policy={policyData.paternityLeave} />
+          ) : (
+            hasSearch && (
+              <Alert variant="default">
+                <AlertTitle>No matches</AlertTitle>
+                <AlertDescription>
+                  Paternity Leave rules do not match “{policySearch}”.
+                </AlertDescription>
+              </Alert>
+            )
+          )}
         </TabsContent>
       </Tabs>
 

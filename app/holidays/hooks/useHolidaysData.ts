@@ -23,6 +23,7 @@ export type HolidaysStats = {
   past: number;
   optional: number;
   mandatory: number;
+  mandatoryUpcoming: number;
   nextHoliday: Holiday | null;
   availableYears: number[];
   holidaysByMonth: Record<number, Holiday[]>;
@@ -39,7 +40,7 @@ export function useHolidaysData() {
     viewMode: "grid",
   });
 
-  const { data, isLoading, error } = useSWR<{ items: Holiday[] }>(
+  const { data, isLoading, error, mutate } = useSWR<{ items: Holiday[] }>(
     "/api/holidays",
     fetcher,
     {
@@ -58,6 +59,7 @@ export function useHolidaysData() {
     const past = holidays.filter((h) => new Date(h.date) < today);
     const optional = holidays.filter((h) => h.isOptional);
     const mandatory = holidays.filter((h) => !h.isOptional);
+    const mandatoryUpcoming = upcoming.filter((h) => !h.isOptional).length;
 
     // Get next holiday
     const nextHoliday =
@@ -90,6 +92,7 @@ export function useHolidaysData() {
       past: past.length,
       optional: optional.length,
       mandatory: mandatory.length,
+      mandatoryUpcoming,
       nextHoliday,
       availableYears,
       holidaysByMonth,
@@ -159,5 +162,6 @@ export function useHolidaysData() {
     clearFilters,
     isLoading,
     error,
+    refresh: mutate,
   };
 }

@@ -130,6 +130,20 @@ export async function GET(req: NextRequest) {
         },
       },
     });
+    const rangeLabel = `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
+    const hasMatchingLeaves = leaves.length > 0;
+    const emptyState = hasMatchingLeaves
+      ? null
+      : {
+          title:
+            departmentId || leaveType
+              ? "No requests for this filter combination"
+              : "No leave activity for the selected period",
+          description:
+            departmentId || leaveType
+              ? "Try widening the department, leave type, or time range filters to see results."
+              : `We did not record any leave requests between ${rangeLabel}.`,
+        };
 
     // Calculate KPIs
     const pendingCount = leaves.filter((l) => ["PENDING", "SUBMITTED"].includes(l.status)).length;
@@ -250,6 +264,7 @@ export async function GET(req: NextRequest) {
         department: departmentId ? Number(departmentId) : null,
         leaveType: leaveType || null,
       },
+      emptyState,
     });
   } catch (err) {
     console.error("Analytics API error:", err);

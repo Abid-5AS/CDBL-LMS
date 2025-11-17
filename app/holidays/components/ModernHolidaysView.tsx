@@ -11,6 +11,7 @@ import { PDFExportButton } from "./PDFExportButton";
 import { formatDate } from "@/lib/utils";
 import { Badge, TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui";
 import { EmployeePageHero } from "@/components/employee/PageHero";
+import { HolidayAdminPanel } from "./HolidayAdminPanel";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -37,7 +38,9 @@ export function ModernHolidaysView({ role }: ModernHolidaysViewProps) {
     clearFilters,
     isLoading,
     error,
+    refresh,
   } = useHolidaysData();
+  const isAdminRole = role === "HR_ADMIN" || role === "HR_HEAD" || role === "CEO";
 
   const headerActions = (
     <TooltipProvider>
@@ -157,6 +160,13 @@ export function ModernHolidaysView({ role }: ModernHolidaysViewProps) {
         className="space-y-6"
       >
         {/* KPI Section */}
+        {isAdminRole && (
+          <HolidayAdminPanel
+            onCreated={async () => {
+              await refresh?.();
+            }}
+          />
+        )}
         <HolidaysKPISection stats={holidaysStats} />
 
         {/* Simple highlight card for upcoming holiday */}

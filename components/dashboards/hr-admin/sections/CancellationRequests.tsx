@@ -138,7 +138,7 @@ export function CancellationRequestsPanel() {
                   </TableCell>
                   <TableCell className="text-right">
                     <Button asChild size="sm" variant="outline">
-                      <Link href={`/approvals?leave=${leave.id}`}>Review</Link>
+                      <Link href={`/approvals/${leave.id}?source=cancellation`}>Review</Link>
                     </Button>
                   </TableCell>
                 </TableRow>

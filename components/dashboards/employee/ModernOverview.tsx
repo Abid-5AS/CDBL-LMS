@@ -8,13 +8,13 @@ import {
   Calendar,
   Clock,
   TrendingUp,
-  BarChart3,
   PieChart,
   Activity,
-  Settings,
   Plus,
-  CalendarPlus,
   Info,
+  AlertCircle,
+  ClipboardList,
+  BookOpen,
 } from "lucide-react";
 
 import {
@@ -117,6 +117,8 @@ export function ModernEmployeeDashboard({
 }: EmployeeDashboardContentProps) {
   const router = useRouter();
   const [activeLeaveTab, setActiveLeaveTab] = useState<string>("overview");
+  const infoButtonClasses =
+    "inline-flex h-7 w-7 items-center justify-center rounded-full border border-border/60 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60";
 
   // Scroll to specific section and optionally switch tabs
   const scrollToSection = (sectionId: string, tabId?: string) => {
@@ -159,11 +161,18 @@ export function ModernEmployeeDashboard({
 
   const quickActions = [
     {
-      label: "Apply for Leave",
-      description: "Start a new leave request",
-      icon: Plus,
-      accent: "bg-gradient-to-br from-indigo-500 to-purple-500 text-white",
-      onClick: () => router.push("/leaves/apply"),
+      label: "Review My Leaves",
+      description: "Jump to status & history",
+      icon: ClipboardList,
+      accent: "bg-gradient-to-br from-cyan-500 to-blue-500 text-white",
+      onClick: () => router.push("/leaves"),
+    },
+    {
+      label: "Check Balance & Policies",
+      description: "View balances and rules",
+      icon: BookOpen,
+      accent: "bg-gradient-to-br from-emerald-500 to-teal-500 text-white",
+      onClick: () => router.push("/balance"),
     },
   ];
 
@@ -203,7 +212,7 @@ export function ModernEmployeeDashboard({
                   leftIcon={<Plus className="h-4 w-4" aria-hidden="true" />}
                   onClick={() => router.push("/leaves/apply")}
                 >
-                  Apply Leave
+                  Apply for Leave
                 </Button>
               </div>
               {dashboardData.nextScheduledLeave && (
@@ -225,6 +234,34 @@ export function ModernEmployeeDashboard({
             </div>
           </motion.section>
 
+          <motion.section variants={itemVariants}>
+            <div className="sticky top-4 z-20 hidden md:block">
+              <div className="surface-card flex flex-wrap items-center justify-between gap-3 border border-border/70 px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-muted-foreground">
+                  Quick Navigation
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="rounded-full border border-border/70"
+                    onClick={() => scrollToSection("action-center")}
+                  >
+                    Action Center
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="rounded-full border border-border/70"
+                    onClick={() => scrollToSection("leave-details", "balance")}
+                  >
+                    Leave Details
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </motion.section>
+
           {/* Quick Stats Grid */}
           <DashboardSection
             title="Leave Metrics"
@@ -234,7 +271,7 @@ export function ModernEmployeeDashboard({
             animate={true}
           >
             <ResponsiveDashboardGrid
-              columns="2:2:4:4"
+              columns="2:2:3:3"
               gap="md"
               animate={true}
               staggerChildren={0.1}
@@ -243,15 +280,16 @@ export function ModernEmployeeDashboard({
               <RoleKPICard
                 title={
                   <div className="flex items-center gap-2">
-                    <span>Pending Requests</span>
+                    <span>Needs Your Action</span>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
-                          aria-label="Information about pending requests"
-                          className="hover:opacity-70 transition-opacity"
+                          type="button"
+                          aria-label="Learn about requests that need your input"
+                          className={infoButtonClasses}
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <Info className="h-4 w-4 text-muted-foreground" />
+                          <AlertCircle className="h-4 w-4" aria-hidden="true" />
                         </button>
                       </TooltipTrigger>
                       <TooltipContent side="bottom" className="max-w-xs">
@@ -259,36 +297,88 @@ export function ModernEmployeeDashboard({
                           What this shows:
                         </p>
                         <p className="text-sm mb-2">
-                          Your leave requests currently going through the
-                          approval process.
+                          Requests returned to you that must be edited or
+                          confirmed before they can re-enter the approval
+                          chain.
                         </p>
                         <p className="text-sm font-semibold mb-1">
                           Current stage:
                         </p>
                         <p className="text-sm mb-2">
-                          The subtitle shows which approver (Department Head, HR
-                          Admin, HR Head, or CEO) is currently reviewing your
-                          request and the average wait time.
+                          Tap to jump directly to the Action Center where you
+                          can edit, resubmit, or cancel these requests.
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          You can cancel pending requests anytime from the
-                          Action Center below.
+                          Once all items are handled this number resets to 0.
                         </p>
                       </TooltipContent>
                     </Tooltip>
                   </div>
                 }
-                value={dashboardData.pendingCount}
+                value={dashboardData.needsAttentionCount}
+                subtitle={
+                  dashboardData.needsAttentionCount > 0
+                    ? "Returned or cancelled items"
+                    : "No actions required"
+                }
+                icon={AlertCircle}
+                role="EMPLOYEE"
+                animate={true}
+                onClick={() => scrollToSection("action-center")}
+                clickLabel="Jump to Action Center"
+              />
+
+              <RoleKPICard
+                title={
+                  <div className="flex items-center gap-2">
+                    <span>Under Review</span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          aria-label="Information about under review requests"
+                          className={infoButtonClasses}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Info className="h-4 w-4" aria-hidden="true" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">
+                          What this shows:
+                        </p>
+                        <p className="text-sm mb-2">
+                          Requests currently moving through approvers. Nothing
+                          is required from you unless someone returns it.
+                        </p>
+                        <p className="text-sm font-semibold mb-1">
+                          How it's calculated:
+                        </p>
+                        <p className="text-sm mb-2">
+                          Includes submitted, pending, recalled, and
+                          cancellation requests forwarded to managers/HR. The
+                          subtitle highlights who currently has the request
+                          plus the average wait.
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Explore approvals in My Leaves for a full audit
+                          trail.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                }
+                value={dashboardData.underReviewCount}
                 subtitle={
                   dashboardData.pendingStageInfo
                     ? `With ${dashboardData.pendingStageInfo.role} • ${dashboardData.pendingAverageWait}d avg wait`
                     : "Awaiting approval"
                 }
-                icon={dashboardData.pendingStageInfo?.icon || Clock}
+                icon={Clock}
                 role="EMPLOYEE"
                 animate={true}
                 onClick={() => router.push("/leaves?status=pending")}
-                clickLabel="View your pending leave requests"
+                clickLabel="View requests awaiting approval"
               />
 
               <RoleKPICard
@@ -298,11 +388,12 @@ export function ModernEmployeeDashboard({
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
+                          type="button"
                           aria-label="Information about total leave balance"
-                          className="hover:opacity-70 transition-opacity"
+                          className={infoButtonClasses}
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <Info className="h-4 w-4 text-muted-foreground" />
+                          <Info className="h-4 w-4" aria-hidden="true" />
                         </button>
                       </TooltipTrigger>
                       <TooltipContent side="bottom" className="max-w-xs">
@@ -310,20 +401,12 @@ export function ModernEmployeeDashboard({
                           What this shows:
                         </p>
                         <p className="text-sm mb-2">
-                          Total leave days available to you across all leave
-                          types (Earned, Casual, Medical).
-                        </p>
-                        <p className="text-sm font-semibold mb-1">
-                          How it's calculated:
-                        </p>
-                        <p className="text-sm mb-2">
-                          Sum of remaining days in each leave category. This
-                          includes carried-over balance and annual allocation
-                          minus any used or pending days.
+                          Total leave days available to you across Earned,
+                          Casual, and Medical leave.
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          View detailed breakdown in the "Leave Balance" tab
-                          below.
+                          Tap to open the Leave Balance tab for breakdown and
+                          expiry notes.
                         </p>
                       </TooltipContent>
                     </Tooltip>
@@ -334,53 +417,8 @@ export function ModernEmployeeDashboard({
                 icon={Calendar}
                 role="EMPLOYEE"
                 animate={true}
-                onClick={() => router.push("/balance")}
+                onClick={() => scrollToSection("leave-details", "balance")}
                 clickLabel="View detailed balance breakdown"
-              />
-
-              <RoleKPICard
-                title={
-                  <div className="flex items-center gap-2">
-                    <span>Days Used</span>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          aria-label="Information about days used"
-                          className="hover:opacity-70 transition-opacity"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Info className="h-4 w-4 text-muted-foreground" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom" className="max-w-xs">
-                        <p className="text-sm font-semibold mb-1">
-                          What this shows:
-                        </p>
-                        <p className="text-sm mb-2">
-                          Total number of leave days you've taken this calendar
-                          year across all leave types.
-                        </p>
-                        <p className="text-sm font-semibold mb-1">Includes:</p>
-                        <p className="text-sm mb-2">
-                          Only approved leaves that have been taken. Pending
-                          requests and future approved leaves are not counted
-                          until they occur.
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Check "Recent Activity" tab to see breakdown by leave
-                          type.
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                }
-                value={dashboardData.usedThisYear}
-                subtitle="This year"
-                icon={BarChart3}
-                role="EMPLOYEE"
-                animate={true}
-                onClick={() => scrollToSection("leave-details", "activity")}
-                clickLabel="View leave usage history in Leave Details"
               />
 
               <RoleKPICard
@@ -394,8 +432,9 @@ export function ModernEmployeeDashboard({
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
+                          type="button"
                           aria-label="Information about next approved leave"
-                          className="hover:opacity-70 transition-opacity"
+                          className={infoButtonClasses}
                           onClick={(e) => e.stopPropagation()}
                         >
                           <Info className="h-4 w-4 text-muted-foreground" />
@@ -455,8 +494,8 @@ export function ModernEmployeeDashboard({
 
           {/* Action Center */}
           <DashboardSection
-            title="Recent Actions"
-            description="Items requiring your attention"
+            title="Action Center"
+            description="Handle returned requests, certificate tasks, and expiring balances"
             isLoading={isLoadingLeaves}
             animate={true}
           >
@@ -497,16 +536,33 @@ export function ModernEmployeeDashboard({
                         id: "overview",
                         label: "Overview",
                         icon: Activity,
-                        badge: dashboardData.pendingCount.toString(),
+                        badge: dashboardData.needsAttentionCount.toString(),
                         content: (
                           <div className="flex flex-col items-center justify-center gap-2 py-6 sm:py-8">
-                            <p className="text-base font-medium">
-                              You&apos;re all caught up on leave details.
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              Use the Leave Balance and Recent Activity tabs to
-                              explore your data.
-                            </p>
+                            {dashboardData.needsAttentionCount === 0 ? (
+                              <>
+                                <p className="text-base font-medium">
+                                  You&apos;re all caught up on leave actions.
+                                </p>
+                                <p className="text-sm text-muted-foreground text-center">
+                                  Explore your balance or recent history using the tabs.
+                                </p>
+                              </>
+                            ) : (
+                              <>
+                                <p className="text-base font-medium text-center">
+                                  {dashboardData.needsAttentionCount} request
+                                  {dashboardData.needsAttentionCount === 1 ? " needs" : "s need"} your input.
+                                </p>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => scrollToSection("action-center")}
+                                >
+                                  Review in Action Center
+                                </Button>
+                              </>
+                            )}
                           </div>
                         ),
                       },

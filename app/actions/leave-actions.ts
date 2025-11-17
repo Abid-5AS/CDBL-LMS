@@ -12,6 +12,7 @@ import { prisma } from "@/lib/prisma";
 import { LeaveService } from "@/lib/services/leave.service";
 import { NotificationService } from "@/lib/services/notification.service";
 import type { LeaveType } from "@prisma/client";
+import { invalidateHRAdminStatsCache } from "@/lib/dashboard/hr-admin-data";
 
 /**
  * Submit a new leave request
@@ -138,6 +139,7 @@ export async function forwardLeaveRequest(leaveId: number) {
     revalidatePath("/approvals");
     revalidatePath("/dashboard");
     revalidatePath(`/leaves/${leaveId}`);
+    invalidateHRAdminStatsCache();
 
     return { success: true };
   } catch (error) {
@@ -174,6 +176,7 @@ export async function approveLeaveRequest(leaveId: number, comment?: string) {
     revalidatePath("/dashboard");
     revalidatePath("/leaves");
     revalidatePath(`/leaves/${leaveId}`);
+    invalidateHRAdminStatsCache();
 
     return { success: true };
   } catch (error) {
@@ -227,6 +230,7 @@ export async function rejectLeaveRequest(leaveId: number, comment?: string) {
     revalidatePath("/approvals");
     revalidatePath("/dashboard");
     revalidatePath("/leaves");
+    invalidateHRAdminStatsCache();
     revalidatePath(`/leaves/${leaveId}`);
 
     return { success: true };
@@ -376,6 +380,7 @@ export async function bulkRejectLeaveRequests(leaveIds: number[], reason: string
     revalidatePath("/approvals");
     revalidatePath("/leaves");
     revalidatePath("/dashboard");
+    invalidateHRAdminStatsCache();
 
     return {
       success: true,

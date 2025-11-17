@@ -34,40 +34,50 @@ type ActionItem = {
   data?: any;
 };
 
+const UNDER_REVIEW_STATUSES = new Set<LeaveRequest["status"]>([
+  "SUBMITTED",
+  "PENDING",
+  "CANCELLATION_REQUESTED",
+  "RECALLED",
+]);
+
+const ACTION_REQUIRED_STATUSES = new Set<LeaveRequest["status"]>([
+  "RETURNED",
+]);
+
 export function useEmployeeDashboardData(
   leaves: LeaveRequest[] | undefined,
   balanceData: Record<string, unknown> | undefined
 ) {
   return React.useMemo(() => {
-    const pendingLeaves =
-      leaves?.filter(
-        (l) => l.status === "PENDING" || l.status === "SUBMITTED"
-      ) || [];
-    const returnedLeaves = leaves?.filter((l) => l.status === "RETURNED") || [];
+    const underReviewLeaves =
+      leaves?.filter((l) => UNDER_REVIEW_STATUSES.has(l.status)) || [];
+    const actionRequiredLeaves =
+      leaves?.filter((l) => ACTION_REQUIRED_STATUSES.has(l.status)) || [];
     const approvedLeaves = leaves?.filter((l) => l.status === "APPROVED") || [];
 
     // Calculate pending request details
-    const pendingDetails =
-      pendingLeaves.length > 0
+    const underReviewDetails =
+      underReviewLeaves.length > 0
         ? {
-            oldestRequest: pendingLeaves.reduce((oldest, current) =>
+            oldestRequest: underReviewLeaves.reduce((oldest, current) =>
               new Date(current.createdAt || current.updatedAt) <
               new Date(oldest.createdAt || oldest.updatedAt)
                 ? current
                 : oldest
             ),
             averageWaitDays: Math.round(
-              pendingLeaves.reduce(
+              underReviewLeaves.reduce(
                 (sum, leave) =>
                   sum + getDaysWaiting(leave.createdAt || leave.updatedAt),
                 0
-              ) / pendingLeaves.length
+              ) / underReviewLeaves.length
             ),
           }
         : null;
 
-    const pendingStageInfo = pendingDetails
-      ? getCurrentApprovalStage(pendingDetails.oldestRequest.approvals)
+    const pendingStageInfo = underReviewDetails
+      ? getCurrentApprovalStage(underReviewDetails.oldestRequest.approvals)
       : null;
 
     const normalizedBalanceData = normalizeBalanceData(balanceData);
@@ -113,7 +123,7 @@ export function useEmployeeDashboardData(
     const actionItems: ActionItem[] = [];
 
     // 1. Returned requests
-    returnedLeaves.forEach((leave) => {
+    actionRequiredLeaves.forEach((leave) => {
       actionItems.push({
         type: "returned",
         title: `${leaveTypeLabel[leave.type] || leave.type} Leave - Returned`,
@@ -148,6 +158,7 @@ export function useEmployeeDashboardData(
 
     // 3. Upcoming leaves that can be cancelled (within cancellation window)
     const cancelableLeaves = upcomingApprovedLeaves
+      .filter((l) => l.id !== nextScheduledLeave?.id)
       .filter((l) => {
         const daysUntil = Math.ceil(
           (new Date(l.startDate).getTime() - now.getTime()) /
@@ -191,20 +202,19 @@ export function useEmployeeDashboardData(
     }
 
     return {
-      pendingCount: pendingLeaves.length,
-      returnedCount: returnedLeaves.length,
+      underReviewCount: underReviewLeaves.length,
+      needsAttentionCount: actionRequiredLeaves.length,
+      returnedCount: actionRequiredLeaves.length,
       approvedCount: approvedLeaves.length,
       totalBalance,
       usedThisYear,
       balanceData: normalizedBalanceData,
       recentLeaves,
-      pendingLeaves,
-      returnedLeaves,
       nextScheduledLeave,
       daysUntilNextLeave,
       actionItems,
       pendingStageInfo,
-      pendingAverageWait: pendingDetails?.averageWaitDays || 0,
+      pendingAverageWait: underReviewDetails?.averageWaitDays || 0,
     };
   }, [leaves, balanceData]);
 }

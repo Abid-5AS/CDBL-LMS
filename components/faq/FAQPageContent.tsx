@@ -8,6 +8,8 @@ import {
   Clock,
   FileText,
   Mail,
+  Settings,
+  ChevronDown,
 } from "lucide-react";
 import {
   Card,
@@ -29,6 +31,8 @@ import {
 import { EmployeePageHero } from "@/components/employee/PageHero";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useUser } from "@/lib/user-context";
 
 // ============================================
 // FAQ Data
@@ -174,6 +178,15 @@ const faqData = {
   ],
 };
 
+const categoryPolicyLink: Record<string, { href: string; label: string } | null> = {
+  general: null,
+  casualLeave: { href: "/policies?tab=cl", label: "Casual Leave policy" },
+  earnedLeave: { href: "/policies?tab=el", label: "Earned Leave policy" },
+  medicalLeave: { href: "/policies?tab=ml", label: "Medical Leave policy" },
+  modifications: { href: "/policies", label: "Policy handbook" },
+  technical: null,
+};
+
 const totalFaqCount = Object.values(faqData).reduce(
   (sum, faqs) => sum + faqs.length,
   0
@@ -186,6 +199,14 @@ const categoryTabMap: Record<string, string> = {
   modifications: "modifications",
   technical: "technical",
 };
+const categoryLabels: Record<string, string> = {
+  general: "General",
+  casualLeave: "Casual Leave",
+  earnedLeave: "Earned Leave",
+  medicalLeave: "Medical",
+  modifications: "Modifications",
+  technical: "Technical",
+};
 
 // ============================================
 // FAQ Accordion Component
@@ -197,6 +218,7 @@ interface FAQAccordionProps {
 }
 
 function FAQAccordion({ faqs, category }: FAQAccordionProps) {
+  const policyLink = categoryPolicyLink[category];
   return (
     <Accordion type="multiple" className="space-y-2">
       {faqs.map((faq, index) => (
@@ -205,11 +227,23 @@ function FAQAccordion({ faqs, category }: FAQAccordionProps) {
           value={`${category}-${index}`}
           className="border rounded-lg px-4"
         >
-          <AccordionTrigger className="hover:no-underline">
+          <AccordionTrigger className="hover:no-underline justify-between gap-3">
             <span className="text-left font-medium">{faq.question}</span>
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
+              View answer
+              <ChevronDown className="size-4 transition-transform data-[state=open]:rotate-180" />
+            </span>
           </AccordionTrigger>
-          <AccordionContent className="text-muted-foreground">
-            {faq.answer}
+          <AccordionContent className="text-muted-foreground space-y-2">
+            <p>{faq.answer}</p>
+            {policyLink && (
+              <p className="text-xs">
+                Need the full rule?{' '}
+                <Link href={policyLink.href} className="underline font-medium">
+                  {policyLink.label}
+                </Link>
+              </p>
+            )}
           </AccordionContent>
         </AccordionItem>
       ))}
@@ -225,6 +259,9 @@ export function FAQPageContent() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = React.useState("");
   const [activeTab, setActiveTab] = React.useState("general");
+  const user = useUser();
+  const canManageFaq =
+    !!user && ["HR_ADMIN", "HR_HEAD", "SYSTEM_ADMIN"].includes(user.role);
 
   // Filter FAQs based on search
   const filteredFAQs = React.useMemo(() => {
@@ -254,7 +291,7 @@ export function FAQPageContent() {
 
   const suggestionList = React.useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
-    if (term.length < 2) return [];
+    if (term.length < 1) return [];
     const matches: Array<{ category: string; question: string }> = [];
     Object.entries(faqData).forEach(([category, faqs]) => {
       faqs.forEach((faq) => {
@@ -280,13 +317,25 @@ export function FAQPageContent() {
         description="Search curated answers about applying for leave, balances, policy compliance, and troubleshooting."
         stats={heroStats}
         actions={
-          <Button
-            size="sm"
-            leftIcon={<Mail className="size-4" aria-hidden="true" />}
-            onClick={() => router.push("/help")}
-          >
-            Contact Support
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            {canManageFaq && (
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<Settings className="size-4" aria-hidden="true" />}
+                onClick={() => router.push("/admin/tools")}
+              >
+                Update FAQs
+              </Button>
+            )}
+            <Button
+              size="sm"
+              leftIcon={<Mail className="size-4" aria-hidden="true" />}
+              onClick={() => router.push("/help")}
+            >
+              Contact Support
+            </Button>
+          </div>
         }
       />
 
@@ -301,6 +350,9 @@ export function FAQPageContent() {
             className="pl-10 h-12 text-base"
           />
         </div>
+        <p className="text-xs text-muted-foreground mt-1">
+          Results update instantly—no need to press Enter.
+        </p>
         {suggestionList.length > 0 && (
           <div className="mt-3 rounded-2xl border border-border/60 bg-muted/30 p-3 space-y-2">
             <p className="text-xs uppercase tracking-wide text-muted-foreground">
@@ -311,7 +363,7 @@ export function FAQPageContent() {
                 <button
                   key={`${suggestion.category}-${suggestion.question}-${index}`}
                   type="button"
-                  className="text-left text-sm text-foreground hover:text-primary transition-colors"
+                  className="flex flex-col rounded-xl border border-transparent px-2 py-1 text-left text-sm text-foreground hover:border-primary/20 hover:text-primary transition-colors"
                   onClick={() => {
                     setActiveTab(
                       categoryTabMap[suggestion.category] ?? "general"
@@ -319,7 +371,10 @@ export function FAQPageContent() {
                     setSearchTerm(suggestion.question);
                   }}
                 >
-                  {suggestion.question}
+                  <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                    {categoryLabels[suggestion.category] ?? "FAQ"}
+                  </span>
+                  <span className="font-medium">{suggestion.question}</span>
                 </button>
               ))}
             </div>

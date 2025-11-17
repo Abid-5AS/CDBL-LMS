@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, useOptimistic, useTransition } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import useSWR, { mutate as globalMutate } from "swr";
 import { toast } from "sonner";
 import clsx from "clsx";
@@ -75,14 +76,40 @@ const STATUS_OPTIONS = [
   { value: "SUBMITTED", label: "Submitted" },
 ];
 
+const HISTORY_STATUS_OPTIONS = [
+  { value: "APPROVED", label: "Approved" },
+  { value: "REJECTED", label: "Rejected" },
+  { value: "FORWARDED", label: "Forwarded" },
+];
+
+type HistoryDecision = "ALL" | "APPROVED" | "REJECTED" | "FORWARDED";
+
 // Use shared TYPE_OPTIONS from constants
 const TYPE_OPTIONS = LEAVE_TYPE_OPTIONS;
 
 export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const initialViewMode = searchParams.get("view") === "history" ? "history" : "queue";
+  const initialHistoryDecision = (searchParams.get("decision") || "ALL").toUpperCase();
+  const validHistoryValues = ["ALL", ...HISTORY_STATUS_OPTIONS.map((opt) => opt.value)];
+  const [viewMode, setViewMode] = useState<"queue" | "history">(initialViewMode);
+  const [historyDecision, setHistoryDecision] = useState<HistoryDecision>(
+    validHistoryValues.includes(initialHistoryDecision)
+      ? (initialHistoryDecision as HistoryDecision)
+      : "ALL"
+  );
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [queueStatusFilter, setQueueStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const statusFilterValue =
+    viewMode === "history"
+      ? historyDecision === "ALL"
+        ? "all"
+        : historyDecision
+      : queueStatusFilter;
 
   // Dialog state management
   const [dialogState, setDialogState] = useState<{
@@ -99,14 +126,40 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   const userRole = (user?.role as AppRole) || "EMPLOYEE";
   const isHRAdmin = userRole === "HR_ADMIN";
 
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (viewMode === "history") {
+      params.set("view", "history");
+      params.set("decision", historyDecision);
+    } else {
+      params.delete("view");
+      params.delete("decision");
+    }
+    const next = params.toString();
+    const current = searchParams.toString();
+    if (next !== current) {
+      const suffix = next ? `?${next}` : "";
+      router.replace(`${pathname}${suffix}`, { scroll: false });
+    }
+  }, [historyDecision, viewMode, router, searchParams, pathname]);
+
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [viewMode]);
+
   // Update selection count when selectedIds changes
   useEffect(() => {
     setSelection(selectedIds);
     return () => setSelection([]);
   }, [selectedIds, setSelection]);
 
+  const cacheKey =
+    viewMode === "history"
+      ? `/api/approvals/history?decision=${historyDecision}`
+      : "/api/approvals";
+
   const { data, error, isLoading, mutate } = useSWR<ApprovalsResponse>(
-    "/api/approvals",
+    cacheKey,
     apiFetcher,
     {
       revalidateOnFocus: false,
@@ -125,14 +178,14 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   // useTransition for Server Actions
   const [isPending, startTransition] = useTransition();
 
-  // Use optimistic items for instant UI updates
-  const allItems = useMemo(
-    () => optimisticItems,
-    [optimisticItems]
+  const baseItems = data?.items ?? [];
+  const displayedItems = useMemo(
+    () => (viewMode === "history" ? baseItems : optimisticItems),
+    [viewMode, baseItems, optimisticItems]
   );
 
   const items = useMemo(() => {
-    let filtered = allItems;
+    let filtered = displayedItems;
 
     // Search filter
     if (searchQuery.trim()) {
@@ -150,8 +203,8 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     }
 
     // Status filter
-    if (statusFilter !== "all") {
-      filtered = filtered.filter((item) => item.status === statusFilter);
+    if (statusFilterValue !== "all") {
+      filtered = filtered.filter((item) => item.status === statusFilterValue);
     }
 
     // Type filter
@@ -160,19 +213,31 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     }
 
     return filtered;
-  }, [allItems, searchQuery, statusFilter, typeFilter]);
+  }, [displayedItems, searchQuery, statusFilterValue, typeFilter]);
 
   const clearFilters = useCallback(() => {
     setSearchQuery("");
-    setStatusFilter("all");
+    setQueueStatusFilter("all");
+    setHistoryDecision("ALL");
     setTypeFilter("all");
   }, []);
 
+  const handleStatusFilterChange = useCallback(
+    (next: string) => {
+      if (viewMode === "history") {
+        setHistoryDecision(next === "all" ? "ALL" : (next as HistoryDecision));
+      } else {
+        setQueueStatusFilter(next);
+      }
+    },
+    [viewMode]
+  );
+
   useEffect(() => {
     if (onDataChange) {
-      onDataChange(items);
+      onDataChange(viewMode === "queue" ? items : []);
     }
-  }, [items, onDataChange]);
+  }, [items, onDataChange, viewMode]);
 
   // Open confirmation dialog for destructive actions
   const openConfirmDialog = useCallback((
@@ -198,6 +263,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     action: "approve" | "reject" | "forward" | "return",
     comment?: string
   ) => {
+    if (viewMode !== "queue") return;
     // Instant UI update with useOptimistic
     setOptimisticItems(id);
 
@@ -266,7 +332,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         await mutate();
       }
     });
-  }, [setOptimisticItems, closeDialog, startTransition, mutate]);
+  }, [setOptimisticItems, closeDialog, startTransition, mutate, viewMode]);
 
   // Handle decision routing - open dialog for destructive actions
   const handleDecision = useCallback(async (
@@ -285,6 +351,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   }, [openConfirmDialog, executeDecision]);
 
   const handleSelectRow = useCallback((itemId: string, checked: boolean) => {
+    if (viewMode !== "queue") return;
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (checked) {
@@ -294,17 +361,19 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
       }
       return next;
     });
-  }, []);
+  }, [viewMode]);
 
   const handleSelectAll = useCallback((checked: boolean) => {
+    if (viewMode !== "queue") return;
     if (checked) {
       setSelectedIds(new Set(items.map((item) => item.id)));
     } else {
       setSelectedIds(new Set());
     }
-  }, [items]);
+  }, [items, viewMode]);
 
   const handleBulkApprove = useCallback(async () => {
+    if (viewMode !== "queue") return;
     if (selectedIds.size === 0) return;
 
     // Optimistically remove selected items from UI
@@ -345,9 +414,10 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         await mutate();
       }
     });
-  }, [selectedIds, setOptimisticItems, startTransition, mutate]);
+  }, [selectedIds, setOptimisticItems, startTransition, mutate, viewMode]);
 
   const handleBulkReject = useCallback(async () => {
+    if (viewMode !== "queue") return;
     if (selectedIds.size === 0 || !bulkRejectReason.trim() || bulkRejectReason.trim().length < 5) {
       toast.error("Please provide a rejection reason (minimum 5 characters)");
       return;
@@ -390,10 +460,12 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         await mutate();
       }
     });
-  }, [selectedIds, bulkRejectReason, setOptimisticItems, startTransition, mutate]);
+  }, [selectedIds, bulkRejectReason, setOptimisticItems, startTransition, mutate, viewMode]);
 
-  const allSelected = items.length > 0 && selectedIds.size === items.length;
-  const someSelected = selectedIds.size > 0 && selectedIds.size < items.length;
+  const allSelected =
+    viewMode === "queue" && items.length > 0 && selectedIds.size === items.length;
+  const someSelected =
+    viewMode === "queue" && selectedIds.size > 0 && selectedIds.size < items.length;
 
   if (isLoading) {
     return (
@@ -428,18 +500,26 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     );
   }
 
-  if (!items.length && allItems.length === 0) {
+  if (!items.length && displayedItems.length === 0) {
     return (
       <Card className={cn(glassCard.elevated, "rounded-2xl")}>
         <CardContent>
           <EmptyState
             icon={CheckCircle}
-            title="No pending requests"
-            description="You are all caught up! There are currently no leave requests awaiting approval."
-            action={{
-              label: "View Past Approvals",
-              href: "/approvals?status=APPROVED",
-            }}
+            title={viewMode === "history" ? "No past approvals" : "No pending requests"}
+            description={
+              viewMode === "history"
+                ? "You have not processed any approvals with the current filters."
+                : "You are all caught up! There are currently no leave requests awaiting approval."
+            }
+            action={
+              viewMode === "history"
+                ? undefined
+                : {
+                    label: "View Past Approvals",
+                    href: "/approvals?view=history",
+                  }
+            }
             className="py-8"
           />
         </CardContent>
@@ -449,14 +529,42 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="inline-flex rounded-full border border-border bg-card/80 p-1">
+          {[
+            { value: "queue", label: "My Queue" },
+            { value: "history", label: "Past Decisions" },
+          ].map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => setViewMode(option.value as "queue" | "history")}
+              className={cn(
+                "px-4 py-1.5 text-sm font-medium rounded-full transition focus-ring",
+                viewMode === option.value
+                  ? "bg-card-action text-foreground shadow"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+              aria-pressed={viewMode === option.value}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+        <p className="text-sm text-muted-foreground">
+          {viewMode === "history"
+            ? "Decisions reflect your last 100 actions."
+            : "Only requests awaiting your action appear here."}
+        </p>
+      </div>
       <FilterBar
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
         searchPlaceholder="Search by employee, type, reason, or date..."
         statusFilter={{
-          value: statusFilter,
-          onChange: setStatusFilter,
-          options: STATUS_OPTIONS,
+          value: statusFilterValue,
+          onChange: handleStatusFilterChange,
+          options: viewMode === "history" ? HISTORY_STATUS_OPTIONS : STATUS_OPTIONS,
         }}
         typeFilter={{
           value: typeFilter,
@@ -467,7 +575,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
       />
 
       {/* Bulk Actions Bar */}
-      {selectedIds.size > 0 && (
+      {viewMode === "queue" && selectedIds.size > 0 && (
         <Card className={cn(glassCard.elevated, "rounded-2xl bg-primary/5 border-primary/20")}>
           <CardContent className="flex items-center justify-between py-3">
             <div className="flex items-center gap-2">
@@ -523,13 +631,17 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         </Card>
       )}
 
-      {items.length === 0 && allItems.length > 0 ? (
+      {items.length === 0 && displayedItems.length > 0 ? (
         <Card className={cn(glassCard.elevated, "rounded-2xl")}>
           <CardContent>
             <EmptyState
               icon={FilterX}
-              title="No matching requests"
-              description="No leave requests match your current filter criteria. Try adjusting your search or clearing filters."
+              title={viewMode === "history" ? "No matching decisions" : "No matching requests"}
+              description={
+                viewMode === "history"
+                  ? "No past approvals match your current filters. Adjust the status or search term."
+                  : "No leave requests match your current filter criteria. Try adjusting your search or clearing filters."
+              }
               action={{
                 label: "Clear All Filters",
                 onClick: clearFilters,
@@ -542,27 +654,40 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
             <ModernTable>
               <ModernTable.Header>
                 <ModernTable.Row>
-                  <ModernTable.Head className="w-12">
-                    <Checkbox
-                      checked={allSelected}
-                      onCheckedChange={(checked) =>
-                        handleSelectAll(checked === true)
-                      }
-                      aria-label="Select all rows"
-                      className={
-                        someSelected
-                          ? "data-[state=checked]:bg-card-action"
-                          : ""
-                      }
-                    />
-                  </ModernTable.Head>
+                  {viewMode === "queue" && (
+                    <ModernTable.Head className="w-12">
+                      <Checkbox
+                        checked={allSelected}
+                        onCheckedChange={(checked) =>
+                          handleSelectAll(checked === true)
+                        }
+                        aria-label="Select all rows"
+                        className={
+                          someSelected
+                            ? "data-[state=checked]:bg-card-action"
+                            : ""
+                        }
+                      />
+                    </ModernTable.Head>
+                  )}
                   <ModernTable.Head>Employee</ModernTable.Head>
                   <ModernTable.Head>Type</ModernTable.Head>
                   <ModernTable.Head>Dates</ModernTable.Head>
                   <ModernTable.Head>Days</ModernTable.Head>
                   <ModernTable.Head>Reason</ModernTable.Head>
-                  <ModernTable.Head>Stage</ModernTable.Head>
-                  <ModernTable.Head className="text-right">Actions</ModernTable.Head>
+                  {viewMode === "queue" ? (
+                    <>
+                      <ModernTable.Head>Stage</ModernTable.Head>
+                      <ModernTable.Head className="text-right">
+                        Actions
+                      </ModernTable.Head>
+                    </>
+                  ) : (
+                    <>
+                      <ModernTable.Head>Decision</ModernTable.Head>
+                      <ModernTable.Head>Processed On</ModernTable.Head>
+                    </>
+                  )}
                 </ModernTable.Row>
               </ModernTable.Header>
               <ModernTable.Body>
@@ -572,6 +697,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                   const stage =
                     item.approvals?.[item.currentStageIndex]?.status ??
                     item.status;
+                  const decisionMeta = item.approvals?.[0];
                   return (
                     <ModernTable.Row
                       key={item.id}
@@ -592,16 +718,18 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                         }
                       }}
                     >
-                      <ModernTable.Cell>
-                        <Checkbox
-                          checked={selectedIds.has(item.id)}
-                          onCheckedChange={(checked) =>
-                            handleSelectRow(item.id, checked === true)
-                          }
-                          onClick={(e) => e.stopPropagation()}
-                          aria-label={`Select row ${item.id}`}
-                        />
-                      </ModernTable.Cell>
+                      {viewMode === "queue" && (
+                        <ModernTable.Cell>
+                          <Checkbox
+                            checked={selectedIds.has(item.id)}
+                            onCheckedChange={(checked) =>
+                              handleSelectRow(item.id, checked === true)
+                            }
+                            onClick={(e) => e.stopPropagation()}
+                            aria-label={`Select row ${item.id}`}
+                          />
+                        </ModernTable.Cell>
+                      )}
                       <ModernTable.Cell>
                         <div className="font-medium text-text-primary">
                           {item.requestedByName}
@@ -629,47 +757,63 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                           {item.reason}
                         </p>
                       </ModernTable.Cell>
-                      <ModernTable.Cell className="text-sm font-medium capitalize text-text-secondary">
-                        {stage.toLowerCase()}
-                      </ModernTable.Cell>
-                      <ModernTable.Cell className="text-right">
-                        <div
-                          className="flex justify-end"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <ApprovalActionButtons
-                            ceoMode={userRole === "CEO" || userRole === "HR_HEAD"}
-                            onForward={
-                              userRole === "HR_ADMIN" || userRole === "DEPT_HEAD"
-                                ? () => handleDecision(item.id, "forward", item.requestedByName || undefined)
-                                : undefined
-                            }
-                            onReturn={
-                              userRole === "HR_ADMIN" || userRole === "DEPT_HEAD"
-                                ? () => handleDecision(item.id, "return", item.requestedByName || undefined)
-                                : undefined
-                            }
-                            onCancel={() => handleDecision(item.id, "reject", item.requestedByName || undefined)}
-                            onApprove={
-                              userRole === "CEO" || userRole === "HR_HEAD"
-                                ? () => handleDecision(item.id, "approve", item.requestedByName || undefined)
-                                : undefined
-                            }
-                            disabled={isPending}
-                            loading={isPending}
-                            loadingAction={null}
-                          />
-                        </div>
-                      </ModernTable.Cell>
+                      {viewMode === "queue" ? (
+                        <>
+                          <ModernTable.Cell className="text-sm font-medium capitalize text-text-secondary">
+                            {stage.toLowerCase()}
+                          </ModernTable.Cell>
+                          <ModernTable.Cell className="text-right">
+                            <div
+                              className="flex justify-end"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <ApprovalActionButtons
+                                ceoMode={userRole === "CEO" || userRole === "HR_HEAD"}
+                                onForward={
+                                  userRole === "HR_ADMIN" || userRole === "DEPT_HEAD"
+                                    ? () => handleDecision(item.id, "forward", item.requestedByName || undefined)
+                                    : undefined
+                                }
+                                onReturn={
+                                  userRole === "HR_ADMIN" || userRole === "DEPT_HEAD"
+                                    ? () => handleDecision(item.id, "return", item.requestedByName || undefined)
+                                    : undefined
+                                }
+                                onCancel={() => handleDecision(item.id, "reject", item.requestedByName || undefined)}
+                                onApprove={
+                                  userRole === "CEO" || userRole === "HR_HEAD"
+                                    ? () => handleDecision(item.id, "approve", item.requestedByName || undefined)
+                                    : undefined
+                                }
+                                disabled={isPending}
+                                loading={isPending}
+                                loadingAction={null}
+                              />
+                            </div>
+                          </ModernTable.Cell>
+                        </>
+                      ) : (
+                        <>
+                          <ModernTable.Cell className="text-sm font-semibold capitalize text-text-secondary">
+                            {item.status.toLowerCase()}
+                          </ModernTable.Cell>
+                          <ModernTable.Cell className="text-sm text-text-secondary">
+                            {decisionMeta?.decidedAt
+                              ? formatDate(decisionMeta.decidedAt)
+                              : "—"}
+                          </ModernTable.Cell>
+                        </>
+                      )}
                     </ModernTable.Row>
                   );
                 })}
               </ModernTable.Body>
             </ModernTable>
       )}
-      {items.length !== allItems.length && allItems.length > 0 && (
+      {items.length !== displayedItems.length && displayedItems.length > 0 && (
         <p className="text-sm text-muted-foreground text-center">
-          Showing {items.length} of {allItems.length} requests
+          Showing {items.length} of {displayedItems.length}{" "}
+          {viewMode === "history" ? "decisions" : "requests"}
         </p>
       )}
 

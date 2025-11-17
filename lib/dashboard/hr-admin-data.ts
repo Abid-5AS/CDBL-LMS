@@ -72,6 +72,11 @@ const statsCache: {
 let hasCachedStats = false;
 const STATS_CACHE_TTL = 60 * 1000;
 
+export function invalidateHRAdminStatsCache() {
+  hasCachedStats = false;
+  statsCache.timestamp = 0;
+}
+
 export async function getHRAdminKPIData(user?: MinimalUser): Promise<HRAdminDashboardStats> {
   const resolvedUser = await resolveAuthorizedUser(user);
 

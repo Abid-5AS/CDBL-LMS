@@ -402,7 +402,27 @@ export function EmployeeManagementProfile({
                     Reporting, status, and org placement
                   </p>
                 </div>
-                <Button variant="ghost" size="sm" className="text-sm text-primary">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-sm text-primary"
+                  disabled={!employee.managerEmail}
+                  title={
+                    employee.managerEmail
+                      ? `Email ${employee.manager ?? "manager"}`
+                      : "Manager contact not available"
+                  }
+                  onClick={() => {
+                    if (!employee.managerEmail) return;
+                    const subject = encodeURIComponent(
+                      `Quick check-in about ${employee.name}'s availability`
+                    );
+                    const body = encodeURIComponent(
+                      "Hi,\n\nCan we align on coverage for the upcoming leave window?\n\nThanks,"
+                    );
+                    window.location.href = `mailto:${employee.managerEmail}?subject=${subject}&body=${body}`;
+                  }}
+                >
                   <MessageCircle className="mr-2 h-4 w-4" />
                   Message manager
                 </Button>
@@ -656,11 +676,17 @@ export function EmployeeManagementProfile({
                       <Button
                         variant="ghost"
                         size="xs"
-                        onClick={() => router.push(`/approvals?request=${action.id}`)}
+                        onClick={() => router.push(`/approvals/${action.id}`)}
+                        aria-label={`Review leave ${action.id}`}
                       >
                         Review
                       </Button>
-                      <Button variant="ghost" size="xs">
+                      <Button
+                        variant="ghost"
+                        size="xs"
+                        onClick={() => router.push(`/leaves/${action.id}#comments`)}
+                        aria-label={`Comment on leave ${action.id}`}
+                      >
                         Comment
                       </Button>
                     </div>

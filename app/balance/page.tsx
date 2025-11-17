@@ -2,6 +2,7 @@
 
 import { Calendar, Clock, TrendingUp, AlertCircle, BookOpen, CalendarPlus, FileDown, History } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -10,6 +11,7 @@ import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
 import { ConversionHistory } from "@/components/leaves/ConversionHistory";
 import { EmployeePageHero } from "@/components/employee/PageHero";
+import { TrendChart } from "@/components/shared/LeaveCharts/TrendChart";
 
 type BalanceDetail = {
   type: "EARNED" | "CASUAL" | "MEDICAL";
@@ -59,6 +61,17 @@ function BalanceContent() {
       revalidateOnFocus: false,
     }
   );
+  const { data: analyticsData } = useSWR<{
+    monthlyUsage?: Array<{
+      monthName: string;
+      earned: number;
+      casual: number;
+      medical: number;
+      total: number;
+    }>;
+  }>("/api/dashboard/analytics?window=rolling12", apiFetcher, {
+    revalidateOnFocus: false,
+  });
   const router = useRouter();
 
   const currentYear = new Date().getFullYear();
@@ -72,6 +85,14 @@ function BalanceContent() {
   const utilizationPct =
     utilizationBase > 0 ? Math.round((totalUsed / utilizationBase) * 100) : 0;
 
+  const usageTrend = (analyticsData?.monthlyUsage || []).map((month) => ({
+    month: month.monthName,
+    leaves: month.total,
+    approved: month.earned,
+    pending: month.casual,
+    returned: month.medical,
+  }));
+
   const heroStats = [
     {
       label: "Total Available",
@@ -82,7 +103,10 @@ function BalanceContent() {
     {
       label: "Used This Year",
       value: isLoading ? "…" : `${totalUsed} days`,
-      helper: utilizationBase > 0 ? `${utilizationPct}% utilized` : "",
+      helper:
+        utilizationBase > 0
+          ? `${utilizationPct}% utilized · replaces dashboard summary`
+          : "Synced with dashboard summary",
     },
     {
       label: "Accrued",
@@ -140,7 +164,7 @@ function BalanceContent() {
             leftIcon={<FileDown className="size-4" aria-hidden="true" />}
             onClick={() => router.push("/reports")}
           >
-            Download statement
+            Download PDF statement
           </Button>
           <Button
             variant="secondary"
@@ -148,10 +172,25 @@ function BalanceContent() {
             leftIcon={<History className="size-4" aria-hidden="true" />}
             onClick={() => router.push("/leaves")}
           >
-            View history
+            View usage history
           </Button>
         </div>
+        <p className="text-[11px] text-muted-foreground">
+          Exports include your accrual statement, while usage history opens the detailed My Leaves log.
+        </p>
       </div>
+
+      {usageTrend.length > 0 && (
+        <Card className="surface-card">
+          <CardHeader>
+            <CardTitle>Monthly usage trend</CardTitle>
+            <CardDescription>Rolling 12 months of approved leave days by type.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <TrendChart data={usageTrend} dataKey="leaves" height={220} />
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {(["EARNED", "CASUAL", "MEDICAL"] as const).map((type) => {
@@ -240,8 +279,14 @@ function BalanceContent() {
                   {showExpiryWarning && (
                     <Alert variant="default" className="py-2">
                       <AlertCircle className="h-3 w-3" />
-                      <AlertDescription className="text-xs">
-                        {available} days will expire on Dec 31
+                      <AlertDescription className="text-xs flex items-center gap-2">
+                        <span>{available} days will expire on Dec 31.</span>
+                        <Link
+                          href="/policies#casual"
+                          className="underline text-foreground text-[11px]"
+                        >
+                          Policy
+                        </Link>
                       </AlertDescription>
                     </Alert>
                   )}
@@ -249,15 +294,21 @@ function BalanceContent() {
                   {showCarryForwardWarning && (
                     <Alert variant="default" className="py-2">
                       <AlertCircle className="h-3 w-3" />
-                      <AlertDescription className="text-xs">
-                        Max {config.maxCarryForward} days can be carried forward
+                      <AlertDescription className="text-xs flex items-center gap-2">
+                        <span>Max {config.maxCarryForward} days can be carried forward.</span>
+                        <Link
+                          href="/policies#earned"
+                          className="underline text-foreground text-[11px]"
+                        >
+                          See rules
+                        </Link>
                       </AlertDescription>
                     </Alert>
                   )}
 
                   {!showExpiryWarning && !showCarryForwardWarning && (
                     <p className="text-xs text-muted-foreground">
-                      All balances are within policy thresholds.
+                      No expiry or carry-forward action required this year.
                     </p>
                   )}
                 </div>

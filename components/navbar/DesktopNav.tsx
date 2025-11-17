@@ -42,7 +42,7 @@ export function DesktopNav({
 
   return (
     <div
-      className="hidden md:flex w-full min-w-0 flex-nowrap items-center justify-between gap-4 px-4 sm:px-6 lg:px-8"
+      className="hidden md:flex w-full min-w-0 flex-nowrap items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 overflow-x-hidden"
       style={{ height: navHeight }}
     >
       <div className="flex flex-1 min-w-0 flex-nowrap items-center gap-4 overflow-hidden">
@@ -61,7 +61,7 @@ export function DesktopNav({
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
-          className="relative hidden md:flex flex-1 min-w-0 max-w-full items-center justify-center overflow-hidden rounded-full border border-border bg-background/80 p-1.5 shadow-sm backdrop-blur-xl dark:border-border dark:bg-background/30"
+          className="relative hidden md:flex flex-1 min-w-0 max-w-full items-center justify-center overflow-x-auto scrollbar-hide rounded-full border border-border bg-background/80 p-1.5 shadow-sm backdrop-blur-xl dark:border-border dark:bg-background/30"
         >
           <nav
             role="navigation"

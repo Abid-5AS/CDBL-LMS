@@ -34,6 +34,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
   EnhancedSmoothTab,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from "@/components/ui";
 
 // Shared Components (barrel export)
@@ -51,7 +55,7 @@ import { CANCELABLE_STATUSES } from "@/hooks/useLeaveRequests";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
 import Link from "next/link";
-import { Wallet, ArrowRight, CalendarPlus } from "lucide-react";
+import { Wallet, ArrowRight, CalendarPlus, Info } from "lucide-react";
 import { SortedTimelineAdapter } from "@/components/shared/timeline-adapters";
 
 type LeaveRow = {
@@ -75,9 +79,9 @@ type LeaveRow = {
 
 const FILTER_OPTIONS = [
   { value: "all", label: "All" },
-  { value: "pending", label: "Pending" },
+  { value: "returned", label: "Need Action" },
+  { value: "pending", label: "Under Review" },
   { value: "approved", label: "Approved" },
-  { value: "returned", label: "Returned" },
   { value: "rejected", label: "Rejected" },
   { value: "cancelled", label: "Cancelled" },
 ];
@@ -101,14 +105,15 @@ const LEAVE_TAB_ITEMS = [
   },
   {
     id: "pending",
-    title: "Pending",
-    color: "bg-data-warning/80 hover:bg-data-warning dark:bg-data-warning/70 dark:hover:bg-data-warning/80",
+    title: "Under Review",
+    color:
+      "bg-data-info/80 hover:bg-data-info dark:bg-data-info/70 dark:hover:bg-data-info/80",
     cardContent: (
       <div className="p-6 h-full flex flex-col justify-center">
         <div className="space-y-2">
-          <h3 className="text-xl font-semibold text-foreground">Pending Approval</h3>
+          <h3 className="text-xl font-semibold text-foreground">Under Review</h3>
           <p className="text-sm text-muted-foreground">
-            Requests awaiting manager or HR approval
+            Approvers are processing these requests. No action required unless returned.
           </p>
         </div>
       </div>
@@ -144,7 +149,54 @@ const LEAVE_TAB_ITEMS = [
       </div>
     ),
   },
+  {
+    id: "returned",
+    title: "Need Action",
+    color:
+      "bg-data-warning/90 hover:bg-data-warning dark:bg-data-warning/80 dark:hover:bg-data-warning/90",
+    cardContent: (
+      <div className="p-6 h-full flex flex-col justify-center">
+        <div className="space-y-2">
+          <h3 className="text-xl font-semibold text-foreground">Needs Your Attention</h3>
+          <p className="text-sm text-muted-foreground">
+            Returned items that must be edited or cancelled promptly
+          </p>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "cancelled",
+    title: "Cancelled",
+    color:
+      "bg-muted/80 hover:bg-muted dark:bg-muted/60 dark:hover:bg-muted/80",
+    cardContent: (
+      <div className="p-6 h-full flex flex-col justify-center">
+        <div className="space-y-2">
+          <h3 className="text-xl font-semibold text-foreground">Cancelled Requests</h3>
+          <p className="text-sm text-muted-foreground">
+            Requests you or an approver cancelled
+          </p>
+        </div>
+      </div>
+    ),
+  },
 ];
+
+const UNDER_REVIEW_STATUSES = new Set([
+  "submitted",
+  "pending",
+  "cancellation_requested",
+  "recalled",
+]);
+
+const ACTION_REQUIRED_STATUSES = new Set(["returned"]);
+
+const QUICK_BALANCE_TYPES = [
+  { key: "EARNED", label: "Earned", helper: "Carry-forward eligible" },
+  { key: "CASUAL", label: "Casual", helper: "Expires Dec 31" },
+  { key: "MEDICAL", label: "Medical", helper: "Certificate >3 days" },
+] as const;
 
 const ITEMS_PER_PAGE = 5;
 const VIEW_MODES = [
@@ -211,13 +263,9 @@ export function MyLeavesPageContent() {
       const status = row.status.toLowerCase();
       switch (selectedFilter) {
         case "pending":
-          return (
-            status === "submitted" ||
-            status === "pending" ||
-            status === "cancellation_requested"
-          );
+          return UNDER_REVIEW_STATUSES.has(status);
         case "returned":
-          return status === "returned";
+          return ACTION_REQUIRED_STATUSES.has(status);
         case "cancelled":
           return status === "cancelled" || status === "recalled";
         default:
@@ -233,21 +281,17 @@ export function MyLeavesPageContent() {
   const summaryStats = useMemo(() => {
     return filteredRows.reduce(
       (acc, row) => {
-        if (
-          row.status === "SUBMITTED" ||
-          row.status === "PENDING" ||
-          row.status === "CANCELLATION_REQUESTED" ||
-          row.status === "RECALLED"
-        ) {
-          acc.pending += 1;
-        } else if (row.status === "APPROVED") {
+        const status = row.status.toLowerCase();
+        if (UNDER_REVIEW_STATUSES.has(status)) {
+          acc.underReview += 1;
+        } else if (ACTION_REQUIRED_STATUSES.has(status)) {
+          acc.needAction += 1;
+        } else if (status === "approved") {
           acc.approved += 1;
-        } else if (row.status === "RETURNED" || row.status === "REJECTED") {
-          acc.action += 1;
         }
         return acc;
       },
-      { pending: 0, approved: 0, action: 0 }
+      { underReview: 0, approved: 0, needAction: 0 }
     );
   }, [filteredRows]);
 
@@ -305,8 +349,9 @@ export function MyLeavesPageContent() {
   });
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 py-8">
-      <div className="surface-card p-6 space-y-4">
+    <TooltipProvider delayDuration={100}>
+      <div className="max-w-6xl mx-auto space-y-6 py-8">
+        <div className="surface-card p-6 space-y-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
@@ -327,23 +372,41 @@ export function MyLeavesPageContent() {
       </div>
 
       {!balanceLoading && balanceData && (
-        <div className="surface-card px-4 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm text-muted-foreground">
-              Balance details live on the Balance page.
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Track accruals, carry forward rules, and conversions from there.
-            </p>
+        <div className="surface-card px-4 py-4 space-y-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">
+                Quick balance snapshot
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Full history, conversion rules, and statements live on the Balance page.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<Wallet className="size-4" aria-hidden="true" />}
+              onClick={() => router.push("/balance")}
+            >
+              Open Balance
+            </Button>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            leftIcon={<Wallet className="size-4" aria-hidden="true" />}
-            onClick={() => router.push("/balance")}
-          >
-            View Balance
-          </Button>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {QUICK_BALANCE_TYPES.map((type) => (
+              <div
+                key={type.key}
+                className="rounded-2xl border border-border/70 bg-muted/30 px-3 py-3"
+              >
+                <p className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+                  {type.label}
+                </p>
+                <p className="text-xl font-semibold text-foreground">
+                  {Math.max(0, Math.round(balanceData?.[type.key] ?? 0))}d
+                </p>
+                <p className="text-[11px] text-muted-foreground">{type.helper}</p>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -355,7 +418,7 @@ export function MyLeavesPageContent() {
               Status Filters
             </p>
             <p className="text-sm text-muted-foreground">
-              Focus on pending work or review past approvals.
+              Separate tasks that need your input from items approvers are reviewing.
             </p>
           </div>
           <div className="inline-flex rounded-full border border-border bg-background/80 p-1 gap-1">
@@ -512,33 +575,57 @@ export function MyLeavesPageContent() {
                               onClick={(e) => e.stopPropagation()}
                             >
                               {CANCELABLE_STATUSES.has(row.status) ? (
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-8 w-8 p-0 text-data-error hover:bg-data-error dark:hover:bg-data-error/20"
-                                      aria-label="Cancel request"
-                                    >
-                                      <XCircle className="size-4" aria-hidden="true" />
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>Cancel this request?</AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        This will mark the request as cancelled. Approvers will no
-                                        longer see it.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>Keep</AlertDialogCancel>
-                                      <AlertDialogAction onClick={() => cancelRequest(row.id)}>
-                                        Cancel Request
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
+                                row.status === "APPROVED" ? (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <span className="inline-flex">
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-8 w-8 p-0 text-muted-foreground cursor-not-allowed"
+                                          aria-label="Approved leave cancellation info"
+                                          disabled
+                                        >
+                                          <Info className="size-4" aria-hidden="true" />
+                                        </Button>
+                                      </span>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="left" className="max-w-xs">
+                                      <p className="text-xs">
+                                        Approved leave cancellations require manager approval.
+                                        Use the Action Center to submit a cancellation request.
+                                      </p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                ) : (
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 w-8 p-0 text-data-error hover:bg-data-error dark:hover:bg-data-error/20"
+                                        aria-label="Cancel request"
+                                      >
+                                        <XCircle className="size-4" aria-hidden="true" />
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Cancel this request?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          This will mark the request as cancelled. Approvers will no
+                                          longer see it.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Keep</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => cancelRequest(row.id)}>
+                                          Cancel Request
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                )
                               ) : (
                                 <span className="text-xs text-text-secondary dark:text-text-secondary">
                                   —
@@ -633,10 +720,10 @@ export function MyLeavesPageContent() {
                   <div className="grid gap-3 sm:grid-cols-3">
                     <div className="rounded-2xl border border-border/70 p-3">
                       <p className="text-xs uppercase tracking-widest text-muted-foreground">
-                        Pending / Submitted
+                        Under Review
                       </p>
                       <p className="text-2xl font-semibold text-foreground">
-                        {summaryStats.pending}
+                        {summaryStats.underReview}
                       </p>
                     </div>
                     <div className="rounded-2xl border border-border/70 p-3">
@@ -649,10 +736,10 @@ export function MyLeavesPageContent() {
                     </div>
                     <div className="rounded-2xl border border-border/70 p-3">
                       <p className="text-xs uppercase tracking-widest text-muted-foreground">
-                        Needs Attention
+                        Need Your Attention
                       </p>
                       <p className="text-2xl font-semibold text-data-warning">
-                        {summaryStats.action}
+                        {summaryStats.needAction}
                       </p>
                     </div>
                   </div>
@@ -683,6 +770,7 @@ export function MyLeavesPageContent() {
         onOpenChange={setModalOpen}
         leave={selectedLeave}
       />
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }

@@ -184,6 +184,7 @@ export async function GET(req: Request) {
       yearUsed: totalUsed,
       remainingAll: earned + casual + medical,
     },
+    monthlyUsage,
     heatmap: heatmapData.map((item) => ({
       date: item.date,
       value: item.count,
@@ -196,4 +197,3 @@ export async function GET(req: Request) {
     ].filter((d) => d.days > 0),
   });
 }
-

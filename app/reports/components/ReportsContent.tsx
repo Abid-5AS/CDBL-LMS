@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { KpiCards, FilterBar, ChartsSection } from "@/components/reports";
 import { ExportSection } from "@/components/shared";
 import useSWR from "swr";
-import { Card, CardContent, Badge } from "@/components/ui";
+import { Card, CardContent, Badge, Alert, AlertDescription, AlertTitle } from "@/components/ui";
 import { AlertTriangle, ShieldCheck } from "lucide-react";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -117,6 +117,11 @@ export function ReportsContent() {
     return items;
   }, [kpis]);
 
+  const emptyState = data?.emptyState as
+    | { title: string; description: string }
+    | null
+    | undefined;
+
   if (error) {
     return (
       <Card className="glass-card">
@@ -143,7 +148,13 @@ export function ReportsContent() {
           onLeaveTypeChange={setLeaveType}
         />
 
-        <KpiCards kpis={kpis} duration={duration} isLoading={isLoading} />
+      <KpiCards kpis={kpis} duration={duration} isLoading={isLoading} />
+      {!isLoading && emptyState && (
+        <Alert variant="secondary" className="border border-dashed border-amber-200/60 bg-amber-50/50 dark:bg-amber-950/20">
+          <AlertTitle>{emptyState.title}</AlertTitle>
+          <AlertDescription>{emptyState.description}</AlertDescription>
+        </Alert>
+      )}
 
         <ChartsSection
           monthlyTrend={charts.monthlyTrend || []}

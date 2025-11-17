@@ -2,6 +2,7 @@
 
 import { motion, type Variants } from "framer-motion";
 import { CalendarDays, Clock, Star, History } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { HolidaysStats } from "../hooks/useHolidaysData";
 
 type HolidaysKPISectionProps = {
@@ -24,14 +25,21 @@ const iconClasses =
 
 type StatCardProps = {
   label: string;
-  value: number;
+  value: number | string;
   helper: string;
   icon: React.ReactNode;
+  muted?: boolean;
 };
 
-function HolidayStatCard({ label, value, helper, icon }: StatCardProps) {
+function HolidayStatCard({ label, value, helper, icon, muted = false }: StatCardProps) {
   return (
-    <div className="neo-card p-4 flex flex-col gap-3 h-full">
+    <div
+      className={cn(
+        "neo-card p-4 flex flex-col gap-3 h-full",
+        muted && "opacity-70"
+      )}
+      aria-disabled={muted}
+    >
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">{label}</p>
         <div className={iconClasses}>{icon}</div>
@@ -45,6 +53,7 @@ function HolidayStatCard({ label, value, helper, icon }: StatCardProps) {
 }
 
 export function HolidaysKPISection({ stats }: HolidaysKPISectionProps) {
+  const optionalCardMuted = stats.optional === 0;
   const cards: StatCardProps[] = [
     {
       label: "Upcoming",
@@ -54,15 +63,16 @@ export function HolidaysKPISection({ stats }: HolidaysKPISectionProps) {
     },
     {
       label: "Mandatory",
-      value: stats.mandatory,
-      helper: "Required holidays",
+      value: stats.mandatoryUpcoming,
+      helper: "Still to observe",
       icon: <Clock className="size-4" aria-hidden="true" />,
     },
     {
       label: "Optional",
-      value: stats.optional,
-      helper: "Choose to observe",
+      value: optionalCardMuted ? "—" : stats.optional,
+      helper: optionalCardMuted ? "No optional holidays" : "Choose to observe",
       icon: <Star className="size-4" aria-hidden="true" />,
+      muted: optionalCardMuted,
     },
     {
       label: "Already Observed",
