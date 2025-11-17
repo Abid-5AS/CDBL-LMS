@@ -340,26 +340,32 @@ export function CEODashboardClient() {
             </Card>
           )}
 
-          {/* System Health Monitor */}
+          {/* System Health Monitor - PLACEHOLDER DATA */}
           {!isLoading && stats?.systemHealth && (
-            <Card className="rounded-2xl">
+            <Card className="rounded-2xl border-dashed border-2 border-muted-foreground/30">
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Activity className="h-4 w-4" />
+                  <Activity className="h-4 w-4 text-muted-foreground" />
                   System Status
+                  <Badge variant="outline" className="ml-auto text-xs">
+                    Mock Data
+                  </Badge>
                 </CardTitle>
+                <p className="text-xs text-muted-foreground">
+                  Real system monitoring coming soon
+                </p>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 opacity-60">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Uptime</span>
-                  <span className="text-lg font-bold text-data-success">
+                  <span className="text-lg font-bold text-muted-foreground">
                     {stats.systemHealth.uptime || 99.9}%
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">API</span>
                   <Badge
-                    variant={stats.systemHealth.apiStatus === "healthy" ? "default" : "destructive"}
+                    variant="outline"
                     className="text-xs"
                   >
                     {stats.systemHealth.apiStatus || "healthy"}
@@ -368,7 +374,7 @@ export function CEODashboardClient() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Database</span>
                   <Badge
-                    variant={stats.systemHealth.dbStatus === "healthy" ? "default" : "destructive"}
+                    variant="outline"
                     className="text-xs"
                   >
                     {stats.systemHealth.dbStatus || "healthy"}
@@ -469,21 +475,29 @@ export function CEODashboardClient() {
               </CardContent>
             </Card>
 
-            {/* System Health Card */}
-            <Card className="rounded-2xl">
+            {/* System Health Card - PLACEHOLDER DATA */}
+            <Card className="rounded-2xl border-dashed border-2 border-muted-foreground/30">
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Target className="h-4 w-4" />
-                  System Health
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <Target className="h-4 w-4" />
+                    System Health
+                  </CardTitle>
+                  <Badge variant="outline" className="text-xs">
+                    Mock Data
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Real monitoring coming soon
+                </p>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 opacity-60">
                 <div>
-                  <p className="text-3xl font-bold text-data-success">
+                  <p className="text-3xl font-bold text-muted-foreground">
                     {stats?.systemHealth?.uptime || 99.9}%
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Uptime (30 days)
+                    Uptime (placeholder)
                   </p>
                 </div>
                 <Separator />
@@ -491,7 +505,7 @@ export function CEODashboardClient() {
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-muted-foreground">API Status</span>
                     <Badge
-                      variant={stats?.systemHealth?.apiStatus === "healthy" ? "default" : "destructive"}
+                      variant="outline"
                       className="text-xs"
                     >
                       {stats?.systemHealth?.apiStatus || "healthy"}
@@ -500,7 +514,7 @@ export function CEODashboardClient() {
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-muted-foreground">Database</span>
                     <Badge
-                      variant={stats?.systemHealth?.dbStatus === "healthy" ? "default" : "destructive"}
+                      variant="outline"
                       className="text-xs"
                     >
                       {stats?.systemHealth?.dbStatus || "healthy"}

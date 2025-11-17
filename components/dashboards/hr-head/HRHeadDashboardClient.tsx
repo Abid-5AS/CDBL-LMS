@@ -3,7 +3,7 @@
 import { Suspense, useMemo } from "react";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
-import { Clock, Users, RotateCcw, Calendar, Activity, TrendingUp, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Clock, Users, RotateCcw, Calendar, Activity, TrendingUp, AlertCircle, CheckCircle2, Info } from "lucide-react";
 import {
   RoleKPICard,
   ResponsiveDashboardGrid,
@@ -46,6 +46,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { DashboardCardSkeleton } from "@/app/dashboard/shared/LoadingFallback";
 import { formatDate } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
 
 interface HRHeadStats {
   // Core KPIs
@@ -184,27 +190,55 @@ export function HRHeadDashboardClient() {
   }, [stats]);
 
   return (
-    <div className="space-y-6">
-      {/* Top KPI Cards */}
-      <DashboardSection
-        title="HR Operations Overview"
-        description="Key metrics for leave management and HR operations"
-        isLoading={isLoading}
-        loadingFallback={<KPIGridSkeleton />}
-      >
-        <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
-          <RoleKPICard
-              title="Pending Requests"
-              value={stats?.pending || 0}
-              subtitle="Awaiting approval"
-              icon={Clock}
-              role="HR_HEAD"
-              trend={stats && stats.pending > 10 ? {
-                value: stats.pending - 10,
-                label: "above normal",
-                direction: "up"
-              } : undefined}
-            />
+    <TooltipProvider>
+      <div className="space-y-6">
+        {/* Top KPI Cards */}
+        <DashboardSection
+          title="HR Operations Overview"
+          description="Key metrics for leave management and HR operations"
+          isLoading={isLoading}
+          loadingFallback={<KPIGridSkeleton />}
+        >
+          <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
+            <RoleKPICard
+                title={
+                  <div className="flex items-center gap-2">
+                    <span>Your Approval Queue</span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          aria-label="Information about your approval queue"
+                          className="hover:opacity-70 transition-opacity"
+                        >
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">What this shows:</p>
+                        <p className="text-sm mb-2">
+                          Leave requests awaiting YOUR approval as HR Head. This is your personal work queue.
+                        </p>
+                        <p className="text-sm font-semibold mb-1">Why it matters:</p>
+                        <p className="text-sm mb-2">
+                          Employees are waiting for you to review and approve/reject their leave requests. This is the same data shown in the "Pending Approvals" table below.
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Calculation: Counts approvals where you are the approver and decision is still PENDING.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                }
+                value={stats?.pending || 0}
+                subtitle="Awaiting your decision"
+                icon={Clock}
+                role="HR_HEAD"
+                trend={stats && stats.pending > 10 ? {
+                  value: stats.pending - 10,
+                  label: "above normal",
+                  direction: "up"
+                } : undefined}
+              />
             <RoleKPICard
               title="On Leave Today"
               value={stats?.onLeave || 0}
@@ -262,20 +296,36 @@ export function HRHeadDashboardClient() {
               } : undefined}
             />
             <RoleKPICard
-              title="Policy Compliance"
+              title={
+                <div className="flex items-center gap-2">
+                  <span>Policy Compliance</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        aria-label="Information about policy compliance"
+                        className="hover:opacity-70 transition-opacity"
+                      >
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs">
+                      <p className="text-sm font-semibold mb-1 text-amber-500">⚠️ Placeholder Data</p>
+                      <p className="text-sm mb-2">
+                        This metric is currently hardcoded. Real compliance tracking is coming soon.
+                      </p>
+                      <p className="text-sm font-semibold mb-1">Future implementation:</p>
+                      <p className="text-xs text-muted-foreground">
+                        Will track on-time processing (≤3 days), proper documentation, and policy violations.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              }
               value={`${stats?.complianceScore || 0}%`}
-              subtitle="Meeting SLA targets"
+              subtitle="Meeting SLA targets (mock)"
               icon={CheckCircle2}
               role="HR_HEAD"
-              trend={
-                stats && stats.complianceScore
-                  ? {
-                      value: stats.complianceScore >= 90 ? 2 : 5,
-                      label: "vs last month",
-                      direction: stats.complianceScore >= 90 ? "up" : "down"
-                    }
-                  : undefined
-              }
+              trend={undefined}
             />
         </ResponsiveDashboardGrid>
       </DashboardSection>
@@ -373,6 +423,7 @@ export function HRHeadDashboardClient() {
         </div>
       </DashboardSection>
     </div>
+    </TooltipProvider>
   );
 }
 
