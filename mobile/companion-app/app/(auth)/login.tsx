@@ -70,7 +70,7 @@ export default function LoginScreen() {
     }
   };
 
-  const handleBiometric Login = async () => {
+  const handleBiometricLogin = async () => {
     try {
       const isAvailable = await BiometricAuth.isAvailable();
       if (!isAvailable) {
