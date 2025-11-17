@@ -6,12 +6,13 @@ import {
   TextInput,
   RefreshControl,
   ActivityIndicator,
+  FlatList,
 } from "react-native";
 import { useState, useMemo } from "react";
 import { ThemedCard } from "@/src/components/shared/ThemedCard";
 import { ThemedButton } from "@/src/components/shared/ThemedButton";
 import { useTheme } from "@/src/providers/ThemeProvider";
-import { useLeaveApplications } from "@/src/hooks/useLeaveApplications";
+import { useLeaveHistory } from "@/src/hooks/useLeaveHistory";
 import { syncService } from "@/src/sync/SyncService";
 import { SyncStatusBanner } from "@/src/components/shared/SyncStatusBanner";
 import { format } from "date-fns";
@@ -21,7 +22,7 @@ export default function HistoryScreen() {
   const [filter, setFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { applications, isLoading, refresh } = useLeaveApplications();
+  const { data: applications, isLoading, error, refetch } = useLeaveHistory();
   const [refreshing, setRefreshing] = useState(false);
 
   const getStatusColor = (status: string) => {
@@ -52,14 +53,23 @@ export default function HistoryScreen() {
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    // Trigger sync with server
-    await syncService.sync();
-    // Refresh local data
-    await refresh();
-    setRefreshing(false);
+    try {
+      // Trigger sync with server (if available)
+      if (syncService?.sync) {
+        await syncService.sync();
+      }
+      // Refresh data from API
+      await refetch();
+    } catch (err) {
+      console.error('Refresh error:', err);
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   const filteredLeaves = useMemo(() => {
+    if (!applications) return [];
+
     return applications.filter((leave) => {
       if (filter !== "all" && leave.status !== filter) return false;
       if (
@@ -163,137 +173,19 @@ export default function HistoryScreen() {
             Loading leave history...
           </Text>
         </View>
-      ) : (
-        <>
-          {filteredLeaves.map((leave) => (
-            <ThemedCard key={leave.id} style={styles.leaveCard}>
-              <View style={styles.leaveHeader}>
-                <View style={{ flex: 1 }}>
-                  <Text
-                    style={[
-                      styles.leaveType,
-                      { color: "text" in colors ? colors.text : colors.onSurface },
-                    ]}
-                  >
-                    {leave.leave_type}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.leaveDates,
-                      {
-                        color:
-                          "textSecondary" in colors
-                            ? colors.textSecondary
-                            : colors.onSurfaceVariant,
-                      },
-                    ]}
-                  >
-                    {format(new Date(leave.start_date), "MMM dd, yyyy")} -{" "}
-                    {format(new Date(leave.end_date), "MMM dd, yyyy")}
-                  </Text>
-            </View>
-            <View
-              style={[
-                styles.statusBadge,
-                { backgroundColor: getStatusColor(leave.status) + "20" },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.statusIcon,
-                  { color: getStatusColor(leave.status) },
-                ]}
-              >
-                {getStatusIcon(leave.status)}
-              </Text>
-              <Text
-                style={[
-                  styles.statusText,
-                  { color: getStatusColor(leave.status) },
-                ]}
-              >
-                {leave.status.charAt(0).toUpperCase() + leave.status.slice(1)}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.leaveDetails}>
-            <View style={styles.detailRow}>
-              <Text
-                style={[
-                  styles.detailLabel,
-                  {
-                    color:
-                      "textSecondary" in colors
-                        ? colors.textSecondary
-                        : colors.onSurfaceVariant,
-                  },
-                ]}
-              >
-                Duration:
-              </Text>
-              <Text
-                style={[
-                  styles.detailValue,
-                  { color: "text" in colors ? colors.text : colors.onSurface },
-                ]}
-              >
-                {leave.days_requested} {leave.days_requested === 1 ? "day" : "days"}
-              </Text>
-            </View>
-            <View style={styles.detailRow}>
-              <Text
-                style={[
-                  styles.detailLabel,
-                  {
-                    color:
-                      "textSecondary" in colors
-                        ? colors.textSecondary
-                        : colors.onSurfaceVariant,
-                  },
-                ]}
-              >
-                Applied on:
-              </Text>
-              <Text
-                style={[
-                  styles.detailValue,
-                  { color: "text" in colors ? colors.text : colors.onSurface },
-                ]}
-              >
-                {leave.applied_on
-                  ? format(new Date(leave.applied_on), "MMM dd, yyyy")
-                  : format(new Date(leave.local_created_at), "MMM dd, yyyy")}
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.reasonBox,
-                {
-                  backgroundColor: isDark
-                    ? "rgba(255,255,255,0.05)"
-                    : "rgba(0,0,0,0.03)",
-                },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.reasonText,
-                  { color: "text" in colors ? colors.text : colors.onSurface },
-                ]}
-              >
-                {leave.reason}
-              </Text>
-            </View>
-          </View>
-            </ThemedCard>
-          ))}
-
-          {filteredLeaves.length === 0 && !isLoading && (
-        <View style={styles.emptyState}>
+      ) : error ? (
+        <View style={styles.errorState}>
           <Text
             style={[
-              styles.emptyText,
+              styles.errorText,
+              { color: "#F44336" },
+            ]}
+          >
+            Failed to load leave history
+          </Text>
+          <Text
+            style={[
+              styles.errorSubtext,
               {
                 color:
                   "textSecondary" in colors
@@ -302,10 +194,199 @@ export default function HistoryScreen() {
               },
             ]}
           >
-            No leave applications found
+            {error.message}
           </Text>
+          <ThemedButton
+            variant="primary"
+            onPress={handleRefresh}
+            style={styles.retryButton}
+          >
+            Retry
+          </ThemedButton>
         </View>
-          )}
+      ) : (
+        <>
+          <FlatList
+            data={filteredLeaves}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item: leave }) => (
+              <ThemedCard style={styles.leaveCard}>
+                <View style={styles.leaveHeader}>
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      style={[
+                        styles.leaveType,
+                        { color: "text" in colors ? colors.text : colors.onSurface },
+                      ]}
+                    >
+                      {leave.leaveType}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.leaveDates,
+                        {
+                          color:
+                            "textSecondary" in colors
+                              ? colors.textSecondary
+                              : colors.onSurfaceVariant,
+                        },
+                      ]}
+                    >
+                      {format(new Date(leave.startDate), "MMM dd, yyyy")} -{" "}
+                      {format(new Date(leave.endDate), "MMM dd, yyyy")}
+                    </Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      { backgroundColor: getStatusColor(leave.status) + "20" },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.statusIcon,
+                        { color: getStatusColor(leave.status) },
+                      ]}
+                    >
+                      {getStatusIcon(leave.status)}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.statusText,
+                        { color: getStatusColor(leave.status) },
+                      ]}
+                    >
+                      {leave.status.charAt(0).toUpperCase() + leave.status.slice(1)}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.leaveDetails}>
+                  <View style={styles.detailRow}>
+                    <Text
+                      style={[
+                        styles.detailLabel,
+                        {
+                          color:
+                            "textSecondary" in colors
+                              ? colors.textSecondary
+                              : colors.onSurfaceVariant,
+                        },
+                      ]}
+                    >
+                      Duration:
+                    </Text>
+                    <Text
+                      style={[
+                        styles.detailValue,
+                        { color: "text" in colors ? colors.text : colors.onSurface },
+                      ]}
+                    >
+                      {leave.workingDays} {leave.workingDays === 1 ? "day" : "days"}
+                      {leave.halfDay && " (Half Day)"}
+                    </Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text
+                      style={[
+                        styles.detailLabel,
+                        {
+                          color:
+                            "textSecondary" in colors
+                              ? colors.textSecondary
+                              : colors.onSurfaceVariant,
+                        },
+                      ]}
+                    >
+                      Applied on:
+                    </Text>
+                    <Text
+                      style={[
+                        styles.detailValue,
+                        { color: "text" in colors ? colors.text : colors.onSurface },
+                      ]}
+                    >
+                      {format(new Date(leave.appliedDate), "MMM dd, yyyy")}
+                    </Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.reasonBox,
+                      {
+                        backgroundColor: isDark
+                          ? "rgba(255,255,255,0.05)"
+                          : "rgba(0,0,0,0.03)",
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.reasonText,
+                        { color: "text" in colors ? colors.text : colors.onSurface },
+                      ]}
+                    >
+                      {leave.reason}
+                    </Text>
+                  </View>
+                  {leave.approverComments && (
+                    <View
+                      style={[
+                        styles.commentBox,
+                        {
+                          backgroundColor: isDark
+                            ? "rgba(255,255,255,0.05)"
+                            : "rgba(0,0,0,0.03)",
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.commentLabel,
+                          {
+                            color:
+                              "textSecondary" in colors
+                                ? colors.textSecondary
+                                : colors.onSurfaceVariant,
+                          },
+                        ]}
+                      >
+                        Approver Comments:
+                      </Text>
+                      <Text
+                        style={[
+                          styles.commentText,
+                          { color: "text" in colors ? colors.text : colors.onSurface },
+                        ]}
+                      >
+                        {leave.approverComments}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </ThemedCard>
+            )}
+            ListEmptyComponent={
+              !isLoading ? (
+                <View style={styles.emptyState}>
+                  <Text
+                    style={[
+                      styles.emptyText,
+                      {
+                        color:
+                          "textSecondary" in colors
+                            ? colors.textSecondary
+                            : colors.onSurfaceVariant,
+                      },
+                    ]}
+                  >
+                    No leave applications found
+                  </Text>
+                </View>
+              ) : null
+            }
+            contentContainerStyle={filteredLeaves.length === 0 ? styles.emptyListContent : undefined}
+            scrollEnabled={false}
+          />
         </>
       )}
       </ScrollView>
@@ -426,5 +507,44 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 15,
+  },
+  emptyListContent: {
+    flexGrow: 1,
+  },
+  errorState: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 40,
+  },
+  errorText: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  errorSubtext: {
+    fontSize: 14,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  retryButton: {
+    paddingHorizontal: 32,
+  },
+  commentBox: {
+    marginTop: 8,
+    padding: 12,
+    borderRadius: 8,
+  },
+  commentLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    marginBottom: 4,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  commentText: {
+    fontSize: 14,
+    lineHeight: 20,
+    fontStyle: "italic",
   },
 });

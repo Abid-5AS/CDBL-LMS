@@ -6,13 +6,17 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { router } from 'expo-router';
 import { ThemedCard } from '../src/components/shared/ThemedCard';
+import { ThemedButton } from '../src/components/shared/ThemedButton';
 import { useTheme } from '../src/providers/ThemeProvider';
+import { useAuthStore } from '../src/store/authStore';
 import { useUserProfile } from '../src/hooks/useUserProfile';
 import { useLeaveBalances } from '../src/hooks/useLeaveBalances';
 import { useLeaveApplications } from '../src/hooks/useLeaveApplications';
+import { apiClient } from '../src/api/client';
 import {
   User,
   Mail,
@@ -22,15 +26,47 @@ import {
   CheckCircle,
   Clock,
   XCircle,
+  LogOut,
 } from 'lucide-react-native';
 
 export default function ProfileScreen() {
   const { colors, isDark } = useTheme();
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
   const { profile, isLoading: profileLoading } = useUserProfile();
   const { balances, getTotalAvailable, getTotalUsed } = useLeaveBalances();
   const { applications, isLoading: appsLoading } = useLeaveApplications();
 
   const isLoading = profileLoading || appsLoading;
+
+  const handleLogout = async () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              // Clear token from API client
+              await apiClient.clearToken();
+              // Clear auth store
+              await logout();
+              // Navigate to login
+              router.replace('/(auth)/login');
+            } catch (error: any) {
+              Alert.alert('Error', 'Failed to logout. Please try again.');
+            }
+          },
+        },
+      ]
+    );
+  };
 
   // Calculate statistics
   const totalApplications = applications.length;
@@ -115,7 +151,7 @@ export default function ProfileScreen() {
                 { color: 'text' in colors ? colors.text : colors.onSurface },
               ]}
             >
-              {profile?.name || 'Employee'}
+              {user?.name || profile?.name || 'Employee'}
             </Text>
 
             <View style={styles.infoGrid}>
@@ -152,7 +188,7 @@ export default function ProfileScreen() {
                       { color: 'text' in colors ? colors.text : colors.onSurface },
                     ]}
                   >
-                    {profile?.email || 'N/A'}
+                    {user?.email || profile?.email || 'N/A'}
                   </Text>
                 </View>
               </View>
@@ -190,7 +226,7 @@ export default function ProfileScreen() {
                       { color: 'text' in colors ? colors.text : colors.onSurface },
                     ]}
                   >
-                    {profile?.employee_id || 'N/A'}
+                    {user?.employeeId || profile?.employee_id || 'N/A'}
                   </Text>
                 </View>
               </View>
@@ -228,7 +264,7 @@ export default function ProfileScreen() {
                       { color: 'text' in colors ? colors.text : colors.onSurface },
                     ]}
                   >
-                    {profile?.department || 'N/A'}
+                    {user?.department || profile?.department || 'N/A'}
                   </Text>
                 </View>
               </View>
@@ -266,11 +302,23 @@ export default function ProfileScreen() {
                       { color: 'text' in colors ? colors.text : colors.onSurface },
                     ]}
                   >
-                    {profile?.role || 'Employee'}
+                    {user?.role || profile?.role || 'Employee'}
                   </Text>
                 </View>
               </View>
             </View>
+
+            {/* Logout Button */}
+            <ThemedButton
+              variant="outline"
+              onPress={handleLogout}
+              style={styles.logoutButton}
+            >
+              <LogOut size={20} color={colors.primary} style={styles.logoutIcon} />
+              <Text style={[styles.logoutText, { color: colors.primary }]}>
+                Logout
+              </Text>
+            </ThemedButton>
           </ThemedCard>
 
           {/* Leave Statistics */}
@@ -552,5 +600,18 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: 'rgba(128, 128, 128, 0.2)',
     marginVertical: 12,
+  },
+  logoutButton: {
+    marginTop: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoutIcon: {
+    marginRight: 8,
+  },
+  logoutText: {
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
