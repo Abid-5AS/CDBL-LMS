@@ -240,14 +240,68 @@ export function HRHeadDashboardClient() {
                 } : undefined}
               />
             <RoleKPICard
-              title="On Leave Today"
+              title={
+                <div className="flex items-center gap-2">
+                  <span>On Leave Today</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        aria-label="Information about employees on leave"
+                        className="hover:opacity-70 transition-opacity"
+                      >
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs">
+                      <p className="text-sm font-semibold mb-1">What this shows:</p>
+                      <p className="text-sm mb-2">
+                        Number of employees currently on approved leave today across the entire organization.
+                      </p>
+                      <p className="text-sm font-semibold mb-1">Why it matters:</p>
+                      <p className="text-sm mb-2">
+                        Helps you monitor workforce availability. High numbers may indicate capacity issues or seasonal patterns.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Calculation: Counts approved leaves where today falls between start and end date.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              }
               value={stats?.onLeave || 0}
               subtitle={`Out of ${stats?.totalEmployees || 0} employees`}
               icon={Users}
               role="HR_HEAD"
             />
             <RoleKPICard
-              title="Returned for Modification"
+              title={
+                <div className="flex items-center gap-2">
+                  <span>Returned for Modification</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        aria-label="Information about returned requests"
+                        className="hover:opacity-70 transition-opacity"
+                      >
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs">
+                      <p className="text-sm font-semibold mb-1">What this shows:</p>
+                      <p className="text-sm mb-2">
+                        Leave requests sent back to employees by you or other approvers for corrections or additional information.
+                      </p>
+                      <p className="text-sm font-semibold mb-1">What to do:</p>
+                      <p className="text-sm mb-2">
+                        Monitor this metric. High numbers may indicate unclear policies, poor communication, or training gaps.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Target: Keep below 10% of total submissions for efficient processing.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              }
               value={stats?.returned || 0}
               subtitle="Require employee action"
               icon={RotateCcw}
@@ -259,7 +313,34 @@ export function HRHeadDashboardClient() {
               } : undefined}
             />
             <RoleKPICard
-              title="Upcoming Leaves"
+              title={
+                <div className="flex items-center gap-2">
+                  <span>Upcoming Leaves</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        aria-label="Information about upcoming leaves"
+                        className="hover:opacity-70 transition-opacity"
+                      >
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs">
+                      <p className="text-sm font-semibold mb-1">What this shows:</p>
+                      <p className="text-sm mb-2">
+                        Approved leave requests scheduled to start in the next 7 days across all departments.
+                      </p>
+                      <p className="text-sm font-semibold mb-1">Why it matters:</p>
+                      <p className="text-sm mb-2">
+                        Helps you forecast workforce availability and identify potential capacity constraints.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Use this to coordinate with department heads about upcoming absences.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              }
               value={stats?.upcoming || 0}
               subtitle="Next 7 days"
               icon={Calendar}
@@ -277,14 +358,68 @@ export function HRHeadDashboardClient() {
       >
         <ResponsiveDashboardGrid columns="1:1:3:3" gap="md">
             <RoleKPICard
-              title="This Month"
+              title={
+                <div className="flex items-center gap-2">
+                  <span>This Month</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        aria-label="Information about monthly requests"
+                        className="hover:opacity-70 transition-opacity"
+                      >
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs">
+                      <p className="text-sm font-semibold mb-1">What this shows:</p>
+                      <p className="text-sm mb-2">
+                        Total number of leave requests submitted organization-wide this month, regardless of status.
+                      </p>
+                      <p className="text-sm font-semibold mb-1">Why it matters:</p>
+                      <p className="text-sm mb-2">
+                        Tracks overall leave request volume. Spikes may indicate seasonal patterns, organizational changes, or upcoming holidays.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Use this to forecast HR workload and resource planning.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              }
               value={stats?.monthlyRequests || 0}
               subtitle="Total requests submitted"
               icon={Activity}
               role="HR_HEAD"
             />
             <RoleKPICard
-              title="New Hires"
+              title={
+                <div className="flex items-center gap-2">
+                  <span>New Hires</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        aria-label="Information about new hires"
+                        className="hover:opacity-70 transition-opacity"
+                      >
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs">
+                      <p className="text-sm font-semibold mb-1">What this shows:</p>
+                      <p className="text-sm mb-2">
+                        Number of new employees who joined the organization this month.
+                      </p>
+                      <p className="text-sm font-semibold mb-1">Action required:</p>
+                      <p className="text-sm mb-2">
+                        Ensure new hires are onboarded to the leave system, understand leave policies, and have their balances properly initialized.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        New employees typically need leave policy training within first week.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              }
               value={stats?.newHires || 0}
               subtitle="Joined this month"
               icon={Users}

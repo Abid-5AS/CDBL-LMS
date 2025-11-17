@@ -7,7 +7,13 @@ import { DeptHeadQuickActions } from "./sections/QuickActions";
 import { useApiQueryWithParams } from "@/lib/apiClient";
 import { useFilterFromUrl } from "@/lib/url-filters";
 import { RoleKPICard, ResponsiveDashboardGrid, DashboardSection } from "@/components/dashboards/shared";
-import { ClipboardList, CheckCircle, RotateCcw, XCircle, RefreshCw, AlertTriangle } from "lucide-react";
+import { ClipboardList, CheckCircle, RotateCcw, XCircle, RefreshCw, AlertTriangle, Info } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
 
 function CardSkeleton() {
   return (
@@ -126,59 +132,168 @@ export function DeptHeadDashboardWrapper() {
   }, [counts]);
 
   return (
-    <div className="space-y-6">
-      {/* Top Row - KPI Cards Grid */}
-      <DashboardSection
-        title="Leave Requests Overview"
-        description="Key metrics for your department's leave approvals"
-        isLoading={isLoading}
-        loadingFallback={<KPIGridSkeleton />}
-        action={
-          <button
-            onClick={() => mutate()}
-            className="p-2 hover:bg-muted rounded-lg transition-colors"
-            title="Refresh"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
-        }
-      >
-        <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
-          <RoleKPICard
-            title="Pending"
-            value={counts.pending}
-            subtitle="Awaiting your review"
-            icon={ClipboardList}
-            role="DEPT_HEAD"
-          />
-          <RoleKPICard
-            title="Forwarded"
-            value={counts.forwarded}
-            subtitle="Sent to HR"
-            icon={CheckCircle}
-            role="DEPT_HEAD"
-          />
-          <RoleKPICard
-            title="Returned"
-            value={counts.returned}
-            subtitle="Need employee action"
-            icon={RotateCcw}
-            role="DEPT_HEAD"
-            trend={counts.returned > 0 ? {
-              value: counts.returned,
-              label: "requires follow-up",
-              direction: "down"
-            } : undefined}
-          />
-          <RoleKPICard
-            title="Cancelled"
-            value={counts.cancelled}
-            subtitle="Withdrawn by employee"
-            icon={XCircle}
-            role="DEPT_HEAD"
-          />
-        </ResponsiveDashboardGrid>
-      </DashboardSection>
+    <TooltipProvider>
+      <div className="space-y-6">
+        {/* Top Row - KPI Cards Grid */}
+        <DashboardSection
+          title="Leave Requests Overview"
+          description="Key metrics for your department's leave approvals"
+          isLoading={isLoading}
+          loadingFallback={<KPIGridSkeleton />}
+          action={
+            <button
+              onClick={() => mutate()}
+              className="p-2 hover:bg-muted rounded-lg transition-colors"
+              title="Refresh"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
+          }
+        >
+          <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
+            <RoleKPICard
+              title={
+                <div className="flex items-center gap-2">
+                  <span>Pending</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        aria-label="Information about pending requests"
+                        className="hover:opacity-70 transition-opacity"
+                      >
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs">
+                      <p className="text-sm font-semibold mb-1">What this shows:</p>
+                      <p className="text-sm mb-2">
+                        Leave requests from your department awaiting YOUR approval as Department Head.
+                      </p>
+                      <p className="text-sm font-semibold mb-1">What to do:</p>
+                      <p className="text-sm mb-2">
+                        Review each request and either Approve & Forward to HR, Return to employee for changes, or Reject.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Target: Process within 1-2 business days to keep approval pipeline moving.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              }
+              value={counts.pending}
+              subtitle="Awaiting your review"
+              icon={ClipboardList}
+              role="DEPT_HEAD"
+            />
+            <RoleKPICard
+              title={
+                <div className="flex items-center gap-2">
+                  <span>Forwarded</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        aria-label="Information about forwarded requests"
+                        className="hover:opacity-70 transition-opacity"
+                      >
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs">
+                      <p className="text-sm font-semibold mb-1">What this shows:</p>
+                      <p className="text-sm mb-2">
+                        Requests you've approved and forwarded to HR for final processing.
+                      </p>
+                      <p className="text-sm font-semibold mb-1">Why it matters:</p>
+                      <p className="text-sm mb-2">
+                        Tracks your approval throughput. High number means you're efficiently processing requests.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        These requests are now awaiting HR Admin or HR Head review.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              }
+              value={counts.forwarded}
+              subtitle="Sent to HR"
+              icon={CheckCircle}
+              role="DEPT_HEAD"
+            />
+            <RoleKPICard
+              title={
+                <div className="flex items-center gap-2">
+                  <span>Returned</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        aria-label="Information about returned requests"
+                        className="hover:opacity-70 transition-opacity"
+                      >
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs">
+                      <p className="text-sm font-semibold mb-1">What this shows:</p>
+                      <p className="text-sm mb-2">
+                        Requests you've sent back to employees for corrections or additional information.
+                      </p>
+                      <p className="text-sm font-semibold mb-1">Why it matters:</p>
+                      <p className="text-sm mb-2">
+                        High numbers may indicate unclear policies or poor initial submissions. Consider team training if consistently high.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Employees need to update and resubmit these requests.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              }
+              value={counts.returned}
+              subtitle="Need employee action"
+              icon={RotateCcw}
+              role="DEPT_HEAD"
+              trend={counts.returned > 0 ? {
+                value: counts.returned,
+                label: "requires follow-up",
+                direction: "down"
+              } : undefined}
+            />
+            <RoleKPICard
+              title={
+                <div className="flex items-center gap-2">
+                  <span>Cancelled</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        aria-label="Information about cancelled requests"
+                        className="hover:opacity-70 transition-opacity"
+                      >
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs">
+                      <p className="text-sm font-semibold mb-1">What this shows:</p>
+                      <p className="text-sm mb-2">
+                        Leave requests withdrawn by employees before approval, or cancellation requests for approved leaves.
+                      </p>
+                      <p className="text-sm font-semibold mb-1">Why track this:</p>
+                      <p className="text-sm mb-2">
+                        High cancellation rate may indicate poor planning or changing circumstances in your department.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        These requests are closed and don't require any action.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              }
+              value={counts.cancelled}
+              subtitle="Withdrawn by employee"
+              icon={XCircle}
+              role="DEPT_HEAD"
+            />
+          </ResponsiveDashboardGrid>
+        </DashboardSection>
 
       {/* Pending Requests Table */}
       <DashboardSection
@@ -247,6 +362,7 @@ export function DeptHeadDashboardWrapper() {
         </div>
       </DashboardSection>
     </div>
+    </TooltipProvider>
   );
 }
 
