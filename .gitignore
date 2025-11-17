@@ -86,3 +86,11 @@ Thumbs.db
 # Windows
 Desktop.ini
 $RECYCLE.BIN/
+
+# AI Assistant Tools
+.ai/
+.claude/
+.codex/
+.cursor/
+.serena/
+.todo/
