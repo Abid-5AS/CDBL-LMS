@@ -41,14 +41,29 @@ function RootLayoutNav() {
   useEffect(() => {
     if (isLoading) return;
 
-    const inAuthGroup = segments[0] === '(tabs)';
+    const inAuthGroup = segments[0] === '(auth)' || segments[0] === 'login';
+    const inProtectedRoute = segments[0] === '(tabs)' ||
+                             segments[0] === 'settings' ||
+                             segments[0] === 'profile' ||
+                             segments[0] === 'ai-assistant' ||
+                             segments[0] === 'approvals' ||
+                             segments[0] === 'admin' ||
+                             segments[0] === 'reports';
 
-    if (!isAuthenticated && inAuthGroup) {
-      // Redirect to login if not authenticated
+    // Force redirect to login if not authenticated and trying to access protected routes
+    if (!isAuthenticated && inProtectedRoute) {
+      console.log('🔒 Not authenticated, redirecting to login');
       router.replace('/login');
-    } else if (isAuthenticated && !inAuthGroup) {
-      // Redirect to tabs if authenticated
+    }
+    // Redirect to tabs if authenticated and on auth screens
+    else if (isAuthenticated && inAuthGroup) {
+      console.log('✅ Already authenticated, redirecting to home');
       router.replace('/(tabs)');
+    }
+    // If not authenticated and not in any protected route, redirect to login
+    else if (!isAuthenticated && segments.length === 0) {
+      console.log('🔒 No route, redirecting to login');
+      router.replace('/login');
     }
   }, [isAuthenticated, segments, isLoading]);
 

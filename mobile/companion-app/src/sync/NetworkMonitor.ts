@@ -4,6 +4,12 @@
  * Monitors network connectivity and notifies listeners of changes
  */
 
+// Import NetInfo types
+interface NetInfoState {
+  isConnected: boolean | null;
+  isInternetReachable: boolean | null;
+}
+
 // Safely import NetInfo with fallback
 let NetInfo: any;
 try {

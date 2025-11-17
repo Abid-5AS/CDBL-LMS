@@ -4,7 +4,56 @@
  * Central location for all backend API endpoints
  */
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+import { Platform } from 'react-native';
+import Constants from 'expo-constants';
+
+/**
+ * Determine the API base URL based on environment and platform
+ *
+ * Priority:
+ * 1. EXPO_PUBLIC_API_URL environment variable (set in .env or eas.json)
+ * 2. Development mode detection:
+ *    - Android Emulator: http://10.0.2.2:3000
+ *    - iOS Simulator/Real Device: Use local network IP
+ * 3. Production fallback (should always set EXPO_PUBLIC_API_URL in production)
+ */
+function getApiBaseUrl(): string {
+  // Priority 1: Use environment variable if set
+  if (process.env.EXPO_PUBLIC_API_URL) {
+    return process.env.EXPO_PUBLIC_API_URL;
+  }
+
+  // Priority 2: Development mode with platform-specific defaults
+  if (__DEV__) {
+    if (Platform.OS === 'android') {
+      // Android Emulator uses 10.0.2.2 to access host machine
+      // Real Android device needs LAN IP (set via EXPO_PUBLIC_API_URL)
+      const debuggerHost = Constants.expoConfig?.hostUri?.split(':')[0];
+      if (debuggerHost) {
+        return `http://${debuggerHost}:3000`;
+      }
+      // Fallback for Android Emulator
+      return 'http://10.0.2.2:3000';
+    } else {
+      // iOS Simulator/Device: try to use the debugger host
+      const debuggerHost = Constants.expoConfig?.hostUri?.split(':')[0];
+      if (debuggerHost) {
+        return `http://${debuggerHost}:3000`;
+      }
+    }
+  }
+
+  // Priority 3: Production fallback (should be configured via env)
+  console.warn('⚠️ API_BASE_URL not configured! Set EXPO_PUBLIC_API_URL in your environment.');
+  return 'https://your-production-api.com';
+}
+
+const API_BASE_URL = getApiBaseUrl();
+
+// Log the API URL in development for debugging
+if (__DEV__) {
+  console.log('🌐 API Base URL:', API_BASE_URL);
+}
 
 export const API_ENDPOINTS = {
   // Authentication
