@@ -501,9 +501,42 @@ export class ApprovalService {
 
   /**
    * Check if all approvals are completed and approved (final approval)
+   * Considers the requester's role to determine the approval chain
    */
   private static async isFinalApproval(leaveId: number): Promise<boolean> {
-    return await ApprovalRepository.areAllApprovalsApproved(leaveId);
+    // Get the leave request with requester info
+    const leave = await prisma.leaveRequest.findUnique({
+      where: { id: leaveId },
+      include: {
+        requester: { select: { role: true } },
+        approvals: {
+          include: {
+            approver: { select: { role: true } },
+          },
+          orderBy: { step: 'desc' },
+        },
+      },
+    });
+
+    if (!leave) {
+      return false;
+    }
+
+    // Get the appropriate workflow chain based on requester role
+    const { getChainFor } = await import('@/lib/workflow');
+    const chain = getChainFor(leave.type, leave.requester.role as any);
+
+    // Check if we have an approval from the final approver in the chain
+    const finalRole = chain[chain.length - 1];
+
+    // Find if there's an approved approval from the final approver
+    const finalApproval = leave.approvals.find(
+      (approval) =>
+        approval.approver.role === finalRole &&
+        approval.decision === 'APPROVED'
+    );
+
+    return !!finalApproval;
   }
 
   /**

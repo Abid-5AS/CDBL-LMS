@@ -15,6 +15,8 @@ import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
 import { calculateMLConversion, formatConversionBreakdown } from "@/lib/medical-leave-conversion";
 import { calculateCLConversion, formatCLConversionBreakdown } from "@/lib/casual-leave-conversion";
+import { fetchHolidaysInRange } from "@/lib/leave-validation";
+import { countWorkingDays } from "@/lib/working-days";
 
 export const cache = "no-store";
 
@@ -44,10 +46,10 @@ export async function POST(
 
   const userRole = user.role as AppRole;
 
-  // Get the leave request with requester (need type for per-type chain resolution)
+  // Get the leave request with requester (need type and role for per-type chain resolution)
   const leave = await prisma.leaveRequest.findUnique({
     where: { id: leaveId },
-    include: { requester: { select: { email: true } } },
+    include: { requester: { select: { email: true, role: true } } },
   });
 
   if (!leave) {
@@ -56,28 +58,30 @@ export async function POST(
     });
   }
 
+  const requesterRole = leave.requester.role as AppRole;
+
   // Explicitly exclude HR_ADMIN from approval (operational role only)
   if (userRole === "HR_ADMIN") {
     return NextResponse.json(
       error(
         "forbidden",
-        "HR Admin cannot approve requests. Only HR Head, CEO, or System Admin can approve.",
+        "HR Admin cannot approve requests. Only final approvers (Dept Head or CEO) can approve.",
         traceId
       ),
       { status: 403 }
     );
   }
 
-  // Check if user can approve for this leave type (per-type chain logic)
-  if (!canPerformAction(userRole, "APPROVE", leave.type)) {
+  // Check if user can approve for this leave type (per-type chain logic with requester role)
+  if (!canPerformAction(userRole, "APPROVE", leave.type, requesterRole)) {
     return NextResponse.json(
       error("forbidden", "You cannot approve leave requests", traceId),
       { status: 403 }
     );
   }
 
-  // Verify user is final approver for this leave type
-  if (!isFinalApprover(userRole, leave.type)) {
+  // Verify user is final approver for this leave type and requester
+  if (!isFinalApprover(userRole, leave.type, requesterRole)) {
     return NextResponse.json(
       error(
         "forbidden",
@@ -106,7 +110,12 @@ export async function POST(
   }
 
   // Check if leave is in an approvable state
-  if (!["SUBMITTED", "PENDING"].includes(leave.status)) {
+  const isCancellationRequest = leave.status === "CANCELLATION_REQUESTED" || leave.isCancellationRequest;
+  const validStatuses = isCancellationRequest
+    ? ["CANCELLATION_REQUESTED", "PENDING"]
+    : ["SUBMITTED", "PENDING"];
+
+  if (!validStatuses.includes(leave.status)) {
     return NextResponse.json(
       error("invalid_status", undefined, traceId, {
         currentStatus: leave.status,
@@ -115,11 +124,10 @@ export async function POST(
     );
   }
 
-  const step = getStepForRole(userRole, leave.type);
-  const newStatus = getStatusAfterAction(
-    leave.status as LeaveStatus,
-    "APPROVE"
-  );
+  const step = getStepForRole(userRole, leave.type, requesterRole);
+  const newStatus = isCancellationRequest
+    ? "CANCELLED" as LeaveStatus  // Cancellation approved → status becomes CANCELLED
+    : getStatusAfterAction(leave.status as LeaveStatus, "APPROVE");
 
   // Update existing PENDING approval to APPROVED, or create new one
   const existingApproval = await prisma.approval.findFirst({
@@ -159,9 +167,86 @@ export async function POST(
     data: { status: newStatus as LeaveStatus },
   });
 
-  // Update balance when leave is approved
+  // Handle balance updates
   const currentYear = new Date().getFullYear();
 
+  // For cancellation requests: restore balance instead of deducting
+  if (isCancellationRequest) {
+    // For partial cancellation: days already deducted minus new working days
+    // For full cancellation: all working days
+    // Note: For partial cancellation, the leave.workingDays already represents the NEW reduced days
+    // So we need to get the originally deducted amount from the balance or calculate it
+
+    // Get the original deducted days (before cancellation request was made)
+    // This should be calculated from originalEndDate if partial, or workingDays if full
+    let daysToRestore = 0;
+
+    if (leave.isPartialCancellation && leave.originalEndDate) {
+      // Calculate original working days from originalEndDate
+      const holidays = await fetchHolidaysInRange(leave.startDate, leave.originalEndDate);
+      const originalWorkingDays = await countWorkingDays(leave.startDate, leave.originalEndDate, holidays);
+      daysToRestore = originalWorkingDays - leave.workingDays; // Difference between original and new
+    } else {
+      // Full cancellation: restore all working days
+      daysToRestore = leave.workingDays;
+    }
+
+    // Restore balance
+    const balance = await prisma.balance.findUnique({
+      where: {
+        userId_type_year: {
+          userId: leave.requesterId,
+          type: leave.type,
+          year: currentYear,
+        },
+      },
+    });
+
+    if (balance && daysToRestore > 0) {
+      const newUsed = Math.max((balance.used || 0) - daysToRestore, 0);
+      const newClosing = (balance.opening || 0) + (balance.accrued || 0) - newUsed;
+
+      await prisma.balance.update({
+        where: {
+          userId_type_year: {
+            userId: leave.requesterId,
+            type: leave.type,
+            year: currentYear,
+          },
+        },
+        data: {
+          used: newUsed,
+          closing: newClosing,
+        },
+      });
+    }
+
+    // Create audit log for cancellation approval
+    await prisma.auditLog.create({
+      data: {
+        actorEmail: user.email,
+        action: leave.isPartialCancellation ? "PARTIAL_CANCELLATION_APPROVED" : "CANCELLATION_APPROVED",
+        targetEmail: leave.requester.email,
+        details: {
+          leaveId,
+          actorRole: userRole,
+          step,
+          daysRestored: daysToRestore,
+          isPartial: leave.isPartialCancellation,
+        },
+      },
+    });
+
+    return NextResponse.json({
+      ok: true,
+      status: newStatus,
+      message: leave.isPartialCancellation
+        ? `Partial cancellation approved. ${daysToRestore} day(s) restored to balance.`
+        : `Cancellation approved. ${daysToRestore} day(s) restored to balance.`,
+    });
+  }
+
+  // Regular leave approval: deduct from balance
   // CL >3 days: First 3 days from CL, remaining from EL (Policy 6.20.d)
   let clConversionDetails: string | null = null;
 

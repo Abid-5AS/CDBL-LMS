@@ -17,16 +17,16 @@ const PartialCancelSchema = z.object({
 });
 
 /**
- * Partial Cancellation Endpoint
+ * Partial Cancellation Request Endpoint - Updated 2025-11-17
  *
- * Rules (Per Master Spec):
- * - Can only partially cancel APPROVED leaves that have started
- * - Past days are locked (already taken)
- * - Cancels all remaining future days (sets endDate to yesterday or today)
- * - Remaining days restored to balance
- * - EL overflow logic applies if balance exceeds 60
- * - Leave status remains APPROVED (leave was approved, just ended early)
- * - Creates audit log with PARTIAL_CANCELLATION action
+ * New Rules:
+ * - Employee requests partial cancellation of APPROVED leave
+ * - Request goes through same approval flow as new leave requests:
+ *   - Employee → HR_ADMIN → HR_HEAD → DEPT_HEAD
+ *   - Dept Head → HR_ADMIN → HR_HEAD → CEO
+ * - Creates a cancellation request with status CANCELLATION_REQUESTED
+ * - Only future days can be cancelled (past days are locked)
+ * - Once approved, the leave end date is adjusted and balance is restored
  */
 export async function POST(
   request: NextRequest,
@@ -153,74 +153,51 @@ export async function POST(
     );
   }
 
-  // Update leave request (endDate changed, status remains APPROVED)
-  const updatedLeave = await prisma.leaveRequest.update({
+  // Create a partial cancellation request that will go through approval workflow
+  // Status is set to CANCELLATION_REQUESTED and will go through approval chain
+  await prisma.leaveRequest.update({
     where: { id: leaveId },
     data: {
-      endDate: newEndDate,
-      workingDays: newWorkingDays,
-      // Status remains APPROVED - leave was approved and partially completed
+      status: 'CANCELLATION_REQUESTED',
+      isCancellationRequest: true,
+      isPartialCancellation: true,
+      originalEndDate: leave.endDate, // Store original end date
+      endDate: newEndDate, // Proposed new end date
+      workingDays: newWorkingDays, // Proposed new working days
+      cancellationReason: parsed.data.reason,
     },
   });
 
-  // Restore balance for cancelled future days
-  const currentYear = new Date().getFullYear();
-  const balance = await prisma.balance.findUnique({
-    where: {
-      userId_type_year: {
-        userId: user.id,
-        type: leave.type,
-        year: currentYear,
-      },
-    },
+  // Create approval record for HR_ADMIN (first in chain)
+  const hrAdmin = await prisma.user.findFirst({
+    where: { role: 'HR_ADMIN' },
+    select: { id: true },
   });
 
-  let balanceRestored = false;
-  if (balance) {
-    const newUsed = Math.max((balance.used || 0) - cancelledDays, 0);
-    const newClosing = (balance.opening || 0) + (balance.accrued || 0) - newUsed;
-
-    await prisma.balance.update({
-      where: {
-        userId_type_year: {
-          userId: user.id,
-          type: leave.type,
-          year: currentYear,
-        },
-      },
+  if (hrAdmin) {
+    await prisma.approval.create({
       data: {
-        used: newUsed,
-        closing: newClosing,
+        leaveId: leaveId,
+        approverId: hrAdmin.id,
+        step: 1,
+        decision: 'PENDING',
       },
     });
-
-    balanceRestored = true;
-
-    // Check if EL overflow to SPECIAL is needed (Policy 6.19.c)
-    if (leave.type === "EARNED" && newClosing > 60) {
-      await processELOverflow(
-        user.id,
-        currentYear,
-        user.email,
-        "partial_cancellation"
-      );
-    }
   }
 
-  // Create audit log
+  // Create audit log for cancellation request
   await prisma.auditLog.create({
     data: {
       actorEmail: user.email,
-      action: "PARTIAL_CANCELLATION",
+      action: "PARTIAL_CANCELLATION_REQUESTED",
       targetEmail: user.email,
       details: {
         leaveId: leave.id,
         originalEndDate: leave.endDate,
-        newEndDate: newEndDate,
+        requestedEndDate: newEndDate,
         originalWorkingDays: leave.workingDays,
-        newWorkingDays: newWorkingDays,
-        cancelledFutureDays: cancelledDays,
-        balanceRestored,
+        requestedWorkingDays: newWorkingDays,
+        futureDaysToCancel: cancelledDays,
         reason: parsed.data.reason,
       },
     },
@@ -228,13 +205,13 @@ export async function POST(
 
   return NextResponse.json({
     ok: true,
-    leaveId: updatedLeave.id,
+    leaveId: leaveId,
+    status: 'CANCELLATION_REQUESTED',
     originalEndDate: leave.endDate,
-    newEndDate: newEndDate,
+    requestedEndDate: newEndDate,
     originalWorkingDays: leave.workingDays,
-    newWorkingDays: newWorkingDays,
-    cancelledDays: cancelledDays,
-    balanceRestored,
-    message: `Leave partially cancelled. Remaining ${cancelledDays} future day(s) cancelled and restored to your ${leave.type} balance. Past days remain as taken.`,
+    requestedWorkingDays: newWorkingDays,
+    daysToCancel: cancelledDays,
+    message: `Partial cancellation request submitted. Your request to cancel ${cancelledDays} future day(s) has been sent for approval. The leave will remain active until approved.`,
   });
 }
