@@ -48,6 +48,20 @@ export const API_ENDPOINTS = {
     REGISTER: '/api/notifications/register',
     LIST: '/api/notifications',
   },
+
+  // Manager & Approvals
+  MANAGER: {
+    PENDING_APPROVALS: '/api/manager/pending',
+    TEAM_OVERVIEW: '/api/manager/team-overview',
+    TEAM_ON_LEAVE: '/api/manager/team-on-leave',
+  },
+
+  // Approvals (for all approval roles)
+  APPROVALS: {
+    PENDING: '/api/approvals/pending',
+    DECISION: (id: string) => `/api/approvals/${id}/decision`,
+    HISTORY: '/api/approvals/history',
+  },
 } as const;
 
 export { API_BASE_URL };

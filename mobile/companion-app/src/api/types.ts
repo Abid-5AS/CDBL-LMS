@@ -152,3 +152,45 @@ export interface ApiError {
   message: string;
   details?: any;
 }
+
+// Approval Requests/Responses
+export interface PendingApprovalResponse {
+  id: string;
+  employeeId: string;
+  employeeName: string;
+  employeeDepartment: string;
+  leaveType: string;
+  startDate: string;
+  endDate: string;
+  workingDays: number;
+  reason: string;
+  appliedDate: string;
+  halfDay: boolean;
+}
+
+export interface ApprovalDecisionRequest {
+  status: 'APPROVED' | 'REJECTED';
+  comment?: string;
+}
+
+export interface ApprovalDecisionResponse {
+  success: boolean;
+  message: string;
+}
+
+// Team Stats
+export interface TeamStatsResponse {
+  totalEmployees: number;
+  onLeaveToday: number;
+  pendingApprovals: number;
+  approvedThisMonth: number;
+}
+
+export interface TeamMemberOnLeave {
+  employeeId: string;
+  employeeName: string;
+  department: string;
+  leaveType: string;
+  startDate: string;
+  endDate: string;
+}
