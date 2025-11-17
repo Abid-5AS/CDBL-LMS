@@ -219,6 +219,7 @@ export function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rememberDevice, setRememberDevice] = useState(true);
+  const [skipOtp, setSkipOtp] = useState(false); // Testing toggle
 
   // OTP Step State
   const [showOtpStep, setShowOtpStep] = useState(false);
@@ -293,8 +294,8 @@ export function LoginForm() {
         return;
       }
 
-      // Check if OTP is required
-      if (data.requiresOtp) {
+      // Check if OTP is required (skip if testing toggle is enabled)
+      if (data.requiresOtp && !skipOtp) {
         setShowOtpStep(true);
         setOtpExpiry(data.expiresIn || 600);
         toast.success("Verification code sent to your email!");
@@ -302,8 +303,8 @@ export function LoginForm() {
         return;
       }
 
-      // Old flow (shouldn't happen with 2FA enabled)
-      toast.success("Login successful!");
+      // Direct login flow (when OTP is skipped or not required)
+      toast.success("Login successful!" + (skipOtp ? " (OTP verification skipped)" : ""));
       const role = data?.user?.role;
       if (typeof window !== "undefined") {
         const destination = getHomePageForRole(role as any) || "/dashboard";
@@ -632,6 +633,30 @@ export function LoginForm() {
                   onCheckedChange={setRememberDevice}
                   aria-label="Toggle trusted device"
                   className="data-[state=checked]:bg-card-action data-[state=unchecked]:bg-border"
+                />
+              </div>
+              </motion.div>
+
+              {/* Testing Toggle - Skip OTP */}
+              <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.76 }}
+            >
+              <div className="flex items-center justify-between rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 backdrop-blur-md">
+                <div>
+                  <p className="text-sm font-semibold text-amber-600 dark:text-amber-400">Skip OTP (Testing Mode)</p>
+                  <p className="text-xs text-amber-600/70 dark:text-amber-400/70">
+                    {skipOtp
+                      ? "⚠️ OTP verification disabled - for testing only"
+                      : "Enable to bypass email verification"}
+                  </p>
+                </div>
+                <Switch
+                  checked={skipOtp}
+                  onCheckedChange={setSkipOtp}
+                  aria-label="Toggle OTP skip for testing"
+                  className="data-[state=checked]:bg-amber-500 data-[state=unchecked]:bg-border"
                 />
               </div>
               </motion.div>
