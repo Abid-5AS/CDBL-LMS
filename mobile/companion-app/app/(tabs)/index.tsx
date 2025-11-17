@@ -385,7 +385,8 @@ export default function HomeScreen() {
             </View>
           </ThemedCard>
           </Animated.View>
-
+        </>
+        )}
           {/* Platform Info */}
           <View style={styles.platformInfo}>
             <Text
