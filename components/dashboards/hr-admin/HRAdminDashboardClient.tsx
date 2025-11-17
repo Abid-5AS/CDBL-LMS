@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, lazy, memo, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
 import {
@@ -112,6 +113,7 @@ function HRAdminDashboardClientImpl({
   initialStats,
   initialKpis,
 }: HRAdminDashboardClientProps) {
+  const router = useRouter();
   // Track hydration state to prevent hydration mismatches from animations
   const [isHydrated, setIsHydrated] = useState(false);
   useEffect(() => {
@@ -250,6 +252,8 @@ function HRAdminDashboardClientImpl({
                     icon={Clock}
                     role="HR_ADMIN"
                     animate={true}
+                    onClick={() => router.push("/leaves?status=pending")}
+                    clickLabel="View pending leave requests"
                     trend={
                       displayStats && displayStats.pendingRequests > 15
                         ? {
