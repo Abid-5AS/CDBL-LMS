@@ -4,7 +4,22 @@
  * Monitors network connectivity and notifies listeners of changes
  */
 
-import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
+// Safely import NetInfo with fallback
+let NetInfo: any;
+try {
+  NetInfo = require('@react-native-community/netinfo').default;
+} catch (error) {
+  console.warn('[NetworkMonitor] NetInfo not available, using fallback mode (always online)');
+  NetInfo = {
+    addEventListener: (listener: (state: any) => void) => {
+      // Immediately report online status
+      listener({ isConnected: true });
+      // Return an empty unsubscribe function
+      return () => {};
+    },
+    fetch: async () => ({ isConnected: true }),
+  };
+}
 
 type NetworkStatusListener = (isConnected: boolean) => void;
 

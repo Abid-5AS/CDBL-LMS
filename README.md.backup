@@ -66,10 +66,10 @@ The CDBL Leave Management System digitizes and automates the leave management pr
    ```bash
    # Generate Prisma Client
    pnpm prisma generate
-
+   
    # Run migrations
    pnpm prisma migrate dev
-
+   
    # Seed database (optional, for demo data)
    pnpm prisma:seed
    ```
@@ -132,46 +132,23 @@ cdbl-leave-management/
 
 ## Documentation
 
-Comprehensive documentation is available in the organized `docs/` directory:
+Comprehensive documentation is available in the `docs/` directory:
 
 ### Core Documentation
-- **[Project Goals](./docs/core/01-Project-Goals.md)** - Purpose, objectives, success criteria
-- **[Technical Documentation](./docs/core/02-Technical-Documentation.md)** - Tech stack, architecture, setup
-- **[Database Schema](./docs/core/03-Database-Schema.md)** - Complete database documentation with ER diagrams
-- **[User Roles & Permissions](./docs/core/04-User-Roles-and-Permissions.md)** - Complete RBAC documentation
-- **[System Functionality](./docs/core/05-System-Functionality.md)** - Feature list by module
-- **[Flow Charts](./docs/core/06-Flow-Charts.md)** - Visual workflow diagrams
-- **[Development Phases](./docs/core/07-Development-Phases.md)** - Development timeline and milestones
+- **[Project Goals](./docs/01-Project-Goals.md)** - Purpose, objectives, success criteria
+- **[Technical Documentation](./docs/02-Technical-Documentation.md)** - Tech stack, architecture, setup
+- **[Database Schema](./docs/03-Database-Schema.md)** - Complete database documentation with ER diagrams
+- **[User Roles & Permissions](./docs/04-User-Roles-and-Permissions.md)** - Complete RBAC documentation
+- **[System Functionality](./docs/05-System-Functionality.md)** - Feature list by module
+- **[Flow Charts](./docs/06-Flow-Charts.md)** - Visual workflow diagrams
+- **[Development Phases](./docs/07-Development-Phases.md)** - Development timeline and milestones
 
-### Policy Documentation
-- **[Policy Overview](./docs/policies/Policy_Implementation_Map.md)** - Policy implementation mapping
-- **[Policy Rules Reference](./docs/policies/Policy_Reference.md)** - Complete policy rules
-- **[CDBL Leave Policy Chapter 06](./docs/policies/CDBL_LEAVE_POLICY_CHAPTER_06.md)** - Original policy text
-- **[Policy Compliance Analysis](./docs/policies/POLICY_COMPLIANCE_ANALYSIS.md)** - Compliance implementation details
-- **[Policy Settings](./docs/policies/Policy_Settings.md)** - Policy configuration guide
+### Policy & Logic
+- **[Policy Logic Reference](./docs/Policy%20Logic/README.md)** - Comprehensive policy rules extraction (12 documents)
 
-### UI/UX & Design
-- **[Accessibility Guide](./docs/ui-ux/ACCESSIBILITY_GUIDE.md)** - Accessibility implementation
-- **[Design System](./docs/ui-ux/NEO_DESIGN_SYSTEM.md)** - Design system guidelines
-- **[Color System](./docs/ui-ux/COLOR_SYSTEM_GUIDE.md)** - Color palette and usage
-- **[Visual Consistency](./docs/ui-ux/VISUAL_CONSISTENCY_GUIDELINES.md)** - Visual guidelines
-
-### API Documentation
-- **[API Contracts](./docs/api/API_Contracts.md)** - Complete API endpoint documentation
-- **[API Documentation](./docs/api/API_DOCUMENTATION.md)** - API reference materials
-
-### Development & Testing
-- **[Development Playbook](./docs/development/DEVELOPMENT_PLAYBOOK.md)** - Development guidelines
-- **[Testing Guide](./docs/testing/README_TESTING.md)** - Testing strategy and procedures
-- **[Testing Checklist](./docs/testing/TESTING_CHECKLIST.md)** - QA verification checklist
-
-### Deployment
-- **[Deployment Guide](./docs/deployment/DEPLOYMENT_GUIDE.md)** - Deployment procedures
-- **[Production Deployment](./docs/deployment/PRODUCTION_DEPLOYMENT_GUIDE.md)** - Production-specific steps
-- **[Deployment Checklist](./docs/deployment/DEPLOYMENT_CHECKLIST.md)** - Pre-deployment verification
-
-### Legacy Documentation
-- **[Legacy Files](./docs/legacy/)** - Historical documentation and archives
+### API & Reference
+- **[API Contracts](./docs/API/API_Contracts.md)** - Complete API endpoint documentation
+- **[Reference Documentation](./docs/References/)** - Additional reference materials
 
 ---
 
@@ -260,9 +237,9 @@ Internal use only - CDBL Leave Management System
 
 ## Version
 
-**Current Version**: 0.1.0
-**Policy Version**: v1.1
-**Next.js Version**: 16.0.0
+**Current Version**: 0.1.0  
+**Policy Version**: v1.1  
+**Next.js Version**: 16.0.0  
 **Last Updated**: Current
 
 ---
