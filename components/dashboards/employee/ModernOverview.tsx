@@ -277,8 +277,8 @@ export function ModernEmployeeDashboard({
                 icon={dashboardData.pendingStageInfo?.icon || Clock}
                 role="EMPLOYEE"
                 animate={true}
-                onClick={() => scrollToSection("action-center")}
-                clickLabel="View your pending requests in the Action Center"
+                onClick={() => router.push("/leaves?status=pending")}
+                clickLabel="View your pending leave requests"
               />
 
               <RoleKPICard
@@ -316,8 +316,8 @@ export function ModernEmployeeDashboard({
                 icon={Calendar}
                 role="EMPLOYEE"
                 animate={true}
-                onClick={() => scrollToSection("leave-details", "balance")}
-                clickLabel="View detailed balance breakdown in Leave Details"
+                onClick={() => router.push("/balance")}
+                clickLabel="View detailed balance breakdown"
               />
 
               <RoleKPICard
