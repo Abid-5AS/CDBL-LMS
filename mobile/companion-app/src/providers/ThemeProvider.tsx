@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useColorScheme, Platform } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { PaperProvider } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
@@ -8,6 +7,9 @@ import {
   material3DarkTheme,
 } from "../theme/material3-theme";
 import { getThemeColors } from "../theme/colors";
+
+// AsyncStorage will be loaded dynamically to avoid initialization errors
+let AsyncStorage: any = null;
 
 type ThemeMode = "light" | "dark" | "system";
 
@@ -32,6 +34,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const loadTheme = async () => {
       try {
+        // Dynamically load AsyncStorage if not already loaded
+        if (!AsyncStorage) {
+          try {
+            const module = await import("@react-native-async-storage/async-storage");
+            AsyncStorage = module.default;
+          } catch {
+            // AsyncStorage not available
+          }
+        }
+
         // AsyncStorage might not be available in some environments (fallback gracefully)
         if (AsyncStorage && AsyncStorage.getItem) {
           const savedMode = await AsyncStorage.getItem(THEME_KEY);
@@ -51,6 +63,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Persist theme preference when changed
   const setMode = async (newMode: ThemeMode) => {
     try {
+      // Dynamically load AsyncStorage if not already loaded
+      if (!AsyncStorage) {
+        try {
+          const module = await import("@react-native-async-storage/async-storage");
+          AsyncStorage = module.default;
+        } catch {
+          // AsyncStorage not available
+        }
+      }
+
       // AsyncStorage might not be available in some environments (fallback gracefully)
       if (AsyncStorage && AsyncStorage.setItem) {
         await AsyncStorage.setItem(THEME_KEY, newMode);
