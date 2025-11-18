@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { DeptHeadDashboardWrapper } from "@/components/dashboards";
 import { DashboardLoadingFallback } from "../shared/LoadingFallback";
-import { DashboardLayout } from "../shared/DashboardLayout";
+import { RoleBasedDashboard } from "@/components/dashboards/shared/RoleBasedDashboard";
 
 async function DeptHeadDashboardContent() {
   const user = await getCurrentUser();
@@ -20,13 +20,14 @@ async function DeptHeadDashboardContent() {
   const username = user.name ?? "Manager";
 
   return (
-    <DashboardLayout
+    <RoleBasedDashboard
       role={user.role === "CEO" ? "CEO" : "DEPT_HEAD"}
       title={`Welcome, ${username}`}
       description="Review and manage team leave requests"
+      animate={true}
     >
       <DeptHeadDashboardWrapper />
-    </DashboardLayout>
+    </RoleBasedDashboard>
   );
 }
 

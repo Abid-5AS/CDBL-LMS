@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { HRAdminDashboard } from "@/components/dashboards";
 import { DashboardLoadingFallback } from "../shared/LoadingFallback";
-import { DashboardLayout } from "../shared/DashboardLayout";
+import { RoleBasedDashboard } from "@/components/dashboards/shared/RoleBasedDashboard";
 import {
   getHRAdminKPIData,
   getHRAdminStatsData,
@@ -11,7 +11,7 @@ import {
 
 async function HRAdminDashboardContent() {
   const user = await getCurrentUser();
-  
+
   if (!user) {
     redirect("/login");
   }
@@ -28,17 +28,18 @@ async function HRAdminDashboardContent() {
   ]);
 
   return (
-    <DashboardLayout
+    <RoleBasedDashboard
       role="HR_ADMIN"
       title={`Welcome, ${username}`}
       description="Operational leave management and forwarding"
+      animate={true}
     >
       <HRAdminDashboard
         username={username}
         initialKpis={initialKpis}
         initialStats={initialStats}
       />
-    </DashboardLayout>
+    </RoleBasedDashboard>
   );
 }
 
