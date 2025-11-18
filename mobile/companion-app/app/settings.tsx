@@ -36,8 +36,8 @@ export default function SettingsScreen() {
   const { preferences, updatePreferences, isInitialized } = useNotifications();
   const [isTogglingBiometric, setIsTogglingBiometric] = useState(false);
 
-  const handleThemeChange = (newMode: 'light' | 'dark' | 'system') => {
-    setMode(newMode);
+  const handleThemeChange = async (newMode: 'light' | 'dark' | 'system') => {
+    await setMode(newMode);
   };
 
   const handleBiometricToggle = async (value: boolean) => {

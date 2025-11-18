@@ -56,9 +56,10 @@ if (__DEV__) {
 }
 
 export const API_ENDPOINTS = {
-  // Authentication
+  // Authentication (Mobile-specific endpoints)
   AUTH: {
-    LOGIN: '/api/auth/login',
+    LOGIN: '/api/auth/mobile-login',
+    VERIFY_OTP: '/api/auth/mobile-verify-otp',
     REFRESH: '/api/auth/refresh',
     LOGOUT: '/api/auth/logout',
   },

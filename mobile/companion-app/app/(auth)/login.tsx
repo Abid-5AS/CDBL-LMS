@@ -4,12 +4,12 @@
  */
 
 import { useState } from 'react';
-import { View, StyleSheet, KeyboardAvoidingView, Platform, Alert } from 'react-native';
-import { TextInput, Button, Text, Surface, useTheme } from 'react-native-paper';
+import { View, StyleSheet, KeyboardAvoidingView, Platform, Alert, TouchableOpacity } from 'react-native';
+import { TextInput, Button, Text, Surface, useTheme, SegmentedButtons } from 'react-native-paper';
 import { router } from 'expo-router';
 import { useAuthStore } from '@/src/store/authStore';
 import { BiometricAuth } from '@/src/auth/BiometricAuth';
-import { Fingerprint } from 'lucide-react-native';
+import { Fingerprint, Shield } from 'lucide-react-native';
 import { apiClient } from '@/src/api/client';
 import { API_ENDPOINTS } from '@/src/api/endpoints';
 import { LoginRequest, LoginResponse } from '@/src/api/types';
@@ -21,6 +21,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [useOtp, setUseOtp] = useState(false);
 
   const login = useAuthStore((state) => state.login);
 
@@ -35,13 +36,27 @@ export default function LoginScreen() {
       // Call the login API
       const response = await apiClient.post<LoginResponse>(
         API_ENDPOINTS.AUTH.LOGIN,
-        { email, password } as LoginRequest
+        { email, password, skipOtp: !useOtp } as LoginRequest
       );
 
       if (!response.success || !response.data) {
         throw new Error(response.message || 'Login failed');
       }
 
+      // If OTP is required, navigate to verification screen
+      if ((response.data as any).requiresOtp) {
+        router.push({
+          pathname: '/(auth)/verify-otp',
+          params: {
+            email: (response.data as any).email,
+            userId: (response.data as any).userId,
+            expiresIn: (response.data as any).expiresIn,
+          },
+        });
+        return;
+      }
+
+      // Direct login flow
       const { user: userData, token } = response.data;
 
       // Transform API user to auth store User type
@@ -132,6 +147,21 @@ export default function LoginScreen() {
             style={styles.input}
           />
 
+          <View style={styles.otpToggle}>
+            <TouchableOpacity
+              style={[
+                styles.toggleButton,
+                useOtp && styles.toggleButtonActive,
+              ]}
+              onPress={() => setUseOtp(!useOtp)}
+            >
+              <Shield size={16} color={useOtp ? theme.colors.primary : '#999'} />
+              <Text style={[styles.toggleText, useOtp && styles.toggleTextActive]}>
+                {useOtp ? 'Enable OTP Verification' : 'Disable OTP Verification'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           <Button
             mode="contained"
             onPress={handleLogin}
@@ -188,6 +218,31 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: 'transparent',
+  },
+  otpToggle: {
+    paddingVertical: 8,
+  },
+  toggleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  toggleButtonActive: {
+    borderColor: '#6200ee',
+    backgroundColor: '#f3e5f5',
+  },
+  toggleText: {
+    fontSize: 14,
+    color: '#999',
+  },
+  toggleTextActive: {
+    color: '#6200ee',
+    fontWeight: '500',
   },
   button: {
     marginTop: 8,

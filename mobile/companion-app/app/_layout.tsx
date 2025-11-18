@@ -41,7 +41,7 @@ function RootLayoutNav() {
   useEffect(() => {
     if (isLoading) return;
 
-    const inAuthGroup = segments[0] === '(auth)' || segments[0] === 'login';
+    const inAuthGroup = segments[0] === '(auth)';
     const inProtectedRoute = segments[0] === '(tabs)' ||
                              segments[0] === 'settings' ||
                              segments[0] === 'profile' ||
@@ -53,7 +53,7 @@ function RootLayoutNav() {
     // Force redirect to login if not authenticated and trying to access protected routes
     if (!isAuthenticated && inProtectedRoute) {
       console.log('🔒 Not authenticated, redirecting to login');
-      router.replace('/login');
+      router.replace('/(auth)/login');
     }
     // Redirect to tabs if authenticated and on auth screens
     else if (isAuthenticated && inAuthGroup) {
@@ -63,13 +63,13 @@ function RootLayoutNav() {
     // If not authenticated and not in any protected route, redirect to login
     else if (!isAuthenticated && segments.length === 0) {
       console.log('🔒 No route, redirecting to login');
-      router.replace('/login');
+      router.replace('/(auth)/login');
     }
   }, [isAuthenticated, segments, isLoading]);
 
   return (
     <Stack>
-      <Stack.Screen name="login" options={{ headerShown: false }} />
+      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen
         name="modal"

@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { useColorScheme, Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { PaperProvider } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
@@ -14,14 +15,45 @@ interface ThemeContextType {
   mode: ThemeMode;
   isDark: boolean;
   colors: ReturnType<typeof getThemeColors>;
-  setMode: (mode: ThemeMode) => void;
+  setMode: (mode: ThemeMode) => Promise<void>;
+  isLoading: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+const THEME_KEY = "app_theme_mode";
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const systemColorScheme = useColorScheme();
-  const [mode, setMode] = useState<ThemeMode>("system");
+  const [mode, setModeState] = useState<ThemeMode>("system");
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load theme preference on mount
+  useEffect(() => {
+    const loadTheme = async () => {
+      try {
+        const savedMode = await AsyncStorage.getItem(THEME_KEY);
+        if (savedMode && (savedMode === "light" || savedMode === "dark" || savedMode === "system")) {
+          setModeState(savedMode as ThemeMode);
+        }
+      } catch (error) {
+        console.error("Failed to load theme preference:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadTheme();
+  }, []);
+
+  // Persist theme preference when changed
+  const setMode = async (newMode: ThemeMode) => {
+    try {
+      await AsyncStorage.setItem(THEME_KEY, newMode);
+      setModeState(newMode);
+    } catch (error) {
+      console.error("Failed to save theme preference:", error);
+    }
+  };
 
   const isDark =
     mode === "system" ? systemColorScheme === "dark" : mode === "dark";
@@ -37,11 +69,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     },
   };
 
-  const value = {
+  const value: ThemeContextType = {
     mode,
     isDark,
     colors,
     setMode,
+    isLoading,
   };
 
   // On Android, wrap with PaperProvider for Material 3

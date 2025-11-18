@@ -1,7 +1,10 @@
 import { create } from 'zustand';
+import * as SecureStore from 'expo-secure-store';
 import { User, AuthState } from '../auth/types';
 import { BiometricAuth } from '../auth/BiometricAuth';
 import { saveUserProfile, getUserProfile, clearAllData } from '../database';
+
+const TOKEN_KEY = 'auth_token';
 
 const AUTH_TIMEOUT = 15 * 60 * 1000; // 15 minutes
 
@@ -83,6 +86,16 @@ export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
     try {
       set({ isLoading: true });
 
+      // Check if a valid auth token exists
+      const token = await SecureStore.getItemAsync(TOKEN_KEY);
+
+      if (!token) {
+        // No token = not authenticated
+        console.log('No auth token found, user not authenticated');
+        set({ isLoading: false });
+        return false;
+      }
+
       // Check if user profile exists in database
       const profile = await getUserProfile();
 
@@ -107,8 +120,13 @@ export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
           isLoading: false,
         });
 
+        console.log('✅ Auth status verified: user authenticated with valid token');
         return true;
       }
+
+      // Token exists but no profile - inconsistent state, clear token
+      console.warn('Token exists but no user profile found - clearing token');
+      await SecureStore.deleteItemAsync(TOKEN_KEY);
 
       set({ isLoading: false });
       return false;
