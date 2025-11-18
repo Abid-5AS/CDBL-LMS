@@ -16,7 +16,7 @@ import {
 import { router } from 'expo-router';
 import { ThemedCard } from '../../../src/components/shared/ThemedCard';
 import { ThemedButton } from '../../../src/components/shared/ThemedButton';
-import { useTheme } from '../../../src/providers/ThemeProvider';
+import { useTheme } from '@/src/providers/ThemeProvider';
 import { useAdminUsers, AdminUser } from '../../../src/hooks/useAdminUsers';
 import {
   Search,
@@ -30,6 +30,7 @@ import {
   X,
   ChevronLeft,
 } from 'lucide-react-native';
+import { spacing, radius, typography } from '../../../src/theme/designTokens';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -114,11 +115,11 @@ export default function AdminUsersScreen() {
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case 'ADMIN':
-        return '#F44336'; // Red
+        return colors.error;
       case 'MANAGER':
-        return '#FF9800'; // Orange
+        return colors.warning;
       case 'USER':
-        return '#4CAF50'; // Green
+        return colors.success;
       default:
         return colors.primary;
     }
@@ -252,13 +253,13 @@ export default function AdminUsersScreen() {
             style={[
               styles.actionButton,
               styles.deactivateButton,
-              { borderColor: '#F44336' },
+              { borderColor: colors.error },
             ]}
             onPress={() => handleDeactivateUser(user)}
             disabled={isProcessing}
           >
-            <UserX size={18} color="#F44336" />
-            <Text style={[styles.actionButtonText, { color: '#F44336' }]}>
+            <UserX size={18} color={colors.error} />
+            <Text style={[styles.actionButtonText, { color: colors.error }]}>
               Deactivate
             </Text>
           </TouchableOpacity>
@@ -305,8 +306,8 @@ export default function AdminUsersScreen() {
           style={[
             styles.searchBar,
             {
-              backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
-              borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+              backgroundColor: 'surfaceVariant' in colors ? colors.surfaceVariant : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)'),
+              borderColor: colors.border,
             },
           ]}
         >
@@ -371,7 +372,7 @@ export default function AdminUsersScreen() {
           </View>
         ) : error ? (
           <View style={styles.centerContainer}>
-            <Text style={[styles.messageText, { color: '#F44336' }]}>
+            <Text style={[styles.messageText, { color: colors.error }]}>
               {error.message}
             </Text>
             <ThemedButton onPress={refetch} style={styles.retryButton}>
@@ -418,7 +419,7 @@ export default function AdminUsersScreen() {
           )
         }
       >
-        <UserPlus size={24} color="#FFFFFF" />
+        <UserPlus size={24} color={colors.onPrimary} />
       </TouchableOpacity>
 
       {/* Role Edit Modal */}
@@ -492,9 +493,7 @@ export default function AdminUsersScreen() {
                               {
                                 backgroundColor: isSelected
                                   ? colors.primary + '20'
-                                  : isDark
-                                  ? 'rgba(255,255,255,0.05)'
-                                  : 'rgba(0,0,0,0.03)',
+                                  : 'surfaceVariant' in colors ? colors.surfaceVariant : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)'),
                                 borderColor: isSelected ? colors.primary : 'transparent',
                                 borderWidth: isSelected ? 2 : 0,
                               },
@@ -564,77 +563,77 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 16,
+    paddingHorizontal: radius.lg,
+    paddingTop: spacing.xxl + spacing.md,
+    paddingBottom: spacing.md,
   },
   backButton: {
-    marginRight: 12,
+    marginRight: spacing.md,
   },
   headerContent: {
     flex: 1,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: radius.xl,
+    fontWeight: typography.display.fontWeight,
+    marginBottom: spacing.xs,
   },
   subtitle: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: radius.md,
+    fontWeight: typography.body.fontWeight,
   },
   searchContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 16,
+    paddingHorizontal: radius.lg,
+    marginBottom: spacing.md,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    borderRadius: radius.md,
     borderWidth: 1,
-    gap: 12,
+    gap: spacing.md,
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    padding: 20,
-    paddingBottom: 100,
+    padding: radius.lg,
+    paddingBottom: spacing.xxl * 2 + spacing.sm,
   },
   userCard: {
-    padding: 16,
-    marginBottom: 12,
+    padding: spacing.md,
+    marginBottom: spacing.md,
   },
   userHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
-    gap: 12,
+    marginBottom: spacing.md,
+    gap: spacing.md,
   },
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: spacing.xxl + spacing.md,
+    height: spacing.xxl + spacing.md,
+    borderRadius: radius.xl,
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarText: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: typography.heading.fontSize,
+    fontWeight: typography.display.fontWeight,
   },
   userInfo: {
     flex: 1,
   },
   userName: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: typography.heading.fontSize,
+    fontWeight: typography.heading.fontWeight,
     marginBottom: 6,
   },
   roleBadge: {
@@ -642,38 +641,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'flex-start',
     paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    gap: 4,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.md,
+    gap: spacing.xs,
   },
   roleText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: typography.display.fontWeight,
   },
   userDetails: {
-    gap: 8,
-    marginBottom: 16,
+    gap: spacing.sm,
+    marginBottom: spacing.md,
   },
   detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.sm,
   },
   detailText: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: radius.md,
+    fontWeight: typography.body.fontWeight,
   },
   actionButtons: {
     flexDirection: 'row',
-    gap: 12,
+    gap: spacing.md,
   },
   actionButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: 10,
+    paddingVertical: spacing.md,
+    borderRadius: radius.sm + 2,
     gap: 6,
   },
   editButton: {
@@ -684,16 +683,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   actionButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: radius.md,
+    fontWeight: typography.heading.fontWeight,
   },
   fab: {
     position: 'absolute',
-    right: 20,
-    bottom: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    right: radius.lg,
+    bottom: radius.lg,
+    width: spacing.xxl + spacing.md,
+    height: spacing.xxl + spacing.md,
+    borderRadius: radius.xl,
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 8,
@@ -706,16 +705,16 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 60,
-    gap: 16,
+    paddingVertical: spacing.xxl + spacing.md,
+    gap: spacing.md,
   },
   messageText: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
     textAlign: 'center',
   },
   retryButton: {
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
   modalOverlay: {
     flex: 1,
@@ -725,13 +724,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: radius.lg,
   },
   modalContent: {
     width: '100%',
     maxWidth: 400,
-    borderRadius: 20,
-    padding: 24,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -742,37 +741,37 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: radius.lg,
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: typography.heading.fontSize,
+    fontWeight: typography.display.fontWeight,
   },
   modalBody: {
-    gap: 20,
+    gap: radius.lg,
   },
   modalUserName: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
   roleOptions: {
-    gap: 12,
+    gap: spacing.md,
   },
   roleOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
-    gap: 12,
+    padding: spacing.md,
+    borderRadius: radius.md,
+    gap: spacing.md,
   },
   roleOptionText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.heading.fontWeight,
   },
   modalActions: {
     flexDirection: 'row',
-    gap: 12,
-    marginTop: 8,
+    gap: spacing.md,
+    marginTop: spacing.sm,
   },
   modalButton: {
     flex: 1,

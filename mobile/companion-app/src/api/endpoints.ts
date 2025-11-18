@@ -68,7 +68,11 @@ export const API_ENDPOINTS = {
   USER: {
     PROFILE: '/api/user/profile',
     UPDATE_PROFILE: '/api/user/profile',
-    BALANCE: '/api/user/balance',
+  },
+
+  // Leave Balance
+  BALANCE: {
+    GET: '/api/balance/mine',
   },
 
   // Leave Applications

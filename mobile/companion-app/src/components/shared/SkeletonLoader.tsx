@@ -59,7 +59,7 @@ export function SkeletonLoader({
           width,
           height,
           borderRadius,
-          backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+          backgroundColor: colors.surfaceVariant,
         },
         style,
       ]}
@@ -68,7 +68,7 @@ export function SkeletonLoader({
         style={[
           styles.shimmer,
           {
-            backgroundColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)',
+            backgroundColor: colors.surfaceDisabled,
           },
           animatedStyle,
         ]}
@@ -89,7 +89,7 @@ export function SkeletonCard() {
       style={[
         styles.card,
         {
-          backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+          backgroundColor: colors.surface,
         },
       ]}
     >
@@ -118,6 +118,8 @@ export function SkeletonCard() {
   );
 }
 
+import { spacing, radius } from '@/src/theme/designTokens';
+
 const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
@@ -128,17 +130,17 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   card: {
-    padding: 16,
-    borderRadius: 20,
-    marginBottom: 12,
+    padding: spacing.md,
+    borderRadius: radius.lg,
+    marginBottom: spacing.md,
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   cardContent: {
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   cardFooter: {
     flexDirection: 'row',

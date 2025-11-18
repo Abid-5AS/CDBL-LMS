@@ -97,10 +97,10 @@ export function ManagerDashboard({ userName, userRole }: ManagerDashboardProps) 
             </ThemedCard>
 
             <ThemedCard style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: '#FF9800' + '20' }]}>
-                <Clock size={24} color="#FF9800" />
+              <View style={[styles.statIcon, { backgroundColor: colors.warningContainer }]}>
+                <Clock size={24} color={colors.warning} />
               </View>
-              <Text style={[styles.statValue, { color: '#FF9800' }]}>
+              <Text style={[styles.statValue, { color: colors.warning }]}>
                 {stats?.pendingApprovals || approvals.length}
               </Text>
               <Text
@@ -119,10 +119,10 @@ export function ManagerDashboard({ userName, userRole }: ManagerDashboardProps) 
             </ThemedCard>
 
             <ThemedCard style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: '#4CAF50' + '20' }]}>
-                <CheckCircle size={24} color="#4CAF50" />
+              <View style={[styles.statIcon, { backgroundColor: colors.successContainer }]}>
+                <CheckCircle size={24} color={colors.success} />
               </View>
-              <Text style={[styles.statValue, { color: '#4CAF50' }]}>
+              <Text style={[styles.statValue, { color: colors.success }]}>
                 {stats?.approvedThisMonth || 0}
               </Text>
               <Text
@@ -168,9 +168,7 @@ export function ManagerDashboard({ userName, userRole }: ManagerDashboardProps) 
                     style={[
                       styles.approvalItem,
                       {
-                        backgroundColor: isDark
-                          ? 'rgba(255,255,255,0.05)'
-                          : 'rgba(0,0,0,0.03)',
+                        backgroundColor: colors.surfaceVariant,
                       },
                     ]}
                     onPress={() => router.push('/approvals')}
@@ -198,8 +196,8 @@ export function ManagerDashboard({ userName, userRole }: ManagerDashboardProps) 
                         {approval.leaveType} • {approval.workingDays} days
                       </Text>
                     </View>
-                    <View style={[styles.pendingBadge, { backgroundColor: '#FF9800' + '20' }]}>
-                      <Text style={[styles.pendingText, { color: '#FF9800' }]}>
+                    <View style={[styles.pendingBadge, { backgroundColor: colors.warningContainer }]}>
+                      <Text style={[styles.pendingText, { color: colors.warning }]}>
                         Pending
                       </Text>
                     </View>
@@ -211,7 +209,7 @@ export function ManagerDashboard({ userName, userRole }: ManagerDashboardProps) 
                 style={[styles.approveAllButton, { backgroundColor: colors.primary }]}
                 onPress={() => router.push('/approvals')}
               >
-                <Text style={styles.approveAllText}>Review All Approvals</Text>
+                <Text style={[styles.approveAllText, { color: colors.onPrimary }]}>Review All Approvals</Text>
               </TouchableOpacity>
             </ThemedCard>
             </Animated.View>
@@ -244,9 +242,7 @@ export function ManagerDashboard({ userName, userRole }: ManagerDashboardProps) 
                     style={[
                       styles.teamMemberItem,
                       {
-                        backgroundColor: isDark
-                          ? 'rgba(255,255,255,0.05)'
-                          : 'rgba(0,0,0,0.03)',
+                        backgroundColor: colors.surfaceVariant,
                       },
                     ]}
                   >
@@ -300,146 +296,147 @@ export function ManagerDashboard({ userName, userRole }: ManagerDashboardProps) 
   );
 }
 
+import { spacing, radius, typography } from '../../theme/designTokens';
+
 const styles = StyleSheet.create({
   header: {
-    marginBottom: 24,
-    paddingTop: 20,
+    marginBottom: spacing.lg,
+    paddingTop: radius.lg,
   },
   greeting: {
-    fontSize: 16,
-    fontWeight: '500',
-    marginBottom: 4,
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
+    marginBottom: spacing.xs,
   },
   name: {
-    fontSize: 32,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: typography.display.fontSize,
+    fontWeight: typography.display.fontWeight,
+    marginBottom: spacing.xs,
   },
   role: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: radius.md,
+    fontWeight: typography.heading.fontWeight,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   loadingContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 60,
+    padding: spacing.xxl + spacing.lg,
   },
   statsGrid: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
+    gap: spacing.md,
+    marginBottom: spacing.md,
   },
   statCard: {
     flex: 1,
-    padding: 16,
+    padding: spacing.md,
     alignItems: 'center',
   },
   statIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: spacing.xxl + spacing.sm,
+    height: spacing.xxl + spacing.sm,
+    borderRadius: radius.xl,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   statValue: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: typography.display.fontSize - 4,
+    fontWeight: typography.display.fontWeight,
+    marginBottom: spacing.xs,
   },
   statLabel: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: typography.caption.fontSize - 1,
+    fontWeight: typography.heading.fontWeight,
     textAlign: 'center',
   },
   card: {
-    marginBottom: 16,
-    padding: 16,
+    marginBottom: spacing.md,
+    padding: spacing.md,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   cardTitle: {
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: typography.heading.fontSize,
+    fontWeight: typography.heading.fontWeight,
   },
   viewAllText: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: radius.md,
+    fontWeight: typography.heading.fontWeight,
   },
   approvalsList: {
-    gap: 12,
-    marginBottom: 16,
+    gap: spacing.md,
+    marginBottom: spacing.md,
   },
   approvalItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    borderRadius: 12,
+    padding: spacing.md,
+    borderRadius: radius.md,
   },
   approvalName: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.heading.fontWeight,
+    marginBottom: spacing.xs,
   },
   approvalDetails: {
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
   pendingBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.md,
   },
   pendingText: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.heading.fontWeight,
   },
   approveAllButton: {
-    padding: 14,
-    borderRadius: 12,
+    padding: radius.md,
+    borderRadius: radius.md,
     alignItems: 'center',
   },
   approveAllText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.heading.fontWeight,
   },
   countBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.md,
   },
   countText: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: radius.md,
+    fontWeight: typography.display.fontWeight,
   },
   teamList: {
-    gap: 12,
+    gap: spacing.md,
   },
   teamMemberItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    borderRadius: 12,
+    padding: spacing.md,
+    borderRadius: radius.md,
   },
   memberName: {
-    fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 4,
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.heading.fontWeight,
+    marginBottom: spacing.xs,
   },
   memberDetails: {
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
   emptyText: {
-    fontSize: 14,
+    fontSize: radius.md,
     textAlign: 'center',
-    paddingVertical: 20,
+    paddingVertical: radius.lg,
   },
 });

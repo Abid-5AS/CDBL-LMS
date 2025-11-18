@@ -7,6 +7,7 @@ import { ThemedCard } from '@/src/components/shared/ThemedCard';
 import { SyncStatusBanner } from '@/src/components/shared/SyncStatusBanner';
 import { format, parseISO, eachDayOfInterval } from 'date-fns';
 import { X } from 'lucide-react-native';
+import { spacing, typography, radius } from '@/src/theme/designTokens';
 
 export default function CalendarScreen() {
   const { colors, isDark } = useTheme();
@@ -30,9 +31,9 @@ export default function CalendarScreen() {
 
           // Color code by status
           let color = colors.primary;
-          if (app.status === 'approved') color = '#4CAF50';
-          if (app.status === 'pending') color = '#FF9800';
-          if (app.status === 'rejected') color = '#F44336';
+          if (app.status === 'approved') color = colors.success;
+          if (app.status === 'pending') color = colors.warning;
+          if (app.status === 'rejected') color = colors.error;
 
           if (!marks[dateKey]) {
             marks[dateKey] = {
@@ -102,11 +103,11 @@ export default function CalendarScreen() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'approved':
-        return '#4CAF50';
+        return colors.success;
       case 'pending':
-        return '#FF9800';
+        return colors.warning;
       case 'rejected':
-        return '#F44336';
+        return colors.error;
       default:
         return colors.primary;
     }
@@ -168,10 +169,10 @@ export default function CalendarScreen() {
               textSectionTitleColor:
                 'textSecondary' in colors ? colors.textSecondary : colors.onSurfaceVariant,
               selectedDayBackgroundColor: colors.primary,
-              selectedDayTextColor: '#FFFFFF',
+              selectedDayTextColor: colors.onPrimary,
               todayTextColor: colors.primary,
               dayTextColor: 'text' in colors ? colors.text : colors.onSurface,
-              textDisabledColor: isDark ? '#4A4A4A' : '#D1D1D6',
+              textDisabledColor: colors.disabled,
               monthTextColor: 'text' in colors ? colors.text : colors.onSurface,
               indicatorColor: colors.primary,
               arrowColor: colors.primary,
@@ -203,7 +204,7 @@ export default function CalendarScreen() {
 
           <ThemedCard style={styles.legendCard}>
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#4CAF50' }]} />
+              <View style={[styles.legendDot, { backgroundColor: colors.success }]} />
               <Text
                 style={[
                   styles.legendText,
@@ -215,7 +216,7 @@ export default function CalendarScreen() {
             </View>
 
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#FF9800' }]} />
+              <View style={[styles.legendDot, { backgroundColor: colors.warning }]} />
               <Text
                 style={[
                   styles.legendText,
@@ -227,7 +228,7 @@ export default function CalendarScreen() {
             </View>
 
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#F44336' }]} />
+              <View style={[styles.legendDot, { backgroundColor: colors.error }]} />
               <Text
                 style={[
                   styles.legendText,
@@ -295,7 +296,7 @@ export default function CalendarScreen() {
               >
                 Approved
               </Text>
-              <Text style={[styles.statValue, { color: '#4CAF50' }]}>
+              <Text style={[styles.statValue, { color: colors.success }]}>
                 {applications.filter((a) => a.status === 'approved').length}
               </Text>
             </View>
@@ -314,7 +315,7 @@ export default function CalendarScreen() {
               >
                 Pending
               </Text>
-              <Text style={[styles.statValue, { color: '#FF9800' }]}>
+              <Text style={[styles.statValue, { color: colors.warning }]}>
                 {applications.filter((a) => a.status === 'pending').length}
               </Text>
             </View>
@@ -334,7 +335,7 @@ export default function CalendarScreen() {
             style={[
               styles.modalContent,
               {
-                backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
+                backgroundColor: colors.surface,
               },
             ]}
           >
@@ -377,9 +378,7 @@ export default function CalendarScreen() {
                     style={[
                       styles.leaveItem,
                       {
-                        backgroundColor: isDark
-                          ? 'rgba(255, 255, 255, 0.05)'
-                          : 'rgba(0, 0, 0, 0.03)',
+                        backgroundColor: colors.surfaceVariant,
                         borderLeftColor: getStatusColor(leave.status),
                       },
                     ]}
@@ -463,70 +462,70 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 20,
-    paddingBottom: 100,
+    padding: spacing.lg,
+    paddingBottom: spacing.xxl,
   },
   header: {
-    marginBottom: 24,
-    paddingTop: 20,
+    marginBottom: spacing.lg,
+    paddingTop: spacing.lg,
   },
   title: {
-    fontSize: 34,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: typography.display.fontSize,
+    fontWeight: typography.display.fontWeight,
+    marginBottom: spacing.xs,
   },
   subtitle: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
   calendarCard: {
-    padding: 16,
-    marginBottom: 24,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.heading.fontWeight,
     letterSpacing: 0.5,
-    marginBottom: 8,
-    marginLeft: 4,
+    marginBottom: spacing.sm,
+    marginLeft: spacing.xs,
   },
   legendCard: {
-    padding: 16,
-    gap: 12,
+    padding: spacing.md,
+    gap: spacing.md,
   },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: spacing.md,
   },
   legendDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+    width: spacing.md,
+    height: spacing.md,
+    borderRadius: radius.sm,
   },
   legendText: {
-    fontSize: 15,
-    fontWeight: '500',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
   statsCard: {
-    padding: 16,
+    padding: spacing.md,
   },
   statRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: spacing.sm,
   },
   statLabel: {
-    fontSize: 15,
-    fontWeight: '500',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
   statValue: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.display.fontWeight,
   },
   modalOverlay: {
     flex: 1,
@@ -534,69 +533,69 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingTop: 20,
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
+    paddingTop: spacing.lg,
     maxHeight: '80%',
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 16,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md,
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: typography.heading.fontSize,
+    fontWeight: typography.display.fontWeight,
   },
   modalScroll: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xxl,
   },
   noLeavesText: {
-    fontSize: 15,
-    fontWeight: '500',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
     textAlign: 'center',
-    paddingVertical: 40,
+    paddingVertical: spacing.xxl,
   },
   leaveItem: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
+    padding: spacing.md,
+    borderRadius: radius.md,
+    marginBottom: spacing.md,
     borderLeftWidth: 4,
   },
   leaveHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   leaveType: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.heading.fontWeight,
   },
   statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.md,
   },
   statusText: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.heading.fontWeight,
   },
   leaveDates: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginBottom: 4,
+    fontSize: radius.md,
+    fontWeight: typography.body.fontWeight,
+    marginBottom: spacing.xs,
   },
   leaveReason: {
-    fontSize: 14,
-    fontWeight: '400',
-    marginBottom: 8,
+    fontSize: radius.md,
+    fontWeight: typography.body.fontWeight,
+    marginBottom: spacing.sm,
   },
   leaveDays: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.heading.fontWeight,
   },
 });

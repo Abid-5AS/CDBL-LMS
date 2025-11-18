@@ -11,7 +11,7 @@ import {
 import { router } from 'expo-router';
 import { ThemedCard } from '../src/components/shared/ThemedCard';
 import { ThemedButton } from '../src/components/shared/ThemedButton';
-import { useTheme } from '../src/providers/ThemeProvider';
+import { useTheme } from '@/src/providers/ThemeProvider';
 import { useAuthStore } from '../src/store/authStore';
 import { useUserProfile } from '../src/hooks/useUserProfile';
 import { useLeaveBalances } from '../src/hooks/useLeaveBalances';
@@ -28,6 +28,7 @@ import {
   XCircle,
   LogOut,
 } from 'lucide-react-native';
+import { spacing, radius, typography } from '../src/theme/designTokens';
 
 export default function ProfileScreen() {
   const { colors, isDark } = useTheme();
@@ -85,19 +86,19 @@ export default function ProfileScreen() {
       label: 'Approved',
       value: approvedApplications,
       icon: CheckCircle,
-      color: '#4CAF50',
+      color: colors.success,
     },
     {
       label: 'Pending',
       value: pendingApplications,
       icon: Clock,
-      color: '#FF9800',
+      color: colors.warning,
     },
     {
       label: 'Rejected',
       value: rejectedApplications,
       icon: XCircle,
-      color: '#F44336',
+      color: colors.error,
     },
   ];
 
@@ -467,37 +468,37 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 20,
-    paddingBottom: 100,
+    padding: spacing.lg,
+    paddingBottom: spacing.xxl * 2,
   },
   header: {
-    marginBottom: 24,
-    paddingTop: 60,
+    marginBottom: spacing.lg,
+    paddingTop: spacing.xxl,
   },
   backButton: {
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   backText: {
-    fontSize: 17,
-    fontWeight: '600',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.heading.fontWeight,
   },
   title: {
-    fontSize: 34,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: typography.display.fontSize,
+    fontWeight: typography.display.fontWeight,
+    marginBottom: spacing.xs,
   },
   subtitle: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
   loadingContainer: {
-    padding: 60,
+    padding: spacing.xxl,
     alignItems: 'center',
   },
   profileCard: {
-    padding: 24,
+    padding: spacing.lg,
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   avatar: {
     width: 96,
@@ -505,26 +506,26 @@ const styles = StyleSheet.create({
     borderRadius: 48,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   name: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 24,
+    fontSize: radius.xl,
+    fontWeight: typography.display.fontWeight,
+    marginBottom: spacing.lg,
   },
   infoGrid: {
     width: '100%',
-    gap: 16,
+    gap: spacing.md,
   },
   infoItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: spacing.md,
   },
   infoIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: spacing.xxl,
+    height: spacing.xxl,
+    borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -532,86 +533,86 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   infoLabel: {
-    fontSize: 13,
-    fontWeight: '500',
-    marginBottom: 2,
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.caption.fontWeight,
+    marginBottom: spacing.xs / 2,
   },
   infoValue: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.heading.fontWeight,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.heading.fontWeight,
     letterSpacing: 0.5,
-    marginBottom: 12,
-    marginLeft: 4,
+    marginBottom: spacing.md,
+    marginLeft: spacing.xs,
   },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: spacing.md,
   },
   statCard: {
     flex: 1,
     minWidth: '47%',
-    padding: 16,
+    padding: spacing.md,
     alignItems: 'center',
   },
   statIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: spacing.xxl + spacing.xs,
+    height: spacing.xxl + spacing.xs,
+    borderRadius: spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   statValue: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: radius.xl,
+    fontWeight: typography.display.fontWeight,
+    marginBottom: spacing.xs,
   },
   statLabel: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: typography.heading.fontWeight,
     textAlign: 'center',
   },
   balanceCard: {
-    padding: 20,
+    padding: radius.lg,
   },
   balanceRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: spacing.sm,
   },
   balanceLabel: {
-    fontSize: 15,
-    fontWeight: '500',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
   balanceValue: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.display.fontWeight,
   },
   balanceDivider: {
     height: 1,
     backgroundColor: 'rgba(128, 128, 128, 0.2)',
-    marginVertical: 12,
+    marginVertical: spacing.md,
   },
   logoutButton: {
-    marginTop: 20,
+    marginTop: radius.lg,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
   logoutIcon: {
-    marginRight: 8,
+    marginRight: spacing.sm,
   },
   logoutText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.heading.fontWeight,
   },
 });

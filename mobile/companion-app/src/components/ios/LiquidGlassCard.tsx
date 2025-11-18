@@ -1,6 +1,7 @@
 import React from "react";
 import { View, StyleSheet, ViewStyle, Platform } from "react-native";
 import { useTheme } from "../../providers/ThemeProvider";
+import { spacing } from "../../theme/designTokens";
 
 // Import @expo/ui components for true iOS 26 Liquid Glass
 // Note: These are SwiftUI-backed and work best in development builds
@@ -39,7 +40,7 @@ export function LiquidGlassCardComponent({
   intensity = 80,
   materialColor = 'systemThickMaterial',
 }: LiquidGlassCardProps) {
-  const { isDark } = useTheme();
+  const { isDark, colors } = useTheme();
 
   // iOS with @expo/ui - True Liquid Glass
   if (Platform.OS === "ios" && LiquidGlassCard && LiquidGlassBackground) {
@@ -85,7 +86,7 @@ export function LiquidGlassCardComponent({
         styles.androidCard,
         style,
         {
-          backgroundColor: isDark ? "#1C1C1E" : "#FFFFFF",
+          backgroundColor: colors.surface,
         },
       ]}
     >
@@ -113,7 +114,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   content: {
-    padding: 16,
+    padding: spacing.md,
     backgroundColor: "rgba(255, 255, 255, 0.1)",
     borderRadius: 20,
     borderWidth: 1,
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255, 255, 255, 0.1)",
   },
   androidCard: {
-    padding: 16,
+    padding: spacing.md,
     borderRadius: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },

@@ -15,15 +15,17 @@ export default function ModalScreen() {
   );
 }
 
+import { spacing, radius } from '@/src/theme/designTokens';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    padding: radius.lg,
   },
   link: {
-    marginTop: 15,
-    paddingVertical: 15,
+    marginTop: spacing.md - 1,
+    paddingVertical: spacing.md - 1,
   },
 });

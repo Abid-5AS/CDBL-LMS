@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Stack, router, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
-import { ThemeProvider } from "../src/providers/ThemeProvider";
+import { ThemeProvider } from "@/src/providers/ThemeProvider";
 import { useAuthStore } from "../src/store/authStore";
 import { initDatabase } from "../src/database";
 import { ErrorBoundary } from "../src/components/errors/ErrorBoundary";
@@ -93,11 +93,11 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   return (
-    <ErrorBoundary>
-      <ThemeProvider>
+    <ThemeProvider>
+      <ErrorBoundary>
         <RootLayoutNav />
         <StatusBar style="auto" />
-      </ThemeProvider>
-    </ErrorBoundary>
+      </ErrorBoundary>
+    </ThemeProvider>
   );
 }

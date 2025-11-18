@@ -132,7 +132,7 @@ export function ThemedButton({
       return { color: colors.primary };
     }
     if (variant === "primary") {
-      return { color: "#FFFFFF" };
+      return { color: colors.onPrimary };
     }
     // secondary variant
     return {

@@ -13,13 +13,13 @@ export const balanceRules: Rule[] = [
     id: "BAL_001",
     name: "Sufficient Balance Check",
     description: "Ensure sufficient leave balance is available",
-    leaveTypes: ["ALL"],
+    leaveTypes: ["EARNED", "CASUAL", "MEDICAL", "MATERNITY", "PATERNITY", "STUDY", "SPECIAL", "SPECIAL_DISABILITY", "QUARANTINE", "EXTRAWITHPAY", "EXTRAWITHOUTPAY"],
     priority: 100,
     validate: (context: ValidationContext): RuleResult => {
-      const { leaveRequest, balance } = context;
+      const { leaveRequest, currentBalance } = context;
       const { type, workingDays = 0 } = leaveRequest;
 
-      if (!balance) {
+      if (!currentBalance) {
         return {
           passed: true,
           severity: "WARNING",
@@ -28,7 +28,19 @@ export const balanceRules: Rule[] = [
         };
       }
 
-      const { available } = balance;
+      // Get the balance for the requested leave type
+      const requestedBalance = currentBalance[type];
+      if (!requestedBalance) {
+        return {
+          passed: false,
+          severity: "ERROR",
+          code: "BAL_TYPE_NOT_FOUND",
+          message: `Balance for ${type} not found.`,
+        };
+      }
+
+      // Calculate available balance (closing - used + pending)
+      const available = requestedBalance.closing - requestedBalance.used;
 
       if (workingDays > available) {
         return {
@@ -38,7 +50,7 @@ export const balanceRules: Rule[] = [
           message: `Insufficient ${type} balance. Available: ${available} days, Requested: ${workingDays} days.`,
           suggestions: [
             {
-              type: "REDUCE_DAYS",
+              type: "SPLIT_REQUEST",
               reasoning: `Reduce your request to ${available} days or less to match your available balance.`,
               priority: 100,
             },
@@ -61,9 +73,10 @@ export const balanceRules: Rule[] = [
       };
     },
     explain: (context: ValidationContext): string => {
-      const { balance, leaveRequest } = context;
-      const { workingDays = 0 } = leaveRequest;
-      const available = balance?.available || 0;
+      const { currentBalance, leaveRequest } = context;
+      const { type, workingDays = 0 } = leaveRequest;
+      const requestedBalance = currentBalance?.[type];
+      const available = requestedBalance ? requestedBalance.closing - requestedBalance.used : 0;
       return `Balance Policy: You must have sufficient leave balance. Available: ${available} days, Requested: ${workingDays} days, Remaining after: ${available - workingDays} days.`;
     },
   },
@@ -72,13 +85,13 @@ export const balanceRules: Rule[] = [
     id: "BAL_002",
     name: "Low Balance Warning",
     description: "Warn if balance will be low after this request",
-    leaveTypes: ["ALL"],
+    leaveTypes: ["EARNED", "CASUAL", "MEDICAL", "MATERNITY", "PATERNITY", "STUDY", "SPECIAL", "SPECIAL_DISABILITY", "QUARANTINE", "EXTRAWITHPAY", "EXTRAWITHOUTPAY"],
     priority: 60,
     validate: (context: ValidationContext): RuleResult => {
-      const { leaveRequest, balance } = context;
-      const { workingDays = 0 } = leaveRequest;
+      const { leaveRequest, currentBalance } = context;
+      const { type, workingDays = 0 } = leaveRequest;
 
-      if (!balance) {
+      if (!currentBalance) {
         return {
           passed: true,
           severity: "INFO",
@@ -87,7 +100,17 @@ export const balanceRules: Rule[] = [
         };
       }
 
-      const { available } = balance;
+      const requestedBalance = currentBalance[type];
+      if (!requestedBalance) {
+        return {
+          passed: true,
+          severity: "INFO",
+          code: "BAL_TYPE_NOT_FOUND",
+          message: `Balance for ${type} not found`,
+        };
+      }
+
+      const available = requestedBalance.closing - requestedBalance.used;
       const remainingAfter = available - workingDays;
 
       // Warn if less than 3 days will remain
@@ -108,9 +131,10 @@ export const balanceRules: Rule[] = [
       };
     },
     explain: (context: ValidationContext): string => {
-      const { balance, leaveRequest } = context;
-      const { workingDays = 0 } = leaveRequest;
-      const available = balance?.available || 0;
+      const { currentBalance, leaveRequest } = context;
+      const { type, workingDays = 0 } = leaveRequest;
+      const requestedBalance = currentBalance?.[type];
+      const available = requestedBalance ? requestedBalance.closing - requestedBalance.used : 0;
       const remainingAfter = available - workingDays;
       return `Balance Advisory: After this request, you'll have ${remainingAfter} days remaining. It's recommended to keep at least 3 days in reserve for emergencies.`;
     },
@@ -120,13 +144,13 @@ export const balanceRules: Rule[] = [
     id: "BAL_003",
     name: "Pending Leaves Deduction",
     description: "Account for pending leave applications",
-    leaveTypes: ["ALL"],
+    leaveTypes: ["EARNED", "CASUAL", "MEDICAL", "MATERNITY", "PATERNITY", "STUDY", "SPECIAL", "SPECIAL_DISABILITY", "QUARANTINE", "EXTRAWITHPAY", "EXTRAWITHOUTPAY"],
     priority: 95,
     validate: (context: ValidationContext): RuleResult => {
-      const { leaveRequest, balance } = context;
-      const { workingDays = 0 } = leaveRequest;
+      const { leaveRequest, currentBalance, previousLeaves } = context;
+      const { type, workingDays = 0 } = leaveRequest;
 
-      if (!balance) {
+      if (!currentBalance) {
         return {
           passed: true,
           severity: "INFO",
@@ -135,20 +159,37 @@ export const balanceRules: Rule[] = [
         };
       }
 
-      const { available, pending } = balance;
+      const requestedBalance = currentBalance[type];
+      if (!requestedBalance) {
+        return {
+          passed: true,
+          severity: "INFO",
+          code: "BAL_TYPE_NOT_FOUND",
+          message: `Balance for ${type} not found`,
+        };
+      }
 
-      if (pending > 0) {
-        const effectiveAvailable = available - pending;
+      // Calculate pending days from previous leaves
+      const pendingLeaves = previousLeaves.filter(leave =>
+        leave.status === "PENDING" &&
+        leave.type === type &&
+        leave.id
+      );
+      const pendingDays = pendingLeaves.reduce((sum, leave) => sum + leave.workingDays, 0);
+
+      if (pendingDays > 0) {
+        const available = requestedBalance.closing - requestedBalance.used;
+        const effectiveAvailable = available - pendingDays;
 
         if (workingDays > effectiveAvailable) {
           return {
             passed: false,
             severity: "ERROR",
             code: "BAL_PENDING_OVERLAP",
-            message: `You have ${pending} days pending approval. Effective available balance: ${effectiveAvailable} days. Cannot request ${workingDays} days.`,
+            message: `You have ${pendingDays} days pending approval. Effective available balance: ${effectiveAvailable} days. Cannot request ${workingDays} days.`,
             suggestions: [
               {
-                type: "WAIT_FOR_APPROVAL",
+                type: "SPLIT_REQUEST",
                 reasoning:
                   "Wait for your pending leave applications to be approved or rejected before submitting new requests.",
                 priority: 90,
@@ -161,7 +202,7 @@ export const balanceRules: Rule[] = [
           passed: true,
           severity: "WARNING",
           code: "BAL_PENDING_CONSIDERATION",
-          message: `Note: ${pending} days are pending approval. Effective available: ${effectiveAvailable} days.`,
+          message: `Note: ${pendingDays} days are pending approval. Effective available: ${effectiveAvailable} days.`,
         };
       }
 
@@ -173,9 +214,18 @@ export const balanceRules: Rule[] = [
       };
     },
     explain: (context: ValidationContext): string => {
-      const { balance } = context;
-      const pending = balance?.pending || 0;
-      return `Balance Calculation: Pending leave applications (${pending} days) are deducted from available balance to prevent over-booking. Wait for pending approvals before submitting new requests.`;
+      const { currentBalance, previousLeaves, leaveRequest } = context;
+      const { type } = leaveRequest;
+      const requestedBalance = currentBalance?.[type];
+      if (!requestedBalance) {
+        return `Balance Calculation: Balance for ${type} not found.`;
+      }
+      const pendingLeaves = previousLeaves.filter(leave =>
+        leave.status === "PENDING" &&
+        leave.type === type
+      );
+      const pendingDays = pendingLeaves.reduce((sum, leave) => sum + leave.workingDays, 0);
+      return `Balance Calculation: Pending leave applications (${pendingDays} days) are deducted from available balance to prevent over-booking. Wait for pending approvals before submitting new requests.`;
     },
   },
 ];

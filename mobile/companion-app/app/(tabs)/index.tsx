@@ -6,11 +6,11 @@ import {
   Text,
   RefreshControl,
   ActivityIndicator,
-  TouchableOpacity,
+  useWindowDimensions,
 } from "react-native";
-import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeIn } from "react-native-reanimated";
 import { router } from "expo-router";
-import { ThemedCard } from "@/src/components/shared/ThemedCard";
+import { SectionHeader, ThemedCard } from "@/src/components/shared";
 import { ThemedButton } from "@/src/components/shared/ThemedButton";
 import { useTheme } from "@/src/providers/ThemeProvider";
 import { useAuthStore } from "@/src/store/authStore";
@@ -21,22 +21,34 @@ import { syncService } from "@/src/sync/SyncService";
 import { SyncStatusBanner } from "@/src/components/shared/SyncStatusBanner";
 import { ManagerDashboard } from "@/src/components/dashboard/ManagerDashboard";
 import { useState } from "react";
-import { FileText, Calendar, Clock, TrendingUp } from "lucide-react-native";
+import { Clock } from "lucide-react-native";
+import { spacing, typography, radius } from "@/src/theme/designTokens";
 
 export default function HomeScreen() {
   const { colors, isDark } = useTheme();
+  const { width } = useWindowDimensions();
   const user = useAuthStore((state) => state.user);
-  const { profile, isLoading: profileLoading, refresh: refreshProfile } = useUserProfile();
-  const { balances, isLoading: balancesLoading, getTotalAvailable, refresh: refreshBalances } = useLeaveBalances();
-  const { applications, isLoading: appsLoading, refresh: refreshApps } = useLeaveApplications();
+  const { profile, isLoading: profileLoading, refresh: refreshProfile } =
+    useUserProfile();
+  const {
+    balances,
+    isLoading: balancesLoading,
+    isRefreshing: balancesRefreshing,
+    getTotalAvailable,
+    refresh: refreshBalances,
+  } = useLeaveBalances();
+  const {
+    applications,
+    isLoading: appsLoading,
+    isRefreshing: appsRefreshing,
+    refresh: refreshApps,
+  } = useLeaveApplications();
 
   const [refreshing, setRefreshing] = useState(false);
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    // Trigger sync with server
     await syncService.sync();
-    // Refresh local data
     await Promise.all([refreshProfile(), refreshBalances(), refreshApps()]);
     setRefreshing(false);
   };
@@ -46,13 +58,28 @@ export default function HomeScreen() {
   );
 
   const isLoading = profileLoading || balancesLoading || appsLoading;
+  const isRefreshingData =
+    balancesRefreshing || appsRefreshing || refreshing;
+  const totalAvailable = getTotalAvailable();
+  const heroSubtitle = `You have ${totalAvailable} days ready to spend`;
+  const statusColors: Record<string, string> = {
+    pending: colors.warning,
+    approved: colors.success,
+    rejected: colors.error,
+    draft: colors.textSecondary,
+  };
 
-  // Get top 3 leave balances
   const topBalances = balances.slice(0, 3);
 
-  // Determine if user is a manager/approver (MANAGER, HR, CEO)
-  const userRole = user?.role || profile?.role || 'EMPLOYEE';
-  const isApprover = ['MANAGER', 'HR', 'CEO'].includes(userRole.toUpperCase());
+  const userRole = user?.role || profile?.role || "EMPLOYEE";
+  const isApprover = ["MANAGER", "HR", "CEO"].includes(
+    userRole.toUpperCase()
+  );
+
+  const heroNameStyle = {
+    ...styles.heroName,
+    fontSize: width < 380 ? typography.heading.fontSize : typography.display.fontSize,
+  };
 
   return (
     <>
@@ -71,323 +98,321 @@ export default function HomeScreen() {
       >
         {isApprover ? (
           <ManagerDashboard
-            userName={user?.name || profile?.name || 'Manager'}
+            userName={user?.name || profile?.name || "Manager"}
             userRole={userRole}
           />
         ) : (
           <>
             <Animated.View
-              style={styles.header}
               entering={FadeIn.duration(600)}
+              style={styles.heroWrapper}
             >
-        <Text
-          style={[
-            styles.greeting,
-            {
-              color:
-                "textSecondary" in colors
-                  ? colors.textSecondary
-                  : colors.onSurfaceVariant,
-            },
-          ]}
-        >
-          Welcome back,
-        </Text>
-        <Text
-          style={[
-            styles.name,
-            { color: "text" in colors ? colors.text : colors.onSurface },
-          ]}
-        >
-          {profile?.name || "Employee"}
-        </Text>
-        {profile?.department && (
-          <Text
-            style={[
-              styles.department,
-              {
-                color:
-                  "textSecondary" in colors
-                    ? colors.textSecondary
-                    : colors.onSurfaceVariant,
-              },
-            ]}
-          >
-            {profile.department} • {profile.role || "Employee"}
-          </Text>
-        )}
-      </Animated.View>
-
-      {isLoading && !refreshing ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-        </View>
-      ) : (
-        <>
-          {/* Quick Stats */}
-          <Animated.View
-            style={styles.statsGrid}
-            entering={FadeInDown.delay(200).springify()}
-          >
-            <ThemedCard style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: colors.primary + "20" }]}>
-                <TrendingUp size={24} color={colors.primary} />
-              </View>
-              <Text style={[styles.statValue, { color: colors.primary }]}>
-                {getTotalAvailable()}
-              </Text>
-              <Text
-                style={[
-                  styles.statLabel,
-                  {
-                    color:
-                      "textSecondary" in colors
-                        ? colors.textSecondary
-                        : colors.onSurfaceVariant,
-                  },
-                ]}
+              <ThemedCard
+                style={[styles.heroCard, { backgroundColor: colors.primary }]}
               >
-                Days Available
-              </Text>
-            </ThemedCard>
-
-            <ThemedCard style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: "#FF9800" + "20" }]}>
-                <Clock size={24} color="#FF9800" />
-              </View>
-              <Text style={[styles.statValue, { color: "#FF9800" }]}>
-                {pendingApplications.length}
-              </Text>
-              <Text
-                style={[
-                  styles.statLabel,
-                  {
-                    color:
-                      "textSecondary" in colors
-                        ? colors.textSecondary
-                        : colors.onSurfaceVariant,
-                  },
-                ]}
-              >
-                Pending
-              </Text>
-            </ThemedCard>
-          </Animated.View>
-
-          {/* Leave Balances Overview */}
-          <Animated.View entering={FadeInDown.delay(400).springify()}>
-            <ThemedCard style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Text
-                style={[
-                  styles.cardTitle,
-                  { color: "text" in colors ? colors.text : colors.onSurface },
-                ]}
-              >
-                Leave Balances
-              </Text>
-              <TouchableOpacity onPress={() => router.push("/(tabs)/balance")}>
-                <Text style={[styles.viewAllText, { color: colors.primary }]}>
-                  View All
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {topBalances.length > 0 ? (
-              <View style={styles.balancesContainer}>
-                {topBalances.map((balance) => (
-                  <View key={balance.id} style={styles.balanceRow}>
-                    <View style={{ flex: 1 }}>
-                      <Text
-                        style={[
-                          styles.balanceType,
-                          { color: "text" in colors ? colors.text : colors.onSurface },
-                        ]}
-                      >
-                        {balance.leave_type}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.balanceDetails,
-                          {
-                            color:
-                              "textSecondary" in colors
-                                ? colors.textSecondary
-                                : colors.onSurfaceVariant,
-                          },
-                        ]}
-                      >
-                        {balance.used_days} used • {balance.pending_days} pending
-                      </Text>
-                    </View>
-                    <Text style={[styles.balanceValue, { color: colors.primary }]}>
-                      {balance.available_days}/{balance.total_days}
+                <View style={styles.heroHeader}>
+                  <Text style={[styles.heroGreeting, { color: colors.onPrimary }]}>Welcome back,</Text>
+                  <Text style={[heroNameStyle, { color: colors.onPrimary }]}>
+                    {profile?.name || "Employee"}
+                  </Text>
+                  {profile?.department && (
+                    <Text style={[styles.heroMeta, { color: colors.onPrimary, opacity: 0.9 }]}>
+                      {profile.department} • {profile.role || "Employee"}
+                    </Text>
+                  )}
+                </View>
+                <Text style={[styles.heroSubtitle, { color: colors.onPrimary }]}>{heroSubtitle}</Text>
+                <View style={styles.heroChips}>
+                  <View style={styles.heroChip}>
+                    <Text style={[styles.heroChipLabel, { color: colors.onPrimary, opacity: 0.85 }]}>Available</Text>
+                    <Text style={[styles.heroChipValue, { color: colors.onPrimary }]}>
+                      {totalAvailable} days
                     </Text>
                   </View>
-                ))}
+                  <View style={[styles.heroChip, styles.heroChipLast]}>
+                    <Text style={[styles.heroChipLabel, { color: colors.onPrimary, opacity: 0.85 }]}>Pending</Text>
+                    <Text style={[styles.heroChipValue, { color: colors.onPrimary }]}>
+                      {pendingApplications.length} requests
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.heroFooter}>
+                  <Text style={[styles.heroFooterText, { color: colors.onPrimary, opacity: 0.9 }]}>
+                    Tap “Apply Leave” to start a request
+                  </Text>
+                  <Clock size={20} color={colors.onPrimary} />
+                </View>
+              </ThemedCard>
+            </Animated.View>
+
+            {isRefreshingData && (
+              <View
+                style={[
+                  styles.refreshBanner,
+                  {
+                    backgroundColor:
+                      "surfaceVariant" in colors
+                        ? colors.surfaceVariant
+                        : colors.onSurface,
+                  },
+                ]}
+              >
+                <ActivityIndicator
+                  animating
+                  size="small"
+                  color={colors.primary}
+                />
+                <Text
+                  style={[
+                    styles.refreshText,
+                    {
+                      color:
+                        "text" in colors
+                          ? colors.text
+                          : colors.onSurfaceVariant,
+                    },
+                  ]}
+                >
+                  Syncing live data…
+                </Text>
+              </View>
+            )}
+
+            {isLoading && !isRefreshingData ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={colors.primary} />
               </View>
             ) : (
-              <Text
-                style={[
-                  styles.emptyText,
-                  {
-                    color:
-                      "textSecondary" in colors
-                        ? colors.textSecondary
-                        : colors.onSurfaceVariant,
-                  },
-                ]}
-              >
-                No leave balances available
-              </Text>
-            )}
-          </ThemedCard>
-          </Animated.View>
-
-          {/* Recent Applications */}
-          {pendingApplications.length > 0 && (
-            <Animated.View entering={FadeInDown.delay(500).springify()}>
-              <ThemedCard style={styles.card}>
-              <View style={styles.cardHeader}>
-                <Text
-                  style={[
-                    styles.cardTitle,
-                    { color: "text" in colors ? colors.text : colors.onSurface },
-                  ]}
+              <>
+                <Animated.View
+                  entering={FadeInDown.delay(200).springify()}
+                  style={styles.section}
                 >
-                  Pending Applications
-                </Text>
-                <TouchableOpacity onPress={() => router.push("/(tabs)/history")}>
-                  <Text style={[styles.viewAllText, { color: colors.primary }]}>
-                    View All
-                  </Text>
-                </TouchableOpacity>
-              </View>
+                  <ThemedCard style={styles.card}>
+                    <SectionHeader
+                      title="Leave Balances"
+                      subtitle="Live from the HR system"
+                      actionLabel="View all"
+                      onAction={() => router.push("/(tabs)/balance")}
+                    />
+                    <View style={styles.balanceGrid}>
+                      {topBalances.length > 0 ? (
+                        topBalances.map((balance) => {
+                          const percent = balance.total_days
+                            ? (balance.available_days / balance.total_days) * 100
+                            : 0;
 
-              <View style={styles.applicationsContainer}>
-                {pendingApplications.slice(0, 2).map((app) => (
-                  <View
-                    key={app.id}
-                    style={[
-                      styles.applicationItem,
-                      {
-                        backgroundColor: isDark
-                          ? "rgba(255,255,255,0.05)"
-                          : "rgba(0,0,0,0.03)",
-                      },
-                    ]}
+                          return (
+                            <View key={balance.id} style={styles.balanceItem}>
+                              <View style={styles.balanceItemHeader}>
+                                <View style={{ flexShrink: 1, marginRight: spacing.sm }}>
+                                  <Text
+                                    style={[
+                                      styles.balanceType,
+                                      {
+                                        color:
+                                          "text" in colors
+                                            ? colors.text
+                                            : colors.onSurface,
+                                      },
+                                    ]}
+                                  >
+                                    {balance.leave_type}
+                                  </Text>
+                                  <Text
+                                    style={[
+                                      styles.balanceDetails,
+                                      {
+                                        color:
+                                          "textSecondary" in colors
+                                            ? colors.textSecondary
+                                            : colors.onSurfaceVariant,
+                                      },
+                                    ]}
+                                  >
+                                    {balance.used_days} used • {balance.pending_days} pending
+                                  </Text>
+                                </View>
+                                <View style={styles.balanceValueGroup}>
+                                  <Text
+                                    style={[
+                                      styles.balanceValue,
+                                      { color: colors.primary },
+                                    ]}
+                                  >
+                                    {balance.available_days}
+                                  </Text>
+                                  <Text
+                                    style={[
+                                      styles.balanceOutOf,
+                                      {
+                                        color:
+                                          "textSecondary" in colors
+                                            ? colors.textSecondary
+                                            : colors.onSurfaceVariant,
+                                      },
+                                    ]}
+                                  >
+                                    / {balance.total_days}
+                                  </Text>
+                                </View>
+                              </View>
+                              <View
+                                style={[
+                                  styles.progressTrack,
+                                  {
+                                    backgroundColor: isDark
+                                      ? "rgba(255,255,255,0.1)"
+                                      : "rgba(0,0,0,0.08)",
+                                  },
+                                ]}
+                              >
+                                <View
+                                  style={[
+                                    styles.progressFill,
+                                    {
+                                      width: `${Math.min(percent, 100)}%`,
+                                      backgroundColor: colors.primary,
+                                    },
+                                  ]}
+                                />
+                              </View>
+                            </View>
+                          );
+                        })
+                      ) : (
+                        <Text
+                          style={[
+                            styles.emptyText,
+                            {
+                              color:
+                                "textSecondary" in colors
+                                  ? colors.textSecondary
+                                  : colors.onSurfaceVariant,
+                            },
+                          ]}
+                        >
+                          No leave balances available
+                        </Text>
+                      )}
+                    </View>
+                  </ThemedCard>
+                </Animated.View>
+
+                {pendingApplications.length > 0 && (
+                  <Animated.View
+                    entering={FadeInDown.delay(400).springify()}
+                    style={styles.section}
                   >
-                    <View style={{ flex: 1 }}>
-                      <Text
-                        style={[
-                          styles.applicationType,
-                          { color: "text" in colors ? colors.text : colors.onSurface },
-                        ]}
-                      >
-                        {app.leave_type}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.applicationDays,
-                          {
-                            color:
-                              "textSecondary" in colors
-                                ? colors.textSecondary
-                                : colors.onSurfaceVariant,
-                          },
-                        ]}
-                      >
-                        {app.days_requested} days • {app.status}
-                      </Text>
-                    </View>
-                    <View
-                      style={[
-                        styles.statusBadge,
-                        {
-                          backgroundColor:
-                            app.status === "draft" ? "#9E9E9E" + "20" : "#FF9800" + "20",
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.statusText,
-                          {
-                            color: app.status === "draft" ? "#9E9E9E" : "#FF9800",
-                          },
-                        ]}
-                      >
-                        {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
-                      </Text>
-                    </View>
-                  </View>
-                ))}
-              </View>
-            </ThemedCard>
-            </Animated.View>
-          )}
+                    <ThemedCard style={styles.card}>
+                      <SectionHeader
+                        title="Pending Applications"
+                        subtitle="Awaiting approvals"
+                        actionLabel="View history"
+                        onAction={() => router.push("/(tabs)/history")}
+                      />
+                      <View style={styles.applicationsContainer}>
+                        {pendingApplications.slice(0, 2).map((app) => (
+                          <View
+                            key={app.id}
+                            style={[
+                              styles.applicationItem,
+                              {
+                                backgroundColor: isDark
+                                  ? "rgba(255,255,255,0.05)"
+                                  : "rgba(0,0,0,0.03)",
+                              },
+                            ]}
+                          >
+                            <View style={styles.applicationContent}>
+                              <Text
+                                style={[
+                                  styles.applicationType,
+                                  {
+                                    color:
+                                      "text" in colors
+                                        ? colors.text
+                                        : colors.onSurface,
+                                  },
+                                ]}
+                              >
+                                {app.leave_type}
+                              </Text>
+                              <Text
+                                style={[
+                                  styles.applicationDays,
+                                  {
+                                    color:
+                                      "textSecondary" in colors
+                                        ? colors.textSecondary
+                                        : colors.onSurfaceVariant,
+                                  },
+                                ]}
+                              >
+                                {app.days_requested} days • {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
+                              </Text>
+                            </View>
+                            <View
+                              style={[
+                                styles.statusBadge,
+                                {
+                                  backgroundColor:
+                                    (statusColors[app.status] || colors.primary) +
+                                    "20",
+                                },
+                              ]}
+                            >
+                              <Text
+                                style={[
+                                  styles.statusText,
+                                  {
+                                    color:
+                                      statusColors[app.status] || colors.primary,
+                                  },
+                                ]}
+                              >
+                                {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
+                              </Text>
+                            </View>
+                          </View>
+                        ))}
+                      </View>
+                    </ThemedCard>
+                  </Animated.View>
+                )}
 
-          {/* Quick Actions */}
-          <Animated.View entering={FadeInDown.delay(600).springify()}>
-            <ThemedCard style={styles.card}>
-            <Text
-              style={[
-                styles.cardTitle,
-                { color: "text" in colors ? colors.text : colors.onSurface },
-              ]}
-            >
-              Quick Actions
-            </Text>
-            <View style={styles.actionsGrid}>
-              <TouchableOpacity
-                style={[
-                  styles.actionButton,
-                  {
-                    backgroundColor: isDark
-                      ? "rgba(255,255,255,0.05)"
-                      : "rgba(0,0,0,0.03)",
-                  },
-                ]}
-                onPress={() => router.push("/(tabs)/apply")}
-              >
-                <FileText size={32} color={colors.primary} />
-                <Text
-                  style={[
-                    styles.actionText,
-                    { color: "text" in colors ? colors.text : colors.onSurface },
-                  ]}
+                <Animated.View
+                  entering={FadeInDown.delay(500).springify()}
+                  style={styles.section}
                 >
-                  Apply Leave
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.actionButton,
-                  {
-                    backgroundColor: isDark
-                      ? "rgba(255,255,255,0.05)"
-                      : "rgba(0,0,0,0.03)",
-                  },
-                ]}
-                onPress={() => router.push("/(tabs)/history")}
-              >
-                <Calendar size={32} color={colors.primary} />
-                <Text
-                  style={[
-                    styles.actionText,
-                    { color: "text" in colors ? colors.text : colors.onSurface },
-                  ]}
-                >
-                  View History
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </ThemedCard>
-          </Animated.View>
-        </>
+                  <ThemedCard style={styles.card}>
+                    <SectionHeader
+                      title="Quick Actions"
+                      subtitle="Navigate your leave workflow"
+                    />
+                    <View style={styles.actionsGrid}>
+                      <ThemedButton
+                        variant="primary"
+                        onPress={() => router.push("/(tabs)/apply")}
+                        style={styles.actionButton}
+                      >
+                        Apply Leave
+                      </ThemedButton>
+                      <ThemedButton
+                        variant="outline"
+                        onPress={() => router.push("/(tabs)/history")}
+                        style={[styles.actionButton, styles.actionButtonLast]}
+                      >
+                        View History
+                      </ThemedButton>
+                    </View>
+                  </ThemedCard>
+                </Animated.View>
+              </>
+            )}
+          </>
         )}
-          {/* Platform Info */}
+        {!isApprover && (
           <View style={styles.platformInfo}>
             <Text
               style={[
@@ -405,7 +430,6 @@ export default function HomeScreen() {
                 : "Android Material 3"}
             </Text>
           </View>
-          </>
         )}
       </ScrollView>
     </>
@@ -417,155 +441,184 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 16,
-    paddingBottom: 100,
+    padding: spacing.lg,
+    paddingBottom: spacing.xxl,
   },
-  header: {
-    marginBottom: 20,
-    paddingTop: 16,
+  heroWrapper: {
+    marginBottom: spacing.lg,
   },
-  greeting: {
-    fontSize: 16,
-    fontWeight: "500",
-    marginBottom: 4,
+  heroCard: {
+    borderRadius: radius.xl,
+    padding: spacing.lg,
   },
-  name: {
-    fontSize: 32,
-    fontWeight: "700",
-    marginBottom: 4,
+  heroHeader: {
+    marginBottom: spacing.md,
   },
-  department: {
-    fontSize: 14,
-    fontWeight: "500",
+  heroGreeting: {
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.caption.fontWeight,
+    marginBottom: spacing.xs,
   },
-  statsGrid: {
+  heroName: {
+    fontSize: typography.display.fontSize,
+    fontWeight: typography.display.fontWeight,
+    marginBottom: spacing.xs,
+  },
+  heroMeta: {
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.caption.fontWeight,
+  },
+  heroSubtitle: {
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
+    marginBottom: spacing.md,
+  },
+  heroChips: {
     flexDirection: "row",
-    gap: 12,
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
-  statCard: {
+  heroChip: {
     flex: 1,
-    padding: 12,
-    alignItems: "center",
+    padding: spacing.sm,
+    borderRadius: radius.md,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    marginRight: spacing.sm,
   },
-  statIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 12,
+  heroChipLast: {
+    marginRight: 0,
   },
-  statValue: {
-    fontSize: 28,
-    fontWeight: "700",
-    marginBottom: 4,
+  heroChipLabel: {
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.caption.fontWeight,
+    marginBottom: spacing.xs,
   },
-  statLabel: {
-    fontSize: 12,
-    fontWeight: "500",
-    textAlign: "center",
+  heroChipValue: {
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
-  card: {
-    marginBottom: 12,
-    padding: 16,
-  },
-  cardHeader: {
+  heroFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
+    marginTop: spacing.sm,
   },
-  cardTitle: {
-    fontSize: 20,
-    fontWeight: "600",
+  heroFooterText: {
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.caption.fontWeight,
   },
-  viewAllText: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  balancesContainer: {
-    gap: 12,
-  },
-  balanceRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 8,
-  },
-  balanceType: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 4,
-  },
-  balanceDetails: {
-    fontSize: 13,
-    fontWeight: "500",
-  },
-  balanceValue: {
-    fontSize: 18,
-    fontWeight: "700",
-  },
-  applicationsContainer: {
-    gap: 12,
-  },
-  applicationItem: {
+  refreshBanner: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 12,
-    borderRadius: 12,
+    padding: spacing.sm,
+    borderRadius: radius.md,
+    marginBottom: spacing.md,
   },
-  applicationType: {
-    fontSize: 15,
-    fontWeight: "600",
-    marginBottom: 4,
-  },
-  applicationDays: {
-    fontSize: 13,
-    fontWeight: "500",
-  },
-  statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  actionsGrid: {
-    flexDirection: "row",
-    gap: 12,
-    marginTop: 12,
-  },
-  actionButton: {
-    flex: 1,
-    padding: 20,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-  },
-  actionText: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  platformInfo: {
-    alignItems: "center",
-    marginTop: 8,
-  },
-  platformText: {
-    fontSize: 12,
-    fontWeight: "500",
+  refreshText: {
+    marginLeft: spacing.sm,
+    fontSize: typography.caption.fontSize,
   },
   loadingContainer: {
     alignItems: "center",
     justifyContent: "center",
-    padding: 60,
+    padding: spacing.xl,
+  },
+  section: {
+    marginBottom: spacing.lg,
+  },
+  card: {
+    padding: spacing.md,
+    borderRadius: radius.lg,
+  },
+  balanceGrid: {
+    marginTop: spacing.sm,
+  },
+  balanceItem: {
+    marginBottom: spacing.md,
+  },
+  balanceItemHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: spacing.xs,
+  },
+  balanceType: {
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
+  },
+  balanceDetails: {
+    fontSize: typography.caption.fontSize,
+  },
+  balanceValueGroup: {
+    alignItems: "flex-end",
+  },
+  balanceValue: {
+    fontSize: typography.heading.fontSize,
+    fontWeight: typography.heading.fontWeight,
+  },
+  balanceOutOf: {
+    fontSize: typography.caption.fontSize,
+  },
+  progressTrack: {
+    height: 6,
+    borderRadius: radius.sm,
+    overflow: "hidden",
+  },
+  progressFill: {
+    height: 6,
+  },
+  applicationsContainer: {
+    marginTop: spacing.sm,
+  },
+  applicationItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: spacing.sm,
+    borderRadius: radius.md,
+  },
+  applicationContent: {
+    flex: 1,
+    marginRight: spacing.md,
+  },
+  applicationType: {
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.heading.fontWeight,
+  },
+  applicationDays: {
+    fontSize: typography.caption.fontSize,
+    marginTop: spacing.xs,
+  },
+  statusBadge: {
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.m,
+    borderRadius: radius.md,
+  },
+  statusText: {
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.caption.fontWeight,
+  },
+  actionsGrid: {
+    flexDirection: "row",
+    marginTop: spacing.md,
+  },
+  actionButton: {
+    flex: 1,
+    marginRight: spacing.sm,
+  },
+  actionButtonLast: {
+    marginRight: 0,
+  },
+  platformInfo: {
+    alignItems: "center",
+    marginTop: spacing.md,
+    paddingBottom: spacing.xl,
+  },
+  platformText: {
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.caption.fontWeight,
   },
   emptyText: {
-    fontSize: 14,
     textAlign: "center",
-    paddingVertical: 20,
+    marginTop: spacing.sm,
   },
 });

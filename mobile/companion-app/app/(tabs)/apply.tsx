@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useState, useEffect } from "react";
-import { ThemedCard } from "@/src/components/shared/ThemedCard";
+import { SectionHeader, ThemedCard } from "@/src/components/shared";
 import { ThemedButton } from "@/src/components/shared/ThemedButton";
 import { useTheme } from "@/src/providers/ThemeProvider";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -19,10 +19,44 @@ import { useNotifications } from "@/src/hooks/useNotifications";
 import { AIAssistantModal } from "@/src/components/ai/AIAssistantModal";
 import { AILeaveSuggestion } from "@/src/ai/types";
 import { format, parseISO } from "date-fns";
+import * as DocumentPicker from "expo-document-picker";
+import * as FileSystem from "expo-file-system";
+import { apiClient } from "@/src/api/client";
+import { API_ENDPOINTS } from "@/src/api/endpoints";
+import { LeaveApplicationResponse } from "@/src/api/types";
+import { spacing, typography, radius } from "@/src/theme/designTokens";
+
+const MAX_CERTIFICATE_SIZE = 5 * 1024 * 1024;
+const ALLOWED_CERTIFICATE_TYPES = ["application/pdf"];
+
+type CertificateAttachment = {
+  name: string;
+  uri: string;
+  mimeType?: string | null;
+  size?: number | null;
+  base64?: string;
+};
+
+const formatBytes = (value?: number | null) => {
+  if (!value || value <= 0) {
+    return "Unknown size";
+  }
+
+  if (value < 1024) {
+    return `${value} B`;
+  }
+
+  if (value < 1024 * 1024) {
+    return `${(value / 1024).toFixed(1)} KB`;
+  }
+
+  return `${(value / (1024 * 1024)).toFixed(1)} MB`;
+};
 
 export default function ApplyLeaveScreen() {
   const { colors, isDark } = useTheme();
-  const { createApplication } = useLeaveApplications();
+  const { createApplication, refresh: refreshApplications } =
+    useLeaveApplications();
   const {
     balances,
     getBalanceByType,
@@ -39,6 +73,10 @@ export default function ApplyLeaveScreen() {
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAIModal, setShowAIModal] = useState(false);
+  const [certificate, setCertificate] = useState<CertificateAttachment | null>(
+    null
+  );
+  const [certificateError, setCertificateError] = useState<string | null>(null);
 
   // Update end date when start date changes (ensure end date is after start date)
   useEffect(() => {
@@ -70,6 +108,35 @@ export default function ApplyLeaveScreen() {
       return { valid: false, message: "Invalid date range" };
     }
 
+    const requiresCertificate = /medical/i.test(leaveType);
+
+    if (requiresCertificate && !certificate) {
+      return {
+        valid: false,
+        message: "Medical leave requires a supporting certificate",
+      };
+    }
+
+    if (certificate?.size && certificate.size > MAX_CERTIFICATE_SIZE) {
+      return {
+        valid: false,
+        message: "Certificate must be smaller than 5 MB",
+      };
+    }
+
+    if (
+      certificate?.mimeType &&
+      !(
+        ALLOWED_CERTIFICATE_TYPES.includes(certificate.mimeType) ||
+        certificate.mimeType.startsWith("image/")
+      )
+    ) {
+      return {
+        valid: false,
+        message: "Only PDF or image certificates are accepted",
+      };
+    }
+
     if (selectedBalance && daysRequested > selectedBalance.available_days) {
       return {
         valid: false,
@@ -78,6 +145,67 @@ export default function ApplyLeaveScreen() {
     }
 
     return { valid: true };
+  };
+
+  const handlePickCertificate = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ["application/pdf", "image/*"],
+        copyToCacheDirectory: false,
+      });
+
+      if (result.canceled) {
+        return;
+      }
+
+      const fileInfo = result.assets && result.assets[0];
+      if (!fileInfo) {
+        setCertificateError("No file selected.");
+        return;
+      }
+
+      if (fileInfo.size && fileInfo.size > MAX_CERTIFICATE_SIZE) {
+        setCertificateError("Certificate must be smaller than 5 MB.");
+        setCertificate(null);
+        return;
+      }
+
+      if (
+        fileInfo.mimeType &&
+        !(
+          ALLOWED_CERTIFICATE_TYPES.includes(fileInfo.mimeType) ||
+          fileInfo.mimeType.startsWith("image/")
+        )
+      ) {
+        setCertificateError("Only PDF or image certificates are accepted.");
+        setCertificate(null);
+        return;
+      }
+
+      setCertificateError(null);
+
+      const base64 = await FileSystem.readAsStringAsync(fileInfo.uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      setCertificate({
+        name: fileInfo.name || "document",
+        uri: fileInfo.uri,
+        mimeType: fileInfo.mimeType,
+        size: fileInfo.size,
+        base64,
+      });
+    } catch (error) {
+      console.error("Certificate selection failed:", error);
+      setCertificateError(
+        "Unable to load the selected certificate. Please try again."
+      );
+    }
+  };
+
+  const clearCertificate = () => {
+    setCertificate(null);
+    setCertificateError(null);
   };
 
   const handleSubmit = async () => {
@@ -91,52 +219,63 @@ export default function ApplyLeaveScreen() {
     try {
       setIsSubmitting(true);
 
-      const result = await createApplication({
+      const payload: Record<string, any> = {
         leaveType,
         startDate: format(startDate, "yyyy-MM-dd"),
         endDate: format(endDate, "yyyy-MM-dd"),
-        daysRequested,
+        workingDays: daysRequested,
         reason: reason.trim(),
-        status: "pending",
-      });
+      };
 
-      if (result.success) {
-        // Send notification for submitted application
-        await sendApplicationSubmitted(
-          leaveType,
-          format(startDate, "MMM dd, yyyy"),
-          format(endDate, "MMM dd, yyyy")
-        );
-
-        // Schedule leave reminder (1 day before start)
-        if (result.id) {
-          await scheduleLeaveReminder(result.id, leaveType, startDate);
-        }
-
-        Alert.alert(
-          "Success",
-          "Your leave application has been submitted successfully!",
-          [
-            {
-              text: "OK",
-              onPress: () => {
-                // Reset form
-                setReason("");
-                setStartDate(new Date());
-                setEndDate(new Date());
-              },
-            },
-          ]
-        );
-      } else {
-        Alert.alert(
-          "Error",
-          "Failed to submit leave application. Please try again."
-        );
+      if (certificate?.base64) {
+        payload.certificate = {
+          fileName: certificate.name,
+          mimeType: certificate.mimeType,
+          content: certificate.base64,
+        };
       }
+
+      const response = await apiClient.post<LeaveApplicationResponse>(
+        API_ENDPOINTS.LEAVES.CREATE,
+        payload
+      );
+
+      await refreshApplications();
+
+      await sendApplicationSubmitted(
+        leaveType,
+        format(startDate, "MMM dd, yyyy"),
+        format(endDate, "MMM dd, yyyy")
+      );
+
+      const submittedId =
+        response.data?.id ?? `pending_${Date.now().toString()}`;
+
+      await scheduleLeaveReminder(submittedId, leaveType, startDate);
+
+      Alert.alert(
+        "Success",
+        "Your leave application has been submitted successfully!",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              setReason("");
+              setStartDate(new Date());
+              setEndDate(new Date());
+              setCertificate(null);
+              setCertificateError(null);
+            },
+          },
+        ]
+      );
     } catch (error) {
       console.error("Submit error:", error);
-      Alert.alert("Error", "An unexpected error occurred. Please try again.");
+      const message =
+        error && typeof error === "object" && "message" in error
+          ? (error as any).message
+          : "An unexpected error occurred. Please try again.";
+      Alert.alert("Error", message);
     } finally {
       setIsSubmitting(false);
     }
@@ -196,21 +335,154 @@ export default function ApplyLeaveScreen() {
     }
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    content: {
+      padding: spacing.lg,
+      paddingBottom: spacing.xxl,
+    },
+    headerSection: {
+      marginBottom: spacing.md,
+    },
+    headerAccessory: {
+      fontSize: typography.caption.fontSize,
+      fontWeight: typography.caption.fontWeight,
+      color: colors.textSecondary,
+    },
+    subtitle: {
+      fontSize: typography.caption.fontSize,
+      fontWeight: typography.caption.fontWeight,
+      marginTop: spacing.xs,
+    },
+    aiRow: {
+      alignItems: "flex-start",
+      marginBottom: spacing.md,
+    },
+    aiButton: {
+      width: "100%",
+    },
+    card: {
+      marginBottom: spacing.lg,
+      padding: spacing.md,
+      borderRadius: radius.lg,
+    },
+    typeGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      marginTop: spacing.sm,
+    },
+    typeButton: {
+      flex: 1,
+      marginRight: spacing.sm,
+      marginBottom: spacing.sm,
+    },
+    typeButtonNoMargin: {
+      marginRight: 0,
+    },
+    balanceCard: {
+      marginTop: spacing.md,
+      padding: spacing.sm,
+      borderRadius: radius.md,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    balanceText: {
+      fontSize: typography.caption.fontSize,
+    },
+    balanceValue: {
+      fontSize: typography.heading.fontSize,
+      fontWeight: typography.heading.fontWeight,
+    },
+    dateRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginTop: spacing.sm,
+    },
+    dateField: {
+      flex: 1,
+      marginRight: spacing.sm,
+    },
+    dateFieldLast: {
+      marginRight: 0,
+    },
+    dateLabel: {
+      fontSize: typography.caption.fontSize,
+      fontWeight: typography.caption.fontWeight,
+      marginBottom: spacing.xs,
+    },
+    durationSummary: {
+      marginTop: spacing.md,
+      padding: spacing.sm,
+      borderRadius: radius.md,
+      backgroundColor: colors.surfaceVariant,
+    },
+    durationLabel: {
+      fontSize: typography.caption.fontSize,
+      fontWeight: typography.caption.fontWeight,
+    },
+    durationValue: {
+      fontSize: typography.heading.fontSize,
+      fontWeight: typography.heading.fontWeight,
+    },
+    textArea: {
+      borderRadius: radius.md,
+      padding: spacing.sm,
+      borderWidth: 1,
+      borderColor: "transparent",
+      fontSize: typography.body.fontSize,
+      minHeight: spacing.xxl * 3,
+      textAlignVertical: "top",
+    },
+    helpText: {
+      fontSize: typography.caption.fontSize,
+      fontWeight: typography.caption.fontWeight,
+      marginBottom: spacing.sm,
+    },
+    certificateMeta: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginTop: spacing.md,
+    },
+    certificateName: {
+      fontSize: typography.body.fontSize,
+      fontWeight: typography.heading.fontWeight,
+    },
+    certificateDetails: {
+      fontSize: typography.caption.fontSize,
+    },
+    certificateError: {
+      fontSize: typography.caption.fontSize,
+      fontWeight: typography.caption.fontWeight,
+      marginTop: spacing.xs,
+    },
+    actions: {
+      marginTop: spacing.md,
+    },
+    actionButton: {
+      marginBottom: spacing.sm,
+    },
+  });
+
   return (
     <>
       <ScrollView
         style={[styles.container, { backgroundColor: colors.background }]}
         contentContainerStyle={styles.content}
       >
-        <View style={styles.header}>
-          <Text
-            style={[
-              styles.title,
-              { color: "text" in colors ? colors.text : colors.onSurface },
-            ]}
-          >
-            Apply for Leave
-          </Text>
+        <View style={styles.headerSection}>
+          <SectionHeader
+            title="Apply for Leave"
+            subtitle="Policy-aware validations before submission"
+            accessory={
+              <Text style={styles.headerAccessory}>
+                {daysRequested} {daysRequested === 1 ? "day" : "days"} selected
+              </Text>
+            }
+          />
           <Text
             style={[
               styles.subtitle,
@@ -222,46 +494,42 @@ export default function ApplyLeaveScreen() {
               },
             ]}
           >
-            Fill in the details below
+            Drafts are saved locally until you sync.
           </Text>
         </View>
 
-        {/* AI Assistant Button */}
-        <ThemedButton
-          variant="secondary"
-          onPress={() => setShowAIModal(true)}
-          style={{ marginBottom: 16 }}
-        >
-          ✨ Get AI Suggestions
-        </ThemedButton>
+        <View style={styles.aiRow}>
+          <ThemedButton
+            variant="secondary"
+            onPress={() => setShowAIModal(true)}
+            style={styles.aiButton}
+          >
+            ✨ Get AI Suggestions
+          </ThemedButton>
+        </View>
 
         <ThemedCard style={styles.card}>
-          <Text
-            style={[
-              styles.label,
-              { color: "text" in colors ? colors.text : colors.onSurface },
-            ]}
-          >
-            Leave Type
-          </Text>
-
+          <SectionHeader title="Leave Type" subtitle="Choose a leave bucket" />
           {balancesLoading ? (
             <ActivityIndicator
               size="small"
               color={colors.primary}
-              style={{ marginVertical: 20 }}
+              style={{ marginVertical: spacing.md }}
             />
           ) : (
             <>
               <View style={styles.typeGrid}>
-                {balances.map((balance) => (
+                {balances.map((balance, index) => (
                   <ThemedButton
                     key={balance.id}
                     variant={
                       leaveType === balance.leave_type ? "primary" : "outline"
                     }
                     onPress={() => setLeaveType(balance.leave_type)}
-                    style={styles.typeButton}
+                    style={[
+                      styles.typeButton,
+                      index % 2 === 1 && styles.typeButtonNoMargin,
+                    ]}
                   >
                     {balance.leave_type}
                   </ThemedButton>
@@ -299,30 +567,13 @@ export default function ApplyLeaveScreen() {
         </ThemedCard>
 
         <ThemedCard style={styles.card}>
-          <Text
-            style={[
-              styles.label,
-              { color: "text" in colors ? colors.text : colors.onSurface },
-            ]}
-          >
-            Duration
-          </Text>
-
+          <SectionHeader
+            title="Duration"
+            subtitle="Select start and end dates"
+          />
           <View style={styles.dateRow}>
             <View style={styles.dateField}>
-              <Text
-                style={[
-                  styles.dateLabel,
-                  {
-                    color:
-                      "textSecondary" in colors
-                        ? colors.textSecondary
-                        : colors.onSurfaceVariant,
-                  },
-                ]}
-              >
-                Start Date
-              </Text>
+              <Text style={styles.dateLabel}>Start Date</Text>
               <ThemedButton
                 variant="outline"
                 onPress={() => setShowStartPicker(true)}
@@ -330,21 +581,8 @@ export default function ApplyLeaveScreen() {
                 {startDate.toLocaleDateString("en-GB")}
               </ThemedButton>
             </View>
-
-            <View style={styles.dateField}>
-              <Text
-                style={[
-                  styles.dateLabel,
-                  {
-                    color:
-                      "textSecondary" in colors
-                        ? colors.textSecondary
-                        : colors.onSurfaceVariant,
-                  },
-                ]}
-              >
-                End Date
-              </Text>
+            <View style={[styles.dateField, styles.dateFieldLast]}>
+              <Text style={styles.dateLabel}>End Date</Text>
               <ThemedButton
                 variant="outline"
                 onPress={() => setShowEndPicker(true)}
@@ -378,44 +616,19 @@ export default function ApplyLeaveScreen() {
             />
           )}
 
-          <View
-            style={[
-              styles.durationCard,
-              {
-                backgroundColor: isDark
-                  ? "rgba(255,255,255,0.05)"
-                  : "rgba(0,0,0,0.03)",
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.durationText,
-                {
-                  color:
-                    "textSecondary" in colors
-                      ? colors.textSecondary
-                      : colors.onSurfaceVariant,
-                },
-              ]}
-            >
-              Total Days Requested
-            </Text>
-            <Text style={[styles.durationValue, { color: colors.primary }]}>
+          <View style={styles.durationSummary}>
+            <Text style={styles.durationLabel}>Total Days Requested</Text>
+            <Text style={styles.durationValue}>
               {daysRequested} {daysRequested === 1 ? "day" : "days"}
             </Text>
           </View>
         </ThemedCard>
 
         <ThemedCard style={styles.card}>
-          <Text
-            style={[
-              styles.label,
-              { color: "text" in colors ? colors.text : colors.onSurface },
-            ]}
-          >
-            Reason
-          </Text>
+          <SectionHeader
+            title="Reason"
+            subtitle="Help approvers understand your request"
+          />
           <TextInput
             style={[
               styles.textArea,
@@ -440,11 +653,84 @@ export default function ApplyLeaveScreen() {
           />
         </ThemedCard>
 
+        <ThemedCard style={styles.card}>
+          <SectionHeader
+            title="Medical Certificate"
+            subtitle="Upload proof for medical leave"
+          />
+          <Text
+            style={[
+              styles.helpText,
+              {
+                color:
+                  "textSecondary" in colors
+                    ? colors.textSecondary
+                    : colors.onSurfaceVariant,
+              },
+            ]}
+          >
+            Attach a PDF or image certificate (max 5 MB) when applying for
+            medical leave.
+          </Text>
+          <ThemedButton
+            variant={certificate ? "secondary" : "outline"}
+            onPress={handlePickCertificate}
+            style={{ marginTop: spacing.sm }}
+          >
+            {certificate ? "Replace Certificate" : "Attach Certificate"}
+          </ThemedButton>
+
+          {certificate && (
+            <View style={styles.certificateMeta}>
+              <View>
+                <Text
+                  style={[
+                    styles.certificateName,
+                    {
+                      color: "text" in colors ? colors.text : colors.onSurface,
+                    },
+                  ]}
+                >
+                  {certificate.name}
+                </Text>
+                <Text
+                  style={[
+                    styles.certificateDetails,
+                    {
+                      color:
+                        "textSecondary" in colors
+                          ? colors.textSecondary
+                          : colors.onSurfaceVariant,
+                    },
+                  ]}
+                >
+                  {formatBytes(certificate.size)} •{" "}
+                  {certificate.mimeType || "File"}
+                </Text>
+              </View>
+              <ThemedButton
+                variant="outline"
+                onPress={clearCertificate}
+                style={{ minWidth: spacing.xxl * 3 }}
+              >
+                Remove
+              </ThemedButton>
+            </View>
+          )}
+
+          {certificateError && (
+            <Text style={[styles.certificateError, { color: colors.error }]}>
+              {certificateError}
+            </Text>
+          )}
+        </ThemedCard>
+
         <View style={styles.actions}>
           <ThemedButton
             variant="primary"
             onPress={handleSubmit}
             disabled={isSubmitting || balancesLoading}
+            style={styles.actionButton}
           >
             {isSubmitting ? "Submitting..." : "Submit Application"}
           </ThemedButton>
@@ -452,13 +738,13 @@ export default function ApplyLeaveScreen() {
             variant="outline"
             onPress={handleSaveDraft}
             disabled={isSubmitting || balancesLoading}
+            style={styles.actionButton}
           >
             Save as Draft
           </ThemedButton>
         </View>
       </ScrollView>
 
-      {/* AI Assistant Modal */}
       <AIAssistantModal
         visible={showAIModal}
         onClose={() => setShowAIModal(false)}
@@ -467,101 +753,3 @@ export default function ApplyLeaveScreen() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    padding: 20,
-    paddingBottom: 100,
-  },
-  header: {
-    marginBottom: 24,
-    paddingTop: 20,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "700",
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  card: {
-    marginBottom: 16,
-    padding: 16,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 12,
-  },
-  typeGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginBottom: 16,
-  },
-  typeButton: {
-    flex: 1,
-    minWidth: "47%",
-  },
-  balanceCard: {
-    padding: 12,
-    borderRadius: 12,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  balanceText: {
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  balanceValue: {
-    fontSize: 20,
-    fontWeight: "700",
-  },
-  dateRow: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 16,
-  },
-  dateField: {
-    flex: 1,
-  },
-  dateLabel: {
-    fontSize: 14,
-    fontWeight: "500",
-    marginBottom: 8,
-  },
-  durationCard: {
-    padding: 12,
-    borderRadius: 12,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 16,
-  },
-  durationText: {
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  durationValue: {
-    fontSize: 20,
-    fontWeight: "700",
-  },
-  textArea: {
-    borderRadius: 12,
-    padding: 12,
-    borderWidth: 1,
-    fontSize: 15,
-    minHeight: 100,
-    textAlignVertical: "top",
-  },
-  actions: {
-    gap: 12,
-    marginTop: 8,
-  },
-});

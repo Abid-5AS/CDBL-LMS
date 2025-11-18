@@ -24,10 +24,8 @@ export function AIMessageBubble({ message }: AIMessageBubbleProps) {
           styles.iconContainer,
           {
             backgroundColor: isUser
-              ? colors.primary + '20'
-              : isDark
-              ? 'rgba(255, 255, 255, 0.1)'
-              : 'rgba(0, 0, 0, 0.05)',
+              ? colors.primaryContainer
+              : colors.surfaceVariant,
           },
         ]}
       >
@@ -44,9 +42,7 @@ export function AIMessageBubble({ message }: AIMessageBubbleProps) {
           {
             backgroundColor: isUser
               ? colors.primary
-              : isDark
-              ? 'rgba(255, 255, 255, 0.1)'
-              : 'rgba(0, 0, 0, 0.05)',
+              : colors.surfaceVariant,
           },
         ]}
       >
@@ -55,9 +51,7 @@ export function AIMessageBubble({ message }: AIMessageBubbleProps) {
             styles.text,
             {
               color: isUser
-                ? '#FFFFFF'
-                : 'text' in colors
-                ? colors.text
+                ? colors.onPrimary
                 : colors.onSurface,
             },
           ]}
@@ -69,9 +63,7 @@ export function AIMessageBubble({ message }: AIMessageBubbleProps) {
             styles.timestamp,
             {
               color: isUser
-                ? 'rgba(255, 255, 255, 0.7)'
-                : 'textSecondary' in colors
-                ? colors.textSecondary
+                ? colors.onPrimary
                 : colors.onSurfaceVariant,
             },
           ]}
@@ -86,11 +78,13 @@ export function AIMessageBubble({ message }: AIMessageBubbleProps) {
   );
 }
 
+import { spacing, radius, typography } from '../../theme/designTokens';
+
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    marginVertical: 8,
-    gap: 8,
+    marginVertical: spacing.sm,
+    gap: spacing.sm,
   },
   userContainer: {
     justifyContent: 'flex-end',
@@ -99,24 +93,24 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   iconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: spacing.xl,
+    height: spacing.xl,
+    borderRadius: radius.lg,
     justifyContent: 'center',
     alignItems: 'center',
   },
   bubble: {
     maxWidth: '70%',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 16,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    borderRadius: radius.lg,
   },
   text: {
-    fontSize: 15,
-    lineHeight: 20,
+    fontSize: typography.body.fontSize,
+    lineHeight: typography.heading.lineHeight,
   },
   timestamp: {
-    fontSize: 11,
-    marginTop: 4,
+    fontSize: typography.caption.fontSize - 1,
+    marginTop: spacing.xs,
   },
 });

@@ -208,29 +208,59 @@ export async function getLeaveBalances(
 // Leave application operations
 export async function saveLeaveApplication(application: {
   id: string;
-  leaveType: string;
-  startDate: string;
-  endDate: string;
-  daysRequested: number;
-  reason: string;
+  leaveType?: string;
+  startDate?: string;
+  endDate?: string;
+  daysRequested?: number;
+  reason?: string;
   status?: string;
+  leave_type?: string;
+  start_date?: string;
+  end_date?: string;
+  days_requested?: number;
+  half_day?: number;
+  applied_date?: string;
+  approver_comments?: string;
+  created_at?: string;
+  updated_at?: string;
+  synced?: number;
 }) {
   const db = await getDatabase();
   const now = Date.now();
+
+  // Support both camelCase and snake_case field names
+  const leaveType = application.leaveType || application.leave_type || 'Casual Leave';
+  const startDate = application.startDate || application.start_date || '';
+  const endDate = application.endDate || application.end_date || '';
+  const daysRequested = application.daysRequested || application.days_requested || 0;
+  const reason = application.reason || '';
+  const status = application.status || 'draft';
+  const appliedOn = application.applied_date || application.created_at || new Date().toISOString();
+  const approverComments = application.approver_comments || '';
+  const localCreatedAt = application.created_at ? new Date(application.created_at).getTime() : now;
+  const lastModifiedAt = application.updated_at ? new Date(application.updated_at).getTime() : now;
+  const isSynced = application.synced !== undefined ? application.synced : 0;
+  const halfDay = application.half_day || 0;
+
   await db.runAsync(
-    `INSERT INTO leave_applications 
-     (id, leave_type, start_date, end_date, days_requested, reason, status, local_created_at, last_modified_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT OR REPLACE INTO leave_applications
+     (id, leave_type, start_date, end_date, days_requested, reason, status, applied_on, approver_comments,
+      local_created_at, last_modified_at, half_day, is_synced)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       application.id,
-      application.leaveType,
-      application.startDate,
-      application.endDate,
-      application.daysRequested,
-      application.reason,
-      application.status || "draft",
-      now,
-      now,
+      leaveType,
+      startDate,
+      endDate,
+      daysRequested,
+      reason,
+      status,
+      appliedOn,
+      approverComments,
+      localCreatedAt,
+      lastModifiedAt,
+      halfDay,
+      isSynced
     ]
   );
 
@@ -262,6 +292,17 @@ export async function updateLeaveApplication(
     status?: string;
     serverId?: string;
     isSynced?: boolean;
+    leave_type?: string;
+    start_date?: string;
+    end_date?: string;
+    days_requested?: number;
+    reason?: string;
+    half_day?: number;
+    applied_date?: string;
+    approver_comments?: string;
+    created_at?: string;
+    updated_at?: string;
+    synced?: number;
   }
 ) {
   const db = await getDatabase();
@@ -279,6 +320,50 @@ export async function updateLeaveApplication(
   if (updates.isSynced !== undefined) {
     fields.push("is_synced = ?");
     values.push(updates.isSynced ? 1 : 0);
+  }
+  if (updates.leave_type) {
+    fields.push("leave_type = ?");
+    values.push(updates.leave_type);
+  }
+  if (updates.start_date) {
+    fields.push("start_date = ?");
+    values.push(updates.start_date);
+  }
+  if (updates.end_date) {
+    fields.push("end_date = ?");
+    values.push(updates.end_date);
+  }
+  if (updates.days_requested !== undefined) {
+    fields.push("days_requested = ?");
+    values.push(updates.days_requested);
+  }
+  if (updates.reason) {
+    fields.push("reason = ?");
+    values.push(updates.reason);
+  }
+  if (updates.half_day !== undefined) {
+    fields.push("half_day = ?");
+    values.push(updates.half_day);
+  }
+  if (updates.applied_date) {
+    fields.push("applied_on = ?");
+    values.push(updates.applied_date);
+  }
+  if (updates.approver_comments) {
+    fields.push("approver_comments = ?");
+    values.push(updates.approver_comments);
+  }
+  if (updates.created_at) {
+    fields.push("local_created_at = ?");
+    values.push(updates.created_at);
+  }
+  if (updates.updated_at) {
+    fields.push("last_modified_at = ?");
+    values.push(updates.updated_at);
+  }
+  if (updates.synced !== undefined) {
+    fields.push("is_synced = ?");
+    values.push(updates.synced);
   }
 
   fields.push("last_modified_at = ?");

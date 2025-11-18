@@ -11,7 +11,7 @@ import {
 import { router } from 'expo-router';
 import { ThemedCard } from '../src/components/shared/ThemedCard';
 import { ThemedButton } from '../src/components/shared/ThemedButton';
-import { useTheme } from '../src/providers/ThemeProvider';
+import { useTheme } from '@/src/providers/ThemeProvider';
 import { useAuthStore } from '../src/store/authStore';
 import { BiometricAuth } from '../src/auth/BiometricAuth';
 import { useNotifications } from '../src/hooks/useNotifications';
@@ -29,6 +29,7 @@ import {
   Lock,
   Edit3,
 } from 'lucide-react-native';
+import { spacing, radius, typography } from '../src/theme/designTokens';
 
 export default function SettingsScreen() {
   const { colors, isDark, mode, setMode } = useTheme();
@@ -245,9 +246,7 @@ export default function SettingsScreen() {
                     {
                       backgroundColor: isSelected
                         ? colors.primary + '20'
-                        : isDark
-                        ? 'rgba(255,255,255,0.05)'
-                        : 'rgba(0,0,0,0.03)',
+                        : 'surfaceVariant' in colors ? colors.surfaceVariant : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)'),
                       borderColor: isSelected ? colors.primary : 'transparent',
                       borderWidth: isSelected ? 2 : 0,
                     },
@@ -256,7 +255,7 @@ export default function SettingsScreen() {
                 >
                   <Icon
                     size={28}
-                    color={isSelected ? colors.primary : isDark ? '#8E8E93' : '#666'}
+                    color={isSelected ? colors.primary : colors.textSecondary}
                   />
                   <Text
                     style={[
@@ -331,14 +330,14 @@ export default function SettingsScreen() {
               onValueChange={handleBiometricToggle}
               disabled={isTogglingBiometric}
               trackColor={{
-                false: isDark ? '#48484A' : '#E5E5EA',
+                false: colors.surfaceVariant,
                 true: colors.primary + '80',
               }}
-              thumbColor={biometricEnabled ? colors.primary : '#FFFFFF'}
+              thumbColor={biometricEnabled ? colors.primary : colors.outline}
             />
           </View>
 
-          <View style={[styles.divider, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }]} />
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
           {/* Change Password */}
           <TouchableOpacity
@@ -446,17 +445,17 @@ export default function SettingsScreen() {
               onValueChange={(value) => updatePreferences({ enabled: value })}
               disabled={!isInitialized}
               trackColor={{
-                false: isDark ? '#48484A' : '#E5E5EA',
+                false: colors.surfaceVariant,
                 true: colors.primary + '80',
               }}
-              thumbColor={preferences.enabled ? colors.primary : '#FFFFFF'}
+              thumbColor={preferences.enabled ? colors.primary : colors.outline}
             />
           </View>
 
           {/* Notification Types */}
           {preferences.enabled && (
             <>
-              <View style={[styles.divider, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }]} />
+              <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
               <View style={styles.settingRow}>
                 <View style={styles.settingInfo}>
@@ -488,14 +487,14 @@ export default function SettingsScreen() {
                   value={preferences.leaveReminders}
                   onValueChange={(value) => updatePreferences({ leaveReminders: value })}
                   trackColor={{
-                    false: isDark ? '#48484A' : '#E5E5EA',
+                    false: colors.surfaceVariant,
                     true: colors.primary + '80',
                   }}
-                  thumbColor={preferences.leaveReminders ? colors.primary : '#FFFFFF'}
+                  thumbColor={preferences.leaveReminders ? colors.primary : colors.outline}
                 />
               </View>
 
-              <View style={[styles.divider, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }]} />
+              <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
               <View style={styles.settingRow}>
                 <View style={styles.settingInfo}>
@@ -527,14 +526,14 @@ export default function SettingsScreen() {
                   value={preferences.lowBalanceWarnings}
                   onValueChange={(value) => updatePreferences({ lowBalanceWarnings: value })}
                   trackColor={{
-                    false: isDark ? '#48484A' : '#E5E5EA',
+                    false: colors.surfaceVariant,
                     true: colors.primary + '80',
                   }}
-                  thumbColor={preferences.lowBalanceWarnings ? colors.primary : '#FFFFFF'}
+                  thumbColor={preferences.lowBalanceWarnings ? colors.primary : colors.outline}
                 />
               </View>
 
-              <View style={[styles.divider, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }]} />
+              <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
               <View style={styles.settingRow}>
                 <View style={styles.settingInfo}>
@@ -566,10 +565,10 @@ export default function SettingsScreen() {
                   value={preferences.applicationUpdates}
                   onValueChange={(value) => updatePreferences({ applicationUpdates: value })}
                   trackColor={{
-                    false: isDark ? '#48484A' : '#E5E5EA',
+                    false: colors.surfaceVariant,
                     true: colors.primary + '80',
                   }}
-                  thumbColor={preferences.applicationUpdates ? colors.primary : '#FFFFFF'}
+                  thumbColor={preferences.applicationUpdates ? colors.primary : colors.outline}
                 />
               </View>
             </>
@@ -634,7 +633,7 @@ export default function SettingsScreen() {
           style={[
             styles.sectionTitle,
             {
-              color: '#F44336',
+              color: colors.error,
             },
           ]}
         >
@@ -644,11 +643,11 @@ export default function SettingsScreen() {
         <ThemedButton
           variant="outline"
           onPress={handleLogout}
-          style={[styles.logoutButton, { borderColor: '#F44336' }]}
+          style={[styles.logoutButton, { borderColor: colors.error }]}
         >
           <View style={styles.logoutButtonContent}>
-            <LogOut size={20} color="#F44336" />
-            <Text style={[styles.logoutButtonText, { color: '#F44336' }]}>
+            <LogOut size={20} color={colors.error} />
+            <Text style={[styles.logoutButtonText, { color: colors.error }]}>
               Logout
             </Text>
           </View>
@@ -692,61 +691,62 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 20,
-    paddingBottom: 100,
+    padding: radius.lg,
+    paddingBottom: spacing.xxl * 2 + spacing.sm,
   },
   header: {
-    marginBottom: 24,
-    paddingTop: 60,
+    marginBottom: spacing.lg,
+    paddingTop: spacing.xxl + spacing.md,
   },
   backButton: {
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   backText: {
-    fontSize: 17,
-    fontWeight: '600',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.heading.fontWeight,
   },
   title: {
-    fontSize: 34,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: typography.display.fontSize,
+    fontWeight: typography.display.fontWeight,
+    marginBottom: spacing.xs,
   },
   subtitle: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.heading.fontWeight,
     letterSpacing: 0.5,
-    marginBottom: 8,
-    marginLeft: 4,
+    marginBottom: spacing.sm,
+    marginLeft: spacing.xs,
   },
   card: {
-    padding: 16,
+    padding: spacing.md,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 16,
+    fontSize: typography.heading.fontSize,
+    fontWeight: typography.heading.fontWeight,
+    marginBottom: spacing.md,
   },
   themeOptions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: spacing.md,
   },
   themeOption: {
     flex: 1,
-    padding: 16,
-    borderRadius: 12,
+    padding: spacing.md,
+    borderRadius: radius.md,
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.sm,
+    borderWidth: 2,
   },
   themeLabel: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: radius.md,
+    fontWeight: typography.heading.fontWeight,
   },
   settingRow: {
     flexDirection: 'row',
@@ -757,33 +757,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    gap: 12,
+    gap: spacing.md,
   },
   settingText: {
     flex: 1,
   },
   settingTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 2,
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.heading.fontWeight,
+    marginBottom: spacing.xs / 2,
   },
   settingDescription: {
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.caption.fontWeight,
   },
   divider: {
     height: 1,
-    marginVertical: 12,
+    marginVertical: spacing.md,
   },
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: spacing.md,
   },
   profileAvatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: spacing.xl * 2,
+    height: spacing.xl * 2,
+    borderRadius: spacing.xl,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -791,46 +791,46 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   profileName: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: typography.heading.fontSize,
+    fontWeight: typography.display.fontWeight,
+    marginBottom: spacing.xs,
   },
   profileEmail: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginBottom: 2,
+    fontSize: radius.md,
+    fontWeight: typography.body.fontWeight,
+    marginBottom: spacing.xs / 2,
   },
   profileDepartment: {
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.caption.fontWeight,
   },
   editProfileButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: typography.display.lineHeight,
+    height: typography.display.lineHeight,
+    borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
   logoutButton: {
     borderWidth: 2,
-    marginHorizontal: 20,
+    marginHorizontal: radius.lg,
   },
   logoutButtonContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.sm,
   },
   logoutButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.heading.fontWeight,
   },
   footer: {
-    marginTop: 40,
+    marginTop: typography.display.lineHeight,
     alignItems: 'center',
-    gap: 4,
+    gap: spacing.xs,
   },
   footerText: {
-    fontSize: 12,
-    fontWeight: '500',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.caption.fontWeight,
   },
 });

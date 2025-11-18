@@ -4,6 +4,7 @@ import { useTheme } from '../../providers/ThemeProvider';
 import { syncService, SyncResult } from '../../sync/SyncService';
 import { networkMonitor } from '../../sync/NetworkMonitor';
 import { RefreshCw, Wifi, WifiOff, CheckCircle, AlertCircle } from 'lucide-react-native';
+import { spacing, typography } from '../../theme/designTokens';
 
 export function SyncStatusBanner() {
   const { colors, isDark } = useTheme();
@@ -62,10 +63,10 @@ export function SyncStatusBanner() {
   };
 
   const getStatusColor = () => {
-    if (!isConnected) return '#F44336';
-    if (syncResult?.status === 'syncing') return '#FF9800';
-    if (syncResult?.status === 'success') return '#4CAF50';
-    if (syncResult?.status === 'error') return '#F44336';
+    if (!isConnected) return colors.error;
+    if (syncResult?.status === 'syncing') return colors.warning;
+    if (syncResult?.status === 'success') return colors.success;
+    if (syncResult?.status === 'error') return colors.error;
     return colors.primary;
   };
 
@@ -99,9 +100,7 @@ export function SyncStatusBanner() {
       style={[
         styles.container,
         {
-          backgroundColor: isDark
-            ? 'rgba(255, 255, 255, 0.05)'
-            : 'rgba(0, 0, 0, 0.03)',
+          backgroundColor: colors.surfaceVariant,
           borderBottomColor: getStatusColor() + '30',
         },
       ]}
@@ -137,7 +136,7 @@ export function SyncStatusBanner() {
           style={[
             styles.errorText,
             {
-              color: '#F44336',
+              color: colors.error,
             },
           ]}
         >
@@ -150,8 +149,8 @@ export function SyncStatusBanner() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
     borderBottomWidth: 1,
   },
   content: {
@@ -162,18 +161,18 @@ const styles = StyleSheet.create({
   statusInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.sm,
   },
   statusText: {
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
   refreshButton: {
-    padding: 4,
+    padding: spacing.xs,
   },
   errorText: {
-    fontSize: 12,
-    fontWeight: '500',
-    marginTop: 4,
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.body.fontWeight,
+    marginTop: spacing.xs,
   },
 });

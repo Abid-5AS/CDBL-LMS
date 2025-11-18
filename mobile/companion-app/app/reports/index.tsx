@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { ThemedCard } from '../../src/components/shared/ThemedCard';
-import { useTheme } from '../../src/providers/ThemeProvider';
+import { useTheme } from '@/src/providers/ThemeProvider';
 import { apiClient } from '../../src/api/client';
 import { API_ENDPOINTS } from '../../src/api/endpoints';
 import { PieChart, LineChart } from 'react-native-gifted-charts';
@@ -23,6 +23,7 @@ import {
   Clock,
   Calendar,
 } from 'lucide-react-native';
+import { spacing, radius, typography } from '../../src/theme/designTokens';
 
 const { width } = Dimensions.get('window');
 const CHART_WIDTH = width - 80;
@@ -122,19 +123,19 @@ export default function ReportsScreen() {
     ? [
         {
           value: analytics.leaveDistribution.casual,
-          color: '#4CAF50',
+          color: colors.success,
           text: `${analytics.leaveDistribution.casual}`,
           label: 'Casual',
         },
         {
           value: analytics.leaveDistribution.medical,
-          color: '#F44336',
+          color: colors.error,
           text: `${analytics.leaveDistribution.medical}`,
           label: 'Medical',
         },
         {
           value: analytics.leaveDistribution.earned,
-          color: '#2196F3',
+          color: colors.primary,
           text: `${analytics.leaveDistribution.earned}`,
           label: 'Earned',
         },
@@ -255,9 +256,9 @@ export default function ReportsScreen() {
             contentContainerStyle={styles.summaryScroll}
           >
             {renderSummaryCard(FileText, 'Total Leaves', analytics?.summary.totalLeaves || 0, colors.primary)}
-            {renderSummaryCard(Clock, 'Pending', analytics?.summary.pending || 0, '#FF9800')}
-            {renderSummaryCard(CheckCircle, 'Approved', analytics?.summary.approved || 0, '#4CAF50')}
-            {renderSummaryCard(XCircle, 'Rejected', analytics?.summary.rejected || 0, '#F44336')}
+            {renderSummaryCard(Clock, 'Pending', analytics?.summary.pending || 0, colors.warning)}
+            {renderSummaryCard(CheckCircle, 'Approved', analytics?.summary.approved || 0, colors.success)}
+            {renderSummaryCard(XCircle, 'Rejected', analytics?.summary.rejected || 0, colors.error)}
           </ScrollView>
         </View>
 
@@ -400,8 +401,8 @@ export default function ReportsScreen() {
               endOpacity={0.1}
               areaChart
               curved
-              yAxisColor={isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'}
-              xAxisColor={isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'}
+              yAxisColor={colors.border}
+              xAxisColor={colors.border}
               yAxisTextStyle={{
                 color:
                   'textSecondary' in colors
@@ -554,107 +555,107 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 16,
+    paddingHorizontal: radius.lg,
+    paddingTop: spacing.xxl + spacing.md,
+    paddingBottom: spacing.md,
   },
   backButton: {
-    marginRight: 12,
+    marginRight: spacing.md,
   },
   headerContent: {
     flex: 1,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: radius.xl,
+    fontWeight: typography.display.fontWeight,
+    marginBottom: spacing.xs,
   },
   subtitle: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: radius.md,
+    fontWeight: typography.body.fontWeight,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 40,
+    paddingBottom: typography.display.lineHeight,
   },
   summaryContainer: {
-    marginBottom: 20,
+    marginBottom: radius.lg,
   },
   summaryScroll: {
-    paddingHorizontal: 20,
-    gap: 12,
+    paddingHorizontal: radius.lg,
+    gap: spacing.md,
   },
   summaryCard: {
-    padding: 16,
+    padding: spacing.md,
     alignItems: 'center',
     minWidth: 100,
   },
   summaryIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: typography.display.lineHeight,
+    height: typography.display.lineHeight,
+    borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   summaryValue: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: spacing.lg,
+    fontWeight: typography.display.fontWeight,
+    marginBottom: spacing.xs,
   },
   summaryLabel: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: typography.body.fontWeight,
     textAlign: 'center',
   },
   chartCard: {
-    marginHorizontal: 20,
-    marginBottom: 20,
-    padding: 20,
+    marginHorizontal: radius.lg,
+    marginBottom: radius.lg,
+    padding: radius.lg,
   },
   chartHeader: {
-    marginBottom: 20,
+    marginBottom: radius.lg,
   },
   chartHeaderLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: spacing.md,
   },
   chartTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: typography.heading.fontSize,
+    fontWeight: typography.display.fontWeight,
+    marginBottom: spacing.xs,
   },
   chartSubtitle: {
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
   pieChartContainer: {
     alignItems: 'center',
-    marginVertical: 20,
+    marginVertical: radius.lg,
   },
   pieCenter: {
     alignItems: 'center',
     justifyContent: 'center',
   },
   pieCenterValue: {
-    fontSize: 24,
-    fontWeight: '700',
+    fontSize: spacing.lg,
+    fontWeight: typography.display.fontWeight,
   },
   pieCenterLabel: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: typography.body.fontWeight,
   },
   legend: {
-    marginTop: 20,
-    gap: 12,
+    marginTop: radius.lg,
+    gap: spacing.md,
   },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: spacing.md,
   },
   legendDot: {
     width: 12,
@@ -662,65 +663,64 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   legendLabel: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: radius.md,
+    fontWeight: typography.body.fontWeight,
     flex: 1,
   },
   legendValue: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.display.fontWeight,
   },
   lineChartContainer: {
-    marginVertical: 20,
+    marginVertical: radius.lg,
     alignItems: 'center',
   },
   trendStats: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: 20,
-    paddingTop: 20,
+    marginTop: radius.lg,
+    paddingTop: radius.lg,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(128, 128, 128, 0.2)',
   },
   trendStat: {
     alignItems: 'center',
   },
   trendStatLabel: {
     fontSize: 12,
-    fontWeight: '500',
-    marginBottom: 4,
+    fontWeight: typography.body.fontWeight,
+    marginBottom: spacing.xs,
   },
   trendStatValue: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: typography.heading.fontSize,
+    fontWeight: typography.display.fontWeight,
   },
   infoCard: {
-    marginHorizontal: 20,
-    padding: 16,
+    marginHorizontal: radius.lg,
+    padding: spacing.md,
   },
   infoHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
   },
   infoTitle: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: radius.md,
+    fontWeight: typography.heading.fontWeight,
   },
   infoText: {
-    fontSize: 13,
-    fontWeight: '500',
-    lineHeight: 20,
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.body.fontWeight,
+    lineHeight: typography.heading.lineHeight,
   },
   centerContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 12,
+    gap: spacing.md,
   },
   loadingText: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
 });

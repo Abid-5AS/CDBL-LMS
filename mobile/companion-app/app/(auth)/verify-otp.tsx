@@ -151,9 +151,9 @@ export default function OTPVerificationScreen() {
         </View>
 
         <View style={styles.form}>
-          <View style={styles.timerContainer}>
-            <Clock size={20} color="#ff6b6b" />
-            <Text style={styles.timerText}>
+          <View style={[styles.timerContainer, { backgroundColor: theme.colors.errorContainer }]}>
+            <Clock size={20} color={theme.colors.error} />
+            <Text style={[styles.timerText, { color: theme.colors.error }]}>
               Code expires in: {formatTime(timeLeft)}
             </Text>
           </View>
@@ -199,52 +199,52 @@ export default function OTPVerificationScreen() {
   );
 }
 
+import { spacing, radius } from '@/src/theme/designTokens';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 16,
+    padding: spacing.md,
   },
   surface: {
-    padding: 24,
-    borderRadius: 16,
+    padding: spacing.lg,
+    borderRadius: radius.lg,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: spacing.xl,
   },
   title: {
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   subtitle: {
     opacity: 0.7,
     textAlign: 'center',
   },
   form: {
-    gap: 16,
+    gap: spacing.md,
   },
   timerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: 'rgba(255, 107, 107, 0.1)',
+    gap: spacing.sm,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.sm,
   },
   timerText: {
     fontWeight: '500',
-    color: '#ff6b6b',
   },
   input: {
     backgroundColor: 'transparent',
   },
   button: {
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
   footer: {
-    marginTop: 24,
+    marginTop: spacing.lg,
     alignItems: 'center',
   },
   footerText: {

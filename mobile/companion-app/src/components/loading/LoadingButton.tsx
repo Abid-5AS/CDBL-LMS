@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, ActivityIndicator, StyleSheet, ViewStyle } from 'react-native';
 import { useTheme } from '../../providers/ThemeProvider';
+import { spacing, radius, typography } from '../../theme/designTokens';
 
 interface LoadingButtonProps {
   children: string;
@@ -11,11 +12,6 @@ interface LoadingButtonProps {
   style?: ViewStyle;
 }
 
-/**
- * Button with Loading State
- *
- * Shows a spinner when loading, prevents double-clicks
- */
 export function LoadingButton({
   children,
   onPress,
@@ -24,74 +20,39 @@ export function LoadingButton({
   variant = 'primary',
   style,
 }: LoadingButtonProps) {
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
 
-  const getButtonStyle = (): ViewStyle => {
-    const baseStyle: ViewStyle = {
-      paddingVertical: 14,
-      paddingHorizontal: 24,
-      borderRadius: 12,
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexDirection: 'row',
-    };
+  const containerStyle = [
+    styles.base,
+    variant === 'primary' && { backgroundColor: colors.primary },
+    variant === 'secondary' && { backgroundColor: colors.surfaceVariant },
+    variant === 'outline' && { borderColor: colors.primary, borderWidth: 1.5 },
+    (disabled || isLoading) && styles.disabled,
+    style,
+  ];
 
-    if (variant === 'primary') {
-      return {
-        ...baseStyle,
-        backgroundColor: colors.primary,
-        shadowColor: colors.primary,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-      };
-    }
-
-    if (variant === 'secondary') {
-      return {
-        ...baseStyle,
-        backgroundColor: isDark
-          ? 'rgba(255, 255, 255, 0.15)'
-          : 'rgba(0, 0, 0, 0.05)',
-      };
-    }
-
-    // outline
-    return {
-      ...baseStyle,
-      backgroundColor: 'transparent',
-      borderWidth: 1.5,
-      borderColor: colors.primary,
-    };
-  };
-
-  const getTextColor = (): string => {
-    if (variant === 'outline') {
-      return colors.primary;
-    }
-    if (variant === 'primary') {
-      return '#FFFFFF';
-    }
-    return 'text' in colors ? colors.text : colors.onSurface;
-  };
-
-  const isDisabled = disabled || isLoading;
+  const textColor =
+    variant === 'primary'
+      ? colors.onPrimary
+      : variant === 'outline'
+      ? colors.primary
+      : colors.onSurface;
 
   return (
     <TouchableOpacity
-      style={[getButtonStyle(), style, isDisabled && styles.disabled]}
+      style={containerStyle}
       onPress={onPress}
-      disabled={isDisabled}
+      disabled={disabled || isLoading}
       activeOpacity={0.7}
     >
       {isLoading && (
         <ActivityIndicator
           size="small"
-          color={getTextColor()}
+          color={textColor}
           style={styles.spinner}
         />
       )}
-      <Text style={[styles.text, { color: getTextColor() }]}>
+      <Text style={[styles.text, { color: textColor }]}>
         {isLoading ? 'Loading...' : children}
       </Text>
     </TouchableOpacity>
@@ -99,14 +60,22 @@ export function LoadingButton({
 }
 
 const styles = StyleSheet.create({
+  base: {
+    paddingVertical: radius.md,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
   text: {
-    fontSize: 17,
-    fontWeight: '600',
+    fontSize: typography.body.fontSize + 1,
+    fontWeight: typography.heading.fontWeight,
   },
   disabled: {
     opacity: 0.5,
   },
   spinner: {
-    marginRight: 8,
+    marginRight: spacing.sm,
   },
 });

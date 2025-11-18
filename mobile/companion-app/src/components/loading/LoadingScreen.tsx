@@ -45,16 +45,18 @@ export function LoadingScreen({
   );
 }
 
+import { spacing, radius, typography } from '../../theme/designTokens';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: radius.lg,
   },
   message: {
-    marginTop: 16,
-    fontSize: 16,
-    fontWeight: '500',
+    marginTop: spacing.md,
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
 });

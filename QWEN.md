@@ -197,3 +197,18 @@ The documentation is organized into logical categories:
 - `lib/rbac.ts`: Role-based access control
 - `components/ui/`: Reusable UI components
 - `app/dashboard/`: Role-based dashboard implementations
+
+## MCP Configuration
+
+To use the Context7 MCP server with Qwen, add the following configuration to your Qwen settings:
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp", "--api-key", "ctx7sk-54df274b-3c68-4a77-a69b-3f0de26fa7cb"]
+    }
+  }
+}
+```

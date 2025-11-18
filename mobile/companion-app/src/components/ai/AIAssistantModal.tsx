@@ -186,7 +186,7 @@ Would you like me to fill the leave application form with these details?`;
         style={[
           styles.container,
           {
-            backgroundColor: isDark ? '#000000' : '#FFFFFF',
+            backgroundColor: colors.background,
           },
         ]}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -197,10 +197,8 @@ Would you like me to fill the leave application form with these details?`;
           style={[
             styles.header,
             {
-              backgroundColor: isDark ? '#1C1C1E' : '#F2F2F7',
-              borderBottomColor: isDark
-                ? 'rgba(255, 255, 255, 0.1)'
-                : 'rgba(0, 0, 0, 0.1)',
+              backgroundColor: colors.surface,
+              borderBottomColor: colors.border,
             },
           ]}
         >
@@ -272,10 +270,8 @@ Would you like me to fill the leave application form with these details?`;
           style={[
             styles.inputContainer,
             {
-              backgroundColor: isDark ? '#1C1C1E' : '#F2F2F7',
-              borderTopColor: isDark
-                ? 'rgba(255, 255, 255, 0.1)'
-                : 'rgba(0, 0, 0, 0.1)',
+              backgroundColor: colors.surface,
+              borderTopColor: colors.border,
             },
           ]}
         >
@@ -283,9 +279,7 @@ Would you like me to fill the leave application form with these details?`;
             style={[
               styles.input,
               {
-                backgroundColor: isDark
-                  ? 'rgba(255, 255, 255, 0.1)'
-                  : 'rgba(0, 0, 0, 0.05)',
+                backgroundColor: colors.surfaceVariant,
                 color: 'text' in colors ? colors.text : colors.onSurface,
               },
             ]}
@@ -313,7 +307,7 @@ Would you like me to fill the leave application form with these details?`;
           >
             <Send
               size={20}
-              color={inputText.trim() ? '#FFFFFF' : colors.primary}
+              color={inputText.trim() ? colors.onPrimary : colors.primary}
             />
           </TouchableOpacity>
         </View>
@@ -321,6 +315,8 @@ Would you like me to fill the leave application form with these details?`;
     </Modal>
   );
 }
+
+import { spacing, radius, typography } from '../../theme/designTokens';
 
 const styles = StyleSheet.create({
   container: {
@@ -330,67 +326,67 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    paddingTop: Platform.OS === 'ios' ? 60 : 12,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    paddingTop: Platform.OS === 'ios' ? spacing.xxl + spacing.lg : spacing.md,
     borderBottomWidth: 1,
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: spacing.md,
   },
   sparkleIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: spacing.xl + 4,
+    height: spacing.xl + 4,
+    borderRadius: radius.lg,
     justifyContent: 'center',
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: typography.heading.fontSize,
+    fontWeight: typography.display.fontWeight,
   },
   closeButton: {
-    padding: 4,
+    padding: spacing.xs,
   },
   messagesContainer: {
     flex: 1,
   },
   messagesContent: {
-    padding: 16,
-    paddingBottom: 100,
+    padding: spacing.md,
+    paddingBottom: spacing.xxl * 2 + spacing.sm,
   },
   loadingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingVertical: 16,
+    gap: spacing.sm,
+    paddingVertical: spacing.md,
   },
   loadingText: {
-    fontSize: 14,
+    fontSize: radius.md,
     fontStyle: 'italic',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    padding: 12,
-    gap: 8,
+    padding: spacing.md,
+    gap: spacing.sm,
     borderTopWidth: 1,
   },
   input: {
     flex: 1,
     minHeight: 44,
     maxHeight: 120,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 22,
-    fontSize: 15,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    borderRadius: radius.xl,
+    fontSize: typography.body.fontSize,
   },
   sendButton: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: radius.xl,
     justifyContent: 'center',
     alignItems: 'center',
   },

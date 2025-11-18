@@ -21,9 +21,7 @@ export function LoadingCard({ style, height = 100 }: LoadingCardProps) {
         styles.card,
         {
           height,
-          backgroundColor: isDark
-            ? 'rgba(255, 255, 255, 0.1)'
-            : 'rgba(0, 0, 0, 0.05)',
+          backgroundColor: colors.surfaceVariant,
         },
         style,
       ]}
@@ -34,9 +32,7 @@ export function LoadingCard({ style, height = 100 }: LoadingCardProps) {
             styles.skeletonLine,
             styles.skeletonTitle,
             {
-              backgroundColor: isDark
-                ? 'rgba(255, 255, 255, 0.2)'
-                : 'rgba(0, 0, 0, 0.1)',
+              backgroundColor: colors.surfaceDisabled,
             },
           ]}
         />
@@ -45,9 +41,7 @@ export function LoadingCard({ style, height = 100 }: LoadingCardProps) {
             styles.skeletonLine,
             styles.skeletonText,
             {
-              backgroundColor: isDark
-                ? 'rgba(255, 255, 255, 0.15)'
-                : 'rgba(0, 0, 0, 0.08)',
+              backgroundColor: colors.surfaceDisabled,
             },
           ]}
         />
@@ -57,9 +51,7 @@ export function LoadingCard({ style, height = 100 }: LoadingCardProps) {
             styles.skeletonText,
             {
               width: '60%',
-              backgroundColor: isDark
-                ? 'rgba(255, 255, 255, 0.15)'
-                : 'rgba(0, 0, 0, 0.08)',
+              backgroundColor: colors.surfaceDisabled,
             },
           ]}
         />
@@ -68,27 +60,29 @@ export function LoadingCard({ style, height = 100 }: LoadingCardProps) {
   );
 }
 
+import { spacing, radius } from '../../theme/designTokens';
+
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.md,
   },
   skeletonContainer: {
     flex: 1,
     justifyContent: 'center',
   },
   skeletonLine: {
-    height: 16,
-    borderRadius: 4,
-    marginBottom: 12,
+    height: spacing.md,
+    borderRadius: radius.xs,
+    marginBottom: spacing.md,
   },
   skeletonTitle: {
-    height: 20,
+    height: radius.lg,
     width: '70%',
   },
   skeletonText: {
-    height: 14,
+    height: radius.md,
     width: '100%',
   },
 });

@@ -1,4 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
+import { apiClient } from '../api/client';
+import { API_ENDPOINTS } from '../api/endpoints';
+import { LeaveBalanceResponse } from '../api/types';
 import { getLeaveBalances, saveLeaveBalances } from '../database';
 
 export interface LeaveBalance {
@@ -18,30 +21,106 @@ export function useLeaveBalances(year?: number) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [lastSynced, setLastSynced] = useState<Date | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const fetchBalances = useCallback(async () => {
+  const loadLocalBalances = useCallback(
+    async (options?: { suppressLoading?: boolean }) => {
+      if (!options?.suppressLoading) {
+        setIsLoading(true);
+      }
+      try {
+        setError(null);
+        const data = await getLeaveBalances(currentYear);
+        setBalances(data as LeaveBalance[]);
+
+        if (data.length > 0) {
+          const syncTime = (data[0] as LeaveBalance).last_synced_at;
+          setLastSynced(syncTime ? new Date(syncTime) : null);
+        }
+      } catch (err) {
+        setError(err as Error);
+        console.error('Error fetching leave balances:', err);
+      } finally {
+        if (!options?.suppressLoading) {
+          setIsLoading(false);
+        }
+      }
+    },
+    [currentYear]
+  );
+
+  const fetchBalancesFromServer = useCallback(async () => {
+    setIsRefreshing(true);
     try {
-      setIsLoading(true);
-      setError(null);
-      const data = await getLeaveBalances(currentYear);
-      setBalances(data as LeaveBalance[]);
+      // Check if user is authenticated before making API call
+      const authStoreModule = await import('../store/authStore');
+      const user = authStoreModule.useAuthStore.getState().user;
+      if (!user) {
+        console.log('[useLeaveBalances] User not authenticated, skipping server fetch');
+        setIsRefreshing(false);
+        return;
+      }
 
-      // Get last synced time from the first balance
-      if (data.length > 0) {
-        const syncTime = (data[0] as LeaveBalance).last_synced_at;
-        setLastSynced(syncTime ? new Date(syncTime) : null);
+      setError(null);
+      const response = await apiClient.get<any>(
+        API_ENDPOINTS.BALANCE.GET
+      );
+
+      // Handle /api/balance/mine response format
+      // Response can be either:
+      // 1. { year: 2025, balances: [...] } - detailed format with opening, accrued, used, closing
+      // 2. { year: 2025, EARNED: 34, CASUAL: 9, MEDICAL: 12 } - simple format
+      const year = response.data?.year ?? currentYear;
+      let balances: any[] = [];
+
+      if (Array.isArray(response.data?.balances)) {
+        // Detailed format with balance objects
+        balances = response.data.balances.map((balance: any) => ({
+          leaveType: balance.type ?? 'Unknown',
+          total: (balance.opening ?? 0) + (balance.accrued ?? 0),
+          used: balance.used ?? 0,
+          pending: 0,
+          available: balance.closing ?? 0,
+          year: year,
+        }));
+      } else if (response.data) {
+        // Simple format with balance types as keys
+        const types = ['EARNED', 'CASUAL', 'MEDICAL', 'EL', 'CL', 'ML'];
+        balances = types
+          .filter((type) => typeof response.data[type] === 'number')
+          .map((type) => ({
+            leaveType: type,
+            total: response.data[type],
+            used: 0, // Simple format doesn't include breakdown
+            pending: 0,
+            available: response.data[type],
+            year: year,
+          }));
+      }
+
+      if (balances.length > 0) {
+        await saveLeaveBalances(balances);
+        setLastSynced(new Date());
+        await loadLocalBalances({ suppressLoading: true });
       }
     } catch (err) {
-      setError(err as Error);
-      console.error('Error fetching leave balances:', err);
+      const error = err as Error;
+      // Don't treat 401 as an error that should be displayed to user, it's expected when not logged in
+      if (error.message && error.message.includes('401')) {
+        console.log('[useLeaveBalances] Not authenticated, using local data only');
+      } else {
+        setError(error);
+        console.error('Error syncing leave balances:', error);
+      }
     } finally {
-      setIsLoading(false);
+      setIsRefreshing(false);
     }
-  }, [currentYear]);
+  }, [currentYear, loadLocalBalances]);
 
   useEffect(() => {
-    fetchBalances();
-  }, [fetchBalances]);
+    loadLocalBalances();
+    fetchBalancesFromServer();
+  }, [loadLocalBalances, fetchBalancesFromServer]);
 
   const updateBalances = useCallback(
     async (
@@ -56,14 +135,14 @@ export function useLeaveBalances(year?: number) {
     ) => {
       try {
         await saveLeaveBalances(newBalances);
-        await fetchBalances();
+        await loadLocalBalances();
         return { success: true };
       } catch (err) {
         console.error('Error updating leave balances:', err);
         return { success: false, error: err };
       }
     },
-    [fetchBalances]
+    [loadLocalBalances]
   );
 
   const getBalanceByType = useCallback(
@@ -81,15 +160,16 @@ export function useLeaveBalances(year?: number) {
     return balances.reduce((sum, b) => sum + b.used_days, 0);
   }, [balances]);
 
-  const refresh = useCallback(() => {
-    fetchBalances();
-  }, [fetchBalances]);
+  const refresh = useCallback(async () => {
+    await fetchBalancesFromServer();
+  }, [fetchBalancesFromServer]);
 
   return {
     balances,
     isLoading,
     error,
     lastSynced,
+    isRefreshing,
     updateBalances,
     getBalanceByType,
     getTotalAvailable,

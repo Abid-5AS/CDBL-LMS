@@ -6,6 +6,7 @@ import { Platform } from "react-native";
 export const liquidGlassColors = {
   light: {
     primary: "#007AFF",
+    onPrimary: "#FFFFFF",
     background: "#F2F2F7",
     surface: "#FFFFFF",
     surfaceVariant: "#E5E5EA",
@@ -21,6 +22,7 @@ export const liquidGlassColors = {
   },
   dark: {
     primary: "#0A84FF",
+    onPrimary: "#FFFFFF",
     background: "#000000",
     surface: "#1C1C1E",
     surfaceVariant: "#2C2C2E",
@@ -108,9 +110,60 @@ export const material3Colors = {
  * Get platform-specific colors
  */
 export const getThemeColors = (isDark: boolean) => {
-  if (Platform.OS === "ios") {
-    return isDark ? liquidGlassColors.dark : liquidGlassColors.light;
-  } else {
-    return isDark ? material3Colors.dark : material3Colors.light;
-  }
+  const isIOS = Platform.OS === "ios";
+
+  // Get base colors based on platform
+  const baseColors = isIOS
+    ? (isDark ? liquidGlassColors.dark : liquidGlassColors.light)
+    : (isDark ? material3Colors.dark : material3Colors.light);
+
+  // Merge with missing properties to ensure compatibility
+  // This ensures that components can access colors regardless of platform
+  const mergedColors = {
+    ...baseColors,
+    // Add missing properties for cross-platform compatibility
+    onSurface: baseColors.onSurface || baseColors.text,
+    onSurfaceVariant: baseColors.onSurfaceVariant || baseColors.textSecondary,
+    outline: baseColors.outline || baseColors.border,
+    surfaceContainer: baseColors.surfaceContainer || baseColors.surface,
+    surfaceContainerLow: baseColors.surfaceContainerLow || baseColors.surface,
+    surfaceContainerLowest: baseColors.surfaceContainerLowest || baseColors.background,
+    surfaceContainerHighest: baseColors.surfaceContainerHighest || baseColors.surfaceVariant,
+    primaryContainer: baseColors.primaryContainer || baseColors.primary,
+    onPrimaryContainer: baseColors.onPrimaryContainer || baseColors.onPrimary,
+    secondary: baseColors.secondary || baseColors.primary,
+    onSecondary: baseColors.onSecondary || baseColors.onPrimary,
+    secondaryContainer: baseColors.secondaryContainer || baseColors.surfaceVariant,
+    onSecondaryContainer: baseColors.onSecondaryContainer || baseColors.text,
+    tertiary: baseColors.tertiary || baseColors.accent,
+    onTertiary: baseColors.onTertiary || baseColors.onPrimary,
+    tertiaryContainer: baseColors.tertiaryContainer || baseColors.surfaceVariant,
+    onTertiaryContainer: baseColors.onTertiaryContainer || baseColors.text,
+    errorContainer: baseColors.errorContainer || baseColors.error,
+    onError: baseColors.onError || baseColors.onPrimary,
+    onErrorContainer: baseColors.onErrorContainer || baseColors.onPrimary,
+    onBackground: baseColors.onBackground || baseColors.text,
+    inverseSurface: baseColors.inverseSurface || baseColors.surfaceVariant,
+    inverseOnSurface: baseColors.inverseOnSurface || baseColors.text,
+    inversePrimary: baseColors.inversePrimary || baseColors.primary,
+    outlineVariant: baseColors.outlineVariant || baseColors.border,
+    scrim: baseColors.scrim || baseColors.background,
+    // Add missing success, warning, info properties for Material 3 when on iOS
+    success: baseColors.success || "#34C759",
+    warning: baseColors.warning || "#FF9500",
+    info: baseColors.info || "#5AC8FA",
+    successContainer: baseColors.successContainer || "#E6F4EA",
+    onSuccess: baseColors.onSuccess || "#FFFFFF",
+    onSuccessContainer: baseColors.onSuccessContainer || "#0D652D",
+    warningContainer: baseColors.warningContainer || "#FEF7E8",
+    onWarning: baseColors.onWarning || "#4B2900",
+    onWarningContainer: baseColors.onWarningContainer || "#3C1F00",
+    disabled: baseColors.disabled || baseColors.textSecondary,
+    textPrimary: baseColors.textPrimary || baseColors.text,
+    textSecondary: baseColors.textSecondary || baseColors.text,
+    textTertiary: baseColors.textTertiary || baseColors.textSecondary,
+    border: baseColors.border || baseColors.outline,
+  };
+
+  return mergedColors;
 };

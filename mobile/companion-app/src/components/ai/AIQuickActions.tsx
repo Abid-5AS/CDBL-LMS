@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import { useTheme } from '../../providers/ThemeProvider';
 import { QUICK_ACTIONS } from '../../ai/prompts';
 import { Calendar, HelpCircle, AlertCircle, Sun } from 'lucide-react-native';
+import { spacing, radius, typography } from '../../theme/designTokens';
 
 interface AIQuickActionsProps {
   onActionPress: (prompt: string) => void;
@@ -53,12 +54,8 @@ export function AIQuickActions({ onActionPress }: AIQuickActionsProps) {
             style={[
               styles.actionCard,
               {
-                backgroundColor: isDark
-                  ? 'rgba(255, 255, 255, 0.05)'
-                  : 'rgba(0, 0, 0, 0.03)',
-                borderColor: isDark
-                  ? 'rgba(255, 255, 255, 0.1)'
-                  : 'rgba(0, 0, 0, 0.1)',
+                backgroundColor: colors.surfaceVariant,
+                borderColor: colors.border,
               },
             ]}
             onPress={() => onActionPress(action.prompt)}
@@ -89,38 +86,38 @@ export function AIQuickActions({ onActionPress }: AIQuickActionsProps) {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   title: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.heading.fontWeight,
     letterSpacing: 0.5,
-    marginBottom: 12,
-    marginLeft: 4,
+    marginBottom: spacing.md,
+    marginLeft: spacing.xs,
   },
   scrollContent: {
-    gap: 12,
-    paddingHorizontal: 4,
+    gap: spacing.md,
+    paddingHorizontal: spacing.xs,
   },
   actionCard: {
     width: 120,
-    paddingVertical: 16,
-    paddingHorizontal: 12,
-    borderRadius: 12,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
     borderWidth: 1,
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.sm,
   },
   iconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: typography.display.lineHeight,
+    height: typography.display.lineHeight,
+    borderRadius: radius.lg,
     justifyContent: 'center',
     alignItems: 'center',
   },
   actionTitle: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.heading.fontWeight,
     textAlign: 'center',
   },
 });

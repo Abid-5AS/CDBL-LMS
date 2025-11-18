@@ -267,7 +267,7 @@ class SyncService {
    */
   private async updateLeaveApplications(applications: LeaveApplicationResponse[]) {
     const {
-      createLeaveApplication,
+      saveLeaveApplication,
       updateLeaveApplication,
     } = await import('../database');
 
@@ -275,20 +275,14 @@ class SyncService {
       try {
         // Check if exists, then update or create
         // For simplicity, we'll use create which handles upsert
-        await createLeaveApplication({
+        await saveLeaveApplication({
           id: app.id,
-          leave_type: app.leaveType,
-          start_date: app.startDate,
-          end_date: app.endDate,
+          leaveType: app.leaveType,
+          startDate: app.startDate,
+          endDate: app.endDate,
+          daysRequested: app.workingDays,
           reason: app.reason,
-          working_days: app.workingDays,
           status: app.status,
-          half_day: app.halfDay ? 1 : 0,
-          applied_date: app.appliedDate,
-          approver_comments: app.approverComments,
-          created_at: app.appliedDate,
-          updated_at: app.updatedAt,
-          synced: 1,
         });
       } catch (error) {
         console.error(`[SyncService] Failed to update application ${app.id}:`, error);
@@ -300,16 +294,18 @@ class SyncService {
    * Update balances in local database
    */
   private async updateBalances(balances: LeaveBalanceResponse[]) {
-    const { updateLeaveBalance } = await import('../database');
+    const { saveLeaveBalances } = await import('../database');
 
     for (const balance of balances) {
       try {
-        await updateLeaveBalance(balance.id, {
-          total_days: balance.totalDays,
-          used_days: balance.usedDays,
-          pending_days: balance.pendingDays,
-          available_days: balance.availableDays,
-        });
+        await saveLeaveBalances([{
+          leaveType: balance.leaveType,
+          total: balance.totalDays,
+          used: balance.usedDays,
+          pending: balance.pendingDays,
+          available: balance.availableDays,
+          year: balance.year,
+        }]);
       } catch (error) {
         console.error(`[SyncService] Failed to update balance ${balance.id}:`, error);
       }
@@ -320,12 +316,15 @@ class SyncService {
    * Update profile in local database
    */
   private async updateProfile(profile: UserProfileResponse) {
-    const { updateUserProfile } = await import('../database');
+    const { saveUserProfile } = await import('../database');
 
     try {
-      await updateUserProfile({
+      await saveUserProfile({
+        employeeId: profile.employeeId || "",
         name: profile.name,
-        phone_number: profile.phoneNumber,
+        email: profile.email || "",
+        department: profile.department,
+        role: profile.role,
       });
     } catch (error) {
       console.error('[SyncService] Failed to update profile:', error);

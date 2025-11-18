@@ -62,6 +62,8 @@ export default function ParallaxScrollView({
   );
 }
 
+import { spacing } from '@/src/theme/designTokens';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -72,8 +74,8 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 32,
-    gap: 16,
+    padding: spacing.xl,
+    gap: spacing.md,
     overflow: 'hidden',
   },
 });

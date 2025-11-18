@@ -1,97 +1,63 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { ErrorBoundary as ReactErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { ThemedButton } from '../shared/ThemedButton';
 import { LiquidGlassCard } from '../ios/LiquidGlassCard';
 import { AlertCircle } from 'lucide-react-native';
+import { useTheme } from '../../providers/ThemeProvider';
+import { spacing, radius, typography } from '../../theme/designTokens';
 
-interface Props {
-  children: ReactNode;
-  fallback?: (error: Error, resetError: () => void) => ReactNode;
+function logError(error: Error, info: React.ErrorInfo) {
+  // Log error to error reporting service
+  console.error('Error Boundary caught error:', error, info);
+  // TODO: Send to error tracking service (Sentry, etc.)
+  // reportErrorToService(error, info);
 }
 
-interface State {
-  hasError: boolean;
-  error: Error | null;
-}
+function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
+  const { colors } = useTheme();
 
-/**
- * Error Boundary Component
- *
- * Catches React errors and displays a user-friendly error screen
- * Prevents the entire app from crashing
- */
-export class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      hasError: false,
-      error: null,
-    };
-  }
-
-  static getDerivedStateFromError(error: Error): State {
-    return {
-      hasError: true,
-      error,
-    };
-  }
-
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log error to error reporting service
-    console.error('Error Boundary caught error:', error, errorInfo);
-
-    // TODO: Send to error tracking service (Sentry, etc.)
-    // reportErrorToService(error, errorInfo);
-  }
-
-  resetError = () => {
-    this.setState({
-      hasError: false,
-      error: null,
-    });
-  };
-
-  render() {
-    if (this.state.hasError) {
-      // Use custom fallback if provided
-      if (this.props.fallback) {
-        return this.props.fallback(this.state.error!, this.resetError);
-      }
-
-      // Default error UI
-      return (
-        <View style={styles.container}>
-          <LiquidGlassCard style={styles.card}>
-            <View style={styles.iconContainer}>
-              <AlertCircle size={64} color="#F44336" />
-            </View>
-
-            <Text style={styles.title}>Oops! Something went wrong</Text>
-
-            <Text style={styles.message}>
-              We're sorry, but something unexpected happened. The app has recovered and you can try again.
-            </Text>
-
-            {__DEV__ && this.state.error && (
-              <View style={styles.errorDetails}>
-                <Text style={styles.errorTitle}>Error Details (Dev Mode):</Text>
-                <Text style={styles.errorText}>{this.state.error.message}</Text>
-                <Text style={styles.errorStack}>
-                  {this.state.error.stack?.substring(0, 500)}
-                </Text>
-              </View>
-            )}
-
-            <ThemedButton variant="primary" onPress={this.resetError}>
-              Try Again
-            </ThemedButton>
-          </LiquidGlassCard>
+  return (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <LiquidGlassCard style={styles.card}>
+        <View style={styles.iconContainer}>
+          <AlertCircle size={64} color={colors.error} />
         </View>
-      );
-    }
 
-    return this.props.children;
-  }
+        <Text style={[styles.title, { color: colors.onSurface }]}>Oops! Something went wrong</Text>
+
+        <Text style={[styles.message, { color: colors.onSurfaceVariant }]}>
+          We're sorry, but something unexpected happened. The app has recovered and you can try again.
+        </Text>
+
+        {__DEV__ && error && (
+          <View style={[styles.errorDetails, { backgroundColor: colors.warningContainer }]}>
+            <Text style={[styles.errorTitle, { color: colors.onWarningContainer }]}>Error Details (Dev Mode):</Text>
+            <Text style={[styles.errorText, { color: colors.onWarningContainer }]}>{error.message}</Text>
+            <Text style={[styles.errorStack, { color: colors.onWarningContainer }]}>
+              {error.stack?.substring(0, 500)}
+            </Text>
+          </View>
+        )}
+
+        <ThemedButton variant="primary" onPress={resetErrorBoundary}>
+          Try Again
+        </ThemedButton>
+      </LiquidGlassCard>
+    </View>
+  );
+}
+
+interface ErrorBoundaryProps {
+  children: ReactNode;
+}
+
+export function ErrorBoundary({ children }: ErrorBoundaryProps) {
+  return (
+    <ReactErrorBoundary FallbackComponent={ErrorFallback} onError={logError}>
+      {children}
+    </ReactErrorBoundary>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -99,53 +65,46 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#F5F5F5',
+    padding: radius.lg,
   },
   card: {
-    padding: 24,
+    padding: spacing.lg,
     width: '100%',
     maxWidth: 400,
   },
   iconContainer: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: radius.lg,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1C1C1E',
+    fontSize: typography.display.fontSize - 8,
+    fontWeight: typography.display.fontWeight,
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   message: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: typography.body.fontSize,
     textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 24,
+    lineHeight: typography.body.lineHeight,
+    marginBottom: spacing.lg,
   },
   errorDetails: {
-    backgroundColor: '#FFF3CD',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 20,
+    padding: spacing.md,
+    borderRadius: radius.sm,
+    marginBottom: radius.lg,
   },
   errorTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#856404',
-    marginBottom: 8,
+    fontSize: radius.md,
+    fontWeight: typography.heading.fontWeight,
+    marginBottom: spacing.sm,
   },
   errorText: {
-    fontSize: 12,
-    color: '#856404',
-    marginBottom: 8,
+    fontSize: typography.caption.fontSize,
+    marginBottom: spacing.sm,
     fontFamily: 'monospace',
   },
   errorStack: {
-    fontSize: 10,
-    color: '#856404',
+    fontSize: typography.caption.fontSize - 2,
     fontFamily: 'monospace',
   },
 });

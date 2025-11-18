@@ -18,6 +18,7 @@ import { useLeaveHistory } from "@/src/hooks/useLeaveHistory";
 import { syncService } from "@/src/sync/SyncService";
 import { SyncStatusBanner } from "@/src/components/shared/SyncStatusBanner";
 import { format } from "date-fns";
+import { spacing, typography, radius } from "@/src/theme/designTokens";
 
 export default function HistoryScreen() {
   const { colors, isDark } = useTheme();
@@ -30,11 +31,11 @@ export default function HistoryScreen() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "approved":
-        return "#4CAF50";
+        return colors.success;
       case "pending":
-        return "#FF9800";
+        return colors.warning;
       case "rejected":
-        return "#F44336";
+        return colors.error;
       default:
         return colors.primary;
     }
@@ -169,7 +170,7 @@ export default function HistoryScreen() {
           <Text
             style={[
               styles.errorText,
-              { color: "#F44336" },
+              { color: colors.error },
             ]}
           >
             Failed to load leave history
@@ -309,9 +310,9 @@ export default function HistoryScreen() {
                     style={[
                       styles.reasonBox,
                       {
-                        backgroundColor: isDark
+                        backgroundColor: 'surfaceVariant' in colors ? colors.surfaceVariant : (isDark
                           ? "rgba(255,255,255,0.05)"
-                          : "rgba(0,0,0,0.03)",
+                          : "rgba(0,0,0,0.03)"),
                       },
                     ]}
                   >
@@ -329,9 +330,9 @@ export default function HistoryScreen() {
                       style={[
                         styles.commentBox,
                         {
-                          backgroundColor: isDark
+                          backgroundColor: 'surfaceVariant' in colors ? colors.surfaceVariant : (isDark
                             ? "rgba(255,255,255,0.05)"
-                            : "rgba(0,0,0,0.03)",
+                            : "rgba(0,0,0,0.03)"),
                         },
                       ]}
                     >
@@ -396,114 +397,114 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 20,
-    paddingBottom: 100,
+    padding: radius.lg,
+    paddingBottom: spacing.xxl * 2 + spacing.sm,
   },
   header: {
-    marginBottom: 24,
-    paddingTop: 20,
+    marginBottom: spacing.lg,
+    paddingTop: radius.lg,
   },
   title: {
-    fontSize: 32,
-    fontWeight: "700",
-    marginBottom: 4,
+    fontSize: typography.display.fontSize,
+    fontWeight: typography.display.fontWeight,
+    marginBottom: spacing.xs,
   },
   subtitle: {
-    fontSize: 16,
-    fontWeight: "500",
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
   searchCard: {
-    marginBottom: 16,
-    padding: 16,
+    marginBottom: spacing.md,
+    padding: spacing.md,
   },
   searchInput: {
-    borderRadius: 12,
-    padding: 12,
-    fontSize: 15,
-    marginBottom: 12,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    fontSize: typography.body.fontSize,
+    marginBottom: spacing.md,
   },
   filterRow: {
     flexDirection: "row",
-    gap: 8,
+    gap: spacing.sm,
   },
   filterButton: {
     flex: 1,
   },
   leaveCard: {
-    marginBottom: 12,
-    padding: 16,
+    marginBottom: spacing.md,
+    padding: spacing.md,
   },
   leaveHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   leaveType: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 4,
+    fontSize: typography.heading.fontSize,
+    fontWeight: typography.heading.fontWeight,
+    marginBottom: spacing.xs,
   },
   leaveDates: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: radius.md,
+    fontWeight: typography.body.fontWeight,
   },
   statusBadge: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    gap: 4,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.lg,
+    gap: spacing.xs,
   },
   statusIcon: {
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: radius.md,
+    fontWeight: typography.display.fontWeight,
   },
   statusText: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.heading.fontWeight,
   },
   leaveDetails: {
-    gap: 8,
+    gap: spacing.sm,
   },
   detailRow: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
   detailLabel: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: radius.md,
+    fontWeight: typography.body.fontWeight,
   },
   detailValue: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: radius.md,
+    fontWeight: typography.heading.fontWeight,
   },
   reasonBox: {
-    marginTop: 8,
-    padding: 12,
-    borderRadius: 8,
+    marginTop: spacing.sm,
+    padding: spacing.md,
+    borderRadius: radius.sm,
   },
   reasonText: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: radius.md,
+    lineHeight: typography.heading.lineHeight,
   },
   emptyState: {
     alignItems: "center",
-    padding: 40,
+    padding: typography.display.lineHeight,
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: typography.body.fontSize,
     textAlign: "center",
   },
   loadingContainer: {
     alignItems: "center",
     justifyContent: "center",
-    padding: 40,
+    padding: typography.display.lineHeight,
   },
   loadingText: {
-    marginTop: 16,
-    fontSize: 15,
+    marginTop: spacing.md,
+    fontSize: typography.body.fontSize,
   },
   emptyListContent: {
     flexGrow: 1,
@@ -511,37 +512,37 @@ const styles = StyleSheet.create({
   errorState: {
     alignItems: "center",
     justifyContent: "center",
-    padding: 40,
+    padding: typography.display.lineHeight,
   },
   errorText: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 8,
+    fontSize: typography.heading.fontSize,
+    fontWeight: typography.heading.fontWeight,
+    marginBottom: spacing.sm,
     textAlign: "center",
   },
   errorSubtext: {
-    fontSize: 14,
+    fontSize: radius.md,
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: radius.lg,
   },
   retryButton: {
-    paddingHorizontal: 32,
+    paddingHorizontal: spacing.xl,
   },
   commentBox: {
-    marginTop: 8,
-    padding: 12,
-    borderRadius: 8,
+    marginTop: spacing.sm,
+    padding: spacing.md,
+    borderRadius: radius.sm,
   },
   commentLabel: {
-    fontSize: 12,
-    fontWeight: "600",
-    marginBottom: 4,
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.heading.fontWeight,
+    marginBottom: spacing.xs,
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
   commentText: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: radius.md,
+    lineHeight: typography.heading.lineHeight,
     fontStyle: "italic",
   },
 });

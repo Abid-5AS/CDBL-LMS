@@ -147,7 +147,7 @@ export default function ApprovalsScreen() {
       ) : error ? (
         /* Error State */
         <View style={styles.errorContainer}>
-          <Text style={[styles.errorText, { color: '#F44336' }]}>
+          <Text style={[styles.errorText, { color: colors.error }]}>
             Failed to load approvals
           </Text>
           <Text
@@ -345,9 +345,7 @@ export default function ApprovalsScreen() {
                   style={[
                     styles.reasonBox,
                     {
-                      backgroundColor: isDark
-                        ? 'rgba(255,255,255,0.05)'
-                        : 'rgba(0,0,0,0.03)',
+                      backgroundColor: colors.surfaceVariant,
                     },
                   ]}
                 >
@@ -380,14 +378,14 @@ export default function ApprovalsScreen() {
                     variant="outline"
                     onPress={() => handleReject(approval.id, approval.employeeName)}
                     disabled={isBeingProcessed || isProcessing}
-                    style={[styles.rejectButton, { borderColor: '#F44336' }]}
+                    style={[styles.rejectButton, { borderColor: colors.error }]}
                   >
                     {isBeingProcessed ? (
-                      <ActivityIndicator size="small" color="#F44336" />
+                      <ActivityIndicator size="small" color={colors.error} />
                     ) : (
                       <>
-                        <XCircle size={20} color="#F44336" />
-                        <Text style={[styles.rejectText, { color: '#F44336' }]}>
+                        <XCircle size={20} color={colors.error} />
+                        <Text style={[styles.rejectText, { color: colors.error }]}>
                           Reject
                         </Text>
                       </>
@@ -398,14 +396,14 @@ export default function ApprovalsScreen() {
                     variant="primary"
                     onPress={() => handleApprove(approval.id, approval.employeeName)}
                     disabled={isBeingProcessed || isProcessing}
-                    style={[styles.approveButton, { backgroundColor: '#4CAF50' }]}
+                    style={[styles.approveButton, { backgroundColor: colors.success }]}
                   >
                     {isBeingProcessed ? (
-                      <ActivityIndicator size="small" color="#FFFFFF" />
+                      <ActivityIndicator size="small" color={colors.onPrimary} />
                     ) : (
                       <>
-                        <CheckCircle size={20} color="#FFFFFF" />
-                        <Text style={styles.approveText}>Approve</Text>
+                        <CheckCircle size={20} color={colors.onPrimary} />
+                        <Text style={[styles.approveText, { color: colors.onPrimary }]}>Approve</Text>
                       </>
                     )}
                   </ThemedButton>
@@ -420,103 +418,105 @@ export default function ApprovalsScreen() {
   );
 }
 
+import { spacing, radius, typography } from '@/src/theme/designTokens';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   content: {
-    padding: 20,
-    paddingBottom: 100,
+    padding: radius.lg,
+    paddingBottom: spacing.xxl * 2 + spacing.sm,
   },
   header: {
-    marginBottom: 24,
-    paddingTop: 20,
+    marginBottom: spacing.lg,
+    paddingTop: radius.lg,
   },
   backButton: {
-    marginBottom: 12,
+    marginBottom: spacing.md,
     width: 50,
   },
   title: {
-    fontSize: 34,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: typography.display.fontSize,
+    fontWeight: typography.display.fontWeight,
+    marginBottom: spacing.xs,
   },
   subtitle: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
   loadingContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 60,
+    padding: spacing.xxl + spacing.lg,
   },
   loadingText: {
-    marginTop: 16,
-    fontSize: 15,
+    marginTop: spacing.md,
+    fontSize: typography.body.fontSize,
   },
   errorContainer: {
     alignItems: 'center',
-    padding: 40,
+    padding: typography.display.lineHeight,
   },
   errorText: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 8,
+    fontSize: typography.heading.fontSize,
+    fontWeight: typography.heading.fontWeight,
+    marginBottom: spacing.sm,
     textAlign: 'center',
   },
   errorSubtext: {
-    fontSize: 14,
+    fontSize: radius.md,
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: radius.lg,
   },
   retryButton: {
-    paddingHorizontal: 32,
+    paddingHorizontal: spacing.xl,
   },
   emptyContainer: {
     alignItems: 'center',
-    padding: 60,
+    padding: spacing.xxl + spacing.lg,
   },
   emptyTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginTop: 16,
-    marginBottom: 8,
+    fontSize: typography.display.fontSize - 8,
+    fontWeight: typography.display.fontWeight,
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: typography.body.fontSize,
     textAlign: 'center',
   },
   approvalsList: {
-    gap: 16,
+    gap: spacing.md,
   },
   approvalCard: {
-    padding: 16,
+    padding: spacing.md,
   },
   employeeInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
-    gap: 12,
+    marginBottom: spacing.md,
+    gap: spacing.md,
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: spacing.xxl + spacing.sm,
+    height: spacing.xxl + spacing.sm,
+    borderRadius: radius.xl,
     alignItems: 'center',
     justifyContent: 'center',
   },
   employeeName: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 4,
+    fontSize: typography.heading.fontSize,
+    fontWeight: typography.heading.fontWeight,
+    marginBottom: spacing.xs,
   },
   employeeDept: {
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
   leaveDetails: {
-    gap: 8,
-    marginBottom: 16,
+    gap: spacing.sm,
+    marginBottom: spacing.md,
   },
   detailRow: {
     flexDirection: 'row',
@@ -524,53 +524,52 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   detailLabel: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: radius.md,
+    fontWeight: typography.body.fontWeight,
   },
   detailValue: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: radius.md,
+    fontWeight: typography.heading.fontWeight,
   },
   reasonBox: {
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
+    padding: spacing.md,
+    borderRadius: radius.sm,
+    marginBottom: spacing.md,
   },
   reasonLabel: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: typography.caption.fontSize - 1,
+    fontWeight: typography.heading.fontWeight,
     letterSpacing: 0.5,
-    marginBottom: 6,
+    marginBottom: spacing.xs,
   },
   reasonText: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: radius.md,
+    lineHeight: typography.heading.lineHeight,
   },
   actionButtons: {
     flexDirection: 'row',
-    gap: 12,
+    gap: spacing.md,
   },
   rejectButton: {
     flex: 1,
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },
   rejectText: {
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.heading.fontWeight,
   },
   approveButton: {
     flex: 1,
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },
   approveText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.heading.fontWeight,
   },
 });

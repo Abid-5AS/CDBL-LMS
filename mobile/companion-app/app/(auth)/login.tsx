@@ -151,12 +151,15 @@ export default function LoginScreen() {
             <TouchableOpacity
               style={[
                 styles.toggleButton,
-                useOtp && styles.toggleButtonActive,
+                {
+                  borderColor: useOtp ? theme.colors.primary : theme.colors.outline,
+                  backgroundColor: useOtp ? theme.colors.primaryContainer : 'transparent',
+                },
               ]}
               onPress={() => setUseOtp(!useOtp)}
             >
-              <Shield size={16} color={useOtp ? theme.colors.primary : '#999'} />
-              <Text style={[styles.toggleText, useOtp && styles.toggleTextActive]}>
+              <Shield size={16} color={useOtp ? theme.colors.primary : theme.colors.onSurfaceVariant} />
+              <Text style={[styles.toggleText, { color: useOtp ? theme.colors.primary : theme.colors.onSurfaceVariant }]}>
                 {useOtp ? 'Enable OTP Verification' : 'Disable OTP Verification'}
               </Text>
             </TouchableOpacity>
@@ -192,63 +195,55 @@ export default function LoginScreen() {
   );
 }
 
+import { spacing, typography, radius } from '@/src/theme/designTokens';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 16,
+    padding: spacing.md,
   },
   surface: {
-    padding: 24,
-    borderRadius: 16,
+    padding: spacing.lg,
+    borderRadius: radius.lg,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: spacing.xl,
   },
   title: {
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   subtitle: {
     opacity: 0.7,
   },
   form: {
-    gap: 16,
+    gap: spacing.md,
   },
   input: {
     backgroundColor: 'transparent',
   },
   otpToggle: {
-    paddingVertical: 8,
+    paddingVertical: spacing.sm,
   },
   toggleButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 8,
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm + 2,
+    borderRadius: radius.sm,
     borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  toggleButtonActive: {
-    borderColor: '#6200ee',
-    backgroundColor: '#f3e5f5',
   },
   toggleText: {
-    fontSize: 14,
-    color: '#999',
-  },
-  toggleTextActive: {
-    color: '#6200ee',
-    fontWeight: '500',
+    fontSize: typography.body.fontSize,
   },
   button: {
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
   footer: {
-    marginTop: 24,
+    marginTop: spacing.lg,
     alignItems: 'center',
   },
   footerText: {

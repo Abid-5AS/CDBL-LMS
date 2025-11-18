@@ -54,7 +54,7 @@ export default function AIAssistantScreen() {
         style={[
           styles.header,
           {
-            backgroundColor: isDark ? '#1C1C1E' : '#F2F2F7',
+            backgroundColor: colors.surface,
           },
         ]}
       >
@@ -131,8 +131,8 @@ export default function AIAssistantScreen() {
             onPress={() => setModalVisible(true)}
             activeOpacity={0.8}
           >
-            <MessageCircle size={20} color="#FFFFFF" />
-            <Text style={styles.startButtonText}>Start Conversation</Text>
+            <MessageCircle size={20} color={colors.onPrimary} />
+            <Text style={[styles.startButtonText, { color: colors.onPrimary }]}>Start Conversation</Text>
           </TouchableOpacity>
         </View>
 
@@ -275,6 +275,8 @@ export default function AIAssistantScreen() {
   );
 }
 
+import { spacing, radius, typography } from '@/src/theme/designTokens';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -283,85 +285,84 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    paddingTop: 60,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    paddingTop: spacing.xxl + spacing.lg,
   },
   backButton: {
-    padding: 4,
+    padding: spacing.xs,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: typography.heading.fontSize,
+    fontWeight: typography.display.fontWeight,
   },
   placeholder: {
-    width: 32,
+    width: spacing.xl,
   },
   content: {
     flex: 1,
   },
   scrollContent: {
-    padding: 20,
-    paddingBottom: 100,
+    padding: radius.lg,
+    paddingBottom: spacing.xxl * 2 + spacing.sm,
   },
   hero: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: spacing.xl,
   },
   sparkleContainer: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
+    width: spacing.xxl * 3,
+    height: spacing.xxl * 3,
+    borderRadius: radius.xxl,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: radius.lg,
   },
   heroTitle: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: typography.display.fontSize - 4,
+    fontWeight: typography.display.fontWeight,
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   heroSubtitle: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
     textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 24,
+    lineHeight: typography.body.lineHeight,
+    marginBottom: spacing.lg,
   },
   startButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    borderRadius: 24,
+    gap: spacing.sm,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
+    borderRadius: radius.xl,
   },
   startButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.display.fontWeight,
   },
   section: {
-    marginBottom: 32,
+    marginBottom: spacing.xl,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.heading.fontWeight,
     letterSpacing: 0.5,
-    marginBottom: 12,
-    marginLeft: 4,
+    marginBottom: spacing.md,
+    marginLeft: spacing.xs,
   },
   featureCard: {
     flexDirection: 'row',
-    padding: 16,
-    marginBottom: 12,
-    gap: 16,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    gap: spacing.md,
   },
   featureIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: spacing.xxl + spacing.sm,
+    height: spacing.xxl + spacing.sm,
+    borderRadius: radius.xl,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -369,37 +370,37 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   featureTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.heading.fontWeight,
+    marginBottom: spacing.xs,
   },
   featureDescription: {
-    fontSize: 14,
-    fontWeight: '400',
-    lineHeight: 20,
+    fontSize: radius.md,
+    fontWeight: typography.body.fontWeight,
+    lineHeight: typography.heading.lineHeight,
   },
   examplesCard: {
-    padding: 16,
-    gap: 12,
+    padding: spacing.md,
+    gap: spacing.md,
   },
   exampleItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 8,
+    paddingVertical: spacing.sm,
   },
   exampleText: {
     flex: 1,
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: radius.md,
+    fontWeight: typography.body.fontWeight,
     fontStyle: 'italic',
   },
   noteCard: {
-    padding: 16,
-    marginTop: 8,
+    padding: spacing.md,
+    marginTop: spacing.sm,
   },
   noteText: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: typography.caption.fontSize,
+    lineHeight: typography.body.lineHeight - 2,
   },
 });

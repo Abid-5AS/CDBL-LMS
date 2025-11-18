@@ -18,6 +18,7 @@ import {
   Users,
   BarChart3,
 } from 'lucide-react-native';
+import { spacing, radius, typography } from '@/src/theme/designTokens';
 
 export default function MoreScreen() {
   const { colors, isDark } = useTheme();
@@ -209,9 +210,7 @@ export default function MoreScreen() {
                         {
                           backgroundColor: item.highlighted
                             ? colors.primary + '20'
-                            : isDark
-                            ? 'rgba(255,255,255,0.1)'
-                            : 'rgba(0,0,0,0.05)',
+                            : colors.surfaceVariant,
                         },
                       ]}
                     >
@@ -257,9 +256,7 @@ export default function MoreScreen() {
                       style={[
                         styles.divider,
                         {
-                          backgroundColor: isDark
-                            ? 'rgba(255,255,255,0.1)'
-                            : 'rgba(0,0,0,0.1)',
+                          backgroundColor: colors.border,
                         },
                       ]}
                     />
@@ -274,10 +271,10 @@ export default function MoreScreen() {
       {/* Logout Button */}
       <ThemedCard style={styles.logoutCard}>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <View style={[styles.logoutIcon, { backgroundColor: '#F44336' + '20' }]}>
-            <LogOut size={22} color="#F44336" />
+          <View style={[styles.logoutIcon, { backgroundColor: colors.error + '20' }]}>
+            <LogOut size={22} color={colors.error} />
           </View>
-          <Text style={[styles.logoutText, { color: '#F44336' }]}>Logout</Text>
+          <Text style={[styles.logoutText, { color: colors.error }]}>Logout</Text>
         </TouchableOpacity>
       </ThemedCard>
 
@@ -318,31 +315,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 20,
-    paddingBottom: 100,
+    padding: radius.lg,
+    paddingBottom: spacing.xxl * 2 + spacing.sm,
   },
   header: {
-    marginBottom: 24,
-    paddingTop: 20,
+    marginBottom: spacing.lg,
+    paddingTop: radius.lg,
   },
   title: {
-    fontSize: 34,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: typography.display.fontSize,
+    fontWeight: typography.display.fontWeight,
+    marginBottom: spacing.xs,
   },
   subtitle: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.heading.fontWeight,
     letterSpacing: 0.5,
-    marginBottom: 8,
-    marginLeft: 4,
+    marginBottom: spacing.sm,
+    marginLeft: spacing.xs,
   },
   menuCard: {
     padding: 0,
@@ -351,61 +348,61 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    padding: spacing.md,
   },
   menuIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: typography.display.lineHeight,
+    height: typography.display.lineHeight,
+    borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: spacing.md,
   },
   menuText: {
     flex: 1,
   },
   menuLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 2,
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.heading.fontWeight,
+    marginBottom: spacing.xs / 2,
   },
   menuDescription: {
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.caption.fontWeight,
   },
   divider: {
     height: 1,
-    marginLeft: 68,
+    marginLeft: spacing.xxl + spacing.xl,
   },
   logoutCard: {
     padding: 0,
     overflow: 'hidden',
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    padding: spacing.md,
   },
   logoutIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: typography.display.lineHeight,
+    height: typography.display.lineHeight,
+    borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: spacing.md,
   },
   logoutText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.heading.fontWeight,
   },
   footer: {
-    marginTop: 40,
+    marginTop: typography.display.lineHeight,
     alignItems: 'center',
-    gap: 4,
+    gap: spacing.xs,
   },
   footerText: {
-    fontSize: 12,
-    fontWeight: '500',
+    fontSize: typography.caption.fontSize,
+    fontWeight: typography.caption.fontWeight,
   },
 });
