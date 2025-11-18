@@ -134,14 +134,14 @@ export function ModernEmployeeDashboard({
       label: "Review My Leaves",
       description: "Jump to status & history",
       icon: ClipboardList,
-      accent: "bg-gradient-to-br from-cyan-500 to-blue-500 text-white",
+      accent: "bg-blue-600 text-white",
       onClick: () => router.push("/leaves"),
     },
     {
       label: "Check Balance & Policies",
       description: "View balances and rules",
       icon: BookOpen,
-      accent: "bg-gradient-to-br from-emerald-500 to-teal-500 text-white",
+      accent: "bg-emerald-600 text-white",
       onClick: () => router.push("/balance"),
     },
   ];
@@ -158,7 +158,7 @@ export function ModernEmployeeDashboard({
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="space-y-6 lg:space-y-8"
+          className="space-y-4 lg:space-y-5"
         >
           <motion.section variants={itemVariants}>
             <div className="surface-card p-4 sm:p-6">

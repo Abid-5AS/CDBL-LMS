@@ -27,10 +27,10 @@ type ResponsiveDashboardGridProps = {
 };
 
 const gapClasses = {
-  sm: "gap-3 sm:gap-4",
-  md: "gap-4 sm:gap-6",
-  lg: "gap-6 sm:gap-8",
-  xl: "gap-8 sm:gap-10",
+  sm: "gap-2 sm:gap-3",
+  md: "gap-3 sm:gap-4",
+  lg: "gap-4 sm:gap-5",
+  xl: "gap-5 sm:gap-6",
 };
 
 const containerVariants = {
@@ -229,7 +229,7 @@ export function DashboardSection({
 
   const content = (
     <>
-      <section className={cn("space-y-4 sm:space-y-6", className)}>
+      <section className={cn("space-y-3 sm:space-y-4", className)}>
         {(title || description || action) && (
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
             <div className="flex-1">

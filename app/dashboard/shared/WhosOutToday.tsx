@@ -58,7 +58,7 @@ export function WhosOutToday({ scope = "team", title }: WhosOutTodayProps) {
 
   if (loading) {
     return (
-      <Card className={cn(glassCard.elevated, "rounded-2xl")}>
+      <Card className={cn(glassCard.elevated, "rounded-xl")}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
@@ -76,7 +76,7 @@ export function WhosOutToday({ scope = "team", title }: WhosOutTodayProps) {
 
   if (error) {
     return (
-      <Card className={cn(glassCard.elevated, "rounded-2xl")}>
+      <Card className={cn(glassCard.elevated, "rounded-xl")}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
@@ -93,7 +93,7 @@ export function WhosOutToday({ scope = "team", title }: WhosOutTodayProps) {
   }
 
   return (
-    <Card className={cn(glassCard.elevated, "rounded-2xl")}>
+    <Card className={cn(glassCard.elevated, "rounded-xl")}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 justify-between">
           <div className="flex items-center gap-2">
@@ -117,15 +117,15 @@ export function WhosOutToday({ scope = "team", title }: WhosOutTodayProps) {
             <p className="text-xs text-muted-foreground mt-1">No approved leaves for today</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {data.members.map((member) => (
               <div
                 key={member.id}
                 className={cn(
-                  "flex items-start gap-3 p-3 rounded-lg transition-all duration-300",
+                  "flex items-start gap-2.5 p-2.5 rounded-lg transition-all duration-200",
                   "backdrop-blur-md bg-white/30 dark:bg-gray-900/30",
                   "border border-white/20 dark:border-white/10",
-                  "hover:bg-white/50 dark:hover:bg-gray-900/50 hover:shadow-lg"
+                  "hover:bg-white/50 dark:hover:bg-gray-900/50 hover:shadow-md"
                 )}
               >
                 <div className="flex-shrink-0 mt-0.5">

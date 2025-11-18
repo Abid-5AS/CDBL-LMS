@@ -94,9 +94,9 @@ export function KPICard({
       <div
         className={cn(
           glassCard.elevated,
-          "group relative overflow-hidden rounded-2xl",
-          "px-6 py-5 sm:px-7 sm:py-6",
-          "transition-all duration-300 hover:shadow-3xl",
+          "group relative overflow-hidden rounded-xl",
+          "px-4 py-4 sm:px-5 sm:py-5",
+          "transition-all duration-200 hover:shadow-lg",
           className
         )}
         style={accentVars}
@@ -118,9 +118,9 @@ export function KPICard({
           }}
         />
 
-        <div className="relative flex flex-col gap-5">
+        <div className="relative flex flex-col gap-3.5">
           <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 space-y-3">
+            <div className="flex-1 space-y-2.5">
               <div className="flex flex-wrap items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.35em] text-[color:var(--color-foreground-subtle)]">
                 <span className="text-ellipsis whitespace-nowrap">
                   {title}
@@ -145,7 +145,7 @@ export function KPICard({
 
             {Icon && (
               <div
-                className="rounded-2xl border border-white/20 p-3 shadow-inner dark:border-white/5"
+                className="rounded-xl border border-white/10 p-2.5 shadow-sm dark:border-white/5"
                 style={{
                   background:
                     "linear-gradient(145deg, var(--kpi-accent-soft), transparent)",
