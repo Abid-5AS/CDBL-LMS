@@ -32,12 +32,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const loadTheme = async () => {
       try {
-        const savedMode = await AsyncStorage.getItem(THEME_KEY);
-        if (savedMode && (savedMode === "light" || savedMode === "dark" || savedMode === "system")) {
-          setModeState(savedMode as ThemeMode);
+        // AsyncStorage might not be available in some environments (fallback gracefully)
+        if (AsyncStorage && AsyncStorage.getItem) {
+          const savedMode = await AsyncStorage.getItem(THEME_KEY);
+          if (savedMode && (savedMode === "light" || savedMode === "dark" || savedMode === "system")) {
+            setModeState(savedMode as ThemeMode);
+          }
         }
       } catch (error) {
-        console.error("Failed to load theme preference:", error);
+        console.warn("AsyncStorage not available, using default theme:", error);
       } finally {
         setIsLoading(false);
       }
@@ -48,10 +51,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Persist theme preference when changed
   const setMode = async (newMode: ThemeMode) => {
     try {
-      await AsyncStorage.setItem(THEME_KEY, newMode);
+      // AsyncStorage might not be available in some environments (fallback gracefully)
+      if (AsyncStorage && AsyncStorage.setItem) {
+        await AsyncStorage.setItem(THEME_KEY, newMode);
+      }
       setModeState(newMode);
     } catch (error) {
-      console.error("Failed to save theme preference:", error);
+      console.warn("Failed to save theme preference:", error);
+      // Still update state even if storage fails
+      setModeState(newMode);
     }
   };
 
