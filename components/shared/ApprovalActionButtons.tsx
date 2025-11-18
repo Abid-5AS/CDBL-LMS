@@ -3,13 +3,14 @@
 import { ArrowRight, RotateCcw, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export type ApprovalAction = "forward" | "return" | "cancel" | "approve";
+export type ApprovalAction = "forward" | "return" | "cancel" | "approve" | "reject";
 
 interface ApprovalActionButtonsProps {
   onForward?: () => void;
   onReturn?: () => void;
   onCancel?: () => void;
   onApprove?: () => void;
+  onReject?: () => void;
   disabled?: boolean;
   loading?: boolean;
   loadingAction?: ApprovalAction | null;
@@ -27,6 +28,7 @@ export function ApprovalActionButtons({
   onReturn,
   onCancel,
   onApprove,
+  onReject,
   disabled = false,
   loading = false,
   loadingAction = null,
@@ -60,7 +62,7 @@ export function ApprovalActionButtons({
     );
   }
 
-  // CEO: Approve + Cancel
+  // CEO: Approve + Reject + Cancel
   if (ceoMode) {
     return (
       <div className={`flex items-center ${gap} ${className}`}>
@@ -78,17 +80,37 @@ export function ApprovalActionButtons({
             />
           </Button>
         )}
+        {onReject && (
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={onReject}
+            disabled={disabled || loading}
+            className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-red-500/50 hover:bg-red-500/5 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(239,68,68,0.15)]`}
+            title="Reject"
+          >
+            {loadingAction === "reject" ? (
+              <div
+                className={`${iconSize} animate-spin rounded-full border-2 border-red-600 border-t-transparent`}
+              />
+            ) : (
+              <X
+                className={`${iconSize} text-red-600 dark:text-red-400 transition-colors`}
+              />
+            )}
+          </Button>
+        )}
         {onCancel && (
           <Button
             size="icon"
             variant="ghost"
             onClick={onCancel}
             disabled={disabled || loading}
-            className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-red-500/50 hover:bg-red-500/5 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(239,68,68,0.15)]`}
+            className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-gray-500/50 hover:bg-gray-500/5 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(107,114,128,0.15)]`}
             title="Cancel Request"
           >
             <X
-              className={`${iconSize} text-red-600 dark:text-red-400 transition-colors`}
+              className={`${iconSize} text-gray-600 dark:text-gray-400 transition-colors`}
             />
           </Button>
         )}
@@ -139,22 +161,42 @@ export function ApprovalActionButtons({
           )}
         </Button>
       )}
-      {onCancel && (
+      {onReject && (
         <Button
           size="icon"
           variant="ghost"
-          onClick={onCancel}
+          onClick={onReject}
           disabled={disabled || loading}
           className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-red-500/50 hover:bg-red-500/5 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(239,68,68,0.15)]`}
-          title="Cancel Request"
+          title="Reject Request"
         >
-          {loadingAction === "cancel" ? (
+          {loadingAction === "reject" ? (
             <div
               className={`${iconSize} animate-spin rounded-full border-2 border-red-600 border-t-transparent`}
             />
           ) : (
             <X
               className={`${iconSize} text-red-600 dark:text-red-400 transition-colors`}
+            />
+          )}
+        </Button>
+      )}
+      {onCancel && (
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={onCancel}
+          disabled={disabled || loading}
+          className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-gray-500/50 hover:bg-gray-500/5 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(107,114,128,0.15)]`}
+          title="Cancel Request"
+        >
+          {loadingAction === "cancel" ? (
+            <div
+              className={`${iconSize} animate-spin rounded-full border-2 border-gray-600 border-t-transparent`}
+            />
+          ) : (
+            <X
+              className={`${iconSize} text-gray-600 dark:text-gray-400 transition-colors`}
             />
           )}
         </Button>

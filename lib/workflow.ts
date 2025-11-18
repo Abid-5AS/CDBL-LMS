@@ -26,7 +26,7 @@ export const WORKFLOW_CHAINS: Record<LeaveType | "DEFAULT", AppRole[]> = {
  * Approval chain for department heads applying for leave
  * Dept Head → HR_ADMIN → HR_HEAD → CEO (final approval)
  */
-export const DEPT_HEAD_WORKFLOW_CHAIN: AppRole[] = ["HR_ADMIN", "HR_HEAD", "CEO"];
+export const DEPT_HEAD_WORKFLOW_CHAIN: AppRole[] = ["CEO"];
 
 /**
  * Legacy APPROVAL_CHAIN for backward compatibility
@@ -48,6 +48,16 @@ export function getChainFor(type: LeaveType, requesterRole?: AppRole): AppRole[]
   // Special case: If dept head is applying for leave, use CEO approval chain
   if (requesterRole === "DEPT_HEAD") {
     return DEPT_HEAD_WORKFLOW_CHAIN;
+  }
+  
+  // Special case: If HR_ADMIN is applying
+  if (requesterRole === "HR_ADMIN") {
+    return ["HR_HEAD", "DEPT_HEAD"];
+  }
+
+  // Special case: If HR_HEAD is applying
+  if (requesterRole === "HR_HEAD") {
+    return ["DEPT_HEAD"];
   }
 
   return WORKFLOW_CHAINS[type] ?? WORKFLOW_CHAINS.DEFAULT;
@@ -114,11 +124,12 @@ export function canPerformAction(role: AppRole, action: ApprovalAction, type?: L
       case "FORWARD":
         return !isFinal && chain.includes(role); // Can forward if not final
       case "APPROVE":
+        return isFinal; // Can approve only if final
       case "REJECT":
-        return isFinal; // Can approve/reject only if final
+        return chain.includes(role); // Any approver in chain can reject
       case "RETURN":
-        // HR_ADMIN can return requests for modification (operational role)
-        return role === "HR_ADMIN" || chain.includes(role);
+        // Any approver in the chain can return requests for modification
+        return chain.includes(role);
       default:
         return false;
     }
@@ -134,7 +145,7 @@ export function canPerformAction(role: AppRole, action: ApprovalAction, type?: L
       // CEO can approve/reject for dept head leave requests
       return role === "DEPT_HEAD" || role === "CEO" || role === "SYSTEM_ADMIN";
     case "RETURN":
-      // HR_ADMIN can return requests for modification
+      // Any approver can return requests for modification
       return role === "HR_ADMIN" || role === "HR_HEAD" || role === "CEO" || role === "DEPT_HEAD" || role === "SYSTEM_ADMIN";
     default:
       return false;

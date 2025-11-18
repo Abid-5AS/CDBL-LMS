@@ -158,8 +158,8 @@ export function DesktopNav({
           </Button>
         </div>
 
-        {/* Apply Leave button - Only for EMPLOYEE and DEPT_HEAD roles */}
-        {(user.role === "EMPLOYEE" || user.role === "DEPT_HEAD") && (
+        {/* Apply Leave button - All roles except CEO */}
+        {user.role !== "CEO" && (
           <Button
             size="sm"
             className="gap-1.5 backdrop-blur-md bg-background/80 dark:bg-background/40 border border-border hover:bg-background/90 dark:hover:bg-background/50 shadow-sm"

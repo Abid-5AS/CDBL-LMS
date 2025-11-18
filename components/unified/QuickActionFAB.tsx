@@ -35,8 +35,8 @@ export function QuickActionFAB() {
   // Access pending requests for context
   const { data: leavesData } = useLeaveData();
 
-  // Check if user can apply for leave (only EMPLOYEE and DEPT_HEAD)
-  const canApplyLeave = user?.role === "EMPLOYEE" || user?.role === "DEPT_HEAD";
+  // Check if user can apply for leave (All roles except CEO)
+  const canApplyLeave = user?.role !== "CEO";
 
   const pendingCount = Array.isArray(leavesData?.items)
     ? leavesData.items.filter((item: { status: string }) => 
