@@ -215,6 +215,8 @@ export function HRHeadDashboardClient() {
                   label: "above normal",
                   direction: "up"
                 } : undefined}
+                onClick={() => document.getElementById("pending-approvals")?.scrollIntoView({ behavior: "smooth" })}
+                clickLabel="Jump to approval queue"
               />
             <RoleKPICard
               title={
@@ -319,9 +321,11 @@ export function HRHeadDashboardClient() {
                 </div>
               }
               value={stats?.upcoming || 0}
-              subtitle="Next 7 days"
+              subtitle={`Next 7 days (${stats?.totalEmployees ? Math.round(((stats?.upcoming || 0) / stats.totalEmployees) * 100) : 0}% of workforce)`}
               icon={Calendar}
               role="HR_HEAD"
+              onClick={() => window.location.href = "/calendar"}
+              clickLabel="View leave calendar"
             />
         </ResponsiveDashboardGrid>
       </DashboardSection>
@@ -434,7 +438,7 @@ export function HRHeadDashboardClient() {
       >
         <div className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
           <div className="space-y-4 sm:space-y-6">
-            <Card className="surface-card">
+            <Card className="surface-card" id="pending-approvals">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between gap-4">
                   <div>

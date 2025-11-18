@@ -181,7 +181,7 @@ export function CEODashboard() {
               <RoleKPICard
                 title={
                   <div className="flex items-center gap-2">
-                    <span>On Leave Today</span>
+                    <span>Workforce Availability</span>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
@@ -207,8 +207,8 @@ export function CEODashboard() {
                     </Tooltip>
                   </div>
                 }
-                value={stats?.onLeaveToday || 0}
-                subtitle={`${stats?.utilizationRate || 0}% available`}
+                value={`${stats?.utilizationRate || 0}%`}
+                subtitle={`${stats?.onLeaveToday || 0} on leave`}
                 icon={Activity}
                 role="CEO"
                 trend={
@@ -400,8 +400,8 @@ export function CEODashboard() {
             <Card className="surface-card rounded-2xl">
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-data-info" />
-                  AI Insights
+                  <AlertCircle className="h-4 w-4 text-data-info" />
+                  System Alerts
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -465,6 +465,7 @@ export function CEODashboard() {
                 <CardTitle className="text-base flex items-center gap-2">
                   <Activity className="h-4 w-4 text-muted-foreground" />
                   System Status
+                  <Badge variant="outline" className="ml-auto text-[10px] h-5">Mock Data</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -594,6 +595,7 @@ export function CEODashboard() {
                   <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                     <Target className="h-4 w-4" />
                     System Health
+                    <Badge variant="outline" className="ml-auto text-[10px] h-5">Mock Data</Badge>
                   </CardTitle>
                 </div>
               </CardHeader>

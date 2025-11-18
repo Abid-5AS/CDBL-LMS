@@ -245,14 +245,14 @@ function HRAdminDashboardClientImpl({
                 </div>
                 <div className="relative">
                   <RoleKPICard
-                    title="Pending Requests"
+                    title="Your Approval Queue"
                     value={displayStats?.pendingRequests || 0}
-                    subtitle="Awaiting action"
+                    subtitle="Awaiting your action"
                     icon={Clock}
                     role="HR_ADMIN"
                     animate={true}
-                    onClick={() => router.push("/leaves?status=pending")}
-                    clickLabel="View pending leave requests"
+                    onClick={() => document.getElementById("pending-approvals")?.scrollIntoView({ behavior: "smooth" })}
+                    clickLabel="Jump to approval queue"
                     trend={
                       displayStats && displayStats.pendingRequests > 15
                         ? {
@@ -626,7 +626,7 @@ function HRAdminDashboardClientImpl({
           description="Review and manage pending leave requests"
           isLoading={isLoading}
         >
-          <motion.div variants={itemVariants}>
+          <motion.div variants={itemVariants} id="pending-approvals">
             <Suspense fallback={<DashboardCardSkeleton />}>
               <PendingLeaveRequestsTable />
             </Suspense>

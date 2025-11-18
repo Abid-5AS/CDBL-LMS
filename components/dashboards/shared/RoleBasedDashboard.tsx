@@ -3,8 +3,14 @@
 import { ReactNode, CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Info } from "lucide-react";
 import type { Role } from "@prisma/client";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type RoleBasedDashboardProps = {
   children: ReactNode;
@@ -329,6 +335,7 @@ export function RoleKPICard({
   animate?: boolean;
   onClick?: () => void;
   clickLabel?: string;
+  tooltip?: string;
 }) {
   const config = role
     ? roleConfigs[role] || roleConfigs.EMPLOYEE
@@ -391,8 +398,27 @@ export function RoleKPICard({
       />
       <div className="relative flex items-start justify-between gap-4">
         <div className="flex-1 space-y-3">
-          <div className="text-[0.7rem] font-semibold uppercase tracking-[0.35em] text-[color:var(--color-foreground-subtle)]">
+          <div className="flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.35em] text-[color:var(--color-foreground-subtle)]">
             {title}
+            {tooltip && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      className="cursor-help rounded-full p-0.5 hover:bg-muted/20"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Info className="h-3 w-3 opacity-70" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs text-xs">{tooltip}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </div>
           <div>
             <p className="text-3xl font-semibold text-foreground sm:text-4xl">

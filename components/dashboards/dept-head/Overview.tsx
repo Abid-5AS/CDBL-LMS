@@ -289,15 +289,8 @@ export function DeptHeadDashboardWrapper() {
               subtitle="Require employee action"
               icon={RotateCcw}
               role="DEPT_HEAD"
-              trend={
-                counts.returned > 0
-                  ? {
-                      value: counts.returned,
-                      label: "requires follow-up",
-                      direction: "down",
-                    }
-                  : undefined
-              }
+              icon={RotateCcw}
+              role="DEPT_HEAD"
             />
             <RoleKPICard
               title={
@@ -353,9 +346,9 @@ export function DeptHeadDashboardWrapper() {
             <div className="surface-card">
               <div className="flex items-center justify-between border-b border-border/60 px-6 py-4">
                 <div>
-                  <h3 className="text-lg font-semibold">Awaiting Approval</h3>
+                  <h3 className="text-lg font-semibold">Pending Requests</h3>
                   <p className="text-sm text-muted-foreground">
-                    Requests from your department
+                    Review and approve leave requests
                   </p>
                 </div>
                 <button
@@ -387,10 +380,6 @@ export function DeptHeadDashboardWrapper() {
             </div>
 
             <div className="space-y-4">
-              <DeptHeadInsightsPanel
-                items={insightItems}
-                isLoading={isLoading}
-              />
               <DeptHeadAlertsPanel alerts={alerts} isLoading={isLoading} />
             </div>
           </div>

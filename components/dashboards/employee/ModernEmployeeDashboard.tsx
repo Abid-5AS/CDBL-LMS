@@ -161,29 +161,6 @@ export function ModernEmployeeDashboard({
           className="space-y-4 lg:space-y-5"
         >
           <motion.section variants={itemVariants}>
-            <div className="surface-card p-4 sm:p-6">
-              <div className="flex items-center justify-between gap-4 mb-4">
-                <div>
-                  <h1 className="text-xl sm:text-2xl font-semibold text-foreground">
-                    {username}
-                  </h1>
-                  <p className="text-sm text-muted-foreground">
-                    {mounted
-                      ? new Date().toLocaleDateString("en-GB", {
-                          weekday: "long",
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })
-                      : "..."}
-                  </p>
-                </div>
-                <Button
-                  variant="default"
-                  size="sm"
-                  leftIcon={<Plus className="h-4 w-4" aria-hidden="true" />}
-                  onClick={() => router.push("/leaves/apply")}
-                >
                   Apply for Leave
                 </Button>
               </div>
@@ -298,6 +275,7 @@ export function ModernEmployeeDashboard({
                 animate={true}
                 onClick={() => scrollToSection("action-center")}
                 clickLabel="Jump to Action Center"
+                tooltip="Requests returned to you that must be edited or confirmed before they can re-enter the approval chain."
               />
 
               <RoleKPICard
@@ -351,6 +329,7 @@ export function ModernEmployeeDashboard({
                 animate={true}
                 onClick={() => router.push("/leaves?status=pending")}
                 clickLabel="View requests awaiting approval"
+                tooltip="Requests currently moving through approvers. Nothing is required from you unless someone returns it."
               />
 
               <RoleKPICard
@@ -391,6 +370,7 @@ export function ModernEmployeeDashboard({
                 animate={true}
                 onClick={() => scrollToSection("leave-details", "balance")}
                 clickLabel="View detailed balance breakdown"
+                tooltip="Total leave days available to you across Earned, Casual, and Medical leave."
               />
 
               <RoleKPICard
@@ -460,6 +440,7 @@ export function ModernEmployeeDashboard({
                 animate={true}
                 onClick={() => router.push("/leaves")}
                 clickLabel="View all your leave requests"
+                tooltip="Your next scheduled leave that has been fully approved and is confirmed."
               />
             </ResponsiveDashboardGrid>
           </DashboardSection>
@@ -483,8 +464,18 @@ export function ModernEmployeeDashboard({
             <ConversionSummaryCard year={new Date().getFullYear()} />
           </motion.div>
 
-          {/* Who's Out Today Widget */}
           <motion.div variants={itemVariants}>
+            <div className="mb-2 flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Your Department - Who's Out Today</h3>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Shows colleagues in your department currently on leave.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <WhosOutToday scope="team" />
           </motion.div>
 
