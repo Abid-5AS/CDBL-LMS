@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "dev:turbo": "next dev --turbopack",
-    "build": "prisma generate && next build --turbopack",
-    "start": "next start",
+    "dev": "NODE_OPTIONS='--max-old-space-size=4096' next dev",
+    "dev:low-memory": "NODE_OPTIONS='--max-old-space-size=2048 --optimize-for-size --always-opt' next dev",
+    "dev:turbo": "NODE_OPTIONS='--max-old-space-size=4096' next dev --turbopack",
+    "build": "NODE_OPTIONS='--max-old-space-size=6144' prisma generate && next build --turbopack",
+    "start": "NODE_OPTIONS='--max-old-space-size=4096' next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
     "seed": "tsx prisma/seed.ts",
@@ -19,9 +20,13 @@
     "test:workflow": "tsx scripts/verify-approval-workflow.ts",
     "verify:demo": "tsx scripts/verify-demo-data.ts",
     "verify:deployment": "tsx scripts/verify-deployment.ts",
-    "jobs:scheduler": "tsx scripts/scheduler.ts",
-    "jobs:el-accrual": "tsx scripts/jobs/el-accrual.ts",
-    "jobs:cl-lapse": "tsx scripts/jobs/auto-lapse.ts"
+    "jobs:scheduler": "NODE_OPTIONS='--max-old-space-size=2048' tsx scripts/scheduler.ts",
+    "jobs:el-accrual": "NODE_OPTIONS='--max-old-space-size=2048' tsx scripts/jobs/el-accrual.ts",
+    "jobs:cl-lapse": "NODE_OPTIONS='--max-old-space-size=2048' tsx scripts/jobs/auto-lapse.ts",
+    "memory:monitor": "node scripts/memory-monitor.mjs",
+    "memory:optimize": "echo 'Memory optimization configuration is active. Use npm run dev:low-memory for low-memory systems.'",
+    "memory:test": "node scripts/test-memory-optimization.mjs",
+    "memory:analyze": "node scripts/memory-analysis.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

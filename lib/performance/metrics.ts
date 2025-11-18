@@ -1,7 +1,7 @@
 /**
- * Performance Metrics Collection
+ * Memory-Efficient Performance Metrics Collection
  *
- * Collect and manage performance metrics
+ * Collect and manage performance metrics optimized for memory usage
  */
 
 import {
@@ -57,7 +57,7 @@ export interface ApiMetric {
 }
 
 /**
- * Performance metrics storage
+ * Memory-efficient performance metrics storage
  */
 export class MetricsCollector {
   private webVitals: Map<string, WebVitalMetric> = new Map();
@@ -65,6 +65,10 @@ export class MetricsCollector {
   private renderMetrics: Map<string, RenderMetric> = new Map();
   private apiMetrics: ApiMetric[] = [];
   private listeners: Set<(metric: WebVitalMetric | CustomMetric | RenderMetric | ApiMetric) => void> = new Set();
+
+  // Memory limits to prevent excessive memory usage
+  private readonly MAX_CUSTOM_METRICS = 50;  // Reduced from default
+  private readonly MAX_API_METRICS = 30;    // Reduced from default
 
   /**
    * Record a Web Vitals metric
@@ -91,7 +95,7 @@ export class MetricsCollector {
   }
 
   /**
-   * Record a custom metric
+   * Record a custom metric with memory limit enforcement
    */
   recordCustomMetric(
     name: string,
@@ -108,6 +112,12 @@ export class MetricsCollector {
     };
 
     this.customMetrics.push(metric);
+
+    // Enforce memory limit by removing oldest metrics
+    if (this.customMetrics.length > this.MAX_CUSTOM_METRICS) {
+      this.customMetrics = this.customMetrics.slice(-this.MAX_CUSTOM_METRICS);
+    }
+
     this.notifyListeners(metric);
 
     return metric;
@@ -144,7 +154,7 @@ export class MetricsCollector {
   }
 
   /**
-   * Record an API metric
+   * Record an API metric with memory limit enforcement
    */
   recordApiMetric(
     endpoint: string,
@@ -172,6 +182,12 @@ export class MetricsCollector {
     };
 
     this.apiMetrics.push(metric);
+
+    // Enforce memory limit by removing oldest metrics
+    if (this.apiMetrics.length > this.MAX_API_METRICS) {
+      this.apiMetrics = this.apiMetrics.slice(-this.MAX_API_METRICS);
+    }
+
     this.notifyListeners(metric);
 
     return metric;
@@ -250,6 +266,21 @@ export class MetricsCollector {
   }
 
   /**
+   * Trim metrics to stay within memory limits
+   */
+  trimMetrics(): void {
+    // Trim custom metrics if they exceed the limit
+    if (this.customMetrics.length > this.MAX_CUSTOM_METRICS) {
+      this.customMetrics = this.customMetrics.slice(-this.MAX_CUSTOM_METRICS);
+    }
+
+    // Trim API metrics if they exceed the limit
+    if (this.apiMetrics.length > this.MAX_API_METRICS) {
+      this.apiMetrics = this.apiMetrics.slice(-this.MAX_API_METRICS);
+    }
+  }
+
+  /**
    * Subscribe to metric changes
    */
   subscribe(
@@ -268,18 +299,20 @@ export class MetricsCollector {
   private notifyListeners(
     metric: WebVitalMetric | CustomMetric | RenderMetric | ApiMetric
   ): void {
-    this.listeners.forEach(listener => {
+    // Execute listeners in a memory-efficient way
+    const listenersArray = [...this.listeners];
+    for (const listener of listenersArray) {
       try {
         listener(metric);
       } catch (error) {
         console.error("Error in metrics listener:", error);
       }
-    });
+    }
   }
 }
 
 /**
- * Global metrics collector instance
+ * Global metrics collector instance with memory management
  */
 let globalCollector: MetricsCollector | null = null;
 

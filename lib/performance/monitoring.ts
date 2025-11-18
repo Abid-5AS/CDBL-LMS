@@ -1,7 +1,7 @@
 /**
- * Performance Monitoring
+ * Memory-Efficient Performance Monitoring
  *
- * Utilities for collecting Web Vitals and performance metrics
+ * Utilities for collecting Web Vitals and performance metrics optimized for memory usage
  */
 
 import {
@@ -22,13 +22,42 @@ import {
   MONITORING_CONFIG,
 } from "@/constants/performance";
 
+// Memory-efficient singleton for performance monitoring
+class PerformanceMonitor {
+  private static instance: PerformanceMonitor;
+  private monitoringActive: boolean = false;
+  private memoryCheckInterval: NodeJS.Timeout | null = null;
+
+  private constructor() {}
+
+  public static getInstance(): PerformanceMonitor {
+    if (!PerformanceMonitor.instance) {
+      PerformanceMonitor.instance = new PerformanceMonitor();
+    }
+    return PerformanceMonitor.instance;
+  }
+
+  public isMonitoringActive(): boolean {
+    return this.monitoringActive;
+  }
+
+  public setMonitoringActive(active: boolean): void {
+    this.monitoringActive = active;
+  }
+}
+
 /**
  * Initialize Web Vitals collection
  *
  * Sets up automatic collection of Core Web Vitals metrics
  */
 export function initializeWebVitals(): void {
-  if (typeof window === "undefined") {
+  if (typeof window === "undefined" || !MONITORING_CONFIG.trackWebVitals) {
+    return;
+  }
+
+  // Check if already initialized to prevent multiple registrations
+  if (typeof window !== "undefined" && (window as any).__webVitalsInitialized) {
     return;
   }
 
@@ -71,6 +100,11 @@ export function initializeWebVitals(): void {
       console.log("TTFB:", metric.value);
     }
   });
+
+  // Mark as initialized to prevent multiple registrations
+  if (typeof window !== "undefined") {
+    (window as any).__webVitalsInitialized = true;
+  }
 }
 
 /**
@@ -79,7 +113,7 @@ export function initializeWebVitals(): void {
  * Records timing metrics for page load phases
  */
 export function trackPageLoadPerformance(): void {
-  if (typeof window === "undefined" || !window.performance) {
+  if (typeof window === "undefined" || !window.performance || !MONITORING_CONFIG.trackPageLoad) {
     return;
   }
 
@@ -197,11 +231,11 @@ export function trackMemoryUsage(): void {
 
   // Warn if memory usage is high
   if (
-    usagePercent > PERFORMANCE_THRESHOLDS.memoryUsageWarning &&
+    usagePercent > PERFORMANCE_THRESHOLDS.memoryWarning &&
     MONITORING_CONFIG.devWarnings
   ) {
     console.warn(
-      `High memory usage: ${usagePercent.toFixed(2)}% (threshold: ${PERFORMANCE_THRESHOLDS.memoryUsageWarning}%)`
+      `High memory usage: ${usagePercent.toFixed(2)}% (threshold: ${PERFORMANCE_THRESHOLDS.memoryWarning}%)`
     );
   }
 }
@@ -282,8 +316,8 @@ export function trackLayoutShifts(): void {
 
     observer.observe({ entryTypes: ["layout-shift"] });
 
-    // Clean up after some time
-    setTimeout(() => observer.disconnect(), 60000);
+    // Clean up after some time to save memory
+    setTimeout(() => observer.disconnect(), 30000); // Reduced from 60s to 30s
   } catch (error) {
     if (MONITORING_CONFIG.devWarnings) {
       console.warn("Layout shift tracking not available:", error);
@@ -306,7 +340,8 @@ export function trackResourceTiming(): void {
   }
 
   try {
-    const resources = window.performance.getEntriesByType("resource");
+    // Only capture limited resources to save memory
+    const resources = window.performance.getEntriesByType("resource").slice(0, 20); // Only first 20 resources
 
     // Group resources by type
     const resourcesByType: Record<string, PerformanceResourceTiming[]> = {};
@@ -409,7 +444,7 @@ export function initializePerformanceMonitoring(): void {
     return;
   }
 
-  // Initialize Web Vitals collection
+  // Initialize Web Vitals collection (now enabled in development too)
   if (MONITORING_CONFIG.trackWebVitals) {
     initializeWebVitals();
   }
@@ -417,18 +452,28 @@ export function initializePerformanceMonitoring(): void {
   // Track page load performance
   if (MONITORING_CONFIG.trackPageLoad) {
     // Wait for page load event
-    window.addEventListener("load", () => {
+    const loadHandler = () => {
       trackPageLoadPerformance();
-    });
+      // Remove the event listener to prevent multiple calls
+      window.removeEventListener("load", loadHandler);
+    };
+    window.addEventListener("load", loadHandler);
   }
 
-  // Track memory usage periodically
+  // Track memory usage periodically (only if enabled)
   if (MONITORING_CONFIG.trackMemory) {
     trackMemoryUsage();
-    setInterval(
+
+    // Set up periodic memory checks with longer intervals to save resources
+    const monitor = PerformanceMonitor.getInstance();
+    if (monitor.memoryCheckInterval) {
+      clearInterval(monitor.memoryCheckInterval);
+    }
+
+    monitor.memoryCheckInterval = setInterval(
       () => trackMemoryUsage(),
-      MONITORING_CONFIG.memoryCheckInterval
-    );
+      120000 // Check every 2 minutes to reduce frequency
+    ) as NodeJS.Timeout;
   }
 
   // Track network information
@@ -438,23 +483,61 @@ export function initializePerformanceMonitoring(): void {
 
   // Track layout shifts
   if (MONITORING_CONFIG.trackLayoutShifts) {
-    trackLayoutShifts();
+    const layoutShiftHandler = (list: PerformanceObserverEntryList) => {
+      for (const entry of list.getEntries()) {
+        if (!(entry as any).hadRecentInput) {
+          const shift = (entry as any).value;
+          recordCustomMetric("Layout Shift", shift, "number", {
+            type: "cls",
+            hasRecentInput: false,
+          });
+
+          if (MONITORING_CONFIG.logLayoutShifts) {
+            console.log("Layout Shift:", shift, "- Affected elements:", entry);
+          }
+        }
+      }
+    };
+
+    const layoutShiftObserver = new PerformanceObserver(layoutShiftHandler);
+    layoutShiftObserver.observe({ entryTypes: ["layout-shift"] });
   }
 
-  // Track resource timing
+  // Track resource timing (only during page load)
   if (MONITORING_CONFIG.trackResources) {
     // Wait for resources to load
-    window.addEventListener("load", () => {
+    const resourceHandler = () => {
       trackResourceTiming();
-    });
+      // Remove the event listener to prevent multiple calls
+      window.removeEventListener("load", resourceHandler);
+    };
+    window.addEventListener("load", resourceHandler);
   }
 
-  // Check Web Vitals status periodically
+  // Check Web Vitals status periodically (only if enabled)
   if (MONITORING_CONFIG.checkVitalsInterval > 0) {
     setInterval(
       () => checkWebVitalsStatus(),
       MONITORING_CONFIG.checkVitalsInterval
     );
+  }
+}
+
+/**
+ * Cleanup performance monitoring resources
+ *
+ * Call this when unmounting to free up resources
+ */
+export function cleanupPerformanceMonitoring(): void {
+  if (typeof window !== "undefined") {
+    const monitor = PerformanceMonitor.getInstance();
+
+    if (monitor.memoryCheckInterval) {
+      clearInterval(monitor.memoryCheckInterval);
+      monitor.memoryCheckInterval = null;
+    }
+
+    monitor.setMonitoringActive(false);
   }
 }
 

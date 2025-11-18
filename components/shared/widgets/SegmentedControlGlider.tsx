@@ -17,6 +17,7 @@ export function SegmentedControlGlider({
   onChange: (value: string) => void;
 }) {
   const [gliderStyle, setGliderStyle] = useState({});
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   const updateGlider = (index: number) => {
     // Check for document to avoid SSR errors
@@ -31,13 +32,29 @@ export function SegmentedControlGlider({
     }
   };
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [timeoutId]);
+
   useEffect(() => {
     const selectedIndex = options.findIndex((opt) => opt.value === selected);
+
+    // Clear any existing timeout to prevent conflicts
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
     if (selectedIndex !== -1) {
       // Use timeout to ensure elements are rendered
-      setTimeout(() => updateGlider(selectedIndex), 50);
+      const newTimeoutId = setTimeout(() => updateGlider(selectedIndex), 50);
+      setTimeoutId(newTimeoutId);
     }
-  }, [selected, options]);
+  }, [selected, options, timeoutId]);
 
   return (
     <div className="segmented-control-container w-full max-w-md overflow-x-auto scrollbar-none">

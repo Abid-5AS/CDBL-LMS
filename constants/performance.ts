@@ -57,40 +57,40 @@ export const PERFORMANCE_THRESHOLDS = {
   /** Bundle size error (bytes) */
   bundleSizeError: 250000, // 250KB
 
-  /** Memory usage warning (MB) */
-  memoryWarning: 100,
+  /** Memory usage warning (MB) - Reduced for memory-constrained systems */
+  memoryWarning: 50,
 
-  /** Memory usage error (MB) */
-  memoryError: 200,
+  /** Memory usage error (MB) - Reduced for memory-constrained systems */
+  memoryError: 100,
 } as const;
 
 /**
- * Caching configuration
+ * Caching configuration optimized for memory usage
  */
 export const CACHE_CONFIG = {
-  /** Default TTL for cache entries (ms) */
-  defaultTTL: 5 * 60 * 1000, // 5 minutes
+  /** Default TTL for cache entries (ms) - Reduced for memory efficiency */
+  defaultTTL: 2 * 60 * 1000, // 2 minutes
 
   /** TTL for short-term cache (ms) */
-  shortTTL: 1 * 60 * 1000, // 1 minute
+  shortTTL: 30 * 1000, // 30 seconds
 
   /** TTL for long-term cache (ms) */
-  longTTL: 30 * 60 * 1000, // 30 minutes
+  longTTL: 15 * 60 * 1000, // 15 minutes
 
   /** TTL for API cache (ms) */
-  apiTTL: 5 * 60 * 1000, // 5 minutes
+  apiTTL: 2 * 60 * 1000, // 2 minutes
 
   /** TTL for user data cache (ms) */
-  userDataTTL: 10 * 60 * 1000, // 10 minutes
+  userDataTTL: 5 * 60 * 1000, // 5 minutes
 
-  /** Maximum cache entries */
-  maxEntries: 100,
+  /** Maximum cache entries - Reduced for memory efficiency */
+  maxEntries: 50,
 
   /** Whether to use localStorage for persistence */
-  persistent: true,
+  persistent: false, // Changed to false to reduce memory usage
 
   /** Maximum localStorage size (bytes) */
-  maxStorageSize: 5 * 1024 * 1024, // 5MB
+  maxStorageSize: 2 * 1024 * 1024, // 2MB - Reduced from 5MB
 } as const;
 
 /**
@@ -110,16 +110,16 @@ export const API_CONFIG = {
   batchTimeout: 50,
 
   /** Maximum batch size */
-  maxBatchSize: 10,
+  maxBatchSize: 5, // Reduced from 10 for memory efficiency
 
-  /** Enable prefetching */
-  prefetching: true,
+  /** Enable prefetching - Disabled in development for memory efficiency */
+  prefetching: process.env.NODE_ENV === "production",
 
   /** Request timeout (ms) */
   timeout: 30000,
 
   /** Retry attempts for failed requests */
-  retryAttempts: 3,
+  retryAttempts: 2, // Reduced from 3 for memory efficiency
 
   /** Initial retry delay (ms) */
   retryDelay: 1000,
@@ -135,15 +135,15 @@ export const IMAGE_CONFIG = {
   /** Intersection observer options */
   observerOptions: {
     root: null,
-    rootMargin: "50px",
+    rootMargin: "100px", // Increased from 50px for better performance
     threshold: 0.01,
   },
 
   /** Supported image formats (in order of preference) */
-  formats: ["webp", "avif", "jpeg"] as const,
+  formats: ["webp", "jpeg"] as const, // Removed avif to reduce processing
 
   /** Responsive image sizes (px) */
-  sizes: [320, 480, 768, 1024, 1280, 1536, 1920] as const,
+  sizes: [320, 768, 1024, 1920] as const, // Reduced number of sizes
 
   /** LQIP blur radius (px) */
   lqipBlur: 10,
@@ -152,7 +152,7 @@ export const IMAGE_CONFIG = {
   lqipQuality: 10,
 
   /** Enable blur-up effect */
-  blurUp: true,
+  blurUp: false, // Disabled to reduce memory usage
 
   /** Blur-up transition duration (ms) */
   blurUpDuration: 300,
@@ -163,10 +163,10 @@ export const IMAGE_CONFIG = {
  */
 export const BUNDLE_CONFIG = {
   /** Maximum initial bundle size (bytes) */
-  maxInitialSize: 100000, // 100KB
+  maxInitialSize: 75000, // 75KB - Reduced from 100KB
 
   /** Maximum route bundle size (bytes) */
-  maxRouteSize: 50000, // 50KB
+  maxRouteSize: 35000, // 35KB - Reduced from 50KB
 
   /** Chunks to exclude from analysis */
   excludeChunks: [
@@ -183,14 +183,15 @@ export const BUNDLE_CONFIG = {
 } as const;
 
 /**
- * Monitoring configuration
+ * Monitoring configuration - optimized for memory constrained systems
+ * but maintaining essential development feedback
  */
 export const MONITORING_CONFIG = {
-  /** Enable performance monitoring */
-  enabled: true,
+  /** Enable performance monitoring - now enabled in development too */
+  enabled: true, // Now enabled in development for feedback but optimized
 
-  /** Report metrics in development */
-  reportInDevelopment: true,
+  /** Report metrics in development - now enabled */
+  reportInDevelopment: true, // Now enabled to provide development feedback
 
   /** Report metrics in production */
   reportInProduction: true,
@@ -201,46 +202,47 @@ export const MONITORING_CONFIG = {
   /** Batch metrics before sending */
   batchMetrics: true,
 
-  /** Metrics batch interval (ms) */
-  batchInterval: 30000, // 30 seconds
+  /** Metrics batch interval (ms) - Increased for memory efficiency */
+  batchInterval: 60000, // 60 seconds - Increased from 30
 
   /** Maximum metrics to batch */
-  maxBatchSize: 50,
+  maxBatchSize: 25, // Reduced from 50 for memory efficiency
 
-  /** Enable Web Vitals tracking */
-  trackWebVitals: true,
+  /** Enable Web Vitals tracking - now enabled in development */
+  trackWebVitals: true, // Now enabled in development for performance feedback
 
-  /** Enable custom metrics tracking */
-  trackCustomMetrics: true,
+  /** Enable custom metrics tracking - now enabled in development */
+  trackCustomMetrics: true, // Now enabled in development for feedback
 
-  /** Enable performance profiling */
-  profiling: process.env.NODE_ENV === "development",
+  /** Enable performance profiling - Only in development when needed */
+  profiling: process.env.PERFORMANCE_PROFILING === "true" && process.env.NODE_ENV === "development",
 } as const;
 
 /**
- * Development warnings configuration
+ * Development warnings configuration - optimized for memory constrained systems
+ * but keeping important developer feedback
  */
 export const DEV_WARNINGS = {
   /** Warn on slow renders */
-  slowRenders: true,
+  slowRenders: true, // Kept enabled for performance feedback
 
   /** Warn on slow API calls */
-  slowApis: true,
+  slowApis: true, // Kept enabled for performance feedback
 
   /** Warn on slow images */
-  slowImages: true,
+  slowImages: true, // Kept enabled for performance feedback
 
   /** Warn on bundle size */
-  bundleSize: true,
+  bundleSize: true, // Kept enabled for performance feedback
 
   /** Warn on memory issues */
-  memory: true,
+  memory: true, // Kept enabled for memory feedback
 
   /** Show warnings in console */
-  console: true,
+  console: true, // Kept enabled for developer feedback
 
   /** Show warnings as overlays */
-  overlay: false,
+  overlay: false, // Kept disabled to reduce memory usage but can be enabled when needed
 } as const;
 
 /**

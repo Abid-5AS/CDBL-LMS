@@ -38,6 +38,12 @@ export function AnnotationsToggle() {
   useEffect(() => {
     setMounted(true);
     setIsDev(process.env.NODE_ENV === "development");
+
+    // Cleanup function
+    return () => {
+      // No specific cleanup needed for this component
+      // The state will be handled by React's unmounting process
+    };
   }, []);
 
   const handleToggleAll = () => {

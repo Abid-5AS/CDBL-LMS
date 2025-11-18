@@ -51,6 +51,16 @@ export function FitnessCertificateUpload({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [timeoutId]);
 
   const today = new Date();
   const leaveEnded = today > new Date(endDate);
@@ -106,9 +116,17 @@ export function FitnessCertificateUpload({
       }
 
       setSuccess(true);
-      setTimeout(() => {
+
+      // Clear any existing timeout to prevent conflicts
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
+      const newTimeoutId = setTimeout(() => {
         router.refresh();
       }, 1500);
+
+      setTimeoutId(newTimeoutId);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {

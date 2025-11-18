@@ -13,6 +13,12 @@ export function ChartTooltip({ active, payload, label }: any) {
 
   useEffect(() => {
     setMounted(true);
+
+    // Cleanup function - not strictly necessary for this useEffect but good practice
+    return () => {
+      // No specific cleanup needed for this component
+      // The state will be handled by React's unmounting process
+    };
   }, []);
 
   if (!active || !payload || !payload.length) {

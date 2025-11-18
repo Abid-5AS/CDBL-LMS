@@ -210,6 +210,12 @@ export function TabbedContent({
     if (value && value !== activeTab) {
       setActiveTab(value);
     }
+
+    // Cleanup function - not strictly necessary for this useEffect but good practice
+    return () => {
+      // No specific cleanup needed for this component
+      // The state will be handled by React's unmounting process
+    };
   }, [value, activeTab]);
 
   const handleTabChange = (nextValue: string) => {

@@ -68,6 +68,12 @@ export function useLeaveFiltering(
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
+
+    // Cleanup function - not strictly necessary for this useEffect but good practice
+    return () => {
+      // No specific cleanup needed for this component
+      // The state will be handled by React's unmounting process
+    };
   }, [statusTab, searchInput]);
 
   return {

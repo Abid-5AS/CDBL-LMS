@@ -75,6 +75,12 @@ export function UnifiedModal({
     if (!open) {
       setShowNested(false);
     }
+
+    // Cleanup function - not strictly necessary for this useEffect but good practice
+    return () => {
+      // No specific cleanup needed for this component
+      // The state will be handled by React's unmounting process
+    };
   }, [open]);
 
   const handleMainClose = useCallback(

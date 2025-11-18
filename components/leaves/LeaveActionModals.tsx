@@ -11,7 +11,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -88,6 +88,16 @@ export function ExtensionRequestModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [timeoutId]);
 
   const form = useForm<ExtensionFormData>({
     resolver: zodResolver(extensionSchema),
@@ -115,10 +125,18 @@ export function ExtensionRequestModal({
       }
 
       setSuccess(true);
-      setTimeout(() => {
+
+      // Clear any existing timeout to prevent conflicts
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
+      const newTimeoutId = setTimeout(() => {
         onOpenChange(false);
         router.refresh();
       }, 2000);
+
+      setTimeoutId(newTimeoutId);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -232,6 +250,16 @@ export function ShortenLeaveModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [timeoutId]);
 
   const form = useForm<ShortenFormData>({
     resolver: zodResolver(shortenSchema),
@@ -259,10 +287,18 @@ export function ShortenLeaveModal({
       }
 
       setSuccess(true);
-      setTimeout(() => {
+
+      // Clear any existing timeout to prevent conflicts
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
+      const newTimeoutId = setTimeout(() => {
         onOpenChange(false);
         router.refresh();
       }, 2000);
+
+      setTimeoutId(newTimeoutId);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -375,6 +411,16 @@ export function PartialCancelModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [timeoutId]);
 
   const form = useForm<PartialCancelFormData>({
     resolver: zodResolver(partialCancelSchema),
@@ -401,10 +447,18 @@ export function PartialCancelModal({
       }
 
       setSuccess(true);
-      setTimeout(() => {
+
+      // Clear any existing timeout to prevent conflicts
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
+      const newTimeoutId = setTimeout(() => {
         onOpenChange(false);
         router.refresh();
       }, 2000);
+
+      setTimeoutId(newTimeoutId);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {

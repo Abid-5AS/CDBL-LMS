@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "companionapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.companion-app"
@@ -29,7 +29,6 @@
     },
     "plugins": [
       "expo-router",
-      "expo-notifications",
       [
         "expo-splash-screen",
         {

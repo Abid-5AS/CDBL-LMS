@@ -85,7 +85,17 @@ export function ModernEmployeeDashboard({
 }: EmployeeDashboardContentProps) {
   const router = useRouter();
   const [activeLeaveTab, setActiveLeaveTab] = useState<string>("overview");
+  const [scrollTimeoutId, setScrollTimeoutId] = useState<NodeJS.Timeout | null>(null);
   const mounted = useMounted();
+
+  // Cleanup timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (scrollTimeoutId) {
+        clearTimeout(scrollTimeoutId);
+      }
+    };
+  }, [scrollTimeoutId]);
 
   const infoButtonClasses =
     "inline-flex h-7 w-7 items-center justify-center rounded-full border border-border/60 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60";
@@ -95,7 +105,12 @@ export function ModernEmployeeDashboard({
     if (tabId) {
       setActiveLeaveTab(tabId);
     }
-    setTimeout(() => {
+    // Clear any existing timeout to prevent conflicts
+    if (scrollTimeoutId) {
+      clearTimeout(scrollTimeoutId);
+    }
+
+    const timer = setTimeout(() => {
       const element = document.getElementById(sectionId);
       if (element) {
         const offset = 100; // Account for fixed header
@@ -106,7 +121,12 @@ export function ModernEmployeeDashboard({
           behavior: "smooth",
         });
       }
+      // Clear the timeout ID after execution
+      setScrollTimeoutId(null);
     }, 100);
+
+    // Store the timeout ID so we can clear it if needed
+    setScrollTimeoutId(timer);
   };
   const { allRows: leaves, isLoading: isLoadingLeaves } = useLeaveRequests({
     enableSelection: false,

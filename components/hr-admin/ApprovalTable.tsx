@@ -160,10 +160,22 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
       const suffix = next ? `?${next}` : "";
       router.replace(`${pathname}${suffix}`, { scroll: false });
     }
+
+    // Cleanup function - not strictly necessary for this useEffect but good practice
+    return () => {
+      // No specific cleanup needed for this component
+      // The state will be handled by React's unmounting process
+    };
   }, [historyDecision, viewMode, router, searchParams, pathname]);
 
   useEffect(() => {
     setSelectedIds(new Set());
+
+    // Cleanup function - not strictly necessary for this useEffect but good practice
+    return () => {
+      // No specific cleanup needed for this component
+      // The state will be handled by React's unmounting process
+    };
   }, [viewMode]);
 
   // Update selection count when selectedIds changes
@@ -256,6 +268,12 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     if (onDataChange) {
       onDataChange(viewMode === "queue" ? items : []);
     }
+
+    // Cleanup function - not strictly necessary for this useEffect but good practice
+    return () => {
+      // No specific cleanup needed for this component
+      // The state will be handled by React's unmounting process
+    };
   }, [items, onDataChange, viewMode]);
 
   // Open confirmation dialog for destructive actions

@@ -46,13 +46,21 @@ export function ChartContainer({
       hasRenderedRef.current = true;
 
       // Measure render time after paint
-      requestAnimationFrame(() => {
+      const rafId = requestAnimationFrame(() => {
         if (renderStartRef.current) {
           const renderTime = performance.now() - renderStartRef.current;
           onRender(renderTime);
         }
       });
+
+      // Cleanup function - cancel the animation frame if component unmounts
+      return () => {
+        cancelAnimationFrame(rafId);
+      };
     }
+
+    // Also return cleanup function when the condition isn't met
+    return () => {};
   }, [loading, empty, onRender]);
 
   return (

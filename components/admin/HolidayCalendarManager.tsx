@@ -96,6 +96,12 @@ export function HolidayCalendarManager() {
 
   React.useEffect(() => {
     fetchHolidays();
+
+    // Cleanup function
+    return () => {
+      // No specific cleanup needed for this component
+      // The state will be handled by React's unmounting process
+    };
   }, [fetchHolidays]);
 
   // Validate form

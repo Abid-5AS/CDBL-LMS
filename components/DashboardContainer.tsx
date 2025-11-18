@@ -78,6 +78,12 @@ export function DashboardContainer({ layout, customizeMode, saveLayout, sections
 
   useEffect(() => {
     setItems(layout);
+
+    // Cleanup function - not strictly necessary here but good practice
+    return () => {
+      // No specific cleanup needed for this component
+      // The state will be handled by React's unmounting process
+    };
   }, [layout]);
 
   const activeSections = useMemo(

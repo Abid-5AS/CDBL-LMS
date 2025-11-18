@@ -2,15 +2,49 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
-  cacheComponents: true,
-  reactCompiler: true,
+  cacheComponents: false, // Disable cache components in development to reduce memory usage
+  reactCompiler: false, // Disable React compiler in development to reduce memory usage
   serverExternalPackages: ["@prisma/client", "prisma"],
-  turbopack: {
-    resolveAlias: {
-      fs: { browser: "./empty.ts" },
-    },
+
+  // Development-specific optimizations for memory usage
+  onDemandEntries: {
+    // Reduce time to keep pages in memory
+    maxInactiveAge: 60 * 1000, // 1 minute instead of default 25 seconds
+    pagesBufferLength: 2, // Reduce pages buffer from default 2
   },
-  webpack: (config, { isServer }) => {
+
+  // Webpack optimizations for development
+  webpack: (config, { isServer, dev }) => {
+    // Apply optimizations only in development
+    if (dev && !isServer) {
+      // Reduce memory usage during development
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            default: {
+              minChunks: 1,
+              priority: -20,
+              reuseExistingChunk: true,
+            },
+            vendors: {
+              test: /[\\/]node_modules[\\/]/,
+              priority: -10,
+              chunks: 'all',
+            },
+            // Limit size of chunks to reduce memory
+            largeChunks: {
+              test: (module) => module.size() > 100000, // 100KB
+              priority: 5,
+              chunks: 'all',
+            },
+          },
+        },
+      };
+    }
+
+    // Server-side externals for Prisma
     if (isServer) {
       config.externals = [
         ...(config.externals || []),
@@ -18,8 +52,25 @@ const nextConfig: NextConfig = {
         "prisma",
       ];
     }
+
     return config;
   },
+
+  // Optimize for development memory usage
+  experimental: {
+    // Reduce memory usage by limiting concurrent builds
+    workerThreads: false, // Disable worker threads in development
+    maxWorkers: 1, // Limit to 1 worker in development
+    // Disable incremental cache in development to save memory
+    appDir: true,
+    turbo: {
+      // Turbopack configuration
+      resolveAlias: {
+        fs: { browser: "./empty.ts" },
+      },
+    },
+  },
+
   async headers() {
     return [
       {
