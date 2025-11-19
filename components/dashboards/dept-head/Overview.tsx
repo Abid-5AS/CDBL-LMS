@@ -19,6 +19,7 @@ import {
   RefreshCw,
   AlertTriangle,
   Info,
+  Users,
 } from "lucide-react";
 import {
   Tooltip,
@@ -26,6 +27,7 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from "@/components/ui/tooltip";
+import { STATUS_LABELS, METRIC_LABELS } from "@/constants/dashboard-labels";
 
 function CardSkeleton() {
   return (
@@ -94,27 +96,6 @@ export function DeptHeadDashboardWrapper() {
         }
       : undefined;
 
-  const insightItems = useMemo(
-    () => [
-      {
-        label: "Pending queue",
-        value: counts.pending,
-        helper: "Awaiting your review",
-      },
-      {
-        label: "Forwarded this week",
-        value: counts.forwarded,
-        helper: "Sent onward to HR",
-      },
-      {
-        label: "Returned to employees",
-        value: counts.returned,
-        helper: "Need employee updates",
-      },
-    ],
-    [counts]
-  );
-
   const alerts = useMemo(() => {
     const items: Array<{
       title: string;
@@ -122,26 +103,41 @@ export function DeptHeadDashboardWrapper() {
       tone: "info" | "warning" | "critical";
     }> = [];
 
-    if (counts.pending > 12) {
+    // Alert logic refined: Warning only if queue is significantly large
+    if (counts.pending > 15) {
       items.push({
-        title: "Large approval queue",
-        detail: `${counts.pending} requests require action.`,
+        title: "Large Approval Queue",
+        detail: `${counts.pending} requests awaiting review.`,
         tone: "warning",
+      });
+    } else if (counts.pending > 0) {
+       items.push({
+        title: "Pending Approvals",
+        detail: `${counts.pending} requests awaiting review.`,
+        tone: "info",
       });
     }
 
-    if (counts.returned > 3) {
+    // "Sent Back" is normal, not critical unless very high
+    if (counts.returned > 5) {
       items.push({
-        title: "High return rate",
+        title: "High Return Rate",
         detail: `${counts.returned} requests sent back to employees.`,
-        tone: "critical",
+        tone: "info",
       });
     }
+
+    // Placeholder for Conflict Detection (Future Feature)
+    // items.push({
+    //   title: "Potential Conflict",
+    //   detail: "Multiple requests for Dec 25th.",
+    //   tone: "warning",
+    // });
 
     if (items.length === 0) {
       items.push({
-        title: "All clear",
-        detail: "Approvals are on track.",
+        title: "All Clear",
+        detail: "No urgent actions required.",
         tone: "info",
       });
     }
@@ -154,8 +150,8 @@ export function DeptHeadDashboardWrapper() {
       <div className="space-y-6">
         {/* Top Row - KPI Cards Grid */}
         <DashboardSection
-          title="Leave Requests Overview"
-          description="Key metrics for your department's leave approvals"
+          title="Department Overview"
+          description="Key metrics and approval status"
           isLoading={isLoading}
           loadingFallback={<KPIGridSkeleton />}
           action={
@@ -172,7 +168,7 @@ export function DeptHeadDashboardWrapper() {
             <RoleKPICard
               title={
                 <div className="flex items-center gap-2">
-                  <span>Pending</span>
+                  <span>{METRIC_LABELS.PENDING_APPROVALS}</span>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
@@ -188,16 +184,7 @@ export function DeptHeadDashboardWrapper() {
                       </p>
                       <p className="text-sm mb-2">
                         Leave requests from your department awaiting YOUR
-                        approval as Department Head.
-                      </p>
-                      <p className="text-sm font-semibold mb-1">What to do:</p>
-                      <p className="text-sm mb-2">
-                        Review each request and either Approve & Forward to HR,
-                        Return to employee for changes, or Reject.
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Target: Process within 1-2 business days to keep
-                        approval pipeline moving.
+                        approval.
                       </p>
                     </TooltipContent>
                   </Tooltip>
@@ -207,11 +194,16 @@ export function DeptHeadDashboardWrapper() {
               subtitle="Awaiting your review"
               icon={ClipboardList}
               role="DEPT_HEAD"
+              onClick={() => {
+                const element = document.getElementById("pending-table");
+                element?.scrollIntoView({ behavior: "smooth" });
+              }}
+              clickLabel="Scroll to pending requests"
             />
             <RoleKPICard
               title={
                 <div className="flex items-center gap-2">
-                  <span>Forwarded</span>
+                  <span>{METRIC_LABELS.FORWARDED}</span>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
@@ -229,17 +221,6 @@ export function DeptHeadDashboardWrapper() {
                         Requests you've approved and forwarded to HR for final
                         processing.
                       </p>
-                      <p className="text-sm font-semibold mb-1">
-                        Why it matters:
-                      </p>
-                      <p className="text-sm mb-2">
-                        Tracks your approval throughput. High number means
-                        you're efficiently processing requests.
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        These requests are now awaiting HR Admin or HR Head
-                        review.
-                      </p>
                     </TooltipContent>
                   </Tooltip>
                 </div>
@@ -252,7 +233,7 @@ export function DeptHeadDashboardWrapper() {
             <RoleKPICard
               title={
                 <div className="flex items-center gap-2">
-                  <span>Returned for Modification</span>
+                  <span>{METRIC_LABELS.SENT_BACK}</span>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
@@ -267,19 +248,8 @@ export function DeptHeadDashboardWrapper() {
                         What this shows:
                       </p>
                       <p className="text-sm mb-2">
-                        Requests you've sent back to employees for corrections
-                        or additional information.
-                      </p>
-                      <p className="text-sm font-semibold mb-1">
-                        Why it matters:
-                      </p>
-                      <p className="text-sm mb-2">
-                        High numbers may indicate unclear policies or poor
-                        initial submissions. Consider team training if
-                        consistently high.
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Employees need to update and resubmit these requests.
+                        Requests you've sent back to employees for corrections.
+                        They need to resubmit these.
                       </p>
                     </TooltipContent>
                   </Tooltip>
@@ -289,13 +259,12 @@ export function DeptHeadDashboardWrapper() {
               subtitle="Require employee action"
               icon={RotateCcw}
               role="DEPT_HEAD"
-              icon={RotateCcw}
-              role="DEPT_HEAD"
+              // Removed confusing trend arrow
             />
             <RoleKPICard
               title={
                 <div className="flex items-center gap-2">
-                  <span>Cancelled</span>
+                  <span>{STATUS_LABELS.CANCELLED}</span>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
@@ -310,18 +279,7 @@ export function DeptHeadDashboardWrapper() {
                         What this shows:
                       </p>
                       <p className="text-sm mb-2">
-                        Leave requests withdrawn by employees before approval,
-                        or cancellation requests for approved leaves.
-                      </p>
-                      <p className="text-sm font-semibold mb-1">
-                        Why track this:
-                      </p>
-                      <p className="text-sm mb-2">
-                        High cancellation rate may indicate poor planning or
-                        changing circumstances in your department.
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        These requests are closed and don't require any action.
+                        Requests withdrawn by employees or cancelled after approval.
                       </p>
                     </TooltipContent>
                   </Tooltip>
@@ -336,54 +294,43 @@ export function DeptHeadDashboardWrapper() {
         </DashboardSection>
 
         {/* Pending Requests Table */}
-        <DashboardSection
-          title="Pending Leave Requests"
-          description="Review and process leave requests from your department"
-          isLoading={isLoading}
-          error={error}
-        >
-          <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
-            <div className="surface-card">
-              <div className="flex items-center justify-between border-b border-border/60 px-6 py-4">
-                <div>
-                  <h3 className="text-lg font-semibold">Pending Requests</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Review and approve leave requests
-                  </p>
+        <div id="pending-table">
+          <DashboardSection
+            title="Approval Queue"
+            description="Review and process leave requests from your department"
+            isLoading={isLoading}
+            error={error}
+          >
+            <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(300px,1fr)]">
+              <div className="surface-card">
+                {/* Removed redundant inner header "Pending Requests" */}
+                <div className="px-2 py-4">
+                  <Suspense fallback={<CardSkeleton />}>
+                    <DeptHeadPendingTable
+                      data={
+                        data
+                          ? {
+                              rows: data.rows,
+                              total: data.rows?.length ?? 0,
+                              counts: data.counts,
+                            }
+                          : undefined
+                      }
+                      isLoading={isLoading}
+                      error={error}
+                      onMutate={mutate}
+                    />
+                  </Suspense>
                 </div>
-                <button
-                  onClick={() => mutate()}
-                  className="p-2 hover:bg-muted rounded-lg transition-colors"
-                  title="Refresh"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                </button>
               </div>
-              <div className="px-2 py-4">
-                <Suspense fallback={<CardSkeleton />}>
-                  <DeptHeadPendingTable
-                    data={
-                      data
-                        ? {
-                            rows: data.rows,
-                            total: data.rows?.length ?? 0,
-                            counts: data.counts,
-                          }
-                        : undefined
-                    }
-                    isLoading={isLoading}
-                    error={error}
-                    onMutate={mutate}
-                  />
-                </Suspense>
-              </div>
-            </div>
 
-            <div className="space-y-4">
-              <DeptHeadAlertsPanel alerts={alerts} isLoading={isLoading} />
+              <div className="space-y-4">
+                <DeptHeadAlertsPanel alerts={alerts} isLoading={isLoading} />
+                {/* Removed DeptHeadInsightsPanel (Redundant) */}
+              </div>
             </div>
-          </div>
-        </DashboardSection>
+          </DashboardSection>
+        </div>
 
         {/* Bottom Row - Team Overview and Quick Actions */}
         <DashboardSection
@@ -402,50 +349,6 @@ export function DeptHeadDashboardWrapper() {
         </DashboardSection>
       </div>
     </TooltipProvider>
-  );
-}
-
-function DeptHeadInsightsPanel({
-  items,
-  isLoading,
-}: {
-  items: Array<{ label: string; value: number | string; helper: string }>;
-  isLoading?: boolean;
-}) {
-  return (
-    <div className="surface-card p-4 space-y-3">
-      <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-          Snapshot
-        </p>
-        <h4 className="text-base font-semibold text-foreground">
-          Team Metrics
-        </h4>
-      </div>
-      <div className="space-y-3">
-        {isLoading
-          ? Array.from({ length: 3 }).map((_, idx) => (
-              <div
-                key={idx}
-                className="h-12 rounded-lg bg-muted animate-pulse"
-              />
-            ))
-          : items.map((item) => (
-              <div
-                key={item.label}
-                className="rounded-lg border border-border/60 px-3 py-2"
-              >
-                <p className="text-xs text-muted-foreground uppercase tracking-wide">
-                  {item.label}
-                </p>
-                <p className="text-lg font-semibold text-foreground">
-                  {item.value}
-                </p>
-                <p className="text-xs text-muted-foreground">{item.helper}</p>
-              </div>
-            ))}
-      </div>
-    </div>
   );
 }
 
@@ -471,10 +374,10 @@ function DeptHeadAlertsPanel({
     <div className="surface-card p-4 space-y-3">
       <div>
         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-          Alerts
+          System Alerts
         </p>
         <h4 className="text-base font-semibold text-foreground">
-          Action Items
+          Notifications
         </h4>
       </div>
       <div className="space-y-3">

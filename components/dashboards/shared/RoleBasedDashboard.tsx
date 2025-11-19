@@ -38,6 +38,10 @@ type RoleBasedDashboardProps = {
    */
   animate?: boolean;
   /**
+   * Whether to use a compact header layout
+   */
+  compactHeader?: boolean;
+  /**
    * Background style variant
    */
   backgroundVariant?: "gradient" | "solid" | "transparent";
@@ -159,6 +163,7 @@ export function RoleBasedDashboard({
   actions,
   animate = true,
   backgroundVariant = "gradient",
+  compactHeader = false,
 }: RoleBasedDashboardProps) {
   const config = roleConfigs[role] || roleConfigs.EMPLOYEE;
 
@@ -169,12 +174,14 @@ export function RoleBasedDashboard({
       ? ""
       : cn("bg-gradient-to-br", config.gradient);
 
-  const containerClasses = cn("min-h-screen", backgroundClass, className);
+  const containerClasses = cn("w-full", backgroundClass, className);
 
   const contentClasses = cn(
     "container mx-auto",
     title || description || actions
-      ? "py-6 sm:py-8 lg:py-10"
+      ? compactHeader
+        ? "py-4 sm:py-5 lg:py-6"
+        : "py-6 sm:py-8 lg:py-10"
       : "py-3 sm:py-4 lg:py-6",
     fullWidth ? "px-0" : config.padding,
     !fullWidth && config.maxWidth
@@ -197,7 +204,7 @@ export function RoleBasedDashboard({
         {(title || description || actions) && (
           <div
             className={cn(
-              "mb-6 sm:mb-8 lg:mb-10",
+              compactHeader ? "mb-4 sm:mb-6" : "mb-6 sm:mb-8 lg:mb-10",
               !title && !description && actions && "mb-4"
             )}
           >
@@ -213,7 +220,14 @@ export function RoleBasedDashboard({
               {(title || description) && (
                 <div className="flex-1">
                   {title && (
-                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
+                    <h1
+                      className={cn(
+                        "font-bold text-foreground mb-2",
+                        compactHeader
+                          ? "text-xl sm:text-2xl lg:text-3xl"
+                          : "text-2xl sm:text-3xl lg:text-4xl"
+                      )}
+                    >
                       {title}
                     </h1>
                   )}

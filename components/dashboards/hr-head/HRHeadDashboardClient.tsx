@@ -29,6 +29,7 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from "@/components/ui/tooltip";
+import { STATUS_LABELS, METRIC_LABELS } from "@/constants/dashboard-labels";
 
 interface HRHeadStats {
   // Core KPIs
@@ -143,22 +144,16 @@ export function HRHeadDashboardClient() {
       alerts.push({
         title: "High return rate",
         detail: `${stats.returned} requests need employee fixes`,
-        tone: "critical",
+        tone: "info", // Changed from critical
       });
     }
 
-    if (stats.complianceScore < 90) {
-      alerts.push({
-        title: "Compliance below target",
-        detail: `Score is ${stats.complianceScore}% (target 95%)`,
-        tone: "warning",
-      });
-    }
+    // Removed fake compliance score alert
 
     if (alerts.length === 0) {
       alerts.push({
         title: "Healthy pipeline",
-        detail: "Approvals and compliance look good.",
+        detail: "Approvals are on track.",
         tone: "info",
       });
     }
@@ -180,7 +175,7 @@ export function HRHeadDashboardClient() {
             <RoleKPICard
                 title={
                   <div className="flex items-center gap-2">
-                    <span>Your Approval Queue</span>
+                    <span>{METRIC_LABELS.PENDING_APPROVALS}</span>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
@@ -221,7 +216,7 @@ export function HRHeadDashboardClient() {
             <RoleKPICard
               title={
                 <div className="flex items-center gap-2">
-                  <span>On Leave Today</span>
+                  <span>{METRIC_LABELS.WORKFORCE_AVAILABILITY} (On Leave)</span>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
@@ -255,7 +250,7 @@ export function HRHeadDashboardClient() {
             <RoleKPICard
               title={
                 <div className="flex items-center gap-2">
-                  <span>Returned for Modification</span>
+                  <span>{METRIC_LABELS.SENT_BACK}</span>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
@@ -288,7 +283,7 @@ export function HRHeadDashboardClient() {
               trend={stats && stats.returned > 0 ? {
                 value: stats.returned,
                 label: "needs attention",
-                direction: "down"
+                direction: "neutral" // Changed from down
               } : undefined}
             />
             <RoleKPICard
@@ -333,11 +328,11 @@ export function HRHeadDashboardClient() {
       {/* Secondary Metrics */}
       <DashboardSection
         title="Performance & Compliance"
-        description="Monthly metrics, new hires, and policy compliance"
+        description="Monthly metrics and new hires"
         isLoading={isLoading}
         loadingFallback={<KPIGridSkeleton />}
       >
-        <ResponsiveDashboardGrid columns="1:1:3:3" gap="md">
+        <ResponsiveDashboardGrid columns="1:1:2:2" gap="md">
             <RoleKPICard
               title={
                 <div className="flex items-center gap-2">
@@ -411,22 +406,7 @@ export function HRHeadDashboardClient() {
                 direction: "up"
               } : undefined}
             />
-            <RoleKPICard
-              title="Policy Compliance"
-              value={`${stats?.complianceScore || 0}%`}
-              subtitle="Meeting SLA targets"
-              icon={CheckCircle2}
-              role="HR_HEAD"
-              trend={
-                stats && stats.complianceScore
-                  ? {
-                      value: stats.complianceScore >= 95 ? 5 : -5,
-                      label: "vs target",
-                      direction: stats.complianceScore >= 95 ? "up" : "down",
-                    }
-                  : undefined
-              }
-            />
+            {/* Removed Fake Policy Compliance Card */}
         </ResponsiveDashboardGrid>
       </DashboardSection>
 
@@ -470,7 +450,7 @@ export function HRHeadDashboardClient() {
               stats.departments &&
               stats.departments.length > 0 && (
                 <AnalyticsBarChart
-                  title="Department Distribution"
+                  title="Department Headcount"
                   subtitle="Employees by department"
                   data={stats.departments.map((dept) => ({
                     name: dept.name,
@@ -502,7 +482,7 @@ export function HRHeadDashboardClient() {
         <Suspense fallback={<DashboardCardSkeleton />}>
           <Card className="surface-card">
             <CardHeader>
-              <CardTitle className="text-base">Returned for Modification</CardTitle>
+              <CardTitle className="text-base">{METRIC_LABELS.SENT_BACK}</CardTitle>
             </CardHeader>
             <CardContent>
               <ReturnedRequestsPanel />
@@ -513,7 +493,7 @@ export function HRHeadDashboardClient() {
         <Suspense fallback={<DashboardCardSkeleton />}>
           <Card className="surface-card">
             <CardHeader>
-              <CardTitle className="text-base">Cancellation Requests</CardTitle>
+              <CardTitle className="text-base">{METRIC_LABELS.CANCELLED_REQUESTS}</CardTitle>
             </CardHeader>
             <CardContent>
               <CancellationRequestsPanel />

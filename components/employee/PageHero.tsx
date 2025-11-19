@@ -45,13 +45,13 @@ export function EmployeePageHero({
   });
 
   return (
-    <div className={cn("surface-card p-6 space-y-6", className)}>
+    <div className={cn("surface-card p-4 space-y-4", className)}>
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="space-y-2">
           <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
             {eyebrow}
           </p>
-          <h1 className="text-3xl font-semibold text-foreground">{title}</h1>
+          <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
           {description && (
             <p className="text-sm text-muted-foreground leading-6 max-w-3xl">
               {description}
@@ -59,7 +59,7 @@ export function EmployeePageHero({
           )}
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-          <div className="rounded-xl border border-border/70 px-4 py-3 text-center text-sm text-muted-foreground shadow-sm">
+          <div className="rounded-xl border border-border/70 px-3 py-2 text-center text-sm text-muted-foreground shadow-sm">
             <p className="text-xs uppercase tracking-widest">Today</p>
             <p className="text-xl font-semibold text-foreground">{todayLabel}</p>
           </div>
@@ -72,7 +72,7 @@ export function EmployeePageHero({
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="rounded-2xl border border-border/70 px-4 py-3 hover:border-border/90 transition"
+              className="rounded-2xl border border-border/70 px-3 py-2 hover:border-border/90 transition"
             >
               <p className="text-xs uppercase tracking-wide text-muted-foreground">
                 {stat.label}

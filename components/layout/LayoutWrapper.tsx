@@ -67,7 +67,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
             <main
               className={cn(
                 "relative z-10 flex-1",
-                "pt-[88px] sm:pt-[96px] pb-12"
+                "pt-[88px] sm:pt-[96px] pb-4"
               )}
               role="main"
               aria-label="Main content"

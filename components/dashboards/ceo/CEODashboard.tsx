@@ -44,6 +44,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { METRIC_LABELS } from "@/constants/dashboard-labels";
 
 interface CEOStats {
   // Organization metrics
@@ -61,6 +62,7 @@ interface CEOStats {
   // Financial metrics
   totalLeaveDays: number;
   estimatedCost: number;
+  avgCostPerDay: number;
 
   // Year-over-year comparison
   thisYear: {
@@ -77,13 +79,12 @@ interface CEOStats {
   leaveTypes: Array<{
     type: string;
     count: number;
-    avgDuration: number;
+    days: number; // API returns days, not avgDuration directly
   }>;
 
   departments: Array<{
-    department: string;
-    onLeave: number;
-    utilization: number;
+    name: string; // API returns name
+    employees: number; // API returns employees count
   }>;
 
   monthlyTrend: Array<{
@@ -92,18 +93,15 @@ interface CEOStats {
     days: number;
   }>;
 
-  // AI Insights
+  // Strategic Alerts (formerly AI Insights)
   insights: Array<{
-    type: "info" | "warning" | "success";
+    type: string; // API returns trend, efficiency, risk, utilization
+    priority: string;
     message: string;
   }>;
-
-  // System health
-  systemHealth: {
-    apiStatus: "healthy" | "degraded" | "down";
-    dbStatus: "healthy" | "degraded" | "down";
-    uptime: number;
-  };
+  
+  // System health (mocked data in API, but we ignore it in UI)
+  systemHealth?: any;
 }
 
 export function CEODashboard() {
@@ -130,6 +128,13 @@ export function CEODashboard() {
     );
   }
 
+  // Helper to map API insight types to UI styles
+  const getInsightStyle = (type: string, priority: string) => {
+    if (priority === "high") return "bg-data-warning/10 border-data-warning/30 text-data-warning";
+    if (type === "efficiency" || type === "success") return "bg-data-success/10 border-data-success/30 text-data-success";
+    return "bg-data-info/10 border-data-info/30 text-data-info";
+  };
+
   return (
     <TooltipProvider>
       <div className="space-y-6">
@@ -147,7 +152,7 @@ export function CEODashboard() {
             <RoleKPICard
                 title={
                   <div className="flex items-center gap-2">
-                    <span>Total Workforce</span>
+                    <span>{METRIC_LABELS.TOTAL_WORKFORCE}</span>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
@@ -181,7 +186,7 @@ export function CEODashboard() {
               <RoleKPICard
                 title={
                   <div className="flex items-center gap-2">
-                    <span>Workforce Availability</span>
+                    <span>{METRIC_LABELS.WORKFORCE_AVAILABILITY}</span>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
@@ -224,7 +229,7 @@ export function CEODashboard() {
               <RoleKPICard
                 title={
                   <div className="flex items-center gap-2">
-                    <span>Pending Approvals</span>
+                    <span>{METRIC_LABELS.PENDING_APPROVALS}</span>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
@@ -338,15 +343,14 @@ export function CEODashboard() {
             {/* Department Performance */}
             {stats.departments && stats.departments.length > 0 && (
               <AnalyticsBarChart
-                title="Department Utilization"
-                subtitle="Workforce availability by department"
+                title="Department Headcount"
+                subtitle="Total employees by department"
                 data={stats.departments.map((dept) => ({
-                  name: dept.department,
-                  utilization: dept.utilization,
-                  onLeave: dept.onLeave,
+                  name: dept.name,
+                  employees: dept.employees,
                 }))}
                 dataKeys={[
-                  { key: "utilization", name: "Utilization %", color: "hsl(var(--chart-1))" },
+                  { key: "employees", name: "Employees", color: "hsl(var(--chart-1))" },
                 ]}
                 xAxisKey="name"
               />
@@ -380,7 +384,7 @@ export function CEODashboard() {
                             </span>
                           </div>
                           <div className="flex justify-between items-center text-xs text-muted-foreground">
-                            <span>Avg duration: {type.avgDuration.toFixed(1)} days</span>
+                            <span>Avg duration: {(type.days / (type.count || 1)).toFixed(1)} days</span>
                           </div>
                           {index < stats.leaveTypes.length - 1 && <Separator className="mt-3" />}
                         </div>
@@ -395,13 +399,13 @@ export function CEODashboard() {
 
         {/* Sidebar - Insights & Quick Stats */}
         <div className="xl:w-80 shrink-0 space-y-4 sm:space-y-6">
-          {/* AI-Powered Insights */}
+          {/* Strategic Alerts (formerly AI Insights) */}
           {!isLoading && stats && stats.insights && stats.insights.length > 0 && (
             <Card className="surface-card rounded-2xl">
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <AlertCircle className="h-4 w-4 text-data-info" />
-                  System Alerts
+                  Strategic Alerts
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -410,12 +414,7 @@ export function CEODashboard() {
                     key={index}
                     className={cn(
                       "p-3 rounded-lg border text-sm",
-                      insight.type === "warning" &&
-                        "bg-data-warning/10 border-data-warning/30 text-data-warning",
-                      insight.type === "success" &&
-                        "bg-data-success/10 border-data-success/30 text-data-success",
-                      insight.type === "info" &&
-                        "bg-data-info/10 border-data-info/30 text-data-info"
+                      getInsightStyle(insight.type, insight.priority)
                     )}
                   >
                     {insight.message}
@@ -457,45 +456,8 @@ export function CEODashboard() {
               </CardContent>
             </Card>
           )}
-
-          {/* System Health Monitor - PLACEHOLDER DATA */}
-          {!isLoading && stats?.systemHealth && (
-            <Card className="surface-card rounded-2xl border-dashed border-2 border-muted-foreground/30">
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Activity className="h-4 w-4 text-muted-foreground" />
-                  System Status
-                  <Badge variant="outline" className="ml-auto text-[10px] h-5">Mock Data</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Uptime</span>
-                  <span className="text-lg font-bold">
-                    {stats.systemHealth.uptime || 99.9}%
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">API</span>
-                  <Badge
-                    variant="outline"
-                    className="text-xs"
-                  >
-                    {stats.systemHealth.apiStatus || "healthy"}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Database</span>
-                  <Badge
-                    variant="outline"
-                    className="text-xs"
-                  >
-                    {stats.systemHealth.dbStatus || "healthy"}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          
+          {/* Removed Fake System Health Monitor */}
         </div>
         </div>
       </DashboardSection>
@@ -510,7 +472,7 @@ export function CEODashboard() {
         {isLoading ? (
           <KPIGridSkeleton cards={3} className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" />
         ) : (
-          <ResponsiveDashboardGrid columns="1:2:3:3" gap="md">
+          <ResponsiveDashboardGrid columns="1:2:2:2" gap="md">
             {/* Financial Impact Card */}
             <Card className="surface-card rounded-2xl">
               <CardHeader className="pb-3">
@@ -587,50 +549,8 @@ export function CEODashboard() {
                 </div>
               </CardContent>
             </Card>
-
-            {/* System Health Card - PLACEHOLDER DATA */}
-            <Card className="surface-card rounded-2xl">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                    <Target className="h-4 w-4" />
-                    System Health
-                    <Badge variant="outline" className="ml-auto text-[10px] h-5">Mock Data</Badge>
-                  </CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <p className="text-3xl font-bold">
-                    {stats?.systemHealth?.uptime || 99.9}%
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Uptime
-                  </p>
-                </div>
-                <Separator />
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">API Status</span>
-                    <Badge
-                      variant="outline"
-                      className="text-xs"
-                    >
-                      {stats?.systemHealth?.apiStatus || "healthy"}
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Database</span>
-                    <Badge
-                      variant="outline"
-                      className="text-xs"
-                    >
-                      {stats?.systemHealth?.dbStatus || "healthy"}
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            
+            {/* Removed Fake System Health Card */}
           </ResponsiveDashboardGrid>
         )}
       </DashboardSection>
