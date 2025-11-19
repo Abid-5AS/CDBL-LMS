@@ -31,11 +31,11 @@ export default function HolidaysPage() {
 function HolidaysPageFallback() {
   return (
     <div className="space-y-6 animate-in fade-in">
-      <section className="rounded-3xl border border-border/60 bg-white/70 dark:bg-slate-900/40 backdrop-blur-2xl p-6 shadow-lg shadow-black/5 dark:shadow-black/40">
+      <section className="rounded-3xl border border-border bg-card p-6 shadow-sm">
         <div className="h-8 w-48 bg-slate-200/70 dark:bg-slate-700 animate-pulse rounded-lg" />
         <div className="mt-3 h-4 w-64 bg-slate-200/60 dark:bg-slate-700/80 animate-pulse rounded" />
       </section>
-      <section className="rounded-3xl border border-border/60 bg-white/80 dark:bg-slate-900/30 backdrop-blur-2xl p-6 shadow-lg shadow-black/5 dark:shadow-black/40">
+      <section className="rounded-3xl border border-border bg-card p-6 shadow-sm">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <div

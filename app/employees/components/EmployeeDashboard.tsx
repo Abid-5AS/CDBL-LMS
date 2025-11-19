@@ -145,7 +145,7 @@ export function EmployeeDashboard({
           )}
           initial="initial"
           animate="animate"
-          className="rounded-3xl border backdrop-blur-sm"
+          className="rounded-3xl border border-border bg-card shadow-sm"
           style={cardSurfaceStyle}
         >
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
@@ -235,7 +235,7 @@ export function EmployeeDashboard({
             className="space-y-4"
           >
             <div
-              className="sticky top-4 space-y-4 rounded-3xl border backdrop-blur-sm p-1.5"
+              className="sticky top-4 space-y-4 rounded-3xl border border-border bg-card p-1.5 shadow-sm"
               style={cardSurfaceStyle}
             >
               <HRStatCards stats={data.stats} />
@@ -273,7 +273,7 @@ export function EmployeeDashboard({
             className="mx-auto mt-8 w-full max-w-[1400px] px-4 pb-10"
           >
             <div
-              className="rounded-3xl border backdrop-blur-sm p-6"
+              className="rounded-3xl border border-border bg-card p-6 shadow-sm"
               style={cardSurfaceStyle}
             >
               <div className="mb-4 flex items-center justify-between gap-4">

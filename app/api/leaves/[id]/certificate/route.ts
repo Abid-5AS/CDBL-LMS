@@ -57,8 +57,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   // Parse form data
   const formData = await request.formData();
-  const certificateFile = formData.get("certificate") as File | null;
-  const certificateType = (formData.get("type") as string) || "medical"; // "medical" or "fitness"
+  const certificateFile = (formData as any).get("certificate") as File | null;
+  const certificateType = ((formData as any).get("type") as string) || "medical"; // "medical" or "fitness"
 
   if (!certificateFile) {
     return NextResponse.json(error("file_required", "Certificate file is required", traceId), { status: 400 });

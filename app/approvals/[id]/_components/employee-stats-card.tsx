@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
-import { Balance, LeaveType } from "@prisma/client";
+import { Balance, LeaveType, LeaveStatus } from "@prisma/client";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 
 type EmployeeStatsCardProps = {
@@ -33,7 +33,7 @@ type EmployeeStatsCardProps = {
     startDate: Date;
     endDate: Date;
     workingDays: number;
-    status: string;
+    status: LeaveStatus;
     createdAt: Date;
   }>;
 };

@@ -122,7 +122,7 @@ export function HolidaysFilters({
   }
 
   return (
-    <Card className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border-white/20 dark:border-slate-700/50 shadow-xl">
+    <Card className="bg-card border-border shadow-sm">
       <CardContent className="p-4">{content}</CardContent>
     </Card>
   );

@@ -113,7 +113,7 @@ export function ActionCenter({
   };
 
   return (
-    <Card className={cn("bg-white dark:bg-slate-900 border-gray-200 dark:border-gray-700", className)}>
+    <Card className={cn("bg-card border-border", className)}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -133,7 +133,7 @@ export function ActionCenter({
             {[...Array(3)].map((_, i) => (
               <div
                 key={i}
-                className="p-4 rounded-lg border border-gray-200 dark:border-gray-700"
+                className="p-4 rounded-lg border border-border"
               >
                 <div className="space-y-2">
                   <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
@@ -145,7 +145,7 @@ export function ActionCenter({
           </div>
         ) : actions.length === 0 ? (
           <div className="text-center py-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-950 mb-3">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted/50 mb-3">>
               <svg
                 className="w-8 h-8 text-green-600 dark:text-green-400"
                 fill="none"
@@ -183,8 +183,8 @@ export function ActionCenter({
                       exit={{ opacity: 0, x: 20 }}
                       transition={{ delay: index * 0.05 }}
                       className={cn(
-                        "group relative p-4 rounded-lg border-l-4 bg-gray-50 dark:bg-slate-800/50",
-                        "border-t border-r border-b border-gray-200 dark:border-gray-700",
+                        "group relative p-4 rounded-lg border-l-4 bg-muted/30",
+                        "border-t border-r border-b border-border",
                         priorityStyle.border,
                         action.link && "cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800",
                         "transition-all duration-200"
@@ -283,7 +283,7 @@ export function ActionCenter({
  */
 export function ActionCenterSkeleton({ className }: { className?: string }) {
   return (
-    <Card className={cn("bg-white dark:bg-slate-900 border-gray-200 dark:border-gray-700", className)}>
+    <Card className={cn("bg-card border-border", className)}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="h-6 w-40 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
@@ -294,7 +294,7 @@ export function ActionCenterSkeleton({ className }: { className?: string }) {
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="p-4 rounded-lg border border-gray-200 dark:border-gray-700"
+              className="p-4 rounded-lg border border-border"
             >
               <div className="space-y-2">
                 <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />

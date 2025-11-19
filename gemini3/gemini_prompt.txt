@@ -1,0 +1,31 @@
+You are an expert UX Researcher and Product Designer. You have been given a comprehensive set of documentation and source code for the "CDBL Leave Management System".
+
+**Your Objective:**
+Analyze the provided materials to deeply understand the system from the perspective of its users. You need to produce a detailed research report and design brief.
+
+**Input Materials:**
+- `dashboard_code/`: The actual React/Next.js code for the dashboards.
+- `components_code/`: The UI components used.
+- `schema.prisma`: The database schema.
+- `current_functionalities.md`: A summary of what currently exists.
+- Various Audit Reports and Guides (`.md` files) which contain previous analyses and improvement plans.
+
+**Tasks:**
+
+1.  **Role Analysis:**
+    For each of the following roles: **Employee, Manager, HR Admin, System Admin**.
+    - **Needs:** What are they trying to achieve? (e.g., "Quickly book time off", "Ensure team coverage").
+    - **Pain Points & Frustrations:** Based on the code (complexity, error handling) and audit reports, what is likely annoying or difficult for them?
+    - **Importance:** Rank the features they use by frequency and criticality.
+
+2.  **Page & Layout Recommendations:**
+    For each role's dashboard:
+    - **Ideal Layout:** Describe the optimal arrangement of widgets, tables, and actions.
+    - **Key Cards/Widgets:** What specific information needs to be visible *immediately*? (e.g., "Remaining Balance" vs. "Team Calendar").
+    - **Information Architecture:** How should navigation be structured?
+
+3.  **Prompt Generation:**
+    Finally, generate a specific, high-quality prompt that I can feed back into an AI coding agent to *implement* these improvements. This prompt should be technical and actionable.
+
+**Output Format:**
+Please structure your response as a structured report with clear headings for each role. Conclude with the "Implementation Prompt".

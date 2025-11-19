@@ -1,133 +1,123 @@
 /**
- * Professional Neo + Glassmorphism Design System
+ * Professional Design System
  *
  * CENTRALIZED DESIGN CONFIGURATION
  * - Change values here to update the entire application
  * - All components use these utilities automatically
- * - Professional neo aesthetics with glassmorphism
- * - Modern gradients, shadows, and animations
+ * - Professional solid aesthetics
  * - Full accessibility and dark mode support
  */
 
 // ============================================
-// CORE GLASSMORPHISM SETTINGS
+// CORE PROFESSIONAL CARD SETTINGS
 // ============================================
-// Tweak these values to change the glass effect globally
-const GLASS_CONFIG = {
-  blur: {
-    strong: "backdrop-blur-xl",
-    medium: "backdrop-blur-md",
-    light: "backdrop-blur-sm",
-  },
-  // Combined light/dark backgrounds with proper dark: prefix
+const CARD_CONFIG = {
   background: {
-    strong: "bg-white/80 dark:bg-gray-900/80",
-    medium: "bg-white/70 dark:bg-gray-900/70",
-    subtle: "bg-white/50 dark:bg-gray-900/50",
+    default: "bg-card",
+    elevated: "bg-card shadow-md",
+    subtle: "bg-muted",
   },
-  // Combined light/dark borders with proper dark: prefix
   border: {
-    strong: "border border-white/30 dark:border-white/15",
-    medium: "border border-white/20 dark:border-white/10",
-    subtle: "border border-white/10 dark:border-white/5",
+    default: "border border-border",
+    strong: "border-2 border-border",
+    subtle: "border border-border/50",
   },
-  // Shadows with dark mode support
   shadow: {
-    strong: "shadow-2xl shadow-black/20 dark:shadow-black/40",
-    medium: "shadow-2xl shadow-black/10 dark:shadow-black/30",
-    subtle: "shadow-xl shadow-black/5 dark:shadow-black/20",
+    sm: "shadow-sm",
+    md: "shadow-md",
+    lg: "shadow-lg",
   },
 };
 
-// Glassmorphism Card Variants
+// Professional Card Variants
 export const glassCard = {
-  base: `${GLASS_CONFIG.blur.strong} ${GLASS_CONFIG.background.medium} ${GLASS_CONFIG.border.medium} ${GLASS_CONFIG.shadow.medium}`,
-  elevated: `${GLASS_CONFIG.blur.strong} ${GLASS_CONFIG.background.strong} ${GLASS_CONFIG.border.strong} ${GLASS_CONFIG.shadow.strong}`,
-  subtle: `${GLASS_CONFIG.blur.medium} ${GLASS_CONFIG.background.subtle} ${GLASS_CONFIG.border.subtle} ${GLASS_CONFIG.shadow.subtle}`,
-  interactive: `${GLASS_CONFIG.blur.strong} ${GLASS_CONFIG.background.medium} ${GLASS_CONFIG.border.medium} ${GLASS_CONFIG.shadow.medium} hover:bg-white/80 dark:hover:bg-gray-900/80 hover:shadow-3xl transition-all duration-300`,
+  base: `${CARD_CONFIG.background.default} ${CARD_CONFIG.border.default} ${CARD_CONFIG.shadow.sm} rounded-lg`,
+  elevated: `${CARD_CONFIG.background.elevated} ${CARD_CONFIG.border.default} rounded-lg`,
+  subtle: `${CARD_CONFIG.background.subtle} ${CARD_CONFIG.border.subtle} ${CARD_CONFIG.shadow.sm} rounded-lg`,
+  interactive: `${CARD_CONFIG.background.default} ${CARD_CONFIG.border.default} ${CARD_CONFIG.shadow.sm} rounded-lg hover:shadow-md hover:border-primary/50 transition-all duration-200 cursor-pointer`,
 };
 
-// Neo Button Variants
+// Professional Button Variants
 export const neoButton = {
-  primary: "bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 border border-white/20 backdrop-blur-sm transition-all duration-300",
-  success: "bg-gradient-to-br from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 border border-white/20 backdrop-blur-sm transition-all duration-300",
-  danger: "bg-gradient-to-br from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40 border border-white/20 backdrop-blur-sm transition-all duration-300",
-  glass: "backdrop-blur-md bg-white/10 hover:bg-white/20 dark:bg-black/10 dark:hover:bg-black/20 border border-white/20 text-gray-900 dark:text-white shadow-lg hover:shadow-xl transition-all duration-300",
+  primary: "bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm border border-primary/20 transition-colors duration-200",
+  success: "bg-success hover:bg-success/90 text-white shadow-sm border border-success/20 transition-colors duration-200",
+  danger: "bg-danger hover:bg-danger/90 text-white shadow-sm border border-danger/20 transition-colors duration-200",
+  glass: "bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border shadow-sm transition-all duration-200",
 };
 
-// Neo Badge Variants
+// Professional Badge Variants
 export const neoBadge = {
-  approved: "bg-gradient-to-br from-emerald-500/90 to-emerald-600/70 text-white shadow-md shadow-emerald-500/30 backdrop-blur-sm border border-white/20",
-  pending: "bg-gradient-to-br from-amber-500/90 to-amber-600/70 text-white shadow-md shadow-amber-500/30 backdrop-blur-sm border border-white/20",
-  rejected: "bg-gradient-to-br from-red-500/90 to-red-600/70 text-white shadow-md shadow-red-500/30 backdrop-blur-sm border border-white/20",
-  info: "bg-gradient-to-br from-blue-500/90 to-blue-600/70 text-white shadow-md shadow-blue-500/30 backdrop-blur-sm border border-white/20",
-  glass: "backdrop-blur-md bg-white/20 dark:bg-black/20 border border-white/30 dark:border-white/10 text-gray-900 dark:text-white shadow-md",
+  approved: "bg-success text-white shadow-sm",
+  pending: "bg-warning text-white shadow-sm",
+  rejected: "bg-danger text-white shadow-sm",
+  info: "bg-info text-white shadow-sm",
+  glass: "bg-muted text-foreground border border-border shadow-sm",
 };
 
-// Neo Input/Form Styles
+// Professional Input/Form Styles
 export const neoInput = {
-  base: "backdrop-blur-md bg-white/50 dark:bg-gray-900/50 border border-white/30 dark:border-white/10 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 shadow-inner transition-all duration-300",
-  error: "backdrop-blur-md bg-white/50 dark:bg-gray-900/50 border border-red-500/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 shadow-inner transition-all duration-300",
-  success: "backdrop-blur-md bg-white/50 dark:bg-gray-900/50 border border-emerald-500/50 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 shadow-inner transition-all duration-300",
+  base: "bg-background border border-input focus:border-ring focus:ring-2 focus:ring-ring/20 shadow-sm transition-all duration-200",
+  error: "bg-background border border-destructive focus:border-destructive focus:ring-2 focus:ring-destructive/20 shadow-sm transition-all duration-200",
+  success: "bg-background border border-success focus:border-success focus:ring-2 focus:ring-success/20 shadow-sm transition-all duration-200",
 };
 
-// Animated Gradient Backgrounds
+// Solid Backgrounds
 export const neoGradient = {
-  page: "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-950 dark:via-blue-950 dark:to-indigo-950",
-  card: "bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/30 dark:from-gray-900 dark:via-blue-950/30 dark:to-indigo-950/30",
-  subtle: "bg-gradient-to-br from-gray-50/50 to-gray-100/50 dark:from-gray-900/50 dark:to-gray-800/50",
+  page: "bg-background",
+  card: "bg-card",
+  subtle: "bg-muted",
 };
 
-// Glow Effects for Important Elements
+// Subtle Emphasis (no glow)
 export const neoGlow = {
-  blue: "shadow-[0_0_30px_rgba(59,130,246,0.3)] hover:shadow-[0_0_50px_rgba(59,130,246,0.5)]",
-  emerald: "shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_50px_rgba(16,185,129,0.5)]",
-  red: "shadow-[0_0_30px_rgba(239,68,68,0.3)] hover:shadow-[0_0_50px_rgba(239,68,68,0.5)]",
-  purple: "shadow-[0_0_30px_rgba(168,85,247,0.3)] hover:shadow-[0_0_50px_rgba(168,85,247,0.5)]",
-  soft: "shadow-[0_0_20px_rgba(0,0,0,0.1)] hover:shadow-[0_0_30px_rgba(0,0,0,0.15)]",
+  blue: "shadow-md hover:shadow-lg transition-shadow",
+  emerald: "shadow-md hover:shadow-lg transition-shadow",
+  red: "shadow-md hover:shadow-lg transition-shadow",
+  purple: "shadow-md hover:shadow-lg transition-shadow",
+  soft: "shadow-sm hover:shadow-md transition-shadow",
 };
 
 // ============================================
 // ACTION & NOTIFICATION STYLES
 // ============================================
 export const neoAction = {
-  item: `${GLASS_CONFIG.blur.medium} bg-white/40 dark:bg-gray-900/40 ${GLASS_CONFIG.border.medium} rounded-xl p-3 hover:bg-white/60 dark:hover:bg-gray-900/60 transition-all duration-300`,
-  destructive: `${GLASS_CONFIG.blur.medium} bg-red-50/60 dark:bg-red-900/20 border border-red-200/50 dark:border-red-800/30 rounded-xl p-3 hover:bg-red-50/80 dark:hover:bg-red-900/30 transition-all duration-300`,
-  warning: `${GLASS_CONFIG.blur.medium} bg-amber-50/60 dark:bg-amber-900/20 border border-amber-200/50 dark:border-amber-800/30 rounded-xl p-3 hover:bg-amber-50/80 dark:hover:bg-amber-900/30 transition-all duration-300`,
-  info: `${GLASS_CONFIG.blur.medium} bg-blue-50/60 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-800/30 rounded-xl p-3 hover:bg-blue-50/80 dark:hover:bg-blue-900/30 transition-all duration-300`,
-  success: `${GLASS_CONFIG.blur.medium} bg-emerald-50/60 dark:bg-emerald-900/20 border border-emerald-200/50 dark:border-emerald-800/30 rounded-xl p-3 hover:bg-emerald-50/80 dark:hover:bg-emerald-900/30 transition-all duration-300`,
+  item: "bg-card border border-border rounded-lg p-3 hover:bg-accent transition-colors duration-200",
+  destructive: "bg-destructive/10 border border-destructive/30 rounded-lg p-3 hover:bg-destructive/20 transition-colors duration-200",
+  warning: "bg-warning/10 border border-warning/30 rounded-lg p-3 hover:bg-warning/20 transition-colors duration-200",
+  info: "bg-info/10 border border-info/30 rounded-lg p-3 hover:bg-info/20 transition-colors duration-200",
+  success: "bg-success/10 border border-success/30 rounded-lg p-3 hover:bg-success/20 transition-colors duration-200",
 };
 
 // ============================================
 // DASHBOARD & PANEL STYLES
 // ============================================
 export const neoDashboard = {
-  section: `${glassCard.base} rounded-2xl p-6`,
-  widget: `${glassCard.subtle} rounded-xl p-4`,
-  sidebar: `${GLASS_CONFIG.blur.strong} bg-white/60 dark:bg-gray-900/60 border-r border-r-white/20 dark:border-r-white/10`,
+  section: `${glassCard.base} rounded-xl p-6`,
+  widget: `${glassCard.subtle} rounded-lg p-4`,
+  sidebar: "bg-background border-r border-border",
 };
 
 // ============================================
 // LIST & TABLE ITEM STYLES
 // ============================================
 export const neoList = {
-  item: `${GLASS_CONFIG.blur.light} bg-white/30 dark:bg-gray-900/30 ${GLASS_CONFIG.border.subtle} rounded-lg p-3 hover:bg-white/50 dark:hover:bg-gray-900/50 hover:shadow-lg transition-all duration-300`,
-  itemActive: `${GLASS_CONFIG.blur.medium} bg-white/60 dark:bg-gray-900/60 border border-blue-500/50 dark:border-blue-500/50 rounded-lg p-3 shadow-lg shadow-blue-500/20 transition-all duration-300`,
+  item: "bg-card border border-border rounded-lg p-3 hover:bg-accent hover:shadow-sm transition-all duration-200",
+  itemActive: "bg-primary/10 border border-primary rounded-lg p-3 shadow-sm transition-all duration-200",
 };
 
 // ============================================
 // EMPTY STATE STYLES
 // ============================================
 export const neoEmpty = {
-  container: `${GLASS_CONFIG.blur.medium} bg-white/40 dark:bg-gray-900/40 ${GLASS_CONFIG.border.subtle} rounded-xl p-8 text-center`,
+  container: "bg-muted border border-border rounded-lg p-8 text-center",
 };
 
 // ============================================
 // MODAL & DIALOG STYLES
 // ============================================
 export const neoModal = {
-  overlay: "backdrop-blur-md bg-black/30 dark:bg-black/50",
-  content: `${glassCard.elevated} rounded-2xl`,
+  overlay: "bg-black/50",
+  content: `${glassCard.elevated} rounded-xl`,
 };
 
 // ============================================
@@ -141,17 +131,17 @@ export function cn(...classes: (string | undefined | null | false)[]): string {
   return classes.filter(Boolean).join(" ");
 }
 
-// Helper to get glassmorphism card class (with global toggle)
+// Helper to get card class (with global toggle)
 export function getGlassCard(variant: keyof typeof glassCard = "base"): string {
   return NEO_ENABLED ? glassCard[variant] : "";
 }
 
-// Helper to get neo button class (with global toggle)
+// Helper to get button class (with global toggle)
 export function getNeoButton(variant: keyof typeof neoButton = "primary"): string {
   return NEO_ENABLED ? neoButton[variant] : "";
 }
 
-// Helper to get neo badge class (with global toggle)
+// Helper to get badge class (with global toggle)
 export function getNeoBadge(variant: keyof typeof neoBadge = "info"): string {
   return NEO_ENABLED ? neoBadge[variant] : "";
 }

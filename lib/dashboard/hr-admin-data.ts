@@ -144,6 +144,7 @@ export async function getHRAdminKPIData(user?: MinimalUser): Promise<HRAdminDash
         },
       },
       select: {
+        id: true, // Added to resolve the error
         createdAt: true,
         updatedAt: true,
       },
@@ -199,7 +200,7 @@ export async function getHRAdminKPIData(user?: MinimalUser): Promise<HRAdminDash
     complianceScore: recentApprovals.length > 0
       ? Math.round((await prisma.leaveRequest.count({
           where: {
-            id: { in: recentApprovals.map(r => r.id) }, // Filter from the recent batch
+            id: { in: recentApprovals.map(r => r.id).filter(Boolean) }, // Filter from the recent batch
             OR: [
               { needsCertificate: true, certificateUrl: { not: null } },
               { type: "MEDICAL", certificateUrl: { not: null } },
