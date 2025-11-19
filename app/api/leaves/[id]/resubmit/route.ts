@@ -13,6 +13,7 @@ import path from "path";
 import { randomUUID } from "crypto";
 import { generateSignedUrl } from "@/lib/storage";
 import { violatesCasualLeaveSideTouch } from "@/lib/leave-validation";
+import { validateStatusTransition } from "@/lib/state-machine";
 
 export const cache = "no-store";
 
@@ -128,6 +129,153 @@ export async function POST(
       );
     }
   }
+
+  // ==================== CRITICAL SECURITY VALIDATIONS ====================
+  // These checks prevent balance exploitation and unauthorized modifications
+
+  const currentYear = new Date().getFullYear();
+  const originalWorkingDays = leave.workingDays;
+  const daysDifference = workingDays - originalWorkingDays;
+
+  // SECURITY CHECK 1: Validate state transition (prevents APPROVED → PENDING exploit)
+  try {
+    validateStatusTransition(leave.status, "PENDING");
+  } catch (e: any) {
+    return NextResponse.json(
+      error("invalid_state_transition", e.message, traceId),
+      { status: 400 }
+    );
+  }
+
+  // SECURITY CHECK 2: Prevent leave type changes (prevents type switching exploits)
+  if (body.type !== leave.type) {
+    return NextResponse.json(
+      error(
+        "cannot_change_type",
+        "Leave type cannot be modified after submission. Please cancel and create a new request.",
+        traceId,
+        { originalType: leave.type, requestedType: body.type }
+      ),
+      { status: 400 }
+    );
+  }
+
+  // SECURITY CHECK 3: Prevent excessive day increases (prevents day extension exploits)
+  const MAX_DAY_INCREASE = 3; // Policy: Cannot increase by more than 3 days without new request
+  if (daysDifference > MAX_DAY_INCREASE) {
+    return NextResponse.json(
+      error(
+        "excessive_modification",
+        `Cannot increase leave duration by more than ${MAX_DAY_INCREASE} days. Current: ${originalWorkingDays} days, Requested: ${workingDays} days (+${daysDifference}). Please create a new request or extension.`,
+        traceId,
+        { originalDays: originalWorkingDays, requestedDays: workingDays, maxIncrease: MAX_DAY_INCREASE }
+      ),
+      { status: 400 }
+    );
+  }
+
+  // SECURITY CHECK 4: Validate sufficient balance for the NEW request
+  // This prevents the exploit where balance was already deducted on previous approval
+  const existingBalance = await prisma.balance.findUnique({
+    where: {
+      userId_type_year: {
+        userId: user.id,
+        type: body.type as any,
+        year: currentYear,
+      },
+    },
+  });
+
+  if (!existingBalance) {
+    return NextResponse.json(
+      error(
+        "no_balance_record",
+        `No balance record found for ${body.type} leave in ${currentYear}`,
+        traceId
+      ),
+      { status: 400 }
+    );
+  }
+
+  const availableBalance =
+    (existingBalance.opening || 0) +
+    (existingBalance.accrued || 0) -
+    (existingBalance.used || 0);
+
+  // CRITICAL: Check if new working days exceed available balance
+  // If previous approval deducted days, we need to account for that
+  let balanceNeeded = workingDays;
+
+  // If leave was previously approved and balance was deducted, we need to restore it first
+  // Then check if the new request can be fulfilled
+  if (leave.approvedAt) {
+    // Balance was previously deducted, restore it for this check
+    balanceNeeded = workingDays - originalWorkingDays; // Only need the difference
+
+    // If reducing days, no balance check needed
+    if (balanceNeeded <= 0) {
+      balanceNeeded = 0;
+    } else if (balanceNeeded > availableBalance) {
+      return NextResponse.json(
+        error(
+          "insufficient_balance",
+          `Insufficient balance for modification. Available: ${availableBalance} days, Additional required: ${balanceNeeded} days (Original: ${originalWorkingDays}, New: ${workingDays})`,
+          traceId,
+          { available: availableBalance, required: balanceNeeded, originalDays: originalWorkingDays, newDays: workingDays }
+        ),
+        { status: 400 }
+      );
+    }
+  } else {
+    // Leave was never approved, check full amount
+    if (workingDays > availableBalance) {
+      return NextResponse.json(
+        error(
+          "insufficient_balance",
+          `Insufficient balance. Available: ${availableBalance} days, Requested: ${workingDays} days`,
+          traceId,
+          { available: availableBalance, requested: workingDays }
+        ),
+        { status: 400 }
+      );
+    }
+  }
+
+  // SECURITY CHECK 5: Restore balance if leave was previously approved
+  // This prevents the double-deduction exploit
+  if (leave.approvedAt && originalWorkingDays > 0) {
+    await prisma.balance.update({
+      where: {
+        userId_type_year: {
+          userId: user.id,
+          type: leave.type as any,
+          year: currentYear,
+        },
+      },
+      data: {
+        used: { decrement: originalWorkingDays },
+        closing: { increment: originalWorkingDays },
+      },
+    });
+
+    // Log balance restoration
+    await prisma.auditLog.create({
+      data: {
+        actorEmail: user.email,
+        action: "BALANCE_RESTORED_ON_RESUBMIT",
+        targetEmail: leave.requester.email,
+        details: {
+          leaveId,
+          restoredDays: originalWorkingDays,
+          reason: "Resubmit after approval - restoring original deduction",
+          leaveType: leave.type,
+          year: currentYear,
+        },
+      },
+    });
+  }
+
+  // ==================== END SECURITY VALIDATIONS ====================
 
   // Handle file upload if provided
   let certificateUrl = body.certificateUrl || leave.certificateUrl;

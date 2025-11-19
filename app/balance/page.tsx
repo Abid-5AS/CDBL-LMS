@@ -120,7 +120,7 @@ function BalanceContent() {
   return (
     <div className="mx-auto max-w-5xl space-y-4 py-4">
       {/* Compact Hero Section */}
-      <div className="surface-card p-4">
+      <div className="bg-card border border-border rounded-lg p-4">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground mb-1">
@@ -177,7 +177,7 @@ function BalanceContent() {
       </div>
 
       {error && (
-        <Alert variant="destructive" className="surface-card border border-destructive/40">
+        <Alert variant="destructive" className="bg-card border border-destructive/40">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>Failed to load balance information. Please try again.</AlertDescription>
         </Alert>
@@ -197,7 +197,7 @@ function BalanceContent() {
 
           // Determine status color
           const getStatusColor = () => {
-            if (isLoading) return "bg-bg-secondary";
+            if (isLoading) return "bg-muted";
             const remainingPercentage = total > 0 ? (available / total) * 100 : 0;
             if (remainingPercentage > 50) return "bg-data-success";
             if (remainingPercentage > 20) return "bg-data-warning";
@@ -213,7 +213,7 @@ function BalanceContent() {
             available > config.maxCarryForward;
 
           return (
-            <Card key={type} className="surface-card h-full flex flex-col">
+            <Card key={type} className="bg-card border-border h-full flex flex-col">
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <Icon className={`h-5 w-5 ${config.color}`} />
@@ -311,7 +311,7 @@ function BalanceContent() {
       </div>
 
       {/* Accrual Checkpoint Section */}
-      <div className="surface-card overflow-hidden">
+      <div className="bg-card border border-border rounded-lg overflow-hidden">
         <div className="p-4 border-b border-border/50">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
@@ -354,7 +354,7 @@ function BalanceContent() {
 
       {/* Monthly Usage Trend - Collapsible */}
       {usageTrend.length > 0 && (
-        <Card className="surface-card">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle>Monthly usage trend</CardTitle>
             <CardDescription>Rolling 12 months of approved leave days by type.</CardDescription>

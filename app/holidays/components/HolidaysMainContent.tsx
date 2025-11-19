@@ -56,7 +56,7 @@ export function HolidaysMainContent({
 
   return (
     <motion.div variants={itemVariants} className="space-y-6">
-      <Card className="shadow-sm border border-border">
+      <Card className="shadow-sm border border-border bg-card">
         <CardHeader className="pb-6">
           <div className="space-y-4">
             <div className="flex flex-col gap-1">

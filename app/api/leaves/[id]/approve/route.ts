@@ -17,6 +17,7 @@ import { calculateMLConversion, formatConversionBreakdown } from "@/lib/medical-
 import { calculateCLConversion, formatCLConversionBreakdown } from "@/lib/casual-leave-conversion";
 import { fetchHolidaysInRange } from "@/lib/leave-validation";
 import { countWorkingDays } from "@/lib/working-days";
+import { deductBalance, deductMultipleBalances } from "@/lib/balance-manager";
 
 export const cache = "no-store";
 
@@ -284,44 +285,36 @@ export async function POST(
 
     clConversionDetails = formatCLConversionBreakdown(conversion);
 
-    // Update CL balance (first 3 days)
-    if (conversion.clPortion > 0 && clBalance) {
-      const newUsed = (clBalance.used || 0) + conversion.clPortion;
-      const newClosing = (clBalance.opening || 0) + (clBalance.accrued || 0) - newUsed;
-
-      await prisma.balance.update({
-        where: {
-          userId_type_year: {
-            userId: leave.requesterId,
-            type: "CASUAL",
-            year: currentYear,
-          },
-        },
-        data: {
-          used: newUsed,
-          closing: Math.max(newClosing, 0),
-        },
-      });
+    // SECURITY: Use atomic multi-balance deduction to prevent race conditions
+    const deductions: Array<{ type: any; days: number }> = [];
+    if (conversion.clPortion > 0) {
+      deductions.push({ type: "CASUAL", days: conversion.clPortion });
+    }
+    if (conversion.elPortion > 0) {
+      deductions.push({ type: "EARNED", days: conversion.elPortion });
     }
 
-    // Update EL balance (excess days)
-    if (conversion.elPortion > 0 && elBalance) {
-      const newUsed = (elBalance.used || 0) + conversion.elPortion;
-      const newClosing = (elBalance.opening || 0) + (elBalance.accrued || 0) - newUsed;
+    const deductionResult = await deductMultipleBalances(
+      leave.requesterId,
+      deductions,
+      currentYear,
+      leave.id,
+      { id: user.id, email: user.email, role: userRole }
+    );
 
-      await prisma.balance.update({
-        where: {
-          userId_type_year: {
-            userId: leave.requesterId,
-            type: "EARNED",
-            year: currentYear,
-          },
-        },
-        data: {
-          used: newUsed,
-          closing: Math.max(newClosing, 0),
-        },
-      });
+    if (!deductionResult.success) {
+      return NextResponse.json(
+        error(
+          "balance_deduction_failed",
+          deductionResult.error || "Failed to deduct CL/EL balance for conversion",
+          traceId,
+          {
+            leaveId: leave.id,
+            conversion: { clPortion: conversion.clPortion, elPortion: conversion.elPortion },
+          }
+        ),
+        { status: 400 }
+      );
     }
   } else if (leave.type === "MEDICAL" && leave.workingDays > 14) {
     // Medical Leave >14 days requiring auto-conversion (Policy 6.21.c)
@@ -429,37 +422,51 @@ export async function POST(
     // It's just recorded in the conversion details for transparency
   } else {
     // Standard balance update for non-CL, non-ML, or CL ≤3 days / ML ≤14 days
-    const balance = await prisma.balance.findUnique({
-      where: {
-        userId_type_year: {
-          userId: leave.requesterId,
-          type: leave.type,
-          year: currentYear,
+    // SECURITY: Use atomic deduction to prevent race conditions
+    const deductionResult = await deductBalance(
+      leave.requesterId,
+      leave.type,
+      leave.workingDays,
+      currentYear,
+      leave.id,
+      { id: user.id, email: user.email, role: userRole }
+    );
+
+    if (!deductionResult.success) {
+      // Balance deduction failed (insufficient balance or race condition)
+      return NextResponse.json(
+        error(
+          "balance_deduction_failed",
+          deductionResult.error || "Failed to deduct balance",
+          traceId,
+          {
+            leaveId: leave.id,
+            requiredDays: leave.workingDays,
+            leaveType: leave.type,
+          }
+        ),
+        { status: 400 }
+      );
+    }
+
+    // Log successful deduction details in approval audit
+    await prisma.auditLog.create({
+      data: {
+        actorEmail: user.email,
+        action: "BALANCE_DEDUCTION_ON_APPROVAL",
+        targetEmail: leave.requester.email,
+        details: {
+          leaveId: leave.id,
+          balanceId: deductionResult.balanceId,
+          beforeUsed: deductionResult.beforeUsed,
+          afterUsed: deductionResult.afterUsed,
+          beforeClosing: deductionResult.beforeClosing,
+          afterClosing: deductionResult.afterClosing,
+          days: leave.workingDays,
+          leaveType: leave.type,
         },
       },
     });
-
-    if (balance) {
-      const newUsed = (balance.used || 0) + leave.workingDays;
-      const newClosing = Math.max(
-        (balance.opening || 0) + (balance.accrued || 0) - newUsed,
-        0
-      );
-
-      await prisma.balance.update({
-        where: {
-          userId_type_year: {
-            userId: leave.requesterId,
-            type: leave.type,
-            year: currentYear,
-          },
-        },
-        data: {
-          used: newUsed,
-          closing: newClosing,
-        },
-      });
-    }
   }
 
   // Create audit log

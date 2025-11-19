@@ -33,7 +33,7 @@ export function UpcomingHolidaysPanel({ holidays = [], isLoading }: UpcomingHoli
 
   if (isLoading) {
     return (
-      <Card className="border-border/60 shadow-sm">
+      <Card className="border-border shadow-sm">
         <CardHeader className="pb-2">
           <Skeleton className="h-5 w-32" />
         </CardHeader>
@@ -50,9 +50,9 @@ export function UpcomingHolidaysPanel({ holidays = [], isLoading }: UpcomingHoli
   }
 
   return (
-    <Card className="border-border/60 shadow-sm">
+    <Card className="border-border shadow-sm bg-card">
       <CardHeader className="pb-3">
-        <CardTitle className="text-base font-semibold flex items-center gap-2">
+        <CardTitle className="text-base font-semibold flex items-center gap-2 text-foreground">
           <CalendarDays className="h-4 w-4 text-muted-foreground" />
           Upcoming Holidays
         </CardTitle>
@@ -67,7 +67,7 @@ export function UpcomingHolidaysPanel({ holidays = [], isLoading }: UpcomingHoli
                   <p className="text-xs text-muted-foreground">{holiday.type || "Public Holiday"}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <span className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground ring-1 ring-inset ring-gray-500/10">
+                  <span className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground ring-1 ring-inset ring-border">
                     {formatDate(holiday.date)}
                   </span>
                 </div>

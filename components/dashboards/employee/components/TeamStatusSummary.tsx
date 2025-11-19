@@ -117,16 +117,16 @@ export function TeamStatusSummary() {
         </div>
       </DialogTrigger>
 
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md bg-card border-border">
         <DialogHeader>
-          <DialogTitle>Who's Out Today</DialogTitle>
+          <DialogTitle className="text-foreground">Who's Out Today</DialogTitle>
         </DialogHeader>
         <div className="mt-4 space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
           {data.members.length > 0 ? (
             data.members.map((member) => (
               <div
                 key={member.id}
-                className="flex items-center gap-3 rounded-lg border border-border p-3"
+                className="flex items-center gap-3 rounded-lg border border-border p-3 hover:bg-muted/50 transition-colors"
               >
                 <Avatar className="h-10 w-10">
                   <AvatarFallback className="bg-primary/10 text-primary font-medium">
@@ -134,7 +134,7 @@ export function TeamStatusSummary() {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">{member.name}</p>
+                  <p className="text-sm font-medium text-foreground">{member.name}</p>
                   <p className="text-xs text-muted-foreground">
                     {leaveTypeLabel[member.type]} • {new Date(member.start).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} - {new Date(member.end).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                   </p>

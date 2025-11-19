@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { motion } from "framer-motion";
+
 import { useRouter } from "next/navigation";
 import { Calendar, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui";
@@ -29,13 +29,13 @@ export function EmployeeRecentActivity({
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 p-4">
         {[1, 2, 3].map((i) => (
           <div key={i} className="animate-pulse flex items-center space-x-4">
-            <div className="w-10 h-10 bg-bg-muted dark:bg-bg-tertiary rounded-full"></div>
+            <div className="w-10 h-10 bg-muted rounded-full"></div>
             <div className="flex-1 space-y-2">
-              <div className="h-4 bg-bg-muted dark:bg-bg-tertiary rounded w-3/4"></div>
-              <div className="h-3 bg-bg-muted dark:bg-bg-tertiary rounded w-1/2"></div>
+              <div className="h-4 bg-muted rounded w-3/4"></div>
+              <div className="h-3 bg-muted rounded w-1/2"></div>
             </div>
           </div>
         ))}
@@ -59,17 +59,14 @@ export function EmployeeRecentActivity({
   }
 
   return (
-    <div className="space-y-4">
-      {leaves.map((leave, index) => (
-        <motion.div
+    <div className="divide-y divide-border">
+      {leaves.map((leave) => (
+        <div
           key={leave.id}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: index * 0.1 }}
-          className="flex items-center space-x-4 p-3 rounded-xl bg-bg-secondary/50 dark:bg-bg-tertiary/30 hover:bg-bg-tertiary/50 dark:hover:bg-bg-tertiary/50 transition-colors cursor-pointer"
+          className="flex items-center space-x-4 p-4 hover:bg-muted/50 transition-colors cursor-pointer"
           onClick={() => router.push(`/leaves/${leave.id}`)}
         >
-          <div className="w-10 h-10 bg-gradient-to-br from-brand to-brand-strong rounded-full flex items-center justify-center text-white font-semibold text-sm">
+          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold text-sm">
             {leave.type.charAt(0)}
           </div>
           <div className="flex-1 min-w-0">
@@ -82,18 +79,10 @@ export function EmployeeRecentActivity({
           </div>
           <div className="flex items-center space-x-2">
             <StatusBadge status={leave.status as any} />
-            <ArrowRight className="size-4 text-text-muted" aria-hidden="true" />
+            <ArrowRight className="size-4 text-muted-foreground" aria-hidden="true" />
           </div>
-        </motion.div>
+        </div>
       ))}
-      <Button
-        variant="ghost"
-        className="w-full mt-4 text-brand hover:text-brand-strong hover:bg-brand-soft dark:hover:bg-brand-soft/20"
-        onClick={() => router.push("/leaves")}
-      >
-        View All Leave Requests
-        <ArrowRight className="size-4 ml-2" aria-hidden="true" />
-      </Button>
     </div>
   );
 }

@@ -2,30 +2,25 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
-import { getGlassCard } from "@/lib/neo-design";
 
 const cardVariants = cva(
-  "flex flex-col text-card-foreground transition-all duration-300",
+  "flex flex-col text-card-foreground transition-all duration-100 ease-out",
   {
     variants: {
       variant: {
-        default: getGlassCard("base"),
-        elevated: getGlassCard("elevated"),
-        glass: getGlassCard("interactive"),
-        subtle: getGlassCard("subtle"),
+        default: "bg-card border border-border shadow-sm hover:border-border",
+        elevated: "bg-card border border-border shadow-md",
         outline:
-          "bg-transparent border-2 border-border hover:border-primary/40 shadow-sm hover:shadow-md",
-        ghost: "bg-transparent border-none shadow-none hover:bg-muted/40",
-        gradient:
-          "bg-gradient-to-br from-card/95 to-muted/30 border border-border/40 shadow-md hover:shadow-lg",
+          "bg-transparent border border-border hover:border-border",
+        ghost: "bg-transparent border-none shadow-none hover:bg-muted/50",
       },
       size: {
-        sm: "gap-3 p-4 rounded-lg",
-        default: "gap-4 p-6 rounded-xl",
-        lg: "gap-6 p-8 rounded-2xl",
+        sm: "gap-3 p-4 rounded-md",
+        default: "gap-4 p-6 rounded-md",
+        lg: "gap-6 p-8 rounded-md",
       },
       interactive: {
-        true: "cursor-pointer hover-lift active-press",
+        true: "cursor-pointer hover:-translate-y-[1px] active:translate-y-0",
         false: "",
       },
       padding: {

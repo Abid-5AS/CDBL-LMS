@@ -5,34 +5,32 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-all disabled:pointer-events-none disabled:opacity-60 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-[18px] [&>svg]:flex-shrink-0 [&>span]:flex-shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary touch-target focus-ring hover-lift active-press",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-all duration-100 ease-out disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-[18px] [&>svg]:flex-shrink-0 [&>span]:flex-shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900",
   {
     variants: {
       variant: {
         default:
-          "bg-gradient-to-r from-primary/95 to-primary/85 text-primary-foreground shadow-md hover:shadow-lg hover:from-primary hover:to-primary/90 dark:hover:from-primary/90 dark:hover:to-primary/85 border border-primary/20",
+          "bg-slate-900 text-white hover:bg-slate-800 rounded-md",
         destructive:
-          "bg-gradient-to-r from-destructive/95 to-destructive/85 text-destructive-foreground shadow-md hover:shadow-lg hover:from-destructive hover:to-destructive/90 focus-visible:ring-destructive/30 dark:focus-visible:ring-destructive/40 border border-destructive/20",
+          "bg-red-700 text-white hover:bg-red-800 rounded-md",
         outline:
-          "border-2 border-border bg-background text-foreground shadow-sm hover:bg-muted hover:text-foreground hover:border-primary/40 hover:shadow-md",
+          "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300 rounded-md",
         secondary:
-          "bg-gradient-to-r from-secondary/95 to-secondary/85 text-secondary-foreground shadow-sm hover:shadow-md hover:from-secondary hover:to-secondary/90 border border-secondary/20",
+          "bg-slate-100 text-slate-900 hover:bg-slate-200 border border-slate-200 rounded-md",
         ghost:
-          "hover:bg-muted hover:text-foreground shadow-none hover:shadow-sm",
-        link: "text-primary underline-offset-4 hover:underline hover:text-primary/80 shadow-none hover:shadow-none",
-        glass:
-          "glass-base text-foreground shadow-md hover:shadow-lg border border-white/20 dark:border-white/10",
+          "hover:bg-slate-50 hover:text-slate-900 rounded-md",
+        link: "text-slate-900 underline-offset-4 hover:underline hover:text-slate-700",
       },
       size: {
-        xs: "h-8 px-3 py-1.5 text-xs gap-1.5 rounded-lg has-[>svg]:px-2",
-        sm: "h-9 px-4 py-2 text-sm gap-1.5 rounded-xl has-[>svg]:px-3",
-        default: "h-10 px-5 py-2.5 text-sm gap-2 rounded-xl has-[>svg]:px-4",
-        lg: "h-11 px-6 py-3 text-base gap-2 rounded-2xl has-[>svg]:px-5",
-        xl: "h-12 px-8 py-3.5 text-lg gap-2.5 rounded-2xl has-[>svg]:px-6",
-        icon: "size-10 rounded-xl",
-        "icon-sm": "size-9 rounded-lg",
-        "icon-lg": "size-11 rounded-2xl",
-        "icon-xl": "size-12 rounded-2xl",
+        xs: "h-8 px-3 py-1.5 text-xs gap-1.5 has-[>svg]:px-2",
+        sm: "h-9 px-4 py-2 text-sm gap-1.5 has-[>svg]:px-3",
+        default: "h-10 px-5 py-2.5 text-sm gap-2 has-[>svg]:px-4",
+        lg: "h-11 px-6 py-3 text-base gap-2 has-[>svg]:px-5",
+        xl: "h-12 px-8 py-3.5 text-lg gap-2.5 has-[>svg]:px-6",
+        icon: "size-10",
+        "icon-sm": "size-9",
+        "icon-lg": "size-11",
+        "icon-xl": "size-12",
       },
       loading: {
         true: "cursor-not-allowed",

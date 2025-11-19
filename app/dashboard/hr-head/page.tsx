@@ -1,9 +1,8 @@
 import { Suspense } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { HRHeadDashboardClient } from "@/components/dashboards/hr-head/HRHeadDashboardClient";
+import { CorporateHRHeadDashboard } from "@/components/dashboards/hr-head/CorporateHRHeadDashboard";
 import { DashboardLoadingFallback } from "../shared/LoadingFallback";
-import { RoleBasedDashboard } from "@/components/dashboards";
 
 async function HRHeadDashboardContent() {
   const user = await getCurrentUser();
@@ -17,19 +16,7 @@ async function HRHeadDashboardContent() {
     redirect("/dashboard");
   }
 
-  const username = user.name ?? "HR Head";
-  const role = user.role === "CEO" ? "CEO" : "HR_HEAD";
-
-  return (
-    <RoleBasedDashboard
-      role={role}
-      title={`Welcome, ${username}`}
-      description="Review and approve critical leave requests across the organization"
-      animate={true}
-    >
-      <HRHeadDashboardClient />
-    </RoleBasedDashboard>
-  );
+  return <CorporateHRHeadDashboard />;
 }
 
 export default function HRHeadDashboardPage() {

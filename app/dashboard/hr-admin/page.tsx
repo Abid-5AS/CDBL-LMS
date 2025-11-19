@@ -1,9 +1,8 @@
 import { Suspense } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { HRAdminDashboard } from "@/components/dashboards";
+import { CorporateHRAdminDashboard } from "@/components/dashboards/hr-admin/CorporateHRAdminDashboard";
 import { DashboardLoadingFallback } from "../shared/LoadingFallback";
-import { RoleBasedDashboard } from "@/components/dashboards/shared/RoleBasedDashboard";
 import {
   getHRAdminKPIData,
   getHRAdminStatsData,
@@ -21,25 +20,16 @@ async function HRAdminDashboardContent() {
     redirect("/dashboard");
   }
 
-  const username = user.name ?? "HR Admin";
   const [initialKpis, initialStats] = await Promise.all([
     getHRAdminKPIData(user),
     getHRAdminStatsData({ user }),
   ]);
 
   return (
-    <RoleBasedDashboard
-      role="HR_ADMIN"
-      title={`Welcome, ${username}`}
-      description="Operational leave management and forwarding"
-      animate={true}
-    >
-      <HRAdminDashboard
-        username={username}
-        initialKpis={initialKpis}
-        initialStats={initialStats}
-      />
-    </RoleBasedDashboard>
+    <CorporateHRAdminDashboard
+      initialKpis={initialKpis}
+      initialStats={initialStats}
+    />
   );
 }
 

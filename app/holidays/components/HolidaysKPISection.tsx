@@ -37,8 +37,8 @@ function HolidayStatCard({ label, value, helper, icon, muted = false, featured =
   return (
     <div
       className={cn(
-        "neo-card p-4 flex flex-col gap-3 h-full transition-all duration-200",
-        featured && "ring-2 ring-indigo-500/50 bg-gradient-to-br from-indigo-500/5 to-transparent",
+        "bg-card border border-border rounded-lg p-4 flex flex-col gap-3 h-full transition-all duration-200",
+        featured && "ring-2 ring-primary/20",
         muted && "opacity-70"
       )}
       aria-disabled={muted}
@@ -63,7 +63,7 @@ function HolidayStatCard({ label, value, helper, icon, muted = false, featured =
 function NextHolidayCard({ stats }: { stats: HolidaysStats }) {
   if (!stats.nextHoliday) {
     return (
-      <div className="neo-card p-4 h-full flex flex-col justify-center items-center text-center gap-2">
+      <div className="bg-card border border-border rounded-lg p-4 h-full flex flex-col justify-center items-center text-center gap-2">
         <CalendarDays className="w-8 h-8 text-muted-foreground/50" aria-hidden="true" />
         <p className="text-sm font-medium text-muted-foreground">No upcoming holidays</p>
         <p className="text-xs text-muted-foreground">Check back later</p>
@@ -78,23 +78,23 @@ function NextHolidayCard({ stats }: { stats: HolidaysStats }) {
   );
 
   return (
-    <div className="neo-card p-4 h-full bg-gradient-to-br from-indigo-50 dark:from-indigo-950/30 to-transparent ring-2 ring-indigo-500/30 flex flex-col justify-between">
+    <div className="bg-card border border-border rounded-lg p-4 h-full ring-2 ring-primary/20 flex flex-col justify-between">
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex-1">
-          <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-300 uppercase tracking-wide mb-1">
+          <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-1">
             Next Holiday
           </p>
           <h3 className="font-semibold text-foreground line-clamp-2 text-sm">
             {stats.nextHoliday.name}
           </h3>
         </div>
-        <ArrowRight className="w-4 h-4 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-1" aria-hidden="true" />
+        <ArrowRight className="w-4 h-4 text-primary flex-shrink-0 mt-1" aria-hidden="true" />
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>{formatDate(stats.nextHoliday.date)}</span>
-          <span className="font-semibold text-indigo-600 dark:text-indigo-300">
+          <span className="font-semibold text-primary">
             {daysUntil} days
           </span>
         </div>
