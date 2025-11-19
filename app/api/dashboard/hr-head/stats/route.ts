@@ -211,6 +211,101 @@ export async function GET(req: NextRequest) {
       },
     });
 
+    // Get department-wise performance metrics
+    const departmentPerformance = await Promise.all(
+      departmentStats.map(async (dept) => {
+        const deptName = dept.department || "Unassigned";
+
+        // Get pending requests for this department
+        const pendingInDept = await prisma.leaveRequest.count({
+          where: {
+            status: "PENDING",
+            requester: {
+              department: dept.department,
+            },
+          },
+        });
+
+        // Get employees on leave in this department
+        const onLeaveInDept = await prisma.leaveRequest.count({
+          where: {
+            status: "APPROVED",
+            startDate: { lte: tomorrow },
+            endDate: { gte: today },
+            requester: {
+              department: dept.department,
+            },
+          },
+        });
+
+        // Get approval time stats for this department (last 30 days)
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        const deptApprovals = await prisma.approval.findMany({
+          where: {
+            decidedAt: {
+              gte: thirtyDaysAgo,
+            },
+            decision: {
+              in: ["APPROVED", "REJECTED"],
+            },
+            leave: {
+              requester: {
+                department: dept.department,
+              },
+            },
+          },
+          include: {
+            leave: {
+              select: {
+                createdAt: true,
+              },
+            },
+          },
+        });
+
+        const avgApprovalTime = deptApprovals.length > 0
+          ? deptApprovals.reduce((sum, approval) => {
+              const createdAt = new Date(approval.leave.createdAt);
+              const decidedAt = new Date(approval.decidedAt!);
+              const diffInDays = (decidedAt.getTime() - createdAt.getTime()) / (1000 * 3600 * 24);
+              return sum + diffInDays;
+            }, 0) / deptApprovals.length
+          : 0;
+
+        return {
+          name: deptName,
+          employees: dept._count.id,
+          pending: pendingInDept,
+          onLeave: onLeaveInDept,
+          avgApprovalTime: Number(avgApprovalTime.toFixed(1)),
+        };
+      })
+    );
+
+    // Get escalated cases (requests that required HR_HEAD approval)
+    const escalatedCasesRaw = await prisma.approval.findMany({
+      where: {
+        approverId: user.id,
+        decision: "PENDING",
+        leave: {
+          status: "PENDING",
+        },
+      },
+      take: 10,
+      include: {
+        leave: {
+          include: {
+            requester: {
+              select: {
+                name: true,
+                department: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
     // Calculate compliance score based on on-time processing
     const totalProcessed = approvalStats.length;
     const onTimeApprovals = approvalStats.filter((approval) => {
@@ -256,6 +351,23 @@ export async function GET(req: NextRequest) {
       departments: departmentStats.map((dept) => ({
         name: dept.department || "Unassigned",
         employees: dept._count.id,
+      })),
+
+      // Department performance analytics
+      departmentPerformance,
+
+      // Escalated cases
+      escalatedCases: escalatedCasesRaw.map((approval: any) => ({
+        id: approval.id,
+        leaveId: approval.leaveId,
+        employeeName: approval.leave.requester.name,
+        department: approval.leave.requester.department || "Unassigned",
+        leaveType: approval.leave.type,
+        startDate: approval.leave.startDate,
+        endDate: approval.leave.endDate,
+        workingDays: approval.leave.workingDays,
+        reason: approval.leave.reason,
+        submittedAt: approval.leave.createdAt,
       })),
     };
 

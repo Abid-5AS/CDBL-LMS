@@ -14,13 +14,10 @@ import {
   AlertCircle,
   FileText,
   Calendar,
+  Info,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import {
-  RoleKPICard,
-  ResponsiveDashboardGrid,
-  DashboardSection,
-} from "@/components/dashboards/shared";
+import { RoleBasedDashboard } from "@/components/dashboards/shared";
 import { ChartContainer } from "@/components/shared/LeaveCharts";
 import { PendingLeaveRequestsTable } from "./sections/PendingApprovals";
 import { CancellationRequestsPanel } from "./sections/CancellationRequests";
@@ -46,7 +43,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Info } from "lucide-react";
 
 export interface HRAdminStats {
   // Core KPIs
@@ -161,7 +157,7 @@ function HRAdminDashboardClientImpl({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="surface-card border border-data-error/30 bg-data-error/5 p-6 text-center"
+        className="border border-data-error/30 bg-data-error/5 p-6 text-center rounded-lg"
       >
         <AlertCircle className="h-12 w-12 mx-auto mb-3 text-data-error" />
         <p className="text-sm text-data-error font-medium">
@@ -176,281 +172,72 @@ function HRAdminDashboardClientImpl({
 
   return (
     <TooltipProvider>
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate={isHydrated ? "visible" : "hidden"}
-        className="space-y-6"
+      <RoleBasedDashboard
+        role="HR_ADMIN"
+        animate={true}
+        backgroundVariant="transparent"
+        compactHeader={true}
+        title="HR Operations"
+        description="Manage leave approvals and organizational oversight"
       >
-        {/* Primary KPIs */}
-        <DashboardSection
-          title="Key Performance Metrics"
-          description="Essential leave management KPIs for your organization"
-          isLoading={false}
-          animate={true}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate={isHydrated ? "visible" : "hidden"}
+          className="space-y-6"
         >
-          <ResponsiveDashboardGrid
-            columns="2:2:4:4"
-            gap="md"
-            animate={true}
-            staggerChildren={0.1}
-            delayChildren={0.1}
-          >
-            {isLoading ? (
-              <>
-                {[...Array(4)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="surface-card relative flex h-full min-h-[170px] flex-col px-5 py-5 sm:px-6 sm:py-6"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 space-y-3">
-                        <div className="h-3 w-28 bg-muted/40 animate-pulse rounded" />
-                        <div className="h-9 w-24 bg-muted/40 animate-pulse rounded" />
-                        <div className="h-4 w-32 bg-muted/40 animate-pulse rounded" />
+          {/* YOUR WORKLOAD - Personal Metrics */}
+          <motion.section variants={itemVariants}>
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold">Your Workload</h3>
+              <p className="text-sm text-muted-foreground">
+                Your personal approval queue and processing metrics
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {isLoading ? (
+                <>
+                  {[...Array(2)].map((_, i) => (
+                    <Card key={i} className="border-border/60 shadow-sm">
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 space-y-3">
+                            <div className="h-3 w-28 bg-muted/40 animate-pulse rounded" />
+                            <div className="h-9 w-24 bg-muted/40 animate-pulse rounded" />
+                            <div className="h-4 w-32 bg-muted/40 animate-pulse rounded" />
+                          </div>
+                          <div className="h-12 w-12 bg-muted/40 animate-pulse rounded-2xl" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <Card className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-muted-foreground mb-2">
+                            Your Approval Queue
+                          </p>
+                          <p className="text-3xl font-bold">
+                            {displayStats?.pendingRequests || 0}
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Awaiting your action
+                          </p>
+                        </div>
+                        <div className="h-12 w-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                          <Clock className="h-6 w-6 text-blue-600" />
+                        </div>
                       </div>
-                      <div className="h-12 w-12 bg-muted/40 animate-pulse rounded-2xl" />
-                    </div>
-                  </div>
-                ))}
-              </>
-            ) : (
-              <>
-                <div className="relative">
-                  <RoleKPICard
-                    title="Employees on Leave"
-                    value={displayStats?.employeesOnLeave || 0}
-                    subtitle="Currently absent today"
-                    icon={Users}
-                    role="HR_ADMIN"
-                    animate={true}
-                  />
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        aria-label="Information about employees on leave"
-                        className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
-                      >
-                        <Info className="h-4 w-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom" className="max-w-xs">
-                      <p className="text-sm font-semibold mb-1">
-                        What this shows:
-                      </p>
-                      <p className="text-sm mb-2">
-                        Number of employees who have approved leave today. Helps
-                        you track workforce availability and capacity.
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Calculation: Counts leaves where today falls between
-                        start and end date with APPROVED status.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <div className="relative">
-                  <RoleKPICard
-                    title="Your Approval Queue"
-                    value={displayStats?.pendingRequests || 0}
-                    subtitle="Awaiting your action"
-                    icon={Clock}
-                    role="HR_ADMIN"
-                    animate={true}
-                    onClick={() => document.getElementById("pending-approvals")?.scrollIntoView({ behavior: "smooth" })}
-                    clickLabel="Jump to approval queue"
-                    trend={
-                      displayStats && displayStats.pendingRequests > 15
-                        ? {
-                            value: displayStats.pendingRequests,
-                            label: "needs attention",
-                            direction: "up",
-                          }
-                        : undefined
-                    }
-                  />
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        aria-label="Information about pending requests"
-                        className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
-                      >
-                        <Info className="h-4 w-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom" className="max-w-xs">
-                      <p className="text-sm font-semibold mb-1">
-                        What this shows:
-                      </p>
-                      <p className="text-sm mb-2">
-                        Leave requests awaiting YOUR action. This is your
-                        personal work queue - not organization-wide pending
-                        requests.
-                      </p>
-                      <p className="text-sm font-semibold mb-1">What to do:</p>
-                      <p className="text-sm mb-2">
-                        Review each request and Forward to DEPT_HEAD, Return for
-                        modification, or Reject if invalid.
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Calculation: Counts approvals where you are the approver
-                        and decision is still PENDING.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <div className="relative">
-                  <RoleKPICard
-                    title="Avg Approval Time"
-                    value={`${displayStats?.avgApprovalTime?.toFixed(1) || 0}d`}
-                    subtitle="Processing speed"
-                    icon={TrendingUp}
-                    role="HR_ADMIN"
-                    animate={true}
-                    trend={
-                      displayStats && displayStats.avgApprovalTime > 3
-                        ? {
-                            value: Math.round(
-                              (displayStats.avgApprovalTime - 3) * 10
-                            ),
-                            label: "vs 3d target",
-                            direction: "down",
-                          }
-                        : displayStats && displayStats.avgApprovalTime > 0
-                        ? {
-                            value: Math.round(
-                              (3 - displayStats.avgApprovalTime) * 10
-                            ),
-                            label: "below target",
-                            direction: "up",
-                          }
-                        : undefined
-                    }
-                  />
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        aria-label="Information about average approval time"
-                        className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
-                      >
-                        <Info className="h-4 w-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom" className="max-w-xs">
-                      <p className="text-sm font-semibold mb-1">
-                        What this shows:
-                      </p>
-                      <p className="text-sm mb-2">
-                        Organization-wide average time from submission to final
-                        decision. Shows overall system efficiency.
-                      </p>
-                      <p className="text-sm font-semibold mb-1">
-                        Why it matters:
-                      </p>
-                      <p className="text-sm mb-2">
-                        Target is ≤3 days. Longer times indicate bottlenecks in
-                        the approval chain and may frustrate employees.
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Calculation: Average of (updatedAt - createdAt) for last
-                        100 processed requests in past 30 days.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <div className="relative">
-                  <RoleKPICard
-                    title="Total Leaves (YTD)"
-                    value={displayStats?.totalLeavesThisYear || 0}
-                    subtitle="Approved this year"
-                    icon={Calendar}
-                    role="HR_ADMIN"
-                    animate={true}
-                  />
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        aria-label="Information about total leaves"
-                        className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
-                      >
-                        <Info className="h-4 w-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom" className="max-w-xs">
-                      <p className="text-sm font-semibold mb-1">
-                        What this shows:
-                      </p>
-                      <p className="text-sm mb-2">
-                        Total number of approved leave requests this year. Helps
-                        track overall leave volume and trends.
-                      </p>
-                      <p className="text-sm font-semibold mb-1">
-                        Why it matters:
-                      </p>
-                      <p className="text-sm mb-2">
-                        Higher numbers may indicate seasonal patterns, high
-                        employee utilization of benefits, or potential
-                        understaffing concerns.
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Calculation: Counts all APPROVED leaves where start date
-                        is in current year.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              </>
-            )}
-          </ResponsiveDashboardGrid>
-        </DashboardSection>
-
-        {/* Performance Metrics */}
-        <DashboardSection
-          title="Performance & Compliance"
-          description="Daily metrics, team utilization, and compliance tracking"
-          isLoading={false}
-          animate={true}
-        >
-          <ResponsiveDashboardGrid
-            columns="1:1:3:3"
-            gap="md"
-            animate={true}
-            staggerChildren={0.1}
-            delayChildren={0.2}
-          >
-            {isLoading ? (
-              <>
-                {[...Array(3)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="surface-card rounded-2xl h-full min-h-[170px] flex flex-col p-6"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 space-y-3">
-                        <div className="h-4 w-24 bg-muted/40 animate-pulse rounded" />
-                        <div className="h-8 w-20 bg-muted/40 animate-pulse rounded" />
-                        <div className="h-4 w-32 bg-muted/40 animate-pulse rounded" />
-                      </div>
-                      <div className="h-12 w-12 bg-muted/40 animate-pulse rounded-xl" />
-                    </div>
-                  </div>
-                ))}
-              </>
-            ) : (
-              <>
-                <motion.div variants={itemVariants} className="h-full">
-                  <Card className="surface-card rounded-2xl hover:shadow-lg transition-all duration-300 h-full flex flex-col relative border-border/50">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                        <Target className="h-4 w-4" />
-                        Daily Processing
-                      </CardTitle>
-                    </CardHeader>
+                    </CardContent>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
-                          aria-label="Information about daily processing"
-                          className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors z-10"
+                          aria-label="Information about pending requests"
+                          className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
                         >
                           <Info className="h-4 w-4" />
                         </button>
@@ -460,196 +247,346 @@ function HRAdminDashboardClientImpl({
                           What this shows:
                         </p>
                         <p className="text-sm mb-2">
-                          Organization-wide count of leave requests approved or
-                          rejected today. Tracks daily processing momentum.
+                          Leave requests awaiting YOUR action. This is your
+                          personal work queue.
+                        </p>
+                        <p className="text-sm font-semibold mb-1">What to do:</p>
+                        <p className="text-sm">
+                          Review each request and Forward to DEPT_HEAD, Return
+                          for modification, or Reject if invalid.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </Card>
+
+                  <Card className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-muted-foreground mb-2">
+                            Avg Approval Time
+                          </p>
+                          <p className="text-3xl font-bold">
+                            {displayStats?.avgApprovalTime?.toFixed(1) || 0}d
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Processing speed
+                          </p>
+                        </div>
+                        <div className="h-12 w-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                          <TrendingUp className="h-6 w-6 text-emerald-600" />
+                        </div>
+                      </div>
+                    </CardContent>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          aria-label="Information about average approval time"
+                          className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+                        >
+                          <Info className="h-4 w-4" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">
+                          What this shows:
+                        </p>
+                        <p className="text-sm mb-2">
+                          Organization-wide average time from submission to final
+                          decision. Shows overall system efficiency.
                         </p>
                         <p className="text-sm font-semibold mb-1">
                           Why it matters:
                         </p>
-                        <p className="text-sm mb-2">
-                          Target of 10 per day is a general productivity
-                          benchmark (not mandatory). Helps identify slow
-                          processing days.
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Calculation: Counts all requests with APPROVED or
-                          REJECTED status updated today, across all approvers.
+                        <p className="text-sm">
+                          Target is ≤3 days. Longer times indicate bottlenecks in
+                          the approval chain.
                         </p>
                       </TooltipContent>
                     </Tooltip>
-                    <CardContent className="space-y-3 flex-1 flex flex-col justify-center">
-                      <div className="flex items-end justify-between">
-                        <div>
-                          <p className="text-3xl font-bold text-foreground">
-                            {displayStats?.processedToday || 0}
+                  </Card>
+                </>
+              )}
+            </div>
+          </motion.section>
+
+          {/* ORGANIZATION METRICS */}
+          <motion.section variants={itemVariants}>
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold">Organization Metrics</h3>
+              <p className="text-sm text-muted-foreground">
+                Company-wide performance, utilization, and compliance tracking
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+              {isLoading ? (
+                <>
+                  {[...Array(5)].map((_, i) => (
+                    <Card key={i} className="border-border/60 shadow-sm">
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 space-y-3">
+                            <div className="h-4 w-24 bg-muted/40 animate-pulse rounded" />
+                            <div className="h-8 w-20 bg-muted/40 animate-pulse rounded" />
+                            <div className="h-4 w-32 bg-muted/40 animate-pulse rounded" />
+                          </div>
+                          <div className="h-12 w-12 bg-muted/40 animate-pulse rounded-xl" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <Card className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-muted-foreground mb-2">
+                            Employees on Leave
                           </p>
-                          <p className="text-sm text-muted-foreground">
-                            of {displayStats?.dailyTarget || 10} target
+                          <p className="text-3xl font-bold">
+                            {displayStats?.employeesOnLeave || 0}
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Currently absent
                           </p>
                         </div>
-                        <div className="text-right">
-                          <p className="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
-                            {displayStats?.dailyProgress || 0}%
-                          </p>
+                        <div className="h-12 w-12 rounded-xl bg-violet-500/10 flex items-center justify-center">
+                          <Users className="h-6 w-6 text-violet-600" />
                         </div>
                       </div>
-                      <Progress
-                        value={displayStats?.dailyProgress || 0}
-                        className="h-2 bg-muted"
-                        // @ts-ignore
-                        indicatorClassName="bg-gradient-to-r from-blue-500 to-violet-500"
-                      />
-                      {displayStats && displayStats.dailyProgress >= 100 && (
-                        <p className="text-xs text-data-success flex items-center gap-1">
-                          <CheckCircle2 className="h-3 w-3" />
-                          Target achieved!
+                    </CardContent>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          aria-label="Information about employees on leave"
+                          className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+                        >
+                          <Info className="h-4 w-4" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">
+                          What this shows:
                         </p>
-                      )}
+                        <p className="text-sm">
+                          Number of employees who have approved leave today across
+                          the entire organization. Helps track workforce
+                          availability.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </Card>
+
+                  <Card className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-muted-foreground mb-2">
+                            Total Leaves (YTD)
+                          </p>
+                          <p className="text-3xl font-bold">
+                            {displayStats?.totalLeavesThisYear || 0}
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Approved this year
+                          </p>
+                        </div>
+                        <div className="h-12 w-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                          <Calendar className="h-6 w-6 text-amber-600" />
+                        </div>
+                      </div>
+                    </CardContent>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          aria-label="Information about total leaves"
+                          className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+                        >
+                          <Info className="h-4 w-4" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">
+                          What this shows:
+                        </p>
+                        <p className="text-sm">
+                          Total number of approved leave requests this year
+                          organization-wide. Tracks overall leave volume.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </Card>
+
+                  <Card className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
+                    <CardContent className="p-6">
+                      <div className="flex flex-col h-full">
+                        <div className="flex items-start justify-between mb-3">
+                          <p className="text-sm font-medium text-muted-foreground">
+                            Daily Processing
+                          </p>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                aria-label="Information about daily processing"
+                                className="text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+                              >
+                                <Info className="h-4 w-4" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" className="max-w-xs">
+                              <p className="text-sm font-semibold mb-1">
+                                What this shows:
+                              </p>
+                              <p className="text-sm">
+                                Organization-wide count of leave requests approved
+                                or rejected today. Tracks daily processing momentum.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                        <div className="flex items-end justify-between mb-2">
+                          <div>
+                            <p className="text-2xl font-bold text-foreground">
+                              {displayStats?.processedToday || 0}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              of {displayStats?.dailyTarget || 10} target
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-lg font-semibold bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
+                              {displayStats?.dailyProgress || 0}%
+                            </p>
+                          </div>
+                        </div>
+                        <Progress
+                          value={displayStats?.dailyProgress || 0}
+                          className="h-2 bg-muted"
+                        />
+                        {displayStats && displayStats.dailyProgress >= 100 && (
+                          <p className="text-xs text-data-success flex items-center gap-1 mt-2">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Target achieved!
+                          </p>
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
-                </motion.div>
 
-                <div className="relative h-full">
-                  <RoleKPICard
-                    title="Team Utilization"
-                    value={`${displayStats?.teamUtilization || 0}%`}
-                    subtitle="Workforce availability"
-                    icon={Activity}
-                    role="HR_ADMIN"
-                    animate={true}
-                    trend={
-                      displayStats && displayStats.teamUtilization
-                        ? {
-                            value: displayStats.teamUtilization >= 85 ? 2 : 3,
-                            label: "vs target",
-                            direction:
-                              displayStats.teamUtilization >= 85
-                                ? "up"
-                                : "down",
-                          }
-                        : undefined
-                    }
-                  />
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        aria-label="Information about team utilization"
-                        className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors z-10"
-                      >
-                        <Info className="h-4 w-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom" className="max-w-xs">
-                      <p className="text-sm font-semibold mb-1">
-                        What this shows:
-                      </p>
-                      <p className="text-sm mb-2">
-                        Percentage of employees available for work today (not on
-                        approved leave). Real-time workforce capacity indicator.
-                      </p>
-                      <p className="text-sm font-semibold mb-1">
-                        Why it matters:
-                      </p>
-                      <p className="text-sm mb-2">
-                        Target: ≥85%. Below this means too many people are on
-                        leave, which may impact operations and require workload
-                        adjustments.
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Calculation: (Total employees - On leave today) / Total
-                        employees × 100%.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
+                  <Card className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-muted-foreground mb-2">
+                            Team Utilization
+                          </p>
+                          <p className="text-3xl font-bold">
+                            {displayStats?.teamUtilization || 0}%
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Workforce availability
+                          </p>
+                        </div>
+                        <div className="h-12 w-12 rounded-xl bg-cyan-500/10 flex items-center justify-center">
+                          <Activity className="h-6 w-6 text-cyan-600" />
+                        </div>
+                      </div>
+                    </CardContent>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          aria-label="Information about team utilization"
+                          className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+                        >
+                          <Info className="h-4 w-4" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">
+                          What this shows:
+                        </p>
+                        <p className="text-sm">
+                          Percentage of employees available for work today (not on
+                          approved leave). Real-time workforce capacity indicator.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </Card>
 
-                <div className="relative h-full">
-                  <RoleKPICard
-                    title="Compliance Score"
-                    value={`${displayStats?.complianceScore || 0}%`}
-                    subtitle="Policy adherence"
-                    icon={CheckCircle2}
-                    role="HR_ADMIN"
-                    animate={true}
-                    trend={
-                      displayStats && displayStats.complianceScore
-                        ? {
-                            value: displayStats.complianceScore >= 90 ? 1 : 2,
-                            label: "this month",
-                            direction:
-                              displayStats.complianceScore >= 90
-                                ? "up"
-                                : "down",
-                          }
-                        : undefined
-                    }
-                  />
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        aria-label="Information about compliance score"
-                        className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors z-10"
-                      >
-                        <Info className="h-4 w-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom" className="max-w-xs">
-                      <p className="text-sm font-semibold mb-1">
-                        What this shows:
-                      </p>
-                      <p className="text-sm mb-2">
-                        Measures how well the organization follows leave
-                        policies - proper documentation, timely processing, and
-                        workflow adherence.
-                      </p>
-                      <p className="text-sm font-semibold mb-1">
-                        Why it matters:
-                      </p>
-                      <p className="text-sm mb-2">
-                        Target: ≥90%. Low scores indicate policy violations,
-                        documentation issues, or processing delays that need
-                        attention.
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Note: Currently using placeholder value. Real
-                        calculation coming soon (on-time processing +
-                        documentation + policy adherence).
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              </>
-            )}
-          </ResponsiveDashboardGrid>
-        </DashboardSection>
+                  <Card className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-muted-foreground mb-2">
+                            Compliance Score
+                          </p>
+                          <p className="text-3xl font-bold">
+                            {displayStats?.complianceScore || 0}%
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Policy adherence
+                          </p>
+                        </div>
+                        <div className="h-12 w-12 rounded-xl bg-green-500/10 flex items-center justify-center">
+                          <CheckCircle2 className="h-6 w-6 text-green-600" />
+                        </div>
+                      </div>
+                    </CardContent>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          aria-label="Information about compliance score"
+                          className="absolute top-3 right-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+                        >
+                          <Info className="h-4 w-4" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">
+                          What this shows:
+                        </p>
+                        <p className="text-sm">
+                          Measures how well the organization follows leave policies
+                          - proper documentation, timely processing, and workflow
+                          adherence.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </Card>
+                </>
+              )}
+            </div>
+          </motion.section>
 
-        {/* Pending Requests Table - Full Width */}
-        <DashboardSection
-          title="Pending Leave Requests"
-          description="Review and manage pending leave requests"
-          isLoading={isLoading}
-        >
-          <motion.div variants={itemVariants} id="pending-approvals">
+          {/* Pending Requests Table */}
+          <motion.section variants={itemVariants} id="pending-approvals">
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold">Pending Leave Requests</h3>
+              <p className="text-sm text-muted-foreground">
+                Review and manage pending leave requests
+              </p>
+            </div>
             <Suspense fallback={<DashboardCardSkeleton />}>
               <PendingLeaveRequestsTable />
             </Suspense>
-          </motion.div>
-        </DashboardSection>
+          </motion.section>
 
-        {/* Analytics Section - Full Width Grid */}
-        <DashboardSection
-          title="Analytics Overview"
-          description="Request trends and leave type distribution"
-          isLoading={false}
-          animate={true}
-        >
-          <ResponsiveDashboardGrid columns="1:1:2:3" gap="md" animate={true}>
-            {/* Quick Stats Summary */}
-            <motion.div variants={itemVariants}>
-              <Card className="surface-card rounded-2xl hover:shadow-lg transition-all duration-300 h-full border-border/50">
+          {/* Analytics Section */}
+          <motion.section variants={itemVariants}>
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold">Analytics Overview</h3>
+              <p className="text-sm text-muted-foreground">
+                Request trends and leave type distribution
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              {/* Quick Stats Summary */}
+              <Card className="border-border/60 shadow-sm">
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2 text-foreground">
-                    <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <FileText className="h-4 w-4 text-blue-600" />
                     Quick Stats
                   </CardTitle>
                 </CardHeader>
@@ -706,93 +643,94 @@ function HRAdminDashboardClientImpl({
                   )}
                 </CardContent>
               </Card>
-            </motion.div>
 
-            {/* Leave Type Distribution */}
-            <motion.div variants={itemVariants}>
-              <ChartContainer
-                title="Leave Type Distribution"
-                subtitle="Current year breakdown"
-                loading={isLoading}
-                empty={
-                  !isLoading &&
-                  (!displayStats?.leaveTypeBreakdown ||
-                    displayStats.leaveTypeBreakdown.length === 0)
-                }
-                height={400}
-                className="hover:shadow-xl transition-all duration-300 h-full border-border/50"
-              >
-                <Suspense
-                  fallback={
-                    <div className="h-[360px] bg-muted/20 animate-pulse rounded" />
+              {/* Leave Type Distribution */}
+              <div className="lg:col-span-2">
+                <ChartContainer
+                  title="Leave Type Distribution"
+                  subtitle="Current year breakdown"
+                  loading={isLoading}
+                  empty={
+                    !isLoading &&
+                    (!displayStats?.leaveTypeBreakdown ||
+                      displayStats.leaveTypeBreakdown.length === 0)
                   }
+                  height={400}
+                  className="border-border/60 shadow-sm"
                 >
-                  <LazyTypePie
-                    data={
-                      displayStats?.leaveTypeBreakdown?.map((item) => ({
-                        name: item.type,
-                        value: item.count,
-                      })) || []
+                  <Suspense
+                    fallback={
+                      <div className="h-[360px] bg-muted/20 animate-pulse rounded" />
                     }
-                    height={360}
-                  />
-                </Suspense>
-              </ChartContainer>
-            </motion.div>
-
-            {/* Request Trend Chart */}
-            {!isLoading &&
-              displayStats?.monthlyTrend &&
-              displayStats.monthlyTrend.length > 0 && (
-                <motion.div variants={itemVariants}>
-                  <ChartContainer
-                    title="Request Trend"
-                    subtitle="Last 6 months submission pattern"
-                    loading={isLoading}
-                    empty={
-                      !isLoading &&
-                      (!displayStats?.monthlyTrend ||
-                        displayStats.monthlyTrend.length === 0)
-                    }
-                    height={400}
-                    className="hover:shadow-xl transition-all duration-300 h-full border-border/50"
                   >
-                    <Suspense
-                      fallback={
-                        <div className="h-[360px] bg-muted/20 animate-pulse rounded" />
+                    <LazyTypePie
+                      data={
+                        displayStats?.leaveTypeBreakdown?.map((item) => ({
+                          name: item.type,
+                          value: item.count,
+                        })) || []
                       }
-                    >
-                      <LazyTrendChart
-                        data={displayStats.monthlyTrend.map((item) => ({
-                          month: item.month,
-                          leaves: item.count,
-                        }))}
-                        height={360}
-                        dataKey="leaves"
-                      />
-                    </Suspense>
-                  </ChartContainer>
-                </motion.div>
-              )}
-          </ResponsiveDashboardGrid>
-        </DashboardSection>
-
-        {/* Cancellation Requests - Full Width */}
-        <motion.div variants={itemVariants}>
-          <Card className="surface-card rounded-2xl hover:shadow-lg transition-all duration-300 border-border/50">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg text-foreground">Cancellation Requests</CardTitle>
+                      height={360}
+                    />
+                  </Suspense>
+                </ChartContainer>
               </div>
-            </CardHeader>
-            <CardContent>
-              <Suspense fallback={<DashboardCardSkeleton />}>
-                <CancellationRequestsPanel />
-              </Suspense>
-            </CardContent>
-          </Card>
+
+              {/* Request Trend Chart */}
+              {!isLoading &&
+                displayStats?.monthlyTrend &&
+                displayStats.monthlyTrend.length > 0 && (
+                  <div className="lg:col-span-3">
+                    <ChartContainer
+                      title="Request Trend"
+                      subtitle="Last 6 months submission pattern"
+                      loading={isLoading}
+                      empty={
+                        !isLoading &&
+                        (!displayStats?.monthlyTrend ||
+                          displayStats.monthlyTrend.length === 0)
+                      }
+                      height={400}
+                      className="border-border/60 shadow-sm"
+                    >
+                      <Suspense
+                        fallback={
+                          <div className="h-[360px] bg-muted/20 animate-pulse rounded" />
+                        }
+                      >
+                        <LazyTrendChart
+                          data={displayStats.monthlyTrend.map((item) => ({
+                            month: item.month,
+                            leaves: item.count,
+                          }))}
+                          height={360}
+                          dataKey="leaves"
+                        />
+                      </Suspense>
+                    </ChartContainer>
+                  </div>
+                )}
+            </div>
+          </motion.section>
+
+          {/* Cancellation Requests */}
+          <motion.section variants={itemVariants}>
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold">Cancellation Requests</h3>
+              <p className="text-sm text-muted-foreground">
+                Review and process cancellation requests
+              </p>
+            </div>
+            <Card className="border-border/60 shadow-sm">
+              <CardContent className="p-6">
+                <Suspense fallback={<DashboardCardSkeleton />}>
+                  <CancellationRequestsPanel />
+                </Suspense>
+              </CardContent>
+            </Card>
+          </motion.section>
         </motion.div>
-      </motion.div>
+      </RoleBasedDashboard>
     </TooltipProvider>
   );
 }

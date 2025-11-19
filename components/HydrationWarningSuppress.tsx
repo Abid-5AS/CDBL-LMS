@@ -31,6 +31,7 @@ export function HydrationWarningSuppress() {
       // Suppress known benign attributes added by browser extensions or animations
       const benignPatterns = [
         "bis_skin_checked", // Browser extension (Buster Image Solver, etc.)
+        "darkreader", // Browser extension (Dark Reader)
         "style=", // Animation style changes
         "animate", // Framer Motion animate prop
         "opacity:", // Opacity animations

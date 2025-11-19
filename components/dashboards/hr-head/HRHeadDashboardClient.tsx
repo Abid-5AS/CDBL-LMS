@@ -8,9 +8,8 @@ import {
   RoleKPICard,
   ResponsiveDashboardGrid,
   DashboardSection,
-  AnalyticsBarChart,
-  ExportButton,
 } from "@/components/dashboards/shared";
+import { AnalyticsBarChart } from "@/components/dashboards/shared/AnalyticsChart";
 import {
   KPIGridSkeleton
 } from "@/components/shared/skeletons";
@@ -63,6 +62,29 @@ interface HRHeadStats {
   departments: Array<{
     name: string;
     employees: number;
+  }>;
+
+  // Department performance analytics
+  departmentPerformance: Array<{
+    name: string;
+    employees: number;
+    pending: number;
+    onLeave: number;
+    avgApprovalTime: number;
+  }>;
+
+  // Escalated cases
+  escalatedCases: Array<{
+    id: number;
+    leaveId: number;
+    employeeName: string;
+    department: string;
+    leaveType: string;
+    startDate: Date;
+    endDate: Date;
+    workingDays: number;
+    reason: string;
+    submittedAt: Date;
   }>;
 }
 
@@ -325,14 +347,50 @@ export function HRHeadDashboardClient() {
         </ResponsiveDashboardGrid>
       </DashboardSection>
 
+      {/* Department Performance Analytics */}
+      {!isLoading && stats && stats.departmentPerformance && stats.departmentPerformance.length > 0 && (
+        <DashboardSection
+          title="Department Performance Analytics"
+          description="Pending requests and approval times by department"
+          isLoading={isLoading}
+        >
+          <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+            <AnalyticsBarChart
+              title="Pending by Department"
+              subtitle="Current pending requests per department"
+              data={stats.departmentPerformance.map((dept) => ({
+                name: dept.name,
+                pending: dept.pending,
+              }))}
+              dataKeys={[
+                { key: "pending", name: "Pending", color: "#f59e0b" },
+              ]}
+              xAxisKey="name"
+            />
+            <AnalyticsBarChart
+              title="Approval Time by Department"
+              subtitle="Average approval time in days"
+              data={stats.departmentPerformance.map((dept) => ({
+                name: dept.name,
+                avgTime: dept.avgApprovalTime,
+              }))}
+              dataKeys={[
+                { key: "avgTime", name: "Avg Days", color: "#3b82f6" },
+              ]}
+              xAxisKey="name"
+            />
+          </div>
+        </DashboardSection>
+      )}
+
       {/* Secondary Metrics */}
       <DashboardSection
         title="Performance & Compliance"
-        description="Monthly metrics and new hires"
+        description="Monthly metrics, compliance tracking, and new hires"
         isLoading={isLoading}
         loadingFallback={<KPIGridSkeleton />}
       >
-        <ResponsiveDashboardGrid columns="1:1:2:2" gap="md">
+        <ResponsiveDashboardGrid columns="1:1:3:3" gap="md">
             <RoleKPICard
               title={
                 <div className="flex items-center gap-2">
@@ -406,7 +464,49 @@ export function HRHeadDashboardClient() {
                 direction: "up"
               } : undefined}
             />
-            {/* Removed Fake Policy Compliance Card */}
+            <RoleKPICard
+              title={
+                <div className="flex items-center gap-2">
+                  <span>Policy Compliance</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        aria-label="Information about policy compliance"
+                        className="hover:opacity-70 transition-opacity"
+                      >
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs">
+                      <p className="text-sm font-semibold mb-1">What this shows:</p>
+                      <p className="text-sm mb-2">
+                        Percentage of leave requests processed within the target timeframe (≤3 days from submission to decision).
+                      </p>
+                      <p className="text-sm font-semibold mb-1">Why it matters:</p>
+                      <p className="text-sm mb-2">
+                        High compliance (≥90%) indicates efficient processing. Low scores suggest bottlenecks or delays that frustrate employees.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Calculation: (Requests decided within 3 days / Total processed this month) × 100%
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              }
+              value={`${stats?.complianceScore || 0}%`}
+              subtitle="On-time processing rate"
+              icon={CheckCircle2}
+              role="HR_HEAD"
+              trend={stats && stats.complianceScore >= 90 ? {
+                value: stats.complianceScore - 90,
+                label: "above target",
+                direction: "up"
+              } : stats && stats.complianceScore > 0 ? {
+                value: 90 - stats.complianceScore,
+                label: "below target",
+                direction: "down"
+              } : undefined}
+            />
         </ResponsiveDashboardGrid>
       </DashboardSection>
 
@@ -427,15 +527,6 @@ export function HRHeadDashboardClient() {
                       Awaiting HR head action
                     </p>
                   </div>
-                  {!isLoading && stats && stats.pending > 0 && (
-                    <ExportButton
-                      data={[]}
-                      filename="pending-requests"
-                      title="Pending Requests"
-                      formats={["csv", "pdf"]}
-                      size="sm"
-                    />
-                  )}
                 </div>
               </CardHeader>
               <CardContent>
@@ -471,6 +562,61 @@ export function HRHeadDashboardClient() {
           </div>
         </div>
       </DashboardSection>
+
+      {/* Escalated Cases Table */}
+      {!isLoading && stats && stats.escalatedCases && stats.escalatedCases.length > 0 && (
+        <DashboardSection
+          title="Escalated Cases"
+          description="Requests requiring HR Head approval"
+          isLoading={isLoading}
+        >
+          <Card className="surface-card">
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted/30 border-b border-border">
+                    <tr>
+                      <th className="text-left p-3 font-medium">Employee</th>
+                      <th className="text-left p-3 font-medium">Department</th>
+                      <th className="text-left p-3 font-medium">Type</th>
+                      <th className="text-left p-3 font-medium">Dates</th>
+                      <th className="text-left p-3 font-medium">Days</th>
+                      <th className="text-left p-3 font-medium">Reason</th>
+                      <th className="text-left p-3 font-medium">Submitted</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stats.escalatedCases.map((escalation) => (
+                      <tr key={escalation.id} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                        <td className="p-3">
+                          <a
+                            href={`/leaves/${escalation.leaveId}`}
+                            className="text-data-info hover:underline font-medium"
+                          >
+                            {escalation.employeeName}
+                          </a>
+                        </td>
+                        <td className="p-3 text-muted-foreground">{escalation.department}</td>
+                        <td className="p-3 font-medium">{escalation.leaveType}</td>
+                        <td className="p-3 text-muted-foreground text-xs">
+                          {formatDate(escalation.startDate.toString())} → {formatDate(escalation.endDate.toString())}
+                        </td>
+                        <td className="p-3">{escalation.workingDays}</td>
+                        <td className="p-3 text-muted-foreground max-w-xs truncate">
+                          {escalation.reason}
+                        </td>
+                        <td className="p-3 text-muted-foreground text-xs">
+                          {formatDate(escalation.submittedAt.toString())}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </DashboardSection>
+      )}
 
       {/* Bottom Section - Full Width */}
       <DashboardSection

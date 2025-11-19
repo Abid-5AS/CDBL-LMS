@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ModernTable } from "@/components/ui";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -79,6 +80,9 @@ export function DeptHeadPendingTable({
   // Comparison modal state
   const [comparisonModalOpen, setComparisonModalOpen] = useState(false);
   const [selectedLeaveForComparison, setSelectedLeaveForComparison] = useState<any | null>(null);
+
+  // Batch selection state
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   // Update URL when debounced search changes
   useEffect(() => {
@@ -179,6 +183,50 @@ export function DeptHeadPendingTable({
             sticky={true}
           />
 
+          {/* Bulk Action Bar */}
+          {selectedIds.length > 0 && (
+            <div className="flex items-center justify-between p-4 bg-muted/30 border border-primary/20 rounded-lg mb-4 animate-in fade-in slide-in-from-top-2">
+              <div className="flex items-center gap-2">
+                <Badge variant="default" className="bg-primary text-primary-foreground">
+                  {selectedIds.length} Selected
+                </Badge>
+                <span className="text-sm text-muted-foreground">requests selected</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-8 text-data-error hover:bg-data-error hover:text-data-error"
+                  onClick={() => {
+                    // Bulk return logic would go here
+                    // For now, just clear selection as placeholder
+                    setSelectedIds([]);
+                  }}
+                >
+                  <RotateCcw className="mr-2 h-3.5 w-3.5" />
+                  Return Selected
+                </Button>
+                <Button
+                  size="sm"
+                  className="h-8 bg-data-success hover:bg-data-success/90 text-white"
+                  onClick={async () => {
+                    // Bulk approve logic
+                    // Loop through selectedIds and call handleAction for each
+                    // This is a simplified implementation
+                    for (const id of selectedIds) {
+                      await handleAction(id, "approve");
+                    }
+                    setSelectedIds([]);
+                    if (onMutate) onMutate();
+                  }}
+                >
+                  <CheckCircle2 className="mr-2 h-3.5 w-3.5" />
+                  Approve Selected
+                </Button>
+              </div>
+            </div>
+          )}
+
           {/* Table or Empty State */}
           {rows.length === 0 ? (
             <PendingTableNoResults />
@@ -188,6 +236,18 @@ export function DeptHeadPendingTable({
                 <div className="max-h-[70vh] overflow-y-auto">
                   <ModernTable size="md">
                     <ModernTable.Header bordered={true}>
+                      <ModernTable.Head className="w-[40px]">
+                        <Checkbox
+                          checked={selectedIds.length === rows.length && rows.length > 0}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setSelectedIds(rows.map((r: any) => r.id));
+                            } else {
+                              setSelectedIds([]);
+                            }
+                          }}
+                        />
+                      </ModernTable.Head>
                       <ModernTable.Head>Employee</ModernTable.Head>
                       <ModernTable.Head>Type</ModernTable.Head>
                       <ModernTable.Head className="hidden sm:table-cell">Dates</ModernTable.Head>
@@ -203,9 +263,22 @@ export function DeptHeadPendingTable({
                         const availableActions = getAvailableActions(leave.type as LeaveType);
                         const isPending = leave.status === "PENDING" || leave.status === "SUBMITTED";
                         const isProcessing = processingIds.has(leave.id);
+                        const isSelected = selectedIds.includes(leave.id);
 
                         return (
-                          <ModernTable.Row key={leave.id}>
+                          <ModernTable.Row key={leave.id} className={isSelected ? "bg-muted/30" : ""}>
+                            <ModernTable.Cell>
+                              <Checkbox
+                                checked={isSelected}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setSelectedIds((prev) => [...prev, leave.id]);
+                                  } else {
+                                    setSelectedIds((prev) => prev.filter((id) => id !== leave.id));
+                                  }
+                                }}
+                              />
+                            </ModernTable.Cell>
                             <ModernTable.Cell>
                               <Link
                                 href={`/leaves/${leave.id}`}

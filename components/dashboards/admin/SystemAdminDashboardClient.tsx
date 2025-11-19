@@ -9,6 +9,8 @@ import { QuickActions } from "@/components/shared/QuickActions";
 import { DashboardSection } from "@/app/dashboard/shared/DashboardLayout";
 import { DashboardCardSkeleton } from "@/components/shared/skeletons";
 import { RoleBasedDashboard } from "@/components/dashboards/shared/RoleBasedDashboard";
+import { ConfigurationChecklist } from "./ConfigurationChecklist";
+import { SystemAlertsPanel } from "./SystemAlertsPanel";
 
 type SystemStats = {
   totalUsers: number;
@@ -198,6 +200,17 @@ export function SystemAdminDashboardContent({
 
         <DashboardSection title="Quick Stats">
           <SystemQuickStats systemStats={systemStats} />
+        </DashboardSection>
+
+        {/* Configuration & Alerts Row */}
+        <DashboardSection
+          title="System Configuration & Alerts"
+          description="Configuration status and system health monitoring"
+        >
+          <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+            <ConfigurationChecklist />
+            <SystemAlertsPanel />
+          </div>
         </DashboardSection>
 
         <DashboardSection

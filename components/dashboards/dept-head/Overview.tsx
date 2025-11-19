@@ -2,7 +2,7 @@
 
 import { Suspense, useMemo } from "react";
 import { DeptHeadPendingTable } from "./sections/PendingTable";
-import { DeptHeadTeamOverview } from "./sections/TeamOverview";
+import { TeamCoverageCalendar } from "./components/TeamCoverageCalendar";
 import { DeptHeadQuickActions } from "./sections/QuickActions";
 import { useApiQueryWithParams } from "@/lib/apiClient";
 import { useFilterFromUrl } from "@/lib/url-filters";
@@ -10,6 +10,7 @@ import {
   RoleKPICard,
   ResponsiveDashboardGrid,
   DashboardSection,
+  SmartAlert,
 } from "@/components/dashboards/shared";
 import {
   ClipboardList,
@@ -339,7 +340,7 @@ export function DeptHeadDashboardWrapper() {
         >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <Suspense fallback={<CardSkeleton />}>
-              <DeptHeadTeamOverview />
+              <TeamCoverageCalendar />
             </Suspense>
 
             <Suspense fallback={<CardSkeleton />}>
@@ -363,46 +364,32 @@ function DeptHeadAlertsPanel({
   }>;
   isLoading?: boolean;
 }) {
-  const tones: Record<"info" | "warning" | "critical", string> = {
-    info: "border-emerald-200/70 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400",
-    warning:
-      "border-amber-200/70 bg-amber-500/5 text-amber-600 dark:text-amber-400",
-    critical: "border-red-200/70 bg-red-500/5 text-red-600 dark:text-red-400",
-  };
+  if (isLoading) {
+    return (
+      <div className="surface-card p-4 space-y-3">
+        <div className="h-14 rounded-lg bg-muted animate-pulse" />
+        <div className="h-14 rounded-lg bg-muted animate-pulse" />
+      </div>
+    );
+  }
 
   return (
-    <div className="surface-card p-4 space-y-3">
-      <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-          System Alerts
-        </p>
-        <h4 className="text-base font-semibold text-foreground">
-          Notifications
-        </h4>
-      </div>
-      <div className="space-y-3">
-        {isLoading
-          ? Array.from({ length: 2 }).map((_, idx) => (
-              <div
-                key={idx}
-                className="h-14 rounded-lg bg-muted animate-pulse"
-              />
-            ))
-          : alerts.map((alert, idx) => (
-              <div
-                key={`${alert.title}-${idx}`}
-                className={`rounded-xl border px-3 py-2 text-sm flex gap-2 ${
-                  tones[alert.tone]
-                }`}
-              >
-                <AlertTriangle className="h-4 w-4 mt-0.5" />
-                <div>
-                  <p className="font-semibold">{alert.title}</p>
-                  <p className="text-xs opacity-80">{alert.detail}</p>
-                </div>
-              </div>
-            ))}
-      </div>
+    <div className="space-y-3">
+      {alerts.map((alert, idx) => (
+        <SmartAlert
+          key={`${alert.title}-${idx}`}
+          variant={
+            alert.tone === "critical"
+              ? "destructive"
+              : alert.tone === "warning"
+              ? "warning"
+              : "info"
+          }
+          title={alert.title}
+        >
+          {alert.detail}
+        </SmartAlert>
+      ))}
     </div>
   );
 }

@@ -428,10 +428,35 @@ export function CEODashboard() {
           {!isLoading && stats && (
             <Card className="surface-card rounded-2xl">
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
-                  Financial Summary
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <DollarSign className="h-4 w-4" />
+                    Financial Summary
+                  </CardTitle>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        aria-label="Cost methodology information"
+                        className="hover:opacity-70 transition-opacity"
+                      >
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs">
+                      <p className="text-sm font-semibold mb-1">Methodology:</p>
+                      <p className="text-sm mb-2">
+                        Leave cost is estimated using average employee daily rate multiplied by total approved leave days YTD.
+                      </p>
+                      <p className="text-sm font-semibold mb-1">Calculation:</p>
+                      <p className="text-sm mb-2">
+                        Cost = (Total Leave Days × Avg Daily Rate). Daily rate assumes standard salary distribution across workforce.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        This is an estimate. Actual cost may vary based on employee salaries and benefits.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
@@ -461,6 +486,72 @@ export function CEODashboard() {
         </div>
         </div>
       </DashboardSection>
+
+      {/* Department Scorecard */}
+      {!isLoading && stats && stats.departments && stats.departments.length > 0 && (
+        <DashboardSection
+          title="Department Scorecard"
+          description="Performance metrics by department"
+          isLoading={isLoading}
+        >
+          <Card className="surface-card">
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted/30 border-b border-border">
+                    <tr>
+                      <th className="text-left p-3 font-medium">Department</th>
+                      <th className="text-left p-3 font-medium">Headcount</th>
+                      <th className="text-left p-3 font-medium">On Leave</th>
+                      <th className="text-left p-3 font-medium">Utilization</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stats.departments.map((dept, index) => {
+                      // Calculate estimated on leave (this is simplified - ideally from API)
+                      const estimatedOnLeave = Math.round((stats.onLeaveToday / stats.totalEmployees) * dept.employees);
+                      const utilization = dept.employees > 0 ? Math.round(((dept.employees - estimatedOnLeave) / dept.employees) * 100) : 100;
+
+                      return (
+                        <tr key={index} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                          <td className="p-3 font-medium">{dept.name}</td>
+                          <td className="p-3 text-muted-foreground">{dept.employees}</td>
+                          <td className="p-3">
+                            <div className="flex items-center gap-2">
+                              <span>{estimatedOnLeave}</span>
+                              <span className="text-xs text-muted-foreground">
+                                ({((estimatedOnLeave / dept.employees) * 100).toFixed(0)}%)
+                              </span>
+                            </div>
+                          </td>
+                          <td className="p-3">
+                            <div className="flex items-center gap-2">
+                              <div className="w-full max-w-[100px]">
+                                <Progress value={utilization} className="h-2" />
+                              </div>
+                              <span className={cn(
+                                "text-xs font-medium",
+                                utilization >= 90 ? "text-data-success" :
+                                utilization >= 85 ? "text-data-warning" :
+                                "text-data-error"
+                              )}>
+                                {utilization}%
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <div className="p-4 bg-muted/20 border-t border-border text-xs text-muted-foreground">
+                <p>Note: On Leave and Utilization are estimated based on organization-wide averages. For accurate department-specific data, contact HR.</p>
+              </div>
+            </CardContent>
+          </Card>
+        </DashboardSection>
+      )}
 
       {/* Financial & Strategic Metrics - MOVED DOWN (Detail view after trends) */}
       <DashboardSection

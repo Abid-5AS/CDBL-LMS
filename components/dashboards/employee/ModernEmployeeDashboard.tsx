@@ -49,6 +49,7 @@ import { FloatingQuickActions } from "./components/FloatingQuickActions";
 import { LeaveBalanceCard } from "./components/LeaveBalanceCard";
 import { TeamStatusSummary } from "./components/TeamStatusSummary";
 import { ActiveRequestTracker } from "./components/ActiveRequestTracker";
+import { UpcomingHolidaysPanel } from "./components/UpcomingHolidaysPanel";
 
 // Extracted hooks and utils
 import { KPIGridSkeleton } from "@/components/shared/skeletons";
@@ -260,7 +261,8 @@ export function ModernEmployeeDashboard({
               {/* New Compact Team Status Summary with Modal */}
               <TeamStatusSummary />
 
-              {/* Optional: Upcoming Holidays or other side widgets could go here */}
+              {/* Upcoming Holidays Panel */}
+              <UpcomingHolidaysPanel holidays={holidaysData as any} isLoading={isLoadingHolidays} />
             </motion.div>
           </div>
         </motion.div>
