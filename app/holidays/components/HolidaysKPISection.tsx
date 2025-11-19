@@ -1,8 +1,9 @@
 "use client";
 
 import { motion, type Variants } from "framer-motion";
-import { CalendarDays, Clock, Star, History } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { CalendarDays, Clock, Star, History, ArrowRight } from "lucide-react";
+import { cn, formatDate } from "@/lib/utils";
+import { Badge } from "@/components/ui";
 import type { HolidaysStats } from "../hooks/useHolidaysData";
 
 type HolidaysKPISectionProps = {
@@ -29,24 +30,80 @@ type StatCardProps = {
   helper: string;
   icon: React.ReactNode;
   muted?: boolean;
+  featured?: boolean;
 };
 
-function HolidayStatCard({ label, value, helper, icon, muted = false }: StatCardProps) {
+function HolidayStatCard({ label, value, helper, icon, muted = false, featured = false }: StatCardProps) {
   return (
     <div
       className={cn(
-        "neo-card p-4 flex flex-col gap-3 h-full",
+        "neo-card p-4 flex flex-col gap-3 h-full transition-all duration-200",
+        featured && "ring-2 ring-indigo-500/50 bg-gradient-to-br from-indigo-500/5 to-transparent",
         muted && "opacity-70"
       )}
       aria-disabled={muted}
     >
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">{label}</p>
+        <p className="text-sm font-medium text-muted-foreground">{label}</p>
         <div className={iconClasses}>{icon}</div>
       </div>
       <div>
-        <p className="text-3xl font-semibold text-foreground">{value}</p>
+        <p className={cn(
+          featured ? "text-4xl font-bold" : "text-3xl font-semibold",
+          "text-foreground"
+        )}>
+          {value}
+        </p>
         <p className="text-xs text-muted-foreground mt-1">{helper}</p>
+      </div>
+    </div>
+  );
+}
+
+function NextHolidayCard({ stats }: { stats: HolidaysStats }) {
+  if (!stats.nextHoliday) {
+    return (
+      <div className="neo-card p-4 h-full flex flex-col justify-center items-center text-center gap-2">
+        <CalendarDays className="w-8 h-8 text-muted-foreground/50" aria-hidden="true" />
+        <p className="text-sm font-medium text-muted-foreground">No upcoming holidays</p>
+        <p className="text-xs text-muted-foreground">Check back later</p>
+      </div>
+    );
+  }
+
+  const today = new Date();
+  const nextHolidayDate = new Date(stats.nextHoliday.date);
+  const daysUntil = Math.ceil(
+    (nextHolidayDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+  );
+
+  return (
+    <div className="neo-card p-4 h-full bg-gradient-to-br from-indigo-50 dark:from-indigo-950/30 to-transparent ring-2 ring-indigo-500/30 flex flex-col justify-between">
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <div className="flex-1">
+          <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-300 uppercase tracking-wide mb-1">
+            Next Holiday
+          </p>
+          <h3 className="font-semibold text-foreground line-clamp-2 text-sm">
+            {stats.nextHoliday.name}
+          </h3>
+        </div>
+        <ArrowRight className="w-4 h-4 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-1" aria-hidden="true" />
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>{formatDate(stats.nextHoliday.date)}</span>
+          <span className="font-semibold text-indigo-600 dark:text-indigo-300">
+            {daysUntil} days
+          </span>
+        </div>
+        {stats.nextHoliday.isOptional && (
+          <Badge variant="outline" className="text-xs w-fit">
+            <Star className="w-3 h-3 mr-1" />
+            Optional
+          </Badge>
+        )}
       </div>
     </div>
   );
@@ -54,20 +111,24 @@ function HolidayStatCard({ label, value, helper, icon, muted = false }: StatCard
 
 export function HolidaysKPISection({ stats }: HolidaysKPISectionProps) {
   const optionalCardMuted = stats.optional === 0;
-  const cards: StatCardProps[] = [
+  const cards: (StatCardProps & { id: string })[] = [
     {
+      id: "upcoming",
       label: "Upcoming",
       value: stats.upcoming,
       helper: "Holidays ahead",
       icon: <CalendarDays className="size-4" aria-hidden="true" />,
+      featured: stats.upcoming > 0,
     },
     {
+      id: "mandatory",
       label: "Mandatory",
       value: stats.mandatoryUpcoming,
       helper: "Still to observe",
       icon: <Clock className="size-4" aria-hidden="true" />,
     },
     {
+      id: "optional",
       label: "Optional",
       value: optionalCardMuted ? "—" : stats.optional,
       helper: optionalCardMuted ? "No optional holidays" : "Choose to observe",
@@ -75,6 +136,7 @@ export function HolidaysKPISection({ stats }: HolidaysKPISectionProps) {
       muted: optionalCardMuted,
     },
     {
+      id: "past",
       label: "Already Observed",
       value: stats.past,
       helper: "Completed this year",
@@ -87,11 +149,13 @@ export function HolidaysKPISection({ stats }: HolidaysKPISectionProps) {
       variants={itemVariants}
       initial="hidden"
       animate="visible"
-      className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4"
     >
       {cards.map((card) => (
-        <HolidayStatCard key={card.label} {...card} />
+        <HolidayStatCard key={card.id} {...card} />
       ))}
+      {/* Next Holiday featured card */}
+      <NextHolidayCard stats={stats} />
     </motion.div>
   );
 }

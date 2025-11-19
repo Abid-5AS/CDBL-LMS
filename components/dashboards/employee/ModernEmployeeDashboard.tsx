@@ -48,6 +48,7 @@ import { EmployeeRecentActivity } from "./components/EmployeeRecentActivity";
 import { FloatingQuickActions } from "./components/FloatingQuickActions";
 import { LeaveBalanceCard } from "./components/LeaveBalanceCard";
 import { TeamStatusSummary } from "./components/TeamStatusSummary";
+import { ActiveRequestTracker } from "./components/ActiveRequestTracker";
 
 // Extracted hooks and utils
 import { KPIGridSkeleton } from "@/components/shared/skeletons";
@@ -205,6 +206,9 @@ export function ModernEmployeeDashboard({
               />
             </div>
           </motion.section>
+
+          {/* Active Request Tracking */}
+          <ActiveRequestTracker leaves={leaves} isLoading={isLoadingLeaves} />
 
           {/* Main Content: 2-Column Grid */}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

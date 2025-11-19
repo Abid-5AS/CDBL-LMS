@@ -2,6 +2,7 @@
 
 import { motion, type Variants } from "framer-motion";
 import { Calendar as CalendarIcon, Grid3X3, List } from "lucide-react";
+import type { Role } from "@prisma/client";
 import { HolidaysFilters } from "./HolidaysFilters";
 import { HolidaysGrid } from "./HolidaysGrid";
 import { HolidaysList } from "./HolidaysList";
@@ -22,6 +23,8 @@ type HolidaysMainContentProps = {
   onFiltersChange: (filters: Partial<HolidayFilters>) => void;
   onClearFilters: () => void;
   availableYears: number[];
+  role?: Role;
+  onHolidayUpdated?: () => void;
 };
 
 const itemVariants: Variants = {
@@ -41,6 +44,8 @@ export function HolidaysMainContent({
   onFiltersChange,
   onClearFilters,
   availableYears,
+  role,
+  onHolidayUpdated,
 }: HolidaysMainContentProps) {
   const subtitle =
     holidays.length === 0
@@ -111,10 +116,18 @@ export function HolidaysMainContent({
             </div>
 
             <TabsContent value="grid" className="mt-0">
-              <HolidaysGrid holidays={holidays} />
+              <HolidaysGrid
+                holidays={holidays}
+                role={role}
+                onHolidayUpdated={onHolidayUpdated}
+              />
             </TabsContent>
             <TabsContent value="list" className="mt-0">
-              <HolidaysList holidays={holidays} />
+              <HolidaysList
+                holidays={holidays}
+                role={role}
+                onHolidayUpdated={onHolidayUpdated}
+              />
             </TabsContent>
             <TabsContent value="calendar" className="mt-0">
               <HolidaysCalendarView holidays={holidays} />

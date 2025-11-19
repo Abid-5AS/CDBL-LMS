@@ -104,6 +104,7 @@ function BalanceContent() {
     {
       label: "Used This Year",
       value: isLoading ? "…" : `${totalUsed} days`,
+      state: undefined,
       helper:
         utilizationBase > 0
           ? `${utilizationPct}% utilized · replaces dashboard summary`
