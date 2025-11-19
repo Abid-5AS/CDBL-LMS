@@ -68,7 +68,7 @@ type ApprovalDetailsContentProps = {
     startDate: Date;
     endDate: Date;
     workingDays: number;
-    status: string;
+    status: LeaveStatus;
     createdAt: Date;
   }>;
   overlappingLeaves: Array<{
@@ -77,7 +77,7 @@ type ApprovalDetailsContentProps = {
     startDate: Date;
     endDate: Date;
     workingDays: number;
-    status: string;
+    status: LeaveStatus;
     requester: {
       name: string;
       email: string;

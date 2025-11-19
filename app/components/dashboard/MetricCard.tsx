@@ -216,7 +216,7 @@ export function MetricCardSkeleton({ className }: { className?: string }) {
           <div className="h-8 w-20 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
           <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
         </div>
-        <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-xl" />
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm" />
       </div>
     </div>
   );

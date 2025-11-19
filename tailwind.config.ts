@@ -23,14 +23,14 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: [
-          "var(--font-geist-sans)",
+          "var(--font-sans)",
           ...defaultTheme.fontFamily.sans,
         ],
         heading: [
-          "var(--font-geist-sans)",
+          "var(--font-sans)",
           ...defaultTheme.fontFamily.sans,
         ],
-        mono: ["var(--font-geist-mono)", ...defaultTheme.fontFamily.mono],
+        mono: ["var(--font-mono)", ...defaultTheme.fontFamily.mono],
       },
       colors: {
         background: "var(--color-bg)",
@@ -39,44 +39,48 @@ const config: Config = {
         border: "var(--color-border)",
         ring: "var(--color-ring)",
         brand: {
-          DEFAULT: "var(--color-brand)",
-          soft: "var(--color-brand-soft)",
-          strong: "var(--color-brand-strong)",
+          DEFAULT: "var(--color-primary)",
+          soft: "var(--color-accent)",
+          strong: "var(--color-primary)",
         },
         accent: "var(--color-accent)",
-        success: "var(--color-data-success)",
-        warning: "var(--color-data-warning)",
-        danger: "var(--color-data-error)",
-        info: "var(--color-data-info)",
-      },
-      backgroundImage: {
-        "shell-grid":
-          "linear-gradient(90deg, var(--shell-grid-color) 1px, transparent 1px), linear-gradient(0deg, var(--shell-grid-color) 1px, transparent 1px)",
-        "shell-aurora": "var(--shell-gradient)",
+        success: "var(--color-success)",
+        warning: "var(--color-warning)",
+        danger: "var(--color-danger)",
+        info: "var(--color-info)",
+        sidebar: {
+          DEFAULT: "var(--sidebar)",
+          foreground: "var(--sidebar-foreground)",
+          primary: "var(--sidebar-primary)",
+          "primary-foreground": "var(--sidebar-primary-foreground)",
+          accent: "var(--sidebar-accent)",
+          "accent-foreground": "var(--sidebar-accent-foreground)",
+          border: "var(--sidebar-border)",
+          ring: "var(--sidebar-ring)",
+        },
       },
       boxShadow: {
-        brand: "var(--shell-card-glow)",
-        card: "var(--shadow-1)",
-        panel: "var(--shadow-2)",
+        card: "var(--elevation-1)",
+        panel: "var(--elevation-2)",
       },
       borderRadius: {
-        xl: "1.25rem",
-        "2xl": "1.75rem",
-        "3xl": "2.5rem",
+        xl: "0.75rem",
+        "2xl": "1rem",
+        "3xl": "1.5rem",
       },
       keyframes: {
         "fade-up": {
-          "0%": { opacity: "0", transform: "translateY(20px)" },
+          "0%": { opacity: "0", transform: "translateY(10px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
         "scale-in": {
-          "0%": { opacity: "0", transform: "scale(0.96)" },
+          "0%": { opacity: "0", transform: "scale(0.98)" },
           "100%": { opacity: "1", transform: "scale(1)" },
         },
       },
       animation: {
-        "fade-up": "fade-up 0.6s var(--ease-out) forwards",
-        "scale-in": "scale-in 0.45s var(--ease-out) forwards",
+        "fade-up": "fade-up 0.4s ease-out forwards",
+        "scale-in": "scale-in 0.3s ease-out forwards",
       },
     },
   },

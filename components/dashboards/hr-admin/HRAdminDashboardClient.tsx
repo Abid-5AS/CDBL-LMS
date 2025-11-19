@@ -180,7 +180,7 @@ function HRAdminDashboardClientImpl({
         variants={containerVariants}
         initial="hidden"
         animate={isHydrated ? "visible" : "hidden"}
-        className="space-y-4"
+        className="space-y-6"
       >
         {/* Primary KPIs */}
         <DashboardSection
@@ -201,7 +201,7 @@ function HRAdminDashboardClientImpl({
                 {[...Array(4)].map((_, i) => (
                   <div
                     key={i}
-                    className="neo-card relative flex h-full min-h-[170px] flex-col px-5 py-5 sm:px-6 sm:py-6"
+                    className="surface-card relative flex h-full min-h-[170px] flex-col px-5 py-5 sm:px-6 sm:py-6"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 space-y-3">
@@ -251,14 +251,14 @@ function HRAdminDashboardClientImpl({
                 </div>
                 <div className="relative">
                   <RoleKPICard
-                    title="Pending Requests"
+                    title="Your Approval Queue"
                     value={displayStats?.pendingRequests || 0}
-                    subtitle="Awaiting action"
+                    subtitle="Awaiting your action"
                     icon={Clock}
                     role="HR_ADMIN"
                     animate={true}
-                    onClick={() => router.push("/leaves?status=pending")}
-                    clickLabel="View pending leave requests"
+                    onClick={() => document.getElementById("pending-approvals")?.scrollIntoView({ behavior: "smooth" })}
+                    clickLabel="Jump to approval queue"
                     trend={
                       displayStats && displayStats.pendingRequests > 15
                         ? {
@@ -439,7 +439,7 @@ function HRAdminDashboardClientImpl({
             ) : (
               <>
                 <motion.div variants={itemVariants} className="h-full">
-                  <Card className="surface-card rounded-2xl hover:shadow-lg transition-all duration-300 h-full flex flex-col relative">
+                  <Card className="surface-card rounded-2xl hover:shadow-lg transition-all duration-300 h-full flex flex-col relative border-border/50">
                     <CardHeader className="pb-3">
                       <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                         <Target className="h-4 w-4" />
@@ -480,7 +480,7 @@ function HRAdminDashboardClientImpl({
                     <CardContent className="space-y-3 flex-1 flex flex-col justify-center">
                       <div className="flex items-end justify-between">
                         <div>
-                          <p className="text-3xl font-bold">
+                          <p className="text-3xl font-bold text-foreground">
                             {displayStats?.processedToday || 0}
                           </p>
                           <p className="text-sm text-muted-foreground">
@@ -495,12 +495,9 @@ function HRAdminDashboardClientImpl({
                       </div>
                       <Progress
                         value={displayStats?.dailyProgress || 0}
-                        className="h-2 bg-gradient-to-r from-blue-100 to-violet-100 dark:from-blue-950 dark:to-violet-950"
-                        style={{
-                          // @ts-ignore
-                          "--progress-background":
-                            "linear-gradient(to right, #3b82f6, #7c3aed)",
-                        }}
+                        className="h-2 bg-muted"
+                        // @ts-ignore
+                        indicatorClassName="bg-gradient-to-r from-blue-500 to-violet-500"
                       />
                       {displayStats && displayStats.dailyProgress >= 100 && (
                         <p className="text-xs text-data-success flex items-center gap-1">
@@ -632,7 +629,7 @@ function HRAdminDashboardClientImpl({
           description="Review and manage pending leave requests"
           isLoading={isLoading}
         >
-          <motion.div variants={itemVariants}>
+          <motion.div variants={itemVariants} id="pending-approvals">
             <Suspense fallback={<DashboardCardSkeleton />}>
               <PendingLeaveRequestsTable />
             </Suspense>
@@ -649,9 +646,9 @@ function HRAdminDashboardClientImpl({
           <ResponsiveDashboardGrid columns="1:1:2:3" gap="md" animate={true}>
             {/* Quick Stats Summary */}
             <motion.div variants={itemVariants}>
-              <Card className="surface-card rounded-2xl hover:shadow-lg transition-all duration-300 h-full">
+              <Card className="surface-card rounded-2xl hover:shadow-lg transition-all duration-300 h-full border-border/50">
                 <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2">
+                  <CardTitle className="text-base flex items-center gap-2 text-foreground">
                     <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                     Quick Stats
                   </CardTitle>
@@ -673,21 +670,21 @@ function HRAdminDashboardClientImpl({
                           {displayStats?.processedToday || 0}
                         </span>
                       </div>
-                      <Separator />
+                      <Separator className="bg-border/50" />
                       <div className="flex justify-between items-center text-sm group hover:bg-muted/30 p-2 rounded-lg transition-colors">
                         <span className="text-muted-foreground">Pending</span>
                         <span className="font-semibold text-foreground">
                           {displayStats?.pendingRequests || 0}
                         </span>
                       </div>
-                      <Separator />
+                      <Separator className="bg-border/50" />
                       <div className="flex justify-between items-center text-sm group hover:bg-muted/30 p-2 rounded-lg transition-colors">
                         <span className="text-muted-foreground">On Leave</span>
                         <span className="font-semibold text-foreground">
                           {displayStats?.employeesOnLeave || 0}
                         </span>
                       </div>
-                      <Separator />
+                      <Separator className="bg-border/50" />
                       <div className="flex justify-between items-center text-sm group hover:bg-muted/30 p-2 rounded-lg transition-colors">
                         <span className="text-muted-foreground">
                           Avg Processing
@@ -696,7 +693,7 @@ function HRAdminDashboardClientImpl({
                           {displayStats?.avgApprovalTime?.toFixed(1) || 0} days
                         </span>
                       </div>
-                      <Separator />
+                      <Separator className="bg-border/50" />
                       <div className="flex justify-between items-center text-sm group hover:bg-muted/30 p-2 rounded-lg transition-colors">
                         <span className="text-muted-foreground">
                           Encashment Queue
@@ -723,7 +720,7 @@ function HRAdminDashboardClientImpl({
                     displayStats.leaveTypeBreakdown.length === 0)
                 }
                 height={400}
-                className="hover:shadow-xl transition-all duration-300 h-full"
+                className="hover:shadow-xl transition-all duration-300 h-full border-border/50"
               >
                 <Suspense
                   fallback={
@@ -758,7 +755,7 @@ function HRAdminDashboardClientImpl({
                         displayStats.monthlyTrend.length === 0)
                     }
                     height={400}
-                    className="hover:shadow-xl transition-all duration-300 h-full"
+                    className="hover:shadow-xl transition-all duration-300 h-full border-border/50"
                   >
                     <Suspense
                       fallback={
@@ -782,10 +779,10 @@ function HRAdminDashboardClientImpl({
 
         {/* Cancellation Requests - Full Width */}
         <motion.div variants={itemVariants}>
-          <Card className="surface-card rounded-2xl hover:shadow-lg transition-all duration-300">
+          <Card className="surface-card rounded-2xl hover:shadow-lg transition-all duration-300 border-border/50">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Cancellation Requests</CardTitle>
+                <CardTitle className="text-lg text-foreground">Cancellation Requests</CardTitle>
               </div>
             </CardHeader>
             <CardContent>

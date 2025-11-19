@@ -109,19 +109,19 @@ export async function POST(req: Request) {
       };
 
       const raw = {
-        type: String(formData.get("type") ?? ""),
-        startDate: String(formData.get("startDate") ?? ""),
-        endDate: String(formData.get("endDate") ?? ""),
-        reason: String(formData.get("reason") ?? ""),
-        workingDays: formData.get("workingDays")
-          ? Number(formData.get("workingDays"))
+        type: String((formData as any).get("type") ?? ""),
+        startDate: String((formData as any).get("startDate") ?? ""),
+        endDate: String((formData as any).get("endDate") ?? ""),
+        reason: String((formData as any).get("reason") ?? ""),
+        workingDays: (formData as any).get("workingDays")
+          ? Number((formData as any).get("workingDays"))
           : undefined,
-        needsCertificate: toBoolean(formData.get("needsCertificate")),
+        needsCertificate: toBoolean((formData as any).get("needsCertificate")),
       };
 
       certificateFile =
-        formData.get("certificate") instanceof File
-          ? (formData.get("certificate") as File)
+        (formData as any).get("certificate") instanceof File
+          ? ((formData as any).get("certificate") as File)
           : null;
       parsedInput = ApplySchema.parse(raw);
     } else {

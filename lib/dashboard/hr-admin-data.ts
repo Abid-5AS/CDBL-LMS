@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { getDailyProcessingTarget } from "@/lib/config/system-settings";
 import type { User } from "@prisma/client";
 
 export type HRAdminDashboardStats = {
@@ -70,7 +71,7 @@ const statsCache: {
 };
 
 let hasCachedStats = false;
-const STATS_CACHE_TTL = 60 * 1000;
+const STATS_CACHE_TTL = 60 * 60 * 1000; // 1 hour cache
 
 export function invalidateHRAdminStatsCache() {
   hasCachedStats = false;
@@ -143,10 +144,10 @@ export async function getHRAdminKPIData(user?: MinimalUser): Promise<HRAdminDash
         },
       },
       select: {
+        id: true, // Added to resolve the error
         createdAt: true,
         updatedAt: true,
       },
-      take: 100,
       orderBy: {
         updatedAt: "desc",
       },
@@ -178,7 +179,7 @@ export async function getHRAdminKPIData(user?: MinimalUser): Promise<HRAdminDash
     teamUtilization = Math.round((availableEmployees / totalEmployees) * 100);
   }
 
-  const dailyTarget = 10;
+  const dailyTarget = await getDailyProcessingTarget();
   const dailyProgress = Math.min(
     Math.round((processedToday / dailyTarget) * 100),
     100
@@ -195,8 +196,19 @@ export async function getHRAdminKPIData(user?: MinimalUser): Promise<HRAdminDash
     dailyTarget,
     dailyProgress,
     teamUtilization, // Now calculated from real data
-    // PLACEHOLDER: Compliance score calculation not yet implemented
-    complianceScore: 94,
+    // Compliance score: proportion of processed requests with required documentation
+    complianceScore: recentApprovals.length > 0
+      ? Math.round((await prisma.leaveRequest.count({
+          where: {
+            id: { in: recentApprovals.map(r => r.id).filter(Boolean) }, // Filter from the recent batch
+            OR: [
+              { needsCertificate: true, certificateUrl: { not: null } },
+              { type: "MEDICAL", certificateUrl: { not: null } },
+              { type: "SPECIAL_DISABILITY", fitnessCertificateUrl: { not: null } },
+            ],
+          }
+        }) / recentApprovals.length) * 100)
+      : 100,
     // Empty arrays in fast endpoint, populated in /stats
     leaveTypeBreakdown: [],
     monthlyTrend: [],
@@ -366,11 +378,27 @@ export async function getHRAdminStatsData(
     0
   );
 
-  const dailyTarget = 10;
+  const dailyTarget = await getDailyProcessingTarget();
   const dailyProgress = Math.min(
     Math.round((processedToday / dailyTarget) * 100),
     100
   );
+
+  // Compliance score: proportion of processed requests with required documentation
+  const totalProcessed = approvalTimeData.length;
+  const compliantCount = await prisma.leaveRequest.count({
+    where: {
+      status: { in: ["APPROVED", "REJECTED"] },
+      OR: [
+        { needsCertificate: true, certificateUrl: { not: null } },
+        { type: "MEDICAL", certificateUrl: { not: null } },
+        { type: "SPECIAL_DISABILITY", fitnessCertificateUrl: { not: null } },
+      ],
+    },
+  });
+  const complianceScore = totalProcessed > 0
+    ? Math.round((compliantCount / totalProcessed) * 100)
+    : 100;
 
   const trendByMonth: Record<string, number> = {};
   monthlyRequests.forEach((item) => {
@@ -390,7 +418,7 @@ export async function getHRAdminStatsData(
     dailyTarget,
     dailyProgress,
     teamUtilization,
-    complianceScore: 94,
+    complianceScore,
     leaveTypeBreakdown: leaveTypeBreakdown.map((item) => ({
       type: item.type,
       count: item._count.id,

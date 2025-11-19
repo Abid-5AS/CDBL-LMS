@@ -54,10 +54,16 @@ export async function GET(req: Request) {
       }
     } else {
       // Use repository method for all queries
-      items = await LeaveRepository.findAll({
-        status: statusFilter && statusFilter !== "all" ? statusFilter as any : undefined,
-        limit,
-      });
+      // Ensure status filter is passed correctly, even for CANCELLATION_REQUESTED
+      try {
+        items = await LeaveRepository.findAll({
+          status: statusFilter && statusFilter !== "all" ? statusFilter as any : undefined,
+          limit,
+        });
+      } catch (err) {
+        console.error("Error fetching leaves:", err);
+        return NextResponse.json({ error: "Failed to fetch leaves", details: String(err) }, { status: 500 });
+      }
     }
 
     return NextResponse.json({ items });
@@ -89,20 +95,20 @@ export async function POST(req: Request) {
       };
 
       const raw = {
-        type: String(formData.get("type") ?? ""),
-        startDate: String(formData.get("startDate") ?? ""),
-        endDate: String(formData.get("endDate") ?? ""),
-        reason: String(formData.get("reason") ?? ""),
-        workingDays: formData.get("workingDays")
-          ? Number(formData.get("workingDays"))
+        type: String((formData as any).get("type") ?? ""),
+        startDate: String((formData as any).get("startDate") ?? ""),
+        endDate: String((formData as any).get("endDate") ?? ""),
+        reason: String((formData as any).get("reason") ?? ""),
+        workingDays: (formData as any).get("workingDays")
+          ? Number((formData as any).get("workingDays"))
           : undefined,
-        needsCertificate: toBoolean(formData.get("needsCertificate")),
-        incidentDate: formData.get("incidentDate")
-          ? String(formData.get("incidentDate"))
+        needsCertificate: toBoolean((formData as any).get("needsCertificate")),
+        incidentDate: (formData as any).get("incidentDate")
+          ? String((formData as any).get("incidentDate"))
           : undefined,
       };
 
-      const cert = formData.get("certificate");
+      const cert = (formData as any).get("certificate");
       certificateFile = cert instanceof File ? cert : undefined;
       parsedInput = ApplySchema.parse(raw);
     } else {

@@ -49,7 +49,7 @@ export async function POST(req: Request) {
         email: true,
         name: true,
         role: true,
-        employeeId: true,
+        empCode: true,
         department: true,
       },
     });
@@ -96,7 +96,7 @@ export async function POST(req: Request) {
           id: String(user.id),
           email: user.email,
           name: user.name,
-          employeeId: user.employeeId || "",
+          employeeId: user.empCode || "",
           department: user.department || "",
           role: user.role,
         },

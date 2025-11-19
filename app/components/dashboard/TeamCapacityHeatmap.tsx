@@ -124,7 +124,7 @@ export function TeamCapacityHeatmap({
 
   if (isLoading) {
     return (
-      <Card className={cn("bg-white dark:bg-slate-900 border-gray-200 dark:border-gray-700", className)}>
+      <Card className={cn("bg-card border-border", className)}>
         <CardHeader className="pb-3">
           <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
         </CardHeader>
@@ -144,7 +144,7 @@ export function TeamCapacityHeatmap({
 
   if (!teamData || teamData.length === 0) {
     return (
-      <Card className={cn("bg-white dark:bg-slate-900 border-gray-200 dark:border-gray-700", className)}>
+      <Card className={cn("bg-card border-border", className)}>
         <CardHeader className="pb-3">
           <CardTitle className="text-lg font-semibold">{title}</CardTitle>
           {description && (
@@ -187,7 +187,7 @@ export function TeamCapacityHeatmap({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className={cn("bg-white dark:bg-slate-900 border-gray-200 dark:border-gray-700", className)}>
+      <Card className={cn("bg-card border-border", className)}>
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div>
@@ -208,7 +208,7 @@ export function TeamCapacityHeatmap({
         <CardContent className="space-y-6">
           {/* Summary Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="p-3 rounded-lg bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-gray-700">
+            <div className="p-3 rounded-lg bg-muted/50 border border-border">
               <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
                 Total Leaves
               </p>
@@ -239,7 +239,7 @@ export function TeamCapacityHeatmap({
           </div>
 
           {/* Legend */}
-          <div className="flex items-center gap-4 p-3 rounded-lg bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-4 p-3 rounded-lg bg-muted/50 border border-border">
             <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
               Risk Levels:
             </span>

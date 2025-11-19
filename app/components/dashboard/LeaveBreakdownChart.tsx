@@ -67,7 +67,7 @@ function CustomTooltip({ active, payload }: any) {
   if (!active || !payload || !payload.length) return null;
 
   return (
-    <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-3">
+    <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
       <p className="font-semibold text-sm text-gray-900 dark:text-gray-100 mb-2">
         {payload[0].payload.type}
       </p>

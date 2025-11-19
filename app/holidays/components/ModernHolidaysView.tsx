@@ -8,9 +8,7 @@ import { HolidaysKPISection } from "./HolidaysKPISection";
 import { HolidaysMainContent } from "./HolidaysMainContent";
 import { useHolidaysData } from "../hooks/useHolidaysData";
 import { PDFExportButton } from "./PDFExportButton";
-import { formatDate } from "@/lib/utils";
-import { Badge, TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui";
-import { EmployeePageHero } from "@/components/employee/PageHero";
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui";
 import { HolidayAdminPanel } from "./HolidayAdminPanel";
 
 const containerVariants = {
@@ -46,11 +44,16 @@ export function ModernHolidaysView({ role }: ModernHolidaysViewProps) {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <PDFExportButton variant="outline" size="sm" className="gap-2 rounded-xl" />
+          <PDFExportButton
+            variant="outline"
+            size="sm"
+            className="gap-2 rounded-xl"
+            holidays={filteredHolidays}
+          />
         </TooltipTrigger>
         <TooltipContent>
           <p className="text-xs max-w-xs">
-            Downloads the full holiday list for the selected filters, including mandatory/optional flags.
+            Export holidays as PDF or iCalendar format for your calendar app.
           </p>
         </TooltipContent>
       </Tooltip>
@@ -71,15 +74,15 @@ export function ModernHolidaysView({ role }: ModernHolidaysViewProps) {
         backgroundVariant="transparent"
       >
         <div className="space-y-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => (
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+            {[1, 2, 3, 4, 5].map((i) => (
               <div
                 key={i}
-                className="h-32 bg-slate-200 dark:bg-slate-700 rounded-xl animate-pulse"
+                className="h-28 bg-slate-200 dark:bg-slate-700 rounded-xl animate-pulse"
               />
             ))}
           </div>
-          <div className="h-96 bg-slate-200 dark:bg-slate-700 rounded-xl animate-pulse" />
+          <div className="h-80 bg-slate-200 dark:bg-slate-700 rounded-xl animate-pulse" />
         </div>
       </RoleBasedDashboard>
     );
@@ -104,62 +107,21 @@ export function ModernHolidaysView({ role }: ModernHolidaysViewProps) {
     );
   }
 
-  const today = new Date();
-  const nextHolidayDate = holidaysStats.nextHoliday
-    ? new Date(holidaysStats.nextHoliday.date)
-    : null;
-  const daysUntilNext =
-    nextHolidayDate && nextHolidayDate > today
-      ? Math.ceil(
-          (nextHolidayDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-        )
-      : null;
-
-  const heroStats = [
-    {
-      label: "Total Holidays",
-      value: holidaysStats.total,
-      helper: `${holidaysStats.availableYears[0] || new Date().getFullYear()}`,
-    },
-    {
-      label: "Next Holiday",
-      value: holidaysStats.nextHoliday?.name ?? "None scheduled",
-      helper: holidaysStats.nextHoliday
-        ? formatDate(holidaysStats.nextHoliday.date)
-        : "Stay tuned for updates",
-    },
-    {
-      label: "Days Until Next",
-      value: daysUntilNext !== null ? `${daysUntilNext} days` : "—",
-      helper:
-        daysUntilNext !== null ? "Plan coverage now" : "All observances passed",
-      state: daysUntilNext !== null && daysUntilNext <= 7 ? "warning" : "default",
-    },
-  ];
-
   return (
     <RoleBasedDashboard
       role={role}
       title="Company Holidays"
-      description={`View and plan around ${holidaysStats.total} company holidays for ${viewingYearDescription}`}
+      description={`View and manage ${holidaysStats.total} company holidays for ${viewingYearDescription}`}
       animate={true}
       backgroundVariant="transparent"
     >
-      <EmployeePageHero
-        eyebrow="Company Calendar"
-        title="Holidays & Closures"
-        description={`Stay ahead of ${holidaysStats.total} holidays scheduled for ${viewingYearDescription}.`}
-        stats={heroStats}
-        actions={headerActions}
-        className="mb-6"
-      />
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="space-y-6"
+        className="space-y-5"
       >
-        {/* KPI Section */}
+        {/* Admin Panel */}
         {isAdminRole && (
           <HolidayAdminPanel
             onCreated={async () => {
@@ -167,35 +129,9 @@ export function ModernHolidaysView({ role }: ModernHolidaysViewProps) {
             }}
           />
         )}
-        <HolidaysKPISection stats={holidaysStats} />
 
-        {/* Simple highlight card for upcoming holiday */}
-        {holidaysStats.nextHoliday && (
-          <section className="neo-card p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-4">
-              <div className="px-4 py-3 rounded-xl bg-muted text-sm font-semibold text-indigo-600 dark:text-indigo-300">
-                {formatDate(holidaysStats.nextHoliday.date)}
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Next Holiday</p>
-                <p className="text-lg font-semibold text-foreground">
-                  {holidaysStats.nextHoliday.name}
-                </p>
-                <div className="mt-1 flex gap-2">
-                  {holidaysStats.nextHoliday.isOptional ? (
-                    <Badge variant="outline" className="text-xs">
-                      Optional
-                    </Badge>
-                  ) : (
-                    <Badge variant="secondary" className="text-xs">
-                      Mandatory
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
+        {/* KPI Section with integrated next holiday */}
+        <HolidaysKPISection stats={holidaysStats} />
 
         {/* Main Content */}
         <HolidaysMainContent
@@ -204,6 +140,8 @@ export function ModernHolidaysView({ role }: ModernHolidaysViewProps) {
           onFiltersChange={updateFilters}
           onClearFilters={clearFilters}
           availableYears={holidaysStats.availableYears}
+          role={role}
+          onHolidayUpdated={() => refresh?.()}
         />
       </motion.div>
     </RoleBasedDashboard>

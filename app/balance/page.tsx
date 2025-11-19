@@ -12,6 +12,7 @@ import { apiFetcher } from "@/lib/apiClient";
 import { ConversionHistory } from "@/components/leaves/ConversionHistory";
 import { EmployeePageHero } from "@/components/employee/PageHero";
 import { TrendChart } from "@/components/shared/LeaveCharts/TrendChart";
+import { cn } from "@/lib";
 
 type BalanceDetail = {
   type: "EARNED" | "CASUAL" | "MEDICAL";
@@ -103,6 +104,7 @@ function BalanceContent() {
     {
       label: "Used This Year",
       value: isLoading ? "…" : `${totalUsed} days`,
+      state: undefined,
       helper:
         utilizationBase > 0
           ? `${utilizationPct}% utilized · replaces dashboard summary`
@@ -116,21 +118,27 @@ function BalanceContent() {
   ] as const;
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 py-8">
-      <EmployeePageHero
-        eyebrow="Balances"
-        title="Your Leave Overview"
-        description={`Track available days, usage, and policy reminders for ${data?.year ?? currentYear}.`}
-        stats={heroStats}
-        actions={
-          <>
+    <div className="mx-auto max-w-5xl space-y-4 py-4">
+      {/* Compact Hero Section */}
+      <div className="surface-card p-4">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground mb-1">
+              BALANCES
+            </p>
+            <h1 className="text-2xl font-semibold text-foreground mb-1">Your Leave Overview</h1>
+            <p className="text-sm text-muted-foreground">
+              Track available days, usage, and policy reminders for {data?.year ?? currentYear}.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
               leftIcon={<BookOpen className="size-4" aria-hidden="true" />}
               onClick={() => router.push("/policies")}
             >
-              View Policies
+              Policies
             </Button>
             <Button
               size="sm"
@@ -139,9 +147,34 @@ function BalanceContent() {
             >
               Apply Leave
             </Button>
-          </>
-        }
-      />
+          </div>
+        </div>
+        
+        {/* Inline Stats */}
+        <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-border/50">
+          {heroStats.map((stat) => (
+            <div
+              key={stat.label}
+              className="flex items-center gap-3 px-3 py-2 rounded-lg border border-border/70 bg-muted/20"
+            >
+              <div>
+                <p className="text-xs text-muted-foreground">{stat.label}</p>
+                <p
+                  className={cn(
+                    "text-base font-semibold",
+                    stat.state === "danger" ? "text-destructive" :
+                    stat.state === "warning" ? "text-data-warning" :
+                    stat.state === "success" ? "text-data-success" :
+                    "text-foreground"
+                  )}
+                >
+                  {stat.value}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {error && (
         <Alert variant="destructive" className="surface-card border border-destructive/40">
@@ -150,49 +183,8 @@ function BalanceContent() {
         </Alert>
       )}
 
-      <div className="surface-card p-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">Upcoming accrual checkpoint</p>
-          <p className="text-base font-semibold text-foreground">
-            {isYearEnd ? "Year-end balance reconciliation" : "Monthly accrual closes in 5 days"}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2 justify-start md:justify-end">
-          <Button
-            variant="outline"
-            size="sm"
-            leftIcon={<FileDown className="size-4" aria-hidden="true" />}
-            onClick={() => router.push("/reports")}
-          >
-            Download PDF statement
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            leftIcon={<History className="size-4" aria-hidden="true" />}
-            onClick={() => router.push("/leaves")}
-          >
-            View usage history
-          </Button>
-        </div>
-        <p className="text-[11px] text-muted-foreground">
-          Exports include your accrual statement, while usage history opens the detailed My Leaves log.
-        </p>
-      </div>
-
-      {usageTrend.length > 0 && (
-        <Card className="surface-card">
-          <CardHeader>
-            <CardTitle>Monthly usage trend</CardTitle>
-            <CardDescription>Rolling 12 months of approved leave days by type.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <TrendChart data={usageTrend} dataKey="leaves" height={220} />
-          </CardContent>
-        </Card>
-      )}
-
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Leave Balance Cards - PRIORITY CONTENT */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {(["EARNED", "CASUAL", "MEDICAL"] as const).map((type) => {
           const config = LEAVE_TYPE_CONFIG[type];
           const balance = data?.balances.find((b) => b.type === type);
@@ -225,14 +217,14 @@ function BalanceContent() {
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <Icon className={`h-5 w-5 ${config.color}`} />
-                  <CardTitle className="text-lg">{config.label}</CardTitle>
+                  <CardTitle className="text-base">{config.label}</CardTitle>
                 </div>
                 <CardDescription>{config.description}</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-2">
                 <div>
                   <div className="flex items-baseline justify-between">
-                    <p className="text-3xl font-semibold text-foreground">
+                    <p className="text-2xl font-semibold text-foreground">
                       {isLoading ? "..." : available}
                     </p>
                     <p className="text-sm text-muted-foreground">
@@ -277,7 +269,7 @@ function BalanceContent() {
 
                 <div className="space-y-1.5 min-h-[60px]">
                   {showExpiryWarning && (
-                    <Alert variant="default" className="py-2">
+                    <Alert variant="default" className="py-1">
                       <AlertCircle className="h-3 w-3" />
                       <AlertDescription className="text-xs flex items-center gap-2">
                         <span>{available} days will expire on Dec 31.</span>
@@ -292,7 +284,7 @@ function BalanceContent() {
                   )}
 
                   {showCarryForwardWarning && (
-                    <Alert variant="default" className="py-2">
+                    <Alert variant="default" className="py-1">
                       <AlertCircle className="h-3 w-3" />
                       <AlertDescription className="text-xs flex items-center gap-2">
                         <span>Max {config.maxCarryForward} days can be carried forward.</span>
@@ -317,6 +309,61 @@ function BalanceContent() {
           );
         })}
       </div>
+
+      {/* Accrual Checkpoint Section */}
+      <div className="surface-card overflow-hidden">
+        <div className="p-4 border-b border-border/50">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <Calendar className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground font-medium">Upcoming Checkpoint</p>
+              <p className="text-sm font-semibold text-foreground">
+                {isYearEnd ? "Year-end balance reconciliation" : "Monthly accrual closes in 5 days"}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="p-4 bg-muted/20">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 justify-center"
+              leftIcon={<FileDown className="size-4" aria-hidden="true" />}
+              onClick={() => router.push("/reports")}
+            >
+              Download Statement
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="flex-1 justify-center"
+              leftIcon={<History className="size-4" aria-hidden="true" />}
+              onClick={() => router.push("/leaves")}
+            >
+              View History
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-3 text-center">
+            Export includes accrual statement • History shows detailed leave log
+          </p>
+        </div>
+      </div>
+
+      {/* Monthly Usage Trend - Collapsible */}
+      {usageTrend.length > 0 && (
+        <Card className="surface-card">
+          <CardHeader>
+            <CardTitle>Monthly usage trend</CardTitle>
+            <CardDescription>Rolling 12 months of approved leave days by type.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <TrendChart data={usageTrend} dataKey="leaves" height={220} />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Conversion History Section */}
       <ConversionHistory year={data?.year ?? currentYear} showHeader />

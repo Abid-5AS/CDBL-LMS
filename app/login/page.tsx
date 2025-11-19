@@ -3,22 +3,13 @@ import { redirect } from "next/navigation";
 import { unstable_noStore as noStore } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { getHomePageForRole } from "@/lib/navigation";
-import { LoginForm, LoginIllustration } from "./components/LoginForm";
-
-const stats = [
-  { label: "Employees onboarded", value: "3.4K+" },
-  { label: "Leaves processed monthly", value: "28K" },
-  { label: "Avg. approval time", value: "2m" },
-];
+import { LoginForm } from "./components/LoginForm";
 
 export default function LoginPage() {
   return (
-    <>
-      <LoginStyles />
-      <Suspense fallback={<LoginFallback />}>
-        <LoginGate />
-      </Suspense>
-    </>
+    <Suspense fallback={<LoginFallback />}>
+      <LoginGate />
+    </Suspense>
   );
 }
 
@@ -32,189 +23,55 @@ async function LoginGate() {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#040916] text-white overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 opacity-60">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(43,73,255,0.25),_transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_rgba(23,173,173,0.35),_transparent_60%)]" />
-        <div className="absolute inset-0 bg-grid-white/[0.02]" />
+    <div className="min-h-screen w-full flex bg-zinc-50 dark:bg-zinc-950">
+      {/* Left Side - Brand / Aesthetic */}
+      <div className="hidden lg:flex w-1/2 bg-zinc-900 relative overflow-hidden items-center justify-center">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-zinc-800/50 via-zinc-900 to-zinc-950" />
+        <div className="relative z-10 p-12 text-white max-w-lg">
+          <div className="mb-8">
+             <div className="h-12 w-12 bg-white rounded-xl flex items-center justify-center mb-6">
+                <svg className="w-8 h-8 text-zinc-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+             </div>
+             <h1 className="text-4xl font-bold tracking-tight mb-4">CDBL Leave Management</h1>
+             <p className="text-zinc-400 text-lg leading-relaxed">
+               Streamline your workforce management with our secure and efficient leave approval system.
+             </p>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 text-sm text-zinc-300">
+              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              </div>
+              <span>Secure Enterprise Access</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm text-zinc-300">
+              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              </div>
+              <span>Real-time Approval Workflows</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="relative z-10 flex min-h-screen flex-col gap-8 lg:flex-row">
-        {/* Inspiration / Highlights Panel */}
-        <section className="relative flex flex-1 flex-col justify-between px-8 py-12 lg:px-14">
-          <div className="max-w-2xl space-y-8">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs uppercase tracking-[0.2em] text-white/80">
-              <span className="inline-flex size-2 rounded-full bg-emerald-300 animate-pulse" />
-              Secure Access
-            </div>
-            <div className="space-y-4">
-              <h1 className="text-4xl font-bold leading-tight md:text-5xl">
-                Seamless leave management for every role at{" "}
-                <span className="text-card-action">CDBL</span>
-              </h1>
-              <p className="text-base text-white/70 md:text-lg">
-                Centralize approvals, real-time balances, and policy insights in one secure
-                dashboard. Continue where you left off with confidence.
-              </p>
-            </div>
-
-            <ul className="space-y-3 text-sm text-white/70">
-              <li className="flex items-start gap-3">
-                <span className="mt-1 inline-flex size-2 rounded-full bg-card-action" />
-                Unified login for HR, Department Heads, and Executives with contextual dashboards.
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="mt-1 inline-flex size-2 rounded-full bg-data-info" />
-                MFA-backed security with device trust indicators and audit-friendly reporting.
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="mt-1 inline-flex size-2 rounded-full bg-amber-400" />
-                Built-in OTP verification ensures payroll-sensitive flows stay protected.
-              </li>
-            </ul>
-
-            <dl className="grid gap-4 sm:grid-cols-3">
-              {stats.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl"
-                >
-                  <dt className="text-xs uppercase tracking-wide text-white/60">{stat.label}</dt>
-                  <dd className="text-2xl font-semibold text-white">{stat.value}</dd>
-                </div>
-              ))}
-            </dl>
+      {/* Right Side - Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+        <div className="w-full max-w-md">
+          <LoginForm />
+          <div className="mt-8 text-center">
+            <p className="text-xs text-zinc-400">
+              &copy; {new Date().getFullYear()} Central Depository Bangladesh Limited. All rights reserved.
+            </p>
           </div>
-
-          <div className="mt-10 flex flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-3xl lg:mt-0">
-            <div className="flex flex-col gap-2">
-              <p className="text-sm uppercase tracking-[0.3em] text-white/60">Live system pulse</p>
-              <p className="text-xl font-semibold text-white">
-                99.9% uptime and real-time policy alerts
-              </p>
-            </div>
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-              <div className="flex-1 text-white/70 text-sm">
-                Monitor approvals, blackout periods, and SLA adherence while your teams stay in sync.
-              </div>
-              <div className="flex flex-1 items-center justify-center rounded-2xl bg-white/10 p-4 backdrop-blur-xl">
-                <LoginIllustration />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Form Panel */}
-        <section className="flex flex-1 items-center justify-center px-6 py-12 md:px-12 lg:max-w-xl lg:px-10 lg:py-20">
-          <div className="w-full">
-            <LoginForm />
-            <div className="mt-8 text-center text-xs text-muted-foreground">
-              v2.1 · Secure by CDBL HRD
-            </div>
-          </div>
-        </section>
+        </div>
       </div>
     </div>
   );
 }
 
 function LoginFallback() {
-  return <div className="min-h-screen w-full bg-bg-primary" />;
-}
-
-// Styles component for animations and gradients
-function LoginStyles() {
-  return (
-    <style dangerouslySetInnerHTML={{
-      __html: `
-        /* Gradient label style */
-        .text-gradient-label {
-          background: linear-gradient(to right, #3730a3, #6366f1);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          text-fill-color: transparent;
-        }
-
-        /* Animation utilities */
-        .animate-fade-in-up {
-          animation: fade-in-up 0.5s ease-out forwards;
-          opacity: 0;
-        }
-
-        .animate-fade-in {
-          animation: fade-in 0.5s ease-out forwards;
-          opacity: 0;
-        }
-
-        .animate-shake-x {
-          animation: shake-x 0.5s ease-out;
-        }
-
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-
-        @keyframes shake-x {
-          0%, 100% {
-            transform: translateX(0);
-          }
-          10%, 30%, 50%, 70%, 90% {
-            transform: translateX(-10px);
-          }
-          20%, 40%, 60%, 80% {
-            transform: translateX(10px);
-          }
-        }
-
-        .animate-duration-500ms {
-          animation-duration: 500ms;
-        }
-
-        .animate-duration-700ms {
-          animation-duration: 700ms;
-        }
-
-        .animate-delay-100ms {
-          animation-delay: 100ms;
-        }
-
-        .animate-delay-200ms {
-          animation-delay: 200ms;
-        }
-
-        .animate-delay-300ms {
-          animation-delay: 300ms;
-        }
-
-        .animate-delay-400ms {
-          animation-delay: 400ms;
-        }
-
-        .animate-delay-500ms {
-          animation-delay: 500ms;
-        }
-
-        .animate-ease-out {
-          animation-timing-function: ease-out;
-        }
-      `
-    }} />
-  );
+  return <div className="min-h-screen w-full bg-zinc-50 dark:bg-zinc-950" />;
 }

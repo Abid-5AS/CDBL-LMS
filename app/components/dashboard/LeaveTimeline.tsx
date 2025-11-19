@@ -109,7 +109,7 @@ const statusConfig: Record<
   CANCELLED: {
     icon: XCircle,
     color: "text-gray-600 dark:text-gray-400",
-    bg: "bg-gray-100 dark:bg-gray-800",
+    bg: "bg-muted/20",
     border: "border-gray-300 dark:border-gray-700",
     label: "Cancelled",
   },
@@ -192,7 +192,7 @@ export function LeaveTimeline({
 
   if (isLoading) {
     return (
-      <Card className={cn("bg-white dark:bg-slate-900 border-gray-200 dark:border-gray-700", className)}>
+      <Card className={cn("bg-card border-border", className)}>
         <CardHeader className="pb-3">
           <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
         </CardHeader>
@@ -216,7 +216,7 @@ export function LeaveTimeline({
 
   if (!leaves || leaves.length === 0) {
     return (
-      <Card className={cn("bg-white dark:bg-slate-900 border-gray-200 dark:border-gray-700", className)}>
+      <Card className={cn("bg-card border-border", className)}>
         <CardHeader className="pb-3">
           <CardTitle className="text-lg font-semibold">{title}</CardTitle>
           {description && (
@@ -227,7 +227,7 @@ export function LeaveTimeline({
         </CardHeader>
         <CardContent>
           <div className="text-center py-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 mb-3">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted/50 mb-3">
               <Calendar className="h-8 w-8 text-gray-400 dark:text-gray-600" />
             </div>
             <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -248,7 +248,7 @@ export function LeaveTimeline({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className={cn("bg-white dark:bg-slate-900 border-gray-200 dark:border-gray-700", className)}>
+      <Card className={cn("bg-card border-border", className)}>
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div>
@@ -272,7 +272,7 @@ export function LeaveTimeline({
             <div className={cn("relative", orientation === "horizontal" && "flex gap-6 overflow-x-auto")}>
               {/* Timeline Line */}
               {orientation === "vertical" && (
-                <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700" />
+                <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border" />
               )}
 
               {/* Timeline Items */}
@@ -312,7 +312,7 @@ export function LeaveTimeline({
                       {/* Content Card */}
                       <div
                         className={cn(
-                          "flex-1 p-4 rounded-lg border-2 bg-gray-50 dark:bg-slate-800/50 transition-all duration-200",
+                          "flex-1 p-4 rounded-lg border-2 bg-muted/20 transition-all duration-200",
                           config.border,
                           interactive && onLeaveClick && "cursor-pointer hover:shadow-md hover:border-blue-400 dark:hover:border-blue-600"
                         )}
@@ -365,7 +365,7 @@ export function LeaveTimeline({
 
                         {/* Reason */}
                         {leave.reason && (
-                          <div className="mb-3 p-2 rounded bg-gray-100 dark:bg-slate-800">
+                          <div className="mb-3 p-2 rounded bg-muted/50">
                             <p className="text-xs text-gray-600 dark:text-gray-400">
                               {leave.reason}
                             </p>

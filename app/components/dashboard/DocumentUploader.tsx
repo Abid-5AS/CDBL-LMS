@@ -340,7 +340,7 @@ export function DocumentUploader({
                             className="w-12 h-12 object-cover rounded"
                           />
                         ) : (
-                          <div className="w-12 h-12 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                          <div className="w-12 h-12 rounded-xl border border-border bg-card p-6 shadow-sm flex items-center justify-center">
                             <FileText className="h-6 w-6 text-gray-600 dark:text-gray-400" />
                           </div>
                         )}

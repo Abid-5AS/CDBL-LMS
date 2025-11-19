@@ -3,8 +3,14 @@
 import { ReactNode, CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Info } from "lucide-react";
 import type { Role } from "@prisma/client";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type RoleBasedDashboardProps = {
   children: ReactNode;
@@ -31,6 +37,10 @@ type RoleBasedDashboardProps = {
    * Animation configuration
    */
   animate?: boolean;
+  /**
+   * Whether to use a compact header layout
+   */
+  compactHeader?: boolean;
   /**
    * Background style variant
    */
@@ -153,6 +163,7 @@ export function RoleBasedDashboard({
   actions,
   animate = true,
   backgroundVariant = "gradient",
+  compactHeader = false,
 }: RoleBasedDashboardProps) {
   const config = roleConfigs[role] || roleConfigs.EMPLOYEE;
 
@@ -163,12 +174,14 @@ export function RoleBasedDashboard({
       ? ""
       : cn("bg-gradient-to-br", config.gradient);
 
-  const containerClasses = cn("min-h-screen", backgroundClass, className);
+  const containerClasses = cn("w-full", backgroundClass, className);
 
   const contentClasses = cn(
     "container mx-auto",
     title || description || actions
-      ? "py-6 sm:py-8 lg:py-10"
+      ? compactHeader
+        ? "py-4 sm:py-5 lg:py-6"
+        : "py-6 sm:py-8 lg:py-10"
       : "py-3 sm:py-4 lg:py-6",
     fullWidth ? "px-0" : config.padding,
     !fullWidth && config.maxWidth
@@ -191,7 +204,7 @@ export function RoleBasedDashboard({
         {(title || description || actions) && (
           <div
             className={cn(
-              "mb-6 sm:mb-8 lg:mb-10",
+              compactHeader ? "mb-4 sm:mb-6" : "mb-6 sm:mb-8 lg:mb-10",
               !title && !description && actions && "mb-4"
             )}
           >
@@ -207,7 +220,14 @@ export function RoleBasedDashboard({
               {(title || description) && (
                 <div className="flex-1">
                   {title && (
-                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2">
+                    <h1
+                      className={cn(
+                        "font-bold text-foreground mb-2",
+                        compactHeader
+                          ? "text-xl sm:text-2xl lg:text-3xl"
+                          : "text-2xl sm:text-3xl lg:text-4xl"
+                      )}
+                    >
                       {title}
                     </h1>
                   )}
@@ -314,6 +334,7 @@ export function RoleKPICard({
   animate = true,
   onClick,
   clickLabel,
+  tooltip,
 }: {
   title: string | ReactNode;
   value: string | number;
@@ -329,6 +350,7 @@ export function RoleKPICard({
   animate?: boolean;
   onClick?: () => void;
   clickLabel?: string;
+  tooltip?: string;
 }) {
   const config = role
     ? roleConfigs[role] || roleConfigs.EMPLOYEE
@@ -381,18 +403,30 @@ export function RoleKPICard({
       title={onClick && clickLabel ? clickLabel : undefined}
       aria-label={onClick && clickLabel ? clickLabel : undefined}
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-        style={{
-          background:
-            "radial-gradient(circle at 15% 0%, var(--role-kpi-accent-soft), transparent 60%)",
-        }}
-      />
+      {/* Removed gradient effect for professional look */}
       <div className="relative flex items-start justify-between gap-4">
         <div className="flex-1 space-y-3">
-          <div className="text-[0.7rem] font-semibold uppercase tracking-[0.35em] text-[color:var(--color-foreground-subtle)]">
+          <div className="flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.35em] text-[color:var(--color-foreground-subtle)]">
             {title}
+            {tooltip && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      className="cursor-help rounded-full p-0.5 hover:bg-muted/20"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Info className="h-3 w-3 opacity-70" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs text-xs">{tooltip}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </div>
           <div>
             <p className="text-3xl font-semibold text-foreground sm:text-4xl">
@@ -423,10 +457,8 @@ export function RoleKPICard({
         </div>
         {Icon && (
           <div
-            className="rounded-2xl border border-white/20 p-3 shadow-inner dark:border-white/5"
+            className="rounded-xl border border-border/50 p-3 bg-accent/10"
             style={{
-              background:
-                "linear-gradient(135deg, var(--role-kpi-accent-soft), transparent)",
               color: "var(--role-kpi-accent)",
             }}
           >

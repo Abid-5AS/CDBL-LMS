@@ -144,7 +144,7 @@ export function ApprovalList({
 
   if (isLoading) {
     return (
-      <Card className={cn("bg-white dark:bg-slate-900 border-gray-200 dark:border-gray-700", className)}>
+      <Card className={cn("bg-card border-border", className)}>
         <CardHeader className="pb-3">
           <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
         </CardHeader>
@@ -153,7 +153,7 @@ export function ApprovalList({
             {[...Array(3)].map((_, i) => (
               <div
                 key={i}
-                className="p-4 rounded-lg border border-gray-200 dark:border-gray-700"
+                className="p-4 rounded-lg border border-border"
               >
                 <div className="space-y-3">
                   <div className="h-5 w-3/4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
@@ -169,7 +169,7 @@ export function ApprovalList({
   }
 
   return (
-    <Card className={cn("bg-white dark:bg-slate-900 border-gray-200 dark:border-gray-700", className)}>
+    <Card className={cn("bg-card border-border", className)}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div>
@@ -193,7 +193,7 @@ export function ApprovalList({
       <CardContent>
         {approvals.length === 0 ? (
           <div className="text-center py-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-950 mb-3">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted/50 mb-3">
               <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
             </div>
             <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -222,8 +222,8 @@ export function ApprovalList({
                       exit={{ opacity: 0, x: -20 }}
                       transition={{ delay: index * 0.05 }}
                       className={cn(
-                        "p-4 rounded-lg border-2 bg-gray-50 dark:bg-slate-800/50",
-                        "border-gray-200 dark:border-gray-700",
+                        "p-4 rounded-lg border-2 bg-muted/30",
+                        "border-border",
                         "hover:border-blue-300 dark:hover:border-blue-700",
                         "transition-all duration-200"
                       )}
@@ -336,7 +336,7 @@ export function ApprovalList({
                           >
                             <div className="pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
                               {approval.reason && (
-                                <div className="p-3 rounded bg-gray-100 dark:bg-slate-800">
+                                <div className="p-3 rounded bg-muted/50">
                                   <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                                     Reason:
                                   </p>
@@ -349,7 +349,7 @@ export function ApprovalList({
                                 {approval.chain.map((step, stepIndex) => (
                                   <div
                                     key={stepIndex}
-                                    className="flex items-center justify-between text-xs p-2 rounded bg-gray-100 dark:bg-slate-800"
+                                    className="flex items-center justify-between text-xs p-2 rounded bg-muted/50"
                                   >
                                     <span className="text-gray-600 dark:text-gray-400">
                                       Step {step.step}: {step.role}
@@ -457,7 +457,7 @@ export function ApprovalList({
  */
 export function ApprovalListSkeleton({ className }: { className?: string }) {
   return (
-    <Card className={cn("bg-white dark:bg-slate-900 border-gray-200 dark:border-gray-700", className)}>
+    <Card className={cn("bg-card border-border", className)}>
       <CardHeader className="pb-3">
         <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
       </CardHeader>

@@ -187,11 +187,11 @@ export function RecentActivityTable({
           </div>
         ) : (
           <>
-            <div className="rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
               <div className="max-h-[520px] overflow-auto">
                 <Table>
                   <TableHeader className="sticky top-0 z-10">
-                    <TableRow className="bg-white/95 dark:bg-slate-900/90 backdrop-blur">
+                    <TableRow className="bg-background/95">
                       {columns.map((column) => (
                         <TableHead
                           key={column.key}

@@ -74,13 +74,13 @@ export async function POST(
   if (contentType.includes("multipart/form-data")) {
     const formData = await request.formData();
     body = {
-      type: formData.get("type")?.toString(),
-      startDate: formData.get("startDate")?.toString(),
-      endDate: formData.get("endDate")?.toString(),
-      reason: formData.get("reason")?.toString(),
-      needsCertificate: formData.get("needsCertificate") === "true",
-      certificateUrl: formData.get("certificateUrl")?.toString() || null,
-      certificateFile: formData.get("certificate") as File | null,
+      type: (formData as any).get("type")?.toString(),
+      startDate: (formData as any).get("startDate")?.toString(),
+      endDate: (formData as any).get("endDate")?.toString(),
+      reason: (formData as any).get("reason")?.toString(),
+      needsCertificate: (formData as any).get("needsCertificate") === "true",
+      certificateUrl: (formData as any).get("certificateUrl")?.toString() || null,
+      certificateFile: (formData as any).get("certificate") as File | null,
     };
   } else {
     body = await request.json().catch(() => ({}));

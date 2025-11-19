@@ -18,7 +18,7 @@ export default async function ApprovalsGate() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-3xl border border-border bg-card/90 backdrop-blur-sm p-6 shadow-lg shadow-black/5 dark:shadow-black/30">
+      <section className="rounded-3xl border border-border bg-card p-6 shadow-sm">
         <h1 className="text-2xl font-semibold text-foreground">
           Pending Leave Approvals
         </h1>
