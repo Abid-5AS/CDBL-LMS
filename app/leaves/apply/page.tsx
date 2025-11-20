@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { getUserRole } from "@/lib/session";
 import { ApplyLeaveForm } from "./_components/apply-leave-form";
+import { LeaveSectionNav } from "@/components/layout/SectionNav";
 
 async function ApplyLeavePageWrapper() {
   const user = await getCurrentUser();
@@ -27,14 +28,18 @@ async function ApplyLeavePageWrapper() {
 export default function ApplyLeavePage() {
   return (
     <Suspense fallback={<ApplyLeaveFallback />}>
-      <ApplyLeavePageWrapper />
+      <div className="max-w-5xl mx-auto w-full space-y-6 px-4 sm:px-6 lg:px-0 py-8">
+        <LeaveSectionNav />
+        <ApplyLeavePageWrapper />
+      </div>
     </Suspense>
   );
 }
 
 function ApplyLeaveFallback() {
   return (
-    <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
+    <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-0 py-8 space-y-6">
+      <div className="h-10 rounded-xl bg-surface-2 border border-outline/60 dark:border-border" />
       <div className="space-y-6">
         <div className="h-8 bg-muted/40 rounded-lg w-48" />
         <div className="h-4 bg-muted/40 rounded-lg w-64" />

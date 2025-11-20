@@ -1,65 +1,62 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronLeft, ChevronRight, User } from "lucide-react";
+import { CalendarHeader, CalendarViewMode } from "@/components/calendar/CalendarHeader";
+import { CalendarLegend } from "@/components/calendar/CalendarLegend";
+import { CalendarGrid, CalendarEvent } from "@/components/calendar/CalendarGrid";
+import { TimelineGrid } from "@/components/calendar/TimelineGrid";
+import { DayClickModal } from "@/components/calendar/DayClickModal";
+import { TeamCalendarView } from "@/components/calendar/TeamCalendarView";
+import { DepartmentHeatmap } from "@/components/calendar/DepartmentHeatmap";
+import { format, addMonths, subMonths, startOfMonth, addDays } from "date-fns";
+import { Loader2, CalendarDays, Clock, Wallet, LayoutGrid, Users, BarChart3 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { leaveTypeLabel } from "@/lib/ui";
-import { LeaveType } from "@prisma/client";
-import Link from "next/link";
-
-type CalendarEvent = {
-  id: number;
-  employeeName: string;
-  employeeCode: string | null;
-  department: string;
-  leaveType: LeaveType;
-  startDate: string;
-  endDate: string;
-  status: string;
-  workingDays: number;
-};
 
 type LeaveCalendarViewProps = {
   currentUserRole: string;
 };
 
-// Professional Neo + Glassmorphism Design System
-const LEAVE_TYPE_COLORS: Record<LeaveType, string> = {
-  EARNED: "bg-gradient-to-br from-[#0066FF]/90 to-[#00A3FF]/70 text-white shadow-lg shadow-blue-500/30 backdrop-blur-sm border border-white/20",
-  CASUAL: "bg-gradient-to-br from-[#00D084]/90 to-[#34D399]/70 text-white shadow-lg shadow-emerald-500/30 backdrop-blur-sm border border-white/20",
-  MEDICAL: "bg-gradient-to-br from-[#FF3B30]/90 to-[#FF6461]/70 text-white shadow-lg shadow-red-500/30 backdrop-blur-sm border border-white/20",
-  MATERNITY: "bg-gradient-to-br from-[#FF2D55]/90 to-[#FF69B4]/70 text-white shadow-lg shadow-pink-500/30 backdrop-blur-sm border border-white/20",
-  PATERNITY: "bg-gradient-to-br from-[#5E5CE6]/90 to-[#8B5CF6]/70 text-white shadow-lg shadow-violet-500/30 backdrop-blur-sm border border-white/20",
-  STUDY: "bg-gradient-to-br from-[#FFCC00]/90 to-[#FBBF24]/70 text-gray-900 shadow-lg shadow-yellow-500/30 backdrop-blur-sm border border-white/20",
-  EXTRAWITHPAY: "bg-gradient-to-br from-[#FF9500]/90 to-[#FB923C]/70 text-white shadow-lg shadow-orange-500/30 backdrop-blur-sm border border-white/20",
-  EXTRAWITHOUTPAY: "bg-gradient-to-br from-[#8E8E93]/90 to-[#9CA3AF]/70 text-white shadow-lg shadow-gray-500/30 backdrop-blur-sm border border-white/20",
-  SPECIAL_DISABILITY: "bg-gradient-to-br from-[#5856D6]/90 to-[#6366F1]/70 text-white shadow-lg shadow-indigo-500/30 backdrop-blur-sm border border-white/20",
-  QUARANTINE: "bg-gradient-to-br from-[#32ADE6]/90 to-[#38BDF8]/70 text-white shadow-lg shadow-sky-500/30 backdrop-blur-sm border border-white/20",
-  SPECIAL: "bg-gradient-to-br from-[#AF52DE]/90 to-[#C084FC]/70 text-white shadow-lg shadow-purple-500/30 backdrop-blur-sm border border-white/20",
-};
-
 export function LeaveCalendarView({ currentUserRole }: LeaveCalendarViewProps) {
-  const today = new Date();
-  const [currentMonth, setCurrentMonth] = useState(today.getMonth());
-  const [currentYear, setCurrentYear] = useState(today.getFullYear());
-  const [view, setView] = useState<"my" | "team" | "all">("team");
+  const isAdmin = ["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"].includes(currentUserRole);
+  const isManager = ["DEPT_HEAD", "MANAGER"].includes(currentUserRole);
+  const isEmployee = !isAdmin && !isManager;
+  
+  const getDefaultTab = () => {
+    if (isAdmin) return "heatmap";
+    if (isManager) return "team";
+    return "my";
+  };
+
+  const [activeTab, setActiveTab] = useState(getDefaultTab());
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [viewMode, setViewMode] = useState<CalendarViewMode>(isEmployee ? "2-week" : "timeline");
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const isAdmin = ["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"].includes(currentUserRole);
+  
+  // Modal State
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedEvents, setSelectedEvents] = useState<CalendarEvent[]>([]);
 
   useEffect(() => {
-    fetchCalendarData();
-  }, [currentMonth, currentYear, view]);
+    if (activeTab === "my") {
+      fetchCalendarData();
+    }
+  }, [currentDate, activeTab]);
 
   const fetchCalendarData = async () => {
     try {
       setLoading(true);
+      const month = currentDate.getMonth();
+      const year = currentDate.getFullYear();
+      
+      // Employees only see their own data
       const response = await fetch(
-        `/api/calendar/leaves?month=${currentMonth}&year=${currentYear}&view=${view}`
+        `/api/calendar/leaves?month=${month}&year=${year}&view=my`
       );
 
       if (!response.ok) {
@@ -67,7 +64,20 @@ export function LeaveCalendarView({ currentUserRole }: LeaveCalendarViewProps) {
       }
 
       const data = await response.json();
-      setEvents(data.events || []);
+      
+      // Transform and filter: employees ONLY see their own leaves
+      const transformedEvents: CalendarEvent[] = (data.events || []).map((event: any) => ({
+        id: event.id,
+        title: leaveTypeLabel[event.leaveType] || event.leaveType,
+        startDate: new Date(event.startDate),
+        endDate: new Date(event.endDate),
+        type: event.leaveType,
+        status: event.status,
+        employeeName: event.employeeName,
+        isHoliday: false
+      }));
+
+      setEvents(transformedEvents);
     } catch (error) {
       console.error("Failed to fetch calendar data:", error);
       setEvents([]);
@@ -76,201 +86,206 @@ export function LeaveCalendarView({ currentUserRole }: LeaveCalendarViewProps) {
     }
   };
 
-  const getDaysInMonth = (month: number, year: number) => {
-    return new Date(year, month + 1, 0).getDate();
+  const handlePrev = () => setCurrentDate(prev => subMonths(prev, 1));
+  const handleNext = () => setCurrentDate(prev => addMonths(prev, 1));
+  const handleToday = () => setCurrentDate(new Date());
+
+  const handleDayClick = (date: Date, dayEvents: CalendarEvent[]) => {
+    setSelectedDate(date);
+    setSelectedEvents(dayEvents);
+    setModalOpen(true);
   };
 
-  const getFirstDayOfMonth = (month: number, year: number) => {
-    return new Date(year, month, 1).getDay();
-  };
-
-  const previousMonth = () => {
-    if (currentMonth === 0) {
-      setCurrentMonth(11);
-      setCurrentYear(currentYear - 1);
-    } else {
-      setCurrentMonth(currentMonth - 1);
+  const timelineRows = [
+    {
+      id: "me",
+      label: "My Leave Schedule",
+      avatar: "",
+      events: events
     }
-  };
-
-  const nextMonth = () => {
-    if (currentMonth === 11) {
-      setCurrentMonth(0);
-      setCurrentYear(currentYear + 1);
-    } else {
-      setCurrentMonth(currentMonth + 1);
-    }
-  };
-
-  const getEventsForDate = (date: number) => {
-    const targetDate = new Date(currentYear, currentMonth, date);
-    return events.filter((event) => {
-      const start = new Date(event.startDate);
-      const end = new Date(event.endDate);
-      start.setHours(0, 0, 0, 0);
-      end.setHours(23, 59, 59, 999);
-      return targetDate >= start && targetDate <= end;
-    });
-  };
-
-  const renderCalendarGrid = () => {
-    const daysInMonth = getDaysInMonth(currentMonth, currentYear);
-    const firstDay = getFirstDayOfMonth(currentMonth, currentYear);
-    const days = [];
-
-    // Empty cells for days before the first of the month
-    for (let i = 0; i < firstDay; i++) {
-      days.push(
-        <div key={`empty-${i}`} className="min-h-[120px] bg-muted/30 rounded-lg"></div>
-      );
-    }
-
-    // Days of the month
-    for (let date = 1; date <= daysInMonth; date++) {
-      const dayEvents = getEventsForDate(date);
-      const isToday =
-        date === today.getDate() &&
-        currentMonth === today.getMonth() &&
-        currentYear === today.getFullYear();
-
-      days.push(
-        <div
-          key={date}
-          className={`min-h-[120px] border rounded-lg p-2 ${
-            isToday
-              ? "bg-primary/10 border-primary"
-              : "bg-card border-muted hover:border-muted-foreground/20"
-          } transition-colors`}
-        >
-          <div className="text-sm font-semibold mb-1">
-            {date}
-            {isToday && (
-              <Badge variant="default" className="ml-2 text-xs">
-                Today
-              </Badge>
-            )}
-          </div>
-          <div className="space-y-1">
-            {dayEvents.slice(0, 3).map((event) => (
-              <Link
-                key={event.id}
-                href={`/leaves/${event.id}`}
-                className={`block text-xs p-1 rounded ${
-                  LEAVE_TYPE_COLORS[event.leaveType]
-                } hover:opacity-80 transition-opacity`}
-              >
-                <div className="font-medium truncate">{event.employeeName}</div>
-                <div className="text-xs truncate">{leaveTypeLabel[event.leaveType]}</div>
-              </Link>
-            ))}
-            {dayEvents.length > 3 && (
-              <div className="text-xs text-muted-foreground pl-1">
-                +{dayEvents.length - 3} more
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    return days;
-  };
-
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
   ];
-
-  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  
+  const nextLeave = events.find(e => new Date(e.startDate) > new Date() && e.status === "APPROVED");
+  const pendingCount = events.filter(e => e.status === "PENDING").length;
+  const upcomingEvents = events.filter(e => {
+    const start = new Date(e.startDate);
+    const end = new Date(e.endDate);
+    const now = new Date();
+    const twoWeeks = addDays(now, 14);
+    return start <= twoWeeks && end >= now;
+  }).sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
 
   return (
-    <Card className="rounded-2xl border-muted shadow-sm">
-      <CardHeader>
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <CardTitle className="flex items-center gap-4">
-            <Button variant="outline" size="icon" onClick={previousMonth}>
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="text-2xl font-bold">
-              {monthNames[currentMonth]} {currentYear}
-            </span>
-            <Button variant="outline" size="icon" onClick={nextMonth}>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </CardTitle>
-
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">View:</span>
-            <Select value={view} onValueChange={(v) => setView(v as any)}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="my">My Leaves</SelectItem>
-                <SelectItem value="team">Team Leaves</SelectItem>
-                {isAdmin && <SelectItem value="all">All Leaves</SelectItem>}
-              </SelectContent>
-            </Select>
+    <div className="w-full max-w-7xl mx-auto space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        {(isAdmin || isManager) && (
+          <div className="flex justify-center sm:justify-start mb-6">
+            <TabsList className="inline-grid w-full sm:w-auto grid-cols-2 sm:grid-cols-3 gap-1">
+              <TabsTrigger value="my" className="gap-1.5 text-xs sm:text-sm px-3 sm:px-4">
+                <LayoutGrid className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">My Calendar</span>
+                <span className="sm:hidden">Mine</span>
+              </TabsTrigger>
+              {(isManager || isAdmin) && (
+                <TabsTrigger value="team" className="gap-1.5 text-xs sm:text-sm px-3 sm:px-4">
+                  <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Team View</span>
+                  <span className="sm:hidden">Team</span>
+                </TabsTrigger>
+              )}
+              {isAdmin && (
+                <TabsTrigger value="heatmap" className="gap-1.5 text-xs sm:text-sm px-3 sm:px-4 col-span-2 sm:col-span-1">
+                  <BarChart3 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  Overview
+                </TabsTrigger>
+              )}
+            </TabsList>
           </div>
-        </div>
-
-        {/* Legend */}
-        <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t">
-          {Object.entries(LEAVE_TYPE_COLORS).map(([type, colorClass]) => (
-            <div key={type} className="flex items-center gap-2">
-              <div className={`w-4 h-4 rounded ${colorClass}`}></div>
-              <span className="text-xs text-muted-foreground">
-                {leaveTypeLabel[type as LeaveType]}
-              </span>
-            </div>
-          ))}
-        </div>
-      </CardHeader>
-
-      <CardContent>
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-pulse text-muted-foreground">Loading...</div>
-          </div>
-        ) : (
-          <>
-            {/* Week day headers */}
-            <div className="grid grid-cols-7 gap-2 mb-2">
-              {weekDays.map((day) => (
-                <div
-                  key={day}
-                  className="text-center text-sm font-semibold text-muted-foreground py-2"
-                >
-                  {day}
-                </div>
-              ))}
-            </div>
-
-            {/* Calendar grid */}
-            <div className="grid grid-cols-7 gap-2">{renderCalendarGrid()}</div>
-
-            {/* Summary */}
-            <div className="mt-6 pt-4 border-t">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">
-                  Total events this month:
-                </span>
-                <Badge variant="secondary">{events.length}</Badge>
-              </div>
-            </div>
-          </>
         )}
-      </CardContent>
-    </Card>
+
+        <TabsContent value="my" className="space-y-4 sm:space-y-6 mt-0">
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+            <Card className="shadow-sm border-border/50 hover:shadow-md transition-shadow">
+              <CardContent className="p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
+                <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                  <CalendarDays className="h-4 w-4 sm:h-5 sm:w-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground font-medium">Next Leave</p>
+                  <p className="text-sm font-semibold truncate">
+                    {nextLeave 
+                      ? `${format(nextLeave.startDate, "MMM d")} (${leaveTypeLabel[nextLeave.type]})`
+                      : "None scheduled"}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="shadow-sm border-border/50 hover:shadow-md transition-shadow">
+              <CardContent className="p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
+                <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0">
+                  <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground font-medium">Pending</p>
+                  <p className="text-sm font-semibold">{pendingCount} Request{pendingCount !== 1 ? 's' : ''}</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-sm border-border/50 hover:shadow-md transition-shadow">
+              <CardContent className="p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
+                <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 shrink-0">
+                  <Wallet className="h-4 w-4 sm:h-5 sm:w-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground font-medium">Balance</p>
+                  <p className="text-sm font-semibold truncate">View Details →</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="rounded-xl border shadow-sm overflow-hidden">
+            <div className="p-3 sm:p-4 border-b bg-muted/30">
+              <CalendarHeader
+                currentDate={currentDate}
+                onPrev={handlePrev}
+                onNext={handleNext}
+                onToday={handleToday}
+                viewMode={viewMode}
+                onViewModeChange={setViewMode}
+              />
+            </div>
+
+            <CardContent className="p-0 min-h-[400px] sm:min-h-[500px] relative">
+              {loading && (
+                <div className="absolute inset-0 z-10 bg-background/50 backdrop-blur-[1px] flex items-center justify-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              )}
+
+              <div className={cn("transition-opacity duration-200", loading && "opacity-50")}>
+                {viewMode === "month" && (
+                  <div className="p-2 sm:p-0">
+                    <CalendarGrid
+                      currentDate={currentDate}
+                      events={events}
+                      onDayClick={handleDayClick}
+                      className="h-[500px] sm:h-[600px]"
+                    />
+                  </div>
+                )}
+
+                {(viewMode === "2-week" || viewMode === "timeline") && (
+                  <div className="p-3 sm:p-4 space-y-6">
+                    <TimelineGrid
+                      startDate={viewMode === "2-week" ? new Date() : startOfMonth(currentDate)}
+                      daysToShow={viewMode === "2-week" ? 14 : 30}
+                      rows={timelineRows}
+                      className="pb-4"
+                    />
+                    
+                    {upcomingEvents.length > 0 && (
+                      <div>
+                        <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                          <span className="h-1 w-1 rounded-full bg-primary"></span>
+                          Upcoming Leaves
+                        </h3>
+                        <div className="space-y-2">
+                          {upcomingEvents.map(event => (
+                            <div key={event.id} className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/5 transition-colors">
+                              <div className="flex items-center gap-3 min-w-0 flex-1">
+                                <Badge 
+                                  variant="outline" 
+                                  className={cn(
+                                    "capitalize shrink-0",
+                                    event.status === 'APPROVED' && 'border-emerald-500 bg-emerald-500/10 text-emerald-700',
+                                    event.status === 'PENDING' && 'border-amber-500 bg-amber-500/10 text-amber-700',
+                                    event.status === 'REJECTED' && 'border-rose-500 bg-rose-500/10 text-rose-700'
+                                  )}
+                                >
+                                  {event.status}
+                                </Badge>
+                                <div className="min-w-0">
+                                  <p className="text-sm font-medium truncate">{event.title}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {format(event.startDate, "MMM d")} - {format(event.endDate, "MMM d")}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </CardContent>
+            
+            <div className="px-3 sm:px-4 py-3 bg-muted/20 border-t">
+              <CalendarLegend />
+            </div>
+          </Card>
+
+          <DayClickModal
+            isOpen={modalOpen}
+            onClose={() => setModalOpen(false)}
+            date={selectedDate}
+            events={selectedEvents}
+          />
+        </TabsContent>
+
+        <TabsContent value="team" className="mt-0">
+          <TeamCalendarView currentUserRole={currentUserRole} />
+        </TabsContent>
+
+        <TabsContent value="heatmap" className="mt-0">
+          <DepartmentHeatmap currentUserRole={currentUserRole} />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }

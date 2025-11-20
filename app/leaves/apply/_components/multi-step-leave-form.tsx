@@ -23,7 +23,6 @@ import {
 import { useApplyLeaveForm } from "./use-apply-leave-form";
 import { LEAVE_OPTIONS, POLICY_TOOLTIPS, type LeaveType } from "./leave-constants";
 import { LeaveSummarySidebar } from "./leave-summary-sidebar";
-import { glassCard, neoBadge } from "@/lib/neo-design";
 import { cn } from "@/lib/utils";
 
 const steps = [
@@ -123,7 +122,7 @@ export function MultiStepLeaveForm() {
     switch (currentStep) {
       case 0: // Leave Type
         return (
-          <Card className={cn(glassCard.elevated, "rounded-2xl")}>
+          <Card className="rounded-2xl border border-outline/60 dark:border-border bg-surface-1 shadow-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="w-5 h-5" />
@@ -138,11 +137,12 @@ export function MultiStepLeaveForm() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handleTypeChange(option.value as LeaveType)}
-                    className={`p-4 rounded-lg border-2 text-left transition-all ${
+                    className={cn(
+                      "p-4 rounded-lg border-2 text-left transition-all",
                       type === option.value
                         ? "border-primary bg-primary/5"
-                        : "border-muted hover:border-muted-foreground/50"
-                    }`}
+                        : "border-outline/60 hover:border-outline"
+                    )}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-semibold">{option.label}</h3>
@@ -165,7 +165,7 @@ export function MultiStepLeaveForm() {
 
       case 1: // Dates & Duration
         return (
-          <Card className={cn(glassCard.elevated, "rounded-2xl")}>
+          <Card className="rounded-2xl border border-outline/60 dark:border-border bg-surface-1 shadow-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
@@ -244,7 +244,7 @@ export function MultiStepLeaveForm() {
 
       case 2: // Details & Reason
         return (
-          <Card className={cn(glassCard.elevated, "rounded-2xl")}>
+          <Card className="rounded-2xl border border-outline/60 dark:border-border bg-surface-1 shadow-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="w-5 h-5" />
@@ -267,7 +267,7 @@ export function MultiStepLeaveForm() {
 
       case 3: // Documents
         return (
-          <Card className={cn(glassCard.elevated, "rounded-2xl")}>
+          <Card className="rounded-2xl border border-outline/60 dark:border-border bg-surface-1 shadow-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Clock className="w-5 h-5" />
@@ -306,7 +306,7 @@ export function MultiStepLeaveForm() {
 
       case 4: // Review & Submit
         return (
-          <Card className={cn(glassCard.elevated, "rounded-2xl")}>
+          <Card className="rounded-2xl border border-outline/60 dark:border-border bg-surface-1 shadow-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5" />

@@ -24,8 +24,10 @@ async function EmployeeDashboardPageContent() {
     <SelectionProvider>
       <RoleBasedDashboard
         role="EMPLOYEE"
-        title={`Welcome, ${username}`}
-        description="Manage your leave requests and view balances"
+        title={undefined}
+        description={undefined}
+        compactHeader
+        backgroundVariant="solid"
         animate={true}
       >
         <ModernEmployeeDashboard username={username} />

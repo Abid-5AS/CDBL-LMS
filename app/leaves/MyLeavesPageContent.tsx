@@ -57,6 +57,7 @@ import { apiFetcher } from "@/lib/apiClient";
 import Link from "next/link";
 import { Wallet, ArrowRight, CalendarPlus, Info } from "lucide-react";
 import { SortedTimelineAdapter } from "@/components/shared/timeline-adapters";
+import { LeaveSectionNav } from "@/components/layout/SectionNav";
 
 type LeaveRow = {
   id: number;
@@ -350,7 +351,8 @@ export function MyLeavesPageContent() {
 
   return (
     <TooltipProvider delayDuration={100}>
-      <div className="max-w-6xl mx-auto space-y-6 py-8">
+      <div className="max-w-6xl mx-auto space-y-6 py-8 px-4 sm:px-6 lg:px-0">
+        <LeaveSectionNav />
         <div className="surface-card p-6 space-y-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>

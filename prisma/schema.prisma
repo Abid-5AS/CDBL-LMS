@@ -71,6 +71,7 @@ model LeaveRequest {
   id                    Int         @id @default(autoincrement())
   requesterId           Int
   type                  LeaveType
+  originalType          LeaveType?  // Tracks if type was changed during approval
   startDate             DateTime
   endDate               DateTime
   workingDays           Int
@@ -270,6 +271,7 @@ enum NotificationType {
   LEAVE_RETURNED
   LEAVE_FORWARDED
   LEAVE_CANCELLED
+  LEAVE_TYPE_CHANGED
   LEAVE_CANCELLATION_REQUESTED
   LEAVE_APPROACHING
   APPROVAL_REQUIRED

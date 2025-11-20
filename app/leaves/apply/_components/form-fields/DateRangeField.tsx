@@ -23,6 +23,22 @@ interface DateRangeFieldProps {
   errors: { start?: string; end?: string };
 }
 
+// Get backdate info based on minSelectableDate
+function getBackdateInfo(minDate?: Date) {
+  if (!minDate) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const minDateMidnight = new Date(minDate);
+  minDateMidnight.setHours(0, 0, 0, 0);
+  
+  const daysDiff = Math.floor((today.getTime() - minDateMidnight.getTime()) / (1000 * 60 * 60 * 24));
+  
+  if (daysDiff <= 0) {
+    return { canBackdate: false, days: 0 };
+  }
+  return { canBackdate: true, days: daysDiff };
+}
+
 export function DateRangeField({
   dateRange,
   setDateRange,
@@ -33,31 +49,28 @@ export function DateRangeField({
   rangeValidation,
   errors,
 }: DateRangeFieldProps) {
+  const backdateInfo = getBackdateInfo(minSelectableDate);
+  
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <Label htmlFor="leave-dates" className="text-sm font-medium leading-6">
-          Leave Dates <span className="text-destructive">*</span>
-        </Label>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button type="button" className="inline-flex items-center">
-                <HelpCircle className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground transition-colors" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="max-w-xs">
-              <p className="text-xs">
-                All days in the range count toward balance. Start/End cannot be
-                Fri/Sat or holidays.
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-      <p className="text-xs text-muted-foreground">
-        Select the start and end date. Weekends or holidays are counted but not permitted as start/end.
-      </p>
+      <Label htmlFor="leave-dates" className="text-sm font-medium">
+        Leave Dates <span className="text-destructive">*</span>
+      </Label>
+      
+      {/* Backdate Policy Info */}
+      {backdateInfo && (
+        <div className="rounded-md border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20 px-3 py-2 flex items-start gap-2">
+          <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+          <p className="text-xs text-blue-700 dark:text-blue-300">
+            {backdateInfo.canBackdate ? (
+              <>This leave type can be backdated up to <strong>{backdateInfo.days} days</strong> from today.</>
+            ) : (
+              <>This leave type cannot be backdated. Dates must be from today onwards.</>
+            )}
+          </p>
+        </div>
+      )}
+      
       <DateRangePicker
         value={{ start: dateRange.start, end: dateRange.end }}
         onChange={(range) => setDateRange({ start: range.start, end: range.end })}

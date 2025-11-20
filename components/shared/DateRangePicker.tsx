@@ -125,20 +125,15 @@ export function DateRangePicker({
               aria-label="Select leave date range"
               aria-expanded={open}
               className={cn(
-                "w-full rounded-2xl border border-border bg-background/70 px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                "w-full rounded-lg border bg-background px-3 py-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 disabled && "cursor-not-allowed opacity-50"
               )}
             >
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/60 text-muted-foreground">
-                    <CalendarIcon className="h-4 w-4" aria-hidden="true" />
-                  </span>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <CalendarIcon className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                   <div className="flex flex-col">
-                    <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
-                      Date range
-                    </span>
-                    <span className="text-sm font-semibold text-foreground">
+                    <span className="text-sm font-medium text-foreground">
                       {value.start ? (
                         value.end ? (
                           <>
@@ -151,13 +146,11 @@ export function DateRangePicker({
                         "Select dates"
                       )}
                     </span>
-                    <span className="text-xs text-muted-foreground">
-                      {value.start
-                        ? value.end
-                          ? `${selectedDays ?? 0} day${selectedDays && selectedDays !== 1 ? "s" : ""} selected`
-                          : "Choose an end date"
-                        : "Opens calendar picker"}
-                    </span>
+                    {value.start && value.end && (
+                      <span className="text-xs text-muted-foreground">
+                        {selectedDays} day{selectedDays !== 1 ? "s" : ""}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <ChevronDown

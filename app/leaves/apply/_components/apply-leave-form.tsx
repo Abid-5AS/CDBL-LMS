@@ -98,129 +98,123 @@ export function ApplyLeaveForm() {
     POLICY_TOOLTIPS.EARNED ||
     null;
 
-  const heroStats = [
-    {
-      label: "Current Balance",
-      value:
-        typeof balanceForType === "number" ? `${balanceForType} days` : "—",
-    },
-    {
-      label: "Requested",
-      value: requestedDays > 0 ? `${requestedDays} days` : "—",
-    },
-    {
-      label: "Projected Balance",
-      value:
-        remainingBalance || remainingBalance === 0
-          ? `${Math.max(remainingBalance, 0)} days`
-          : "—",
-      state:
-        remainingBalance < 0
-          ? "text-destructive"
-          : remainingBalance < 2
-          ? "text-data-warning"
-          : "text-data-success",
-    },
-  ];
+  const balancePercent = balanceForType && requestedDays > 0
+    ? Math.max(0, Math.min(100, (remainingBalance / balanceForType) * 100))
+    : 100;
+
+  const getBalanceColor = (percent: number) => {
+    if (percent > 50) return "bg-emerald-500";
+    if (percent > 25) return "bg-amber-500";
+    return "bg-rose-500";
+  };
+
+  const getBalanceTextColor = (balance: number) => {
+    if (balance < 0) return "text-rose-600 dark:text-rose-400";
+    if (balance < 2) return "text-amber-600 dark:text-amber-400";
+    return "text-emerald-600 dark:text-emerald-500";
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="mx-auto max-w-[1400px] space-y-8">
-        <div className="surface-card p-6 space-y-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
-                Leave Request
-              </p>
-              <h1 className="text-3xl font-semibold text-foreground">
-                Apply for Leave
-              </h1>
-              <p className="text-sm text-muted-foreground leading-6 max-w-2xl">
-                Share your leave details, attach supporting documents, and track
-                balances in real time before submitting.
-              </p>
-            </div>
-            <div className="rounded-xl border border-border/60 px-4 py-3 text-sm text-muted-foreground">
-              <p className="text-xs uppercase tracking-widest">Today</p>
-              <p className="text-xl font-semibold text-foreground">
-                {todayLabel}
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-3">
-            {heroStats.map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-2xl border border-border/70 px-4 py-3"
-              >
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  {stat.label}
-                </p>
-                <p
-                  className={cn(
-                    "text-lg font-semibold text-foreground",
-                    stat.state
-                  )}
-                >
-                  {stat.value}
-                </p>
-              </div>
-            ))}
-          </div>
+    <div className="space-y-4">
+      <div className="mx-auto max-w-[1400px] space-y-4">
+        {/* Compact Header */}
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <div className="h-6 w-1 bg-primary rounded-full" />
+            Apply for Leave
+          </h1>
+          {lastSavedTime && (
+            <Badge variant="secondary" className="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800">
+              <CheckCircle2 className="w-3 h-3 mr-1" />
+              Saved {lastSavedTime}
+            </Badge>
+          )}
         </div>
+        {/* Warning Banner */}
+        {warnings.length > 0 && (
+          <div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 p-3">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <div className="flex-1 space-y-1">
+                <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">Please review</p>
+                {warnings.map((warning, idx) => (
+                  <p key={idx} className="text-xs text-amber-700 dark:text-amber-300">• {warning}</p>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Two-column responsive layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
           {/* LEFT: Form Section (8 columns) */}
-          <div className="lg:col-span-8 space-y-8">
-            <Card className="bg-card border border-border shadow-lg shadow-black/5 dark:shadow-black/30 rounded-3xl">
-              <CardHeader className="p-6">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2 text-base font-semibold text-foreground leading-6">
-                    <Calendar className="w-4 h-4 text-muted-foreground" />
-                    Leave Details
-                  </CardTitle>
-                  {lastSavedTime && (
-                    <Badge
-                      variant="secondary"
-                      className="bg-data-success/15 text-data-success border border-data-success/40 dark:bg-data-success/20 dark:text-data-success"
-                    >
-                      <CheckCircle2 className="w-3 h-3 mr-1" />
-                      Saved just now
-                    </Badge>
-                  )}
-                </div>
-              </CardHeader>
-
+          <div className="lg:col-span-8">
+            <Card className="border shadow-sm">
               <form
                 onSubmit={handleReviewSubmit}
                 noValidate
                 aria-label="Leave application form"
               >
-                <CardContent className="p-6 space-y-6">
-                  {/* Leave Type and Date Range in Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <LeaveTypeField
-                      type={type}
-                      onTypeChange={handleTypeChange}
-                      error={errors.type}
-                      clearErrors={clearErrors}
-                    />
-                    <DateRangeField
-                      dateRange={dateRange}
-                      setDateRange={(range) =>
-                        setDateRange({
-                          start: range.start ?? undefined,
-                          end: range.end ?? undefined,
-                        })
-                      }
-                      holidays={holidays.map((h) => new Date(h.date))}
-                      minSelectableDate={minSelectableDate}
-                      submitting={submitting}
-                      requestedDays={requestedDays}
-                      rangeValidation={rangeValidation}
-                      errors={{ start: errors.start, end: errors.end }}
-                    />
+                <CardContent className="p-4 sm:p-6 space-y-5">
+                  {/* Balance Overview - Compact, Inside Form */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="rounded-lg border bg-card p-3">
+                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1">Current</p>
+                      <p className="text-xl font-bold text-foreground flex items-baseline gap-1">
+                        {typeof balanceForType === "number" ? balanceForType : "—"}
+                        <span className="text-xs font-normal text-muted-foreground">days</span>
+                      </p>
+                      {type && balanceForType !== undefined && (
+                        <div className="w-full bg-muted/30 rounded-full h-1 mt-2">
+                          <div className="h-full bg-emerald-500 rounded-full" style={{ width: "100%" }} />
+                        </div>
+                      )}
+                    </div>
+                    <div className={cn("rounded-lg border p-3", requestedDays > 0 ? "bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800" : "bg-card")}>
+                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1">Requesting</p>
+                      <p className={cn("text-xl font-bold flex items-baseline gap-1", requestedDays > 0 ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground")}>
+                        {requestedDays > 0 ? requestedDays : "—"}
+                        <span className="text-xs font-normal text-muted-foreground">days</span>
+                      </p>
+                    </div>
+                    <div className={cn("rounded-lg border p-3", remainingBalance !== null && remainingBalance < 0 ? "bg-rose-50/50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800" : remainingBalance !== null && remainingBalance < 2 ? "bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800" : "bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800")}>
+                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1">After</p>
+                      <p className={cn("text-xl font-bold flex items-baseline gap-1", remainingBalance !== null ? getBalanceTextColor(remainingBalance) : "text-foreground")}>
+                        {remainingBalance !== null ? Math.max(remainingBalance, 0) : "—"}
+                        <span className="text-xs font-normal text-muted-foreground">days</span>
+                      </p>
+                      {remainingBalance !== null && balanceForType !== undefined && (
+                        <div className="w-full bg-muted/30 rounded-full h-1 mt-2">
+                          <div className={cn("h-full rounded-full transition-all", getBalanceColor(balancePercent))} style={{ width: `${Math.max(0, balancePercent)}%` }} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {/* Leave Type and Date Range */}
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <LeaveTypeField
+                        type={type}
+                        onTypeChange={handleTypeChange}
+                        error={errors.type}
+                        clearErrors={clearErrors}
+                      />
+                      <DateRangeField
+                        dateRange={dateRange}
+                        setDateRange={(range) =>
+                          setDateRange({
+                            start: range.start ?? undefined,
+                            end: range.end ?? undefined,
+                          })
+                        }
+                        holidays={holidays.map((h) => new Date(h.date))}
+                        minSelectableDate={minSelectableDate}
+                        submitting={submitting}
+                        requestedDays={requestedDays}
+                        rangeValidation={rangeValidation}
+                        errors={{ start: errors.start, end: errors.end }}
+                      />
+                    </div>
                   </div>
 
                   {/* Special Disability Leave: Incident Date Field */}
@@ -374,60 +368,23 @@ export function ApplyLeaveForm() {
                   )}
                 </CardContent>
 
-                {/* Actions inside form */}
-                <div className="flex flex-col gap-4 pt-6 border-t border-muted mt-6 px-6 pb-6">
-                  <div
-                    className="text-xs text-muted-foreground"
-                    aria-live="polite"
-                  >
-                    <p className="font-semibold text-foreground text-sm">
-                      Form status
-                    </p>
-                    <p>
-                      {submitting
-                        ? "Submitting request…"
-                        : lastSavedTime
-                        ? `Auto-saved at ${lastSavedTime}`
-                        : "Draft auto-saves every minute. You can also save manually."}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap justify-end gap-3">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => router.back()}
-                      disabled={submitting}
-                      className="transition-transform hover:scale-[1.02]"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      onClick={handleManualSave}
-                      disabled={submitting}
-                      className="transition-transform hover:scale-[1.02]"
-                      leftIcon={<Save className="size-4" aria-hidden="true" />}
-                    >
-                      Save Draft
-                    </Button>
-                    <Button
-                      type="submit"
-                      loading={submitting}
-                      loadingText="Submitting Request..."
-                      className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all hover:scale-[1.01] hover:shadow-md rounded-full px-6"
-                      leftIcon={<Send className="size-4" aria-hidden="true" />}
-                    >
-                      Submit Request
-                    </Button>
+                {/* Actions */}
+                <div className="flex items-center justify-between gap-3 pt-3 border-t bg-muted/20 px-4 sm:px-6 pb-4">
+                  <p className="text-xs text-muted-foreground">
+                    {submitting ? "Submitting..." : lastSavedTime ? `Saved ${lastSavedTime}` : "Auto-saves"}
+                  </p>
+                  <div className="flex gap-2">
+                    <Button type="button" variant="ghost" onClick={() => router.back()} disabled={submitting} size="sm">Cancel</Button>
+                    <Button type="button" variant="outline" onClick={handleManualSave} disabled={submitting} size="sm" className="gap-1.5"><Save className="h-3.5 w-3.5" />Save</Button>
+                    <Button type="submit" loading={submitting} className="gap-1.5" size="sm"><Send className="h-3.5 w-3.5" />Submit</Button>
                   </div>
                 </div>
               </form>
             </Card>
           </div>
 
-          {/* RIGHT: Unified Guidance Panel (4 columns) */}
-          <aside className="lg:col-span-4 space-y-6">
+          {/* RIGHT: Sidebar (4 columns) */}
+          <aside className="lg:col-span-4 space-y-0">
             <LeaveSummarySidebar
               type={type}
               dateRange={dateRange}
@@ -462,9 +419,9 @@ export function ApplyLeaveForm() {
             }}
             disabled={submitting}
             size="lg"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg transition-all hover:scale-[1.02]"
-            leftIcon={<Send className="size-4" aria-hidden="true" />}
+            className="shadow-lg hover:shadow-xl transition-all gap-2"
           >
+            <Send className="size-4" aria-hidden="true" />
             {submitting ? "Submitting..." : "Submit Request"}
           </Button>
         </div>

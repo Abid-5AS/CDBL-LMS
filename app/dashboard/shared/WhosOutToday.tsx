@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { User, Calendar } from "lucide-react";
 import { leaveTypeLabel } from "@/lib/ui";
 import { LeaveType } from "@prisma/client";
-import { glassCard, neoBadge } from "@/lib/neo-design";
 import { cn } from "@/lib/utils";
 
 type TeamMember = {
@@ -58,7 +57,7 @@ export function WhosOutToday({ scope = "team", title }: WhosOutTodayProps) {
 
   if (loading) {
     return (
-      <Card className={cn(glassCard.elevated, "rounded-xl")}>
+      <Card className="rounded-xl border border-outline/60 dark:border-border bg-surface-1 shadow-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
@@ -76,7 +75,7 @@ export function WhosOutToday({ scope = "team", title }: WhosOutTodayProps) {
 
   if (error) {
     return (
-      <Card className={cn(glassCard.elevated, "rounded-xl")}>
+      <Card className="rounded-xl border border-outline/60 dark:border-border bg-surface-1 shadow-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
@@ -93,7 +92,7 @@ export function WhosOutToday({ scope = "team", title }: WhosOutTodayProps) {
   }
 
   return (
-    <Card className={cn(glassCard.elevated, "rounded-xl")}>
+    <Card className="rounded-xl border border-outline/60 dark:border-border bg-surface-1 shadow-card">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 justify-between">
           <div className="flex items-center gap-2">
@@ -101,7 +100,7 @@ export function WhosOutToday({ scope = "team", title }: WhosOutTodayProps) {
             {displayTitle}
           </div>
           {data && data.count > 0 && (
-            <Badge variant="secondary" className={cn("ml-auto", neoBadge.glass)}>
+            <Badge variant="secondary" className="ml-auto bg-surface-2 border border-outline/60 dark:border-border/60 text-foreground">
               {data.count} {data.count === 1 ? "person" : "people"}
             </Badge>
           )}
@@ -136,7 +135,7 @@ export function WhosOutToday({ scope = "team", title }: WhosOutTodayProps) {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{member.name}</p>
                   <div className="flex items-center gap-2 mt-1">
-                    <Badge variant="outline" className={cn("text-xs", neoBadge.glass)}>
+                    <Badge variant="outline" className="text-xs bg-surface-2 border border-outline/60 dark:border-border/60 text-foreground">
                       {leaveTypeLabel[member.type]}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
