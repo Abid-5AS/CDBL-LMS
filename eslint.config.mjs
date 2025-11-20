@@ -6,6 +6,7 @@ const eslintConfig = [
     ignores: ["node_modules/**"],
   },
   {
+    files: ["**/*.{js,ts,jsx,tsx}"],
     rules: {
       // Ban deprecated chart component imports
       "no-restricted-imports": [
@@ -43,6 +44,18 @@ const eslintConfig = [
               message: "Dashboards must import from @shared or @dash only. Use @shared/* for primitives or @dash/* for role-specific components.",
             },
           ],
+        },
+      ],
+      // Nudge contributors to use design tokens over inline color literals
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "Literal[value=/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/]",
+          message: "Use design tokens or Tailwind semantic colors instead of inline hex values.",
+        },
+        {
+          selector: "Literal[value=/^(rgb|rgba|hsl|hsla)\\(/i]",
+          message: "Use design tokens or Tailwind semantic colors instead of inline color values.",
         },
       ],
     },

@@ -77,17 +77,17 @@ export function DesktopNav({
                     <Link
                       href={link.href}
                       className={cn(
-                        "group/link relative flex flex-nowrap items-center gap-2 overflow-hidden whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-all duration-200 focus-ring",
+                        "group/link relative flex flex-nowrap items-center gap-2 overflow-hidden whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 focus-ring border border-transparent",
                         active
-                          ? "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-foreground"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                          ? "bg-surface-2 text-foreground border-outline/60 dark:border-border/60 shadow-sm"
+                          : "text-muted-foreground hover:bg-surface-2 hover:text-foreground"
                       )}
                     >
                       <Icon
                         className={cn(
                           "h-4 w-4 shrink-0 transition-all duration-200",
                           active
-                            ? "text-primary dark:text-primary-foreground"
+                            ? "text-foreground"
                             : "text-muted-foreground group-hover/link:text-foreground"
                         )}
                       />
@@ -114,7 +114,7 @@ export function DesktopNav({
           <Button
             variant="outline"
             size="sm"
-            className="gap-2 text-muted-foreground hover:text-foreground bg-background/50 border-border/50"
+            className="gap-2 text-muted-foreground hover:text-foreground bg-surface-1 border-outline/60 dark:border-border/60"
             onClick={openSearch}
             leftIcon={<Search className="h-4 w-4" />}
             aria-label="Search leaves and related information"

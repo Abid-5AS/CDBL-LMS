@@ -3,7 +3,11 @@ import { apiGet } from "@/lib/apiClient";
 import { redirect } from "next/navigation";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Plane, Clock, LogOut, FileText, User, Calendar, CheckCircle2, AlertCircle, XCircle } from "lucide-react";
+import { ModalShell } from "@/components/layout/ModalShell";
+import { StatusChip } from "@/components/ui/status-chip";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Plane, Clock, LogOut, FileText, User, Calendar, CheckCircle2, AlertCircle, XCircle, Info } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -37,6 +41,30 @@ const formatRole = (role: string) => {
 
 type TabValue = "balance" | "actions" | "recent";
 
+type StatusMeta = {
+  icon: LucideIcon;
+  intent: "success" | "warning" | "danger" | "info" | "neutral";
+  label: string;
+};
+
+const STATUS_META: Record<string, StatusMeta> = {
+  APPROVED: { icon: CheckCircle2, intent: "success", label: "Approved" },
+  PENDING: { icon: AlertCircle, intent: "warning", label: "Pending" },
+  SUBMITTED: { icon: AlertCircle, intent: "warning", label: "Submitted" },
+  REJECTED: { icon: XCircle, intent: "danger", label: "Rejected" },
+  CANCELLED: { icon: XCircle, intent: "danger", label: "Cancelled" },
+};
+
+const getStatusMeta = (status: string): StatusMeta => {
+  const normalized = status?.toUpperCase?.() ?? "";
+  if (STATUS_META[normalized]) return STATUS_META[normalized];
+  return {
+    icon: Info,
+    intent: "info",
+    label: normalized.replaceAll("_", " ").toLowerCase(),
+  };
+};
+
 // Server Component: Renders static content and pre-fetched data
 export async function ControlCenterServer({ onClose }: { onClose: () => void }) {
   const user = await getCurrentUser();
@@ -67,7 +95,7 @@ export async function ControlCenterServer({ onClose }: { onClose: () => void }) 
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent
-        className="sm:max-w-md w-[calc(100vw-2rem)] rounded-2xl p-6 bg-card border border-border shadow-lg backdrop-blur-sm"
+        className="sm:max-w-md w-[calc(100vw-2rem)] border-none bg-transparent p-0 shadow-none"
         data-control-center
       >
         <DialogHeader className="sr-only">
@@ -75,55 +103,60 @@ export async function ControlCenterServer({ onClose }: { onClose: () => void }) 
           <DialogDescription>User settings and information</DialogDescription>
         </DialogHeader>
 
-        {/* User Info Header - Rendered on server */}
-        <div className="flex items-center gap-4 mb-4 pb-4 border-b border-border/50">
-          <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold text-base shadow-md flex-shrink-0">
-            {user.name?.[0]?.toUpperCase() ?? "U"}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h2 className="font-semibold text-lg text-foreground truncate">{user.name ?? "User"}</h2>
-            {user.department && (
-              <p className="text-sm text-muted-foreground truncate">{user.department}</p>
-            )}
-            <div className="flex items-center gap-2 mt-1">
-              <span className="inline-block text-xs text-primary font-medium bg-accent/50 px-2 py-0.5 rounded">
-                {formatRole(user.role ?? "")}
-              </span>
-              <span className="text-xs text-muted-foreground">Policy v2.0</span>
+        <ModalShell
+          size="sm"
+          className="w-full"
+          title="Control Center"
+          description="Your leave balances, quick actions, and recent activity."
+        >
+          {/* User Info Header - Rendered on server */}
+          <div className="flex items-center gap-4 pb-4 border-b border-border/60">
+            <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold text-base shadow-md flex-shrink-0">
+              {user.name?.[0]?.toUpperCase() ?? "U"}
+            </div>
+            <div className="flex-1 min-w-0 space-y-1">
+              <h2 className="heading-sm truncate">{user.name ?? "User"}</h2>
+              {user.department && (
+                <p className="body-muted truncate">{user.department}</p>
+              )}
+              <div className="flex items-center gap-2 flex-wrap">
+                <StatusChip intent="info" variant="soft" label={formatRole(user.role ?? "")} />
+                <StatusChip intent="muted" variant="outline" label="Policy v2.0" />
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Employee Content - Rendered on server if applicable */}
-        {showEmployeeContent ? (
-          <ControlCenterClientWithBalances 
-            onClose={onClose} 
-            balances={{ earned, casual, medical }} 
-            user={user}
-          />
-        ) : (
-          <div className="text-center py-8">
-            <p className="text-sm text-muted-foreground mb-4">
-              Executive view - organizational metrics available in dashboard
-            </p>
-            <a href="/dashboard">
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={onClose}
-              >
-                <User className="h-4 w-4" />
-                Go to Dashboard
-              </Button>
-            </a>
+          {/* Employee Content - Rendered on server if applicable */}
+          {showEmployeeContent ? (
+            <ControlCenterClientWithBalances 
+              onClose={onClose} 
+              balances={{ earned, casual, medical }} 
+              user={user}
+            />
+          ) : (
+            <div className="text-center py-6 space-y-4">
+              <p className="body-muted">
+                Executive view — organizational metrics available in dashboard
+              </p>
+              <a href="/dashboard">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  onClick={onClose}
+                >
+                  <User className="h-4 w-4" />
+                  Go to Dashboard
+                </Button>
+              </a>
+            </div>
+          )}
+
+          {/* Logout Button - Client component for interactivity */}
+          <div className="pt-4 border-t border-border/60 flex justify-end">
+            <ClientLogoutButton onClose={onClose} />
           </div>
-        )}
-
-        {/* Logout Button - Client component for interactivity */}
-        <div className="mt-6 pt-4 border-t border-border/50 flex justify-end">
-          <ClientLogoutButton onClose={onClose} />
-        </div>
+        </ModalShell>
       </DialogContent>
     </Dialog>
   );
@@ -157,13 +190,7 @@ function ControlCenterClientWithBalances({
       .slice(0, 5)
       .map((leave: any) => ({
         ...leave,
-        statusIcon: leave.status === "APPROVED" ? CheckCircle2 :
-                     leave.status === "PENDING" || leave.status === "SUBMITTED" ? AlertCircle :
-                     leave.status === "REJECTED" || leave.status === "CANCELLED" ? XCircle : AlertCircle,
-        statusColor: leave.status === "APPROVED" ? "text-data-success dark:text-data-success" :
-                     leave.status === "PENDING" || leave.status === "SUBMITTED" ? "text-data-warning dark:text-data-warning" :
-                     leave.status === "REJECTED" || leave.status === "CANCELLED" ? "text-data-error dark:text-data-error" :
-                     "text-muted-foreground",
+        statusMeta: getStatusMeta(leave.status),
       }));
   }, [leavesData]);
 
@@ -173,13 +200,13 @@ function ControlCenterClientWithBalances({
     <>
       {/* Tabs Navigation - Client for interactivity */}
       {showEmployeeContent && (
-        <div className="flex gap-1 mb-4 p-1 bg-muted/30 rounded-lg">
+        <div className="flex gap-1 mb-4 p-1 bg-surface-2 border border-outline/60 dark:border-border/60 rounded-xl">
           <button
             onClick={() => setActiveTab("balance")}
             className={cn(
-              "flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all",
+              "flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-all",
               activeTab === "balance"
-                ? "bg-background text-foreground shadow-sm"
+                ? "bg-surface-1 text-foreground shadow-sm border border-outline/60 dark:border-border/60"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -188,9 +215,9 @@ function ControlCenterClientWithBalances({
           <button
             onClick={() => setActiveTab("actions")}
             className={cn(
-              "flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all",
+              "flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-all",
               activeTab === "actions"
-                ? "bg-background text-foreground shadow-sm"
+                ? "bg-surface-1 text-foreground shadow-sm border border-outline/60 dark:border-border/60"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -199,9 +226,9 @@ function ControlCenterClientWithBalances({
           <button
             onClick={() => setActiveTab("recent")}
             className={cn(
-              "flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all",
+              "flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-all",
               activeTab === "recent"
-                ? "bg-background text-foreground shadow-sm"
+                ? "bg-surface-1 text-foreground shadow-sm border border-outline/60 dark:border-border/60"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -294,34 +321,45 @@ function ControlCenterClientWithBalances({
         {activeTab === "recent" && (
           <div className="space-y-2 max-h-[280px] overflow-y-auto">
             {recentLeaves.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">
-                No recent leave requests
-              </p>
+              <EmptyState
+                title="No recent leave requests"
+                description="When you apply for leave, it will appear here with status updates."
+                icon={Calendar}
+                className="border-none bg-transparent shadow-none py-6"
+              />
             ) : (
               recentLeaves.map((leave: any) => {
-                const StatusIcon = leave.statusIcon;
+                const meta = leave.statusMeta;
+                const MetaIcon = meta.icon;
                 return (
-                  <div
+                  <button
+                    type="button"
                     key={leave.id}
-                    className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors text-sm"
+                    className="flex w-full items-start gap-3 rounded-xl border border-outline/50 bg-surface-1 p-3 text-left text-sm transition-colors hover:bg-surface-2 dark:border-border/70"
                     onClick={() => {
                       onClose();
                       router.push(`/leaves?highlight=${leave.id}`);
                     }}
                   >
-                    <StatusIcon className={cn("h-4 w-4 mt-0.5 flex-shrink-0", leave.statusColor)} />
-                    <div className="flex-1 min-w-0">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-foreground border border-outline/50 dark:border-border/60">
+                      <MetaIcon className="h-4 w-4" />
+                    </span>
+                    <div className="flex-1 min-w-0 space-y-1">
                       <p className="font-medium text-foreground capitalize">
-                        {leave.type.toLowerCase()} Leave
+                        {leave.type.toLowerCase()} leave
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
                       </p>
-                      <p className="text-xs font-medium mt-1 capitalize" style={{ color: 'inherit' }}>
-                        {leave.status.toLowerCase().replace('_', ' ')}
-                      </p>
+                      <StatusChip
+                        intent={meta.intent}
+                        variant="soft"
+                        icon={MetaIcon}
+                        label={meta.label}
+                        className="w-fit"
+                      />
                     </div>
-                  </div>
+                  </button>
                 );
               })
             )}

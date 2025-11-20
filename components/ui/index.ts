@@ -194,3 +194,5 @@ export { SmartInput, validationRules } from "./smart-input";
 export { ModernTable, ModernTableCard } from "./modern-table";
 export { default as SmoothTab } from "../kokonutui/smooth-tab";
 export { default as EnhancedSmoothTab } from "./enhanced-smooth-tab";
+export { EmptyState } from "./empty-state";
+export { StatusChip } from "./status-chip";

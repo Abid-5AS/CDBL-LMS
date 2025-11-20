@@ -33,21 +33,67 @@ const config: Config = {
         mono: ["var(--font-mono)", ...defaultTheme.fontFamily.mono],
       },
       colors: {
-        background: "var(--color-bg)",
+        background: "var(--color-background)",
         foreground: "var(--color-foreground)",
-        surface: "var(--color-surface)",
-        border: "var(--color-border)",
-        ring: "var(--color-ring)",
+        card: {
+          DEFAULT: "var(--color-card)",
+          foreground: "var(--color-card-foreground)",
+        },
+        popover: {
+          DEFAULT: "var(--color-popover)",
+          foreground: "var(--color-popover-foreground)",
+        },
+        primary: {
+          DEFAULT: "var(--color-primary)",
+          foreground: "var(--color-primary-foreground)",
+        },
+        secondary: {
+          DEFAULT: "var(--color-secondary)",
+          foreground: "var(--color-secondary-foreground)",
+        },
+        muted: {
+          DEFAULT: "var(--color-muted)",
+          foreground: "var(--color-muted-foreground)",
+        },
+        accent: {
+          DEFAULT: "var(--color-accent)",
+          foreground: "var(--color-accent-foreground)",
+        },
         brand: {
           DEFAULT: "var(--color-primary)",
           soft: "var(--color-accent)",
           strong: "var(--color-primary)",
         },
-        accent: "var(--color-accent)",
-        success: "var(--color-success)",
-        warning: "var(--color-warning)",
-        danger: "var(--color-danger)",
-        info: "var(--color-info)",
+        destructive: {
+          DEFAULT: "var(--color-destructive)",
+          foreground: "var(--color-destructive-foreground)",
+        },
+        success: {
+          DEFAULT: "var(--color-success)",
+          foreground: "var(--color-success-foreground)",
+        },
+        warning: {
+          DEFAULT: "var(--color-warning)",
+          foreground: "var(--color-warning-foreground)",
+        },
+        danger: {
+          DEFAULT: "var(--color-danger)",
+          foreground: "var(--color-danger-foreground)",
+        },
+        info: {
+          DEFAULT: "var(--color-info)",
+          foreground: "var(--color-info-foreground)",
+        },
+        border: "var(--color-border)",
+        input: "var(--color-input)",
+        ring: "var(--color-ring)",
+        outline: "var(--color-outline)",
+        surface: {
+          DEFAULT: "var(--color-surface-1)",
+          1: "var(--color-surface-1)",
+          2: "var(--color-surface-2)",
+          3: "var(--color-surface-3)",
+        },
         sidebar: {
           DEFAULT: "var(--sidebar)",
           foreground: "var(--sidebar-foreground)",

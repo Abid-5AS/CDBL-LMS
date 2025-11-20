@@ -17,12 +17,7 @@ type LayoutWrapperProps = {
 
 function ShellBackground() {
   return (
-    <div className="shell-bg" aria-hidden="true">
-      <div className="shell-bg__layer shell-bg__layer--gradient" />
-      <div className="shell-bg__layer shell-bg__layer--grid" />
-      <div className="shell-bg__blob shell-bg__blob--left" />
-      <div className="shell-bg__blob shell-bg__blob--right" />
-    </div>
+    <div className="absolute inset-0 bg-background" aria-hidden="true" />
   );
 }
 
@@ -59,14 +54,14 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
       <SelectionProvider>
         <LeaveDataProvider>
           <div
-            className="relative flex min-h-screen w-full flex-col overflow-hidden"
+            className="relative flex min-h-screen w-full flex-col overflow-hidden bg-background"
             suppressHydrationWarning
           >
             <ShellBackground />
             <Navbar />
             <main
               className={cn(
-                "relative z-10 flex-1",
+                "relative z-10 flex-1 bg-transparent",
                 "pt-[88px] sm:pt-[96px] pb-4"
               )}
               role="main"

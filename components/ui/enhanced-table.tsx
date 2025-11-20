@@ -25,11 +25,11 @@ function EnhancedTable({
   ...props 
 }: EnhancedTableProps) {
   return (
-    <Card className={cn("overflow-hidden border shadow-sm", containerClassName)}>
+    <Card className={cn("overflow-hidden border border-outline/60 dark:border-border bg-surface-1 shadow-card", containerClassName)}>
       <CardContent className="p-0">
         <Table 
           className={cn(
-            "w-full caption-bottom text-sm",
+            "w-full caption-bottom text-sm text-foreground",
             className
           )} 
           {...props}
@@ -46,8 +46,8 @@ function EnhancedTableHeader({ className, ...props }: React.ComponentProps<"thea
   return (
     <TableHeader
       className={cn(
-        "[&_tr]:border-b [&_tr]:bg-bg-muted/30 dark:[&_tr]:bg-bg-muted/20",
-        "[&_tr]:border-border-strong dark:[&_tr]:border-border-strong/20",
+        "[&_tr]:border-b [&_tr]:border-outline/60 dark:[&_tr]:border-border/60",
+        "[&_tr]:bg-surface-2",
         "[&_tr]:sticky [&_tr]:top-0 [&_tr]:z-10",
         className
       )}
@@ -62,9 +62,8 @@ function EnhancedTableHead({ className, ...props }: React.ComponentProps<"th">) 
     <TableHead
       className={cn(
         "text-foreground h-12 px-4 text-left align-middle font-medium text-xs",
-        "text-text-secondary dark:text-text-secondary",
+        "text-muted-foreground",
         "whitespace-nowrap [&:has([role=checkbox])]:pr-0",
-        "bg-bg-muted/30 dark:bg-bg-muted/20",
         className
       )}
       {...props}
@@ -78,8 +77,8 @@ function EnhancedTableBody({ className, ...props }: React.ComponentProps<"tbody"
     <TableBody
       className={cn(
         "[&_tr:last-child]:border-0",
-        "[&_tr:hover]:bg-bg-secondary/50 dark:[&_tr:hover]:bg-bg-secondary/30",
-        "[&_tr:nth-child(even)]:bg-bg-primary dark:[&_tr:nth-child(even)]:bg-bg-secondary/20",
+        "[&_tr:hover]:bg-surface-2",
+        "[&_tr:nth-child(even)]:bg-surface-1",
         className
       )}
       {...props}
@@ -92,10 +91,10 @@ function EnhancedTableRow({ className, ...props }: React.ComponentProps<"tr">) {
   return (
     <TableRow
       className={cn(
-        "border-b border-border-strong/20 dark:border-border-strong/10",
-        "hover:bg-bg-secondary/50 dark:hover:bg-bg-secondary/30",
+        "border-b border-outline/60 dark:border-border/60",
+        "hover:bg-surface-2",
         "transition-colors duration-150",
-        "data-[state=selected]:bg-card-action/10 dark:data-[state=selected]:bg-card-action/20",
+        "data-[state=selected]:bg-surface-3",
         className
       )}
       {...props}
@@ -109,7 +108,7 @@ function EnhancedTableCell({ className, ...props }: React.ComponentProps<"td">) 
     <TableCell
       className={cn(
         "px-4 py-3 align-middle text-sm",
-        "text-text-secondary dark:text-text-primary",
+        "text-foreground",
         "[&:has([role=checkbox])]:pr-0",
         className
       )}
