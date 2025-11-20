@@ -35,9 +35,9 @@ export async function changeLeaveType(
     const leave = await prisma.leaveRequest.findUnique({
       where: { id: leaveId },
       include: {
-        requestedBy: true,
+        requester: true,
         approvals: {
-          orderBy: { createdAt: "asc" },
+          orderBy: { id: "asc" },
         },
       },
     });
@@ -63,7 +63,7 @@ export async function changeLeaveType(
     }
 
     // Verify user has permission to approve (can change type)
-    const canApprove = await verifyApprovalPermission(leave, user.id);
+    const canApprove = await verifyApprovalPermission(leave, parseInt(user.id));
     if (!canApprove) {
       return {
         success: false,
@@ -72,14 +72,14 @@ export async function changeLeaveType(
     }
 
     // Check employee balance for new type
-    const employeeId = leave.requestedById;
-    const year = new Date(leave.start).getFullYear();
+    const employeeId = leave.requesterId;
+    const year = new Date(leave.startDate).getFullYear();
     
-    const balance = await prisma.leaveBalance.findFirst({
+    const balance = await prisma.balance.findFirst({
       where: {
-        employeeId,
-        year,
+        userId: employeeId,
         type: newType,
+        year,
       },
     });
 
@@ -91,10 +91,10 @@ export async function changeLeaveType(
     }
 
     const requestedDays = leave.workingDays;
-    if (balance.remaining < requestedDays) {
+    if (balance.closing < requestedDays) {
       return {
         success: false,
-        error: `Insufficient ${newType} balance. Employee has ${balance.remaining} days, but requesting ${requestedDays} days.`,
+        error: `Insufficient ${newType} balance. Employee has ${balance.closing} days, but requesting ${requestedDays} days.`,
       };
     }
 
@@ -105,20 +105,18 @@ export async function changeLeaveType(
         where: { id: leaveId },
         data: {
           type: newType,
-          originalType: leave.type, // Store original for audit
         },
       });
 
       // Add approval comment documenting the change
       await tx.approval.create({
         data: {
-          leaveRequestId: leaveId,
-          approverId: user.id,
-          status: "COMMENTED",
+          leaveId: leaveId,
+          approverId: parseInt(user.id),
+          decision: "PENDING",
           comment: `Leave type changed from ${leave.type} to ${newType}. Reason: ${reason.trim()}`,
-          actionDate: new Date(),
-          roleAtApproval: user.role,
-          stageIndex: leave.currentStageIndex,
+          decidedAt: new Date(),
+          step: leave.approvals.length + 1,
         },
       });
     });
@@ -159,11 +157,10 @@ export async function changeLeaveType(
  */
 async function verifyApprovalPermission(
   leave: any,
-  userId: string
+  userId: number
 ): Promise<boolean> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    include: { department: true },
   });
 
   if (!user) return false;
@@ -173,12 +170,13 @@ async function verifyApprovalPermission(
     return true;
   }
 
-  // Department Head can modify leaves in their department
+  // Department Head can modify leaves in their department  
   if (user.role === "DEPT_HEAD") {
     const requester = await prisma.user.findUnique({
-      where: { id: leave.requestedById },
+      where: { id: leave.requesterId },
+      select: { department: true },
     });
-    return requester?.departmentId === user.departmentId;
+    return requester?.department === user.department;
   }
 
   return false;

@@ -1,204 +1,76 @@
 "use client";
 
-import { ArrowRight, RotateCcw, X, Check } from "lucide-react";
+import { CheckCircle, XCircle, Forward, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export type ApprovalAction = "forward" | "return" | "cancel" | "approve" | "reject";
+export type ApprovalAction = "approve" | "reject" | "forward" | "return";
 
-interface ApprovalActionButtonsProps {
-  onForward?: () => void;
-  onReturn?: () => void;
-  onCancel?: () => void;
-  onApprove?: () => void;
-  onReject?: () => void;
+type ApprovalActionButtonsProps = {
+  onAction: (action: ApprovalAction) => void;
   disabled?: boolean;
-  loading?: boolean;
-  loadingAction?: ApprovalAction | null;
-  /** Show only CEO actions (approve/cancel) */
-  ceoMode?: boolean;
-  /** Show employee mode (cancel only) */
-  employeeMode?: boolean;
-  /** Button size variant */
-  size?: "default" | "sm";
-  className?: string;
-}
+  hideForward?: boolean;
+  hideReturn?: boolean;
+  hideDanger?: boolean;
+};
 
 export function ApprovalActionButtons({
-  onForward,
-  onReturn,
-  onCancel,
-  onApprove,
-  onReject,
+  onAction,
   disabled = false,
-  loading = false,
-  loadingAction = null,
-  ceoMode = false,
-  employeeMode = false,
-  size = "default",
-  className = "",
+  hideForward = false,
+  hideReturn = false,
+  hideDanger = false,
 }: ApprovalActionButtonsProps) {
-  const buttonSize = size === "sm" ? "h-10 w-10" : "h-12 w-12";
-  const iconSize = size === "sm" ? "h-4 w-4" : "h-5 w-5";
-  const gap = size === "sm" ? "gap-2" : "gap-2.5";
-  // Employee: Only cancel
-  if (employeeMode) {
-    return (
-      <div className={`flex items-center ${gap} ${className}`}>
-        {onCancel && (
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={onCancel}
-            disabled={disabled || loading}
-            className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-red-500/50 hover:bg-red-500/5 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(239,68,68,0.15)]`}
-            title="Cancel Request"
-          >
-            <X
-              className={`${iconSize} text-red-600 dark:text-red-400 transition-colors`}
-            />
-          </Button>
-        )}
-      </div>
-    );
-  }
-
-  // CEO: Approve + Reject + Cancel
-  if (ceoMode) {
-    return (
-      <div className={`flex items-center ${gap} ${className}`}>
-        {onApprove && (
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={onApprove}
-            disabled={disabled || loading}
-            className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-green-500/50 hover:bg-green-500/5 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(34,197,94,0.15)]`}
-            title="Approve"
-          >
-            <Check
-              className={`${iconSize} text-green-600 dark:text-green-400 transition-colors`}
-            />
-          </Button>
-        )}
-        {onReject && (
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={onReject}
-            disabled={disabled || loading}
-            className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-red-500/50 hover:bg-red-500/5 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(239,68,68,0.15)]`}
-            title="Reject"
-          >
-            {loadingAction === "reject" ? (
-              <div
-                className={`${iconSize} animate-spin rounded-full border-2 border-red-600 border-t-transparent`}
-              />
-            ) : (
-              <X
-                className={`${iconSize} text-red-600 dark:text-red-400 transition-colors`}
-              />
-            )}
-          </Button>
-        )}
-        {onCancel && (
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={onCancel}
-            disabled={disabled || loading}
-            className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-gray-500/50 hover:bg-gray-500/5 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(107,114,128,0.15)]`}
-            title="Cancel Request"
-          >
-            <X
-              className={`${iconSize} text-gray-600 dark:text-gray-400 transition-colors`}
-            />
-          </Button>
-        )}
-      </div>
-    );
-  }
-
-  // All other roles (DEPT_HEAD, HR_ADMIN, HR_HEAD): Forward, Return, Cancel
   return (
-    <div className={`flex items-center ${gap} ${className}`}>
-      {onForward && (
+    <div className="flex items-center gap-2 flex-wrap">
+      {/* Approve Button */}
+      <Button
+        onClick={() => onAction("approve")}
+        disabled={disabled}
+        size="sm"
+        className="bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
+      >
+        <CheckCircle className="h-4 w-4 mr-2" />
+        Approve
+      </Button>
+
+      {/* Forward Button */}
+      {!hideForward && (
         <Button
-          size="icon"
-          variant="ghost"
-          onClick={onForward}
-          disabled={disabled || loading}
-          className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-[rgb(91,94,252)]/50 hover:bg-[rgba(91,94,252,0.05)] transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(91,94,252,0.2)]`}
-          title="Forward to Next Stage"
+          onClick={() => onAction("forward")}
+          disabled={disabled}
+          size="sm"
+          variant="outline"
         >
-          {loadingAction === "forward" ? (
-            <div
-              className={`${iconSize} animate-spin rounded-full border-2 border-[rgb(91,94,252)] border-t-transparent`}
-            />
-          ) : (
-            <ArrowRight
-              className={`${iconSize} text-[rgb(91,94,252)] transition-colors`}
-            />
-          )}
+          <Forward className="h-4 w-4 mr-2" />
+          Forward
         </Button>
       )}
-      {onReturn && (
+
+      {/* Return for Modification Button */}
+      {!hideReturn && (
         <Button
-          size="icon"
-          variant="ghost"
-          onClick={onReturn}
-          disabled={disabled || loading}
-          className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-amber-500/50 hover:bg-amber-500/5 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(245,158,11,0.15)]`}
-          title="Return for Modification"
+          onClick={() => onAction("return")}
+          disabled={disabled}
+          size="sm"
+          variant="outline"
+          className="border-amber-500 text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950/20"
         >
-          {loadingAction === "return" ? (
-            <div
-              className={`${iconSize} animate-spin rounded-full border-2 border-amber-600 border-t-transparent`}
-            />
-          ) : (
-            <RotateCcw
-              className={`${iconSize} text-amber-600 dark:text-amber-400 transition-colors`}
-            />
-          )}
+          <RotateCcw className="h-4 w-4 mr-2" />
+          Return
         </Button>
       )}
-      {onReject && (
+
+      {/* Reject Button */}
+      {!hideDanger && (
         <Button
-          size="icon"
-          variant="ghost"
-          onClick={onReject}
-          disabled={disabled || loading}
-          className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-red-500/50 hover:bg-red-500/5 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(239,68,68,0.15)]`}
-          title="Reject Request"
+          onClick={() => onAction("reject")}
+          disabled={disabled}
+          size="sm"
+          variant="outline"
+          className="border-red-500 text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/20"
         >
-          {loadingAction === "reject" ? (
-            <div
-              className={`${iconSize} animate-spin rounded-full border-2 border-red-600 border-t-transparent`}
-            />
-          ) : (
-            <X
-              className={`${iconSize} text-red-600 dark:text-red-400 transition-colors`}
-            />
-          )}
-        </Button>
-      )}
-      {onCancel && (
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={onCancel}
-          disabled={disabled || loading}
-          className={`group ${buttonSize} rounded-xl border border-[var(--shell-card-border)] bg-[var(--color-card-elevated)] hover:border-gray-500/50 hover:bg-gray-500/5 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(107,114,128,0.15)]`}
-          title="Cancel Request"
-        >
-          {loadingAction === "cancel" ? (
-            <div
-              className={`${iconSize} animate-spin rounded-full border-2 border-gray-600 border-t-transparent`}
-            />
-          ) : (
-            <X
-              className={`${iconSize} text-gray-600 dark:text-gray-400 transition-colors`}
-            />
-          )}
+          <XCircle className="h-4 w-4 mr-2" />
+          Reject
         </Button>
       )}
     </div>
