@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import {
-  GlassModal,
-  GlassModalContent,
-  GlassModalHeader,
-  GlassModalTitle,
-  GlassModalDescription,
-  GlassModalFooter,
-} from "@/components/ui/glass-modal";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
@@ -145,17 +145,17 @@ export function LeaveDetailsModal({
     leave.status !== "CANCELLED";
 
   return (
-    <GlassModal open={open} onOpenChange={onOpenChange}>
-      <GlassModalContent className="max-w-3xl max-h-[90vh] overflow-y-auto [&>button]:hidden rounded-3xl bg-card border-border shadow-xl">
-        <GlassModalHeader className="pb-4 border-b border-border/50">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto [&>button]:hidden rounded-3xl bg-card border-border shadow-xl">
+        <DialogHeader className="pb-4 border-b border-border/50">
           {/* Header Row 1: Title + Status + Close Button */}
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <FileText className="h-5 w-5 text-brand shrink-0" />
               <div className="flex items-center gap-2 min-w-0">
-                <GlassModalTitle className="text-lg font-semibold text-foreground truncate">
+                <DialogTitle className="text-lg font-semibold text-foreground truncate">
                   {leaveTypeLabel[leave.type] || leave.type}
-                </GlassModalTitle>
+                </DialogTitle>
                 <StatusBadge status={leave.status} />
               </div>
             </div>
@@ -213,7 +213,7 @@ export function LeaveDetailsModal({
               </span>
             )}
           </div>
-        </GlassModalHeader>
+        </DialogHeader>
 
         <div className="space-y-5 mt-4 px-1">
           {/* Dates and Duration */}
@@ -269,7 +269,7 @@ export function LeaveDetailsModal({
         </div>
 
         {/* Footer with Actions */}
-        <GlassModalFooter className="flex justify-between items-center pt-4 border-t border-border/50 mt-6">
+        <DialogFooter className="flex justify-between items-center pt-4 border-t border-border/50 mt-6">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Close
           </Button>
@@ -315,8 +315,8 @@ export function LeaveDetailsModal({
               </Button>
             )}
           </div>
-        </GlassModalFooter>
-      </GlassModalContent>
-    </GlassModal>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import { getJwtCookieName, verifyJwt } from "@/lib/auth-jwt";
+import { getJwtCookieName, verifyJwt } from "@/lib/auth";
 
 export async function POST(req: Request) {
   const res = NextResponse.json({ ok: true });

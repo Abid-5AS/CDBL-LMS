@@ -89,7 +89,9 @@ export async function forwardLeaveRequest(leaveId: number) {
 
     // For now, delegate to existing API logic
     // In a full refactor, we'd move all the business logic here
-    const { getNextRoleInChain, getStepForRole } = await import("@/lib/workflow");
+    const { getNextRoleInChain, getStepForRole } = await import(
+      "@/lib/workflow"
+    );
 
     const nextRole = getNextRoleInChain(userRole as any, leave.type);
     if (!nextRole) {
@@ -220,11 +222,7 @@ export async function rejectLeaveRequest(leaveId: number, comment?: string) {
     });
 
     // Send notification email to requester
-    await NotificationService.notifyLeaveRejected(
-      leaveId,
-      user.name,
-      comment
-    );
+    await NotificationService.notifyLeaveRejected(leaveId, user.name, comment);
 
     // Automatic cache invalidation
     revalidatePath("/approvals");
@@ -282,11 +280,7 @@ export async function returnLeaveForModification(
     });
 
     // Send notification email to requester
-    await NotificationService.notifyLeaveReturned(
-      leaveId,
-      user.name,
-      comment
-    );
+    await NotificationService.notifyLeaveReturned(leaveId, user.name, comment);
 
     // Automatic cache invalidation
     revalidatePath("/approvals");
@@ -348,9 +342,12 @@ export async function bulkApproveLeaveRequests(leaveIds: number[]) {
 
 /**
  * Bulk reject leave requests
- * Uses: POST /api/leaves/bulk/reject
+ * Replaces: POST /api/leaves/bulk/reject
  */
-export async function bulkRejectLeaveRequests(leaveIds: number[], reason: string) {
+export async function bulkRejectLeaveRequests(
+  leaveIds: number[],
+  reason: string
+) {
   try {
     const user = await getCurrentUser();
     if (!user) {
@@ -358,23 +355,23 @@ export async function bulkRejectLeaveRequests(leaveIds: number[], reason: string
     }
 
     if (!reason || reason.trim().length < 5) {
-      return { success: false, error: "Rejection reason is required (minimum 5 characters)" };
+      return {
+        success: false,
+        error: "Rejection reason is required (minimum 5 characters)",
+      };
     }
 
-    const response = await fetch("/api/leaves/bulk/reject", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ ids: leaveIds, reason: reason.trim() }),
-    });
+    let rejected = 0;
+    let failed = 0;
 
-    if (!response.ok) {
-      const data = await response.json();
-      return { success: false, error: data.error || "Failed to reject requests" };
+    for (const leaveId of leaveIds) {
+      const result = await LeaveService.rejectLeave(leaveId, user.id, reason);
+      if (result.success) {
+        rejected++;
+      } else {
+        failed++;
+      }
     }
-
-    const data = await response.json();
 
     // Automatic cache invalidation
     revalidatePath("/approvals");
@@ -384,8 +381,8 @@ export async function bulkRejectLeaveRequests(leaveIds: number[], reason: string
 
     return {
       success: true,
-      rejected: data.rejected || 0,
-      failed: data.failed || 0,
+      rejected,
+      failed,
     };
   } catch (error) {
     console.error("bulkRejectLeaveRequests error:", error);

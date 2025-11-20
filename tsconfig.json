@@ -6,8 +6,8 @@
       "dom.iterable",
       "esnext"
     ],
-    "allowJs": true,
-    "skipLibCheck": true,
+    "allowJs": false,
+    "skipLibCheck": false,
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
@@ -37,15 +37,18 @@
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
+    "app",
+    "components",
+    "constants",
+    "context",
+    "hooks",
+    "lib",
+    "prisma",
+    "scripts",
+    "tests",
+    "types",
     ".next-dev/types/**/*.ts",
-    ".next-dev/dev/types/**/*.ts",
-    ".next-dev\\dev/types/**/*.ts",
-    ".next-dev\\dev/types/**/*.ts",
-    ".next/dev/dev/types/**/*.ts"
+    ".next-dev/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

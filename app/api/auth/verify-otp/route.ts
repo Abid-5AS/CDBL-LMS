@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { signJwt, getJwtCookieName } from "@/lib/auth-jwt";
+import { signJwt, getJwtCookieName } from "@/lib/auth";
 import { verifyOtpCode } from "@/lib/otp";
 
 export const cache = "no-store";
@@ -75,7 +75,12 @@ export async function POST(req: Request) {
     // Return success response with user data
     const res = NextResponse.json({
       ok: true,
-      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
 
     // Set session token cookie
@@ -88,6 +93,9 @@ export async function POST(req: Request) {
     return res;
   } catch (error) {
     console.error("OTP verification error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

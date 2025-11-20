@@ -8,7 +8,7 @@ import { canEditEmployee } from "@/lib/rbac";
 import { Button, Badge } from "@/components/ui";
 import { EmployeeProfileCard } from "./EmployeeProfileCard";
 import { LeaveHistoryTable } from "./LeaveHistoryTable";
-import { HRStatCards } from "@/components/HRStatCards";
+import { ModernHRStatCards } from "@/components/ModernHRStatCards";
 import { Pencil } from "lucide-react";
 
 type EmployeeDetailViewProps = {
@@ -28,7 +28,7 @@ const getRoleBadgeVariant = (role: AppRole) => {
     case "DEPT_HEAD":
       return "bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800";
     case "EMPLOYEE":
-      return "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-900/20 dark:text-slate-400 dark:border-slate-800";
+      return "bg-secondary text-secondary-foreground border-secondary dark:bg-secondary/20 dark:text-secondary-foreground dark:border-secondary";
     case "SYSTEM_ADMIN":
       return "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800";
   }
@@ -81,7 +81,7 @@ export function EmployeeDetailView({
       </nav>
 
       {/* Header with employee info */}
-      <div className="neo-card p-6">
+      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
         <div className="flex items-start justify-between flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <h1 className="text-2xl font-semibold text-foreground">
@@ -147,7 +147,7 @@ export function EmployeeDetailView({
           <h2 className="text-lg font-semibold text-foreground mb-4">
             Leave Statistics
           </h2>
-          <HRStatCards stats={employee.stats} />
+          <ModernHRStatCards stats={employee.stats} />
         </div>
       )}
 

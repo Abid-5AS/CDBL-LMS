@@ -46,14 +46,11 @@ function Dashboard() {
 import { useOptimizedAPI } from "@/hooks";
 
 function UserList() {
-  const { data, loading, error } = useOptimizedAPI<User[]>(
-    "/api/users",
-    {
-      deduplication: true,
-      memoization: true,
-      autoFetch: true,
-    }
-  );
+  const { data, loading, error } = useOptimizedAPI<User[]>("/api/users", {
+    deduplication: true,
+    memoization: true,
+    autoFetch: true,
+  });
 
   return <div>{/* render users */}</div>;
 }
@@ -94,11 +91,13 @@ The system targets these Core Web Vitals:
 ### 1. Metrics Collection & Monitoring
 
 **Files:**
+
 - `lib/performance/metrics.ts` - Core metrics collection
 - `lib/performance/monitoring.ts` - Web Vitals tracking
 - `hooks/usePerformanceMonitor.ts` - React hook
 
 **Features:**
+
 - Automatic Web Vitals tracking (LCP, FID, CLS, FCP, TTFB)
 - Custom metric recording
 - Component render time tracking
@@ -115,7 +114,7 @@ import {
   recordWebVital,
   recordCustomMetric,
   recordRenderMetric,
-  recordApiMetric
+  recordApiMetric,
 } from "@/lib/performance";
 
 // Record metrics
@@ -131,10 +130,12 @@ const { metrics, areMetricsHealthy, getHealthScore } = usePerformanceMonitor();
 ### 2. Bundle Analysis & Optimization
 
 **Files:**
+
 - `lib/performance/bundleAnalysis.ts` - Bundle size analysis
 - `lib/performance/treeshaking.ts` - Tree-shaking utilities
 
 **Features:**
+
 - Bundle size analysis by type
 - Code composition breakdown
 - Tree-shaking detection
@@ -149,7 +150,7 @@ const { metrics, areMetricsHealthy, getHealthScore } = usePerformanceMonitor();
 import {
   analyzeBundleSize,
   estimateBundleReductionPotential,
-  generateTreeShakingReport
+  generateTreeShakingReport,
 } from "@/lib/performance";
 
 const analysis = analyzeBundleSize();
@@ -164,11 +165,13 @@ console.log(generateTreeShakingReport());
 ### 3. Caching Strategies
 
 **Files:**
+
 - `lib/cache/strategies.ts` - LRU and TTL caching
 - `lib/cache/invalidation.ts` - Invalidation management
 - `hooks/useCache.ts` - React hooks
 
 **Strategies Implemented:**
+
 - **LRU Cache**: Least Recently Used with size limits
 - **TTL Cache**: Time-To-Live based expiration
 - **Write-Through**: Immediate consistency
@@ -205,10 +208,12 @@ const { fetchAndCache, loading } = useAsyncCache<User>({
 ### 4. Lazy Loading & Code Splitting
 
 **Files:**
+
 - `lib/performance/lazyLoading.ts` - Dynamic imports
 - `lib/performance/codeSplitting.ts` - Chunk optimization
 
 **Features:**
+
 - Dynamic module import tracking
 - Route-based code splitting
 - Component lazy loading
@@ -224,7 +229,7 @@ import {
   dynamicImport,
   preloadRoute,
   createRoutePrefetcher,
-  preloadCriticalResources
+  preloadCriticalResources,
 } from "@/lib/performance";
 
 // Dynamic imports with tracking
@@ -251,10 +256,12 @@ preloadCriticalResources([
 ### 5. API Optimization
 
 **Files:**
+
 - `lib/api/optimization.ts` - Request optimization
 - `hooks/useOptimizedAPI.ts` - React hook
 
 **Features:**
+
 - Request deduplication
 - Request batching
 - API memoization
@@ -269,8 +276,8 @@ import { useOptimizedAPI } from "@/hooks";
 import {
   RequestDeduplicator,
   APIMemoizer,
-  ConnectionPool
-} from "@/lib/api";
+  ConnectionPool,
+} from "@/lib/apiClient";
 
 // Simple hook usage
 const { data, loading, error, refetch } = useOptimizedAPI<User[]>(
@@ -284,20 +291,20 @@ const { data, loading, error, refetch } = useOptimizedAPI<User[]>(
 
 // Or use directly
 const deduplicator = new RequestDeduplicator();
-const result = await deduplicator.execute(
-  "/api/users",
-  "GET",
-  () => fetch("/api/users").then(r => r.json())
+const result = await deduplicator.execute("/api/users", "GET", () =>
+  fetch("/api/users").then((r) => r.json())
 );
 ```
 
 ### 6. Image Optimization
 
 **Files:**
+
 - `lib/performance/imageOptimization.ts` - Image utilities
 - `components/images/OptimizedImage.tsx` - React component
 
 **Features:**
+
 - Responsive image srcSet generation
 - Multi-format support (AVIF, WebP, JPEG)
 - Quality optimization
@@ -312,7 +319,7 @@ const result = await deduplicator.execute(
 import { OptimizedImage } from "@/components/images";
 import {
   getResponsiveImageSrcSet,
-  generatePictureElement
+  generatePictureElement,
 } from "@/lib/performance";
 
 // Component usage
@@ -325,7 +332,7 @@ import {
   priority={false}
   trackMetrics={true}
   blurPlaceholder={true}
-/>
+/>;
 
 // Utility usage
 const srcSet = getResponsiveImageSrcSet("/images/photo.jpg");
@@ -350,7 +357,7 @@ function ExpensiveComponent() {
   useEffect(() => {
     const cached = get("component-data");
     if (!cached) {
-      fetchData().then(data => set("component-data", data));
+      fetchData().then((data) => set("component-data", data));
     }
   }, []);
 }
@@ -388,7 +395,7 @@ function UserList() {
 
   return (
     <div>
-      {data?.map(user => (
+      {data?.map((user) => (
         <OptimizedImage
           key={user.id}
           src={user.avatar}
@@ -407,14 +414,11 @@ function UserList() {
 
 ```typescript
 function DataFetcher() {
-  const { data, error, refetch } = useOptimizedAPI(
-    "/api/critical-data",
-    {
-      retry: true,
-      maxRetries: 3,
-      autoFetch: true,
-    }
-  );
+  const { data, error, refetch } = useOptimizedAPI("/api/critical-data", {
+    retry: true,
+    maxRetries: 3,
+    autoFetch: true,
+  });
 
   if (error) {
     return <button onClick={() => refetch()}>Retry</button>;
@@ -503,7 +507,7 @@ const analysis = exportBundleAnalysis();
 ```typescript
 import {
   analyzeImagePerformance,
-  generateImageOptimizationReport
+  generateImageOptimizationReport,
 } from "@/lib/performance";
 
 const perf = analyzeImagePerformance();
@@ -534,9 +538,9 @@ useEffect(() => {
 ```typescript
 // In your analytics service
 trackEvent("performance", {
-  lcp: metrics.webVitals.find(v => v.name === "LCP")?.value,
-  fid: metrics.webVitals.find(v => v.name === "FID")?.value,
-  cls: metrics.webVitals.find(v => v.name === "CLS")?.value,
+  lcp: metrics.webVitals.find((v) => v.name === "LCP")?.value,
+  fid: metrics.webVitals.find((v) => v.name === "FID")?.value,
+  cls: metrics.webVitals.find((v) => v.name === "CLS")?.value,
   timestamp: Date.now(),
 });
 ```
@@ -549,22 +553,22 @@ Update `constants/performance.ts` to customize:
 
 ```typescript
 export const WEB_VITALS_TARGETS = {
-  LCP: 2500,  // 2.5s
-  FID: 100,   // 100ms
-  CLS: 0.1,   // 0.1 score
+  LCP: 2500, // 2.5s
+  FID: 100, // 100ms
+  CLS: 0.1, // 0.1 score
   // ...
 };
 
 export const PERFORMANCE_THRESHOLDS = {
-  componentRender: 50,      // 50ms
-  apiResponse: 1000,        // 1s
+  componentRender: 50, // 50ms
+  apiResponse: 1000, // 1s
   componentRenderError: 100, // 100ms
   // ...
 };
 
 export const CACHE_CONFIG = {
-  defaultTTL: 300000,       // 5 minutes
-  maxCacheSize: 5242880,    // 5MB
+  defaultTTL: 300000, // 5 minutes
+  maxCacheSize: 5242880, // 5MB
   // ...
 };
 ```

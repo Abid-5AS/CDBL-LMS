@@ -2,21 +2,24 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
-import { neoInput } from "@/lib/neo-design";
 
 const inputVariants = cva(
   "flex w-full text-foreground transition-all file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 touch-target",
   {
     variants: {
       variant: {
-        default: neoInput.base,
+        default:
+          "rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         filled:
           "border-transparent bg-muted/60 dark:bg-muted/40 shadow-sm focus-visible:bg-background focus-visible:border-primary/60 focus-visible:ring-4 focus-visible:ring-primary/20 hover:bg-muted/80 dark:hover:bg-muted/60",
         ghost:
           "border-transparent shadow-none focus-visible:border-primary/60 focus-visible:ring-4 focus-visible:ring-primary/20 hover:bg-muted/40",
-        glass: neoInput.base,
-        error: neoInput.error,
-        success: neoInput.success,
+        glass:
+          "rounded-md border border-input bg-background/50 px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 backdrop-blur-sm",
+        error:
+          "rounded-md border border-destructive bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2 text-destructive placeholder:text-destructive/50",
+        success:
+          "rounded-md border border-emerald-500 bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 text-emerald-600 placeholder:text-emerald-600/50",
       },
       size: {
         sm: "h-9 px-3 py-2 text-sm rounded-lg",
@@ -32,7 +35,7 @@ const inputVariants = cva(
 );
 
 interface InputProps
-  extends React.ComponentProps<"input">,
+  extends Omit<React.ComponentProps<"input">, "size">,
     VariantProps<typeof inputVariants> {
   label?: string;
   helperText?: string;

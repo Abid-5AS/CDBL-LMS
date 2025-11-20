@@ -34,7 +34,7 @@ export { useUser } from "./user-context";
 // - leave-days.ts - Leave calculations
 // - role-ui.ts - Role display helpers
 // - navigation.ts - Navigation config
-// - auth.ts, auth-jwt.ts - Auth functions
+// - auth.ts - Auth functions
 // - policy.ts - Policy logic
 // - session.ts - Session management
 // - storage.ts - File storage

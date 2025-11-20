@@ -49,7 +49,6 @@ import {
 } from "@/lib";
 import type { AppRole } from "@/lib/rbac";
 import { LEAVE_TYPE_OPTIONS } from "@/lib/constants";
-import { glassCard, neoButton, neoInput } from "@/lib/neo-design";
 import { cn } from "@/lib/utils";
 
 // Local imports
@@ -76,9 +75,9 @@ type ApprovalTableProps = {
 
 function statusStyle(status: string) {
   const normalized = status.toUpperCase();
-  if (normalized === "APPROVED") return "bg-data-success";
-  if (normalized === "REJECTED") return "bg-data-error";
-  return "hover:bg-bg-secondary";
+  if (normalized === "APPROVED") return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400";
+  if (normalized === "REJECTED") return "bg-red-500/15 text-red-700 dark:text-red-400";
+  return "hover:bg-muted/50";
 }
 
 const STATUS_OPTIONS = [
@@ -444,10 +443,10 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
         if (result.success) {
           toast.success(
-            `Successfully rejected ${result.rejected} leave request(s)`,
+            `Successfully approved ${result.approved} leave request(s)`,
             {
               description:
-                result.failed > 0
+                (result.failed ?? 0) > 0
                   ? `${result.failed} request(s) could not be rejected`
                   : undefined,
             }
@@ -545,7 +544,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
   if (isLoading) {
     return (
-      <Card className={cn(glassCard.elevated, "rounded-2xl")}>
+      <Card className={cn("bg-card shadow-md border border-border", "rounded-2xl")}>
         <CardContent>
           <EmptyState
             icon={Loader2}
@@ -560,7 +559,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
   if (error) {
     return (
-      <Card className={cn(glassCard.elevated, "rounded-2xl")}>
+      <Card className={cn("bg-card shadow-md border border-border", "rounded-2xl")}>
         <CardContent>
           <EmptyState
             title="Unable to load approvals"
@@ -578,7 +577,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
   if (!items.length && displayedItems.length === 0) {
     return (
-      <Card className={cn(glassCard.elevated, "rounded-2xl")}>
+      <Card className={cn("bg-card shadow-md border border-border", "rounded-2xl")}>
         <CardContent>
           <EmptyState
             icon={CheckCircle}
@@ -659,7 +658,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
       {viewMode === "queue" && selectedIds.size > 0 && (
         <Card
           className={cn(
-            glassCard.elevated,
+            "bg-card shadow-md border border-border",
             "rounded-2xl bg-primary/5 border-primary/20"
           )}
         >
@@ -681,7 +680,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                 disabled={isPending}
                 className={cn(
                   "inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md",
-                  neoButton.success
+                  "bg-emerald-600 text-white hover:bg-emerald-700"
                 )}
               >
                 {isPending ? (
@@ -719,7 +718,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
       )}
 
       {items.length === 0 && displayedItems.length > 0 ? (
-        <Card className={cn(glassCard.elevated, "rounded-2xl")}>
+        <Card className={cn("bg-card shadow-md border border-border", "rounded-2xl")}>
           <CardContent>
             <EmptyState
               icon={FilterX}
@@ -935,7 +934,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         open={dialogState.type === "reject"}
         onOpenChange={(open) => !open && closeDialog()}
       >
-        <AlertDialogContent className={cn(glassCard.elevated, "rounded-2xl")}>
+        <AlertDialogContent className={cn("bg-card shadow-md border border-border", "rounded-2xl")}>
           <AlertDialogHeader>
             <AlertDialogTitle>Reject Leave Request?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -947,7 +946,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
           <AlertDialogFooter>
             <AlertDialogCancel
               onClick={closeDialog}
-              className={neoButton.glass}
+              className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
             >
               Cancel
             </AlertDialogCancel>
@@ -958,7 +957,6 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                 }
               }}
               className={cn(
-                neoButton.danger,
                 "bg-destructive text-destructive-foreground hover:bg-destructive/90"
               )}
             >
@@ -973,7 +971,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         open={dialogState.type === "return"}
         onOpenChange={(open) => !open && closeDialog()}
       >
-        <AlertDialogContent className={cn(glassCard.elevated, "rounded-2xl")}>
+        <AlertDialogContent className={cn("bg-card shadow-md border border-border", "rounded-2xl")}>
           <AlertDialogHeader>
             <AlertDialogTitle>Return for Modification</AlertDialogTitle>
             <AlertDialogDescription>
@@ -994,7 +992,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
               value={returnComment}
               onChange={(e) => setReturnComment(e.target.value)}
               placeholder="Please provide a clear reason for returning this request (minimum 5 characters)..."
-              className={cn("min-h-[100px]", neoInput.base)}
+              className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               aria-required="true"
               aria-describedby="return-comment-error"
             />
@@ -1011,7 +1009,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
           <AlertDialogFooter>
             <AlertDialogCancel
               onClick={closeDialog}
-              className={neoButton.glass}
+              className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
             >
               Cancel
             </AlertDialogCancel>
@@ -1040,7 +1038,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
           }
         }}
       >
-        <AlertDialogContent className={cn(glassCard.elevated, "rounded-2xl")}>
+        <AlertDialogContent className={cn("bg-card shadow-md border border-border", "rounded-2xl")}>
           <AlertDialogHeader>
             <AlertDialogTitle>Bulk Reject Leave Requests?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -1062,7 +1060,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
               value={bulkRejectReason}
               onChange={(e) => setBulkRejectReason(e.target.value)}
               placeholder="Provide a detailed reason for rejecting these leave requests..."
-              className={cn(neoInput.glass, "min-h-[100px]")}
+              className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               maxLength={500}
             />
             <p className="text-xs text-muted-foreground mt-1">
@@ -1075,7 +1073,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                 setShowBulkRejectDialog(false);
                 setBulkRejectReason("");
               }}
-              className={neoButton.glass}
+              className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
             >
               Cancel
             </AlertDialogCancel>

@@ -4,7 +4,6 @@ import type { ComponentType, CSSProperties, ReactNode } from "react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui";
 import { cn } from "@/lib/utils";
-import { glassCard } from "@/lib/neo-design";
 
 type KPICardProps = {
   title: string;
@@ -50,10 +49,10 @@ export function KPICard({
     NonNullable<typeof status> | "default",
     { label: string; color: string }
   > = {
-    healthy: { label: "On track", color: "var(--color-data-success)" },
-    low: { label: "Watch", color: "var(--color-data-warning)" },
-    critical: { label: "Critical", color: "var(--color-data-error)" },
-    default: { label: "Stable", color: "var(--color-brand)" },
+    healthy: { label: "On track", color: "#059669" }, // emerald-600
+    low: { label: "Watch", color: "#d97706" }, // amber-600
+    critical: { label: "Critical", color: "var(--destructive)" },
+    default: { label: "Stable", color: "var(--primary)" },
   };
 
   const convertBgClassToVar = (value?: string) => {
@@ -93,7 +92,7 @@ export function KPICard({
     >
       <div
         className={cn(
-          glassCard.elevated,
+          "bg-card shadow-md border border-border",
           "group relative overflow-hidden rounded-xl",
           "px-4 py-4 sm:px-5 sm:py-5",
           "transition-all duration-200 hover:shadow-lg",
@@ -107,7 +106,7 @@ export function KPICard({
         <div className="relative flex flex-col gap-3.5">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 space-y-2.5">
-              <div className="flex flex-wrap items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.35em] text-[color:var(--color-foreground-subtle)]">
+              <div className="flex flex-wrap items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.35em] text-muted-foreground">
                 <span className="text-ellipsis whitespace-nowrap">
                   {title}
                 </span>
@@ -211,4 +210,21 @@ export function KPIGrid({ children, className, columns = 3 }: KPIGridProps) {
     </div>
   );
 }
-// ...existing code from components/shared/KPICard.tsx will be moved here
+
+/**
+ * KPICardSkeleton - Loading skeleton for KPI cards
+ */
+export function KPICardSkeleton({ className }: { className?: string }) {
+  return (
+    <div className={cn("bg-card shadow-md border border-border", "rounded-xl p-6", className)}>
+      <div className="flex items-start justify-between">
+        <div className="flex-1 space-y-3">
+          <div className="h-3 w-24 animate-pulse rounded bg-muted/50" />
+          <div className="h-9 w-28 animate-pulse rounded bg-muted/50" />
+          <div className="h-4 w-32 animate-pulse rounded bg-muted/50" />
+        </div>
+        <div className="h-12 w-12 animate-pulse rounded-xl bg-muted/40" />
+      </div>
+    </div>
+  );
+}

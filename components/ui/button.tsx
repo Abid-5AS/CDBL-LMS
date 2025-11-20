@@ -5,21 +5,21 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-all duration-100 ease-out disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-[18px] [&>svg]:flex-shrink-0 [&>span]:flex-shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-all duration-100 ease-out disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-[18px] [&>svg]:flex-shrink-0 [&>span]:flex-shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
   {
     variants: {
       variant: {
         default:
-          "bg-slate-900 text-white hover:bg-slate-800 rounded-md",
+          "bg-primary text-primary-foreground hover:bg-primary/90 rounded-md",
         destructive:
-          "bg-red-700 text-white hover:bg-red-800 rounded-md",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-md",
         outline:
-          "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300 rounded-md",
+          "border border-input bg-card text-foreground hover:bg-accent hover:text-accent-foreground rounded-md",
         secondary:
-          "bg-slate-100 text-slate-900 hover:bg-slate-200 border border-slate-200 rounded-md",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-input rounded-md",
         ghost:
-          "hover:bg-slate-50 hover:text-slate-900 rounded-md",
-        link: "text-slate-900 underline-offset-4 hover:underline hover:text-slate-700",
+          "hover:bg-accent hover:text-accent-foreground rounded-md",
+        link: "text-primary underline-offset-4 hover:underline hover:text-primary/80",
       },
       size: {
         xs: "h-8 px-3 py-1.5 text-xs gap-1.5 has-[>svg]:px-2",

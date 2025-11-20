@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { checkRateLimit } from "@/lib/rateLimit";
-import { signJwt } from "@/lib/auth-jwt";
+import { signJwt } from "@/lib/auth";
 import { createOtpCode } from "@/lib/otp";
 
 export const cache = "no-store";
