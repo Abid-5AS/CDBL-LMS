@@ -71,70 +71,13 @@ export async function forwardLeaveRequest(leaveId: number) {
       return { success: false, error: "Unauthorized" };
     }
 
-    // Check if user has permission to forward
-    const userRole = user.role as string;
-    if (!["HR_ADMIN", "DEPT_HEAD"].includes(userRole)) {
-      return { success: false, error: "You cannot forward leave requests" };
-    }
+    const result = await LeaveService.forwardLeave(leaveId, user.id);
 
-    // Get the leave request
-    const leave = await prisma.leaveRequest.findUnique({
-      where: { id: leaveId },
-      include: { approvals: true },
-    });
-
-    if (!leave) {
-      return { success: false, error: "Leave request not found" };
-    }
-
-    // For now, delegate to existing API logic
-    // In a full refactor, we'd move all the business logic here
-    const { getNextRoleInChain, getStepForRole } = await import(
-      "@/lib/workflow"
-    );
-
-    const nextRole = getNextRoleInChain(userRole as any, leave.type);
-    if (!nextRole) {
-      return { success: false, error: "No next role in approval chain" };
-    }
-
-    // Update current approval to FORWARDED
-    await prisma.approval.updateMany({
-      where: {
-        leaveId,
-        approverId: user.id,
-        decision: "PENDING",
-      },
-      data: {
-        decision: "FORWARDED",
-        toRole: nextRole,
-        decidedAt: new Date(),
-      },
-    });
-
-    // Create next approval
-    const nextApprover = await prisma.user.findFirst({
-      where: { role: nextRole },
-      orderBy: { id: "asc" },
-    });
-
-    if (nextApprover) {
-      const nextStep = getStepForRole(nextRole, leave.type);
-      await prisma.approval.create({
-        data: {
-          leaveId,
-          step: nextStep,
-          approverId: nextApprover.id,
-          decision: "PENDING",
-        },
-      });
-
-      // Send notification email to new approver
-      await NotificationService.notifyLeaveForwarded(
-        leaveId,
-        nextApprover.id,
-        user.name
-      );
+    if (!result.success) {
+      return {
+        success: false,
+        error: result.error?.message || "Failed to forward request",
+      };
     }
 
     // Automatic cache invalidation
@@ -164,7 +107,7 @@ export async function approveLeaveRequest(leaveId: number, comment?: string) {
       return { success: false, error: "Unauthorized" };
     }
 
-    const result = await LeaveService.approveLeave(user.id, leaveId, comment);
+    const result = await LeaveService.approveLeave(leaveId, user.id, comment);
 
     if (!result.success) {
       return {
@@ -201,28 +144,18 @@ export async function rejectLeaveRequest(leaveId: number, comment?: string) {
       return { success: false, error: "Unauthorized" };
     }
 
-    // Update approval
-    await prisma.approval.updateMany({
-      where: {
-        leaveId,
-        approverId: user.id,
-        decision: "PENDING",
-      },
-      data: {
-        decision: "REJECTED",
-        comment,
-        decidedAt: new Date(),
-      },
-    });
+    const result = await LeaveService.rejectLeave(
+      leaveId,
+      user.id,
+      comment || "Rejected"
+    );
 
-    // Update leave status
-    await prisma.leaveRequest.update({
-      where: { id: leaveId },
-      data: { status: "REJECTED" },
-    });
-
-    // Send notification email to requester
-    await NotificationService.notifyLeaveRejected(leaveId, user.name, comment);
+    if (!result.success) {
+      return {
+        success: false,
+        error: result.error?.message || "Failed to reject leave request",
+      };
+    }
 
     // Automatic cache invalidation
     revalidatePath("/approvals");
@@ -259,28 +192,14 @@ export async function returnLeaveForModification(
       return { success: false, error: "Comment must be at least 5 characters" };
     }
 
-    // Update approval
-    await prisma.approval.updateMany({
-      where: {
-        leaveId,
-        approverId: user.id,
-        decision: "PENDING",
-      },
-      data: {
-        decision: "RETURNED",
-        comment,
-        decidedAt: new Date(),
-      },
-    });
+    const result = await LeaveService.returnLeave(leaveId, user.id, comment);
 
-    // Update leave status
-    await prisma.leaveRequest.update({
-      where: { id: leaveId },
-      data: { status: "RETURNED" },
-    });
-
-    // Send notification email to requester
-    await NotificationService.notifyLeaveReturned(leaveId, user.name, comment);
+    if (!result.success) {
+      return {
+        success: false,
+        error: result.error?.message || "Failed to return leave request",
+      };
+    }
 
     // Automatic cache invalidation
     revalidatePath("/approvals");
@@ -313,7 +232,7 @@ export async function bulkApproveLeaveRequests(leaveIds: number[]) {
     let failed = 0;
 
     for (const leaveId of leaveIds) {
-      const result = await LeaveService.approveLeave(user.id, leaveId);
+      const result = await LeaveService.approveLeave(leaveId, user.id);
       if (result.success) {
         approved++;
       } else {
