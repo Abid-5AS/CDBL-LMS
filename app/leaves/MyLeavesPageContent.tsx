@@ -57,7 +57,7 @@ import { apiFetcher } from "@/lib/apiClient";
 import Link from "next/link";
 import { Wallet, ArrowRight, CalendarPlus, Info } from "lucide-react";
 import { SortedTimelineAdapter } from "@/components/shared/timeline-adapters";
-import { LeaveSectionNav } from "@/components/layout/SectionNav";
+import { LeaveCalendarView } from "./calendar/_components/LeaveCalendarView";
 
 type LeaveRow = {
   id: number;
@@ -203,6 +203,7 @@ const ITEMS_PER_PAGE = 5;
 const VIEW_MODES = [
   { id: "table", label: "Table View", icon: Table2 },
   { id: "timeline", label: "Timeline", icon: History },
+  { id: "calendar", label: "Calendar", icon: CalendarPlus },
 ];
 type ViewMode = (typeof VIEW_MODES)[number]["id"];
 
@@ -352,7 +353,6 @@ export function MyLeavesPageContent() {
   return (
     <TooltipProvider delayDuration={100}>
       <div className="max-w-6xl mx-auto space-y-6 py-8 px-4 sm:px-6 lg:px-0">
-        <LeaveSectionNav />
         <div className="surface-card p-6 space-y-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -759,6 +759,32 @@ export function MyLeavesPageContent() {
                     }
                     onItemClick={(item) => handleTimelineItemSelect(item.id)}
                   />
+                </div>
+              )}
+              {viewMode === "calendar" && (
+                <div className="p-6">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
+                        Calendar View
+                      </p>
+                      <h2 className="text-xl font-semibold text-foreground">
+                        Leave Calendar
+                      </h2>
+                      <p className="text-sm text-muted-foreground">
+                        View your leave schedule and upcoming holidays.
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Button variant="outline" size="sm" onClick={() => setViewMode("table")}>
+                        Back to Table
+                      </Button>
+                      <Button variant="secondary" size="sm" asChild>
+                        <Link href="/leaves/apply">Apply for Leave</Link>
+                      </Button>
+                    </div>
+                  </div>
+                  <LeaveCalendarView currentUserRole="EMPLOYEE" />
                 </div>
               )}
             </motion.div>

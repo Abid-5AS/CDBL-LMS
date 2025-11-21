@@ -4,7 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 
 export const cache = "no-store";
 
-type RecommendationType = "holiday_bridge" | "balance_optimization" | "certificate_reminder" | "consecutive_warning";
+type RecommendationType = "holiday_bridge" | "balance_optimization" | "certificate_reminder" | "consecutive_warning" | "rest_recharge" | "policy_guard";
 
 interface Recommendation {
   type: RecommendationType;
@@ -157,6 +157,45 @@ export async function GET() {
     }
   }
 
+  // ... existing code ...
+
+  // 3. Rest & Recharge: Check if employee hasn't taken leave in the last 4 months
+  const fourMonthsAgo = new Date(today);
+  fourMonthsAgo.setMonth(fourMonthsAgo.getMonth() - 4);
+
+  const recentLeaves = await prisma.leaveRequest.findFirst({
+    where: {
+      requesterId: me.id,
+      status: { in: ["APPROVED", "SUBMITTED"] },
+      endDate: { gte: fourMonthsAgo },
+    },
+  });
+
+  if (!recentLeaves) {
+    recommendations.push({
+      type: "rest_recharge",
+      title: "Time for a Break?",
+      message: "You haven't taken any leave in the last 4 months. Taking regular breaks is important for your well-being and productivity.",
+      severity: "info",
+      action: {
+        label: "Plan Leave",
+        href: "/leaves/apply",
+      },
+    });
+  }
+
+  // 4. Policy Guard: Busy Season Warning (Example: June Closing)
+  // Assuming June 20-30 is a busy period for finance/admin
+  const isJune = today.getMonth() === 5; // Month is 0-indexed
+  if (isJune && today.getDate() < 20) {
+     recommendations.push({
+      type: "policy_guard",
+      title: "Upcoming Busy Season",
+      message: "Please note that leave requests may be restricted from June 20th to June 30th due to fiscal year-end closing.",
+      severity: "warning",
+    });
+  }
+  
   return NextResponse.json({ recommendations });
 }
 

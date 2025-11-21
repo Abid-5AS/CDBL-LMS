@@ -7,7 +7,13 @@ import {
 } from "@/hooks/useDashboardLayout";
 import { DashboardContainer, SectionHeader } from "@/components";
 import { EmployeeProfileCard, LeaveHistoryTable } from "@/components/shared";
-import { LeaveBalanceCard } from "./LeaveBalanceCard";
+import { SmartLeaveAssistant } from "./SmartLeaveAssistant";
+
+// ... existing imports
+
+// ... inside EmployeeDashboard component ...
+
+
 import ChartsSection from "./ChartsSection";
 import { ModernHRStatCards } from "@/components/ModernHRStatCards";
 import { ApprovalActions } from "./ApprovalActions";
@@ -69,6 +75,7 @@ export function EmployeeDashboard({
       [SECTION_MAP.Overview]: (
         <section className="space-y-4">
           <SectionHeader title="Employee Overview" />
+          <SmartLeaveAssistant />
           <div className="grid gap-4 xl:grid-cols-2">
             <EmployeeProfileCard
               name={data.name}

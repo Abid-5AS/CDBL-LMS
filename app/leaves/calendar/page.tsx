@@ -3,7 +3,6 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { LeaveCalendarView } from "./_components/LeaveCalendarView";
 import { Calendar } from "lucide-react";
-import { LeaveSectionNav } from "@/components/layout/SectionNav";
 import { Card, CardContent } from "@/components/ui/card";
 
 async function LeaveCalendarPageContent() {
@@ -15,7 +14,6 @@ async function LeaveCalendarPageContent() {
 
   return (
     <div className="max-w-6xl mx-auto w-full space-y-6 px-4 sm:px-6 lg:px-0 py-8">
-      <LeaveSectionNav />
       <div className="flex flex-col gap-2">
         <h1 className="heading-lg flex items-center gap-2">
           <Calendar className="icon-md" />

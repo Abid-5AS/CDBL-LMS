@@ -33,6 +33,7 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
     { icon: ClipboardList, label: "My Leaves", href: "/leaves" },
     { icon: Wallet, label: "Balance", href: "/balance" },
     { icon: Calendar, label: "Holidays", href: "/holidays" },
+    { icon: BookOpen, label: "Policies", href: "/policies" },
     { icon: Wrench, label: "Experimental", href: "/experimental-features" },
   ],
 
