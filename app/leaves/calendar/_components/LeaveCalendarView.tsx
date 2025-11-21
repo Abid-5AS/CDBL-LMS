@@ -60,7 +60,12 @@ export function LeaveCalendarView({ currentUserRole }: LeaveCalendarViewProps) {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch");
+        if (response.status === 401) {
+          // Redirect to login page if unauthorized
+          window.location.href = "/login";
+          return;
+        }
+        throw new Error("Failed to fetch calendar data");
       }
 
       const data = await response.json();

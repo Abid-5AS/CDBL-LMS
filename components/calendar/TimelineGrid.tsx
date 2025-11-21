@@ -70,7 +70,7 @@ export function TimelineGrid({
               {/* Row Header */}
               {showRowHeaders && (
                 <div className="w-32 sm:w-48 shrink-0 p-2 sm:p-3 border-r border-border/50 flex items-center gap-2 sm:gap-3">
-                  {row.avatar !== undefined && (
+                  {row.avatar && (
                     <Avatar className="h-6 w-6 sm:h-8 sm:w-8 border border-border shrink-0">
                       <AvatarImage src={row.avatar} />
                       <AvatarFallback className="text-[10px] sm:text-xs">{row.label.substring(0, 2).toUpperCase()}</AvatarFallback>
