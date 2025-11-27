@@ -35,6 +35,10 @@ import { useLeaveData } from "@/components/providers";
 import { cn } from "@/lib/utils";
 import { Wallet, ClipboardList } from "lucide-react";
 
+function formatLeaveType(type: string) {
+  return type.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase());
+}
+
 function LeaveRequestCard({ request }: { request: any }) {
   const statusColors = {
     PENDING: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800",
@@ -74,7 +78,7 @@ function LeaveRequestCard({ request }: { request: any }) {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-foreground">
-                {request.leaveType.name}
+                {formatLeaveType(request.type)}
               </h3>
               <span className={cn(
                 "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border",
@@ -141,8 +145,8 @@ function RequestsView() {
 
   const filteredRequests = data?.items?.filter((item: any) => {
     const matchesTab = activeTab === "all" || item.status.toLowerCase() === activeTab;
-    const matchesSearch = item.leaveType.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         item.reason?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = item.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.reason?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesTab && matchesSearch;
   }) || [];
 
