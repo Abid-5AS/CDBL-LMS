@@ -162,7 +162,7 @@ export function CorporateCEODashboard() {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-slate-50 p-6">
+      <div className="min-h-screen p-6">
         {/* Corporate Header */}
         <div className="mb-6">
           <h1 className={cn(typography.pageTitle, "mb-1")}>

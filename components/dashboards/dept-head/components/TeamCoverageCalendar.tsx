@@ -4,7 +4,7 @@ import * as React from "react";
 import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 interface CoverageDay {
@@ -26,7 +26,8 @@ export function TeamCoverageCalendar() {
 
     for (let i = 1; i <= daysInMonth; i++) {
       const date = new Date(year, month, i);
-      const count = Math.floor(Math.random() * 5); // Mock count 0-4
+      // Deterministic mock data to avoid hydration mismatch (replace with real API later)
+      const count = (i + currentDate.getDate()) % 5; // Mock count 0-4, deterministic
       let intensity: CoverageDay["intensity"] = "none";
       if (count > 0) intensity = "low";
       if (count > 2) intensity = "medium";
@@ -98,9 +99,11 @@ export function TeamCoverageCalendar() {
             <div key={`pad-${i}`} className="aspect-square" />
           ))}
           
-          {calendarDays.map((day, i) => (
-            <TooltipProvider key={i}>
-              <Tooltip>
+          {calendarDays.map((day) => {
+            // Use stable key based on date instead of array index
+            const dateKey = `${day.date.getFullYear()}-${day.date.getMonth()}-${day.date.getDate()}`;
+            return (
+              <Tooltip key={dateKey}>
                 <TooltipTrigger asChild>
                   <div
                     className={cn(
@@ -114,14 +117,20 @@ export function TeamCoverageCalendar() {
                 </TooltipTrigger>
                 <TooltipContent side="top">
                   <div className="text-xs">
-                    <p className="font-semibold">{day.date.toLocaleDateString()}</p>
+                    <p className="font-semibold">
+                      {day.date.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </p>
                     <p>{day.count} on leave</p>
                     {day.count > 3 && <p className="text-red-400 font-bold">High Absence!</p>}
                   </div>
                 </TooltipContent>
               </Tooltip>
-            </TooltipProvider>
-          ))}
+            );
+          })}
         </div>
         <div className="mt-4 flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
           <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-400" /> Low</div>

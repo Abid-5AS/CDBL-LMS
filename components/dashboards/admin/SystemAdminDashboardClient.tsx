@@ -179,16 +179,36 @@ export function SystemAdminDashboardContent({
   systemStats,
   auditLogsSlot,
 }: SystemAdminDashboardContentProps) {
+  const actions = [
+    <Button key="users" asChild variant="default">
+      <Link href="/admin">
+        <Users className="mr-2 h-4 w-4" />
+        User Management
+      </Link>
+    </Button>,
+    <Button key="audit" asChild variant="outline">
+      <Link href="/admin/audit">
+        <Activity className="mr-2 h-4 w-4" />
+        Audit Logs
+      </Link>
+    </Button>,
+    <Button key="settings" asChild variant="outline">
+      <Link href="/admin">
+        <Settings className="mr-2 h-4 w-4" />
+        System Settings
+      </Link>
+    </Button>,
+  ];
+
   return (
     <RoleBasedDashboard
       role="SYSTEM_ADMIN"
       title="Admin Console"
-      description="System-level configuration and management"
+      description={`Welcome back, ${username}. Manage system configuration and users.`}
+      actions={actions}
       animate
     >
       <div className="space-y-6">
-        <SystemAdminHeader username={username} />
-
         <DashboardSection
           title="System Overview"
           description="Key system metrics and status"

@@ -232,7 +232,7 @@ export function CorporateHRHeadDashboard() {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-slate-50 p-4">
+      <div className="min-h-screen p-4">
         {/* Corporate Header */}
         <div className="mb-4">
           <h1 className={cn(typography.pageTitle, "mb-1")}>

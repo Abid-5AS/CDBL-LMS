@@ -9,12 +9,12 @@ import { Users, User, Pencil } from "lucide-react";
 import {
   Card,
   CardContent,
-  EnhancedTable,
-  EnhancedTableHeader,
-  EnhancedTableBody,
-  EnhancedTableHead,
-  EnhancedTableRow,
-  EnhancedTableCell,
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
   Button,
   Badge,
   Tooltip,
@@ -204,48 +204,48 @@ export function EmployeeList() {
         </Card>
       ) : (
         <div className="max-h-[70vh] overflow-y-auto">
-          <EnhancedTable>
-            <EnhancedTableHeader>
-              <EnhancedTableRow>
-                <EnhancedTableHead>Name</EnhancedTableHead>
-                <EnhancedTableHead className="hidden sm:table-cell">Email</EnhancedTableHead>
-                <EnhancedTableHead className="hidden md:table-cell">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead className="hidden sm:table-cell">Email</TableHead>
+                <TableHead className="hidden md:table-cell">
                   Employee Code
-                </EnhancedTableHead>
-                <EnhancedTableHead className="hidden lg:table-cell">
+                </TableHead>
+                <TableHead className="hidden lg:table-cell">
                   Department
-                </EnhancedTableHead>
-                <EnhancedTableHead>Role</EnhancedTableHead>
-                <EnhancedTableHead className="text-right">Actions</EnhancedTableHead>
-              </EnhancedTableRow>
-            </EnhancedTableHeader>
-            <EnhancedTableBody>
+                </TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
                 {paginatedEmployees.map((employee) => (
-                  <EnhancedTableRow
+                  <TableRow
                     key={employee.id}
                     className="hover:bg-bg-secondary dark:hover:bg-bg-secondary/50"
                   >
-                    <EnhancedTableCell className="font-medium text-text-primary">
+                    <TableCell className="font-medium text-text-primary">
                       {employee.name}
-                    </EnhancedTableCell>
-                    <EnhancedTableCell className="hidden sm:table-cell text-muted-foreground">
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell text-muted-foreground">
                       {employee.email}
-                    </EnhancedTableCell>
-                    <EnhancedTableCell className="hidden md:table-cell text-muted-foreground">
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell text-muted-foreground">
                       {employee.empCode || "—"}
-                    </EnhancedTableCell>
-                    <EnhancedTableCell className="hidden lg:table-cell text-muted-foreground">
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell text-muted-foreground">
                       {employee.department || "—"}
-                    </EnhancedTableCell>
-                    <EnhancedTableCell>
+                    </TableCell>
+                    <TableCell>
                       <Badge
                         variant="outline"
                         className={getRoleBadgeClasses(employee.role)}
                       >
                         {getRoleLabel(employee.role)}
                       </Badge>
-                    </EnhancedTableCell>
-                    <EnhancedTableCell className="text-right">
+                    </TableCell>
+                    <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <TooltipProvider>
                           <Tooltip>
@@ -282,11 +282,11 @@ export function EmployeeList() {
                             </TooltipProvider>
                           )}
                       </div>
-                    </EnhancedTableCell>
-                  </EnhancedTableRow>
+                    </TableCell>
+                  </TableRow>
                 ))}
-            </EnhancedTableBody>
-          </EnhancedTable>
+            </TableBody>
+          </Table>
         </div>
       )}
 

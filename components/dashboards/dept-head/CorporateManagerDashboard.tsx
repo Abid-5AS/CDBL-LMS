@@ -35,10 +35,10 @@ import { SmartAlert } from "@/components/dashboards/shared";
 
 function CardSkeleton() {
   return (
-    <div className="border border-slate-200 shadow-sm rounded-md p-4">
+    <div className="border border-border shadow-sm rounded-md p-4 bg-card">
       <div className="space-y-4">
-        <div className="h-4 w-32 bg-slate-100 animate-pulse rounded" />
-        <div className="h-20 bg-slate-100 animate-pulse rounded" />
+        <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+        <div className="h-20 bg-muted animate-pulse rounded" />
       </div>
     </div>
   );
@@ -168,7 +168,7 @@ export function CorporateManagerDashboard() {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-slate-50 p-4">
+      <div className="min-h-screen p-4">
         {/* Corporate Header */}
         <div className="mb-4">
           <div className="flex items-center justify-between">
@@ -184,7 +184,7 @@ export function CorporateManagerDashboard() {
             {/* Header Actions */}
             <button
               onClick={() => mutate()}
-              className="p-2 hover:bg-slate-200 rounded-md transition-colors border border-slate-200"
+              className="p-2 hover:bg-muted rounded-md transition-colors border border-border"
               title="Refresh"
             >
               <RefreshCw className="w-4 h-4" />
@@ -353,7 +353,7 @@ export function CorporateManagerDashboard() {
 
             <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(300px,1fr)]">
               {/* Left: Approval Queue Table */}
-              <div className="border border-slate-200 shadow-sm rounded-md bg-white">
+              <div className="border border-border shadow-sm rounded-md bg-card">
                 <div className="px-2 py-4">
                   <Suspense fallback={<CardSkeleton />}>
                     <DeptHeadPendingTable
@@ -424,9 +424,9 @@ function DeptHeadAlertsPanel({
 }) {
   if (isLoading) {
     return (
-      <div className="border border-slate-200 shadow-sm rounded-md bg-white p-4 space-y-3">
-        <div className="h-14 rounded-md bg-slate-100 animate-pulse" />
-        <div className="h-14 rounded-md bg-slate-100 animate-pulse" />
+      <div className="border border-border shadow-sm rounded-md bg-card p-4 space-y-3">
+        <div className="h-14 rounded-md bg-muted animate-pulse" />
+        <div className="h-14 rounded-md bg-muted animate-pulse" />
       </div>
     );
   }
