@@ -1,17 +1,17 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Inbox, CheckCircle2 } from "lucide-react";
 
 export function PendingTableLoading() {
   return (
-    <Card className="rounded-2xl border-muted/60 shadow-sm">
-      <CardHeader>
+    <GlassCard variant="hover" className="rounded-2xl border-muted/60 shadow-sm">
+      <GlassCardHeader>
         <Skeleton className="h-6 w-32" />
-      </CardHeader>
-      <CardContent className="space-y-4">
+      </GlassCardHeader>
+      <GlassCardContent className="space-y-4">
         <Skeleton className="h-10 w-full" />
         <div className="space-y-2">
           <Skeleton className="h-6 w-20" />
@@ -32,8 +32,8 @@ export function PendingTableLoading() {
         <div className="border rounded-lg">
           <Skeleton className="h-64 w-full" />
         </div>
-      </CardContent>
-    </Card>
+      </GlassCardContent>
+    </GlassCard>
   );
 }
 
@@ -45,11 +45,11 @@ export function PendingTableError({
   onRetry: () => void;
 }) {
   return (
-    <Card className="rounded-2xl border-muted/60 shadow-sm">
-      <CardHeader>
-        <CardTitle>Pending Requests</CardTitle>
-      </CardHeader>
-      <CardContent className="py-12">
+    <GlassCard variant="hover" className="rounded-2xl border-muted/60 shadow-sm">
+      <GlassCardHeader>
+        <GlassCardTitle>Pending Requests</GlassCardTitle>
+      </GlassCardHeader>
+      <GlassCardContent className="py-12">
         <div className="text-center space-y-4">
           <div className="text-sm font-semibold text-data-error">
             Failed to load requests
@@ -61,18 +61,18 @@ export function PendingTableError({
             Retry
           </Button>
         </div>
-      </CardContent>
-    </Card>
+      </GlassCardContent>
+    </GlassCard>
   );
 }
 
 export function PendingTableEmpty() {
   return (
-    <Card className="rounded-2xl border-muted/60 shadow-sm">
-      <CardHeader>
-        <CardTitle>Pending Requests</CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
+    <GlassCard variant="hover" className="rounded-2xl border-muted/60 shadow-sm">
+      <GlassCardHeader>
+        <GlassCardTitle>Pending Requests</GlassCardTitle>
+      </GlassCardHeader>
+      <GlassCardContent className="p-0">
         <div className="p-12 text-center bg-gradient-to-br from-muted/30 to-muted/10 rounded-lg border border-muted/60">
           <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-data-success" />
           <h3 className="text-lg font-semibold mb-2">All clear!</h3>
@@ -80,21 +80,21 @@ export function PendingTableEmpty() {
             No pending approvals at the moment.
           </p>
         </div>
-      </CardContent>
-    </Card>
+      </GlassCardContent>
+    </GlassCard>
   );
 }
 
 export function PendingTableNoResults() {
   return (
-    <Card className="py-12">
-      <CardContent className="text-center">
+    <GlassCard variant="hover" className="py-12">
+      <GlassCardContent className="text-center">
         <Inbox className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
         <p className="font-semibold mb-2">No requests match your filters</p>
         <p className="text-sm text-muted-foreground">
           Try adjusting filters or check approved requests.
         </p>
-      </CardContent>
-    </Card>
+      </GlassCardContent>
+    </GlassCard>
   );
 }

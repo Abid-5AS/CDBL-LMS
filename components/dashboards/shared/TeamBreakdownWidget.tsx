@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Users, TrendingUp, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -38,11 +38,11 @@ export function TeamBreakdownWidget({
 }: TeamBreakdownWidgetProps) {
   if (isLoading) {
     return (
-      <Card className="animate-fade-in">
-        <CardHeader>
+      <GlassCard variant="hover" className="animate-fade-in">
+        <GlassCardHeader>
           <Skeleton className="h-6 w-48" />
-        </CardHeader>
-        <CardContent className="space-y-3">
+        </GlassCardHeader>
+        <GlassCardContent className="space-y-3">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="flex items-center gap-3">
               <Skeleton className="h-10 w-10 rounded-full" />
@@ -53,22 +53,22 @@ export function TeamBreakdownWidget({
               <Skeleton className="h-6 w-12" />
             </div>
           ))}
-        </CardContent>
-      </Card>
+        </GlassCardContent>
+      </GlassCard>
     );
   }
 
   const total = metrics.reduce((sum, m) => sum + m.count, 0);
 
   return (
-    <Card className="animate-scale-in">
-      <CardHeader className="pb-3">
+    <GlassCard variant="hover" className="animate-scale-in">
+      <GlassCardHeader className="pb-3">
         <div className="flex items-center gap-2">
           <Users className="h-5 w-5 text-primary" />
-          <CardTitle className="text-lg">{title}</CardTitle>
+          <GlassCardTitle className="text-lg">{title}</GlassCardTitle>
         </div>
-      </CardHeader>
-      <CardContent>
+      </GlassCardHeader>
+      <GlassCardContent>
         <div className="space-y-4">
           {metrics.map((metric, index) => {
             const percentage = metric.percentage || (total > 0 ? (metric.count / total) * 100 : 0);
@@ -138,7 +138,7 @@ export function TeamBreakdownWidget({
             <p className="text-sm">No team data available</p>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </GlassCardContent>
+    </GlassCard>
   );
 }

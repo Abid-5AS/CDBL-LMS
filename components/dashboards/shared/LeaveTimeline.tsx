@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format, isToday, isFuture, isPast } from "date-fns";
 
@@ -192,11 +192,11 @@ export function LeaveTimeline({
 
   if (isLoading) {
     return (
-      <Card className={cn("bg-card border-border", className)}>
-        <CardHeader className="pb-3">
+      <GlassCard variant="hover" className={cn(className)}>
+        <GlassCardHeader className="pb-3">
           <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
-        </CardHeader>
-        <CardContent>
+        </GlassCardHeader>
+        <GlassCardContent>
           <div className="space-y-4">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="flex gap-4">
@@ -209,23 +209,23 @@ export function LeaveTimeline({
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </GlassCardContent>
+      </GlassCard>
     );
   }
 
   if (!leaves || leaves.length === 0) {
     return (
-      <Card className={cn("bg-card border-border", className)}>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-semibold">{title}</CardTitle>
+      <GlassCard variant="hover" className={cn(className)}>
+        <GlassCardHeader className="pb-3">
+          <GlassCardTitle className="text-lg font-semibold">{title}</GlassCardTitle>
           {description && (
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {description}
             </p>
           )}
-        </CardHeader>
-        <CardContent>
+        </GlassCardHeader>
+        <GlassCardContent>
           <div className="text-center py-12">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted/50 mb-3">
               <Calendar className="h-8 w-8 text-gray-400 dark:text-gray-600" />
@@ -237,8 +237,8 @@ export function LeaveTimeline({
               Your leave records will appear here
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </GlassCardContent>
+      </GlassCard>
     );
   }
 
@@ -248,17 +248,17 @@ export function LeaveTimeline({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className={cn("bg-card border-border", className)}>
-        <CardHeader className="pb-3">
+      <GlassCard variant="hover" className={cn(className)}>
+        <GlassCardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div>
-              <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <GlassCardTitle className="text-lg font-semibold flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 {title}
                 <Badge variant="secondary" className="ml-2">
                   {leaves.length}
                 </Badge>
-              </CardTitle>
+              </GlassCardTitle>
               {description && (
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   {description}
@@ -266,8 +266,8 @@ export function LeaveTimeline({
               )}
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
+        </GlassCardHeader>
+        <GlassCardContent>
           <ScrollArea className="h-auto max-h-[600px]">
             <div className={cn("relative", orientation === "horizontal" && "flex gap-6 overflow-x-auto")}>
               {/* Timeline Line */}
@@ -439,8 +439,8 @@ export function LeaveTimeline({
               </div>
             </div>
           </ScrollArea>
-        </CardContent>
-      </Card>
+        </GlassCardContent>
+      </GlassCard>
     </motion.div>
   );
 }

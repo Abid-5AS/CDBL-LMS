@@ -14,6 +14,12 @@ import { NotificationService } from "@/lib/services/notification.service";
 import type { LeaveType } from "@prisma/client";
 import { invalidateHRAdminStatsCache } from "@/lib/dashboard/hr-admin-data";
 
+// Helper to check if user has approver privileges
+function checkApproverRole(role: string) {
+  const approverRoles = ["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO", "SYSTEM_ADMIN"];
+  return approverRoles.includes(role);
+}
+
 /**
  * Submit a new leave request
  * Replaces: POST /api/leaves
@@ -71,6 +77,10 @@ export async function forwardLeaveRequest(leaveId: number) {
       return { success: false, error: "Unauthorized" };
     }
 
+    if (!checkApproverRole(user.role)) {
+      return { success: false, error: "Insufficient permissions" };
+    }
+
     const result = await LeaveService.forwardLeave(leaveId, user.id);
 
     if (!result.success) {
@@ -105,6 +115,10 @@ export async function approveLeaveRequest(leaveId: number, comment?: string) {
     const user = await getCurrentUser();
     if (!user) {
       return { success: false, error: "Unauthorized" };
+    }
+
+    if (!checkApproverRole(user.role)) {
+      return { success: false, error: "Insufficient permissions" };
     }
 
     const result = await LeaveService.approveLeave(leaveId, user.id, comment);
@@ -142,6 +156,10 @@ export async function rejectLeaveRequest(leaveId: number, comment?: string) {
     const user = await getCurrentUser();
     if (!user) {
       return { success: false, error: "Unauthorized" };
+    }
+
+    if (!checkApproverRole(user.role)) {
+      return { success: false, error: "Insufficient permissions" };
     }
 
     const result = await LeaveService.rejectLeave(
@@ -188,6 +206,10 @@ export async function returnLeaveForModification(
       return { success: false, error: "Unauthorized" };
     }
 
+    if (!checkApproverRole(user.role)) {
+      return { success: false, error: "Insufficient permissions" };
+    }
+
     if (!comment || comment.length < 5) {
       return { success: false, error: "Comment must be at least 5 characters" };
     }
@@ -226,6 +248,10 @@ export async function bulkApproveLeaveRequests(leaveIds: number[]) {
     const user = await getCurrentUser();
     if (!user) {
       return { success: false, error: "Unauthorized" };
+    }
+
+    if (!checkApproverRole(user.role)) {
+      return { success: false, error: "Insufficient permissions" };
     }
 
     let approved = 0;
@@ -271,6 +297,10 @@ export async function bulkRejectLeaveRequests(
     const user = await getCurrentUser();
     if (!user) {
       return { success: false, error: "Unauthorized" };
+    }
+
+    if (!checkApproverRole(user.role)) {
+      return { success: false, error: "Insufficient permissions" };
     }
 
     if (!reason || reason.trim().length < 5) {

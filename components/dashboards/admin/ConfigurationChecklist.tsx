@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { CheckCircle, AlertTriangle, Settings } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
@@ -53,21 +53,21 @@ export function ConfigurationChecklist() {
 
   if (isLoading) {
     return (
-      <Card className="surface-card">
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
+      <GlassCard variant="hover" className="surface-card">
+        <GlassCardHeader>
+          <GlassCardTitle className="text-base flex items-center gap-2">
             <Settings className="h-4 w-4" />
             Configuration Status
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </GlassCardTitle>
+        </GlassCardHeader>
+        <GlassCardContent>
           <div className="space-y-3">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="h-12 bg-muted animate-pulse rounded" />
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </GlassCardContent>
+      </GlassCard>
     );
   }
 
@@ -105,14 +105,14 @@ export function ConfigurationChecklist() {
     : [];
 
   return (
-    <Card className="surface-card">
-      <CardHeader>
-        <CardTitle className="text-base flex items-center gap-2">
+    <GlassCard variant="hover" className="surface-card">
+      <GlassCardHeader>
+        <GlassCardTitle className="text-base flex items-center gap-2">
           <Settings className="h-4 w-4" />
           Configuration Status
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
+        </GlassCardTitle>
+      </GlassCardHeader>
+      <GlassCardContent className="space-y-3">
         {items.map((item) => (
           <Link
             key={item.label}
@@ -137,7 +137,7 @@ export function ConfigurationChecklist() {
             </Badge>
           </Link>
         ))}
-      </CardContent>
-    </Card>
+      </GlassCardContent>
+    </GlassCard>
   );
 }

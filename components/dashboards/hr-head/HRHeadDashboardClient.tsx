@@ -18,7 +18,7 @@ import {
   CancellationRequests as CancellationRequestsPanel,
   ReturnedRequests as ReturnedRequestsPanel,
 } from "@/components/dashboards";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { Separator } from "@/components/ui/separator";
 import { DashboardCardSkeleton } from "@/app/dashboard/shared/LoadingFallback";
 import { formatDate } from "@/lib/utils";
@@ -518,23 +518,23 @@ export function HRHeadDashboardClient() {
       >
         <div className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
           <div className="space-y-4 sm:space-y-6">
-            <Card className="surface-card" id="pending-approvals">
-              <CardHeader className="pb-3">
+            <GlassCard variant="hover" className="surface-card" id="pending-approvals">
+              <GlassCardHeader className="pb-3">
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <CardTitle className="text-lg">Pending Approvals</CardTitle>
+                    <GlassCardTitle className="text-lg">Pending Approvals</GlassCardTitle>
                     <p className="text-sm text-muted-foreground">
                       Awaiting HR head action
                     </p>
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent>
+              </GlassCardHeader>
+              <GlassCardContent>
                 <Suspense fallback={<DashboardCardSkeleton />}>
                   <PendingLeaveRequestsTable />
                 </Suspense>
-              </CardContent>
-            </Card>
+              </GlassCardContent>
+            </GlassCard>
 
             {!isLoading &&
               stats &&
@@ -570,8 +570,8 @@ export function HRHeadDashboardClient() {
           description="Requests requiring HR Head approval"
           isLoading={isLoading}
         >
-          <Card className="surface-card">
-            <CardContent className="p-0">
+          <GlassCard variant="hover" className="surface-card">
+            <GlassCardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-muted/30 border-b border-border">
@@ -613,8 +613,8 @@ export function HRHeadDashboardClient() {
                   </tbody>
                 </table>
               </div>
-            </CardContent>
-          </Card>
+            </GlassCardContent>
+          </GlassCard>
         </DashboardSection>
       )}
 
@@ -626,25 +626,25 @@ export function HRHeadDashboardClient() {
       >
         <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
         <Suspense fallback={<DashboardCardSkeleton />}>
-          <Card className="surface-card">
-            <CardHeader>
-              <CardTitle className="text-base">{METRIC_LABELS.SENT_BACK}</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <GlassCard variant="hover" className="surface-card">
+            <GlassCardHeader>
+              <GlassCardTitle className="text-base">{METRIC_LABELS.SENT_BACK}</GlassCardTitle>
+            </GlassCardHeader>
+            <GlassCardContent>
               <ReturnedRequestsPanel />
-            </CardContent>
-          </Card>
+            </GlassCardContent>
+          </GlassCard>
         </Suspense>
 
         <Suspense fallback={<DashboardCardSkeleton />}>
-          <Card className="surface-card">
-            <CardHeader>
-              <CardTitle className="text-base">{METRIC_LABELS.CANCELLED_REQUESTS}</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <GlassCard variant="hover" className="surface-card">
+            <GlassCardHeader>
+              <GlassCardTitle className="text-base">{METRIC_LABELS.CANCELLED_REQUESTS}</GlassCardTitle>
+            </GlassCardHeader>
+            <GlassCardContent>
               <CancellationRequestsPanel />
-            </CardContent>
-          </Card>
+            </GlassCardContent>
+          </GlassCard>
         </Suspense>
         </div>
       </DashboardSection>
@@ -661,14 +661,14 @@ function InsightsPanel({
   isLoading?: boolean;
 }) {
   return (
-    <Card className="surface-card">
-      <CardHeader>
-        <CardTitle className="text-base flex items-center gap-2">
+    <GlassCard variant="hover" className="surface-card">
+      <GlassCardHeader>
+        <GlassCardTitle className="text-base flex items-center gap-2">
           <TrendingUp className="h-4 w-4" />
           Organization Snapshot
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
+        </GlassCardTitle>
+      </GlassCardHeader>
+      <GlassCardContent className="space-y-3">
         {isLoading
           ? Array.from({ length: 3 }).map((_, idx) => (
               <div key={idx} className="h-14 rounded-xl bg-muted animate-pulse" />
@@ -682,8 +682,8 @@ function InsightsPanel({
                 <p className="text-xs text-muted-foreground">{item.helper}</p>
               </div>
             ))}
-      </CardContent>
-    </Card>
+      </GlassCardContent>
+    </GlassCard>
   );
 }
 
@@ -701,14 +701,14 @@ function AlertsPanel({
   };
 
   return (
-    <Card className="surface-card">
-      <CardHeader>
-        <CardTitle className="text-base flex items-center gap-2">
+    <GlassCard variant="hover" className="surface-card">
+      <GlassCardHeader>
+        <GlassCardTitle className="text-base flex items-center gap-2">
           <Clock className="h-4 w-4" />
           Alerts
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
+        </GlassCardTitle>
+      </GlassCardHeader>
+      <GlassCardContent className="space-y-3">
         {isLoading
           ? Array.from({ length: 2 }).map((_, idx) => (
               <div key={idx} className="h-16 rounded-xl bg-muted animate-pulse" />
@@ -722,8 +722,8 @@ function AlertsPanel({
                 <p className="text-xs opacity-80">{alert.detail}</p>
               </div>
             ))}
-      </CardContent>
-    </Card>
+      </GlassCardContent>
+    </GlassCard>
   );
 }
 
@@ -735,14 +735,14 @@ function ActivityPanel({
   isLoading?: boolean;
 }) {
   return (
-    <Card className="surface-card">
-      <CardHeader>
-        <CardTitle className="text-base flex items-center gap-2">
+    <GlassCard variant="hover" className="surface-card">
+      <GlassCardHeader>
+        <GlassCardTitle className="text-base flex items-center gap-2">
           <Activity className="h-4 w-4" />
           Recent Activity
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+        </GlassCardTitle>
+      </GlassCardHeader>
+      <GlassCardContent>
         {isLoading ? (
           <div className="space-y-3">
             <div className="h-16 w-full bg-muted animate-pulse rounded" />
@@ -773,7 +773,7 @@ function ActivityPanel({
             No recent activity
           </p>
         )}
-      </CardContent>
-    </Card>
+      </GlassCardContent>
+    </GlassCard>
   );
 }

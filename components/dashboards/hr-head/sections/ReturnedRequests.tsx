@@ -1,13 +1,13 @@
 "use client";
 
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  ModernTable,
+  GlassCard,
+  GlassCardContent,
+  GlassCardHeader,
+  GlassCardTitle,
   Button,
 } from "@/components/ui";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { RotateCcw, FileEdit } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
@@ -47,34 +47,34 @@ export function ReturnedRequestsPanel() {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent className="py-12 text-center text-sm text-muted-foreground">
+      <GlassCard variant="hover">
+        <GlassCardContent className="py-12 text-center text-sm text-muted-foreground">
           Loading...
-        </CardContent>
-      </Card>
+        </GlassCardContent>
+      </GlassCard>
     );
   }
 
   if (error) {
     return (
-      <Card>
-        <CardContent className="py-12 text-center text-sm text-data-error">
+      <GlassCard variant="hover">
+        <GlassCardContent className="py-12 text-center text-sm text-data-error">
           Failed to load returned requests
-        </CardContent>
-      </Card>
+        </GlassCardContent>
+      </GlassCard>
     );
   }
 
   if (returnedRequests.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <GlassCard variant="hover">
+        <GlassCardHeader>
+          <GlassCardTitle className="flex items-center gap-2">
             <RotateCcw className="h-5 w-5" />
             Returned for Modification
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
+          </GlassCardTitle>
+        </GlassCardHeader>
+        <GlassCardContent className="p-0">
           <EmptyState
             icon={FileEdit}
             title="No returned requests"
@@ -84,35 +84,37 @@ export function ReturnedRequestsPanel() {
               href: "/approvals",
             }}
           />
-        </CardContent>
-      </Card>
+        </GlassCardContent>
+      </GlassCard>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <GlassCard variant="hover">
+      <GlassCardHeader>
+        <GlassCardTitle className="flex items-center gap-2">
           <RotateCcw className="h-5 w-5 text-data-info" />
           Returned for Modification ({returnedRequests.length})
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        <ModernTable>
-            <ModernTable.Row>
-              <ModernTable.Header>Employee</ModernTable.Header>
-              <ModernTable.Header>Type</ModernTable.Header>
-              <ModernTable.Header className="hidden sm:table-cell">Dates</ModernTable.Header>
-              <ModernTable.Header className="hidden md:table-cell">Days</ModernTable.Header>
-              <ModernTable.Header>Status</ModernTable.Header>
-              <ModernTable.Header className="text-right">Actions</ModernTable.Header>
-            </ModernTable.Row>
-          <ModernTable.Body>
+        </GlassCardTitle>
+      </GlassCardHeader>
+      <GlassCardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Employee</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead className="hidden sm:table-cell">Dates</TableHead>
+              <TableHead className="hidden md:table-cell">Days</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {returnedRequests.slice(0, 5).map((leave) => {
               if (!leave.requester) return null;
               return (
-                <ModernTable.Row key={leave.id}>
-                  <ModernTable.Cell>
+                <TableRow key={leave.id}>
+                  <TableCell>
                     <Link
                       href={`/employees/${leave.requester.id}`}
                       className="text-data-info hover:underline font-medium"
@@ -122,31 +124,31 @@ export function ReturnedRequestsPanel() {
                     <div className="text-xs text-muted-foreground">
                       {leave.requester.email}
                     </div>
-                  </ModernTable.Cell>
-                  <ModernTable.Cell className="font-medium">
+                  </TableCell>
+                  <TableCell className="font-medium">
                     {leaveTypeLabel[leave.type] ?? leave.type}
-                  </ModernTable.Cell>
-                  <ModernTable.Cell className="hidden sm:table-cell text-text-secondary">
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell text-text-secondary">
                     {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
-                  </ModernTable.Cell>
-                  <ModernTable.Cell className="hidden md:table-cell text-text-secondary">
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell text-text-secondary">
                     {leave.workingDays}
-                  </ModernTable.Cell>
-                  <ModernTable.Cell>
+                  </TableCell>
+                  <TableCell>
                     <StatusBadge status={leave.status as any} />
-                  </ModernTable.Cell>
-                  <ModernTable.Cell className="text-right">
+                  </TableCell>
+                  <TableCell className="text-right">
                     <Link href={`/leaves?highlight=${leave.id}`}>
                       <Button size="sm" variant="outline">
                         View Details
                       </Button>
                     </Link>
-                  </ModernTable.Cell>
-                </ModernTable.Row>
+                  </TableCell>
+                </TableRow>
               );
             })}
-          </ModernTable.Body>
-        </ModernTable>
+          </TableBody>
+        </Table>
         {returnedRequests.length > 5 && (
           <div className="p-4 text-center border-t">
             <Link href="/approvals?status=RETURNED">
@@ -156,7 +158,7 @@ export function ReturnedRequestsPanel() {
             </Link>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </GlassCardContent>
+    </GlassCard>
   );
 }

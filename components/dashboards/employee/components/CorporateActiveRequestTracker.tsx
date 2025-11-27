@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { LeaveTimeline, type LeaveTimelineItem } from "@/components/dashboards/shared/LeaveTimeline";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { Activity, CheckCircle2, Clock, XCircle } from "lucide-react";
 import type { LeaveRow } from "@/hooks/useLeaveRequests";
 import { cn } from "@/lib/utils";
@@ -42,17 +42,17 @@ export function CorporateActiveRequestTracker({
 
   if (isLoading) {
     return (
-      <Card className={cn(
+      <GlassCard variant="hover" className={cn(
         "border-border shadow-sm mb-6 rounded-md",
         cardPadding(density)
       )}>
-        <CardHeader className="pb-2">
+        <GlassCardHeader className="pb-2">
           <div className="h-6 w-48 bg-muted animate-pulse rounded" />
-        </CardHeader>
-        <CardContent>
+        </GlassCardHeader>
+        <GlassCardContent>
           <div className="h-24 bg-muted/50 animate-pulse rounded-md" />
-        </CardContent>
-      </Card>
+        </GlassCardContent>
+      </GlassCard>
     );
   }
 
@@ -82,23 +82,23 @@ export function CorporateActiveRequestTracker({
 
   return (
     <div className="mb-6">
-      <Card className={cn(
+      <GlassCard variant="hover" className={cn(
         "border-l-4 border-l-blue-500 border-border shadow-sm rounded-md",
         "bg-card"
       )}>
-        <CardHeader className={cn("pb-3", cardPadding(density))}>
-          <CardTitle className={cn(
+        <GlassCardHeader className={cn("pb-3", cardPadding(density))}>
+          <GlassCardTitle className={cn(
             typography.cardTitle,
             "flex items-center gap-2 text-foreground"
           )}>
             <Activity className="h-5 w-5 text-blue-600" />
             Active Request Tracking
-          </CardTitle>
+          </GlassCardTitle>
           <p className={cn(typography.label, "!normal-case !text-muted-foreground mt-1")}>
             Your request is currently being reviewed
           </p>
-        </CardHeader>
-        <CardContent className={cardPadding(density)}>
+        </GlassCardHeader>
+        <GlassCardContent className={cardPadding(density)}>
           {/* Request Summary */}
           <div className="mb-4 flex items-center justify-between">
             <div>
@@ -170,8 +170,8 @@ export function CorporateActiveRequestTracker({
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </GlassCardContent>
+      </GlassCard>
     </div>
   );
 }

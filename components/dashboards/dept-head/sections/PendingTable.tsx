@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ModernTable } from "@/components/ui";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { GlassCard, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -158,11 +159,11 @@ export function DeptHeadPendingTable({
 
   return (
     <>
-      <ModernTable.Card.Root>
-        <ModernTable.Card.Header
-          title="Pending Requests"
-          description="Review and manage team leave requests"
-        />
+      <GlassCard variant="hover">
+        <GlassCardHeader className="pb-3">
+          <GlassCardTitle className="text-lg font-semibold">Pending Requests</GlassCardTitle>
+          <p className="text-sm text-muted-foreground mt-1">Review and manage team leave requests</p>
+        </GlassCardHeader>
         <div className="p-6 space-y-4">
           {/* Search Bar with Clear Filters */}
           <SearchWithClear
@@ -232,31 +233,33 @@ export function DeptHeadPendingTable({
             <PendingTableNoResults />
           ) : (
             <div className="space-y-4">
-              <ModernTable.Card.Root>
+              <div className="border rounded-lg overflow-hidden">
                 <div className="max-h-[70vh] overflow-y-auto">
-                  <ModernTable size="md">
-                    <ModernTable.Header bordered={true}>
-                      <ModernTable.Head className="w-[40px]">
-                        <Checkbox
-                          checked={selectedIds.length === rows.length && rows.length > 0}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setSelectedIds(rows.map((r: any) => r.id));
-                            } else {
-                              setSelectedIds([]);
-                            }
-                          }}
-                        />
-                      </ModernTable.Head>
-                      <ModernTable.Head>Employee</ModernTable.Head>
-                      <ModernTable.Head>Type</ModernTable.Head>
-                      <ModernTable.Head className="hidden sm:table-cell">Dates</ModernTable.Head>
-                      <ModernTable.Head className="hidden md:table-cell">Days</ModernTable.Head>
-                      <ModernTable.Head className="hidden lg:table-cell">Reason</ModernTable.Head>
-                      <ModernTable.Head>Status</ModernTable.Head>
-                      <ModernTable.Head className="text-right">Actions</ModernTable.Head>
-                    </ModernTable.Header>
-                    <ModernTable.Body>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[40px]">
+                          <Checkbox
+                            checked={selectedIds.length === rows.length && rows.length > 0}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedIds(rows.map((r: any) => r.id));
+                              } else {
+                                setSelectedIds([]);
+                              }
+                            }}
+                          />
+                        </TableHead>
+                        <TableHead>Employee</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead className="hidden sm:table-cell">Dates</TableHead>
+                        <TableHead className="hidden md:table-cell">Days</TableHead>
+                        <TableHead className="hidden lg:table-cell">Reason</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
                       {rows.map((leave: any) => {
                         if (!leave.requester) return null;
 
@@ -266,8 +269,8 @@ export function DeptHeadPendingTable({
                         const isSelected = selectedIds.includes(leave.id);
 
                         return (
-                          <ModernTable.Row key={leave.id} className={isSelected ? "bg-muted/30" : ""}>
-                            <ModernTable.Cell>
+                          <TableRow key={leave.id} className={isSelected ? "bg-muted/30" : ""}>
+                            <TableCell>
                               <Checkbox
                                 checked={isSelected}
                                 onCheckedChange={(checked) => {
@@ -278,8 +281,8 @@ export function DeptHeadPendingTable({
                                   }
                                 }}
                               />
-                            </ModernTable.Cell>
-                            <ModernTable.Cell>
+                            </TableCell>
+                            <TableCell>
                               <Link
                                 href={`/leaves/${leave.id}`}
                                 className="text-data-info hover:underline font-medium cursor-pointer"
@@ -289,17 +292,17 @@ export function DeptHeadPendingTable({
                               <div className="text-xs text-muted-foreground truncate max-w-[200px]">
                                 {leave.requester.email}
                               </div>
-                            </ModernTable.Cell>
-                            <ModernTable.Cell className="font-medium">
+                            </TableCell>
+                            <TableCell className="font-medium">
                               {leaveTypeLabel[leave.type] ?? leave.type}
-                            </ModernTable.Cell>
-                            <ModernTable.Cell className="hidden sm:table-cell text-text-secondary">
+                            </TableCell>
+                            <TableCell className="hidden sm:table-cell text-text-secondary">
                               {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
-                            </ModernTable.Cell>
-                            <ModernTable.Cell className="hidden md:table-cell text-text-secondary">
+                            </TableCell>
+                            <TableCell className="hidden md:table-cell text-text-secondary">
                               {leave.workingDays}
-                            </ModernTable.Cell>
-                            <ModernTable.Cell className="hidden lg:table-cell max-w-xs">
+                            </TableCell>
+                            <TableCell className="hidden lg:table-cell max-w-xs">
                               {leave.reason && leave.reason.length > 50 ? (
                                 <TooltipProvider>
                                   <Tooltip>
@@ -316,8 +319,8 @@ export function DeptHeadPendingTable({
                               ) : (
                                 <div className="text-text-secondary">{leave.reason}</div>
                               )}
-                            </ModernTable.Cell>
-                            <ModernTable.Cell>
+                            </TableCell>
+                            <TableCell>
                               <div className="flex items-center gap-2">
                                 <StatusBadge status={leave.status} />
                                 {(leave as any).isModified && (
@@ -326,8 +329,8 @@ export function DeptHeadPendingTable({
                                   </Badge>
                                 )}
                               </div>
-                            </ModernTable.Cell>
-                            <ModernTable.Cell className="text-right">
+                            </TableCell>
+                            <TableCell className="text-right">
                               <div className="flex items-center justify-end gap-2 flex-nowrap">
                                 {isPending && (
                                   <>
@@ -456,14 +459,14 @@ export function DeptHeadPendingTable({
                                   </>
                                 )}
                               </div>
-                            </ModernTable.Cell>
-                          </ModernTable.Row>
+                            </TableCell>
+                          </TableRow>
                         );
                       })}
-                    </ModernTable.Body>
-                  </ModernTable>
+                    </TableBody>
+                  </Table>
                 </div>
-              </ModernTable.Card.Root>
+              </div>
 
               {/* Pagination */}
               <ScrollingPagination
@@ -476,7 +479,7 @@ export function DeptHeadPendingTable({
             </div>
           )}
         </div>
-      </ModernTable.Card.Root>
+      </GlassCard>
 
       {/* Approval Dialogs */}
       <ApprovalDialog

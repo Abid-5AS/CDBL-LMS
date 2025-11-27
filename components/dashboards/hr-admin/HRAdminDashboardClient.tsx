@@ -33,7 +33,7 @@ const LazyTrendChart = lazy(() =>
     default: mod.TrendChart,
   }))
 );
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { DashboardCardSkeleton } from "@/components/shared/skeletons";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
@@ -198,8 +198,8 @@ function HRAdminDashboardClientImpl({
               {isLoading ? (
                 <>
                   {[...Array(2)].map((_, i) => (
-                    <Card key={i} className="border-border/60 shadow-sm">
-                      <CardContent className="p-6">
+                    <GlassCard variant="hover" key={i} className="border-border/60 shadow-sm">
+                      <GlassCardContent className="p-6">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 space-y-3">
                             <div className="h-3 w-28 bg-muted/40 animate-pulse rounded" />
@@ -208,14 +208,14 @@ function HRAdminDashboardClientImpl({
                           </div>
                           <div className="h-12 w-12 bg-muted/40 animate-pulse rounded-2xl" />
                         </div>
-                      </CardContent>
-                    </Card>
+                      </GlassCardContent>
+                    </GlassCard>
                   ))}
                 </>
               ) : (
                 <>
-                  <Card className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
-                    <CardContent className="p-6">
+                  <GlassCard variant="hover" className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
+                    <GlassCardContent className="p-6">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
                           <p className="text-sm font-medium text-muted-foreground mb-2">
@@ -232,7 +232,7 @@ function HRAdminDashboardClientImpl({
                           <Clock className="h-6 w-6 text-blue-600" />
                         </div>
                       </div>
-                    </CardContent>
+                    </GlassCardContent>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
@@ -257,10 +257,10 @@ function HRAdminDashboardClientImpl({
                         </p>
                       </TooltipContent>
                     </Tooltip>
-                  </Card>
+                  </GlassCard>
 
-                  <Card className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
-                    <CardContent className="p-6">
+                  <GlassCard variant="hover" className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
+                    <GlassCardContent className="p-6">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
                           <p className="text-sm font-medium text-muted-foreground mb-2">
@@ -277,7 +277,7 @@ function HRAdminDashboardClientImpl({
                           <TrendingUp className="h-6 w-6 text-emerald-600" />
                         </div>
                       </div>
-                    </CardContent>
+                    </GlassCardContent>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
@@ -304,7 +304,7 @@ function HRAdminDashboardClientImpl({
                         </p>
                       </TooltipContent>
                     </Tooltip>
-                  </Card>
+                  </GlassCard>
                 </>
               )}
             </div>
@@ -322,8 +322,8 @@ function HRAdminDashboardClientImpl({
               {isLoading ? (
                 <>
                   {[...Array(5)].map((_, i) => (
-                    <Card key={i} className="border-border/60 shadow-sm">
-                      <CardContent className="p-6">
+                    <GlassCard variant="hover" key={i} className="border-border/60 shadow-sm">
+                      <GlassCardContent className="p-6">
                         <div className="flex items-start justify-between">
                           <div className="flex-1 space-y-3">
                             <div className="h-4 w-24 bg-muted/40 animate-pulse rounded" />
@@ -332,14 +332,14 @@ function HRAdminDashboardClientImpl({
                           </div>
                           <div className="h-12 w-12 bg-muted/40 animate-pulse rounded-xl" />
                         </div>
-                      </CardContent>
-                    </Card>
+                      </GlassCardContent>
+                    </GlassCard>
                   ))}
                 </>
               ) : (
                 <>
-                  <Card className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
-                    <CardContent className="p-6">
+                  <GlassCard variant="hover" className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
+                    <GlassCardContent className="p-6">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
                           <p className="text-sm font-medium text-muted-foreground mb-2">
@@ -356,7 +356,7 @@ function HRAdminDashboardClientImpl({
                           <Users className="h-6 w-6 text-violet-600" />
                         </div>
                       </div>
-                    </CardContent>
+                    </GlassCardContent>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
@@ -377,10 +377,10 @@ function HRAdminDashboardClientImpl({
                         </p>
                       </TooltipContent>
                     </Tooltip>
-                  </Card>
+                  </GlassCard>
 
-                  <Card className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
-                    <CardContent className="p-6">
+                  <GlassCard variant="hover" className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
+                    <GlassCardContent className="p-6">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
                           <p className="text-sm font-medium text-muted-foreground mb-2">
@@ -397,7 +397,7 @@ function HRAdminDashboardClientImpl({
                           <Calendar className="h-6 w-6 text-amber-600" />
                         </div>
                       </div>
-                    </CardContent>
+                    </GlassCardContent>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
@@ -417,10 +417,10 @@ function HRAdminDashboardClientImpl({
                         </p>
                       </TooltipContent>
                     </Tooltip>
-                  </Card>
+                  </GlassCard>
 
-                  <Card className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
-                    <CardContent className="p-6">
+                  <GlassCard variant="hover" className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
+                    <GlassCardContent className="p-6">
                       <div className="flex flex-col h-full">
                         <div className="flex items-start justify-between mb-3">
                           <p className="text-sm font-medium text-muted-foreground">
@@ -472,11 +472,11 @@ function HRAdminDashboardClientImpl({
                           </p>
                         )}
                       </div>
-                    </CardContent>
-                  </Card>
+                    </GlassCardContent>
+                  </GlassCard>
 
-                  <Card className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
-                    <CardContent className="p-6">
+                  <GlassCard variant="hover" className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
+                    <GlassCardContent className="p-6">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
                           <p className="text-sm font-medium text-muted-foreground mb-2">
@@ -493,7 +493,7 @@ function HRAdminDashboardClientImpl({
                           <Activity className="h-6 w-6 text-cyan-600" />
                         </div>
                       </div>
-                    </CardContent>
+                    </GlassCardContent>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
@@ -513,10 +513,10 @@ function HRAdminDashboardClientImpl({
                         </p>
                       </TooltipContent>
                     </Tooltip>
-                  </Card>
+                  </GlassCard>
 
-                  <Card className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
-                    <CardContent className="p-6">
+                  <GlassCard variant="hover" className="border-border/60 shadow-sm hover:shadow-md transition-shadow relative">
+                    <GlassCardContent className="p-6">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
                           <p className="text-sm font-medium text-muted-foreground mb-2">
@@ -533,7 +533,7 @@ function HRAdminDashboardClientImpl({
                           <CheckCircle2 className="h-6 w-6 text-green-600" />
                         </div>
                       </div>
-                    </CardContent>
+                    </GlassCardContent>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
@@ -554,7 +554,7 @@ function HRAdminDashboardClientImpl({
                         </p>
                       </TooltipContent>
                     </Tooltip>
-                  </Card>
+                  </GlassCard>
                 </>
               )}
             </div>
@@ -583,14 +583,14 @@ function HRAdminDashboardClientImpl({
             </div>
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
               {/* Quick Stats Summary */}
-              <Card className="border-border/60 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2 text-foreground">
+              <GlassCard variant="hover" className="border-border/60 shadow-sm">
+                <GlassCardHeader>
+                  <GlassCardTitle className="text-base flex items-center gap-2 text-foreground">
                     <FileText className="h-4 w-4 text-blue-600" />
                     Quick Stats
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
+                  </GlassCardTitle>
+                </GlassCardHeader>
+                <GlassCardContent className="space-y-3">
                   {isLoading ? (
                     <>
                       <div className="h-6 w-full bg-muted/50 animate-pulse rounded" />
@@ -641,8 +641,8 @@ function HRAdminDashboardClientImpl({
                       </div>
                     </>
                   )}
-                </CardContent>
-              </Card>
+                </GlassCardContent>
+              </GlassCard>
 
               {/* Leave Type Distribution */}
               <div className="lg:col-span-2">
@@ -721,13 +721,13 @@ function HRAdminDashboardClientImpl({
                 Review and process cancellation requests
               </p>
             </div>
-            <Card className="border-border/60 shadow-sm">
-              <CardContent className="p-6">
+            <GlassCard variant="hover" className="border-border/60 shadow-sm">
+              <GlassCardContent className="p-6">
                 <Suspense fallback={<DashboardCardSkeleton />}>
                   <CancellationRequestsPanel />
                 </Suspense>
-              </CardContent>
-            </Card>
+              </GlassCardContent>
+            </GlassCard>
           </motion.section>
         </motion.div>
       </RoleBasedDashboard>

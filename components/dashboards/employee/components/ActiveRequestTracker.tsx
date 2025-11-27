@@ -3,7 +3,7 @@
 import * as React from "react";
 import { motion } from "framer-motion";
 import { LeaveTimeline, type LeaveTimelineItem } from "@/components/dashboards/shared/LeaveTimeline";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { Activity } from "lucide-react";
 import type { LeaveRow } from "@/hooks/useLeaveRequests";
 
@@ -23,14 +23,14 @@ export function ActiveRequestTracker({ leaves, isLoading }: ActiveRequestTracker
 
   if (isLoading) {
     return (
-      <Card className="border-border/60 shadow-sm mb-6">
-        <CardHeader className="pb-2">
+      <GlassCard variant="hover" className="mb-6">
+        <GlassCardHeader className="pb-2">
           <div className="h-6 w-48 bg-muted animate-pulse rounded" />
-        </CardHeader>
-        <CardContent>
+        </GlassCardHeader>
+        <GlassCardContent>
           <div className="h-24 bg-muted/50 animate-pulse rounded-lg" />
-        </CardContent>
-      </Card>
+        </GlassCardContent>
+      </GlassCard>
     );
   }
 
@@ -65,14 +65,14 @@ export function ActiveRequestTracker({ leaves, isLoading }: ActiveRequestTracker
       transition={{ duration: 0.4 }}
       className="mb-6"
     >
-      <Card className="border-blue-200 dark:border-blue-800 bg-blue-50/30 dark:bg-blue-950/10 shadow-sm">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg font-semibold flex items-center gap-2 text-blue-700 dark:text-blue-400">
+      <GlassCard variant="hover" className="border-blue-200 dark:border-blue-800 bg-blue-50/30 dark:bg-blue-950/10">
+        <GlassCardHeader className="pb-2">
+          <GlassCardTitle className="text-lg font-semibold flex items-center gap-2 text-blue-700 dark:text-blue-400">
             <Activity className="h-5 w-5" />
             Active Request Tracking
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </GlassCardTitle>
+        </GlassCardHeader>
+        <GlassCardContent>
           <LeaveTimeline
             leaves={[timelineItem]}
             orientation="horizontal"
@@ -81,8 +81,8 @@ export function ActiveRequestTracker({ leaves, isLoading }: ActiveRequestTracker
             className="border-0 shadow-none bg-transparent"
             title=""
           />
-        </CardContent>
-      </Card>
+        </GlassCardContent>
+      </GlassCard>
     </motion.div>
   );
 }

@@ -78,7 +78,7 @@ export function useNavbarState(): NavbarState {
         
         // Or if we are on a sub-route that doesn't match one of the top-level items
         // This prevents "Home" from being active when we are on "Reports"
-        const isTopLevelRoute = ["/reports", "/employees", "/approvals", "/policies", "/leaves", "/holidays"].some(
+        const isTopLevelRoute = ["/reports", "/employees", "/approvals", "/policies", "/leaves"].some(
           route => pathname.startsWith(route)
         );
         return pathname.startsWith(href) && !isTopLevelRoute;

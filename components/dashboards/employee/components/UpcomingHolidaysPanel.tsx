@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { CalendarDays } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -33,31 +33,31 @@ export function UpcomingHolidaysPanel({ holidays = [], isLoading }: UpcomingHoli
 
   if (isLoading) {
     return (
-      <Card className="border-border shadow-sm">
-        <CardHeader className="pb-2">
+      <GlassCard variant="hover">
+        <GlassCardHeader className="pb-2">
           <Skeleton className="h-5 w-32" />
-        </CardHeader>
-        <CardContent className="space-y-3">
+        </GlassCardHeader>
+        <GlassCardContent className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex items-center justify-between">
               <Skeleton className="h-4 w-24" />
               <Skeleton className="h-4 w-16" />
             </div>
           ))}
-        </CardContent>
-      </Card>
+        </GlassCardContent>
+      </GlassCard>
     );
   }
 
   return (
-    <Card className="border-border shadow-sm bg-card">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base font-semibold flex items-center gap-2 text-foreground">
+    <GlassCard variant="hover">
+      <GlassCardHeader className="pb-3">
+        <GlassCardTitle className="text-base font-semibold flex items-center gap-2 text-foreground">
           <CalendarDays className="h-4 w-4 text-muted-foreground" />
           Upcoming Holidays
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+        </GlassCardTitle>
+      </GlassCardHeader>
+      <GlassCardContent>
         {nextHolidays.length > 0 ? (
           <div className="space-y-4">
             {nextHolidays.map((holiday) => (
@@ -79,7 +79,7 @@ export function UpcomingHolidaysPanel({ holidays = [], isLoading }: UpcomingHoli
             No upcoming holidays found.
           </div>
         )}
-      </CardContent>
-    </Card>
+      </GlassCardContent>
+    </GlassCard>
   );
 }

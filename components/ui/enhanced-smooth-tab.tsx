@@ -211,7 +211,7 @@ export default function EnhancedSmoothTab({
                 aria-label="Smooth tabs"
                 className={cn(
                     "flex items-center justify-between gap-1 py-1 mt-auto relative",
-                    "bg-background w-[400px] mx-auto",
+                    "bg-background w-full max-w-4xl mx-auto",
                     "border rounded-xl",
                     "transition-all duration-200",
                     className

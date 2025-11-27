@@ -20,8 +20,8 @@ import {
 
 import {
   Button,
-  Card,
-  CardContent,
+  GlassCard,
+  GlassCardContent,
   Skeleton,
   Tooltip,
   TooltipContent,
@@ -233,8 +233,8 @@ export function ModernEmployeeDashboard({
                 </Tabs>
               </div>
 
-              <Card className="border-border/60 shadow-sm">
-                <CardContent className="p-0">
+              <GlassCard variant="hover">
+                <GlassCardContent className="p-0">
                   {/* Reusing EmployeeRecentActivity but passing filtered leaves */}
                   <EmployeeRecentActivity
                     leaves={filteredLeaves}
@@ -245,8 +245,8 @@ export function ModernEmployeeDashboard({
                       View Full History
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
+                </GlassCardContent>
+              </GlassCard>
             </motion.div>
 
             {/* Right Column: Team Status (1/3 width) */}

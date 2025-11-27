@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { AlertTriangle, Info, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -54,14 +54,14 @@ export function SystemAlertsPanel() {
   };
 
   return (
-    <Card className="surface-card">
-      <CardHeader>
-        <CardTitle className="text-base flex items-center gap-2">
+    <GlassCard variant="hover" className="surface-card">
+      <GlassCardHeader>
+        <GlassCardTitle className="text-base flex items-center gap-2">
           <AlertTriangle className="h-4 w-4" />
           System Alerts
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
+        </GlassCardTitle>
+      </GlassCardHeader>
+      <GlassCardContent className="space-y-3">
         {alerts.length === 0 ? (
           <div className="text-center py-6 text-sm text-muted-foreground">
             <CheckCircle className="h-8 w-8 mx-auto mb-2 text-data-success" />
@@ -89,7 +89,7 @@ export function SystemAlertsPanel() {
             );
           })
         )}
-      </CardContent>
-    </Card>
+      </GlassCardContent>
+    </GlassCard>
   );
 }

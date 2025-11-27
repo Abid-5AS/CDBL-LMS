@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -64,13 +64,13 @@ export function TeamCoverageCalendar() {
   };
 
   return (
-    <Card className="surface-card h-full">
-      <CardHeader className="pb-2">
+    <GlassCard variant="hover" className="surface-card h-full">
+      <GlassCardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base flex items-center gap-2">
+          <GlassCardTitle className="text-base flex items-center gap-2">
             <Calendar className="h-4 w-4 text-muted-foreground" />
             Team Coverage
-          </CardTitle>
+          </GlassCardTitle>
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon" className="h-6 w-6" onClick={prevMonth}>
               <ChevronLeft className="h-4 w-4" />
@@ -83,8 +83,8 @@ export function TeamCoverageCalendar() {
             </Button>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
+      </GlassCardHeader>
+      <GlassCardContent>
         <div className="grid grid-cols-7 gap-1 mb-1">
           {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
             <div key={i} className="text-[10px] text-center text-muted-foreground font-medium">
@@ -128,7 +128,7 @@ export function TeamCoverageCalendar() {
           <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-orange-400" /> Med</div>
           <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-red-500" /> High</div>
         </div>
-      </CardContent>
-    </Card>
+      </GlassCardContent>
+    </GlassCard>
   );
 }

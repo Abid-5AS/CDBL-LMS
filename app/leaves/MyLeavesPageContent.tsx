@@ -12,6 +12,7 @@ import {
   Search,
   XCircle,
   AlertCircle,
+  LayoutGrid,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -26,7 +27,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import { EnhancedSmoothTab } from "@/components/ui/enhanced-smooth-tab";
+import EnhancedSmoothTab from "@/components/ui/enhanced-smooth-tab";
 
 import { LeaveBalanceView } from "@/components/leaves/LeaveBalanceView";
 import { HolidayCalendarView } from "@/components/leaves/HolidayCalendarView";
@@ -145,17 +146,7 @@ function RequestsView() {
     return matchesTab && matchesSearch;
   }) || [];
 
-  // Map requests to timeline items
-  const timelineItems = filteredRequests.map((item: any) => ({
-    id: item.id,
-    type: item.leaveType.name, // Map nested name to type string
-    status: item.status,
-    startDate: item.startDate,
-    endDate: item.endDate,
-    days: item.days,
-    reason: item.reason,
-    createdAt: item.createdAt,
-  }));
+
 
   return (
     <div className="space-y-6">
@@ -190,7 +181,7 @@ function RequestsView() {
       {/* Status Filters */}
       <EnhancedSmoothTab
         items={tabs}
-        activeId={activeTab}
+        value={activeTab}
         onChange={setActiveTab}
         className="w-full max-w-4xl mx-auto"
       />

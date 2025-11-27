@@ -17,7 +17,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { cn } from "@/lib/utils";
 
 // Modern color palette using CSS variables for consistency
@@ -85,16 +85,16 @@ export function AnalyticsLineChart({
   }
 
   return (
-    <Card className={cn("rounded-2xl", className)}>
+    <GlassCard variant="hover" className={cn("rounded-2xl", className)}>
       {title && (
-        <CardHeader>
-          <CardTitle className="text-base">{title}</CardTitle>
+        <GlassCardHeader>
+          <GlassCardTitle className="text-base">{title}</GlassCardTitle>
           {subtitle && (
             <p className="text-sm text-muted-foreground">{subtitle}</p>
           )}
-        </CardHeader>
+        </GlassCardHeader>
       )}
-      <CardContent>
+      <GlassCardContent>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} vertical={false} />
@@ -123,8 +123,8 @@ export function AnalyticsLineChart({
             ))}
           </LineChart>
         </ResponsiveContainer>
-      </CardContent>
-    </Card>
+      </GlassCardContent>
+    </GlassCard>
   );
 }
 
@@ -156,16 +156,16 @@ export function AnalyticsBarChart({
   }
 
   return (
-    <Card className={cn("rounded-2xl", className)}>
+    <GlassCard variant="hover" className={cn("rounded-2xl", className)}>
       {title && (
-        <CardHeader>
-          <CardTitle className="text-base">{title}</CardTitle>
+        <GlassCardHeader>
+          <GlassCardTitle className="text-base">{title}</GlassCardTitle>
           {subtitle && (
             <p className="text-sm text-muted-foreground">{subtitle}</p>
           )}
-        </CardHeader>
+        </GlassCardHeader>
       )}
-      <CardContent>
+      <GlassCardContent>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} vertical={false} />
@@ -192,8 +192,8 @@ export function AnalyticsBarChart({
             ))}
           </BarChart>
         </ResponsiveContainer>
-      </CardContent>
-    </Card>
+      </GlassCardContent>
+    </GlassCard>
   );
 }
 
@@ -225,16 +225,16 @@ export function AnalyticsAreaChart({
   }
 
   return (
-    <Card className={cn("rounded-2xl", className)}>
+    <GlassCard variant="hover" className={cn("rounded-2xl", className)}>
       {title && (
-        <CardHeader>
-          <CardTitle className="text-base">{title}</CardTitle>
+        <GlassCardHeader>
+          <GlassCardTitle className="text-base">{title}</GlassCardTitle>
           {subtitle && (
             <p className="text-sm text-muted-foreground">{subtitle}</p>
           )}
-        </CardHeader>
+        </GlassCardHeader>
       )}
-      <CardContent>
+      <GlassCardContent>
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={data}>
             <defs>
@@ -290,8 +290,8 @@ export function AnalyticsAreaChart({
             ))}
           </AreaChart>
         </ResponsiveContainer>
-      </CardContent>
-    </Card>
+      </GlassCardContent>
+    </GlassCard>
   );
 }
 
@@ -328,16 +328,16 @@ export function AnalyticsPieChart({
   };
 
   return (
-    <Card className={cn("rounded-2xl", className)}>
+    <GlassCard variant="hover" className={cn("rounded-2xl", className)}>
       {title && (
-        <CardHeader>
-          <CardTitle className="text-base">{title}</CardTitle>
+        <GlassCardHeader>
+          <GlassCardTitle className="text-base">{title}</GlassCardTitle>
           {subtitle && (
             <p className="text-sm text-muted-foreground">{subtitle}</p>
           )}
-        </CardHeader>
+        </GlassCardHeader>
       )}
-      <CardContent>
+      <GlassCardContent>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
@@ -360,8 +360,8 @@ export function AnalyticsPieChart({
             <Tooltip contentStyle={glassTooltipStyle} />
           </PieChart>
         </ResponsiveContainer>
-      </CardContent>
-    </Card>
+      </GlassCardContent>
+    </GlassCard>
   );
 }
 
@@ -374,16 +374,16 @@ function ChartSkeleton({
   className?: string;
 }) {
   return (
-    <Card className={cn("rounded-2xl", className)}>
+    <GlassCard variant="hover" className={cn("rounded-2xl", className)}>
       {title && (
-        <CardHeader>
+        <GlassCardHeader>
           <div className="h-5 w-32 bg-muted/50 animate-pulse rounded" />
-        </CardHeader>
+        </GlassCardHeader>
       )}
-      <CardContent>
+      <GlassCardContent>
         <div className="h-[300px] bg-muted/20 animate-pulse rounded-lg" />
-      </CardContent>
-    </Card>
+      </GlassCardContent>
+    </GlassCard>
   );
 }
 

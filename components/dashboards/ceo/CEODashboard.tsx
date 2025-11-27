@@ -39,7 +39,7 @@ import {
   KPIGridSkeleton,
   DashboardCardSkeleton,
 } from "@/components/shared/skeletons";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -369,11 +369,11 @@ export function CEODashboard() {
                   showPercentage={true}
                 />
 
-                <Card className="surface-card rounded-2xl">
-                  <CardHeader>
-                    <CardTitle className="text-base">Leave Type Details</CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                <GlassCard variant="hover" className="surface-card rounded-2xl">
+                  <GlassCardHeader>
+                    <GlassCardTitle className="text-base">Leave Type Details</GlassCardTitle>
+                  </GlassCardHeader>
+                  <GlassCardContent>
                     <div className="space-y-3">
                       {stats.leaveTypes.slice(0, 5).map((type, index) => (
                         <div key={index}>
@@ -390,8 +390,8 @@ export function CEODashboard() {
                         </div>
                       ))}
                     </div>
-                  </CardContent>
-                </Card>
+                  </GlassCardContent>
+                </GlassCard>
               </div>
             )}
           </div>
@@ -401,14 +401,14 @@ export function CEODashboard() {
         <div className="xl:w-80 shrink-0 space-y-4 sm:space-y-6">
           {/* Strategic Alerts (formerly AI Insights) */}
           {!isLoading && stats && stats.insights && stats.insights.length > 0 && (
-            <Card className="surface-card rounded-2xl">
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
+            <GlassCard variant="hover" className="surface-card rounded-2xl">
+              <GlassCardHeader>
+                <GlassCardTitle className="text-base flex items-center gap-2">
                   <AlertCircle className="h-4 w-4 text-data-info" />
                   Strategic Alerts
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
+                </GlassCardTitle>
+              </GlassCardHeader>
+              <GlassCardContent className="space-y-3">
                 {stats.insights.map((insight, index) => (
                   <div
                     key={index}
@@ -420,19 +420,19 @@ export function CEODashboard() {
                     {insight.message}
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </GlassCardContent>
+            </GlassCard>
           )}
 
           {/* Quick Financial Summary */}
           {!isLoading && stats && (
-            <Card className="surface-card rounded-2xl">
-              <CardHeader>
+            <GlassCard variant="hover" className="surface-card rounded-2xl">
+              <GlassCardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base flex items-center gap-2">
+                  <GlassCardTitle className="text-base flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
                     Financial Summary
-                  </CardTitle>
+                  </GlassCardTitle>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
@@ -457,8 +457,8 @@ export function CEODashboard() {
                     </TooltipContent>
                   </Tooltip>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
+              </GlassCardHeader>
+              <GlassCardContent className="space-y-3">
                 <div>
                   <p className="text-2xl font-bold">
                     ${((stats.estimatedCost || 0) / 1000).toFixed(1)}K
@@ -478,8 +478,8 @@ export function CEODashboard() {
                     </span>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </GlassCardContent>
+            </GlassCard>
           )}
           
           {/* Removed Fake System Health Monitor */}
@@ -494,8 +494,8 @@ export function CEODashboard() {
           description="Performance metrics by department"
           isLoading={isLoading}
         >
-          <Card className="surface-card">
-            <CardContent className="p-0">
+          <GlassCard variant="hover" className="surface-card">
+            <GlassCardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-muted/30 border-b border-border">
@@ -548,8 +548,8 @@ export function CEODashboard() {
               <div className="p-4 bg-muted/20 border-t border-border text-xs text-muted-foreground">
                 <p>Note: On Leave and Utilization are estimated based on organization-wide averages. For accurate department-specific data, contact HR.</p>
               </div>
-            </CardContent>
-          </Card>
+            </GlassCardContent>
+          </GlassCard>
         </DashboardSection>
       )}
 
@@ -565,14 +565,14 @@ export function CEODashboard() {
         ) : (
           <ResponsiveDashboardGrid columns="1:2:2:2" gap="md">
             {/* Financial Impact Card */}
-            <Card className="surface-card rounded-2xl">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <GlassCard variant="hover" className="surface-card rounded-2xl">
+              <GlassCardHeader className="pb-3">
+                <GlassCardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <DollarSign className="h-4 w-4" />
                   Financial Impact
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
+                </GlassCardTitle>
+              </GlassCardHeader>
+              <GlassCardContent className="space-y-3">
                 <div>
                   <p className="text-3xl font-bold">
                     ${((stats?.estimatedCost || 0) / 1000).toFixed(1)}K
@@ -594,18 +594,18 @@ export function CEODashboard() {
                       : 0}
                   </span>
                 </div>
-              </CardContent>
-            </Card>
+              </GlassCardContent>
+            </GlassCard>
 
             {/* Year-over-Year Comparison */}
-            <Card className="surface-card rounded-2xl">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <GlassCard variant="hover" className="surface-card rounded-2xl">
+              <GlassCardHeader className="pb-3">
+                <GlassCardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
                   Year-over-Year Growth
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
+                </GlassCardTitle>
+              </GlassCardHeader>
+              <GlassCardContent className="space-y-3">
                 <div className="flex items-end justify-between">
                   <div>
                     <p className="text-3xl font-bold">
@@ -638,8 +638,8 @@ export function CEODashboard() {
                     <span className="font-semibold">{stats?.lastYear?.requests || 0} requests</span>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </GlassCardContent>
+            </GlassCard>
             
             {/* Removed Fake System Health Card */}
           </ResponsiveDashboardGrid>
