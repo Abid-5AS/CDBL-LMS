@@ -12,6 +12,7 @@ import { useTheme } from "next-themes";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui";
+import { RechartsGlassTooltip } from "@/components/ui/recharts-glass-tooltip";
 
 export type Slice = {
   type?: "CASUAL" | "EARNED" | "MEDICAL";
@@ -44,28 +45,6 @@ const TYPE_COLORS_MAP: Record<string, string> = {
   MEDICAL: "hsl(var(--chart-3))",
 };
 
-// Custom glass-styled tooltip
-const CustomTooltip = ({ active, payload }: any) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    return (
-      <div className="glass-card rounded-lg p-3 border border-border/50 shadow-xl backdrop-blur-xl">
-        <p className="text-sm font-semibold text-foreground mb-2">{data.name}</p>
-        <div className="space-y-1">
-          <div className="flex items-center justify-between gap-3 text-xs">
-            <span className="text-muted-foreground">Count:</span>
-            <span className="font-semibold text-foreground">{data.value}</span>
-          </div>
-          <div className="flex items-center justify-between gap-3 text-xs">
-            <span className="text-muted-foreground">Percentage:</span>
-            <span className="font-semibold text-foreground">{data.percent.toFixed(1)}%</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  return null;
-};
 
 // Custom label renderer with better styling
 const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
@@ -176,7 +155,7 @@ export function TypePie({
               />
             ))}
           </Pie>
-          <RechartsTooltip content={<CustomTooltip />} />
+          <RechartsTooltip content={<RechartsGlassTooltip />} />
           {showLegend && (
             <Legend
               wrapperStyle={{

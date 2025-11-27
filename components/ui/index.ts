@@ -195,3 +195,4 @@ export { default as SmoothTab } from "../kokonutui/smooth-tab";
 export { default as EnhancedSmoothTab } from "./enhanced-smooth-tab";
 export { EmptyState } from "./empty-state";
 export { StatusChip } from "./status-chip";
+export { RechartsGlassTooltip } from "./recharts-glass-tooltip";

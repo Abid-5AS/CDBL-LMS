@@ -110,10 +110,12 @@ export function BarChartCard({
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "hsl(var(--popover))",
+                  backgroundColor: "hsl(var(--card))",
+                  backdropFilter: "blur(12px)",
                   border: "1px solid hsl(var(--border))",
-                  borderRadius: "8px",
-                  padding: "8px 12px",
+                  borderRadius: "12px",
+                  padding: "12px",
+                  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
                 }}
                 labelStyle={{ color: "hsl(var(--foreground))", fontWeight: 600 }}
               />
@@ -177,10 +179,12 @@ export function LineChartCard({
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "hsl(var(--popover))",
+                  backgroundColor: "hsl(var(--card))",
+                  backdropFilter: "blur(12px)",
                   border: "1px solid hsl(var(--border))",
-                  borderRadius: "8px",
-                  padding: "8px 12px",
+                  borderRadius: "12px",
+                  padding: "12px",
+                  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
                 }}
                 labelStyle={{ color: "hsl(var(--foreground))", fontWeight: 600 }}
               />
@@ -259,10 +263,12 @@ export function PieChartCard({
               </Pie>
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "hsl(var(--popover))",
+                  backgroundColor: "hsl(var(--card))",
+                  backdropFilter: "blur(12px)",
                   border: "1px solid hsl(var(--border))",
-                  borderRadius: "8px",
-                  padding: "8px 12px",
+                  borderRadius: "12px",
+                  padding: "12px",
+                  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
                 }}
               />
             </PieChart>

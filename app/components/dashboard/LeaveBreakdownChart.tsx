@@ -16,6 +16,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import { RechartsGlassTooltip } from "@/components/ui/recharts-glass-tooltip";
 
 /**
  * Chart Data Interface
@@ -164,7 +165,7 @@ export function LeaveBreakdownChart({
           className="text-xs text-gray-600 dark:text-gray-400"
           tick={{ fill: "currentColor" }}
         />
-        {interactive && <Tooltip content={<CustomTooltip />} />}
+        {interactive && <Tooltip content={<RechartsGlassTooltip />} />}
         {showLegend && (
           <Legend
             wrapperStyle={{

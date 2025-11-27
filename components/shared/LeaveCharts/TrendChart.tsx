@@ -12,6 +12,7 @@ import {
 import { useTheme } from "next-themes";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { RechartsGlassTooltip } from "@/components/ui/recharts-glass-tooltip";
 
 export type TrendPoint = {
   month: string;
@@ -47,29 +48,6 @@ const MONTH_ORDER = [
   "Dec",
 ];
 
-// Custom glass-styled tooltip
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="glass-card rounded-lg p-3 border border-border/50 shadow-xl backdrop-blur-xl">
-        <p className="text-sm font-semibold text-foreground mb-2">{label}</p>
-        {payload.map((entry: any, index: number) => (
-          <div key={index} className="flex items-center justify-between gap-3 text-xs">
-            <span className="flex items-center gap-2">
-              <span
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: entry.color }}
-              />
-              <span className="text-muted-foreground font-medium">{entry.name}:</span>
-            </span>
-            <span className="font-semibold text-foreground">{entry.value}</span>
-          </div>
-        ))}
-      </div>
-    );
-  }
-  return null;
-};
 
 /**
  * TrendChart - Modern monthly leave trend area chart with gradients
@@ -176,7 +154,7 @@ export function TrendChart({
             tickLine={false}
             axisLine={{ stroke: gridColor }}
           />
-          <RechartsTooltip content={<CustomTooltip />} />
+          <RechartsTooltip content={<RechartsGlassTooltip />} />
           {stacked ? (
             <>
               <Area
