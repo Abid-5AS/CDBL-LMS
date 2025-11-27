@@ -69,7 +69,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 
 // Custom label renderer with better styling
 const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
-  if (percent < 5) return null; // Hide labels for small slices
+  if (percent < 5) return null; // Hide labels for small slices (< 5%)
 
   const RADIAN = Math.PI / 180;
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -86,7 +86,7 @@ const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent
       className="text-xs font-semibold"
       style={{ textShadow: "0 0 4px rgba(0,0,0,0.8)" }}
     >
-      {`${(percent * 100).toFixed(0)}%`}
+      {`${percent.toFixed(1)}%`}
     </text>
   );
 };
@@ -141,7 +141,7 @@ export function TypePie({
   }
 
   return (
-    <div className={cn("w-full", className)} style={{ height: `${height}px` }}>
+    <div className={cn("w-full", className)} style={{ height: `${height}px`, minHeight: `${height}px` }}>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie

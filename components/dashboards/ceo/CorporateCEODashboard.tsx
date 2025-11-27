@@ -187,9 +187,9 @@ export function CorporateCEODashboard() {
             {isLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[1, 2, 3, 4].map((i) => (
-                  <Card key={i} className="border-slate-200 shadow-sm rounded-md">
+                  <Card key={i} className="border-border shadow-sm rounded-md">
                     <CardContent className="p-6">
-                      <div className="h-20 bg-slate-100 animate-pulse rounded" />
+                      <div className="h-20 bg-muted animate-pulse rounded" />
                     </CardContent>
                   </Card>
                 ))}
@@ -219,7 +219,7 @@ export function CorporateCEODashboard() {
                           <p className="text-sm mb-2">
                             Core organizational capacity metric. Track growth trends and plan for scaling HR resources accordingly.
                           </p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-muted-foreground">
                             "Active" count excludes system/admin accounts.
                           </p>
                         </TooltipContent>
@@ -255,7 +255,7 @@ export function CorporateCEODashboard() {
                           <p className="text-sm mb-2">
                             Low utilization (below 85%) may indicate operational risks, seasonal patterns, or organizational issues requiring attention.
                           </p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-muted-foreground">
                             Target: Maintain 90%+ utilization for optimal operations.
                           </p>
                         </TooltipContent>
@@ -299,7 +299,7 @@ export function CorporateCEODashboard() {
                           <p className="text-sm mb-2">
                             High backlog indicates bottleneck at executive level. Avg approval time tracks organizational efficiency.
                           </p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-muted-foreground">
                             Target: Process within 2-3 days to avoid employee frustration.
                           </p>
                         </TooltipContent>
@@ -343,7 +343,7 @@ export function CorporateCEODashboard() {
                           <p className="text-sm mb-2">
                             Low scores (below 90%) indicate process inefficiencies, policy violations, or training gaps that need executive intervention.
                           </p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-muted-foreground">
                             Target: Maintain 95%+ for regulatory compliance and employee satisfaction.
                           </p>
                         </TooltipContent>
@@ -427,7 +427,7 @@ export function CorporateCEODashboard() {
                         showPercentage={true}
                       />
 
-                      <Card className="border-slate-200 shadow-sm rounded-md">
+                      <Card className="border-border shadow-sm rounded-md">
                         <CardHeader>
                           <CardTitle className={typography.cardTitle}>Leave Type Details</CardTitle>
                         </CardHeader>
@@ -437,11 +437,11 @@ export function CorporateCEODashboard() {
                               <div key={index}>
                                 <div className="flex justify-between items-center mb-1">
                                   <span className="text-sm font-medium">{type.type}</span>
-                                  <span className="text-sm text-slate-500">
+                                  <span className="text-sm text-muted-foreground">
                                     {type.count} requests
                                   </span>
                                 </div>
-                                <div className="flex justify-between items-center text-xs text-slate-500">
+                                <div className="flex justify-between items-center text-xs text-muted-foreground">
                                   <span>Avg duration: {(type.days / (type.count || 1)).toFixed(1)} days</span>
                                 </div>
                                 {index < stats.leaveTypes.length - 1 && <Separator className="mt-3" />}
@@ -459,7 +459,7 @@ export function CorporateCEODashboard() {
               <div className="xl:w-80 shrink-0 space-y-6">
                 {/* Strategic Alerts */}
                 {!isLoading && stats && stats.insights && stats.insights.length > 0 && (
-                  <Card className="border-slate-200 shadow-sm rounded-md">
+                  <Card className="border-border shadow-sm rounded-md">
                     <CardHeader>
                       <CardTitle className={cn(typography.cardTitle, "flex items-center gap-2")}>
                         <AlertCircle className="h-4 w-4 text-blue-600" />
@@ -484,7 +484,7 @@ export function CorporateCEODashboard() {
 
                 {/* Quick Financial Summary */}
                 {!isLoading && stats && (
-                  <Card className="border-slate-200 shadow-sm rounded-md">
+                  <Card className="border-border shadow-sm rounded-md">
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <CardTitle className={cn(typography.cardTitle, "flex items-center gap-2")}>
@@ -509,7 +509,7 @@ export function CorporateCEODashboard() {
                             <p className="text-sm mb-2">
                               Cost = (Total Leave Days × Avg Daily Rate). Daily rate assumes standard salary distribution across workforce.
                             </p>
-                            <p className="text-xs text-slate-500">
+                            <p className="text-xs text-muted-foreground">
                               This is an estimate. Actual cost may vary based on employee salaries and benefits.
                             </p>
                           </TooltipContent>
@@ -521,16 +521,16 @@ export function CorporateCEODashboard() {
                         <p className={typography.kpiNumber}>
                           ${((stats.estimatedCost || 0) / 1000).toFixed(1)}K
                         </p>
-                        <p className="text-xs text-slate-500">Estimated YTD cost</p>
+                        <p className="text-xs text-muted-foreground">Estimated YTD cost</p>
                       </div>
                       <Separator />
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-slate-500">Leave Days</span>
+                          <span className="text-muted-foreground">Leave Days</span>
                           <span className="font-medium">{stats.totalLeaveDays || 0}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-slate-500">YoY Growth</span>
+                          <span className="text-muted-foreground">YoY Growth</span>
                           <span
                             className={cn(
                               "font-medium",
@@ -559,11 +559,11 @@ export function CorporateCEODashboard() {
                 </p>
               </div>
 
-              <Card className="border-slate-200 shadow-sm rounded-md">
+              <Card className="border-border shadow-sm rounded-md">
                 <CardContent className="p-0">
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                      <thead className="bg-slate-50 border-b border-slate-200">
+                      <thead className="bg-muted/30 border-b border-border">
                         <tr>
                           <th className="text-left p-3 font-medium text-slate-700">Department</th>
                           <th className="text-left p-3 font-medium text-slate-700">Headcount</th>
@@ -584,10 +584,10 @@ export function CorporateCEODashboard() {
                           return (
                             <tr
                               key={index}
-                              className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                              className="border-b border-slate-100 hover:bg-muted/50 transition-colors"
                             >
                               <td className="p-3 font-medium">{dept.name}</td>
-                              <td className="p-3 text-slate-500">{dept.employees}</td>
+                              <td className="p-3 text-muted-foreground">{dept.employees}</td>
                               <td className="p-3">
                                 <div className="flex items-center gap-2">
                                   <span>{estimatedOnLeave}</span>
@@ -621,7 +621,7 @@ export function CorporateCEODashboard() {
                       </tbody>
                     </table>
                   </div>
-                  <div className="p-4 bg-slate-50 border-t border-slate-200 text-xs text-slate-500">
+                  <div className="p-4 bg-muted/30 border-t border-border text-xs text-muted-foreground">
                     <p>
                       Note: On Leave and Utilization are estimated based on organization-wide averages. For accurate department-specific data, contact HR.
                     </p>
@@ -643,9 +643,9 @@ export function CorporateCEODashboard() {
             {isLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[1, 2].map((i) => (
-                  <Card key={i} className="border-slate-200 shadow-sm rounded-md">
+                  <Card key={i} className="border-border shadow-sm rounded-md">
                     <CardContent className="p-6">
-                      <div className="h-32 bg-slate-100 animate-pulse rounded" />
+                      <div className="h-32 bg-muted animate-pulse rounded" />
                     </CardContent>
                   </Card>
                 ))}
@@ -653,9 +653,9 @@ export function CorporateCEODashboard() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Financial Impact Card */}
-                <Card className="border-slate-200 shadow-sm rounded-md">
+                <Card className="border-border shadow-sm rounded-md">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-slate-500 flex items-center gap-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                       <DollarSign className="h-4 w-4" />
                       Financial Impact
                     </CardTitle>
@@ -665,15 +665,15 @@ export function CorporateCEODashboard() {
                       <p className={typography.kpiNumber}>
                         ${((stats?.estimatedCost || 0) / 1000).toFixed(1)}K
                       </p>
-                      <p className="text-sm text-slate-500">Est. leave cost (YTD)</p>
+                      <p className="text-sm text-muted-foreground">Est. leave cost (YTD)</p>
                     </div>
                     <Separator />
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-slate-500">Total Leave Days</span>
+                      <span className="text-muted-foreground">Total Leave Days</span>
                       <span className="font-semibold">{stats?.totalLeaveDays || 0}</span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-slate-500">Avg Cost/Day</span>
+                      <span className="text-muted-foreground">Avg Cost/Day</span>
                       <span className="font-semibold">
                         $
                         {stats && stats.totalLeaveDays > 0
@@ -685,9 +685,9 @@ export function CorporateCEODashboard() {
                 </Card>
 
                 {/* Year-over-Year Comparison */}
-                <Card className="border-slate-200 shadow-sm rounded-md">
+                <Card className="border-border shadow-sm rounded-md">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-slate-500 flex items-center gap-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                       <TrendingUp className="h-4 w-4" />
                       Year-over-Year Growth
                     </CardTitle>
@@ -699,7 +699,7 @@ export function CorporateCEODashboard() {
                           {(stats?.yoyGrowth ?? 0) > 0 ? "+" : ""}
                           {stats?.yoyGrowth ?? 0}%
                         </p>
-                        <p className="text-sm text-slate-500">vs last year</p>
+                        <p className="text-sm text-muted-foreground">vs last year</p>
                       </div>
                       <Badge
                         variant={
@@ -720,13 +720,13 @@ export function CorporateCEODashboard() {
                     <Separator />
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-slate-500">This Year</span>
+                        <span className="text-muted-foreground">This Year</span>
                         <span className="font-semibold">
                           {stats?.thisYear?.requests || 0} requests
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-500">Last Year</span>
+                        <span className="text-muted-foreground">Last Year</span>
                         <span className="font-semibold">
                           {stats?.lastYear?.requests || 0} requests
                         </span>
@@ -750,15 +750,15 @@ export function CorporateCEODashboard() {
 
 // Corporate Line Chart (rounded-2xl → rounded-md)
 function CorporateAnalyticsLineChart(props: any) {
-  return <AnalyticsLineChart {...props} className="border-slate-200 shadow-sm rounded-md" />;
+  return <AnalyticsLineChart {...props} className="border-border shadow-sm rounded-md" />;
 }
 
 // Corporate Bar Chart (rounded-2xl → rounded-md)
 function CorporateAnalyticsBarChart(props: any) {
-  return <AnalyticsBarChart {...props} className="border-slate-200 shadow-sm rounded-md" />;
+  return <AnalyticsBarChart {...props} className="border-border shadow-sm rounded-md" />;
 }
 
 // Corporate Pie Chart (rounded-2xl → rounded-md)
 function CorporateAnalyticsPieChart(props: any) {
-  return <AnalyticsPieChart {...props} className="border-slate-200 shadow-sm rounded-md" />;
+  return <AnalyticsPieChart {...props} className="border-border shadow-sm rounded-md" />;
 }

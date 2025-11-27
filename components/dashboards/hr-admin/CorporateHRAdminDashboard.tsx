@@ -192,9 +192,9 @@ export function CorporateHRAdminDashboard({
             {isLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {[1, 2].map((i) => (
-                  <Card key={i} className="border-slate-200 shadow-sm rounded-md">
+                  <Card key={i} className="border-border shadow-sm rounded-md">
                     <CardContent className="p-4">
-                      <div className="h-16 bg-slate-100 animate-pulse rounded" />
+                      <div className="h-16 bg-muted animate-pulse rounded" />
                     </CardContent>
                   </Card>
                 ))}
@@ -202,7 +202,7 @@ export function CorporateHRAdminDashboard({
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Your Approval Queue */}
-                <Card className="border-slate-200 shadow-sm rounded-md hover:shadow-md transition-shadow relative">
+                <Card className="border-border shadow-sm rounded-md hover:shadow-md transition-shadow relative">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
@@ -244,7 +244,7 @@ export function CorporateHRAdminDashboard({
                 </Card>
 
                 {/* Avg Approval Time */}
-                <Card className="border-slate-200 shadow-sm rounded-md hover:shadow-md transition-shadow relative">
+                <Card className="border-border shadow-sm rounded-md hover:shadow-md transition-shadow relative">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
@@ -298,9 +298,9 @@ export function CorporateHRAdminDashboard({
             {isLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <Card key={i} className="border-slate-200 shadow-sm rounded-md">
+                  <Card key={i} className="border-border shadow-sm rounded-md">
                     <CardContent className="p-4">
-                      <div className="h-16 bg-slate-100 animate-pulse rounded" />
+                      <div className="h-16 bg-muted animate-pulse rounded" />
                     </CardContent>
                   </Card>
                 ))}
@@ -308,7 +308,7 @@ export function CorporateHRAdminDashboard({
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                 {/* Employees on Leave */}
-                <Card className="border-slate-200 shadow-sm rounded-md hover:shadow-md transition-shadow relative">
+                <Card className="border-border shadow-sm rounded-md hover:shadow-md transition-shadow relative">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
@@ -344,7 +344,7 @@ export function CorporateHRAdminDashboard({
                 </Card>
 
                 {/* Total Leaves YTD */}
-                <Card className="border-slate-200 shadow-sm rounded-md hover:shadow-md transition-shadow relative">
+                <Card className="border-border shadow-sm rounded-md hover:shadow-md transition-shadow relative">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
@@ -380,7 +380,7 @@ export function CorporateHRAdminDashboard({
                 </Card>
 
                 {/* Daily Processing */}
-                <Card className="border-slate-200 shadow-sm rounded-md hover:shadow-md transition-shadow">
+                <Card className="border-border shadow-sm rounded-md hover:shadow-md transition-shadow">
                   <CardContent className="p-4">
                     <div className="flex flex-col h-full">
                       <div className="flex items-start justify-between mb-3">
@@ -429,7 +429,7 @@ export function CorporateHRAdminDashboard({
                 </Card>
 
                 {/* Team Utilization */}
-                <Card className="border-slate-200 shadow-sm rounded-md hover:shadow-md transition-shadow relative">
+                <Card className="border-border shadow-sm rounded-md hover:shadow-md transition-shadow relative">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
@@ -465,7 +465,7 @@ export function CorporateHRAdminDashboard({
                 </Card>
 
                 {/* Compliance Score */}
-                <Card className="border-slate-200 shadow-sm rounded-md hover:shadow-md transition-shadow relative">
+                <Card className="border-border shadow-sm rounded-md hover:shadow-md transition-shadow relative">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
@@ -527,7 +527,7 @@ export function CorporateHRAdminDashboard({
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
               {/* Quick Stats Summary */}
-              <Card className="border-slate-200 shadow-sm rounded-md">
+              <Card className="border-border shadow-sm rounded-md">
                 <CardHeader>
                   <CardTitle className={cn(typography.cardTitle, "flex items-center gap-2")}>
                     <FileText className="h-4 w-4 text-blue-600" />
@@ -537,41 +537,41 @@ export function CorporateHRAdminDashboard({
                 <CardContent className="space-y-3">
                   {isLoading ? (
                     <>
-                      <div className="h-6 w-full bg-slate-100 animate-pulse rounded" />
-                      <div className="h-6 w-full bg-slate-100 animate-pulse rounded" />
-                      <div className="h-6 w-full bg-slate-100 animate-pulse rounded" />
+                      <div className="h-6 w-full bg-muted animate-pulse rounded" />
+                      <div className="h-6 w-full bg-muted animate-pulse rounded" />
+                      <div className="h-6 w-full bg-muted animate-pulse rounded" />
                     </>
                   ) : (
                     <>
-                      <div className="flex justify-between items-center text-sm hover:bg-slate-50 p-2 rounded-md transition-colors">
+                      <div className="flex justify-between items-center text-sm hover:bg-muted/50 p-2 rounded-md transition-colors">
                         <span className="text-slate-500">Processed Today</span>
                         <span className="font-semibold text-slate-900">
                           {displayStats?.processedToday || 0}
                         </span>
                       </div>
                       <Separator />
-                      <div className="flex justify-between items-center text-sm hover:bg-slate-50 p-2 rounded-md transition-colors">
+                      <div className="flex justify-between items-center text-sm hover:bg-muted/50 p-2 rounded-md transition-colors">
                         <span className="text-slate-500">Pending</span>
                         <span className="font-semibold text-slate-900">
                           {displayStats?.pendingRequests || 0}
                         </span>
                       </div>
                       <Separator />
-                      <div className="flex justify-between items-center text-sm hover:bg-slate-50 p-2 rounded-md transition-colors">
+                      <div className="flex justify-between items-center text-sm hover:bg-muted/50 p-2 rounded-md transition-colors">
                         <span className="text-slate-500">On Leave</span>
                         <span className="font-semibold text-slate-900">
                           {displayStats?.employeesOnLeave || 0}
                         </span>
                       </div>
                       <Separator />
-                      <div className="flex justify-between items-center text-sm hover:bg-slate-50 p-2 rounded-md transition-colors">
+                      <div className="flex justify-between items-center text-sm hover:bg-muted/50 p-2 rounded-md transition-colors">
                         <span className="text-slate-500">Avg Processing</span>
                         <span className="font-semibold text-slate-900">
                           {displayStats?.avgApprovalTime?.toFixed(1) || 0} days
                         </span>
                       </div>
                       <Separator />
-                      <div className="flex justify-between items-center text-sm hover:bg-slate-50 p-2 rounded-md transition-colors">
+                      <div className="flex justify-between items-center text-sm hover:bg-muted/50 p-2 rounded-md transition-colors">
                         <span className="text-slate-500">Encashment Queue</span>
                         <span className="font-semibold text-slate-900">
                           {displayStats?.encashmentPending || 0}
@@ -584,7 +584,7 @@ export function CorporateHRAdminDashboard({
 
               {/* Leave Type Distribution */}
               <div className="lg:col-span-2">
-                <Card className="border-slate-200 shadow-sm rounded-md">
+                <Card className="border-border shadow-sm rounded-md">
                   <CardHeader>
                     <CardTitle className={typography.cardTitle}>Leave Type Distribution</CardTitle>
                     <p className={cn(typography.label, "!normal-case mt-1")}>
@@ -593,7 +593,7 @@ export function CorporateHRAdminDashboard({
                   </CardHeader>
                   <CardContent>
                     {isLoading ? (
-                      <div className="h-[360px] bg-slate-100 animate-pulse rounded" />
+                      <div className="h-[360px] bg-muted animate-pulse rounded" />
                     ) : !displayStats?.leaveTypeBreakdown ||
                       displayStats.leaveTypeBreakdown.length === 0 ? (
                       <div className="h-[360px] flex items-center justify-center text-slate-500">
@@ -602,7 +602,7 @@ export function CorporateHRAdminDashboard({
                     ) : (
                       <Suspense
                         fallback={
-                          <div className="h-[360px] bg-slate-100 animate-pulse rounded" />
+                          <div className="h-[360px] bg-muted animate-pulse rounded" />
                         }
                       >
                         <LazyTypePie
@@ -625,7 +625,7 @@ export function CorporateHRAdminDashboard({
                 displayStats?.monthlyTrend &&
                 displayStats.monthlyTrend.length > 0 && (
                   <div className="lg:col-span-3">
-                    <Card className="border-slate-200 shadow-sm rounded-md">
+                    <Card className="border-border shadow-sm rounded-md">
                       <CardHeader>
                         <CardTitle className={typography.cardTitle}>Request Trend</CardTitle>
                         <p className={cn(typography.label, "!normal-case mt-1")}>
@@ -635,7 +635,7 @@ export function CorporateHRAdminDashboard({
                       <CardContent>
                         <Suspense
                           fallback={
-                            <div className="h-[360px] bg-slate-100 animate-pulse rounded" />
+                            <div className="h-[360px] bg-muted animate-pulse rounded" />
                           }
                         >
                           <LazyTrendChart
@@ -662,7 +662,7 @@ export function CorporateHRAdminDashboard({
                 Review and process cancellation requests
               </p>
             </div>
-            <Card className="border-slate-200 shadow-sm rounded-md">
+            <Card className="border-border shadow-sm rounded-md">
               <CardContent className="p-4">
                 <Suspense fallback={<DashboardCardSkeleton />}>
                   <CancellationRequestsPanel />

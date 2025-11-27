@@ -257,9 +257,9 @@ export function CorporateHRHeadDashboard() {
             {isLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {[1, 2, 3, 4].map((i) => (
-                  <Card key={i} className="border-slate-200 shadow-sm rounded-md">
+                  <Card key={i} className="border-border shadow-sm rounded-md">
                     <CardContent className="p-4">
-                      <div className="h-16 bg-slate-100 animate-pulse rounded" />
+                      <div className="h-16 bg-muted animate-pulse rounded" />
                     </CardContent>
                   </Card>
                 ))}
@@ -491,9 +491,9 @@ export function CorporateHRHeadDashboard() {
             {isLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[1, 2, 3].map((i) => (
-                  <Card key={i} className="border-slate-200 shadow-sm rounded-md">
+                  <Card key={i} className="border-border shadow-sm rounded-md">
                     <CardContent className="p-4">
-                      <div className="h-16 bg-slate-100 animate-pulse rounded" />
+                      <div className="h-16 bg-muted animate-pulse rounded" />
                     </CardContent>
                   </Card>
                 ))}
@@ -644,7 +644,7 @@ export function CorporateHRHeadDashboard() {
             <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
               {/* Left Column: Pending Approvals + Department Chart */}
               <div className="space-y-4">
-                <Card className="border-slate-200 shadow-sm rounded-md" id="pending-approvals">
+                <Card className="border-border shadow-sm rounded-md" id="pending-approvals">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between gap-4">
                       <div>
@@ -699,11 +699,11 @@ export function CorporateHRHeadDashboard() {
                 </p>
               </div>
 
-              <Card className="border-slate-200 shadow-sm rounded-md">
+              <Card className="border-border shadow-sm rounded-md">
                 <CardContent className="p-0">
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                      <thead className="bg-slate-50 border-b border-slate-200">
+                      <thead className="bg-muted/30 border-b border-border">
                         <tr>
                           <th className="text-left p-3 font-medium text-slate-700">Employee</th>
                           <th className="text-left p-3 font-medium text-slate-700">Department</th>
@@ -718,7 +718,7 @@ export function CorporateHRHeadDashboard() {
                         {stats.escalatedCases.map((escalation) => (
                           <tr
                             key={escalation.id}
-                            className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                            className="border-b border-slate-100 hover:bg-muted/50 transition-colors"
                           >
                             <td className="p-3">
                               <a
@@ -762,7 +762,7 @@ export function CorporateHRHeadDashboard() {
 
             <div className="grid gap-4 md:grid-cols-2">
               <Suspense fallback={<DashboardCardSkeleton />}>
-                <Card className="border-slate-200 shadow-sm rounded-md">
+                <Card className="border-border shadow-sm rounded-md">
                   <CardHeader>
                     <CardTitle className={typography.cardTitle}>
                       {METRIC_LABELS.SENT_BACK}
@@ -775,7 +775,7 @@ export function CorporateHRHeadDashboard() {
               </Suspense>
 
               <Suspense fallback={<DashboardCardSkeleton />}>
-                <Card className="border-slate-200 shadow-sm rounded-md">
+                <Card className="border-border shadow-sm rounded-md">
                   <CardHeader>
                     <CardTitle className={typography.cardTitle}>
                       {METRIC_LABELS.CANCELLED_REQUESTS}
@@ -809,7 +809,7 @@ function InsightsPanel({
   const typography = getTypography(density);
 
   return (
-    <Card className="border-slate-200 shadow-sm rounded-md">
+    <Card className="border-border shadow-sm rounded-md">
       <CardHeader>
         <CardTitle className={cn(typography.cardTitle, "flex items-center gap-2")}>
           <TrendingUp className="h-4 w-4" />
@@ -819,10 +819,10 @@ function InsightsPanel({
       <CardContent className="space-y-3">
         {isLoading
           ? Array.from({ length: 3 }).map((_, idx) => (
-              <div key={idx} className="h-14 rounded-md bg-slate-100 animate-pulse" />
+              <div key={idx} className="h-14 rounded-md bg-muted animate-pulse" />
             ))
           : items.map((item) => (
-              <div key={item.label} className="rounded-md border border-slate-200 px-3 py-2">
+              <div key={item.label} className="rounded-md border border-border px-3 py-2">
                 <p className="text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
                 <p className="text-lg font-semibold text-slate-900">{item.value}</p>
                 <p className="text-xs text-slate-500">{item.helper}</p>
@@ -854,7 +854,7 @@ function AlertsPanel({
   };
 
   return (
-    <Card className="border-slate-200 shadow-sm rounded-md">
+    <Card className="border-border shadow-sm rounded-md">
       <CardHeader>
         <CardTitle className={cn(typography.cardTitle, "flex items-center gap-2")}>
           <Clock className="h-4 w-4" />
@@ -864,7 +864,7 @@ function AlertsPanel({
       <CardContent className="space-y-3">
         {isLoading
           ? Array.from({ length: 2 }).map((_, idx) => (
-              <div key={idx} className="h-16 rounded-md bg-slate-100 animate-pulse" />
+              <div key={idx} className="h-16 rounded-md bg-muted animate-pulse" />
             ))
           : alerts.map((alert, idx) => (
               <div
@@ -895,7 +895,7 @@ function ActivityPanel({
   const typography = getTypography(density);
 
   return (
-    <Card className="border-slate-200 shadow-sm rounded-md">
+    <Card className="border-border shadow-sm rounded-md">
       <CardHeader>
         <CardTitle className={cn(typography.cardTitle, "flex items-center gap-2")}>
           <Activity className="h-4 w-4" />
@@ -905,16 +905,16 @@ function ActivityPanel({
       <CardContent>
         {isLoading ? (
           <div className="space-y-3">
-            <div className="h-16 w-full bg-slate-100 animate-pulse rounded" />
-            <div className="h-16 w-full bg-slate-100 animate-pulse rounded" />
-            <div className="h-16 w-full bg-slate-100 animate-pulse rounded" />
+            <div className="h-16 w-full bg-muted animate-pulse rounded" />
+            <div className="h-16 w-full bg-muted animate-pulse rounded" />
+            <div className="h-16 w-full bg-muted animate-pulse rounded" />
           </div>
         ) : activities.length > 0 ? (
           <div className="space-y-3">
             {activities.slice(0, 5).map((activity) => (
               <div
                 key={activity.id}
-                className="rounded-md border border-slate-200 p-3 text-sm"
+                className="rounded-md border border-border p-3 text-sm"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
@@ -943,5 +943,5 @@ function ActivityPanel({
  * Corporate-styled chart wrapper
  */
 function CorporateAnalyticsBarChart(props: any) {
-  return <AnalyticsBarChart {...props} className="border-slate-200 shadow-sm rounded-md" />;
+  return <AnalyticsBarChart {...props} className="border-border shadow-sm rounded-md" />;
 }
