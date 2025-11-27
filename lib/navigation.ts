@@ -34,7 +34,6 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
     { icon: Wallet, label: "Balance", href: "/balance" },
     { icon: Calendar, label: "Holidays", href: "/holidays" },
     { icon: BookOpen, label: "Policies", href: "/policies" },
-    { icon: Wrench, label: "Experimental", href: "/experimental-features" },
   ],
 
   DEPT_HEAD: [
@@ -42,7 +41,6 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
     { icon: ClipboardList, label: "Requests", href: "/approvals" },
     { icon: Users, label: "Team", href: "/employees" },
     { icon: Calendar, label: "Holidays", href: "/holidays" },
-    { icon: Wrench, label: "Experimental", href: "/experimental-features" },
     { icon: HelpCircle, label: "FAQ", href: "/faq" },
   ],
 

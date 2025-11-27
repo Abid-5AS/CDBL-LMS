@@ -77,7 +77,7 @@ export function DesktopNav({
                     <Link
                       href={link.href}
                       className={cn(
-                        "group/link relative flex flex-nowrap items-center gap-2 overflow-hidden whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 focus-ring border border-transparent",
+                        "group/link relative flex flex-nowrap items-center gap-2 overflow-hidden whitespace-nowrap rounded-lg px-2.5 py-1.5 text-sm font-medium transition-all duration-200 focus-ring border border-transparent",
                         active
                           ? "bg-surface-2 text-foreground border-outline/60 dark:border-border/60 shadow-sm"
                           : "text-muted-foreground hover:bg-surface-2 hover:text-foreground"
@@ -91,7 +91,7 @@ export function DesktopNav({
                             : "text-muted-foreground group-hover/link:text-foreground"
                         )}
                       />
-                      <span className="relative hidden lg:inline whitespace-nowrap font-medium">
+                      <span className="relative hidden xl:inline whitespace-nowrap font-medium">
                         {link.label}
                       </span>
                     </Link>

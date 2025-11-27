@@ -188,10 +188,11 @@ function RequestsView() {
         value={activeTab}
         onChange={setActiveTab}
         className="w-full max-w-4xl mx-auto"
+        showCardContent={false}
       />
 
       {/* Content */}
-      <div className="min-h-[400px]">
+      <div className="min-h-[200px]">
         {isLoading ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map((i) => (
@@ -256,38 +257,11 @@ export function MyLeavesPageContent() {
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">Leaves</h1>
         <p className="text-muted-foreground">
-          Manage your leave requests, check balances, and view the holiday calendar.
+          Manage your leave requests and track their status.
         </p>
       </div>
 
-      <Tabs defaultValue="requests" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
-          <TabsTrigger value="requests" className="gap-2">
-            <ClipboardList className="h-4 w-4" />
-            Requests
-          </TabsTrigger>
-          <TabsTrigger value="balances" className="gap-2">
-            <Wallet className="h-4 w-4" />
-            Balances
-          </TabsTrigger>
-          <TabsTrigger value="holidays" className="gap-2">
-            <Calendar className="h-4 w-4" />
-            Holidays
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="requests" className="space-y-6 outline-none">
-          <RequestsView />
-        </TabsContent>
-
-        <TabsContent value="balances" className="outline-none">
-          <LeaveBalanceView />
-        </TabsContent>
-
-        <TabsContent value="holidays" className="outline-none">
-          <HolidayCalendarView />
-        </TabsContent>
-      </Tabs>
+      <RequestsView />
     </div>
   );
 }
