@@ -119,36 +119,78 @@ export function MobileMenu({
 
             {/* Navigation Links */}
             <motion.nav variants={itemVariants} className="space-y-1" aria-label="Navigation links">
-              {navLinks.map((link, index) => {
-                const Icon = link.icon;
-                const active = isActive(link.href);
-                return (
-                  <motion.div
-                    key={link.href}
-                    variants={itemVariants}
-                    custom={index}
-                  >
-                    <Link
-                      href={link.href}
-                      onClick={closeMobileMenu}
-                      aria-current={active ? "page" : undefined}
-                      className={cn(
-                        "flex items-center gap-3 p-3 rounded-lg text-sm font-medium transition-all duration-200 focus-ring",
-                        active
-                          ? "bg-primary/10 text-primary"
-                          : "text-foreground hover:bg-muted"
-                      )}
+              {navLinks.map((item, index) => {
+                if ('items' in item) {
+                  // It's a NavGroup - render as expandable section
+                  return (
+                    <motion.div
+                      key={`${item.label}-${index}`}
+                      variants={itemVariants}
+                      custom={index}
                     >
-                      <Icon className={cn("h-5 w-5", active ? "text-primary" : "text-muted-foreground")} />
-                      <span className="flex-1">{link.label}</span>
-                      {link.badge && (
-                        <span className="bg-primary/20 text-primary px-2 py-0.5 rounded-full text-xs font-semibold">
-                          {link.badge}
-                        </span>
-                      )}
-                    </Link>
-                  </motion.div>
-                );
+                      <div className="p-3 rounded-lg text-sm font-medium">
+                        <div className="flex items-center gap-3 mb-2">
+                          <item.icon className="h-5 w-5 text-muted-foreground" />
+                          <span className="flex-1 font-semibold">{item.label}</span>
+                        </div>
+                        <div className="ml-8 space-y-1">
+                          {item.items.map((subItem) => {
+                            const SubIcon = subItem.icon;
+                            const active = isActive(subItem.href);
+                            return (
+                              <Link
+                                key={subItem.href}
+                                href={subItem.href}
+                                onClick={closeMobileMenu}
+                                aria-current={active ? "page" : undefined}
+                                className={cn(
+                                  "flex items-center gap-3 p-2 rounded-lg text-sm transition-all duration-200 focus-ring",
+                                  active
+                                    ? "bg-primary/10 text-primary"
+                                    : "text-foreground hover:bg-muted"
+                                )}
+                              >
+                                <SubIcon className={cn("h-4 w-4", active ? "text-primary" : "text-muted-foreground")} />
+                                <span className="flex-1">{subItem.label}</span>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                } else {
+                  // It's a regular NavItem - render as link
+                  const Icon = item.icon;
+                  const active = isActive(item.href);
+                  return (
+                    <motion.div
+                      key={item.href}
+                      variants={itemVariants}
+                      custom={index}
+                    >
+                      <Link
+                        href={item.href}
+                        onClick={closeMobileMenu}
+                        aria-current={active ? "page" : undefined}
+                        className={cn(
+                          "flex items-center gap-3 p-3 rounded-lg text-sm font-medium transition-all duration-200 focus-ring",
+                          active
+                            ? "bg-primary/10 text-primary"
+                            : "text-foreground hover:bg-muted"
+                        )}
+                      >
+                        <Icon className={cn("h-5 w-5", active ? "text-primary" : "text-muted-foreground")} />
+                        <span className="flex-1">{item.label}</span>
+                        {item.badge && (
+                          <span className="bg-primary/20 text-primary px-2 py-0.5 rounded-full text-xs font-semibold">
+                            {item.badge}
+                          </span>
+                        )}
+                      </Link>
+                    </motion.div>
+                  );
+                }
               })}
             </motion.nav>
 

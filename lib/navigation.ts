@@ -26,13 +26,21 @@ export type NavItem = {
   badge?: number;
 };
 
+export type NavGroup = {
+  icon: LucideIcon;
+  label: string;
+  items: NavItem[];
+  badge?: number;
+};
+
+export type NavItemOrGroup = NavItem | NavGroup;
+
 // Define role-specific navigation
-export const roleNavConfig: Record<UserRole, NavItem[]> = {
+export const roleNavConfig: Record<UserRole, NavItemOrGroup[]> = {
   EMPLOYEE: [
     { icon: Home, label: "Home", href: "/dashboard/employee" },
     { icon: ClipboardList, label: "My Leaves", href: "/leaves" },
     { icon: Wallet, label: "Balance", href: "/balance" },
-    { icon: Calendar, label: "Holidays", href: "/holidays" },
     { icon: BookOpen, label: "Policies", href: "/policies" },
   ],
 
@@ -40,49 +48,147 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
     { icon: Home, label: "Home", href: "/dashboard/dept-head" },
     { icon: ClipboardList, label: "Requests", href: "/approvals" },
     { icon: Users, label: "Team", href: "/employees" },
-    { icon: Calendar, label: "Holidays", href: "/holidays" },
     { icon: HelpCircle, label: "FAQ", href: "/faq" },
   ],
 
   HR_ADMIN: [
-    { icon: Home, label: "Home", href: "/dashboard/hr-admin" },
-    { icon: ClipboardList, label: "Requests", href: "/approvals" },
-    { icon: Users, label: "Employees", href: "/employees" },
+    {
+      icon: Home,
+      label: "Home",
+      href: "/dashboard/hr-admin"
+    },
+    {
+      icon: ClipboardList,
+      label: "Requests",
+      href: "/approvals"
+    },
+    {
+      icon: Users,
+      label: "People",
+      items: [
+        { icon: Users, label: "Employees", href: "/employees" },
+      ]
+    },
+    {
+      icon: Calendar,
+      label: "Company",
+      items: [
+        { icon: Calendar, label: "Holidays", href: "/holidays" },
+      ]
+    },
     { icon: ChartBar, label: "Reports", href: "/reports" },
-    { icon: Calendar, label: "Holidays", href: "/holidays" },
     { icon: BookOpen, label: "Policies", href: "/policies" },
     { icon: HelpCircle, label: "FAQ", href: "/faq" },
   ],
 
   HR_HEAD: [
-    { icon: Home, label: "Home", href: "/dashboard/hr-head" },
-    { icon: ClipboardList, label: "Approvals", href: "/approvals" },
-    { icon: Users, label: "Employees", href: "/employees" },
+    {
+      icon: Home,
+      label: "Home",
+      href: "/dashboard/hr-head"
+    },
+    {
+      icon: ClipboardList,
+      label: "Approvals",
+      href: "/approvals"
+    },
+    {
+      icon: Users,
+      label: "People",
+      items: [
+        { icon: Users, label: "Employees", href: "/employees" },
+      ]
+    },
+    {
+      icon: Calendar,
+      label: "Company",
+      items: [
+        { icon: Calendar, label: "Holidays", href: "/holidays" },
+      ]
+    },
     { icon: ChartBar, label: "Reports", href: "/reports" },
-    { icon: Calendar, label: "Holidays", href: "/holidays" },
-    { icon: Activity, label: "Audit", href: "/admin/audit" },
+    {
+      icon: Activity,
+      label: "Tools",
+      items: [
+        { icon: Shield, label: "Admin", href: "/admin" },
+        { icon: Activity, label: "Audit", href: "/admin/audit" },
+      ]
+    },
     { icon: HelpCircle, label: "FAQ", href: "/faq" },
   ],
 
   CEO: [
-    { icon: Home, label: "Home", href: "/dashboard/ceo" },
-    { icon: ClipboardList, label: "Approvals", href: "/approvals" },
+    {
+      icon: Home,
+      label: "Home",
+      href: "/dashboard/ceo"
+    },
+    {
+      icon: ClipboardList,
+      label: "Approvals",
+      href: "/approvals"
+    },
     { icon: ChartBar, label: "Reports", href: "/reports" },
-    { icon: Shield, label: "Admin", href: "/admin" },
-    { icon: Activity, label: "Audit", href: "/admin/audit" },
-    { icon: Users, label: "Employees", href: "/employees" },
-    { icon: Calendar, label: "Holidays", href: "/holidays" },
+    {
+      icon: Shield,
+      label: "Admin",
+      items: [
+        { icon: Shield, label: "Admin Dashboard", href: "/admin" },
+        { icon: Activity, label: "Audit Logs", href: "/admin/audit" },
+      ]
+    },
+    {
+      icon: Users,
+      label: "People",
+      items: [
+        { icon: Users, label: "Employees", href: "/employees" },
+      ]
+    },
+    {
+      icon: Calendar,
+      label: "Company",
+      items: [
+        { icon: Calendar, label: "Holidays", href: "/holidays" },
+      ]
+    },
     { icon: HelpCircle, label: "FAQ", href: "/faq" },
   ],
 
   SYSTEM_ADMIN: [
-    { icon: Home, label: "Home", href: "/dashboard/admin" },
-    { icon: ClipboardList, label: "Approvals", href: "/approvals" },
+    {
+      icon: Home,
+      label: "Home",
+      href: "/dashboard/admin"
+    },
+    {
+      icon: ClipboardList,
+      label: "Approvals",
+      href: "/approvals"
+    },
     { icon: ChartBar, label: "Reports", href: "/reports" },
-    { icon: Shield, label: "Admin", href: "/admin" },
-    { icon: Users, label: "Employees", href: "/employees" },
-    { icon: Calendar, label: "Holidays", href: "/holidays" },
-    { icon: Activity, label: "Audit", href: "/admin/audit" },
+    {
+      icon: Shield,
+      label: "Admin",
+      items: [
+        { icon: Shield, label: "Admin Dashboard", href: "/admin" },
+        { icon: Activity, label: "Audit Logs", href: "/admin/audit" },
+      ]
+    },
+    {
+      icon: Users,
+      label: "People",
+      items: [
+        { icon: Users, label: "Employees", href: "/employees" },
+      ]
+    },
+    {
+      icon: Calendar,
+      label: "Company",
+      items: [
+        { icon: Calendar, label: "Holidays", href: "/holidays" },
+      ]
+    },
     { icon: HelpCircle, label: "FAQ", href: "/faq" },
   ],
 };
@@ -98,7 +204,7 @@ export const roleHomePages: Record<UserRole, string> = {
 };
 
 // Get navigation items for a role
-export function getNavItemsForRole(role: UserRole): NavItem[] {
+export function getNavItemsForRole(role: UserRole): NavItemOrGroup[] {
   return roleNavConfig[role] || roleNavConfig.EMPLOYEE;
 }
 

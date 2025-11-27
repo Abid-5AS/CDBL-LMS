@@ -10,6 +10,7 @@ import { AnnotationsToggle } from "../annotations-toggle";
 import { cn } from "@/lib/utils";
 import { useSearch } from "@/hooks/use-search";
 import { Button } from "@/components/ui/button";
+import { DropdownNavItem } from "./DropdownNavItem";
 
 import type { NavbarState } from "./use-navbar-state";
 import { Brand } from "./Brand";
@@ -69,34 +70,49 @@ export function DesktopNav({
             className="w-full min-w-0"
           >
             <ul className="flex w-full flex-nowrap items-center gap-1">
-              {navLinks.map((link, index) => {
-                const Icon = link.icon;
-                const active = isActive(link.href);
-                return (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className={cn(
-                        "group/link relative flex flex-nowrap items-center gap-2 overflow-hidden whitespace-nowrap rounded-lg px-2.5 py-1.5 text-sm font-medium transition-all duration-200 focus-ring border border-transparent",
-                        active
-                          ? "bg-surface-2 text-foreground border-outline/60 dark:border-border/60 shadow-sm"
-                          : "text-muted-foreground hover:bg-surface-2 hover:text-foreground"
-                      )}
-                    >
-                      <Icon
-                        className={cn(
-                          "h-4 w-4 shrink-0 transition-all duration-200",
-                          active
-                            ? "text-foreground"
-                            : "text-muted-foreground group-hover/link:text-foreground"
-                        )}
+              {navLinks.map((item, index) => {
+                // Check if this is a NavGroup (has items property)
+                if ('items' in item) {
+                  // It's a NavGroup - render as dropdown
+                  return (
+                    <li key={`${item.label}-${index}`}>
+                      <DropdownNavItem
+                        icon={item.icon}
+                        label={item.label}
+                        isActive={isActive}
+                        items={item.items}
                       />
-                      <span className="relative hidden xl:inline whitespace-nowrap font-medium">
-                        {link.label}
-                      </span>
-                    </Link>
-                  </li>
-                );
+                    </li>
+                  );
+                } else {
+                  // It's a regular NavItem - render as link
+                  const active = isActive(item.href);
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        className={cn(
+                          "group/link relative flex flex-nowrap items-center gap-2 overflow-hidden whitespace-nowrap rounded-lg px-2.5 py-1.5 text-sm font-medium transition-all duration-200 focus-ring border border-transparent",
+                          active
+                            ? "bg-surface-2 text-foreground border-outline/60 dark:border-border/60 shadow-sm"
+                            : "text-muted-foreground hover:bg-surface-2 hover:text-foreground"
+                        )}
+                      >
+                        <item.icon
+                          className={cn(
+                            "h-4 w-4 shrink-0 transition-all duration-200",
+                            active
+                              ? "text-foreground"
+                              : "text-muted-foreground group-hover/link:text-foreground"
+                          )}
+                        />
+                        <span className="relative hidden xl:inline whitespace-nowrap font-medium">
+                          {item.label}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                }
               })}
             </ul>
           </nav>
