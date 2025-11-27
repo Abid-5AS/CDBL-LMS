@@ -63,6 +63,7 @@ model User {
   teamMembers         User[]               @relation("HeadToMembers")
   encashmentRequests  EncashmentRequest[]
   encashmentApprovals EncashmentRequest[]  @relation("EncashmentApprover")
+  savedReports        SavedReport[]
 
   @@index([deptHeadId])
 }
@@ -107,6 +108,9 @@ model LeaveRequest {
   @@index([status, updatedAt]) // Optimize processed today queries
   @@index([startDate, endDate, status]) // Optimize employees on leave queries
   @@index([type, status, startDate]) // Optimize leave type breakdown queries
+  @@index([type, startDate]) // For type-based trend analysis
+  @@index([requesterId, createdAt]) // For employee history queries
+  @@index([status, createdAt]) // For recent activity tracking
 }
 
 enum ApprovalDecision {
@@ -133,6 +137,8 @@ model Approval {
   @@index([leaveId])
   @@index([approverId, decision]) // Optimize pending approvals query
   @@index([approverId, decidedAt]) // Optimize approval history queries
+  @@index([step, decidedAt]) // For funnel analysis
+  @@index([leaveId, step]) // For approval chain traversal
 }
 
 model Balance {
@@ -290,11 +296,36 @@ model Notification {
   link       String? // Optional link to related resource (e.g., /leaves/123)
   leaveId    Int? // Related leave request ID
   read       Boolean          @default(false)
-  readAt     DateTime?
   createdAt  DateTime         @default(now())
   expiresAt  DateTime? // Optional expiry for time-sensitive notifications
 
   @@index([userId, read])
   @@index([userId, createdAt])
   @@index([createdAt])
+}
+
+model AnalyticsCache {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  data      Json
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key, expiresAt])
+}
+
+model SavedReport {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  config      Json     // Stores the ReportConfig object
+  schedule    String?  // Cron expression for scheduled reports
+  recipients  String?  // Comma-separated email addresses
+  creatorId   Int
+  creator     User     @relation(fields: [creatorId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([creatorId])
 }

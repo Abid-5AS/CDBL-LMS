@@ -1,157 +1,121 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import { parseISO, format } from "date-fns";
+import { getCachedAnalytics, CACHE_TTL } from "@/lib/analytics/cache";
 import { getCurrentUser } from "@/lib/auth";
-import { normalizeToDhakaMidnight } from "@/lib/date-utils";
 
-export const cache = "no-store";
+const prisma = new PrismaClient();
 
-export async function GET(req: Request) {
-  const me = await getCurrentUser();
-  if (!me) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  // Get query parameters
-  const { searchParams } = new URL(req.url);
-  const scope = searchParams.get("scope") || "me"; // default: me
-  const range = searchParams.get("range") || "year"; // default: year
-  const typesParam = searchParams.get("types");
-  const statusParam = searchParams.get("status") || "APPROVED"; // default: APPROVED
-
-  // Parse types filter
-  const types = typesParam && typesParam !== "all" 
-    ? typesParam.split(",").filter(Boolean)
-    : null; // null means all types
-
-  // Parse status filter
-  const statusFilter = statusParam === "ALL" 
-    ? undefined // undefined means all statuses
-    : statusParam === "PENDING"
-    ? ["PENDING", "SUBMITTED"]
-    : [statusParam];
-
-  // Determine date range
-  const today = normalizeToDhakaMidnight(new Date());
-  const year = today.getFullYear();
-  let periodStart: Date;
-  let periodEnd: Date;
-
-  if (range === "rolling12") {
-    // Rolling 12 months: from 12 months ago to today
-    periodStart = new Date(today);
-    periodStart.setMonth(periodStart.getMonth() - 12);
-    periodEnd = today;
-  } else {
-    // Full calendar year: Jan 1 to Dec 31
-    periodStart = normalizeToDhakaMidnight(new Date(year, 0, 1));
-    periodEnd = normalizeToDhakaMidnight(new Date(year, 11, 31));
-  }
-
-  // Determine user IDs to query
-  let requesterIds: number[] = [];
-
-  if (scope === "me") {
-    requesterIds = [me.id];
-  } else {
-    // scope === "team": All team members (same deptHeadId)
-    const currentUser = await prisma.user.findUnique({
-      where: { id: me.id },
-      select: { deptHeadId: true },
-    });
-
-    if (!currentUser?.deptHeadId) {
-      // No team, return empty
-      return NextResponse.json({
-        periodStart: periodStart.toISOString().slice(0, 10),
-        periodEnd: periodEnd.toISOString().slice(0, 10),
-        buckets: [],
-      });
+export async function GET(req: NextRequest) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const teamMembers = await prisma.user.findMany({
-      where: { deptHeadId: currentUser.deptHeadId },
-      select: { id: true },
-    });
+    const { searchParams } = new URL(req.url);
+    const startDateParam = searchParams.get("startDate");
+    const endDateParam = searchParams.get("endDate");
+    const department = searchParams.get("department");
 
-    requesterIds = teamMembers.map((m) => m.id);
-  }
-
-  if (requesterIds.length === 0) {
-    return NextResponse.json({
-      periodStart: periodStart.toISOString().slice(0, 10),
-      periodEnd: periodEnd.toISOString().slice(0, 10),
-      buckets: [],
-    });
-  }
-
-  // Build where clause
-  const whereClause: any = {
-    requesterId: { in: requesterIds },
-    startDate: { lte: periodEnd },
-    endDate: { gte: periodStart },
-  };
-
-  if (types) {
-    whereClause.type = { in: types };
-  }
-
-  if (statusFilter) {
-    whereClause.status = { in: statusFilter };
-  }
-
-  // Fetch leave requests
-  const leaves = await prisma.leaveRequest.findMany({
-    where: whereClause,
-    select: {
-      type: true,
-      startDate: true,
-      endDate: true,
-    },
-  });
-
-  // Create date buckets: map each date to count and types
-  const bucketMap = new Map<string, { count: number; types: Set<string> }>();
-
-  // Initialize all dates in range to 0
-  const currentDate = new Date(periodStart);
-  while (currentDate <= periodEnd) {
-    const dateKey = normalizeToDhakaMidnight(currentDate).toISOString().slice(0, 10);
-    bucketMap.set(dateKey, { count: 0, types: new Set() });
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-
-  // Process each leave request
-  for (const leave of leaves) {
-    const leaveStart = normalizeToDhakaMidnight(leave.startDate);
-    const leaveEnd = normalizeToDhakaMidnight(leave.endDate);
-    const currentDate = new Date(leaveStart);
-
-    // Mark each day in the leave range
-    while (currentDate <= leaveEnd) {
-      const dateKey = normalizeToDhakaMidnight(currentDate).toISOString().slice(0, 10);
-      const bucket = bucketMap.get(dateKey);
-      if (bucket) {
-        bucket.count += 1;
-        bucket.types.add(leave.type);
-      }
-      currentDate.setDate(currentDate.getDate() + 1);
+    if (!startDateParam || !endDateParam) {
+      return NextResponse.json(
+        { error: "startDate and endDate are required" },
+        { status: 400 }
+      );
     }
+
+    const startDate = parseISO(startDateParam);
+    const endDate = parseISO(endDateParam);
+
+    // Create a unique cache key based on params
+    const cacheKey = `heatmap:${startDateParam}:${endDateParam}:${department || "all"}:${user.role}`;
+
+    const data = await getCachedAnalytics(
+      cacheKey,
+      async () => {
+        // Build where clause
+        const where: any = {
+          startDate: { gte: startDate },
+          endDate: { lte: endDate },
+          status: "APPROVED",
+        };
+
+        // Role-based filtering
+        if (user.role === "EMPLOYEE") {
+          where.requesterId = user.id;
+        } else if (user.role === "DEPT_HEAD") {
+          // Dept head sees their department
+          where.requester = {
+            department: user.department, // Assuming user has department field
+          };
+        } else if (department) {
+          // HR/Admin can filter by department
+          where.requester = {
+            department: department,
+          };
+        }
+
+        // Fetch leaves
+        const leaves = await prisma.leaveRequest.findMany({
+          where,
+          select: {
+            startDate: true,
+            endDate: true,
+            type: true,
+            requester: {
+              select: {
+                name: true,
+                department: true,
+              },
+            },
+          },
+        });
+
+        // Aggregate by date
+        const dateMap = new Map<string, { value: number; types: Set<string>; details: any[] }>();
+
+        leaves.forEach((leave) => {
+          let current = new Date(leave.startDate);
+          const end = new Date(leave.endDate);
+
+          while (current <= end) {
+            const dateStr = format(current, "yyyy-MM-dd");
+
+            if (!dateMap.has(dateStr)) {
+              dateMap.set(dateStr, { value: 0, types: new Set(), details: [] });
+            }
+
+            const entry = dateMap.get(dateStr)!;
+            entry.value += 1;
+            entry.types.add(leave.type);
+            entry.details.push({
+              name: leave.requester.name,
+              department: leave.requester.department,
+              type: leave.type,
+            });
+
+            current.setDate(current.getDate() + 1);
+          }
+        });
+
+        // Convert to array
+        return Array.from(dateMap.entries()).map(([date, data]) => ({
+          date,
+          value: data.value,
+          types: Array.from(data.types),
+          details: data.details,
+        }));
+      },
+      CACHE_TTL.AGGREGATION // Cache for 1 hour
+    );
+
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Error fetching heatmap data:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch heatmap data" },
+      { status: 500 }
+    );
   }
-
-  // Convert map to array of buckets (only include dates with count > 0)
-  const buckets = Array.from(bucketMap.entries())
-    .filter(([_, value]) => value.count > 0)
-    .map(([date, value]) => ({
-      date,
-      count: value.count,
-      types: Array.from(value.types),
-    }));
-
-  return NextResponse.json({
-    periodStart: periodStart.toISOString().slice(0, 10),
-    periodEnd: periodEnd.toISOString().slice(0, 10),
-    buckets,
-  });
 }
-
-
