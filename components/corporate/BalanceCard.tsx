@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import type { DensityMode } from "@/lib/ui/density-modes";
 import { cardPadding, cardGap, getTypography } from "@/lib/ui/density-modes";
-import type { LeaveType } from "@prisma/client";
+import type { LeaveType } from "@/lib/enums";
 import { TrendingUp, Clock, Heart } from "lucide-react";
 
 interface BalanceCardProps {
@@ -167,7 +167,7 @@ export function BalanceCard({
   const typography = getTypography(density);
   const config = LEAVE_TYPE_CONFIG[type];
   const Icon = config.icon;
-  
+
   // Calculate progress percentage
   const usagePercentage = total > 0 ? (used / total) * 100 : 0;
 

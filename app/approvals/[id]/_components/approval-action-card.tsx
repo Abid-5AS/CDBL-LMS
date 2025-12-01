@@ -36,7 +36,7 @@ import {
   Forward,
   Loader2,
 } from "lucide-react";
-import { LeaveType } from "@prisma/client";
+import { LeaveType } from "@/lib/enums";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {

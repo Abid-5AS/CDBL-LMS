@@ -20,7 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { submitEncashmentRequest } from "@/app/actions/encashment-actions";
-import { ENCASHMENT_POLICY } from "@/lib/services/encashment.service";
+import { ENCASHMENT_POLICY } from "@/lib/schemas/encashment";
 
 const formSchema = z.object({
   days: z.coerce

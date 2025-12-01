@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Search, X, User, Calendar, Clock } from "lucide-react";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/lib/enums";
 
 // UI Components
 import {

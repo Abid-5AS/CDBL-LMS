@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../node_modules/.prisma/client"
 }
 
@@ -307,6 +307,7 @@ enum NotificationType {
   ENCASHMENT_APPROVED
   ENCASHMENT_REJECTED
   SYSTEM_ANNOUNCEMENT
+  LEAVE_TYPE_CHANGED
 }
 
 // Balance Adjustment Model

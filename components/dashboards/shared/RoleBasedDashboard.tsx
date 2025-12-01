@@ -4,7 +4,7 @@ import { ReactNode, CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown, Minus, Info } from "lucide-react";
-import type { Role } from "@prisma/client";
+import type { Role } from "@/lib/enums";
 import {
   Tooltip,
   TooltipContent,
@@ -171,8 +171,8 @@ export function RoleBasedDashboard({
     backgroundVariant === "solid"
       ? "bg-background"
       : backgroundVariant === "transparent"
-      ? ""
-      : cn("bg-gradient-to-br", config.gradient);
+        ? ""
+        : cn("bg-gradient-to-br", config.gradient);
 
   const containerClasses = cn("w-full", backgroundClass, className);
 
@@ -213,8 +213,8 @@ export function RoleBasedDashboard({
                 "flex flex-col gap-4",
                 actions && !title && !description && "justify-end",
                 actions &&
-                  (title || description) &&
-                  "sm:flex-row sm:items-start sm:justify-between"
+                (title || description) &&
+                "sm:flex-row sm:items-start sm:justify-between"
               )}
             >
               {(title || description) && (
@@ -383,7 +383,7 @@ export function RoleKPICard({
         "neo-card group relative flex h-full min-h-[190px] flex-col overflow-hidden",
         "px-5 py-5 sm:px-6 sm:py-6",
         onClick &&
-          "cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]",
+        "cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]",
         className
       )}
       style={accentVars}
@@ -393,11 +393,11 @@ export function RoleKPICard({
       onKeyDown={
         onClick
           ? (e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onClick();
-              }
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onClick();
             }
+          }
           : undefined
       }
       title={onClick && clickLabel ? clickLabel : undefined}
@@ -445,8 +445,8 @@ export function RoleKPICard({
                 {trend.direction === "down"
                   ? "-"
                   : trend.direction === "up"
-                  ? "+"
-                  : ""}
+                    ? "+"
+                    : ""}
                 {Math.abs(trend.value)}%
               </span>
               <span className="text-[color:var(--color-foreground-subtle)]/80">

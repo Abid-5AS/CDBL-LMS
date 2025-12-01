@@ -36,7 +36,7 @@ import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui/ui";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/lib/enums";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { cn } from "@/lib/utils";
 
@@ -118,18 +118,18 @@ function ReturnedRequestRow({
   // Extract return information from approvals or comments already in the leave data
   const returnApproval = Array.isArray(leave.approvals)
     ? leave.approvals
-        .filter((a) => a.decision === "FORWARDED" && a.comment && a.decidedAt)
-        .sort((a, b) => {
-          const dateA = a.decidedAt ? new Date(a.decidedAt).getTime() : 0;
-          const dateB = b.decidedAt ? new Date(b.decidedAt).getTime() : 0;
-          return dateB - dateA;
-        })[0]
+      .filter((a) => a.decision === "FORWARDED" && a.comment && a.decidedAt)
+      .sort((a, b) => {
+        const dateA = a.decidedAt ? new Date(a.decidedAt).getTime() : 0;
+        const dateB = b.decidedAt ? new Date(b.decidedAt).getTime() : 0;
+        return dateB - dateA;
+      })[0]
     : null;
 
   const returnComment = returnApproval
     ? null
     : Array.isArray(leave.comments)
-    ? leave.comments
+      ? leave.comments
         .filter(
           (c) =>
             c.authorRole !== "EMPLOYEE" &&
@@ -139,7 +139,7 @@ function ReturnedRequestRow({
           (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         )[0]
-    : null;
+      : null;
 
   const { data: commentsData, isLoading: commentsLoading } = useSWR<{
     items?: LeaveComment[];
@@ -160,32 +160,32 @@ function ReturnedRequestRow({
     returnComment ||
     (fetchedComments.length > 0
       ? fetchedComments
-          .filter(
-            (c) =>
-              c.authorRole !== "EMPLOYEE" &&
-              ["DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"].includes(c.authorRole)
-          )
-          .sort(
-            (a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          )[0]
+        .filter(
+          (c) =>
+            c.authorRole !== "EMPLOYEE" &&
+            ["DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"].includes(c.authorRole)
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )[0]
       : null);
 
   const returnInfo = returnApproval
     ? {
-        authorName: returnApproval.approver?.name || "Unknown",
-        authorRole: returnApproval.approver?.role || "Approver",
-        comment: returnApproval.comment || "",
-        createdAt: returnApproval.decidedAt || "",
-      }
+      authorName: returnApproval.approver?.name || "Unknown",
+      authorRole: returnApproval.approver?.role || "Approver",
+      comment: returnApproval.comment || "",
+      createdAt: returnApproval.decidedAt || "",
+    }
     : finalReturnComment
-    ? {
+      ? {
         authorName: finalReturnComment.authorName || "Unknown",
         authorRole: finalReturnComment.authorRole,
         comment: finalReturnComment.comment,
         createdAt: finalReturnComment.createdAt,
       }
-    : null;
+      : null;
 
   // Get initials for avatar
   const getInitials = (name: string) => {

@@ -3,7 +3,7 @@
 import { motion, type Variants } from "framer-motion";
 import { Calendar, Star, Clock, MoreVertical, Trash2 } from "lucide-react";
 import { useState } from "react";
-import type { Role } from "@prisma/client";
+import { Role } from "@/lib/enums";
 import { Badge } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import {
@@ -103,16 +103,16 @@ function HolidayCard({
               isPast
                 ? "bg-slate-500/10"
                 : !holiday.isOptional
-                ? "bg-red-500/10"
-                : "bg-blue-500/10"
+                  ? "bg-red-500/10"
+                  : "bg-blue-500/10"
             )}>
               <Calendar className={cn(
                 "w-5 h-5",
                 isPast
                   ? "text-slate-600 dark:text-slate-400"
                   : !holiday.isOptional
-                  ? "text-red-600 dark:text-red-400"
-                  : "text-blue-600 dark:text-blue-400"
+                    ? "text-red-600 dark:text-red-400"
+                    : "text-blue-600 dark:text-blue-400"
               )} />
             </div>
             <div className="flex flex-col gap-1 items-end">

@@ -1,12 +1,19 @@
 import { prisma } from "@/lib/prisma";
 import { EncashmentStatus, LeaveType } from "@prisma/client";
 import { NotificationService } from "./notification.service";
+import { z } from "zod";
+import { ENCASHMENT_POLICY } from "@/lib/schemas/encashment";
 
-export const ENCASHMENT_POLICY = {
-  MIN_BALANCE_TO_KEEP: 10, // Assumption: Must keep 10 days
-  MAX_ENCASHMENT_PER_REQUEST: 15, // Assumption: Max 15 days at once
-  MIN_SERVICE_YEARS: 1, // Assumption: Must be employed for 1 year
-};
+export { ENCASHMENT_POLICY, EncashmentRequestSchema } from "@/lib/schemas/encashment";
+
+export class EncashmentServiceError extends Error {
+  constructor(public code: string, message: string, public details?: any, public status: number = 400) {
+    super(message);
+    this.name = "EncashmentServiceError";
+  }
+}
+
+
 
 export type EncashmentResult<T> = {
   success: boolean;

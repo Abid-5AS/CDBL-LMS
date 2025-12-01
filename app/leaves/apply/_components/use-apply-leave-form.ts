@@ -12,7 +12,7 @@ import {
   normalizeToDhakaMidnight,
 } from "@/lib/date-utils";
 import { SUCCESS_MESSAGES, INFO_MESSAGES, getToastMessage } from "@/lib/ui/toast-messages";
-import { countWorkingDaysSync } from "@/lib/leaves/working-days";
+import { countWorkingDaysSync } from "@/lib/leaves/working-days-client";
 import { useDraftAutosave } from "./use-draft-autosave";
 import { useHolidays } from "./use-holidays";
 import type { LeaveType } from "./leave-constants";
@@ -42,10 +42,10 @@ export type DateRangeValue = {
 
 type RangeValidationResult =
   | {
-      valid: boolean;
-      containsNonWorking?: boolean;
-      message: string | null;
-    }
+    valid: boolean;
+    containsNonWorking?: boolean;
+    message: string | null;
+  }
   | null;
 
 type FormErrors = {

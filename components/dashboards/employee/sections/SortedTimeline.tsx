@@ -22,7 +22,7 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { SharedTimeline } from "@/components/shared/SharedTimeline";
 import { SortedTimelineAdapter } from "@/components/shared/timeline-adapters";
 import { getChainFor } from "@/lib/workflow";
-import { type LeaveType } from "@prisma/client";
+import { type LeaveType } from "@/lib/enums";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/ui/ui-state";
 

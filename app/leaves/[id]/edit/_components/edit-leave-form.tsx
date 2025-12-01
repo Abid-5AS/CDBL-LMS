@@ -25,7 +25,7 @@ import { AlertCircle, Info, RotateCcw, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/ui/toast-messages";
 import { DateRangePicker, FileUploadSection } from "@/components/shared";
-import { LeaveRequest, LeaveComment } from "@prisma/client";
+import type { LeaveRequest, LeaveComment } from "@prisma/client";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui/ui";
 import Link from "next/link";
@@ -62,9 +62,9 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
   // Fetch holidays for date picker
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const { data: holidaysData } = useSWR<{ items: Array<{ date: string; name: string }> }>("/api/holidays", fetcher);
-  const holidays = holidaysData?.items?.map((h) => ({ 
+  const holidays = holidaysData?.items?.map((h) => ({
     date: h.date.split('T')[0], // Convert ISO to YYYY-MM-DD format
-    name: h.name 
+    name: h.name
   })) || [];
 
   // Get return comment (most recent non-employee comment)
@@ -105,11 +105,11 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
     }
 
     // Validate certificate requirement for medical leave > 3 days
-    const requestedDays = dateRange.start && dateRange.end 
+    const requestedDays = dateRange.start && dateRange.end
       ? Math.ceil((dateRange.end.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24)) + 1
       : 0;
     const requiresCertificate = type === "MEDICAL" && requestedDays > 3;
-    
+
     if (requiresCertificate && !file && !leave.certificateUrl) {
       toast.error("Medical certificate is required for leaves longer than 3 days");
       return;
@@ -124,10 +124,10 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
       formData.append("startDate", dateRange.start.toISOString());
       formData.append("endDate", dateRange.end.toISOString());
       formData.append("reason", reason.trim());
-      const requiresCertificate = type === "MEDICAL" && 
-        (dateRange.start && dateRange.end && 
-         Math.ceil((dateRange.end.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24)) + 1 > 3);
-      
+      const requiresCertificate = type === "MEDICAL" &&
+        (dateRange.start && dateRange.end &&
+          Math.ceil((dateRange.end.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24)) + 1 > 3);
+
       formData.append("needsCertificate", String(requiresCertificate || false));
 
       // Handle file upload: new file takes precedence, otherwise keep existing URL
@@ -168,18 +168,18 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       {/* Breadcrumb */}
       <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/leaves">My Leaves</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Edit & Resubmit</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/leaves">My Leaves</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>Edit & Resubmit</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
 
       {/* Return Comment Alert */}
       {returnComment && (
@@ -277,9 +277,9 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
                     onChange={setFile}
                     onError={setFileError}
                     error={fileError}
-                    required={type === "MEDICAL" && 
-                      (dateRange.start && dateRange.end && 
-                       Math.ceil((dateRange.end.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24)) + 1 > 3)}
+                    required={type === "MEDICAL" &&
+                      (dateRange.start && dateRange.end &&
+                        Math.ceil((dateRange.end.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24)) + 1 > 3)}
                   />
                   {fileError && (
                     <p className="text-sm text-destructive">{fileError}</p>

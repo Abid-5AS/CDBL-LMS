@@ -4,7 +4,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { leaveTypeLabel } from "@/lib";
-import type { LeaveStatus } from "@prisma/client";
+import type { LeaveStatus } from "@/lib/enums";
 
 type LeaveRequest = {
   id: number;

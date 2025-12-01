@@ -77,6 +77,15 @@ export {
   TableCell,
   TableCaption,
 } from "./table";
+export { ModernTable } from "./modern-table";
+export {
+  Table as EnhancedTable,
+  TableHeader as EnhancedTableHeader,
+  TableBody as EnhancedTableBody,
+  TableHead as EnhancedTableHead,
+  TableRow as EnhancedTableRow,
+  TableCell as EnhancedTableCell,
+} from "./table";
 
 export { Calendar } from "./calendar";
 export {

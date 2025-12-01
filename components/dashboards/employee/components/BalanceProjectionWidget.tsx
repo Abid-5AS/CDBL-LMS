@@ -13,7 +13,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui";
-import { LeaveType } from "@prisma/client";
+import { LeaveType } from "@/lib/enums";
 import type { BalanceProjectionResult } from "@/lib/services/balance-projector.service";
 
 type BalanceProjectionWidgetProps = {
@@ -167,8 +167,8 @@ export function BalanceProjectionWidget({
                     {warning.type === "EXPIRY"
                       ? "Balance Expiry"
                       : warning.type === "LOW_BALANCE"
-                      ? "Low Balance"
-                      : "Deficit Warning"}
+                        ? "Low Balance"
+                        : "Deficit Warning"}
                   </p>
                   <p className="text-xs text-orange-700 dark:text-orange-300">
                     {warning.message}

@@ -31,7 +31,7 @@ import {
   Badge,
 } from "@/components/ui";
 import { cn } from "@/lib/utils";
-import type { Role } from "@prisma/client";
+import type { Role } from "@/lib/enums";
 
 type DashboardWidget = {
   id: string;
@@ -270,7 +270,7 @@ export function DashboardCustomization({
                                 className={cn(
                                   "text-xs",
                                   categoryColors[
-                                    category as keyof typeof categoryColors
+                                  category as keyof typeof categoryColors
                                   ]
                                 )}
                               >

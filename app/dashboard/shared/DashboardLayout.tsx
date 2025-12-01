@@ -1,6 +1,6 @@
 import { ReactNode, CSSProperties } from "react";
 import { cn } from "@/lib/utils";
-import type { Role } from "@prisma/client";
+import { Role } from "@/lib/enums";
 import { getRoleAccentColor, getRoleSoftColor } from "@/constants/colors";
 import { Heading, Text } from "@/components/ui/typography";
 
@@ -49,10 +49,10 @@ export function DashboardLayout({
   const accentSoft = role ? getRoleSoftColor(role) : undefined;
   const formattedRole = role
     ? role
-        .toLowerCase()
-        .split("_")
-        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-        .join(" ")
+      .toLowerCase()
+      .split("_")
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" ")
     : undefined;
 
   return (

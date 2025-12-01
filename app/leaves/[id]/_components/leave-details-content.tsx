@@ -17,7 +17,7 @@ import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui/ui";
 import Link from "next/link";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { LeaveRequest, LeaveComment, Approval } from "@prisma/client";
+import type { LeaveRequest, LeaveComment, Approval } from "@prisma/client";
 import { FitnessCertificateModal } from "@/components/leaves/FitnessCertificateModal";
 import { DutyReturnFlow } from "@/components/leaves/DutyReturnFlow";
 import { ConversionDisplay, type ConversionDetails } from "@/components/leaves/ConversionDisplay";
@@ -131,18 +131,18 @@ export function LeaveDetailsContent({ leave, comments, currentUserId, currentUse
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {/* Breadcrumbs */}
         <BreadcrumbList className="mb-6">
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/leaves">My Leaves</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Leave Details</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/leaves">My Leaves</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Leave Details</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
 
         {/* Returned Banner */}
         {isReturned && returnComment && (
@@ -322,12 +322,11 @@ export function LeaveDetailsContent({ leave, comments, currentUserId, currentUse
                     {leave.approvals.map((approval, index) => (
                       <div key={approval.id} className="flex items-start gap-4">
                         <div className="flex-shrink-0">
-                          <div className={`w-2 h-2 rounded-full mt-2 ${
-                            approval.decision === "APPROVED" ? "bg-data-success" :
-                            approval.decision === "REJECTED" ? "bg-data-error" :
-                            approval.decision === "FORWARDED" ? "bg-data-info" :
-                            "bg-bg-secondary"
-                          }`} />
+                          <div className={`w-2 h-2 rounded-full mt-2 ${approval.decision === "APPROVED" ? "bg-data-success" :
+                              approval.decision === "REJECTED" ? "bg-data-error" :
+                                approval.decision === "FORWARDED" ? "bg-data-info" :
+                                  "bg-bg-secondary"
+                            }`} />
                           {index < leave.approvals.length - 1 && (
                             <div className="w-0.5 h-8 bg-muted ml-1" />
                           )}

@@ -31,20 +31,21 @@ const adjustBalanceSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Verify authentication
-    const authResult = await getCurrentUser(request);
-    if (!authResult.authenticated || !authResult.user) {
+    // Verify authentication
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if user is SYSTEM_ADMIN
-    if (authResult.user.role !== Role.SYSTEM_ADMIN) {
+    if (user.role !== Role.SYSTEM_ADMIN) {
       return NextResponse.json(
         { error: "Only SYSTEM_ADMIN can adjust balances" },
         { status: 403 }
       );
     }
 
-    const adminId = authResult.user.id;
+    const adminId = user.id;
 
     // Parse and validate request body
     const body = await request.json();
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: "Invalid request",
-          details: validation.error.errors,
+          details: validation.error.issues,
         },
         { status: 400 }
       );
@@ -100,13 +101,14 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // Verify authentication
-    const authResult = await getCurrentUser(request);
-    if (!authResult.authenticated || !authResult.user) {
+    // Verify authentication
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if user is SYSTEM_ADMIN
-    if (authResult.user.role !== Role.SYSTEM_ADMIN) {
+    if (user.role !== Role.SYSTEM_ADMIN) {
       return NextResponse.json(
         { error: "Only SYSTEM_ADMIN can view adjustment history" },
         { status: 403 }

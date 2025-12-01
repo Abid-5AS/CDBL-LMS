@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
-import type { Role } from "@prisma/client";
+import { Role } from "@/lib/enums";
 import { RoleBasedDashboard } from "../../../components/dashboards/shared/RoleBasedDashboard";
 import { HolidaysKPISection } from "./HolidaysKPISection";
 import { HolidaysMainContent } from "./HolidaysMainContent";

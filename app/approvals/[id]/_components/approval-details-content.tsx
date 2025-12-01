@@ -35,7 +35,8 @@ import {
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui/ui";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { LeaveRequest, Approval, Balance, LeaveType } from "@prisma/client";
+import type { LeaveRequest, Approval, Balance } from "@prisma/client";
+import { LeaveType, LeaveStatus } from "@/lib/enums";
 import { ApprovalActionCard } from "./approval-action-card";
 import { EmployeeStatsCard } from "./employee-stats-card";
 import { PolicyComplianceCheck } from "./policy-compliance-check";
@@ -147,7 +148,7 @@ export function ApprovalDetailsContent({
             {canTakeAction && (
               <ApprovalActionCard
                 leaveId={leave.id}
-                leaveType={leave.type}
+                leaveType={leave.type as unknown as LeaveType}
                 currentUserRole={currentUserRole}
               />
             )}
@@ -161,7 +162,7 @@ export function ApprovalDetailsContent({
 
             {/* Policy Compliance Check */}
             <PolicyComplianceCheck
-              leaveType={leave.type}
+              leaveType={leave.type as unknown as LeaveType}
               workingDays={leave.workingDays}
               startDate={leave.startDate}
               endDate={leave.endDate}
@@ -300,17 +301,16 @@ export function ApprovalDetailsContent({
                     <div key={approval.id} className="flex items-start gap-4">
                       <div className="flex-shrink-0">
                         <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            approval.decision === "APPROVED"
-                              ? "bg-green-100 dark:bg-green-950"
-                              : approval.decision === "REJECTED"
+                          className={`w-10 h-10 rounded-full flex items-center justify-center ${approval.decision === "APPROVED"
+                            ? "bg-green-100 dark:bg-green-950"
+                            : approval.decision === "REJECTED"
                               ? "bg-red-100 dark:bg-red-950"
                               : approval.decision === "FORWARDED"
-                              ? "bg-blue-100 dark:bg-blue-950"
-                              : approval.decision === "RETURNED"
-                              ? "bg-yellow-100 dark:bg-yellow-950"
-                              : "bg-muted"
-                          }`}
+                                ? "bg-blue-100 dark:bg-blue-950"
+                                : (approval.decision as string) === "RETURNED"
+                                  ? "bg-yellow-100 dark:bg-yellow-950"
+                                  : "bg-muted"
+                            }`}
                         >
                           {approval.decision === "APPROVED" && (
                             <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
@@ -321,7 +321,7 @@ export function ApprovalDetailsContent({
                           {approval.decision === "FORWARDED" && (
                             <Forward className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                           )}
-                          {approval.decision === "RETURNED" && (
+                          {(approval.decision as string) === "RETURNED" && (
                             <RotateCcw className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
                           )}
                           {approval.decision === "PENDING" && (
@@ -348,7 +348,7 @@ export function ApprovalDetailsContent({
                             "✗ Rejected"}
                           {approval.decision === "FORWARDED" &&
                             `→ Forwarded to ${approval.toRole || "Next Approver"}`}
-                          {approval.decision === "RETURNED" &&
+                          {(approval.decision as string) === "RETURNED" &&
                             "⟲ Returned for modification"}
                           {approval.decision === "PENDING" && (
                             <span className="flex items-center gap-1">

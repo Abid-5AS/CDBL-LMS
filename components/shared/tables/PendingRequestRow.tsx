@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckCircle2, RotateCcw, ArrowRight, XCircle } from "lucide-react";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/lib/enums";
 import Link from "next/link";
 
 // UI Components (barrel export)

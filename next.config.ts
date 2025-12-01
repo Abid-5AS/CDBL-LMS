@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
   cacheComponents: false, // Disable cache components in development to reduce memory usage
   reactCompiler: false, // Disable React compiler in development to reduce memory usage
-  serverExternalPackages: ["@prisma/client", "prisma", "@prisma/adapter-mariadb", "mariadb", "nodemailer"],
+  serverExternalPackages: ["@prisma/client", ".prisma/client", "prisma", "@prisma/adapter-mariadb", "mariadb", "nodemailer"],
 
   // Development-specific optimizations for memory usage
   onDemandEntries: {

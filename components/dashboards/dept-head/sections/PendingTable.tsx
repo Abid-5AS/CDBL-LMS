@@ -17,7 +17,7 @@ import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui/ui";
 import Link from "next/link";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { LeaveType } from "@prisma/client";
+import { LeaveType } from "@/lib/enums";
 import { LeaveComparisonModal } from "@/components/shared/modals";
 import { AppRole } from "@/lib";
 import { canPerformAction } from "@/lib/workflow";
@@ -277,14 +277,14 @@ export function DeptHeadPendingTable({
       loading: (leave) => processingIds.has(leave.id),
     },
     {
-        label: "Compare",
-        icon: GitCompare,
-        variant: "outline",
-        onClick: (leave) => {
-            setSelectedLeaveForComparison(leave);
-            setComparisonModalOpen(true);
-        },
-        disabled: (leave) => !leave.isModified
+      label: "Compare",
+      icon: GitCompare,
+      variant: "outline",
+      onClick: (leave) => {
+        setSelectedLeaveForComparison(leave);
+        setComparisonModalOpen(true);
+      },
+      disabled: (leave) => !leave.isModified
     }
   ];
 
@@ -306,15 +306,15 @@ export function DeptHeadPendingTable({
       },
     },
     {
-        label: "Return Selected",
-        icon: RotateCcw,
-        variant: "outline",
-        onClick: (selectedIds: (string | number)[]) => {
-            // Bulk return logic - simplified for now as it usually requires comments per request
-            // For now, maybe just clear selection
-             // In a real app, we'd open a bulk return dialog
-             console.log("Bulk return not fully implemented yet", selectedIds);
-        }
+      label: "Return Selected",
+      icon: RotateCcw,
+      variant: "outline",
+      onClick: (selectedIds: (string | number)[]) => {
+        // Bulk return logic - simplified for now as it usually requires comments per request
+        // For now, maybe just clear selection
+        // In a real app, we'd open a bulk return dialog
+        console.log("Bulk return not fully implemented yet", selectedIds);
+      }
     }
   ];
 

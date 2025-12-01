@@ -31,11 +31,13 @@ import EnhancedSmoothTab from "@/components/ui/enhanced-smooth-tab";
 
 import { LeaveBalanceView } from "@/components/leaves/LeaveBalanceView";
 import { HolidayCalendarView } from "@/components/leaves/HolidayCalendarView";
+import { LeaveDetailsModal } from "@/components/shared/modals/LeaveDetailsModal";
 import { useLeaveData } from "@/components/providers";
 import { cn } from "@/lib/utils";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import { Wallet, ClipboardList } from "lucide-react";
 
-function LeaveRequestCard({ request }: { request: any }) {
+function LeaveRequestCard({ request, onClick }: { request: any; onClick: () => void }) {
   const statusColors = {
     PENDING: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800",
     APPROVED: "bg-green-500/10 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800",
@@ -61,7 +63,8 @@ function LeaveRequestCard({ request }: { request: any }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="group relative overflow-hidden rounded-xl border border-border bg-card p-4 transition-all hover:shadow-md dark:hover:border-primary/20"
+      onClick={onClick}
+      className="group relative overflow-hidden rounded-xl border border-border bg-card p-4 transition-all hover:shadow-md dark:hover:border-primary/20 cursor-pointer"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4">
@@ -74,7 +77,7 @@ function LeaveRequestCard({ request }: { request: any }) {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-foreground">
-                {request.leaveType.name}
+                {leaveTypeLabel[request.type] || request.type}
               </h3>
               <span className={cn(
                 "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border",
@@ -90,7 +93,7 @@ function LeaveRequestCard({ request }: { request: any }) {
                 {format(new Date(request.endDate), "MMM d, yyyy")}
               </span>
               <span className="text-xs">•</span>
-              <span>{request.days} days</span>
+              <span>{request.workingDays} days</span>
             </div>
             {request.reason && (
               <p className="mt-2 text-sm text-muted-foreground line-clamp-1">
@@ -110,6 +113,8 @@ function RequestsView() {
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  const [selectedLeave, setSelectedLeave] = useState<any | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const tabs = [
     {
@@ -141,8 +146,9 @@ function RequestsView() {
 
   const filteredRequests = data?.items?.filter((item: any) => {
     const matchesTab = activeTab === "all" || item.status.toLowerCase() === activeTab;
-    const matchesSearch = item.leaveType.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         item.reason?.toLowerCase().includes(searchQuery.toLowerCase());
+    const typeLabel = leaveTypeLabel[item.type] || item.type || "";
+    const matchesSearch = typeLabel.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.reason?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesTab && matchesSearch;
   }) || [];
 
@@ -184,6 +190,7 @@ function RequestsView() {
         value={activeTab}
         onChange={setActiveTab}
         className="w-full max-w-4xl mx-auto"
+        showCardContent={false}
       />
 
       {/* Content */}
@@ -233,7 +240,14 @@ function RequestsView() {
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   <AnimatePresence mode="popLayout">
                     {filteredRequests.map((request: any) => (
-                      <LeaveRequestCard key={request.id} request={request} />
+                      <LeaveRequestCard
+                        key={request.id}
+                        request={request}
+                        onClick={() => {
+                          setSelectedLeave(request);
+                          setIsModalOpen(true);
+                        }}
+                      />
                     ))}
                   </AnimatePresence>
                 </div>
@@ -242,6 +256,13 @@ function RequestsView() {
           </AnimatePresence>
         )}
       </div>
+
+      {/* Leave Details Modal */}
+      <LeaveDetailsModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        leave={selectedLeave}
+      />
     </div>
   );
 }

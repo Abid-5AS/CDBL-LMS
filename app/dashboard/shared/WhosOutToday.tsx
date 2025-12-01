@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { User, Calendar } from "lucide-react";
 import { leaveTypeLabel } from "@/lib/ui/ui";
-import { LeaveType } from "@prisma/client";
+import { LeaveType } from "@/lib/enums";
 import { cn } from "@/lib/utils";
 
 type TeamMember = {
@@ -117,9 +117,9 @@ export function WhosOutToday({ scope = "team", title }: WhosOutTodayProps) {
           </div>
         ) : (
           <div className="space-y-2.5">
-            {data.members.map((member) => (
+            {data.members.map((member, index) => (
               <div
-                key={member.id}
+                key={`${member.id}-${member.start}-${member.end}-${index}`}
                 className={cn(
                   "flex items-start gap-2.5 p-2.5 rounded-lg transition-all duration-200",
                   "backdrop-blur-md bg-white/30 dark:bg-gray-900/30",

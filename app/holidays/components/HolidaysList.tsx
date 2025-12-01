@@ -3,7 +3,7 @@
 import { motion, type Variants } from "framer-motion";
 import { Calendar, Star, Clock, ChevronRight, MoreVertical, Trash2 } from "lucide-react";
 import { useState } from "react";
-import type { Role } from "@prisma/client";
+import { Role } from "@/lib/enums";
 import { Badge } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import {
@@ -104,8 +104,8 @@ function HolidayListItem({
             isPast
               ? "bg-slate-500/10"
               : !holiday.isOptional
-              ? "bg-red-500/10"
-              : "bg-blue-500/10"
+                ? "bg-red-500/10"
+                : "bg-blue-500/10"
           )}>
             <Calendar
               className={cn(
@@ -113,8 +113,8 @@ function HolidayListItem({
                 isPast
                   ? "text-slate-600 dark:text-slate-400"
                   : !holiday.isOptional
-                  ? "text-red-600 dark:text-red-400"
-                  : "text-blue-600 dark:text-blue-400"
+                    ? "text-red-600 dark:text-red-400"
+                    : "text-blue-600 dark:text-blue-400"
               )}
               aria-hidden="true"
             />

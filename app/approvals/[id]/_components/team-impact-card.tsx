@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui/ui";
-import { LeaveType } from "@prisma/client";
+import { LeaveType } from "@/lib/enums";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 
 type TeamImpactCardProps = {
@@ -101,7 +101,7 @@ export function TeamImpactCard({ overlappingLeaves }: TeamImpactCardProps) {
                     {leave.requester.email}
                   </p>
                 </div>
-                <StatusBadge status={leave.status} />
+                <StatusBadge status={leave.status as any} />
               </div>
 
               <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">

@@ -2,7 +2,7 @@
 
 import { motion, type Variants } from "framer-motion";
 import { Calendar as CalendarIcon, Grid3X3, List } from "lucide-react";
-import type { Role } from "@prisma/client";
+import { Role } from "@/lib/enums";
 import { HolidaysFilters } from "./HolidaysFilters";
 import { HolidaysGrid } from "./HolidaysGrid";
 import { HolidaysList } from "./HolidaysList";
@@ -51,8 +51,8 @@ export function HolidaysMainContent({
     holidays.length === 0
       ? "No holidays match the current filters"
       : filters.showPast
-      ? `${holidays.length} holidays`
-      : `${holidays.length} upcoming holidays`;
+        ? `${holidays.length} holidays`
+        : `${holidays.length} upcoming holidays`;
 
   return (
     <motion.div variants={itemVariants} className="space-y-6">
@@ -96,11 +96,10 @@ export function HolidaysMainContent({
                     <TabsTrigger
                       key={tab.id}
                       value={tab.id}
-                      className={`flex items-center gap-1.5 px-3 py-2 rounded-full transition-all ${
-                        isActive
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-full transition-all ${isActive
                           ? 'bg-primary text-primary-foreground shadow-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground'
                           : 'data-[state=active]:bg-background data-[state=active]:text-foreground'
-                      }`}
+                        }`}
                     >
                       <Icon className="w-4 h-4" />
                       <span className="hidden sm:inline">{tab.label}</span>

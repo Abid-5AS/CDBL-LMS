@@ -8,7 +8,7 @@ import { Button } from "@/components/ui";
 import { EmptyState } from "./EmptyState";
 import { Clock, CheckCircle2, XCircle, Circle, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/lib/enums";
 
 export type TimelineItem = {
   id: string;
@@ -231,8 +231,8 @@ export function SharedTimeline({
                     {item.meta.daysUntil === 0
                       ? "Starting today"
                       : item.meta.daysUntil === 1
-                      ? "Starts tomorrow"
-                      : `Starts in ${item.meta.daysUntil} days`}
+                        ? "Starts tomorrow"
+                        : `Starts in ${item.meta.daysUntil} days`}
                   </span>
                 </div>
               )}

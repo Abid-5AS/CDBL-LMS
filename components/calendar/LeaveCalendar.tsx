@@ -22,7 +22,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { leaveTypeLabel, leaveTypeColor } from "@/lib/ui/ui";
-import { LeaveType } from "@prisma/client";
+import { LeaveType } from "@/lib/enums";
 
 interface LeaveEvent {
   id: number;

@@ -19,7 +19,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui";
-import { LeaveType } from "@prisma/client";
+import { LeaveType } from "@/lib/enums";
 import { toast } from "sonner";
 
 type User = {
