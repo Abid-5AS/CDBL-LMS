@@ -66,6 +66,8 @@ model User {
   encashmentProcessed  EncashmentRequest[]  @relation("EncashmentProcessor")
   balanceAdjustments   BalanceAdjustment[]  @relation("BalanceAdjustments")
   adjustmentsMade      BalanceAdjustment[]  @relation("AdjustmentsMade")
+  delegationsDelegated ApprovalDelegation[] @relation("DelegationsDelegated")
+  delegationsReceived  ApprovalDelegation[] @relation("DelegationsReceived")
 
   @@index([deptHeadId])
 }
@@ -328,4 +330,25 @@ model BalanceAdjustment {
   @@index([userId, leaveType, year])
   @@index([adjustedBy])
   @@index([createdAt])
+}
+
+// Approval Delegation Model
+// Allows approvers to delegate their approval authority temporarily
+model ApprovalDelegation {
+  id          Int      @id @default(autoincrement())
+  delegatorId Int // User who is delegating (original approver)
+  delegateId  Int // User who will act as delegate
+  startDate   DateTime // When delegation starts
+  endDate     DateTime // When delegation ends
+  isActive    Boolean  @default(true) // Can be manually revoked
+  reason      String? // Optional reason for delegation
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  delegator User @relation("DelegationsDelegated", fields: [delegatorId], references: [id])
+  delegate  User @relation("DelegationsReceived", fields: [delegateId], references: [id])
+
+  @@index([delegatorId, isActive])
+  @@index([delegateId, isActive])
+  @@index([startDate, endDate])
 }
