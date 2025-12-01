@@ -1,0 +1,13 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Auto-sync database after git pull/merge
+echo "🔄 Checking for database schema changes..."
+
+# Check if schema.prisma or migrations changed
+if git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD | grep -qE 'prisma/schema.prisma|prisma/migrations/'; then
+    echo "📦 Database schema changes detected. Running sync..."
+    pnpm db:sync
+else
+    echo "✅ No database schema changes detected."
+fi
