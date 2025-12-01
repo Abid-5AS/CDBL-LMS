@@ -63,6 +63,8 @@ model User {
   teamMembers         User[]               @relation("HeadToMembers")
   encashmentRequests  EncashmentRequest[]
   encashmentApprovals EncashmentRequest[]  @relation("EncashmentApprover")
+  balanceAdjustments  BalanceAdjustment[]  @relation("BalanceAdjustments")
+  adjustmentsMade     BalanceAdjustment[]  @relation("AdjustmentsMade")
 
   @@index([deptHeadId])
 }
@@ -293,5 +295,27 @@ model Notification {
 
   @@index([userId, read])
   @@index([userId, createdAt])
+  @@index([createdAt])
+}
+
+// Balance Adjustment Model
+// For manual balance corrections by SYSTEM_ADMIN
+model BalanceAdjustment {
+  id           Int       @id @default(autoincrement())
+  userId       Int // Employee whose balance is being adjusted
+  leaveType    LeaveType
+  year         Int
+  amount       Int // Positive for credit, negative for debit
+  reason       String // Required explanation for audit trail
+  previousBalance Int // Balance before adjustment
+  newBalance   Int // Balance after adjustment
+  adjustedBy   Int // SYSTEM_ADMIN who made the adjustment
+  createdAt    DateTime  @default(now())
+
+  user       User @relation("BalanceAdjustments", fields: [userId], references: [id])
+  adjustedByUser User @relation("AdjustmentsMade", fields: [adjustedBy], references: [id])
+
+  @@index([userId, leaveType, year])
+  @@index([adjustedBy])
   @@index([createdAt])
 }
