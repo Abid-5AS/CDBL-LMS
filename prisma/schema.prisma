@@ -56,15 +56,16 @@ model User {
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 
-  leaves              LeaveRequest[]
-  balances            Balance[]
-  approvals           Approval[]           @relation("ApprovalApprover")
-  deptHead            User?                @relation("HeadToMembers", fields: [deptHeadId], references: [id])
-  teamMembers         User[]               @relation("HeadToMembers")
-  encashmentRequests  EncashmentRequest[]
-  encashmentApprovals EncashmentRequest[]  @relation("EncashmentApprover")
-  balanceAdjustments  BalanceAdjustment[]  @relation("BalanceAdjustments")
-  adjustmentsMade     BalanceAdjustment[]  @relation("AdjustmentsMade")
+  leaves               LeaveRequest[]
+  balances             Balance[]
+  approvals            Approval[]           @relation("ApprovalApprover")
+  deptHead             User?                @relation("HeadToMembers", fields: [deptHeadId], references: [id])
+  teamMembers          User[]               @relation("HeadToMembers")
+  encashmentRequests   EncashmentRequest[]
+  encashmentApprovals  EncashmentRequest[]  @relation("EncashmentApprover")
+  encashmentProcessed  EncashmentRequest[]  @relation("EncashmentProcessor")
+  balanceAdjustments   BalanceAdjustment[]  @relation("BalanceAdjustments")
+  adjustmentsMade      BalanceAdjustment[]  @relation("AdjustmentsMade")
 
   @@index([deptHeadId])
 }
@@ -228,14 +229,23 @@ model EncashmentRequest {
   approvedAt       DateTime?
   rejectionReason  String?
   paidAt           DateTime? // When payment was processed
+  // Payment tracking fields
+  paymentStatus    String? // PENDING, PROCESSING, PAID, FAILED
+  paymentMethod    String? // BANK_TRANSFER, CHEQUE, CASH
+  paymentReference String? // Payment reference number/transaction ID
+  paymentDate      DateTime? // Actual payment completion date
+  paymentReceiptUrl String? // URL to payment receipt/proof
+  processedBy      Int? // User ID who processed the payment (usually HR_HEAD or CEO)
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 
-  user     User  @relation(fields: [userId], references: [id])
-  approver User? @relation("EncashmentApprover", fields: [approvedBy], references: [id])
+  user      User  @relation(fields: [userId], references: [id])
+  approver  User? @relation("EncashmentApprover", fields: [approvedBy], references: [id])
+  processor User? @relation("EncashmentProcessor", fields: [processedBy], references: [id])
 
   @@index([userId, status])
   @@index([status])
+  @@index([paymentStatus])
 }
 
 model OrgSettings {
