@@ -47,6 +47,7 @@ import { EmployeeRecentActivity } from "./components/EmployeeRecentActivity";
 import { EmployeeLeaveBalance } from "./components/EmployeeLeaveBalance";
 import { FloatingQuickActions } from "./components/FloatingQuickActions";
 import { ConversionSummaryCard } from "@/components/leaves/ConversionHistory";
+import { BalanceProjectionWidget } from "./components/BalanceProjectionWidget";
 
 // Extracted hooks and utils
 import { KPIGridSkeleton } from "@/components/shared/skeletons";
@@ -569,6 +570,12 @@ export function ModernEmployeeDashboard({
                             isLoading={isLoadingBalance}
                           />
                         ),
+                      },
+                      {
+                        id: "projection",
+                        label: "Balance Projection",
+                        icon: TrendingUp,
+                        content: <BalanceProjectionWidget />,
                       },
                       {
                         id: "activity",

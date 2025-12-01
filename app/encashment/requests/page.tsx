@@ -34,6 +34,13 @@ interface EncashmentRequest {
   createdAt: string;
   approvedAt: string | null;
   rejectionReason: string | null;
+  paymentStatus: string | null;
+  paymentDate: string | null;
+  paymentMethod: string | null;
+  paymentReference: string | null;
+  paymentAmount: number | null;
+  paymentNotes: string | null;
+  paymentReceiptUrl: string | null;
   user: {
     id: number;
     name: string;
@@ -57,6 +64,14 @@ export default function EncashmentRequestsPage() {
   const [rejectionReason, setRejectionReason] = useState("");
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Payment tracking states
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentRequest, setPaymentRequest] = useState<EncashmentRequest | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState("BANK_TRANSFER");
+  const [paymentReference, setPaymentReference] = useState("");
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentNotes, setPaymentNotes] = useState("");
 
   useEffect(() => {
     fetchRequests();
@@ -116,6 +131,56 @@ export default function EncashmentRequestsPage() {
     setDecision(action);
     setError(null);
     setRejectionReason("");
+  };
+
+  const openPaymentModal = (request: EncashmentRequest) => {
+    setPaymentRequest(request);
+    setShowPaymentModal(true);
+    setPaymentMethod("BANK_TRANSFER");
+    setPaymentReference("");
+    setPaymentAmount("");
+    setPaymentNotes("");
+    setError(null);
+  };
+
+  const handleProcessPayment = async () => {
+    if (!paymentRequest || !paymentReference || !paymentAmount) {
+      setError("Please fill in all required fields");
+      return;
+    }
+
+    setProcessing(true);
+    setError(null);
+
+    try {
+      const res = await fetch(`/api/encashment/${paymentRequest.id}/payment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status: "PAID",
+          paymentMethod,
+          paymentReference,
+          paymentAmount: parseFloat(paymentAmount),
+          paymentNotes: paymentNotes || undefined,
+          paymentDate: new Date().toISOString(),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to process payment");
+      }
+
+      // Close dialog and refresh
+      setShowPaymentModal(false);
+      setPaymentRequest(null);
+      fetchRequests();
+    } catch (err: any) {
+      setError(err.message || "Failed to process payment");
+    } finally {
+      setProcessing(false);
+    }
   };
 
   return (
@@ -232,6 +297,79 @@ export default function EncashmentRequestsPage() {
                   </div>
                 )}
 
+                {/* Payment Tracking */}
+                {(request.paymentStatus || request.status === "APPROVED") && (
+                  <div className="mb-4 p-4 rounded border-2 border-blue-200 bg-blue-50">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="font-semibold text-blue-900">Payment Information</p>
+                      {request.paymentStatus && (
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-medium ${
+                            request.paymentStatus === "PAID"
+                              ? "bg-green-100 text-green-800"
+                              : request.paymentStatus === "PROCESSING"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {request.paymentStatus}
+                        </span>
+                      )}
+                    </div>
+
+                    {request.paymentDate ? (
+                      <div className="grid md:grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <p className="text-gray-600">Payment Date</p>
+                          <p className="font-medium">
+                            {new Date(request.paymentDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">Payment Method</p>
+                          <p className="font-medium">{request.paymentMethod || "N/A"}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">Reference</p>
+                          <p className="font-medium">{request.paymentReference || "N/A"}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">Amount</p>
+                          <p className="font-medium text-green-600">
+                            {request.paymentAmount
+                              ? `৳${request.paymentAmount.toLocaleString()}`
+                              : "N/A"}
+                          </p>
+                        </div>
+                        {request.paymentNotes && (
+                          <div className="md:col-span-2">
+                            <p className="text-gray-600">Notes</p>
+                            <p className="font-medium">{request.paymentNotes}</p>
+                          </div>
+                        )}
+                      </div>
+                    ) : request.status === "APPROVED" && (
+                      <p className="text-sm text-gray-600">
+                        Payment pending. Use the "Process Payment" button below to record payment
+                        details.
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {request.status === "APPROVED" && request.paymentStatus !== "PAID" && (
+                  <div className="mb-4">
+                    <Button
+                      variant="default"
+                      onClick={() => openPaymentModal(request)}
+                      className="w-full"
+                    >
+                      <DollarSign className="h-4 w-4 mr-2" />
+                      Process Payment
+                    </Button>
+                  </div>
+                )}
+
                 {request.status === "PENDING" && (
                   <div className="flex gap-2">
                     <Button
@@ -312,6 +450,104 @@ export default function EncashmentRequestsPage() {
               variant={decision === "APPROVED" ? "default" : "destructive"}
             >
               {processing ? "Processing..." : decision === "APPROVED" ? "Approve" : "Reject"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Payment Processing Modal */}
+      <Dialog open={showPaymentModal} onOpenChange={() => setShowPaymentModal(false)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Process Payment</DialogTitle>
+            <DialogDescription>
+              {paymentRequest && (
+                <>
+                  Record payment details for {paymentRequest.user.name}'s encashment
+                  of {paymentRequest.daysRequested} days
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Payment Method *
+              </label>
+              <select
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded"
+              >
+                <option value="BANK_TRANSFER">Bank Transfer</option>
+                <option value="CHEQUE">Cheque</option>
+                <option value="CASH">Cash</option>
+                <option value="MOBILE_BANKING">Mobile Banking</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Payment Reference *
+              </label>
+              <input
+                type="text"
+                value={paymentReference}
+                onChange={(e) => setPaymentReference(e.target.value)}
+                placeholder="e.g., Transaction ID, Cheque Number"
+                className="w-full p-2 border border-gray-300 rounded"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Payment Amount (৳) *
+              </label>
+              <input
+                type="number"
+                value={paymentAmount}
+                onChange={(e) => setPaymentAmount(e.target.value)}
+                placeholder="e.g., 50000"
+                className="w-full p-2 border border-gray-300 rounded"
+                required
+                step="0.01"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Payment Notes (Optional)
+              </label>
+              <Textarea
+                value={paymentNotes}
+                onChange={(e) => setPaymentNotes(e.target.value)}
+                placeholder="Additional notes about the payment..."
+                rows={3}
+              />
+            </div>
+          </div>
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowPaymentModal(false)}
+              disabled={processing}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleProcessPayment}
+              disabled={processing || !paymentReference || !paymentAmount}
+            >
+              {processing ? "Processing..." : "Record Payment"}
             </Button>
           </DialogFooter>
         </DialogContent>

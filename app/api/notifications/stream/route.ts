@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { verifyAuth } from "@/lib/auth-jwt";
+import { getCurrentUser } from "@/lib/auth-jwt";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -12,12 +12,12 @@ import { prisma } from "@/lib/prisma";
  */
 export async function GET(request: NextRequest) {
   // Verify authentication
-  const authResult = await verifyAuth(request);
-  if (!authResult.authenticated || !authResult.user) {
+  const user = await getCurrentUser();
+  if (!user) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const userId = authResult.user.id;
+  const userId = user.id;
 
   // Set up SSE headers
   const encoder = new TextEncoder();
