@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/card";
 import { HolidayCalendarManager } from "@/components/admin/HolidayCalendarManager";
 import { UserManagement } from "@/components/admin/UserManagement";
+import { BalanceAdjustment } from "@/components/admin/BalanceAdjustment";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface AdminToolsContentProps {
@@ -42,6 +43,7 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
     "CEO",
     "SYSTEM_ADMIN",
   ].includes(userRole);
+  const canAdjustBalances = ["SYSTEM_ADMIN"].includes(userRole);
 
   return (
     <div className="space-y-6">
@@ -176,15 +178,18 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
 
       {/* Management Tools */}
       <Tabs
-        defaultValue={canManageUsers ? "users" : "holidays"}
+        defaultValue={canManageUsers ? "users" : canManageHolidays ? "holidays" : "balances"}
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className={`grid w-full ${canManageUsers && canManageHolidays && canAdjustBalances ? 'grid-cols-3' : canManageUsers && canManageHolidays ? 'grid-cols-2' : 'grid-cols-1'}`}>
           {canManageUsers && (
             <TabsTrigger value="users">User Management</TabsTrigger>
           )}
           {canManageHolidays && (
             <TabsTrigger value="holidays">Holiday Calendar</TabsTrigger>
+          )}
+          {canAdjustBalances && (
+            <TabsTrigger value="balances">Balance Adjustment</TabsTrigger>
           )}
         </TabsList>
 
@@ -197,6 +202,12 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
         {canManageHolidays && (
           <TabsContent value="holidays" className="mt-6">
             <HolidayCalendarManager />
+          </TabsContent>
+        )}
+
+        {canAdjustBalances && (
+          <TabsContent value="balances" className="mt-6">
+            <BalanceAdjustment />
           </TabsContent>
         )}
       </Tabs>

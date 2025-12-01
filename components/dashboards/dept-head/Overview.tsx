@@ -4,6 +4,7 @@ import { Suspense, useMemo } from "react";
 import { DeptHeadPendingTable } from "./sections/PendingTable";
 import { TeamCoverageCalendar } from "./components/TeamCoverageCalendar";
 import { DeptHeadQuickActions } from "./sections/QuickActions";
+import { TeamCapacityCalendar } from "./sections/TeamCapacityCalendar";
 import { useApiQueryWithParams } from "@/lib/apiClient";
 import { useFilterFromUrl } from "@/lib/ui/url-filters";
 import {
@@ -341,6 +342,16 @@ export function DeptHeadDashboardWrapper() {
               <DeptHeadQuickActions />
             </Suspense>
           </div>
+        </DashboardSection>
+
+        {/* Team Capacity Calendar */}
+        <DashboardSection
+          title="Team Capacity"
+          description="Monitor team availability and plan leave approvals"
+        >
+          <Suspense fallback={<CardSkeleton />}>
+            <TeamCapacityCalendar daysAhead={30} />
+          </Suspense>
         </DashboardSection>
       </div>
     </TooltipProvider>

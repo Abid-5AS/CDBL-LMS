@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DelegationManagement } from "@/components/admin/DelegationManagement";
 
 type SettingsContentProps = {
   user: {
@@ -139,6 +140,11 @@ export function SettingsContent({ user }: SettingsContentProps) {
           </p>
         </CardContent>
       </Card>
+
+      {/* Delegation Management - Only for roles that can approve */}
+      {["DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"].includes(user.role) && (
+        <DelegationManagement />
+      )}
 
       <Card>
         <CardHeader>

@@ -42,6 +42,7 @@ import {
 import { LeaveSummarySidebar } from "./leave-summary-sidebar";
 import { useApplyLeaveForm } from "./use-apply-leave-form";
 import { useRouter } from "next/navigation";
+import { ConflictWarningCard } from "@/components/leaves/ConflictWarningCard";
 
 export function ApplyLeaveForm() {
   const {
@@ -69,6 +70,8 @@ export function ApplyLeaveForm() {
     holidays,
     incidentDate,
     payCalculation,
+    conflictData,
+    checkingConflicts,
     setDateRange,
     setReason,
     setFile,
@@ -216,6 +219,21 @@ export function ApplyLeaveForm() {
                       />
                     </div>
                   </div>
+
+                  {/* Conflict Warning */}
+                  {conflictData && dateRange.start && dateRange.end && (
+                    <ConflictWarningCard
+                      conflictData={conflictData}
+                      dateRange={dateRange}
+                      onSelectAlternative={(altDate) => {
+                        setDateRange({
+                          start: altDate.start,
+                          end: altDate.end,
+                        });
+                      }}
+                      isLoading={checkingConflicts}
+                    />
+                  )}
 
                   {/* Special Disability Leave: Incident Date Field */}
                   {type === "SPECIAL_DISABILITY" && (

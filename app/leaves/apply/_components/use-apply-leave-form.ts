@@ -16,6 +16,7 @@ import { countWorkingDaysSync } from "@/lib/leaves/working-days";
 import { useDraftAutosave } from "./use-draft-autosave";
 import { useHolidays } from "./use-holidays";
 import type { LeaveType } from "./leave-constants";
+import type { ConflictDetectionResult } from "@/lib/services/conflict-detector.service";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -76,6 +77,8 @@ export function useApplyLeaveForm() {
   const [draftLoaded, setDraftLoaded] = useState(false);
   const [showStickyButton, setShowStickyButton] = useState(false);
   const [incidentDate, setIncidentDate] = useState<Date | undefined>(undefined); // For Special Disability Leave
+  const [conflictData, setConflictData] = useState<ConflictDetectionResult | null>(null);
+  const [checkingConflicts, setCheckingConflicts] = useState(false);
 
   const {
     data: balances,
@@ -127,6 +130,43 @@ export function useApplyLeaveForm() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Check for leave conflicts when date range changes
+  useEffect(() => {
+    const checkConflicts = async () => {
+      // Only check if we have both dates
+      if (!dateRange.start || !dateRange.end) {
+        setConflictData(null);
+        return;
+      }
+
+      setCheckingConflicts(true);
+      try {
+        const response = await fetch("/api/leaves/check-conflicts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            startDate: dateRange.start.toISOString(),
+            endDate: dateRange.end.toISOString(),
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setConflictData(data);
+        } else {
+          setConflictData(null);
+        }
+      } catch (error) {
+        console.error("Error checking conflicts:", error);
+        setConflictData(null);
+      } finally {
+        setCheckingConflicts(false);
+      }
+    };
+
+    checkConflicts();
+  }, [dateRange.start, dateRange.end]);
 
   const requestedDays = useMemo(() => {
     if (!dateRange.start || !dateRange.end) return 0;
@@ -510,6 +550,8 @@ export function useApplyLeaveForm() {
     holidays,
     incidentDate,
     payCalculation,
+    conflictData,
+    checkingConflicts,
     setDateRange,
     setReason,
     setFile,

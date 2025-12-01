@@ -8,25 +8,34 @@ datasource db {
 }
 
 model User {
-  id                  Int                 @id @default(autoincrement())
-  empCode             String?             @unique
-  name                String
-  email               String              @unique
-  role                Role                @default(EMPLOYEE)
-  department          String?
-  createdAt           DateTime            @default(now())
-  updatedAt           DateTime            @updatedAt
-  joinDate            DateTime?
-  retirementDate      DateTime?
-  password            String?
-  deptHeadId          Int?
-  approvals           Approval[]          @relation("ApprovalApprover")
-  balances            Balance[]
-  encashmentApprovals EncashmentRequest[] @relation("EncashmentApprover")
-  encashmentRequests  EncashmentRequest[]
-  leaves              LeaveRequest[]
-  deptHead            User?               @relation("HeadToMembers", fields: [deptHeadId], references: [id])
-  teamMembers         User[]              @relation("HeadToMembers")
+  id             Int       @id @default(autoincrement())
+  name           String
+  email          String    @unique
+  password       String?
+  empCode        String?   @unique
+  role           Role      @default(EMPLOYEE)
+  department     String?
+  deptHeadId     Int?       // User ID of department head (self-relation)
+  joinDate       DateTime? // Service start date for eligibility calculations (Policy 6.18)
+  retirementDate DateTime? // Expected retirement date for study leave validation (Policy 6.25.a)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  leaves               LeaveRequest[]
+  balances             Balance[]
+  approvals            Approval[]           @relation("ApprovalApprover")
+  deptHead             User?                @relation("HeadToMembers", fields: [deptHeadId], references: [id])
+  teamMembers          User[]               @relation("HeadToMembers")
+  encashmentRequests   EncashmentRequest[]
+  encashmentApprovals  EncashmentRequest[]  @relation("EncashmentApprover")
+  encashmentProcessed  EncashmentRequest[]  @relation("EncashmentProcessor")
+  balanceAdjustments   BalanceAdjustment[]  @relation("BalanceAdjustments")
+  adjustmentsMade      BalanceAdjustment[]  @relation("AdjustmentsMade")
+  delegationsDelegated ApprovalDelegation[] @relation("DelegationsDelegated")
+  delegationsReceived  ApprovalDelegation[] @relation("DelegationsReceived")
+  preferences          UserPreferences?
+  leaveTemplates       LeaveTemplate[]
+  policyVersions       PolicyVersion[]
 
   @@index([deptHeadId])
 }
@@ -157,26 +166,37 @@ model LeaveVersion {
   @@index([leaveId, version])
 }
 
+// EL Encashment Request (Policy 6.19.f)
+// Employees can encash EL balance exceeding 10 days
 model EncashmentRequest {
-  id               Int              @id @default(autoincrement())
-  userId           Int
-  year             Int
-  daysRequested    Int
-  balanceAtRequest Int
-  reason           String?
-  status           EncashmentStatus @default(PENDING)
-  approvedBy       Int?
-  approvedAt       DateTime?
-  rejectionReason  String?
-  paidAt           DateTime?
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  approver         User?            @relation("EncashmentApprover", fields: [approvedBy], references: [id])
-  user             User             @relation(fields: [userId], references: [id])
+  id                Int              @id @default(autoincrement())
+  userId            Int
+  year              Int // Year of EL balance being encashed
+  daysRequested     Int // Days employee wants to encash
+  balanceAtRequest  Int // EL balance at time of request (for audit)
+  reason            String? // Optional reason for encashment
+  status            EncashmentStatus @default(PENDING)
+  approvedBy        Int? // User ID of approver (typically CEO)
+  approvedAt        DateTime?
+  rejectionReason   String?
+  paidAt            DateTime? // When payment was processed
+  // Payment tracking fields
+  paymentStatus     String? // PENDING, PROCESSING, PAID, FAILED
+  paymentMethod     String? // BANK_TRANSFER, CHEQUE, CASH
+  paymentReference  String? // Payment reference number/transaction ID
+  paymentDate       DateTime? // Actual payment completion date
+  paymentReceiptUrl String? // URL to payment receipt/proof
+  processedBy       Int? // User ID who processed the payment (usually HR_HEAD or CEO)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  user      User  @relation(fields: [userId], references: [id])
+  approver  User? @relation("EncashmentApprover", fields: [approvedBy], references: [id])
+  processor User? @relation("EncashmentProcessor", fields: [processedBy], references: [id])
 
   @@index([userId, status])
   @@index([status])
-  @@index([approvedBy], map: "EncashmentRequest_approvedBy_fkey")
+  @@index([paymentStatus])
 }
 
 model OrgSettings {
@@ -185,18 +205,19 @@ model OrgSettings {
   value       Json
   description String?
   updatedAt   DateTime @updatedAt
-  updatedBy   Int?
+  updatedBy   Int? // User ID
 }
 
+// 2FA OTP (One-Time Password) Model
 model OtpCode {
   id        Int      @id @default(autoincrement())
   userId    Int
   email     String
-  code      String
+  code      String // 6-digit code
   expiresAt DateTime
   verified  Boolean  @default(false)
-  attempts  Int      @default(0)
-  ipAddress String?
+  attempts  Int      @default(0) // Track verification attempts
+  ipAddress String? // Track IP for security
   createdAt DateTime @default(now())
 
   @@index([email, verified])
@@ -204,18 +225,19 @@ model OtpCode {
   @@map("OtpCode")
 }
 
+// Real-time notification system
 model Notification {
-  id        Int               @id @default(autoincrement())
-  userId    Int
-  type      Notification_type
+  id        Int              @id @default(autoincrement())
+  userId    Int // Recipient user ID
+  type      NotificationType
   title     String
   message   String
-  link      String?
-  leaveId   Int?
-  read      Boolean           @default(false)
+  link      String? // Optional link to related resource (e.g., /leaves/123)
+  leaveId   Int? // Related leave request ID
+  read      Boolean          @default(false)
   readAt    DateTime?
-  createdAt DateTime          @default(now())
-  expiresAt DateTime?
+  createdAt DateTime         @default(now())
+  expiresAt DateTime? // Optional expiry for time-sensitive notifications
 
   @@index([userId, read])
   @@index([userId, createdAt])
@@ -272,7 +294,7 @@ enum EncashmentStatus {
   PAID
 }
 
-enum Notification_type {
+enum NotificationType {
   LEAVE_SUBMITTED
   LEAVE_APPROVED
   LEAVE_REJECTED
@@ -285,4 +307,91 @@ enum Notification_type {
   ENCASHMENT_APPROVED
   ENCASHMENT_REJECTED
   SYSTEM_ANNOUNCEMENT
+}
+
+// Balance Adjustment Model
+// For manual balance corrections by SYSTEM_ADMIN
+model BalanceAdjustment {
+  id              Int       @id @default(autoincrement())
+  userId          Int // Employee whose balance is being adjusted
+  leaveType       LeaveType
+  year            Int
+  amount          Int // Positive for credit, negative for debit
+  reason          String // Required explanation for audit trail
+  previousBalance Int // Balance before adjustment
+  newBalance      Int // Balance after adjustment
+  adjustedBy      Int // SYSTEM_ADMIN who made the adjustment
+  createdAt       DateTime  @default(now())
+
+  user           User @relation("BalanceAdjustments", fields: [userId], references: [id])
+  adjustedByUser User @relation("AdjustmentsMade", fields: [adjustedBy], references: [id])
+
+  @@index([userId, leaveType, year])
+  @@index([adjustedBy])
+  @@index([createdAt])
+}
+
+// Approval Delegation Model
+// Allows approvers to delegate their approval authority temporarily
+model ApprovalDelegation {
+  id          Int      @id @default(autoincrement())
+  delegatorId Int // User who is delegating (original approver)
+  delegateId  Int // User who will act as delegate
+  startDate   DateTime // When delegation starts
+  endDate     DateTime // When delegation ends
+  isActive    Boolean  @default(true) // Can be manually revoked
+  reason      String? // Optional reason for delegation
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  delegator User @relation("DelegationsDelegated", fields: [delegatorId], references: [id])
+  delegate  User @relation("DelegationsReceived", fields: [delegateId], references: [id])
+
+  @@index([delegatorId, isActive])
+  @@index([delegateId, isActive])
+  @@index([startDate, endDate])
+}
+
+// User Dashboard Preferences
+model UserPreferences {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @unique
+  dashboardLayout Json? // Widget arrangement and visibility
+  theme           String?  @default("system") // light, dark, system
+  notifications   Json? // Notification preferences
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Leave Templates for quick application
+model LeaveTemplate {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  name      String // Template name (e.g., "Annual Vacation")
+  leaveType LeaveType
+  duration  Int // Typical duration in days
+  reason    String // Pre-filled reason
+  isShared  Boolean   @default(false) // Can be shared with team
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// Policy Version Tracking
+model PolicyVersion {
+  id            Int      @id @default(autoincrement())
+  version       String // e.g., "v2.1"
+  changes       Json // Description of changes
+  changedBy     Int // User who made changes
+  effectiveFrom DateTime // When this version takes effect
+  createdAt     DateTime @default(now())
+
+  changedByUser User @relation(fields: [changedBy], references: [id])
+
+  @@index([effectiveFrom])
 }
