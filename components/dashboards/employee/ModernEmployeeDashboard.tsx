@@ -29,7 +29,7 @@ import {
 } from "@/components/ui";
 import { useApiQuery } from "@/lib/apiClient";
 import { useLeaveRequests } from "@/hooks";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib";
 import { formatDate } from "@/lib/utils";
 import { RoleBasedDashboard, RoleKPICard } from "../shared/RoleBasedDashboard";
 import {
@@ -51,7 +51,7 @@ import { BalanceProjectionWidget } from "./components/BalanceProjectionWidget";
 
 // Extracted hooks and utils
 import { KPIGridSkeleton } from "@/components/shared/skeletons";
-import { useMounted } from "@/hooks/use-mounted";
+import { useMounted } from "@/hooks/useMounted";
 import { useEmployeeDashboardData } from "./hooks/useEmployeeDashboardData";
 import { WhosOutToday } from "@/app/dashboard/shared/WhosOutToday";
 

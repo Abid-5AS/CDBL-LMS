@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyAuth } from "@/lib/auth-jwt";
+import { getCurrentUser } from "@/lib/auth";
 import { DelegationService } from "@/lib/services/delegation.service";
 import { z } from "zod";
 
@@ -17,7 +17,7 @@ const createDelegationSchema = z.object({
  */
 export async function POST(request: NextRequest) {
   try {
-    const authResult = await verifyAuth(request);
+    const authResult = await getCurrentUser(request);
     if (!authResult.authenticated || !authResult.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await verifyAuth(request);
+    const authResult = await getCurrentUser(request);
     if (!authResult.authenticated || !authResult.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
-    const authResult = await verifyAuth(request);
+    const authResult = await getCurrentUser(request);
     if (!authResult.authenticated || !authResult.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

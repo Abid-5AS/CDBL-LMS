@@ -24,6 +24,12 @@ export { SUCCESS_MESSAGES, getToastMessage } from "./ui/toast-messages";
 // URL/Filter utilities
 export { useFilterFromUrl } from "./ui/url-filters";
 
+// User context hook
+export { useUser } from "@/components/providers/UserContext";
+
+// Common hooks re-exported for convenience
+export { useDebounce } from "@/hooks/useDebounce";
+
 // Hooks moved to @/hooks and @/components/providers
 
 // Note: Import these directly when needed (less commonly used):

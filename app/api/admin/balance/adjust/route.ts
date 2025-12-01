@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyAuth } from "@/lib/auth-jwt";
+import { getCurrentUser } from "@/lib/auth";
 import { BalanceAdjustmentService } from "@/lib/services/balance-adjustment.service";
 import { LeaveType, Role } from "@prisma/client";
 import { z } from "zod";
@@ -31,7 +31,7 @@ const adjustBalanceSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Verify authentication
-    const authResult = await verifyAuth(request);
+    const authResult = await getCurrentUser(request);
     if (!authResult.authenticated || !authResult.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // Verify authentication
-    const authResult = await verifyAuth(request);
+    const authResult = await getCurrentUser(request);
     if (!authResult.authenticated || !authResult.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
