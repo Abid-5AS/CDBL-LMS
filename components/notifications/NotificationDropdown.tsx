@@ -40,7 +40,12 @@ const fetcher = (url: string) =>
     .then((data) => data.notifications || [])
     .catch(() => []);
 
+import { useNotificationStream } from "@/hooks/useNotificationStream";
+
 export function NotificationDropdown() {
+  // Enable real-time notifications
+  useNotificationStream();
+
   // Fetch notifications from API
   const { data: notifications = [], mutate } = useSWR<Notification[]>(
     "/api/notifications/latest",
@@ -118,6 +123,7 @@ export function NotificationDropdown() {
               <button
                 onClick={handleMarkAllAsRead}
                 className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                aria-label="Mark all notifications as read"
               >
                 Mark all read
               </button>

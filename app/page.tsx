@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { unstable_noStore as noStore } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
-import { getHomePageForRole, type UserRole } from "@/lib/navigation";
+import { getHomePageForRole, type UserRole } from "@/lib/ui/navigation";
 
 export default async function Home() {
   noStore();

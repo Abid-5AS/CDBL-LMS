@@ -11,7 +11,7 @@ import {
 import { useTheme } from "next-themes";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 
 export type Slice = {
   type?: "CASUAL" | "EARNED" | "MEDICAL";

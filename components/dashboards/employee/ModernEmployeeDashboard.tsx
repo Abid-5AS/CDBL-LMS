@@ -33,7 +33,7 @@ import {
 } from "@/components/ui";
 import { useApiQuery } from "@/lib/apiClient";
 import { useLeaveRequests } from "@/hooks";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import { formatDate } from "@/lib/utils";
 import { RoleBasedDashboard } from "../shared/RoleBasedDashboard";
 import {
@@ -53,7 +53,7 @@ import { UpcomingHolidaysPanel } from "./components/UpcomingHolidaysPanel";
 
 // Extracted hooks and utils
 import { KPIGridSkeleton } from "@/components/shared/skeletons";
-import { useMounted } from "@/hooks/use-mounted";
+import { useMounted } from "@/hooks";
 import { useEmployeeDashboardData } from "./hooks/useEmployeeDashboardData";
 import { WhosOutToday } from "@/app/dashboard/shared/WhosOutToday";
 
@@ -111,6 +111,15 @@ export function ModernEmployeeDashboard({
 
   // Process data using custom hook
   const dashboardData = useEmployeeDashboardData(leaves, balanceData);
+
+  // Calculate counts
+  const pendingCount = React.useMemo(() => 
+    leaves?.filter(l => ["PENDING", "SUBMITTED", "FORWARDED"].includes(l.status)).length || 0
+  , [leaves]);
+
+  const pastCount = React.useMemo(() => 
+    leaves?.filter(l => ["APPROVED", "REJECTED", "CANCELLED"].includes(l.status)).length || 0
+  , [leaves]);
 
   // Filter leaves for the activity list
   const filteredLeaves = React.useMemo(() => {
@@ -175,7 +184,6 @@ export function ModernEmployeeDashboard({
         backgroundVariant="transparent"
         compactHeader={true}
         title="Overview"
-        description={`Welcome back, ${username.split(" ")[0]}.`}
         actions={headerActions}
       >
         <motion.div
@@ -227,8 +235,8 @@ export function ModernEmployeeDashboard({
                 >
                   <TabsList className="h-8">
                     <TabsTrigger value="ALL" className="text-xs px-3">All</TabsTrigger>
-                    <TabsTrigger value="PENDING" className="text-xs px-3">Pending</TabsTrigger>
-                    <TabsTrigger value="PAST" className="text-xs px-3">Past</TabsTrigger>
+                    <TabsTrigger value="PENDING" className="text-xs px-3">Pending ({pendingCount})</TabsTrigger>
+                    <TabsTrigger value="PAST" className="text-xs px-3">Past ({pastCount})</TabsTrigger>
                   </TabsList>
                 </Tabs>
               </div>

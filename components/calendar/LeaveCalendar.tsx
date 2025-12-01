@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { leaveTypeLabel, leaveTypeColor } from "@/lib/ui";
+import { leaveTypeLabel, leaveTypeColor } from "@/lib/ui/ui";
 import { LeaveType } from "@prisma/client";
 
 interface LeaveEvent {

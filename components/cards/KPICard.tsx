@@ -4,10 +4,11 @@ import type { ComponentType, CSSProperties, ReactNode } from "react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui";
 import { cn } from "@/lib/utils";
+import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 type KPICardProps = {
   title: string;
-  value: string;
+  value: string | number;
   subtext?: string;
   icon?: ComponentType<{ size?: number; className?: string }>;
   iconColor?: string;
@@ -17,12 +18,18 @@ type KPICardProps = {
     total: number;
     label?: string;
   };
+  trend?: {
+    value: string | number;
+    label?: string;
+    direction?: "up" | "down" | "neutral";
+  };
   status?: "healthy" | "low" | "critical";
   badge?: string;
   badgeVariant?: "default" | "secondary" | "destructive" | "outline";
   // Material 3 enhancements
   accentColor?: string;
   className?: string;
+  onClick?: () => void;
 };
 
 export function KPICard({
@@ -32,11 +39,13 @@ export function KPICard({
   icon: Icon,
   iconColor,
   progress,
+  trend,
   status,
   badge,
   badgeVariant = "default",
   accentColor,
   className,
+  onClick,
 }: KPICardProps) {
   const progressPercentage = progress?.total
     ? Math.min(
@@ -80,6 +89,27 @@ export function KPICard({
     "--kpi-accent-muted": `color-mix(in srgb, ${accentColorValue} 8%, transparent)`,
   };
 
+  const renderTrend = () => {
+    if (!trend) return null;
+    
+    let direction = trend.direction;
+    if (!direction && typeof trend.value === 'number') {
+        direction = trend.value > 0 ? 'up' : trend.value < 0 ? 'down' : 'neutral';
+    }
+
+    const TrendIcon = direction === 'up' ? TrendingUp : direction === 'down' ? TrendingDown : Minus;
+    const trendColor = direction === 'up' ? 'text-emerald-600' : direction === 'down' ? 'text-red-600' : 'text-muted-foreground';
+    const trendBg = direction === 'up' ? 'bg-emerald-50' : direction === 'down' ? 'bg-red-50' : 'bg-slate-50';
+
+    return (
+      <div className={cn("inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium", trendBg, trendColor)}>
+        <TrendIcon className="w-3 h-3" />
+        <span>{typeof trend.value === 'number' && trend.value > 0 ? '+' : ''}{trend.value}</span>
+        {trend.label && <span className="text-muted-foreground ml-1">{trend.label}</span>}
+      </div>
+    );
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -89,6 +119,8 @@ export function KPICard({
         y: -4,
         transition: { duration: 0.2, ease: "easeOut" },
       }}
+      onClick={onClick}
+      className={cn(onClick && "cursor-pointer")}
     >
       <div
         className={cn(
@@ -100,9 +132,6 @@ export function KPICard({
         )}
         style={accentVars}
       >
-        {/* Removed gradient effect for professional look */}
-        {/* Removed accent line for professional look */}
-
         <div className="relative flex flex-col gap-3.5">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 space-y-2.5">
@@ -125,6 +154,7 @@ export function KPICard({
                     {subtext}
                   </p>
                 )}
+                {trend && <div className="mt-2">{renderTrend()}</div>}
               </div>
             </div>
 

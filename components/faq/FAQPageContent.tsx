@@ -32,7 +32,7 @@ import { EmployeePageHero } from "@/components/employee/PageHero";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useUser } from "@/lib/user-context";
+import { useUser } from "@/components/providers/UserContext";
 
 // ============================================
 // FAQ Data

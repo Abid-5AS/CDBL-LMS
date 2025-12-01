@@ -45,7 +45,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { RoleBadge } from "@/components/shared/RoleIndicator";
-import type { AppRole } from "@/lib/ui-utils";
+import type { AppRole } from "@/lib/ui/ui-utils";
 
 // ============================================
 // Types

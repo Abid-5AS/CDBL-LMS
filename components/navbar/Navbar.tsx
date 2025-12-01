@@ -7,7 +7,7 @@ import { MobileBar } from "./MobileBar";
 import { MobileMenu } from "./MobileMenu";
 import { useNavbarState } from "./use-navbar-state";
 import { cn } from "@/lib/utils";
-import { useHasMounted } from "@/hooks/use-has-mounted";
+import { useHasMounted } from "@/hooks";
 
 export function Navbar() {
   const state = useNavbarState();

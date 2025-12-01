@@ -14,7 +14,7 @@ import { format, addMonths, subMonths, startOfMonth, addDays } from "date-fns";
 import { Loader2, CalendarDays, Clock, Wallet, LayoutGrid, Users, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 
 type LeaveCalendarViewProps = {
   currentUserRole: string;

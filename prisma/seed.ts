@@ -2,7 +2,8 @@ import path from "path";
 import { promises as fs } from "fs";
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
-import { ApprovalDecision, LeaveStatus, LeaveType, Role } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
+import { LeaveType, LeaveStatus, ApprovalDecision, Role, EncashmentStatus } from "@prisma/client";
 
 import { prisma } from "../lib/prisma";
 import { initDefaultOrgSettings } from "../lib/org-settings";

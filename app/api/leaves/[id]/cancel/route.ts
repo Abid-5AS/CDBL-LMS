@@ -5,8 +5,8 @@ import { LeaveStatus } from "@prisma/client";
 import { z } from "zod";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
-import { canCancelMaternityLeave } from "@/lib/leave-validation";
-import { processELOverflow } from "@/lib/el-overflow";
+import { canCancelMaternityLeave } from "@/lib/leaves/leave-validation";
+import { processELOverflow } from "@/lib/leaves/el-overflow";
 
 export const cache = "no-store";
 

@@ -22,7 +22,7 @@ import {
 } from "@/components/ui";
 import { useApiQuery } from "@/lib/apiClient";
 import { useLeaveRequests } from "@/hooks";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import { formatDate } from "@/lib/utils";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
@@ -39,7 +39,7 @@ import { TeamStatusSummary } from "./components/TeamStatusSummary";
 import { UpcomingHolidaysPanel } from "./components/UpcomingHolidaysPanel";
 
 // Hooks
-import { useMounted } from "@/hooks/use-mounted";
+import { useMounted } from "@/hooks";
 import { useEmployeeDashboardData } from "./hooks/useEmployeeDashboardData";
 
 // Corporate Active Request Tracker (restyled)

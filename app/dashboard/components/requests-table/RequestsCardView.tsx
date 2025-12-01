@@ -16,7 +16,7 @@ import {
 } from "@/components/ui";
 import { ClipboardCheck } from "lucide-react";
 import { StatusBadge, EmptyState } from "@/components/shared";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import { formatDate } from "@/lib/utils";
 import clsx from "clsx";
 import {

@@ -99,6 +99,7 @@ describe("Leave Workflows Integration", () => {
           workingDays: 3,
           reason: "Test leave",
           status: "SUBMITTED",
+          policyVersion: "v1.0",
         },
       });
 
@@ -123,6 +124,7 @@ describe("Leave Workflows Integration", () => {
           workingDays: 3,
           reason: "Test leave",
           status: "PENDING",
+          policyVersion: "v1.0",
         },
       });
 
@@ -171,6 +173,7 @@ describe("Leave Workflows Integration", () => {
           workingDays: 1,
           reason: "Test",
           status: "SUBMITTED",
+          policyVersion: "v1.0",
         },
       });
 
@@ -196,6 +199,7 @@ describe("Leave Workflows Integration", () => {
           workingDays: 1,
           reason: "Test",
           status: "APPROVED",
+          policyVersion: "v1.0",
         },
       });
 
@@ -236,6 +240,7 @@ describe("Leave Workflows Integration", () => {
           workingDays: 3,
           reason: "Test",
           status: "APPROVED",
+          policyVersion: "v1.0",
         },
       });
 
@@ -291,6 +296,7 @@ describe("Leave Workflows Integration", () => {
           workingDays: 5,
           reason: "Test",
           status: "APPROVED",
+          policyVersion: "v1.0",
         },
       });
 
@@ -319,6 +325,7 @@ describe("Leave Workflows Integration", () => {
           workingDays: 1,
           reason: "Test",
           status: "PENDING",
+          policyVersion: "v1.0",
         },
       });
 
@@ -346,6 +353,7 @@ describe("Leave Workflows Integration", () => {
           workingDays: 8,
           reason: "Medical leave",
           status: "APPROVED",
+          policyVersion: "v1.0",
         },
       });
 
@@ -366,6 +374,7 @@ describe("Leave Workflows Integration", () => {
           workingDays: 1,
           reason: "Test",
           status: "PENDING",
+          policyVersion: "v1.0",
         },
       });
 

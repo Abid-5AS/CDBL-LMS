@@ -6,7 +6,7 @@ import { metricCard, getTypography } from "@/lib/ui/density-modes";
 
 interface MetricCardProps {
   label: string | React.ReactNode;
-  value: string | number;
+  value: string | number | React.ReactNode;
   subtitle?: string;
   trend?: {
     value: string;
@@ -23,6 +23,7 @@ interface MetricCardProps {
  * Theme-aware component for KPIs and statistics
  *
  * Design: Clean card with bold numbers, theme-compatible colors
+ * @deprecated Use components/cards/KPICard instead
  */
 export function MetricCard({
   label,

@@ -7,7 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui";
-import { getIcon, leaveStatusIcons, iconSizes } from "@/lib/icons";
+import { getIcon, leaveStatusIcons, iconSizes } from "@/lib/ui/icons";
 import type { LeaveStatus } from "@/lib/workflow";
 import type { BadgeProps } from "@/components/ui/badge";
 import clsx from "clsx";

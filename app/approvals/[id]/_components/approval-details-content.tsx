@@ -33,7 +33,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LeaveRequest, Approval, Balance, LeaveType } from "@prisma/client";
 import { ApprovalActionCard } from "./approval-action-card";

@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { ModalShell } from "@/components/layout/ModalShell";
 import { StatusChip } from "@/components/ui/status-chip";
-import { EmptyState } from "@/components/ui/empty-state";
+import { EmptyState } from "@/components/shared";
 import { Plane, Clock, LogOut, FileText, User, Calendar, CheckCircle2, AlertCircle, XCircle, Info } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { formatDate } from "@/lib/utils";
@@ -74,7 +74,7 @@ export async function ControlCenterServer({ onClose }: { onClose: () => void }) 
   }
 
   // Fetch balances on the server (only for non-executive roles)
-  let balances = {};
+  let balances: BalanceData = {};
   if (user.role !== "CEO" && user.role !== "HR_HEAD") {
     try {
       balances = await apiGet<BalanceData>("/api/balance/mine");

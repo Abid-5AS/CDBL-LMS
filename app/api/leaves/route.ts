@@ -32,45 +32,65 @@ const ApplySchema = z.object({
 });
 
 export async function GET(req: Request) {
-  const me = await getCurrentUser();
-  const traceId = getTraceId(req as any);
-  if (!me) return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
-
-  // Parse query parameters
-  const url = new URL(req.url);
-  const statusFilter = url.searchParams.get("status");
-  const mine = url.searchParams.get("mine") === "1";
-  const limit = Math.min(parseInt(url.searchParams.get("limit") || "50"), 100); // Cap at 100 for performance
+  console.log("[GET /api/leaves] Request received");
+  let traceId = "unknown";
+  try {
+    traceId = getTraceId(req as any);
+  } catch (e) {
+    console.error("[GET /api/leaves] Failed to get traceId:", e);
+  }
 
   try {
+    console.log("[GET /api/leaves] Getting current user...");
+    const me = await getCurrentUser();
+    console.log("[GET /api/leaves] User:", me?.id);
+    
+    if (!me) return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
+
+    // Parse query parameters
+    const url = new URL(req.url);
+    const statusFilter = url.searchParams.get("status");
+    const mine = url.searchParams.get("mine") === "1";
+    const limit = Math.min(parseInt(url.searchParams.get("limit") || "50"), 100); // Cap at 100 for performance
+
     let items;
 
     if (mine) {
       // Use repository method for user-specific queries
+      console.log("[GET /api/leaves] Fetching leaves for user:", me.id, "statusFilter:", statusFilter, "limit:", limit);
       if (statusFilter && statusFilter !== "all") {
         items = await LeaveRepository.findByUserId(me.id, statusFilter as any, { limit });
       } else {
         items = await LeaveRepository.findByUserId(me.id, undefined, { limit });
       }
+      console.log("[GET /api/leaves] Found items:", items?.length);
     } else {
       // Use repository method for all queries
       // Ensure status filter is passed correctly, even for CANCELLATION_REQUESTED
-      try {
-        items = await LeaveRepository.findAll({
-          status: statusFilter && statusFilter !== "all" ? statusFilter as any : undefined,
-          limit,
-        });
-      } catch (err) {
-        console.error("Error fetching leaves:", err);
-        return NextResponse.json({ error: "Failed to fetch leaves", details: String(err) }, { status: 500 });
-      }
+      console.log("[GET /api/leaves] Fetching all leaves");
+      items = await LeaveRepository.findAll({
+        status: statusFilter && statusFilter !== "all" ? statusFilter as any : undefined,
+        limit,
+      });
+      console.log("[GET /api/leaves] Found items:", items?.length);
     }
 
+    console.log("[GET /api/leaves] Attempting serialization check...");
+    try {
+      JSON.stringify(items);
+      console.log("[GET /api/leaves] Serialization check passed");
+    } catch (serErr) {
+      console.error("[GET /api/leaves] Serialization failed:", serErr);
+      throw new Error("Response serialization failed: " + String(serErr));
+    }
+
+    console.log("[GET /api/leaves] Returning response");
     return NextResponse.json({ items });
   } catch (err) {
     console.error("GET /api/leaves error:", err);
+    console.error("Error stack:", err instanceof Error ? err.stack : "No stack trace");
     return NextResponse.json(
-      error("internal_error", "Failed to fetch leave requests", traceId),
+      error("internal_error", "Failed to fetch leave requests: " + String(err), traceId),
       { status: 500 }
     );
   }

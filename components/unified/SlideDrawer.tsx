@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useUIStore } from "@/lib/ui-state";
+import { useUIStore } from "@/lib/ui/ui-state";
 import { LeaveDetailsModal } from "@/components/shared/modals/LeaveDetailsModal";
 import { useLeaveData } from "@/components/providers";
 

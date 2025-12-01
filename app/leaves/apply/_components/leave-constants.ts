@@ -1,4 +1,4 @@
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 
 export type LeaveType =
   | "EARNED"

@@ -3,7 +3,7 @@
  * Used across all components for consistency
  */
 
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 
 /**
  * Leave type enum mirrored from Prisma (for client-side use)

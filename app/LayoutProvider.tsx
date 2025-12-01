@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { UserProvider } from "@/lib/user-context";
+import { UserProvider } from "@/components/providers";
 import { LayoutWrapper } from "@/components/layout/LayoutWrapper";
 import { getCurrentUser } from "@/lib/auth";
 

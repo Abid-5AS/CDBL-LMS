@@ -13,7 +13,7 @@ import { format } from "date-fns";
 import { CalendarEvent } from "./CalendarGrid";
 import { STATUS_COLORS, LEAVE_TYPE_DOTS } from "./CalendarLegend";
 import { cn } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 

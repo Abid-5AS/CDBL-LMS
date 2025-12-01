@@ -6,8 +6,8 @@
 export { cn, formatDate } from "./utils";
 
 // UI helpers
-export { leaveTypeLabel } from "./ui";
-export { getStatusColors } from "./status-colors";
+export { leaveTypeLabel } from "./ui/ui";
+export { getStatusColors } from "./ui/status-colors";
 
 // Workflow/RBAC
 export {
@@ -19,20 +19,17 @@ export {
 export type { AppRole } from "./rbac";
 
 // Toast messages
-export { SUCCESS_MESSAGES, getToastMessage } from "./toast-messages";
+export { SUCCESS_MESSAGES, getToastMessage } from "./ui/toast-messages";
 
 // URL/Filter utilities
-export { useFilterFromUrl } from "./url-filters";
+export { useFilterFromUrl } from "./ui/url-filters";
 
-// Hooks
-export { useDebounce } from "./use-debounce";
-export { useUser } from "./user-context";
+// Hooks moved to @/hooks and @/components/providers
 
 // Note: Import these directly when needed (less commonly used):
-// - animations.ts - Animation variants
-// - working-days.ts - Date calculations
-// - leave-days.ts - Leave calculations
-// - role-ui.ts - Role display helpers
+// - ui/animations.ts - Animation variants
+// - leaves/working-days.ts - Date calculations
+// - leaves/leave-days.ts - Leave calculations
 // - navigation.ts - Navigation config
 // - auth.ts - Auth functions
 // - policy.ts - Policy logic

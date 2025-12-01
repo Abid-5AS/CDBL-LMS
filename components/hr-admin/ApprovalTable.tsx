@@ -53,7 +53,7 @@ import { cn } from "@/lib/utils";
 
 // Local imports
 import { HRApprovalItem } from "./types";
-import { useSelectionContext } from "@/lib/selection-context";
+import { useSelectionContext } from "@/components/providers";
 import { apiFetcher, apiPost } from "@/lib/apiClient";
 
 // Server Actions

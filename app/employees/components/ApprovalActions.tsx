@@ -14,7 +14,7 @@ import {
   Textarea,
 } from "@/components/ui";
 import { submitApprovalDecision } from "@/lib/apiClient";
-import { useUser } from "@/lib/user-context";
+import { useUser } from "@/components/providers";
 import { ArrowRight, RotateCcw } from "lucide-react";
 import type { AppRole } from "@/lib/rbac";
 

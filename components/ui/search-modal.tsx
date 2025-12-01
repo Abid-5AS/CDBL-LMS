@@ -18,11 +18,11 @@ import {
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
-import { useUser } from "@/lib/user-context";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useUser } from "@/components/providers/UserContext";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import useSWR from "swr";
-import { useDebounce } from "@/lib/use-debounce";
 
 // Simple fetcher for API calls
 const fetcher = (url: string) => fetch(url).then((res) => res.json());

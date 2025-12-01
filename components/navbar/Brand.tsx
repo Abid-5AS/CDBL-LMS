@@ -21,7 +21,7 @@ export function Brand({ compact = false }: { compact?: boolean }) {
         )}
       >
         <Image
-          src="/brand/company-logo.png"
+          src="/brand/cdbl-lms.png"
           alt="Central Depository Bangladesh Limited"
           width={compact ? 120 : 140}
           height={compact ? 80 : 90}

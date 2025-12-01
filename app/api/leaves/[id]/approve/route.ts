@@ -13,11 +13,11 @@ import { LeaveStatus } from "@prisma/client";
 import { z } from "zod";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
-import { calculateMLConversion, formatConversionBreakdown } from "@/lib/medical-leave-conversion";
-import { calculateCLConversion, formatCLConversionBreakdown } from "@/lib/casual-leave-conversion";
-import { fetchHolidaysInRange } from "@/lib/leave-validation";
-import { countWorkingDays } from "@/lib/working-days";
-import { deductBalance, deductMultipleBalances } from "@/lib/balance-manager";
+import { calculateMLConversion, formatConversionBreakdown } from "@/lib/leaves/medical-leave-conversion";
+import { calculateCLConversion, formatCLConversionBreakdown } from "@/lib/leaves/casual-leave-conversion";
+import { fetchHolidaysInRange } from "@/lib/leaves/leave-validation";
+import { countWorkingDays } from "@/lib/leaves/working-days";
+import { deductBalance, deductMultipleBalances } from "@/lib/leaves/balance-manager";
 
 export const cache = "no-store";
 

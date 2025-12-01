@@ -9,7 +9,7 @@ type NavLink = {
   label: string;
 };
 
-import { getNavItemsForRole, type UserRole } from "@/lib/navigation";
+import { getNavItemsForRole, type UserRole } from "@/lib/ui/navigation";
 
 export function SegmentedNav({ role }: { role: "EMPLOYEE" | "HR_ADMIN" }) {
   const pathname = usePathname();

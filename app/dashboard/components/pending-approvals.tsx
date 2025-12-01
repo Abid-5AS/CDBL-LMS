@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
-import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/toast-messages";
+import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/ui/toast-messages";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 

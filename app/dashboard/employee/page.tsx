@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { ModernEmployeeDashboard } from "@/components/dashboards";
 import { DashboardLoadingFallback } from "../shared/LoadingFallback";
 import { RoleBasedDashboard } from "@/components/dashboards/shared/RoleBasedDashboard";
-import { SelectionProvider } from "@/lib/selection-context";
+import { SelectionProvider } from "@/components/providers";
 
 async function EmployeeDashboardPageContent() {
   const user = await getCurrentUser();

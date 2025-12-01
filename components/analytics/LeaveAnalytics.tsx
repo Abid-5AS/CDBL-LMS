@@ -22,7 +22,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { leaveTypeLabel, leaveTypeColor } from "@/lib/ui";
+import { leaveTypeLabel, leaveTypeColor } from "@/lib/ui/ui";
 
 // ============================================
 // Types

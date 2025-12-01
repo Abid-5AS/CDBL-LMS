@@ -6,13 +6,13 @@ import { z } from "zod";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
 import { normalizeToDhakaMidnight } from "@/lib/date-utils";
-import { countWorkingDays } from "@/lib/working-days";
+import { countWorkingDays } from "@/lib/leaves/working-days";
 import { getChainFor } from "@/lib/workflow";
 import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
 import { generateSignedUrl } from "@/lib/storage";
-import { violatesCasualLeaveSideTouch } from "@/lib/leave-validation";
+import { violatesCasualLeaveSideTouch } from "@/lib/leaves/leave-validation";
 import { validateStatusTransition } from "@/lib/state-machine";
 
 export const cache = "no-store";

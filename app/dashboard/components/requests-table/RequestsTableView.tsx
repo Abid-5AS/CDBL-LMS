@@ -7,7 +7,7 @@ import { formatDate } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import clsx from "clsx";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import {
   AlertDialog,
   AlertDialogAction,

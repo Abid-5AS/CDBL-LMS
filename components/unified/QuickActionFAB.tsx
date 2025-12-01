@@ -6,7 +6,7 @@ import Link from "next/link";
 import clsx from "clsx";
 import { Plus, Eye, TrendingUp, X } from "lucide-react";
 import { useLeaveData } from "@/components/providers";
-import { useUser } from "@/lib/user-context";
+import { useUser } from "@/components/providers/UserContext";
 
 type FABAction = {
   label: string;

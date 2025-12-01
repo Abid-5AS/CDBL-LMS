@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { unstable_noStore as noStore } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
-import { getHomePageForRole } from "@/lib/navigation";
+import { getHomePageForRole } from "@/lib/ui/navigation";
 import { LoginForm } from "./components/LoginForm";
 
 export default function LoginPage() {

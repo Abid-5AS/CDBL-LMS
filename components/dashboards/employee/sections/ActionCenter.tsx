@@ -33,7 +33,7 @@ import {
   FileX,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
 import { LeaveStatus } from "@prisma/client";

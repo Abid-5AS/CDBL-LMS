@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
       prisma.leaveRequest.count({
         where: {
           status: "APPROVED",
-          startDate: { lte: tomorrow },
+          startDate: { lte: today },
           endDate: { gte: today },
         },
       }),

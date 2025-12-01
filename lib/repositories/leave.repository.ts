@@ -329,7 +329,13 @@ export class LeaveRepository {
   /**
    * Get leave statistics for a user
    */
-  static async getUserLeaveStats(userId: number, year: number) {
+  static async getUserLeaveStats(userId: number, year: number): Promise<{
+    total: number;
+    approved: number;
+    pending: number;
+    rejected: number;
+    byType: Record<string, { count: number; days: number }>;
+  }> {
     const startOfYear = new Date(year, 0, 1);
     const endOfYear = new Date(year, 11, 31);
 

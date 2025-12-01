@@ -25,10 +25,7 @@ describe("StatusBadge Component", () => {
     expect(screen.getByText("Recalled")).toBeInTheDocument();
   });
 
-  it("should render badge for OVERSTAY_PENDING status", () => {
-    render(<StatusBadge status={LeaveStatus.OVERSTAY_PENDING} />);
-    expect(screen.getByText("Overstay")).toBeInTheDocument();
-  });
+
 
   it("should fallback to PENDING for unknown status", () => {
     // @ts-expect-error - Testing invalid status

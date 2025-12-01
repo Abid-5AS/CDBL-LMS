@@ -15,6 +15,7 @@ export { ErrorBoundary } from "./ErrorBoundary";
 export { ExportSection } from "./ExportSection";
 export { CancellationTable } from "./CancellationTable";
 export { LeaveTable } from "./LeaveTable";
+export type { ColumnDef, ActionDef, BulkActionDef } from "./LeaveTable";
 export { EmployeeProfileCard } from "./EmployeeProfileCard";
 export { LeaveHistoryTable } from "./LeaveHistoryTable";
 export { DateRangePicker } from "./DateRangePicker";

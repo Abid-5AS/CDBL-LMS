@@ -23,11 +23,11 @@ import {
 } from "@/components/ui/tooltip";
 import { AlertCircle, Info, RotateCcw, Calendar } from "lucide-react";
 import { toast } from "sonner";
-import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/toast-messages";
+import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/ui/toast-messages";
 import { DateRangePicker, FileUploadSection } from "@/components/shared";
 import { LeaveRequest, LeaveComment } from "@prisma/client";
 import { formatDate } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import Link from "next/link";
 
 type EditLeaveFormProps = {

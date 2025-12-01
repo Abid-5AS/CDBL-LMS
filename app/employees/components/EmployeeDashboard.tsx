@@ -7,6 +7,7 @@ import {
 } from "@/hooks/useDashboardLayout";
 import { DashboardContainer, SectionHeader } from "@/components";
 import { EmployeeProfileCard, LeaveHistoryTable } from "@/components/shared";
+import { LeaveBalanceCard } from "./LeaveBalanceCard";
 import { SmartLeaveAssistant } from "./SmartLeaveAssistant";
 
 // ... existing imports
@@ -15,7 +16,7 @@ import { SmartLeaveAssistant } from "./SmartLeaveAssistant";
 
 
 import ChartsSection from "./ChartsSection";
-import { ModernHRStatCards } from "@/components/ModernHRStatCards";
+import { ModernHRStatCards } from "@/components/dashboards/shared/ModernHRStatCards";
 import { ApprovalActions } from "./ApprovalActions";
 import { canEditEmployee, type AppRole } from "@/lib/rbac";
 import Link from "next/link";
@@ -30,8 +31,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui";
 import { motion, useReducedMotion } from "framer-motion";
-import { getIcon, iconSizes } from "@/lib/icons";
-import { slideUp, staggerChildren } from "@/lib/animations";
+import { getIcon, iconSizes } from "@/lib/ui/icons";
+import { slideUp, staggerChildren } from "@/lib/ui/animations";
 
 const SECTION_MAP = {
   Overview: "Overview",

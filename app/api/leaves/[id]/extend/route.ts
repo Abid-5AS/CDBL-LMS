@@ -6,9 +6,9 @@ import { z } from "zod";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
 import { normalizeToDhakaMidnight } from "@/lib/date-utils";
-import { countWorkingDays } from "@/lib/working-days";
+import { countWorkingDays } from "@/lib/leaves/working-days";
 import { getChainFor } from "@/lib/workflow";
-import { fetchHolidaysInRange } from "@/lib/leave-validation";
+import { fetchHolidaysInRange } from "@/lib/leaves/leave-validation";
 
 export const cache = "no-store";
 

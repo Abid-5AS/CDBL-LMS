@@ -8,8 +8,8 @@ import { ThemeToggle } from "../theme-toggle";
 import { AnnotationsToggle } from "../annotations-toggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useGesture } from "@/hooks/use-gesture";
-import { useSearch } from "@/hooks/use-search";
+import { useGesture } from "@/hooks";
+import { useSearch } from "@/hooks";
 
 import type { NavbarState } from "./use-navbar-state";
 
@@ -88,7 +88,7 @@ export function MobileMenu({
       {isMobileMenuOpen && (
         <motion.div
           id="mobile-menu"
-          ref={gestureRef}
+          ref={gestureRef as React.Ref<HTMLDivElement>}
           variants={menuVariants}
           initial="closed"
           animate="open"

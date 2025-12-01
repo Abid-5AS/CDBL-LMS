@@ -816,6 +816,107 @@ export class NotificationService {
   }
 
   /**
+   * Create notification when encashment is requested
+   */
+  static async notifyEncashmentRequested(
+    requestId: number
+  ): Promise<ServiceResult<void>> {
+    try {
+      const request = await prisma.encashmentRequest.findUnique({
+        where: { id: requestId },
+        include: { user: { select: { name: true } } },
+      });
+
+      if (!request) {
+        return { success: false, error: { code: "not_found", message: "Request not found" } };
+      }
+
+      // Notify HR Admins
+      const hrAdmins = await prisma.user.findMany({
+        where: { role: "HR_ADMIN" },
+        select: { id: true },
+      });
+
+      const notifications: CreateNotificationData[] = hrAdmins.map((admin) => ({
+        userId: admin.id,
+        type: "APPROVAL_REQUIRED",
+        title: "Encashment Request",
+        message: `${request.user.name} has requested encashment of ${request.daysRequested} days`,
+        link: `/dashboard/hr-admin`, // Direct to dashboard where request is visible
+        leaveId: undefined, // Not a leave request
+      }));
+
+      await NotificationRepository.createMany(notifications);
+      return { success: true };
+    } catch (error) {
+      console.error("NotificationService.notifyEncashmentRequested error:", error);
+      return { success: false, error: { code: "notification_error", message: "Failed to send notification" } };
+    }
+  }
+
+  /**
+   * Create notification when encashment is approved
+   */
+  static async notifyEncashmentApproved(
+    requestId: number
+  ): Promise<ServiceResult<void>> {
+    try {
+      const request = await prisma.encashmentRequest.findUnique({
+        where: { id: requestId },
+      });
+
+      if (!request) {
+        return { success: false, error: { code: "not_found", message: "Request not found" } };
+      }
+
+      await NotificationRepository.create({
+        userId: request.userId,
+        type: "ENCASHMENT_APPROVED",
+        title: "Encashment Approved",
+        message: `Your encashment request for ${request.daysRequested} days has been approved.`,
+        link: `/encashment`,
+        leaveId: undefined,
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error("NotificationService.notifyEncashmentApproved error:", error);
+      return { success: false, error: { code: "notification_error", message: "Failed to send notification" } };
+    }
+  }
+
+  /**
+   * Create notification when encashment is rejected
+   */
+  static async notifyEncashmentRejected(
+    requestId: number
+  ): Promise<ServiceResult<void>> {
+    try {
+      const request = await prisma.encashmentRequest.findUnique({
+        where: { id: requestId },
+      });
+
+      if (!request) {
+        return { success: false, error: { code: "not_found", message: "Request not found" } };
+      }
+
+      await NotificationRepository.create({
+        userId: request.userId,
+        type: "ENCASHMENT_REJECTED",
+        title: "Encashment Rejected",
+        message: `Your encashment request for ${request.daysRequested} days has been rejected.${request.rejectionReason ? ` Reason: ${request.rejectionReason}` : ""}`,
+        link: `/encashment`,
+        leaveId: undefined,
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error("NotificationService.notifyEncashmentRejected error:", error);
+      return { success: false, error: { code: "notification_error", message: "Failed to send notification" } };
+    }
+  }
+
+  /**
    * Create notification when fitness certificate is rejected
    */
   static async notifyFitnessCertificateRejected(

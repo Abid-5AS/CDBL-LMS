@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { formatDate } from "@/lib/utils";
-import { getIcon, iconSizes } from "@/lib/icons";
+import { getIcon, iconSizes } from "@/lib/ui/icons";
 import { SharedTimeline } from "@/components/shared/SharedTimeline";
 import { ApprovalTimelineAdapter } from "@/components/shared/timeline-adapters";
 import { cn } from "@/lib/utils";

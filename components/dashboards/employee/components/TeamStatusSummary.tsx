@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { GlassCard, GlassCardContent } from "@/components/ui/glass-card";
 import { Badge } from "@/components/ui/badge";
 import { User, Calendar, ChevronRight, X } from "lucide-react";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import { LeaveType } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import {

@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { AlertCircle, RotateCcw, Edit, Calendar, FileText, User, Clock, Upload, Bell, Plus, Minus } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import Link from "next/link";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LeaveRequest, LeaveComment, Approval } from "@prisma/client";

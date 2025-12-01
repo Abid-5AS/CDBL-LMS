@@ -31,6 +31,9 @@ const variantAccent: Record<
   info: "var(--color-data-info)",
 };
 
+/**
+ * @deprecated Use components/cards/KPICard instead
+ */
 export function KPICard({
   title,
   value,

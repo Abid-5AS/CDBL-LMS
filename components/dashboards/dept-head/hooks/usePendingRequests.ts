@@ -4,11 +4,11 @@ import { useState, useMemo, useEffect } from "react";
 import useSWR from "swr";
 import { toast } from "sonner";
 import { LeaveStatus, LeaveType } from "@prisma/client";
-import { useUser } from "@/lib/user-context";
+import { useUser } from "@/components/providers/UserContext";
 import { isFinalApprover, canPerformAction } from "@/lib/workflow";
-import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/toast-messages";
-import { useDebounce } from "@/lib/use-debounce";
-import { useFilterFromUrl } from "@/lib/url-filters";
+import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/ui/toast-messages";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useFilterFromUrl } from "@/lib/ui/url-filters";
 import { DEFAULT_FILTER } from "@/types/filters";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());

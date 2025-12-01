@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { policy } from "@/lib/policy";
 import { normalizeToDhakaMidnight } from "@/lib/date-utils";
-import { countWorkingDays } from "@/lib/working-days";
+import { countWorkingDays } from "@/lib/leaves/working-days";
 
 export const cache = "no-store";
 

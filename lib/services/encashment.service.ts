@@ -1,149 +1,248 @@
 import { prisma } from "@/lib/prisma";
-import { validateELEncashment } from "@/lib/policy";
-import type { Prisma, User } from "@prisma/client";
-import { z } from "zod";
+import { EncashmentStatus, LeaveType } from "@prisma/client";
+import { NotificationService } from "./notification.service";
 
-export class EncashmentServiceError extends Error {
-  status: number;
-  code: string;
-  details?: unknown;
-
-  constructor(code: string, message: string, status: number, details?: unknown) {
-    super(message);
-    this.code = code;
-    this.status = status;
-    this.details = details;
-  }
-}
-
-export const EncashmentRequestSchema = z.object({
-  daysRequested: z.number().int().positive(),
-  reason: z.string().optional(),
-});
-
-type EncashmentFilters = {
-  status?: string | null;
+export const ENCASHMENT_POLICY = {
+  MIN_BALANCE_TO_KEEP: 10, // Assumption: Must keep 10 days
+  MAX_ENCASHMENT_PER_REQUEST: 15, // Assumption: Max 15 days at once
+  MIN_SERVICE_YEARS: 1, // Assumption: Must be employed for 1 year
 };
 
-export async function listEncashmentRequests(user: User, filters: EncashmentFilters) {
-  const where: Prisma.EncashmentRequestWhereInput = {};
+export type EncashmentResult<T> = {
+  success: boolean;
+  data?: T;
+  error?: string;
+};
 
-  if (user.role === "EMPLOYEE" || user.role === "DEPT_HEAD") {
-    where.userId = user.id;
+export class EncashmentService {
+  /**
+   * Get encashment requests for a user.
+   * 
+   * @param userId - ID of the user
+   * @returns List of encashment requests ordered by creation date (descending)
+   */
+  static async getUserRequests(userId: number) {
+    return prisma.encashmentRequest.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+    });
   }
 
-  if (filters.status && filters.status !== "all") {
-    where.status = filters.status as Prisma.EnumEncashmentStatusFilter["equals"];
-  }
-
-  return prisma.encashmentRequest.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          empCode: true,
-          department: true,
+  /**
+   * Get all pending encashment requests (for Admin).
+   * 
+   * @returns List of pending encashment requests with user details
+   */
+  static async getPendingRequests() {
+    return prisma.encashmentRequest.findMany({
+      where: { status: "PENDING" },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            department: true,
+            empCode: true,
+          },
         },
       },
-      approver: {
-        select: {
-          id: true,
-          name: true,
-          role: true,
-        },
-      },
-    },
-  });
-}
-
-type CreateEncashmentRequestInput = z.infer<typeof EncashmentRequestSchema>;
-
-export async function createEncashmentRequest(user: User, input: CreateEncashmentRequestInput) {
-  const currentYear = new Date().getFullYear();
-
-  const elBalance = await prisma.balance.findUnique({
-    where: {
-      userId_type_year: {
-        userId: user.id,
-        type: "EARNED",
-        year: currentYear,
-      },
-    },
-  });
-
-  if (!elBalance) {
-    throw new EncashmentServiceError(
-      "no_el_balance",
-      "You don't have an EL balance record for this year. Please contact HR.",
-      404
-    );
+      orderBy: { createdAt: "asc" },
+    });
   }
 
-  const currentBalance = (elBalance.opening ?? 0) + (elBalance.accrued ?? 0) - (elBalance.used ?? 0);
-  const validation = validateELEncashment(currentBalance, input.daysRequested);
-
-  if (!validation.valid) {
-    throw new EncashmentServiceError(
-      "encashment_validation_failed",
-      validation.reason ?? "Encashment request failed validation.",
-      400,
-      {
-        currentBalance,
-        requested: input.daysRequested,
-        maxEncashable: validation.maxEncashable,
+  /**
+   * Request Earned Leave (EL) encashment.
+   * 
+   * Validates policy constraints (min balance, max request size) and creates a request.
+   * 
+   * @param userId - ID of the user requesting encashment
+   * @param daysRequested - Number of days to encash
+   * @param reason - Optional reason for the request
+   * @returns EncashmentResult containing the created request or error details
+   */
+  static async requestEncashment(
+    userId: number,
+    daysRequested: number,
+    reason?: string
+  ): Promise<EncashmentResult<any>> {
+    try {
+      // 1. Validate policy constraints
+      if (daysRequested <= 0) {
+        return { success: false, error: "Days requested must be greater than 0" };
       }
-    );
+      if (daysRequested > ENCASHMENT_POLICY.MAX_ENCASHMENT_PER_REQUEST) {
+        return {
+          success: false,
+          error: `Cannot request more than ${ENCASHMENT_POLICY.MAX_ENCASHMENT_PER_REQUEST} days at once`,
+        };
+      }
+
+      // 2. Get current EL balance
+      const currentYear = new Date().getFullYear();
+      const balance = await prisma.balance.findUnique({
+        where: {
+          userId_type_year: {
+            userId,
+            type: LeaveType.EARNED,
+            year: currentYear,
+          },
+        },
+      });
+
+      if (!balance) {
+        return { success: false, error: "Earned Leave balance not found" };
+      }
+
+      // 3. Check if balance is sufficient (considering min balance to keep)
+      // Available for encashment = Closing Balance - Min Balance to Keep
+      // Note: We use 'closing' as the current available balance
+      const availableForEncashment =
+        balance.closing - ENCASHMENT_POLICY.MIN_BALANCE_TO_KEEP;
+
+      if (availableForEncashment < daysRequested) {
+        return {
+          success: false,
+          error: `Insufficient balance. You must retain at least ${ENCASHMENT_POLICY.MIN_BALANCE_TO_KEEP} days of Earned Leave. Available for encashment: ${Math.max(0, availableForEncashment)} days.`,
+        };
+      }
+
+      // 4. Create request
+      const request = await prisma.encashmentRequest.create({
+        data: {
+          userId,
+          year: currentYear,
+          daysRequested,
+          balanceAtRequest: balance.closing,
+          reason,
+          status: EncashmentStatus.PENDING,
+        },
+      });
+
+      // 5. Notify HR Admin
+      await NotificationService.notifyEncashmentRequested(request.id);
+
+      return { success: true, data: request };
+    } catch (error) {
+      console.error("EncashmentService.requestEncashment error:", error);
+      return { success: false, error: "Failed to submit encashment request" };
+    }
   }
 
-  const existingPending = await prisma.encashmentRequest.findFirst({
-    where: {
-      userId: user.id,
-      year: currentYear,
-      status: "PENDING",
-    },
-  });
+  /**
+   * Approve an encashment request.
+   * 
+   * Updates request status to APPROVED and deducts the days from the user's EL balance.
+   * This operation is transactional.
+   * 
+   * @param requestId - ID of the encashment request
+   * @param approverId - ID of the HR Admin approving the request
+   * @returns EncashmentResult indicating success or failure
+   */
+  static async approveEncashment(
+    requestId: number,
+    approverId: number
+  ): Promise<EncashmentResult<any>> {
+    try {
+      const request = await prisma.encashmentRequest.findUnique({
+        where: { id: requestId },
+      });
 
-  if (existingPending) {
-    throw new EncashmentServiceError(
-      "encashment_already_pending",
-      "You already have a pending encashment request for this year. Please wait for it to be processed.",
-      400,
-      { existingRequestId: existingPending.id }
-    );
+      if (!request) {
+        return { success: false, error: "Request not found" };
+      }
+
+      if (request.status !== EncashmentStatus.PENDING) {
+        return { success: false, error: "Request is not pending" };
+      }
+
+      // Transaction to update request and deduct balance
+      const result = await prisma.$transaction(async (tx) => {
+        // 1. Update request status
+        const updatedRequest = await tx.encashmentRequest.update({
+          where: { id: requestId },
+          data: {
+            status: EncashmentStatus.APPROVED,
+            approvedBy: approverId,
+            approvedAt: new Date(),
+          },
+        });
+
+        // 2. Deduct from balance
+        // We increment 'used' and decrement 'closing'
+        // Note: Encashment is technically 'usage' of leave for cash
+        const balance = await tx.balance.update({
+          where: {
+            userId_type_year: {
+              userId: request.userId,
+              type: LeaveType.EARNED,
+              year: request.year,
+            },
+          },
+          data: {
+            used: { increment: request.daysRequested },
+            closing: { decrement: request.daysRequested },
+          },
+        });
+
+        return { request: updatedRequest, balance };
+      });
+
+      // 3. Notify Employee
+      await NotificationService.notifyEncashmentApproved(requestId);
+
+      return { success: true, data: result };
+    } catch (error) {
+      console.error("EncashmentService.approveEncashment error:", error);
+      return { success: false, error: "Failed to approve request" };
+    }
   }
 
-  const encashmentRequest = await prisma.encashmentRequest.create({
-    data: {
-      userId: user.id,
-      year: currentYear,
-      daysRequested: input.daysRequested,
-      balanceAtRequest: currentBalance,
-      reason: input.reason,
-      status: "PENDING",
-    },
-  });
+  /**
+   * Reject an encashment request.
+   * 
+   * Updates request status to REJECTED and records the rejection reason.
+   * 
+   * @param requestId - ID of the encashment request
+   * @param approverId - ID of the HR Admin rejecting the request
+   * @param reason - Reason for rejection
+   * @returns EncashmentResult indicating success or failure
+   */
+  static async rejectEncashment(
+    requestId: number,
+    approverId: number,
+    reason: string
+  ): Promise<EncashmentResult<any>> {
+    try {
+      const request = await prisma.encashmentRequest.findUnique({
+        where: { id: requestId },
+      });
 
-  await prisma.auditLog.create({
-    data: {
-      actorEmail: user.email,
-      action: "ENCASHMENT_REQUESTED",
-      targetEmail: user.email,
-      details: {
-        encashmentId: encashmentRequest.id,
-        year: currentYear,
-        daysRequested: input.daysRequested,
-        balanceAtRequest: currentBalance,
-        remainingBalance: validation.remainingBalance,
-      },
-    },
-  });
+      if (!request) {
+        return { success: false, error: "Request not found" };
+      }
 
-  return {
-    request: encashmentRequest,
-    remainingBalance: validation.remainingBalance,
-  };
+      if (request.status !== EncashmentStatus.PENDING) {
+        return { success: false, error: "Request is not pending" };
+      }
+
+      const updatedRequest = await prisma.encashmentRequest.update({
+        where: { id: requestId },
+        data: {
+          status: EncashmentStatus.REJECTED,
+          approvedBy: approverId, // Recorded as the person who rejected
+          approvedAt: new Date(), // Recorded as decision time
+          rejectionReason: reason,
+        },
+      });
+
+      // Notify Employee
+      await NotificationService.notifyEncashmentRejected(requestId);
+
+      return { success: true, data: updatedRequest };
+    } catch (error) {
+      console.error("EncashmentService.rejectEncashment error:", error);
+      return { success: false, error: "Failed to reject request" };
+    }
+  }
 }

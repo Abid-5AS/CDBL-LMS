@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useUser } from "@/lib/user-context";
+import { useUser } from "@/components/providers";
 
 const ExperimentalFeaturesRoute = () => {
   const router = useRouter();

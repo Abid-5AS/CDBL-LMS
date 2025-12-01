@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
   cacheComponents: false, // Disable cache components in development to reduce memory usage
   reactCompiler: false, // Disable React compiler in development to reduce memory usage
-  serverExternalPackages: ["@prisma/client", "prisma"],
+  serverExternalPackages: ["@prisma/client", "prisma", "@prisma/adapter-mariadb", "mariadb"],
 
   // Development-specific optimizations for memory usage
   onDemandEntries: {
@@ -44,15 +44,6 @@ const nextConfig: NextConfig = {
       };
     }
 
-    // Server-side externals for Prisma
-    if (isServer) {
-      config.externals = [
-        ...(config.externals || []),
-        "@prisma/client",
-        "prisma",
-      ];
-    }
-
     return config;
   },
 
@@ -60,16 +51,10 @@ const nextConfig: NextConfig = {
   experimental: {
     // Reduce memory usage by limiting concurrent builds
     workerThreads: false, // Disable worker threads in development
-    maxWorkers: 1, // Limit to 1 worker in development
-    // Disable incremental cache in development to save memory
-    appDir: true,
-    turbo: {
-      // Turbopack configuration
-      resolveAlias: {
-        fs: { browser: "./empty.ts" },
-      },
-    },
   },
+
+  // Empty turbopack config to silence migration warning
+  turbopack: {},
 
   async headers() {
     return [

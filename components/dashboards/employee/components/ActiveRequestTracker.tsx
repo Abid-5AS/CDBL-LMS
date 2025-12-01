@@ -12,7 +12,10 @@ type ActiveRequestTrackerProps = {
   isLoading: boolean;
 };
 
+import { useRouter } from "next/navigation";
+
 export function ActiveRequestTracker({ leaves, isLoading }: ActiveRequestTrackerProps) {
+  const router = useRouter();
   // Find the most recent active request
   const activeRequest = React.useMemo(() => {
     if (!leaves) return null;
@@ -20,6 +23,19 @@ export function ActiveRequestTracker({ leaves, isLoading }: ActiveRequestTracker
       ["PENDING", "SUBMITTED", "FORWARDED"].includes(leave.status)
     );
   }, [leaves]);
+
+  // Find next approved leave
+  const nextApprovedLeave = React.useMemo(() => {
+    if (!leaves) return null;
+    const now = new Date();
+    const approved = leaves.filter(l => 
+      l.status === 'APPROVED' && new Date(l.startDate) > now
+    );
+    return approved.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())[0];
+  }, [leaves]);
+
+  const displayLeave = activeRequest || nextApprovedLeave;
+  const isApproved = !activeRequest && !!nextApprovedLeave;
 
   if (isLoading) {
     return (
@@ -34,22 +50,22 @@ export function ActiveRequestTracker({ leaves, isLoading }: ActiveRequestTracker
     );
   }
 
-  if (!activeRequest) {
+  if (!displayLeave) {
     return null;
   }
 
   // Map LeaveRow to LeaveTimelineItem
   const timelineItem: LeaveTimelineItem = {
-    id: activeRequest.id,
-    type: activeRequest.type,
-    status: activeRequest.status as any,
-    startDate: activeRequest.startDate,
-    endDate: activeRequest.endDate,
-    days: activeRequest.workingDays,
-    reason: activeRequest.reason,
-    createdAt: activeRequest.createdAt,
-    updatedAt: activeRequest.updatedAt,
-    approvalChain: activeRequest.approvals?.map((approval, index) => ({
+    id: displayLeave.id,
+    type: displayLeave.type,
+    status: displayLeave.status as any,
+    startDate: displayLeave.startDate,
+    endDate: displayLeave.endDate,
+    days: displayLeave.workingDays,
+    reason: displayLeave.reason,
+    createdAt: displayLeave.createdAt,
+    updatedAt: displayLeave.updatedAt,
+    approvalChain: displayLeave.approvals?.map((approval, index) => ({
       step: approval.step || index + 1,
       role: approval.toRole || "Approver",
       status: (approval.decision === "APPROVED" ? "approved" : approval.decision === "REJECTED" ? "rejected" : "pending") as any,
@@ -65,11 +81,21 @@ export function ActiveRequestTracker({ leaves, isLoading }: ActiveRequestTracker
       transition={{ duration: 0.4 }}
       className="mb-6"
     >
-      <GlassCard variant="hover" className="border-blue-200 dark:border-blue-800 bg-blue-50/30 dark:bg-blue-950/10">
+      <GlassCard 
+        variant="hover" 
+        className={`${isApproved 
+          ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50/30 dark:bg-emerald-950/10"
+          : "border-blue-200 dark:border-blue-800 bg-blue-50/30 dark:bg-blue-950/10"
+        } cursor-pointer`}
+        onClick={() => router.push("/leaves")}
+      >
         <GlassCardHeader className="pb-2">
-          <GlassCardTitle className="text-lg font-semibold flex items-center gap-2 text-blue-700 dark:text-blue-400">
+          <GlassCardTitle className={isApproved 
+            ? "text-lg font-semibold flex items-center gap-2 text-emerald-700 dark:text-emerald-400"
+            : "text-lg font-semibold flex items-center gap-2 text-blue-700 dark:text-blue-400"
+          }>
             <Activity className="h-5 w-5" />
-            Active Request Tracking
+            {isApproved ? "Upcoming Leave" : "Active Request Tracking"}
           </GlassCardTitle>
         </GlassCardHeader>
         <GlassCardContent>
@@ -77,7 +103,7 @@ export function ActiveRequestTracker({ leaves, isLoading }: ActiveRequestTracker
             leaves={[timelineItem]}
             orientation="horizontal"
             interactive={false}
-            showApprovalChain={true}
+            showApprovalChain={!isApproved}
             className="border-0 shadow-none bg-transparent"
             title=""
           />

@@ -8,7 +8,7 @@ import { NotificationDropdown } from "@/components/navbar";
 import { ThemeToggle } from "../theme-toggle";
 import { AnnotationsToggle } from "../annotations-toggle";
 import { cn } from "@/lib/utils";
-import { useSearch } from "@/hooks/use-search";
+import { useSearch } from "@/hooks";
 import { Button } from "@/components/ui/button";
 
 import type { NavbarState } from "./use-navbar-state";

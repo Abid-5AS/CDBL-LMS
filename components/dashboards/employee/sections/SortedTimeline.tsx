@@ -24,7 +24,7 @@ import { SortedTimelineAdapter } from "@/components/shared/timeline-adapters";
 import { getChainFor } from "@/lib/workflow";
 import { type LeaveType } from "@prisma/client";
 import { cn } from "@/lib/utils";
-import { useUIStore } from "@/lib/ui-state";
+import { useUIStore } from "@/lib/ui/ui-state";
 
 type LeaveStatus =
   | "SUBMITTED"

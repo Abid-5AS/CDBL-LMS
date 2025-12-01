@@ -14,7 +14,7 @@ import {
 } from "@/components/ui";
 import { Loader2 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 
 type LeaveVersion = {
   id: number;

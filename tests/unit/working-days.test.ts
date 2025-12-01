@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { countWorkingDaysSync } from "@/lib/working-days";
+import { countWorkingDaysSync } from "@/lib/leaves/working-days";
 import { normalizeToDhakaMidnight, isWeekendBD } from "@/lib/date-utils";
 import type { Holiday } from "@/lib/date-utils";
-import { violatesCasualLeaveSideTouch } from "@/lib/leave-validation";
+import { violatesCasualLeaveSideTouch } from "@/lib/leaves/leave-validation";
 
 describe("lib/working-days", () => {
   describe("countWorkingDaysSync()", () => {

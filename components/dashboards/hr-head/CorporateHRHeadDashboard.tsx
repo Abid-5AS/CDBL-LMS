@@ -35,6 +35,7 @@ import { formatDate } from "@/lib/utils";
 // Corporate components
 import { MetricCard } from "@/components/corporate/MetricCard";
 import { getDensityClasses, getTypography } from "@/lib/ui/density-modes";
+import { DemoIndicator } from "@/components/ui/demo-indicator";
 
 // Shared chart components (with corporate styling)
 import { AnalyticsBarChart } from "@/components/dashboards/shared/AnalyticsChart";
@@ -610,7 +611,12 @@ export function CorporateHRHeadDashboard() {
                       </Tooltip>
                     </div>
                   }
-                  value={`${stats?.complianceScore || 0}%`}
+                  value={
+                    <div className="flex items-center gap-2">
+                      {`${stats?.complianceScore || 0}%`}
+                      <DemoIndicator />
+                    </div>
+                  }
                   subtitle="On-time processing rate"
                   icon={CheckCircle2}
                   density={density}
@@ -657,7 +663,7 @@ export function CorporateHRHeadDashboard() {
                   </CardHeader>
                   <CardContent>
                     <Suspense fallback={<DashboardCardSkeleton />}>
-                      <PendingLeaveRequestsTable />
+                      <PendingLeaveRequestsTable hideHeader={true} />
                     </Suspense>
                   </CardContent>
                 </Card>

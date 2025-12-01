@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { getHomePageForRole } from "@/lib/navigation";
+import { getHomePageForRole } from "@/lib/ui/navigation";
 import * as LabelPrimitive from "@radix-ui/react-label";
 import { cva, type VariantProps } from "class-variance-authority";
 import type { ComponentProps } from "react";

@@ -5,7 +5,7 @@ import { LeaveStatus } from "@prisma/client";
 import { normalizeToDhakaMidnight } from "@/lib/date-utils";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
-import { canCancelMaternityLeave } from "@/lib/leave-validation";
+import { canCancelMaternityLeave } from "@/lib/leaves/leave-validation";
 
 /**
  * Employee-initiated cancellation

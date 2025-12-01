@@ -32,6 +32,12 @@
       ],
       "@dash/*": [
         "./components/dashboards/*"
+      ],
+      "@prisma/client": [
+        "./node_modules/.prisma/client/client"
+      ],
+      "@prisma/client/*": [
+        "./node_modules/@prisma/client/*"
       ]
     }
   },

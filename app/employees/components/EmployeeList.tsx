@@ -30,7 +30,7 @@ import { CompletePagination } from "@/components/shared/pagination/Pagination";
 // Lib utilities (barrel export)
 import { useUser } from "@/lib";
 import { canEditEmployee, type AppRole } from "@/lib/rbac";
-import { getRoleBadgeClasses, getRoleLabel } from "@/lib/ui-utils";
+import { getRoleBadgeClasses, getRoleLabel } from "@/lib/ui/ui-utils";
 
 type EmployeeRecord = {
   id: number;

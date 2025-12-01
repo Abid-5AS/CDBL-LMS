@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 import { Button } from "@/components/ui";
-import { getIcon, iconSizes } from "@/lib/icons";
-import { scaleIn } from "@/lib/animations";
+import { getIcon, iconSizes } from "@/lib/ui/icons";
+import { scaleIn } from "@/lib/ui/animations";
 
 const SunIcon = getIcon("Sun");
 const MoonIcon = getIcon("Moon");

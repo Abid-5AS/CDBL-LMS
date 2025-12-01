@@ -13,6 +13,7 @@ const cardVariants = cva(
         outline:
           "bg-transparent border border-border hover:border-border",
         ghost: "bg-transparent border-none shadow-none hover:bg-muted/50",
+        glass: "bg-card/60 backdrop-blur-xl border border-border/40 shadow-sm",
       },
       size: {
         sm: "gap-3 p-4 rounded-md",

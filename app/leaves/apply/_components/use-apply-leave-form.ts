@@ -11,8 +11,8 @@ import {
   isWeekendOrHoliday,
   normalizeToDhakaMidnight,
 } from "@/lib/date-utils";
-import { SUCCESS_MESSAGES, INFO_MESSAGES, getToastMessage } from "@/lib/toast-messages";
-import { countWorkingDaysSync } from "@/lib/working-days";
+import { SUCCESS_MESSAGES, INFO_MESSAGES, getToastMessage } from "@/lib/ui/toast-messages";
+import { countWorkingDaysSync } from "@/lib/leaves/working-days";
 import { useDraftAutosave } from "./use-draft-autosave";
 import { useHolidays } from "./use-holidays";
 import type { LeaveType } from "./leave-constants";

@@ -25,7 +25,7 @@ import { getDensityClasses, getTypography } from "@/lib/ui/density-modes";
 
 // Hooks and utilities
 import { useApiQueryWithParams } from "@/lib/apiClient";
-import { useFilterFromUrl } from "@/lib/url-filters";
+import { useFilterFromUrl } from "@/lib/ui/url-filters";
 
 // Existing feature components (preserved)
 import { DeptHeadPendingTable } from "./sections/PendingTable";
