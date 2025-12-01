@@ -5,6 +5,7 @@ import { LayoutProvider } from "./LayoutProvider";
 import { ThemeProvider } from "next-themes";
 import { ErrorBoundary } from "@/components/errors";
 import { NotificationProvider } from "@/context/NotificationContext";
+import { NotificationProvider as RealtimeNotificationProvider } from "@/lib/contexts/notification-context";
 import { ToastContainer } from "@/components/notifications";
 import { HydrationWarningSuppress } from "@/components/HydrationWarningSuppress";
 
@@ -41,11 +42,13 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ErrorBoundary level="page">
             <NotificationProvider maxNotifications={3}>
-              <LayoutProvider>
-                <main id="main-content">{children}</main>
-              </LayoutProvider>
-              {/* Toast notification container */}
-              <ToastContainer position="top-right" maxWidth="md:max-w-sm" />
+              <RealtimeNotificationProvider>
+                <LayoutProvider>
+                  <main id="main-content">{children}</main>
+                </LayoutProvider>
+                {/* Toast notification container */}
+                <ToastContainer position="top-right" maxWidth="md:max-w-sm" />
+              </RealtimeNotificationProvider>
             </NotificationProvider>
           </ErrorBoundary>
           <Toaster richColors position="bottom-right" />
