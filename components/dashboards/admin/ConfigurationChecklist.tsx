@@ -121,12 +121,12 @@ export function ConfigurationChecklist() {
           >
             <div className="flex items-center gap-3">
               {item.status === "ok" ? (
-                <CheckCircle className="h-5 w-5 text-data-success shrink-0" />
+                <CheckCircle className="h-5 w-5 text-success dark:text-success/90 shrink-0" />
               ) : (
-                <AlertTriangle className="h-5 w-5 text-data-warning shrink-0" />
+                <AlertTriangle className="h-5 w-5 text-warning dark:text-warning/90 shrink-0" />
               )}
               <div>
-                <p className="font-medium text-sm group-hover:text-data-info transition-colors">
+                <p className="font-medium text-sm group-hover:text-info dark:text-info/90 transition-colors">
                   {item.label}
                 </p>
                 <p className="text-xs text-muted-foreground">{item.message}</p>

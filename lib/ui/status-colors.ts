@@ -5,34 +5,34 @@
 
 export const STATUS_COLORS = {
   PENDING: {
-    chip: "bg-data-warning-soft text-data-warning border-data-warning/30 hover:bg-data-warning-soft/80",
-    card:
-      "bg-data-warning-soft/80 dark:bg-data-warning-soft/30 border-data-warning/20 dark:border-data-warning/40 text-data-warning",
-    badge: "bg-data-warning/15 text-data-warning border-data-warning/30",
+    chip: "bg-warning/15 dark:bg-warning/25 text-warning dark:text-warning/90 border-warning/30 dark:border-warning/40 hover:bg-warning/20 dark:hover:bg-warning/30 transition-colors duration-100",
+    card: "bg-warning/10 dark:bg-warning/20 border-warning/20 dark:border-warning/30 text-warning dark:text-warning/90",
+    badge: "bg-warning/15 dark:bg-warning/25 text-warning dark:text-warning/90 border-warning/30",
   },
   FORWARDED: {
-    chip: "bg-data-info-soft text-data-info border-data-info/30 hover:bg-data-info-soft/80",
-    card:
-      "bg-data-info-soft/80 dark:bg-data-info-soft/30 border-data-info/20 dark:border-data-info/40 text-data-info",
-    badge: "bg-data-info/15 text-data-info border-data-info/30",
+    chip: "bg-info/15 dark:bg-info/25 text-info dark:text-info/90 border-info/30 dark:border-info/40 hover:bg-info/20 dark:hover:bg-info/30 transition-colors duration-100",
+    card: "bg-info/10 dark:bg-info/20 border-info/20 dark:border-info/30 text-info dark:text-info/90",
+    badge: "bg-info/15 dark:bg-info/25 text-info dark:text-info/90 border-info/30",
   },
   APPROVED: {
-    chip: "bg-data-success-soft text-data-success border-data-success/30 hover:bg-data-success-soft/80",
-    card:
-      "bg-data-success-soft/80 dark:bg-data-success-soft/30 border-data-success/20 dark:border-data-success/40 text-data-success",
-    badge: "bg-data-success/15 text-data-success border-data-success/30",
+    chip: "bg-success/15 dark:bg-success/25 text-success dark:text-success/90 border-success/30 dark:border-success/40 hover:bg-success/20 dark:hover:bg-success/30 transition-colors duration-100",
+    card: "bg-success/10 dark:bg-success/20 border-success/20 dark:border-success/30 text-success dark:text-success/90",
+    badge: "bg-success/15 dark:bg-success/25 text-success dark:text-success/90 border-success/30",
+  },
+  REJECTED: {
+    chip: "bg-danger/15 dark:bg-danger/25 text-danger dark:text-danger/90 border-danger/30 dark:border-danger/40 hover:bg-danger/20 dark:hover:bg-danger/30 transition-colors duration-100",
+    card: "bg-danger/10 dark:bg-danger/20 border-danger/20 dark:border-danger/30 text-danger dark:text-danger/90",
+    badge: "bg-danger/15 dark:bg-danger/25 text-danger dark:text-danger/90 border-danger/30",
   },
   RETURNED: {
-    chip: "bg-status-returned/15 text-status-returned border-status-returned/30 hover:bg-status-returned/25",
-    card:
-      "bg-status-returned/10 dark:bg-status-returned/20 border-status-returned/30 text-status-returned",
-    badge: "bg-status-returned/15 text-status-returned border-status-returned/30",
+    chip: "bg-amber-500/15 dark:bg-amber-500/25 text-amber-700 dark:text-amber-400 border-amber-500/30 dark:border-amber-500/40 hover:bg-amber-500/20 dark:hover:bg-amber-500/30 transition-colors duration-100",
+    card: "bg-amber-500/10 dark:bg-amber-500/20 border-amber-500/30 text-amber-700 dark:text-amber-400",
+    badge: "bg-amber-500/15 dark:bg-amber-500/25 text-amber-700 dark:text-amber-400 border-amber-500/30",
   },
   CANCELLED: {
-    chip: "bg-status-cancelled/10 text-status-cancelled border-status-cancelled/20 hover:bg-status-cancelled/20",
-    card: "bg-bg-secondary border-bg-muted text-text-secondary",
-    badge:
-      "bg-status-cancelled/10 text-status-cancelled border-status-cancelled/20",
+    chip: "bg-muted dark:bg-muted/80 text-muted-foreground dark:text-muted-foreground/80 border-muted dark:border-muted/50 hover:bg-muted/80 dark:hover:bg-muted/60 transition-colors duration-100",
+    card: "bg-muted dark:bg-muted/80 border-muted dark:border-muted/50 text-muted-foreground dark:text-muted-foreground/80",
+    badge: "bg-muted dark:bg-muted/80 text-muted-foreground dark:text-muted-foreground/80 border-muted dark:border-muted/50",
   },
 } as const;
 
@@ -47,7 +47,7 @@ export function getStatusColors(
 ): string {
   const normalizedStatus = status.toUpperCase();
 
-  // Map FORWARDED to APPROVED colors for consistency
+  // Map FORWARDED to info colors
   if (normalizedStatus === "FORWARDED") {
     return STATUS_COLORS.FORWARDED[variant];
   }
@@ -57,6 +57,6 @@ export function getStatusColors(
     return STATUS_COLORS[statusKey][variant];
   }
 
-  // Default fallback
+  // Default fallback to pending
   return STATUS_COLORS.PENDING[variant];
 }

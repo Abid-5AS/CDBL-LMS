@@ -155,7 +155,7 @@ function HolidayListItem({
               {!isPast && daysUntil > 0 && (
                 <>
                   <span>•</span>
-                  <span className="text-data-warning">
+                  <span className="text-warning dark:text-warning/90">
                     {daysUntil === 1 ? "Tomorrow" : `In ${daysUntil} days`}
                   </span>
                 </>
@@ -175,7 +175,7 @@ function HolidayListItem({
           {!isPast && !isToday && daysUntil <= 7 && daysUntil > 0 && (
             <Badge
               variant="default"
-              className="text-xs bg-data-warning/90 text-white"
+              className="text-xs bg-warning dark:bg-warning/80/90 text-white"
             >
               <Clock className="size-3 mr-1" aria-hidden="true" />
               {daysUntil}d

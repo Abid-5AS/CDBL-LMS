@@ -388,7 +388,7 @@ export function AdminHolidaysManagement() {
             <div className="space-y-6">
               <div className="flex items-center justify-between flex-col sm:flex-row gap-4">
                 <div>
-                  <h2 className="text-2xl font-semibold text-text-secondary">Holidays Management</h2>
+                  <h2 className="text-2xl font-semibold text-muted-foreground dark:text-muted-foreground/80">Holidays Management</h2>
                   <p className="text-sm text-muted-foreground mt-1">
                     Manage company holidays and optional days off for {new Date().getFullYear()}
                   </p>
@@ -433,28 +433,28 @@ export function AdminHolidaysManagement() {
                     )}
                   </div>
                   
-                  <div className="rounded-lg bg-data-info border border-data-info p-4">
-                    <h4 className="text-sm font-medium text-data-info mb-2">CSV Format Requirements:</h4>
-                    <ul className="text-sm text-data-info space-y-1 list-disc list-inside">
-                      <li>Must include columns: <code className="bg-data-info px-1 rounded">Holiday Name</code>, <code className="bg-data-info px-1 rounded">Date</code></li>
+                  <div className="rounded-lg bg-info dark:bg-info/80 border border-info p-4">
+                    <h4 className="text-sm font-medium text-info dark:text-info/90 mb-2">CSV Format Requirements:</h4>
+                    <ul className="text-sm text-info dark:text-info/90 space-y-1 list-disc list-inside">
+                      <li>Must include columns: <code className="bg-info dark:bg-info/80 px-1 rounded">Holiday Name</code>, <code className="bg-info dark:bg-info/80 px-1 rounded">Date</code></li>
                       <li>Date format: YYYY-MM-DD, DD/MM/YYYY, or DD-MM-YYYY</li>
-                      <li>Optional column: <code className="bg-data-info px-1 rounded">Optional</code> (yes/no)</li>
+                      <li>Optional column: <code className="bg-info dark:bg-info/80 px-1 rounded">Optional</code> (yes/no)</li>
                       <li>First row must be headers</li>
                     </ul>
                   </div>
 
                   {csvErrors.length > 0 && (
-                    <div className="rounded-lg bg-data-error border border-data-error p-4 max-h-48 overflow-y-auto">
+                    <div className="rounded-lg bg-danger dark:bg-danger/80 border border-danger p-4 max-h-48 overflow-y-auto">
                       <div className="flex items-start gap-2 mb-2">
-                        <AlertCircle className="h-5 w-5 text-data-error flex-shrink-0 mt-0.5" />
+                        <AlertCircle className="h-5 w-5 text-danger dark:text-danger/90 flex-shrink-0 mt-0.5" />
                         <div>
-                          <h4 className="text-sm font-medium text-data-error">Validation Errors ({csvErrors.length})</h4>
-                          <p className="text-xs text-data-error mt-1">Please fix these errors and try again</p>
+                          <h4 className="text-sm font-medium text-danger dark:text-danger/90">Validation Errors ({csvErrors.length})</h4>
+                          <p className="text-xs text-danger dark:text-danger/90 mt-1">Please fix these errors and try again</p>
                         </div>
                       </div>
                       <div className="space-y-1 mt-3">
                         {csvErrors.map((error, idx) => (
-                          <div key={idx} className="text-sm text-data-error">
+                          <div key={idx} className="text-sm text-danger dark:text-danger/90">
                             <span className="font-medium">Row {error.row}</span> ({error.field}): {error.message}
                           </div>
                         ))}
@@ -503,7 +503,7 @@ export function AdminHolidaysManagement() {
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
                   <Label htmlFor="name" className="required">
-                    Holiday Name <span className="text-data-error">*</span>
+                    Holiday Name <span className="text-danger dark:text-danger/90">*</span>
                   </Label>
                   <Input
                     id="name"
@@ -515,10 +515,10 @@ export function AdminHolidaysManagement() {
                       }
                     }}
                     placeholder="e.g., New Year's Day, Independence Day"
-                    className={formErrors.name ? 'border-data-error' : ''}
+                    className={formErrors.name ? 'border-danger' : ''}
                   />
                   {formErrors.name && (
-                    <p className="text-sm text-data-error flex items-center gap-1">
+                    <p className="text-sm text-danger dark:text-danger/90 flex items-center gap-1">
                       <AlertCircle className="h-3 w-3" />
                       {formErrors.name}
                     </p>
@@ -526,7 +526,7 @@ export function AdminHolidaysManagement() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="date">
-                    Date <span className="text-data-error">*</span>
+                    Date <span className="text-danger dark:text-danger/90">*</span>
                   </Label>
                   <Input
                     id="date"
@@ -538,16 +538,16 @@ export function AdminHolidaysManagement() {
                         setFormErrors({ ...formErrors, date: '' });
                       }
                     }}
-                    className={formErrors.date ? 'border-data-error' : ''}
+                    className={formErrors.date ? 'border-danger' : ''}
                   />
                   {formErrors.date && (
-                    <p className="text-sm text-data-error flex items-center gap-1">
+                    <p className="text-sm text-danger dark:text-danger/90 flex items-center gap-1">
                       <AlertCircle className="h-3 w-3" />
                       {formErrors.date}
                     </p>
                   )}
                 </div>
-                <div className="flex items-center space-x-2 p-3 rounded-lg bg-bg-secondary border">
+                <div className="flex items-center space-x-2 p-3 rounded-lg bg-muted dark:bg-muted/80 border">
                   <Checkbox
                     id="optional"
                     checked={formData.isOptional}
@@ -597,7 +597,7 @@ export function AdminHolidaysManagement() {
             {holidays.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 px-4">
                 <Calendar className="h-12 w-12 text-muted-foreground/50 mb-3" />
-                <h3 className="text-lg font-semibold text-text-secondary mb-1">No holidays added yet</h3>
+                <h3 className="text-lg font-semibold text-muted-foreground dark:text-muted-foreground/80 mb-1">No holidays added yet</h3>
                 <p className="text-sm text-muted-foreground mb-4 text-center">
                   Start by adding a holiday or importing from a CSV file
                 </p>
@@ -638,7 +638,7 @@ export function AdminHolidaysManagement() {
                                     Optional
                                   </Badge>
                                 ) : (
-                                  <Badge variant="default" className="text-xs bg-data-success">
+                                  <Badge variant="default" className="text-xs bg-success dark:bg-success/80">
                                     Mandatory
                                   </Badge>
                                 )}
@@ -655,7 +655,7 @@ export function AdminHolidaysManagement() {
                                 Optional
                               </Badge>
                             ) : (
-                              <Badge variant="default" className="text-xs bg-data-success">
+                              <Badge variant="default" className="text-xs bg-success dark:bg-success/80">
                                 Mandatory
                               </Badge>
                             )}
@@ -679,7 +679,7 @@ export function AdminHolidaysManagement() {
                               }}
                               aria-label={`Delete ${holiday.name}`}
                             >
-                              <Trash2 className="h-4 w-4 text-data-error" aria-hidden="true" />
+                              <Trash2 className="h-4 w-4 text-danger dark:text-danger/90" aria-hidden="true" />
                             </Button>
                           </div>
                         </TableCell>
@@ -706,7 +706,7 @@ export function AdminHolidaysManagement() {
             <AlertDialogCancel onClick={() => setDeletingHolidayId(null)}>
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-data-error hover:bg-data-error">
+            <AlertDialogAction onClick={handleDelete} className="bg-danger dark:bg-danger/80 hover:bg-danger dark:bg-danger/80">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

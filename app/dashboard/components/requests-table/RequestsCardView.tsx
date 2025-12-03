@@ -62,7 +62,7 @@ export function RequestsCardView({
 
   if (error) {
     return (
-      <div className="text-center text-sm text-data-error py-12" role="alert">
+      <div className="text-center text-sm text-danger dark:text-danger/90 py-12" role="alert">
         Failed to load
       </div>
     );

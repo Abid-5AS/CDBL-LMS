@@ -818,17 +818,17 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                     </ModernTable.Cell>
                   )}
                   <ModernTable.Cell>
-                    <div className="font-medium text-text-primary">
+                    <div className="font-medium text-foreground dark:text-foreground/90">
                       {item.requestedByName}
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {item.requestedByEmail ?? "—"}
                     </div>
                   </ModernTable.Cell>
-                  <ModernTable.Cell className="text-sm text-text-secondary">
+                  <ModernTable.Cell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
                     {leaveTypeLabel[item.type] ?? item.type}
                   </ModernTable.Cell>
-                  <ModernTable.Cell className="text-sm text-text-secondary">
+                  <ModernTable.Cell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
                     <div>{start}</div>
                     {start !== end && (
                       <div className="text-xs text-muted-foreground">
@@ -836,17 +836,17 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                       </div>
                     )}
                   </ModernTable.Cell>
-                  <ModernTable.Cell className="text-sm text-text-secondary">
+                  <ModernTable.Cell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
                     {item.requestedDays}
                   </ModernTable.Cell>
-                  <ModernTable.Cell className="max-w-xs text-sm text-text-secondary">
+                  <ModernTable.Cell className="max-w-xs text-sm text-muted-foreground dark:text-muted-foreground/80">
                     <p className="whitespace-pre-wrap wrap-break-word">
                       {item.reason}
                     </p>
                   </ModernTable.Cell>
                   {viewMode === "queue" ? (
                     <>
-                      <ModernTable.Cell className="text-sm font-medium capitalize text-text-secondary">
+                      <ModernTable.Cell className="text-sm font-medium capitalize text-muted-foreground dark:text-muted-foreground/80">
                         {stage.toLowerCase()}
                       </ModernTable.Cell>
                       <ModernTable.Cell className="text-right">
@@ -906,10 +906,10 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                     </>
                   ) : (
                     <>
-                      <ModernTable.Cell className="text-sm font-semibold capitalize text-text-secondary">
+                      <ModernTable.Cell className="text-sm font-semibold capitalize text-muted-foreground dark:text-muted-foreground/80">
                         {item.status.toLowerCase()}
                       </ModernTable.Cell>
-                      <ModernTable.Cell className="text-sm text-text-secondary">
+                      <ModernTable.Cell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
                         {decisionMeta?.decidedAt
                           ? formatDate(decisionMeta.decidedAt)
                           : "—"}

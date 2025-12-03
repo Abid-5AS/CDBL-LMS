@@ -161,7 +161,7 @@ export function PendingLeaveRequestsTable({
       cell: (leave: LeaveRequest) => (
         <div className="flex items-center gap-3">
           <div className="rounded-full bg-gradient-to-br from-card-action to-card-summary p-2">
-            <User className="h-4 w-4 text-text-inverted" />
+            <User className="h-4 w-4 text-white dark:text-white" />
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
@@ -274,13 +274,13 @@ export function PendingLeaveRequestsTable({
     actionButtons: React.ReactNode
   ) => (
     <div
-      className="surface-card p-4 rounded-xl space-y-3 border border-bg-muted"
+      className="surface-card p-4 rounded-xl space-y-3 border border-border dark:border-border/30"
       onClick={() => handleRowClick(leave)}
     >
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <div className="rounded-full bg-gradient-to-br from-card-action to-card-summary p-2">
-            <User className="h-4 w-4 text-text-inverted" />
+            <User className="h-4 w-4 text-white dark:text-white" />
           </div>
           <div>
             <p className="font-medium text-sm">{leave.requester.name}</p>
@@ -314,7 +314,7 @@ export function PendingLeaveRequestsTable({
 
       <div className="space-y-1">
         <p className="text-xs text-muted-foreground">Dates</p>
-        <div className="flex items-center gap-2 text-sm bg-bg-secondary/50 p-2 rounded-lg">
+        <div className="flex items-center gap-2 text-sm bg-muted/50 dark:bg-muted/40 p-2 rounded-lg">
           <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
           <span>
             {formatDate(leave.startDate)} - {formatDate(leave.endDate)}
@@ -391,7 +391,7 @@ export function PendingLeaveRequestsTable({
                 className={cn(
                   "px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
                   statusTab === tab.value
-                    ? "bg-card-action text-text-inverted"
+                    ? "bg-card-action text-white dark:text-white"
                     : "bg-muted text-muted-foreground hover:bg-muted/80"
                 )}
               >
@@ -408,7 +408,7 @@ export function PendingLeaveRequestsTable({
               placeholder="Search by employee, type, or reason..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="pl-9 bg-bg-primary/50 border-bg-muted"
+              className="pl-9 bg-card dark:bg-card/90/50 border-border dark:border-border/30"
             />
             {searchInput && (
               <button

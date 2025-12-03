@@ -1,0 +1,33 @@
+{
+    "labels": {
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "leaveType": "Leave Type",
+        "reason": "Reason",
+        "attachments": "Attachments",
+        "comments": "Comments",
+        "status": "Status",
+        "duration": "Duration",
+        "days": "Days"
+    },
+    "placeholders": {
+        "selectDate": "Select date",
+        "selectLeaveType": "Select leave type",
+        "enterReason": "Enter reason for leave",
+        "addComments": "Add comments..."
+    },
+    "validation": {
+        "required": "This field is required",
+        "invalidDate": "Invalid date selected",
+        "endDateBeforeStartDate": "End date cannot be before start date",
+        "insufficientBalance": "Insufficient leave balance",
+        "fileTooLarge": "File size exceeds limit"
+    },
+    "buttons": {
+        "apply": "Apply",
+        "cancel": "Cancel",
+        "upload": "Upload",
+        "next": "Next",
+        "back": "Back"
+    }
+}

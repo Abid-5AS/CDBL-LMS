@@ -130,10 +130,17 @@ export function DeptHeadPendingTable({
   };
 
   // Action handlers
-  const handleConfirmAction = async (action: "approve" | "reject" | "forward" | "return" | "cancel", comment?: string) => {
+  const handleConfirmAction = async (
+    action: "approve" | "reject" | "forward" | "return" | "cancel",
+    comment?: string,
+    ignoreWarnings?: boolean
+  ) => {
     if (currentLeaveId) {
-      await handleAction(currentLeaveId, action, comment);
-      closeAllDialogs();
+      const result = await handleAction(currentLeaveId, action, comment, ignoreWarnings);
+      if (result?.success) {
+        closeAllDialogs();
+      }
+      return result;
     }
   };
 
@@ -151,7 +158,7 @@ export function DeptHeadPendingTable({
         <div>
           <Link
             href={`/leaves/${leave.id}`}
-            className="text-data-info hover:underline font-medium cursor-pointer"
+            className="text-info dark:text-info/90 hover:underline font-medium cursor-pointer"
             onClick={(e) => e.stopPropagation()}
           >
             {leave.requester.name}
@@ -176,7 +183,7 @@ export function DeptHeadPendingTable({
       accessorKey: "startDate",
       className: "hidden sm:table-cell",
       cell: (leave) => (
-        <span className="text-text-secondary">
+        <span className="text-muted-foreground dark:text-muted-foreground/80">
           {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
         </span>
       ),
@@ -186,7 +193,7 @@ export function DeptHeadPendingTable({
       accessorKey: "workingDays",
       className: "hidden md:table-cell",
       cell: (leave) => (
-        <span className="text-text-secondary">
+        <span className="text-muted-foreground dark:text-muted-foreground/80">
           {leave.workingDays}
         </span>
       ),
@@ -200,7 +207,7 @@ export function DeptHeadPendingTable({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="truncate text-text-secondary cursor-help max-w-xs">
+                <div className="truncate text-muted-foreground dark:text-muted-foreground/80 cursor-help max-w-xs">
                   {leave.reason}
                 </div>
               </TooltipTrigger>
@@ -210,7 +217,7 @@ export function DeptHeadPendingTable({
             </Tooltip>
           </TooltipProvider>
         ) : (
-          <div className="text-text-secondary">{leave.reason}</div>
+          <div className="text-muted-foreground dark:text-muted-foreground/80">{leave.reason}</div>
         )
       ),
     },
@@ -221,7 +228,7 @@ export function DeptHeadPendingTable({
         <div className="flex items-center gap-2">
           <StatusBadge status={leave.status} />
           {leave.isModified && (
-            <Badge variant="outline" className="text-xs text-data-info border-data-info">
+            <Badge variant="outline" className="text-xs text-info dark:text-info/90 border-info">
               Modified
             </Badge>
           )}
@@ -386,7 +393,7 @@ export function DeptHeadPendingTable({
       <ApprovalDialog
         open={dialogs.approve.open}
         onOpenChange={dialogs.approve.setOpen}
-        onConfirm={() => handleConfirmAction("approve")}
+        onConfirm={(ignoreWarnings) => handleConfirmAction("approve", undefined, ignoreWarnings)}
         leaveType={currentLeaveInfo.type}
         employeeName={currentLeaveInfo.name}
         isLoading={currentLeaveId ? processingIds.has(currentLeaveId) : false}
@@ -395,7 +402,7 @@ export function DeptHeadPendingTable({
       <RejectDialog
         open={dialogs.reject.open}
         onOpenChange={dialogs.reject.setOpen}
-        onConfirm={() => handleConfirmAction("reject")}
+        onConfirm={async () => { await handleConfirmAction("reject"); }}
         leaveType={currentLeaveInfo.type}
         employeeName={currentLeaveInfo.name}
         isLoading={currentLeaveId ? processingIds.has(currentLeaveId) : false}
@@ -404,14 +411,14 @@ export function DeptHeadPendingTable({
       <ReturnDialog
         open={dialogs.return.open}
         onOpenChange={dialogs.return.setOpen}
-        onConfirm={(comment) => handleConfirmAction("return", comment)}
+        onConfirm={async (comment) => { await handleConfirmAction("return", comment); }}
         isLoading={currentLeaveId ? processingIds.has(currentLeaveId) : false}
       />
 
       <ForwardDialog
         open={dialogs.forward.open}
         onOpenChange={dialogs.forward.setOpen}
-        onConfirm={(comment) => handleConfirmAction("forward", comment)}
+        onConfirm={async (comment) => { await handleConfirmAction("forward", comment); }}
         nextApprover="HR Head"
         isLoading={currentLeaveId ? processingIds.has(currentLeaveId) : false}
       />
@@ -419,7 +426,7 @@ export function DeptHeadPendingTable({
       <CancelDialog
         open={dialogs.cancel.open}
         onOpenChange={dialogs.cancel.setOpen}
-        onConfirm={(reason) => handleConfirmAction("cancel", reason)}
+        onConfirm={async (reason) => { await handleConfirmAction("cancel", reason); }}
         isLoading={currentLeaveId ? processingIds.has(currentLeaveId) : false}
       />
 

@@ -31,7 +31,7 @@ const LEAVE_TYPE_CONFIG = {
     label: "Earned Leave",
     description: "Accrued leave that can be carried forward",
     icon: TrendingUp,
-    color: "text-data-warning",
+    color: "text-warning dark:text-warning/90",
     maxCarryForward: 60,
     expiresYearEnd: false,
   },
@@ -39,7 +39,7 @@ const LEAVE_TYPE_CONFIG = {
     label: "Casual Leave",
     description: "Short-term leave for personal matters",
     icon: Clock,
-    color: "text-data-info",
+    color: "text-info dark:text-info/90",
     maxCarryForward: undefined,
     expiresYearEnd: true,
   },
@@ -47,7 +47,7 @@ const LEAVE_TYPE_CONFIG = {
     label: "Medical Leave",
     description: "Medical certificate required for > 3 days",
     icon: Calendar,
-    color: "text-data-success",
+    color: "text-success dark:text-success/90",
     maxCarryForward: undefined,
     expiresYearEnd: true,
   },
@@ -163,8 +163,8 @@ export function LeaveBalanceView() {
                   className={cn(
                     "text-base font-semibold",
                     stat.state === "danger" ? "text-destructive" :
-                    stat.state === "warning" ? "text-data-warning" :
-                    stat.state === "success" ? "text-data-success" :
+                    stat.state === "warning" ? "text-warning dark:text-warning/90" :
+                    stat.state === "success" ? "text-success dark:text-success/90" :
                     "text-foreground"
                   )}
                 >
@@ -199,9 +199,9 @@ export function LeaveBalanceView() {
           const getStatusColor = () => {
             if (isLoading) return "bg-muted";
             const remainingPercentage = total > 0 ? (available / total) * 100 : 0;
-            if (remainingPercentage > 50) return "bg-data-success";
-            if (remainingPercentage > 20) return "bg-data-warning";
-            return "bg-data-error";
+            if (remainingPercentage > 50) return "bg-success dark:bg-success/80";
+            if (remainingPercentage > 20) return "bg-warning dark:bg-warning/80";
+            return "bg-danger dark:bg-danger/80";
           };
 
           // Check for warnings
@@ -247,7 +247,7 @@ export function LeaveBalanceView() {
                     {balance.accrued > 0 && (
                       <div className="flex justify-between">
                         <span>Accrued:</span>
-                        <span className="font-medium text-data-success">
+                        <span className="font-medium text-success dark:text-success/90">
                           +{balance.accrued} days
                         </span>
                       </div>
@@ -255,7 +255,7 @@ export function LeaveBalanceView() {
                     {balance.used > 0 && (
                       <div className="flex justify-between">
                         <span>Used:</span>
-                        <span className="font-medium text-data-error">
+                        <span className="font-medium text-danger dark:text-danger/90">
                           -{balance.used} days
                         </span>
                       </div>

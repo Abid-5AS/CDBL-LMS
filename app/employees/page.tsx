@@ -61,8 +61,8 @@ export default function EmployeesPage() {
 function EmployeeListFallback() {
   return (
     <div className="space-y-4">
-      <div className="h-12 bg-bg-secondary dark:bg-bg-secondary rounded animate-pulse" />
-      <div className="h-64 bg-bg-secondary dark:bg-bg-secondary rounded-xl animate-pulse" />
+      <div className="h-12 bg-muted dark:bg-muted/80 rounded animate-pulse" />
+      <div className="h-64 bg-muted dark:bg-muted/80 rounded-xl animate-pulse" />
     </div>
   );
 }

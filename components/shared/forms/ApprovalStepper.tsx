@@ -55,10 +55,10 @@ export function ApprovalStepper({
                 className={clsx(
                   "h-1.5 w-full rounded-full transition-colors",
                   i < currentIndex
-                    ? "bg-data-success dark:bg-data-success"
+                    ? "bg-success dark:bg-success/80 dark:bg-success dark:bg-success/80"
                     : i === currentIndex
-                    ? "bg-data-warning dark:bg-data-warning"
-                    : "bg-bg-secondary dark:bg-bg-secondary"
+                    ? "bg-warning dark:bg-warning/80 dark:bg-warning dark:bg-warning/80"
+                    : "bg-muted dark:bg-muted/80 dark:bg-muted dark:bg-muted/80"
                 )}
                 aria-hidden="true"
               />
@@ -66,20 +66,20 @@ export function ApprovalStepper({
               {/* Stage indicator */}
               <div className="mt-2 flex items-center gap-1.5">
                 {i < currentIndex ? (
-                  <CheckCircle2 className="h-3.5 w-3.5 text-data-success dark:text-data-success shrink-0" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-success dark:text-success/90 dark:text-success dark:text-success/90 shrink-0" />
                 ) : i === currentIndex ? (
                   <div className="relative shrink-0">
-                    <div className="h-3.5 w-3.5 rounded-full bg-data-warning dark:bg-data-warning animate-pulse" />
-                    <div className="absolute inset-0 h-3.5 w-3.5 rounded-full border-2 border-data-warning dark:border-data-warning animate-ping opacity-75" />
+                    <div className="h-3.5 w-3.5 rounded-full bg-warning dark:bg-warning/80 dark:bg-warning dark:bg-warning/80 animate-pulse" />
+                    <div className="absolute inset-0 h-3.5 w-3.5 rounded-full border-2 border-warning dark:border-warning animate-ping opacity-75" />
                   </div>
                 ) : (
-                  <Circle className="h-3.5 w-3.5 text-text-secondary dark:text-text-secondary shrink-0" strokeWidth={2} />
+                  <Circle className="h-3.5 w-3.5 text-muted-foreground dark:text-muted-foreground/80 dark:text-muted-foreground dark:text-muted-foreground/80 shrink-0" strokeWidth={2} />
                 )}
                 <span
                   className={clsx(
                     "text-[10px] leading-tight",
                     i === currentIndex
-                      ? "font-semibold text-text-secondary dark:text-text-secondary"
+                      ? "font-semibold text-muted-foreground dark:text-muted-foreground/80 dark:text-muted-foreground dark:text-muted-foreground/80"
                       : "text-muted-foreground"
                   )}
                 >

@@ -69,7 +69,7 @@ export function EmployeeActionCenter({
       <CardContent>
         {actionItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center max-w-md mx-auto py-6 sm:py-8 text-center gap-2">
-            <CheckCircle2 className="w-12 h-12 text-data-success mb-2" />
+            <CheckCircle2 className="w-12 h-12 text-success dark:text-success/90 mb-2" />
             <p className="text-sm font-medium text-foreground">
               All clear no pending actions.
             </p>

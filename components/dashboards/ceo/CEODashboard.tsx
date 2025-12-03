@@ -116,9 +116,9 @@ export function CEODashboard() {
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-data-error/20 bg-data-error/5 p-6 text-center">
-        <AlertCircle className="h-12 w-12 mx-auto mb-3 text-data-error" />
-        <p className="text-sm text-data-error font-medium">
+      <div className="rounded-2xl border border-danger/20 bg-danger dark:bg-danger/80/5 p-6 text-center">
+        <AlertCircle className="h-12 w-12 mx-auto mb-3 text-danger dark:text-danger/90" />
+        <p className="text-sm text-danger dark:text-danger/90 font-medium">
           Failed to load executive dashboard
         </p>
         <p className="text-xs text-muted-foreground mt-1">
@@ -130,9 +130,9 @@ export function CEODashboard() {
 
   // Helper to map API insight types to UI styles
   const getInsightStyle = (type: string, priority: string) => {
-    if (priority === "high") return "bg-data-warning/10 border-data-warning/30 text-data-warning";
-    if (type === "efficiency" || type === "success") return "bg-data-success/10 border-data-success/30 text-data-success";
-    return "bg-data-info/10 border-data-info/30 text-data-info";
+    if (priority === "high") return "bg-warning dark:bg-warning/80/10 border-warning/30 text-warning dark:text-warning/90";
+    if (type === "efficiency" || type === "success") return "bg-success dark:bg-success/80/10 border-success/30 text-success dark:text-success/90";
+    return "bg-info dark:bg-info/80/10 border-info/30 text-info dark:text-info/90";
   };
 
   return (
@@ -404,7 +404,7 @@ export function CEODashboard() {
             <GlassCard variant="hover" className="surface-card rounded-2xl">
               <GlassCardHeader>
                 <GlassCardTitle className="text-base flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4 text-data-info" />
+                  <AlertCircle className="h-4 w-4 text-info dark:text-info/90" />
                   Strategic Alerts
                 </GlassCardTitle>
               </GlassCardHeader>
@@ -473,7 +473,7 @@ export function CEODashboard() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">YoY Growth</span>
-                    <span className={cn("font-medium", stats.yoyGrowth > 10 && "text-data-warning")}>
+                    <span className={cn("font-medium", stats.yoyGrowth > 10 && "text-warning dark:text-warning/90")}>
                       {(stats.yoyGrowth ?? 0) > 0 ? "+" : ""}{stats.yoyGrowth ?? 0}%
                     </span>
                   </div>
@@ -531,9 +531,9 @@ export function CEODashboard() {
                               </div>
                               <span className={cn(
                                 "text-xs font-medium",
-                                utilization >= 90 ? "text-data-success" :
-                                utilization >= 85 ? "text-data-warning" :
-                                "text-data-error"
+                                utilization >= 90 ? "text-success dark:text-success/90" :
+                                utilization >= 85 ? "text-warning dark:text-warning/90" :
+                                "text-danger dark:text-danger/90"
                               )}>
                                 {utilization}%
                               </span>

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { LogOut, Settings, Search } from "lucide-react";
 
 import { ThemeToggle } from "../theme-toggle";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { AnnotationsToggle } from "../annotations-toggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -175,6 +176,7 @@ export function MobileMenu({
                   </div>
                   <div className="flex items-center gap-1">
                     <ThemeToggle />
+                    <LanguageSwitcher />
                   </div>
                 </div>
 

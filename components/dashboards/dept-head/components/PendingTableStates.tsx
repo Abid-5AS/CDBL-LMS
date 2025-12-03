@@ -51,7 +51,7 @@ export function PendingTableError({
       </CardHeader>
       <CardContent className="py-12">
         <div className="text-center space-y-4">
-          <div className="text-sm font-semibold text-data-error">
+          <div className="text-sm font-semibold text-danger dark:text-danger/90">
             Failed to load requests
           </div>
           <p className="text-xs text-muted-foreground">
@@ -74,7 +74,7 @@ export function PendingTableEmpty() {
       </CardHeader>
       <CardContent className="p-0">
         <div className="p-12 text-center bg-gradient-to-br from-muted/30 to-muted/10 rounded-lg border border-muted/60">
-          <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-data-success" />
+          <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-success dark:text-success/90" />
           <h3 className="text-lg font-semibold mb-2">All clear!</h3>
           <p className="text-sm text-muted-foreground">
             No pending approvals at the moment.

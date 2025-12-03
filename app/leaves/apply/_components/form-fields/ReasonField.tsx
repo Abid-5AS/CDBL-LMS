@@ -46,7 +46,7 @@ export function ReasonField({
             "min-h-[140px] resize-none leading-6 transition-all focus-visible:ring-2 pr-24 pb-12",
             error
               ? "border-destructive focus-visible:ring-destructive"
-              : "border-border-strong dark:border-border-strong focus-visible:ring-card-action/40 hover:border-card-action dark:hover:border-card-action"
+              : "border-border dark:border-border/50 dark:border-border dark:border-border/50 focus-visible:ring-card-action/40 hover:border-card-action dark:hover:border-card-action"
           )}
           aria-label="Reason for leave"
           aria-required="true"

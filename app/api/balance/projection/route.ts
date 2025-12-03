@@ -20,6 +20,9 @@ export async function GET(request: NextRequest) {
     const leaveType = (searchParams.get("leaveType") ||
       "EARNED") as LeaveType;
     const monthsAhead = parseInt(searchParams.get("monthsAhead") || "12", 10);
+    const simulateStartDate = searchParams.get("simulateStartDate");
+    const simulateEndDate = searchParams.get("simulateEndDate");
+    const simulateWorkingDays = searchParams.get("simulateWorkingDays");
 
     // Validate leave type
     if (!Object.values(LeaveType).includes(leaveType)) {
@@ -40,14 +43,25 @@ export async function GET(request: NextRequest) {
     const projection = await BalanceProjectorService.projectBalance(
       user.id,
       leaveType,
-      monthsAhead
+      monthsAhead,
+      simulateStartDate && simulateEndDate && simulateWorkingDays
+        ? {
+          startDate: new Date(simulateStartDate),
+          endDate: new Date(simulateEndDate),
+          workingDays: parseFloat(simulateWorkingDays),
+        }
+        : undefined
     );
 
     return NextResponse.json(projection);
   } catch (error) {
     console.error("[API] Error fetching balance projection:", error);
     return NextResponse.json(
-      { error: "Failed to fetch balance projection" },
+      {
+        error: "Failed to fetch balance projection",
+        details: String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      },
       { status: 500 }
     );
   }

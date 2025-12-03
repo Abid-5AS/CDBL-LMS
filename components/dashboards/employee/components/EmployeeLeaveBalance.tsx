@@ -55,9 +55,9 @@ const leaveColors: Record<
     border: "border-indigo-200 dark:border-indigo-800",
   },
   EXTRAWITHOUTPAY: {
-    light: "bg-bg-secondary/50 dark:bg-bg-tertiary/30",
-    text: "text-text-secondary dark:text-text-tertiary",
-    border: "border-border-soft dark:border-border-strong",
+    light: "bg-muted/50 dark:bg-muted/40",
+    text: "text-muted-foreground dark:text-muted-foreground/80",
+    border: "border-border-soft dark:border-border/50",
   },
 };
 
@@ -76,12 +76,12 @@ export function EmployeeLeaveBalance({
         {[1, 2, 3, 4, 5, 6].map((i) => (
           <div
             key={i}
-            className="animate-pulse p-4 rounded-xl border border-border-soft dark:border-border-strong"
+            className="animate-pulse p-4 rounded-xl border border-border-soft dark:border-border/50"
           >
-            <div className="h-4 bg-bg-muted dark:bg-bg-tertiary rounded w-2/3 mb-3"></div>
-            <div className="h-8 bg-bg-muted dark:bg-bg-tertiary rounded w-1/3 mb-2"></div>
-            <div className="h-2 bg-bg-muted dark:bg-bg-tertiary rounded w-full mb-2"></div>
-            <div className="h-3 bg-bg-muted dark:bg-bg-tertiary rounded w-1/2"></div>
+            <div className="h-4 bg-muted dark:bg-muted/80 rounded w-2/3 mb-3"></div>
+            <div className="h-8 bg-muted dark:bg-muted/80 rounded w-1/3 mb-2"></div>
+            <div className="h-2 bg-muted dark:bg-muted/80 rounded w-full mb-2"></div>
+            <div className="h-3 bg-muted dark:bg-muted/80 rounded w-1/2"></div>
           </div>
         ))}
       </ResponsiveDashboardGrid>

@@ -1,0 +1,18 @@
+{
+    "types": {
+        "casual": "Casual Leave",
+        "sick": "Sick Leave",
+        "earned": "Earned Leave",
+        "maternity": "Maternity Leave",
+        "paternity": "Paternity Leave",
+        "compensatory": "Compensatory Leave",
+        "lwp": "Leave Without Pay"
+    },
+    "rules": {
+        "maxDays": "Maximum {{days}} days allowed",
+        "minDays": "Minimum {{days}} days required",
+        "noticePeriod": "Must apply {{days}} days in advance",
+        "documentRequired": "Supporting document required",
+        "approvalChain": "Requires approval from {{roles}}"
+    }
+}

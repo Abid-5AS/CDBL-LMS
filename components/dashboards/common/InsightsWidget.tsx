@@ -57,7 +57,7 @@ export function InsightsWidget() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="rounded-2xl border border-white/20 p-3 shadow-inner">
-            <Lightbulb className="h-5 w-5 text-data-warning" />
+            <Lightbulb className="h-5 w-5 text-warning dark:text-warning/90" />
           </div>
           <div>
             <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">

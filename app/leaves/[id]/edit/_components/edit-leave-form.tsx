@@ -183,20 +183,20 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
 
       {/* Return Comment Alert */}
       {returnComment && (
-        <Card className="rounded-2xl border-data-warning bg-data-warning/30 dark:bg-data-warning/10 shadow-sm">
+        <Card className="rounded-2xl border-warning bg-warning dark:bg-warning/80/30 dark:bg-warning dark:bg-warning/80/10 shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-data-warning dark:text-data-warning">
-              <AlertCircle className="h-5 w-5 text-data-warning" />
+            <CardTitle className="flex items-center gap-2 text-warning dark:text-warning/90 dark:text-warning dark:text-warning/90">
+              <AlertCircle className="h-5 w-5 text-warning dark:text-warning/90" />
               Return Reason
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <p className="text-sm font-medium text-data-warning dark:text-data-warning">
+              <p className="text-sm font-medium text-warning dark:text-warning/90 dark:text-warning dark:text-warning/90">
                 Returned by {returnComment.authorName} ({returnComment.authorRole})
               </p>
-              <p className="text-sm text-data-warning dark:text-data-warning">{returnComment.comment}</p>
-              <p className="text-xs text-data-warning dark:text-data-warning">
+              <p className="text-sm text-warning dark:text-warning/90 dark:text-warning dark:text-warning/90">{returnComment.comment}</p>
+              <p className="text-xs text-warning dark:text-warning/90 dark:text-warning dark:text-warning/90">
                 {formatDate(returnComment.createdAt)}
               </p>
             </div>
@@ -240,7 +240,7 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
               {/* Reason */}
               <div className="space-y-2">
                 <Label htmlFor="reason">
-                  Reason <span className="text-data-error">*</span>
+                  Reason <span className="text-danger dark:text-danger/90">*</span>
                 </Label>
                 <Textarea
                   id="reason"
@@ -266,7 +266,7 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
                         href={leave.certificateUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-data-info hover:underline"
+                        className="text-sm text-info dark:text-info/90 hover:underline"
                       >
                         View current certificate
                       </a>

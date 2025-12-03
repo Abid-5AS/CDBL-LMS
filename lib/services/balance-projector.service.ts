@@ -59,7 +59,12 @@ export class BalanceProjectorService {
   static async projectBalance(
     userId: number,
     leaveType: LeaveType,
-    monthsAhead: number = 12
+    monthsAhead: number = 12,
+    hypotheticalLeave?: {
+      startDate: Date;
+      endDate: Date;
+      workingDays: number;
+    }
   ): Promise<BalanceProjectionResult> {
     try {
       const currentDate = new Date();
@@ -123,6 +128,16 @@ export class BalanceProjectorService {
           startDate: "asc",
         },
       });
+
+      // Add hypothetical leave if provided
+      if (hypotheticalLeave) {
+        futureLeaves.push({
+          startDate: hypotheticalLeave.startDate,
+          endDate: hypotheticalLeave.endDate,
+          workingDays: hypotheticalLeave.workingDays,
+          status: LeaveStatus.PENDING, // Treat as pending for calculation
+        });
+      }
 
       // Generate monthly projections
       const projections: MonthlyProjection[] = [];

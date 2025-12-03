@@ -17,12 +17,12 @@ const createDelegationSchema = z.object({
  */
 export async function POST(request: NextRequest) {
   try {
-    const authResult = await getCurrentUser(request);
-    if (!authResult.authenticated || !authResult.user) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const delegatorId = authResult.user.id;
+    const delegatorId = user.id;
 
     const body = await request.json();
     const validation = createDelegationSchema.safeParse(body);
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: "Invalid request",
-          details: validation.error.errors,
+          details: validation.error.flatten(),
         },
         { status: 400 }
       );
@@ -74,12 +74,12 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await getCurrentUser(request);
-    if (!authResult.authenticated || !authResult.user) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = authResult.user.id;
+    const userId = user.id;
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type") || "mine"; // "mine" or "received"
 
@@ -110,12 +110,12 @@ export async function GET(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
-    const authResult = await getCurrentUser(request);
-    if (!authResult.authenticated || !authResult.user) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const delegatorId = authResult.user.id;
+    const delegatorId = user.id;
     const { searchParams } = new URL(request.url);
     const delegationId = searchParams.get("id");
 

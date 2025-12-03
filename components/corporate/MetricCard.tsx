@@ -60,8 +60,8 @@ export function MetricCard({
               <span
                 className={cn(
                   "text-xs font-medium",
-                  trend.direction === "up" && "text-data-success",
-                  trend.direction === "down" && "text-data-error",
+                  trend.direction === "up" && "text-success dark:text-success/90",
+                  trend.direction === "down" && "text-danger dark:text-danger/90",
                   trend.direction === "neutral" && "text-muted-foreground"
                 )}
               >

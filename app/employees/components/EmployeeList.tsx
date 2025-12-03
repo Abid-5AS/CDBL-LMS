@@ -154,7 +154,7 @@ export function EmployeeList() {
   if (error) {
     return (
       <Card>
-        <CardContent className="py-12 text-center text-sm text-data-error">
+        <CardContent className="py-12 text-center text-sm text-danger dark:text-danger/90">
           Failed to load employees. Please try again.
         </CardContent>
       </Card>
@@ -223,9 +223,9 @@ export function EmployeeList() {
                 {paginatedEmployees.map((employee) => (
                   <EnhancedTableRow
                     key={employee.id}
-                    className="hover:bg-bg-secondary dark:hover:bg-bg-secondary/50"
+                    className="hover:bg-muted/50 dark:hover:bg-muted/30 transition-colors duration-100"
                   >
-                    <EnhancedTableCell className="font-medium text-text-primary">
+                    <EnhancedTableCell className="font-medium text-foreground dark:text-foreground/90">
                       {employee.name}
                     </EnhancedTableCell>
                     <EnhancedTableCell className="hidden sm:table-cell text-muted-foreground">

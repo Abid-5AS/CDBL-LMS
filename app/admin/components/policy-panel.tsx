@@ -52,15 +52,15 @@ export function PolicyPanel({ policies, onUpdatePolicy, busyPolicyId }: PolicyPa
     <div className="space-y-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-text-secondary">Leave Policy Configuration</h2>
-          <p className="text-sm text-muted-foreground">Tune leave limits and notice periods for each entitlement.</p>
+          <h2 className="text-xl font-semibold text-foreground dark:text-foreground/95">Leave Policy Configuration</h2>
+          <p className="text-sm text-muted-foreground dark:text-muted-foreground/80">Tune leave limits and notice periods for each entitlement.</p>
         </div>
-        <div className="text-xs text-muted-foreground">Last updated: {new Date(version).toLocaleString()}</div>
+        <div className="text-xs text-muted-foreground dark:text-muted-foreground/80">Last updated: {new Date(version).toLocaleString()}</div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-border-strong bg-bg-primary shadow-sm">
-        <table className="min-w-full divide-y divide-slate-200 text-sm">
-          <thead className="bg-bg-secondary text-left text-xs font-semibold uppercase tracking-wide text-text-secondary">
+      <div className="overflow-x-auto rounded-xl border border-border dark:border-border/50 bg-card dark:bg-card/90 shadow-sm">
+        <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700 text-sm">
+          <thead className="bg-secondary dark:bg-secondary/80 text-left text-xs font-semibold uppercase tracking-wide text-foreground dark:text-foreground/90">
             <tr>
               <th className="px-4 py-3">Leave Type</th>
               {editableFields.map((field) => (
@@ -71,12 +71,12 @@ export function PolicyPanel({ policies, onUpdatePolicy, busyPolicyId }: PolicyPa
               <th className="px-4 py-3 text-right">Updated</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {policies.map((policy) => {
               const updating = busyPolicyId === policy.id;
               return (
-                <tr key={policy.id} className="hover:bg-bg-secondary/60">
-                  <td className="px-4 py-3 font-medium text-text-secondary">{policy.leaveType}</td>
+                <tr key={policy.id} className="hover:bg-muted/50 dark:hover:bg-muted/30 transition-colors duration-100">
+                  <td className="px-4 py-3 font-medium text-foreground dark:text-foreground/90">{policy.leaveType}</td>
                   {editableFields.map((field) => {
                     const fieldKey = field.key as keyof PolicyRecord;
                     const value = policy[fieldKey];
@@ -88,7 +88,7 @@ export function PolicyPanel({ policies, onUpdatePolicy, busyPolicyId }: PolicyPa
                           key={`${policy.id}-${fieldKey}-${value ?? ""}`}
                           defaultValue={value ?? ""}
                           onBlur={(event) => handleNumericChange(policy.id, fieldKey as any, event.target.value)}
-                          className="w-full rounded-md border border-border-strong bg-bg-primary px-2 py-1 text-sm"
+                          className="w-full rounded-md border border-border dark:border-border/50 bg-card dark:bg-card/95 text-foreground dark:text-foreground/90 px-2 py-1 text-sm focus:ring-2 focus:ring-ring transition-all"
                           disabled={updating}
                         />
                       </td>

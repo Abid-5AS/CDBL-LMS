@@ -32,6 +32,7 @@ import { BalanceCard } from "@/components/corporate/BalanceCard";
 import { MetricCard } from "@/components/corporate/MetricCard";
 import { getDensityClasses, getTypography, GRID_CONFIGS } from "@/lib/ui/density-modes";
 import { cn } from "@/lib/utils";
+import { LeaveType } from "@/lib/enums";
 
 // Existing feature components (to be restyled)
 import { EmployeeRecentActivity } from "./components/EmployeeRecentActivity";
@@ -178,7 +179,7 @@ export function CorporateEmployeeDashboard({
         <section>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <BalanceCard
-              type="CASUAL"
+              type={LeaveType.CASUAL}
               available={casualBalance}
               used={LEAVE_ENTITLEMENTS.CASUAL - casualBalance}
               total={LEAVE_ENTITLEMENTS.CASUAL}
@@ -186,7 +187,7 @@ export function CorporateEmployeeDashboard({
               onClick={() => router.push("/balance")}
             />
             <BalanceCard
-              type="MEDICAL"
+              type={LeaveType.MEDICAL}
               available={medicalBalance}
               used={LEAVE_ENTITLEMENTS.MEDICAL - medicalBalance}
               total={LEAVE_ENTITLEMENTS.MEDICAL}
@@ -194,7 +195,7 @@ export function CorporateEmployeeDashboard({
               onClick={() => router.push("/balance")}
             />
             <BalanceCard
-              type="EARNED"
+              type={LeaveType.EARNED}
               available={earnedBalance}
               used={LEAVE_ENTITLEMENTS.EARNED - earnedBalance}
               total={LEAVE_ENTITLEMENTS.EARNED}
@@ -288,6 +289,7 @@ export function CorporateEmployeeDashboard({
               holidays={holidaysData as any}
               isLoading={isLoadingHolidays}
             />
+
           </div>
         </div>
       </div>

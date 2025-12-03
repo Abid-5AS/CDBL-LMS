@@ -71,8 +71,8 @@ export function SystemOverviewCards() {
         value="Healthy"
         subtext="All systems operational"
         icon={Activity}
-        iconColor="text-data-success"
-        accentColor="bg-data-success"
+        iconColor="text-success dark:text-success/90"
+        accentColor="bg-success dark:bg-success/80"
       />
     </div>
   );
@@ -86,8 +86,8 @@ export function SystemQuickStats({ systemStats }: QuickStatsProps) {
         value={systemStats.totalUsers.toString()}
         subtext="All system users"
         icon={Users}
-        iconColor="text-data-info"
-        accentColor="bg-data-info"
+        iconColor="text-info dark:text-info/90"
+        accentColor="bg-info dark:bg-info/80"
       />
       <KPICard
         title="Active Admins"
@@ -104,13 +104,13 @@ export function SystemQuickStats({ systemStats }: QuickStatsProps) {
         icon={Activity}
         iconColor={
           systemStats.systemHealth === "healthy"
-            ? "text-data-success"
-            : "text-data-warning"
+            ? "text-success dark:text-success/90"
+            : "text-warning dark:text-warning/90"
         }
         accentColor={
           systemStats.systemHealth === "healthy"
-            ? "bg-data-success"
-            : "bg-data-warning"
+            ? "bg-success dark:bg-success/80"
+            : "bg-warning dark:bg-warning/80"
         }
         status={systemStats.systemHealth === "healthy" ? "healthy" : "low"}
       />

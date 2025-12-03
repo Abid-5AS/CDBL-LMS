@@ -76,9 +76,9 @@ export function UserManagement({ users, onRoleChange, onCreate, busyUserId }: Us
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-border-strong bg-bg-primary shadow-sm">
+      <div className="overflow-x-auto rounded-xl border border-border dark:border-border/50 bg-card dark:bg-card/90 shadow-sm hover:shadow-md transition-all duration-100">
         <table className="min-w-full divide-y divide-slate-200 text-sm">
-          <thead className="bg-bg-secondary text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <thead className="bg-secondary dark:bg-secondary/80 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             <tr>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Email</th>
@@ -92,14 +92,14 @@ export function UserManagement({ users, onRoleChange, onCreate, busyUserId }: Us
             {paginatedUsers.map((user) => {
               const updating = busyUserId === user.id;
               return (
-                <tr key={user.id} className="hover:bg-bg-secondary/60">
+                <tr key={user.id} className="hover:bg-muted/50 dark:hover:bg-muted/30 transition-colors duration-100">
                   <td className="px-4 py-3 font-medium text-foreground">{user.name}</td>
                   <td className="px-4 py-3 text-muted-foreground">{user.email}</td>
                   <td className="px-4 py-3 text-muted-foreground">{user.empCode ?? "—"}</td>
                   <td className="px-4 py-3 text-muted-foreground">{user.department ?? "—"}</td>
                   <td className="px-4 py-3">
                     <select
-                      className="w-full rounded-md border border-border-strong bg-bg-primary px-2 py-1 text-sm"
+                      className="w-full rounded-md border border-border dark:border-border/50 bg-card dark:bg-card/90 px-2 py-1 text-sm"
                       value={user.role}
                       onChange={async (event) => {
                         const nextRole = event.target.value as AdminUserRecord["role"];

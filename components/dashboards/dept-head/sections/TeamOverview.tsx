@@ -86,21 +86,21 @@ export function DeptHeadTeamOverview() {
         <div className="grid grid-cols-2 gap-3">
           <div className="p-3 rounded-lg bg-muted/50">
             <div className="flex items-center gap-2 mb-1">
-              <Users className="h-4 w-4 text-data-info" />
+              <Users className="h-4 w-4 text-info dark:text-info/90" />
               <p className="text-xs text-muted-foreground">Total Employees</p>
             </div>
             <p className="text-2xl font-bold">{data.totalEmployees}</p>
           </div>
           <div className="p-3 rounded-lg bg-muted/50">
             <div className="flex items-center gap-2 mb-1">
-              <Calendar className="h-4 w-4 text-data-warning" />
+              <Calendar className="h-4 w-4 text-warning dark:text-warning/90" />
               <p className="text-xs text-muted-foreground">On Leave Today</p>
             </div>
             <p className="text-2xl font-bold">{data.onLeaveToday}</p>
           </div>
           <div className="p-3 rounded-lg bg-muted/50">
             <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="h-4 w-4 text-data-success" />
+              <TrendingUp className="h-4 w-4 text-success dark:text-success/90" />
               <p className="text-xs text-muted-foreground">Top Leave Type</p>
             </div>
             <p className="text-lg font-semibold">

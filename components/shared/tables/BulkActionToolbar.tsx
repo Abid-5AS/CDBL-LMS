@@ -76,7 +76,7 @@ export function BulkActionToolbar({
                     variant="outline"
                     onClick={onBulkApprove}
                     disabled={isProcessing}
-                    className="text-data-success border-data-success/20 hover:bg-data-success/10 hover:text-data-success hover:border-data-success/30"
+                    className="text-success dark:text-success/90 border-success/20 hover:bg-success dark:bg-success/80/10 hover:text-success dark:text-success/90 hover:border-success/30"
                   >
                     <CheckCircle2 className="h-4 w-4 mr-2" />
                     {isFinalApprover ? "Approve All" : "Forward All"}
@@ -100,7 +100,7 @@ export function BulkActionToolbar({
                     variant="outline"
                     onClick={onBulkReject}
                     disabled={isProcessing}
-                    className="text-data-error border-data-error/20 hover:bg-data-error/10 hover:text-data-error hover:border-data-error/30"
+                    className="text-danger dark:text-danger/90 border-danger/20 hover:bg-danger dark:bg-danger/80/10 hover:text-danger dark:text-danger/90 hover:border-danger/30"
                   >
                     <XCircle className="h-4 w-4 mr-2" />
                     Reject All
@@ -120,7 +120,7 @@ export function BulkActionToolbar({
                     variant="outline"
                     onClick={onBulkReturn}
                     disabled={isProcessing}
-                    className="text-data-warning border-data-warning/20 hover:bg-data-warning/10 hover:text-data-warning hover:border-data-warning/30"
+                    className="text-warning dark:text-warning/90 border-warning/20 hover:bg-warning dark:bg-warning/80/10 hover:text-warning dark:text-warning/90 hover:border-warning/30"
                   >
                     <RotateCcw className="h-4 w-4 mr-2" />
                     Return All
@@ -142,7 +142,7 @@ export function BulkActionToolbar({
                     variant="outline"
                     onClick={onBulkForward}
                     disabled={isProcessing}
-                    className="text-data-info border-data-info/20 hover:bg-data-info/10 hover:text-data-info hover:border-data-info/30"
+                    className="text-info dark:text-info/90 border-info/20 hover:bg-info dark:bg-info/80/10 hover:text-info dark:text-info/90 hover:border-info/30"
                   >
                     <ArrowRight className="h-4 w-4 mr-2" />
                     Forward All

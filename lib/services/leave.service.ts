@@ -215,8 +215,33 @@ export class LeaveService {
   static async approveLeave(
     leaveId: number,
     approverId: number,
-    comment?: string
+    comment?: string,
+    ignoreWarnings: boolean = false
   ): Promise<ServiceResult<any>> {
+    // Check for capacity conflicts before approving
+    if (!ignoreWarnings) {
+      const leave = await LeaveRepository.findById(leaveId);
+      if (leave && leave.requester.department) {
+        const { TeamCapacityService } = await import("./team-capacity.service");
+        const conflict = await TeamCapacityService.checkConflicts(
+          leave.requester.department,
+          leave.startDate,
+          leave.endDate
+        );
+
+        if (conflict.hasConflict) {
+          return {
+            success: false,
+            error: {
+              code: "capacity_conflict",
+              message: conflict.message || "Capacity conflict detected",
+              details: { conflictDays: conflict.conflictDays },
+            },
+          };
+        }
+      }
+    }
+
     return ApprovalService.approve(leaveId, approverId, comment);
   }
 
@@ -266,27 +291,27 @@ export class LeaveService {
 
       // Get next approver to determine toRole
       const nextApprover = await this.getNextApprover(leave);
-      
+
       if (!nextApprover) {
-         return {
-            success: false,
-            error: {
-               code: "no_next_approver",
-               message: "Cannot forward: No next approver found in workflow"
-            }
-         }
+        return {
+          success: false,
+          error: {
+            code: "no_next_approver",
+            message: "Cannot forward: No next approver found in workflow"
+          }
+        }
       }
 
       return ApprovalService.forward(leaveId, currentApproverId, nextApprover.role as any, comment);
     } catch (error) {
-       console.error("LeaveService.forwardLeave error:", error);
-       return {
-          success: false,
-          error: {
-             code: "internal_error",
-             message: "An unexpected error occurred while forwarding leave"
-          }
-       }
+      console.error("LeaveService.forwardLeave error:", error);
+      return {
+        success: false,
+        error: {
+          code: "internal_error",
+          message: "An unexpected error occurred while forwarding leave"
+        }
+      }
     }
   }
 
@@ -428,7 +453,7 @@ export class LeaveService {
 
     // For all other roles (HR_ADMIN, HR_HEAD, CEO), find by role
     const approver = await prisma.user.findFirst({
-      where: { role },
+      where: { role: role as any },
       select: { id: true },
     });
 

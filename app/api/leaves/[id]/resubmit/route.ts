@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { LeaveStatus } from "@prisma/client";
-import { z } from "zod";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
 import { normalizeToDhakaMidnight } from "@/lib/date-utils";
@@ -206,9 +205,11 @@ export async function POST(
   // If previous approval deducted days, we need to account for that
   let balanceNeeded = workingDays;
 
-  // If leave was previously approved and balance was deducted, we need to restore it first
+  // If leave was previously used (balance deducted), we need to restore it first
   // Then check if the new request can be fulfilled
-  if (leave.approvedAt) {
+  // Note: For RETURNED status, balance was already deducted during initial approval
+  const originalWasApproved = originalWorkingDays > 0 && (existingBalance.used || 0) >= originalWorkingDays;
+  if (originalWasApproved) {
     // Balance was previously deducted, restore it for this check
     balanceNeeded = workingDays - originalWorkingDays; // Only need the difference
 
@@ -243,7 +244,7 @@ export async function POST(
 
   // SECURITY CHECK 5: Restore balance if leave was previously approved
   // This prevents the double-deduction exploit
-  if (leave.approvedAt && originalWorkingDays > 0) {
+  if (originalWasApproved && originalWorkingDays > 0) {
     await prisma.balance.update({
       where: {
         userId_type_year: {

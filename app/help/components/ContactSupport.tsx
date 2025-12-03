@@ -43,7 +43,7 @@ export function ContactSupport() {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Mail className="h-5 w-5 text-data-warning" />
+          <Mail className="h-5 w-5 text-warning dark:text-warning/90" />
           <CardTitle>Contact Support</CardTitle>
         </div>
         <CardDescription>Get in touch with our support team</CardDescription>
@@ -91,7 +91,7 @@ export function ContactSupport() {
             Or email us directly at:{" "}
             <a
               href="mailto:hr@cdbl.com"
-              className="text-data-info dark:text-data-info hover:underline"
+              className="text-info dark:text-info/90 dark:text-info dark:text-info/90 hover:underline"
             >
               hr@cdbl.com
             </a>

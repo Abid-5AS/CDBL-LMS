@@ -82,10 +82,10 @@ export function RequestsTable({
                       size="sm"
                       onClick={() => changeFilter(option.value)}
                       className={clsx(
-                        "h-8 rounded-full text-xs font-medium transition-all",
+                        "h-8 rounded-full text-xs font-medium transition-all duration-100",
                         isSelected
-                          ? "bg-card-action hover:bg-card-action text-text-inverted border-card-action shadow-sm"
-                          : "bg-bg-primary hover:bg-bg-secondary text-text-secondary border-bg-muted"
+                          ? "bg-card-action hover:bg-card-action text-white dark:text-white border-card-action shadow-sm"
+                          : "bg-card dark:bg-card/90 hover:bg-muted/50 dark:hover:bg-muted/30 text-foreground dark:text-foreground/90 border-border dark:border-border/50"
                       )}
                       aria-current={isSelected ? "page" : undefined}
                     >

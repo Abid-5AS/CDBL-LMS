@@ -81,7 +81,7 @@ export function PendingApprovals({ role }: { role: string }) {
         <CardHeader>
           <CardTitle>Pending Approvals</CardTitle>
         </CardHeader>
-        <CardContent className="text-sm text-data-error">
+        <CardContent className="text-sm text-danger dark:text-danger/90">
           Failed to load approval queue.
         </CardContent>
       </Card>

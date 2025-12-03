@@ -6,6 +6,7 @@ import { Search, Command, CalendarPlus } from "lucide-react";
 
 import { NotificationDropdown } from "@/components/navbar";
 import { ThemeToggle } from "../theme-toggle";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { AnnotationsToggle } from "../annotations-toggle";
 import { cn } from "@/lib/utils";
 import { useSearch } from "@/hooks";
@@ -153,6 +154,7 @@ export function DesktopNav({
         <div className="flex items-center gap-1 pl-2 border-l border-border">
           <NotificationDropdown />
           <ThemeToggle />
+          <LanguageSwitcher />
           <ProfileMenu
             user={user}
             onLogout={logout}

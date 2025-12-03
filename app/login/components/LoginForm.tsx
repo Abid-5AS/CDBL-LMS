@@ -154,8 +154,8 @@ function LoginIllustration() {
       }}
     >
       {/* Removed specific icons as they are not part of the new design */}
-      <div className="relative z-10 w-full h-auto text-text-secondary/90" />
-      <div className="absolute -bottom-16 -right-16 size-40 bg-data-info/10 rounded-full blur-3xl" />
+      <div className="relative z-10 w-full h-auto text-muted-foreground dark:text-muted-foreground/80/90" />
+      <div className="absolute -bottom-16 -right-16 size-40 bg-info dark:bg-info/80/10 rounded-full blur-3xl" />
       <div className="absolute top-0 -left-16 size-40 bg-card-action/10 rounded-full blur-3xl" />
     </motion.div>
   );

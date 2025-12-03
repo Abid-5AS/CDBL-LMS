@@ -15,11 +15,11 @@ model User {
   empCode        String?   @unique
   role           Role      @default(EMPLOYEE)
   department     String?
-  deptHeadId     Int?       // User ID of department head (self-relation)
+  deptHeadId     Int? // User ID of department head (self-relation)
   joinDate       DateTime? // Service start date for eligibility calculations (Policy 6.18)
   retirementDate DateTime? // Expected retirement date for study leave validation (Policy 6.25.a)
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   leaves               LeaveRequest[]
   balances             Balance[]
@@ -36,6 +36,20 @@ model User {
   preferences          UserPreferences?
   leaveTemplates       LeaveTemplate[]
   policyVersions       PolicyVersion[]
+
+  // Enhanced Profile Relations
+  profile           UserProfile?
+  emergencyContacts EmergencyContact[]
+  bankDetails       BankDetails?
+  documents         UserDocument[]
+
+  // HRIS Integration Relations
+  hrisSyncs             HRISSync[]     @relation("HRISSyncs")
+  hrisConflictsEmployee HRISConflict[] @relation("HRISConflictsEmployee")
+  hrisConflictsResolver HRISConflict[] @relation("HRISConflictsResolver")
+
+  // Scheduled Reports Relations
+  scheduledReports ScheduledReport[] @relation("ReportCreator")
 
   @@index([deptHeadId])
 }
@@ -310,6 +324,46 @@ enum NotificationType {
   LEAVE_TYPE_CHANGED
 }
 
+enum ReportType {
+  LEAVE_SUMMARY // Overall leave statistics
+  LEAVE_BALANCE // Current balance status
+  LEAVE_UTILIZATION // Utilization analysis
+  ATTENDANCE_REPORT // Attendance patterns
+  APPROVAL_TIMES // Approval efficiency
+  DEPARTMENT_ANALYTICS // Department-wise breakdown
+  EMPLOYEE_HISTORY // Individual employee leave history
+  BURNOUT_RISK // Wellbeing and burnout analysis
+  COST_ANALYSIS // Financial impact
+  PATTERN_DETECTION // Abuse pattern detection
+  FORECAST_REPORT // Future leave predictions
+  COMPLIANCE_AUDIT // Policy compliance check
+}
+
+enum ReportFormat {
+  PDF
+  EXCEL
+  CSV
+  JSON
+}
+
+enum ReportFrequency {
+  DAILY
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+  CUSTOM
+}
+
+enum ExecutionStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
 // Balance Adjustment Model
 // For manual balance corrections by SYSTEM_ADMIN
 model BalanceAdjustment {
@@ -366,6 +420,47 @@ model UserPreferences {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+// HRIS Integration - Sync tracking
+model HRISSync {
+  id            Int       @id @default(autoincrement())
+  provider      String // "csv", "excel", "api"
+  status        String // "pending", "running", "completed", "failed"
+  startedAt     DateTime  @default(now())
+  completedAt   DateTime?
+  recordsTotal  Int
+  recordsSynced Int       @default(0)
+  recordsFailed Int       @default(0)
+  errors        Json?
+  createdBy     Int
+
+  user      User           @relation("HRISSyncs", fields: [createdBy], references: [id])
+  conflicts HRISConflict[]
+
+  @@index([status, startedAt])
+  @@index([createdBy])
+}
+
+// HRIS Integration - Conflict resolution
+model HRISConflict {
+  id           Int       @id @default(autoincrement())
+  syncId       Int
+  employeeId   Int?
+  conflictType String // "duplicate", "mismatch", "missing"
+  hrisData     Json // Data from HRIS
+  systemData   Json // Current system data
+  resolution   String? // "keep_hris", "keep_system", "merge", "skip"
+  resolvedBy   Int?
+  resolvedAt   DateTime?
+  createdAt    DateTime  @default(now())
+
+  sync     HRISSync @relation(fields: [syncId], references: [id], onDelete: Cascade)
+  employee User?    @relation("HRISConflictsEmployee", fields: [employeeId], references: [id])
+  resolver User?    @relation("HRISConflictsResolver", fields: [resolvedBy], references: [id])
+
+  @@index([syncId, resolution])
+  @@index([employeeId])
+}
+
 // Leave Templates for quick application
 model LeaveTemplate {
   id        Int       @id @default(autoincrement())
@@ -395,4 +490,110 @@ model PolicyVersion {
   changedByUser User @relation(fields: [changedBy], references: [id])
 
   @@index([effectiveFrom])
+}
+
+// Enhanced User Profile Models
+
+model UserProfile {
+  id               Int       @id @default(autoincrement())
+  userId           Int       @unique
+  phone            String?
+  address          String?   @db.Text
+  permanentAddress String?   @db.Text
+  dob              DateTime?
+  gender           String?
+  bloodGroup       String?
+  maritalStatus    String?
+  nid              String?
+  tin              String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EmergencyContact {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  name      String
+  relation  String
+  phone     String
+  address   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model BankDetails {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  bankName      String
+  accountNumber String
+  branchName    String?
+  routingNumber String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserDocument {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  title      String
+  type       String // e.g., "NID", "Passport", "Certificate"
+  fileUrl    String
+  uploadedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// Scheduled Reports System
+model ScheduledReport {
+  id           Int             @id @default(autoincrement())
+  name         String // Report name (e.g., "Monthly Leave Summary")
+  reportType   ReportType // Type of report
+  format       ReportFormat // Output format (PDF, Excel, CSV)
+  frequency    ReportFrequency // How often to generate
+  recipients   Json // Array of email addresses
+  filters      Json? // Report filters (department, date range, etc.)
+  scheduleTime String? // Cron expression or time (e.g., "09:00")
+  scheduleDay  Int? // Day of month (1-31) or week (1-7)
+  isActive     Boolean         @default(true)
+  lastRunAt    DateTime?
+  nextRunAt    DateTime?
+  createdBy    Int
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  creator    User              @relation("ReportCreator", fields: [createdBy], references: [id])
+  executions ReportExecution[]
+
+  @@index([createdBy])
+  @@index([isActive, nextRunAt])
+  @@index([reportType, isActive])
+}
+
+// Report Execution History
+model ReportExecution {
+  id          Int             @id @default(autoincrement())
+  reportId    Int
+  status      ExecutionStatus @default(PENDING)
+  startedAt   DateTime        @default(now())
+  completedAt DateTime?
+  fileUrl     String? // Generated file path
+  fileSize    Int? // File size in bytes
+  recordCount Int? // Number of records in report
+  errorLog    String?         @db.Text
+  sentTo      Json? // Emails successfully sent to
+
+  report ScheduledReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId, status])
+  @@index([startedAt])
 }

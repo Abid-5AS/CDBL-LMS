@@ -87,7 +87,7 @@ export function SharedTimeline({
     return (
       <div className={cn("space-y-6", className)}>
         <div className="relative">
-          <ol className="relative border-l-2 border-border-strong dark:border-border-strong ml-4 space-y-6">
+          <ol className="relative border-l-2 border-border dark:border-border/50 ml-4 space-y-6">
             {displayedItems.map((item, index) => {
               const isLast = index === displayedItems.length - 1;
               const status = item.status;
@@ -111,13 +111,13 @@ export function SharedTimeline({
                   {/* Timeline node */}
                   <span
                     className={cn(
-                      "absolute -left-[29px] top-0 flex h-6 w-6 items-center justify-center rounded-full ring-8 ring-bg-primary dark:ring-border-strong transition-colors",
+                      "absolute -left-[29px] top-0 flex h-6 w-6 items-center justify-center rounded-full ring-8 ring-card dark:ring-card/90 transition-colors",
                       colors.node,
                       status === "PENDING" && "animate-pulse"
                     )}
                     aria-label={`${item.actor || "Timeline"} - ${item.title}`}
                   >
-                    {item.icon || <Icon className="h-3.5 w-3.5 text-text-inverted" />}
+                    {item.icon || <Icon className="h-3.5 w-3.5 text-white dark:text-white" />}
                   </span>
 
                   {/* Content */}
@@ -127,23 +127,23 @@ export function SharedTimeline({
                         <h3 className={cn("font-semibold text-sm", colors.text)}>
                           {item.actor || "Timeline"}
                           {item.status && (
-                            <span className="ml-2 text-xs font-normal text-text-secondary dark:text-text-secondary">
+                            <span className="ml-2 text-xs font-normal text-foreground dark:text-foreground/90">
                               – {getStatusLabel(item.status)}
                             </span>
                           )}
                         </h3>
                         {item.meta?.approverName && (
-                          <p className="text-xs text-text-secondary dark:text-text-secondary mt-0.5">
+                          <p className="text-xs text-foreground dark:text-foreground/90 mt-0.5">
                             by {item.meta.approverName}
                           </p>
                         )}
                       </div>
-                      <time className="text-xs text-text-secondary dark:text-text-secondary whitespace-nowrap shrink-0">
+                      <time className="text-xs text-foreground dark:text-foreground/90 whitespace-nowrap shrink-0">
                         {formatDate(item.at)}
                       </time>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm text-text-secondary dark:text-text-secondary leading-relaxed">
+                      <p className="text-sm text-foreground dark:text-foreground/90 leading-relaxed">
                         {item.title}
                       </p>
                       {item.status && (
@@ -154,7 +154,7 @@ export function SharedTimeline({
                       )}
                     </div>
                     {item.subtitle && (
-                      <p className="text-sm text-text-secondary dark:text-text-secondary leading-relaxed">
+                      <p className="text-sm text-foreground dark:text-foreground/90 leading-relaxed">
                         {item.subtitle}
                       </p>
                     )}
@@ -175,7 +175,7 @@ export function SharedTimeline({
           </ol>
         </div>
         {hasMore && onLoadMore && (
-          <div className="pt-4 border-t border-border-strong dark:border-border-strong">
+          <div className="pt-4 border-t border-border dark:border-border/50">
             <Button variant="outline" size="sm" onClick={onLoadMore}>
               Load More
             </Button>
@@ -196,7 +196,7 @@ export function SharedTimeline({
           <div
             key={item.id}
             className={cn(
-              "flex items-center justify-between gap-4 p-4 rounded-lg bg-bg-primary dark:bg-bg-secondary border-2 border-border-strong dark:border-border-strong hover:border-data-info dark:hover:border-data-info hover:shadow-sm transition-all",
+              "flex items-center justify-between gap-4 p-4 rounded-lg bg-card dark:bg-card/90 border-2 border-border dark:border-border/50 hover:border-info dark:hover:border-info/80 hover:shadow-md transition-all duration-100",
               dense && "p-3",
               onItemClick && "cursor-pointer"
             )}
@@ -215,17 +215,17 @@ export function SharedTimeline({
                 {status && (
                   <StatusBadge status={status as LeaveStatus} />
                 )}
-                <span className="text-base font-bold text-text-secondary dark:text-text-secondary capitalize">
+                <span className="text-base font-bold text-foreground dark:text-foreground/90 capitalize">
                   {item.title}
                 </span>
               </div>
               {item.subtitle && (
-                <div className="text-sm font-semibold text-text-secondary dark:text-text-secondary mb-1">
+                <div className="text-sm font-semibold text-foreground dark:text-foreground/90 mb-1">
                   {item.subtitle}
                 </div>
               )}
               {item.meta?.daysUntil !== undefined && (
-                <div className="inline-flex items-center gap-1.5 text-xs font-medium text-data-info dark:text-data-info bg-data-info dark:bg-data-info/30 px-2.5 py-1 rounded-full mt-1">
+                <div className="inline-flex items-center gap-1.5 text-xs font-medium text-info dark:text-info/90 bg-info/10 dark:bg-info/30 px-2.5 py-1 rounded-full mt-1">
                   <Clock className="h-3 w-3 flex-shrink-0" strokeWidth={2} />
                   <span>
                     {item.meta.daysUntil === 0
@@ -238,11 +238,11 @@ export function SharedTimeline({
               )}
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              <time className="text-xs text-text-secondary dark:text-text-secondary whitespace-nowrap">
+              <time className="text-xs text-foreground dark:text-foreground/90 whitespace-nowrap">
                 {formatDate(item.at)}
               </time>
               {onItemClick && (
-                <ArrowRight className="h-4 w-4 text-text-secondary" />
+                <ArrowRight className="h-4 w-4 text-foreground dark:text-foreground/90" />
               )}
             </div>
           </div>
@@ -282,39 +282,39 @@ function getStatusColors(
   switch (status) {
     case "APPROVED":
       return {
-        node: "bg-data-success ring-data-success dark:ring-data-success",
-        text: "text-data-success dark:text-data-success",
-        border: "bg-data-success dark:bg-data-success",
+        node: "bg-success dark:bg-success/80 ring-data-success dark:ring-data-success",
+        text: "text-success dark:text-success/90 dark:text-success dark:text-success/90",
+        border: "bg-success dark:bg-success/80 dark:bg-success dark:bg-success/80",
       };
     case "REJECTED":
       return {
-        node: "bg-data-error ring-data-error dark:ring-data-error",
-        text: "text-data-error dark:text-data-error",
-        border: "bg-data-error dark:bg-data-error",
+        node: "bg-danger dark:bg-danger/80 ring-data-error dark:ring-data-error",
+        text: "text-danger dark:text-danger/90 dark:text-danger dark:text-danger/90",
+        border: "bg-danger dark:bg-danger/80 dark:bg-danger dark:bg-danger/80",
       };
     case "FORWARDED":
       return {
-        node: "bg-data-info ring-data-info dark:ring-data-info",
-        text: "text-data-info dark:text-data-info",
-        border: "bg-data-info dark:bg-data-info",
+        node: "bg-info dark:bg-info/80 ring-data-info dark:ring-data-info",
+        text: "text-info dark:text-info/90 dark:text-info dark:text-info/90",
+        border: "bg-info dark:bg-info/80 dark:bg-info dark:bg-info/80",
       };
     case "PENDING":
       return {
-        node: "bg-data-warning ring-data-warning dark:ring-data-warning",
-        text: "text-data-warning dark:text-data-warning",
-        border: "bg-data-warning dark:bg-data-warning",
+        node: "bg-warning dark:bg-warning/80 ring-data-warning dark:ring-data-warning",
+        text: "text-warning dark:text-warning/90 dark:text-warning dark:text-warning/90",
+        border: "bg-warning dark:bg-warning/80 dark:bg-warning dark:bg-warning/80",
       };
     case "RETURNED":
       return {
-        node: "bg-data-warning ring-data-warning dark:ring-data-warning",
-        text: "text-data-warning dark:text-data-warning",
-        border: "bg-data-warning dark:bg-data-warning",
+        node: "bg-warning dark:bg-warning/80 ring-data-warning dark:ring-data-warning",
+        text: "text-warning dark:text-warning/90 dark:text-warning dark:text-warning/90",
+        border: "bg-warning dark:bg-warning/80 dark:bg-warning dark:bg-warning/80",
       };
     default:
       return {
-        node: "bg-bg-secondary ring-border-strong dark:ring-border-strong",
-        text: "text-text-secondary dark:text-text-secondary",
-        border: "bg-bg-secondary dark:bg-bg-secondary",
+        node: "bg-muted dark:bg-muted/80 ring-border dark:ring-border/50",
+        text: "text-foreground dark:text-foreground/90",
+        border: "bg-muted dark:bg-muted/80",
       };
   }
 }

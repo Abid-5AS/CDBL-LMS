@@ -14,7 +14,8 @@ export function useLeaveActions(onMutate?: () => Promise<any>) {
   const handleAction = async (
     leaveId: number,
     action: LeaveAction,
-    comment?: string
+    comment?: string,
+    ignoreWarnings: boolean = false
   ) => {
     setProcessingIds((prev) => new Set(prev).add(leaveId));
 
@@ -26,12 +27,18 @@ export function useLeaveActions(onMutate?: () => Promise<any>) {
         body: JSON.stringify({
           comment: comment || "",
           reason: comment || undefined,
+          ignoreWarnings,
         }),
       });
 
       const payload = await res.json().catch(() => ({}));
 
       if (!res.ok) {
+        // Handle capacity conflict warning
+        if (payload?.error?.code === "capacity_conflict") {
+          return { warning: payload.error };
+        }
+
         const errorMessage = getToastMessage(
           payload?.error || `Failed to ${action} request`,
           payload?.message
@@ -56,6 +63,8 @@ export function useLeaveActions(onMutate?: () => Promise<any>) {
       } else if (typeof window !== "undefined") {
         window.location.reload();
       }
+
+      return { success: true };
     } catch (err) {
       toast.error(getToastMessage("network_error", "Unable to update request"));
     } finally {

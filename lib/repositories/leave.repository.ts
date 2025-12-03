@@ -16,6 +16,7 @@ const DEFAULT_INCLUDES = {
       name: true,
       email: true,
       role: true,
+      department: true,
       joinDate: true,
       retirementDate: true,
     },

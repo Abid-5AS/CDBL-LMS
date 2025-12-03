@@ -1,0 +1,33 @@
+{
+    "labels": {
+        "startDate": "শুরুর তারিখ",
+        "endDate": "শেষ তারিখ",
+        "leaveType": "ছুটির ধরন",
+        "reason": "কারণ",
+        "attachments": "সংযুক্তি",
+        "comments": "মন্তব্য",
+        "status": "অবস্থা",
+        "duration": "সময়কাল",
+        "days": "দিন"
+    },
+    "placeholders": {
+        "selectDate": "তারিখ নির্বাচন করুন",
+        "selectLeaveType": "ছুটির ধরন নির্বাচন করুন",
+        "enterReason": "ছুটির কারণ লিখুন",
+        "addComments": "মন্তব্য যোগ করুন..."
+    },
+    "validation": {
+        "required": "এই তথ্যটি আবশ্যক",
+        "invalidDate": "ভুল তারিখ নির্বাচিত হয়েছে",
+        "endDateBeforeStartDate": "শেষ তারিখ শুরুর তারিখের আগে হতে পারে না",
+        "insufficientBalance": "পর্যাপ্ত ছুটির ব্যালেন্স নেই",
+        "fileTooLarge": "ফাইলের আকার সীমা অতিক্রম করেছে"
+    },
+    "buttons": {
+        "apply": "আবেদন করুন",
+        "cancel": "বাতিল",
+        "upload": "আপলোড",
+        "next": "পরবর্তী",
+        "back": "ফিরে যান"
+    }
+}

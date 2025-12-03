@@ -12,6 +12,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  Button,
 } from "@/components/ui";
 import { LeaveType } from "@/lib/enums";
 import type { BalanceProjectionResult } from "@/lib/services/balance-projector.service";
@@ -31,6 +32,11 @@ export function BalanceProjectionWidget({
   const [loading, setLoading] = useState(true);
   const [selectedType, setSelectedType] = useState<LeaveType>(leaveType);
 
+  const [showSimulator, setShowSimulator] = useState(false);
+  const [simulateStartDate, setSimulateStartDate] = useState<Date | undefined>();
+  const [simulateEndDate, setSimulateEndDate] = useState<Date | undefined>();
+  const [simulateWorkingDays, setSimulateWorkingDays] = useState<number>(1);
+
   useEffect(() => {
     const fetchProjection = async () => {
       setLoading(true);
@@ -39,6 +45,12 @@ export function BalanceProjectionWidget({
           leaveType: selectedType,
           monthsAhead: "12",
         });
+
+        if (showSimulator && simulateStartDate && simulateEndDate) {
+          params.append("simulateStartDate", simulateStartDate.toISOString());
+          params.append("simulateEndDate", simulateEndDate.toISOString());
+          params.append("simulateWorkingDays", simulateWorkingDays.toString());
+        }
 
         const response = await fetch(`/api/balance/projection?${params}`);
         if (response.ok) {
@@ -53,7 +65,7 @@ export function BalanceProjectionWidget({
     };
 
     fetchProjection();
-  }, [selectedType]);
+  }, [selectedType, showSimulator, simulateStartDate, simulateEndDate, simulateWorkingDays]);
 
   if (loading) {
     return (
@@ -89,9 +101,18 @@ export function BalanceProjectionWidget({
   };
 
   // Get projection months that show changes
-  const significantMonths = projection.monthlyProjections.filter(
-    (p) => p.accrued > 0 || p.warnings.length > 0
+  const significantMonths = projection.projections.filter(
+    (p) => p.accrued > 0 || p.used > 0 || p.planned > 0 || p.expiring > 0
   );
+
+  // Calculate peak and lowest balance from projections
+  const peakBalance = projection.projections.length > 0
+    ? Math.max(...projection.projections.map(p => p.projected), projection.currentBalance)
+    : projection.currentBalance;
+
+  const lowestBalance = projection.projections.length > 0
+    ? Math.min(...projection.projections.map(p => p.projected), projection.currentBalance)
+    : projection.currentBalance;
 
   return (
     <Card>
@@ -117,20 +138,65 @@ export function BalanceProjectionWidget({
               </TooltipContent>
             </Tooltip>
           </CardTitle>
-          <select
-            value={selectedType}
-            onChange={(e) => setSelectedType(e.target.value as LeaveType)}
-            className="text-xs border border-border rounded px-2 py-1 bg-background"
-          >
-            {Object.entries(leaveTypeLabels).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2">
+            <Button
+              variant={showSimulator ? "secondary" : "outline"}
+              size="sm"
+              onClick={() => setShowSimulator(!showSimulator)}
+              className="h-7 text-xs"
+            >
+              {showSimulator ? "Hide Simulator" : "What-if Simulator"}
+            </Button>
+            <select
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value as LeaveType)}
+              className="text-xs border border-border rounded px-2 py-1 bg-background"
+            >
+              {Object.entries(leaveTypeLabels).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Simulator Controls */}
+        {showSimulator && (
+          <div className="p-3 bg-muted/30 rounded-lg border border-border/50 space-y-3">
+            <p className="text-xs font-medium text-muted-foreground">Simulate a future leave:</p>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase text-muted-foreground">Start Date</label>
+                <input
+                  type="date"
+                  className="w-full text-xs p-1 border rounded bg-background"
+                  onChange={(e) => setSimulateStartDate(e.target.value ? new Date(e.target.value) : undefined)}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase text-muted-foreground">End Date</label>
+                <input
+                  type="date"
+                  className="w-full text-xs p-1 border rounded bg-background"
+                  onChange={(e) => setSimulateEndDate(e.target.value ? new Date(e.target.value) : undefined)}
+                />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] uppercase text-muted-foreground">Working Days</label>
+              <input
+                type="number"
+                min="1"
+                value={simulateWorkingDays}
+                onChange={(e) => setSimulateWorkingDays(parseInt(e.target.value) || 1)}
+                className="w-full text-xs p-1 border rounded bg-background"
+              />
+            </div>
+          </div>
+        )}
+
         {/* Current Status */}
         <div className="grid grid-cols-3 gap-3 text-center">
           <div className="space-y-1">
@@ -142,13 +208,13 @@ export function BalanceProjectionWidget({
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground">Peak (12mo)</p>
             <p className="text-lg font-semibold text-green-600">
-              {projection.peakBalance.toFixed(1)}
+              {peakBalance.toFixed(1)}
             </p>
           </div>
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground">Lowest (12mo)</p>
             <p className="text-lg font-semibold text-orange-600">
-              {projection.lowestBalance.toFixed(1)}
+              {lowestBalance.toFixed(1)}
             </p>
           </div>
         </div>
@@ -164,11 +230,11 @@ export function BalanceProjectionWidget({
                 <AlertTriangle className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
                 <div className="space-y-1 flex-1">
                   <p className="text-xs font-medium text-orange-900 dark:text-orange-100">
-                    {warning.type === "EXPIRY"
+                    {warning.type === "expiry"
                       ? "Balance Expiry"
-                      : warning.type === "LOW_BALANCE"
-                        ? "Low Balance"
-                        : "Deficit Warning"}
+                      : warning.type === "deficit"
+                        ? "Deficit Warning"
+                        : "Low Balance"}
                   </p>
                   <p className="text-xs text-orange-700 dark:text-orange-300">
                     {warning.message}

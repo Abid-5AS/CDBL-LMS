@@ -95,7 +95,8 @@
 :root {
   /* Light Mode - Zinc + Indigo Theme */
   --background: #ffffff;
-  --foreground: #09090b; /* Zinc 950 */
+  --foreground: #09090b;
+  /* Zinc 950 */
 
   --card: #ffffff;
   --card-foreground: #09090b;
@@ -103,33 +104,43 @@
   --popover: #ffffff;
   --popover-foreground: #09090b;
 
-  --primary: #4f46e5; /* Indigo 600 */
+  --primary: #4f46e5;
+  /* Indigo 600 */
   --primary-foreground: #ffffff;
 
-  --secondary: #f4f4f5; /* Zinc 100 */
-  --secondary-foreground: #18181b; /* Zinc 900 */
+  --secondary: #f4f4f5;
+  /* Zinc 100 */
+  --secondary-foreground: #18181b;
+  /* Zinc 900 */
 
   --muted: #f4f4f5;
-  --muted-foreground: #71717a; /* Zinc 500 */
+  --muted-foreground: #71717a;
+  /* Zinc 500 */
 
   --accent: #f4f4f5;
   --accent-foreground: #18181b;
 
-  --success: #10b981; /* Emerald 500 */
+  --success: #10b981;
+  /* Emerald 500 */
   --success-foreground: #ffffff;
-  --warning: #f59e0b; /* Amber 500 */
+  --warning: #f59e0b;
+  /* Amber 500 */
   --warning-foreground: #ffffff;
-  --danger: #ef4444; /* Rose 500 */
+  --danger: #ef4444;
+  /* Rose 500 */
   --danger-foreground: #ffffff;
-  --info: #3b82f6; /* Blue 500 */
+  --info: #3b82f6;
+  /* Blue 500 */
   --info-foreground: #ffffff;
 
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
 
-  --border: #e4e4e7; /* Zinc 200 */
+  --border: #e4e4e7;
+  /* Zinc 200 */
   --input: #e4e4e7;
-  --ring: #4f46e5; /* Indigo 600 */
+  --ring: #4f46e5;
+  /* Indigo 600 */
   --outline: #e4e4e7;
   --focus-ring: #4f46e5;
 
@@ -139,11 +150,16 @@
   --surface-2: #f8fafc;
   --surface-3: #f1f5f9;
 
-  --chart-1: 221 83% 53%; /* Indigo 600 */
-  --chart-2: 142 71% 45%; /* Emerald 500 */
-  --chart-3: 217 91% 60%; /* Blue 500 */
-  --chart-4: 45 93% 47%; /* Amber 500 */
-  --chart-5: 340 82% 52%; /* Rose 500 */
+  --chart-1: 221 83% 53%;
+  /* Indigo 600 */
+  --chart-2: 142 71% 45%;
+  /* Emerald 500 */
+  --chart-3: 217 91% 60%;
+  /* Blue 500 */
+  --chart-4: 45 93% 47%;
+  /* Amber 500 */
+  --chart-5: 340 82% 52%;
+  /* Rose 500 */
 
   --sidebar: #ffffff;
   --sidebar-foreground: #09090b;
@@ -157,42 +173,55 @@
 
 .dark {
   /* Dark Mode - Zinc + Indigo Theme */
-  --background: #09090b; /* Zinc 950 */
-  --foreground: #fafafa; /* Zinc 50 */
+  --background: #09090b;
+  /* Zinc 950 */
+  --foreground: #fafafa;
+  /* Zinc 50 */
 
-  --card: #18181b; /* Zinc 900 */
+  --card: #18181b;
+  /* Zinc 900 */
   --card-foreground: #fafafa;
 
   --popover: #18181b;
   --popover-foreground: #fafafa;
 
-  --primary: #6366f1; /* Indigo 500 */
+  --primary: #6366f1;
+  /* Indigo 500 */
   --primary-foreground: #ffffff;
 
-  --secondary: #27272a; /* Zinc 800 */
+  --secondary: #27272a;
+  /* Zinc 800 */
   --secondary-foreground: #fafafa;
 
   --muted: #27272a;
-  --muted-foreground: #a1a1aa; /* Zinc 400 */
+  --muted-foreground: #a1a1aa;
+  /* Zinc 400 */
 
   --accent: #27272a;
   --accent-foreground: #fafafa;
 
-  --success: #34d399; /* Emerald 400 */
+  --success: #34d399;
+  /* Emerald 400 */
   --success-foreground: #022c22;
-  --warning: #fbbf24; /* Amber 400 */
+  --warning: #fbbf24;
+  /* Amber 400 */
   --warning-foreground: #451a03;
-  --danger: #f87171; /* Rose 400 */
+  --danger: #f87171;
+  /* Rose 400 */
   --danger-foreground: #450a0a;
-  --info: #60a5fa; /* Blue 400 */
+  --info: #60a5fa;
+  /* Blue 400 */
   --info-foreground: #172554;
 
-  --destructive: #7f1d1d; /* Rose 900 */
+  --destructive: #7f1d1d;
+  /* Rose 900 */
   --destructive-foreground: #fafafa;
 
-  --border: #27272a; /* Zinc 800 */
+  --border: #27272a;
+  /* Zinc 800 */
   --input: #27272a;
-  --ring: #6366f1; /* Indigo 500 */
+  --ring: #6366f1;
+  /* Indigo 500 */
   --outline: #27272a;
   --focus-ring: #6366f1;
 
@@ -206,7 +235,8 @@
   --chart-4: 280 65% 60%;
   --chart-5: 340 75% 55%;
 
-  --sidebar: #09090b; /* Zinc 950 */
+  --sidebar: #09090b;
+  /* Zinc 950 */
   --sidebar-foreground: #fafafa;
   --sidebar-primary: #6366f1;
   --sidebar-primary-foreground: #ffffff;
@@ -220,9 +250,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   /* Accessible focus rings share a single token */
   :focus-visible {
     outline: 2px solid var(--focus-ring);
@@ -232,21 +264,27 @@
   .heading-xl {
     @apply text-3xl font-semibold leading-9 tracking-tight text-foreground;
   }
+
   .heading-lg {
     @apply text-2xl font-semibold leading-8 tracking-tight text-foreground;
   }
+
   .heading-md {
     @apply text-xl font-semibold leading-7 text-foreground;
   }
+
   .heading-sm {
     @apply text-lg font-semibold leading-6 text-foreground;
   }
+
   .body-lg {
     @apply text-base text-foreground leading-7;
   }
+
   .body-md {
     @apply text-sm text-foreground leading-6;
   }
+
   .body-muted {
     @apply text-sm text-muted-foreground leading-6;
   }
@@ -254,9 +292,11 @@
   .icon-sm {
     @apply h-4 w-4;
   }
+
   .icon-md {
     @apply h-5 w-5;
   }
+
   .icon-lg {
     @apply h-6 w-6;
   }
@@ -304,16 +344,12 @@
 
 .shell-bg__layer--grid {
   background-image:
-    linear-gradient(
-      90deg,
+    linear-gradient(90deg,
       transparent calc(var(--shell-grid-size) - 1px),
-      var(--shell-grid-color)
-    ),
-    linear-gradient(
-      0deg,
+      var(--shell-grid-color)),
+    linear-gradient(0deg,
       transparent calc(var(--shell-grid-size) - 1px),
-      var(--shell-grid-color)
-    );
+      var(--shell-grid-color));
   background-size: var(--shell-grid-size) var(--shell-grid-size);
   mix-blend-mode: soft-light;
   opacity: 0.25;
@@ -341,7 +377,7 @@
 }
 
 .page-shell {
-  width: min(1200px, 100%);
+  width: min(1800px, 100%);
   margin: 0 auto;
   padding: 0 clamp(1rem, 4vw, 1.75rem) 1.5rem;
   position: relative;
@@ -391,8 +427,15 @@
 
 /* Animations */
 @keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in-up {

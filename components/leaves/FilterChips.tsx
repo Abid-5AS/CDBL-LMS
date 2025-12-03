@@ -36,8 +36,8 @@ export function FilterChips({
               "focus:outline-none focus:ring-2 focus:ring-card-action focus:ring-offset-2",
               "hover:scale-105",
               isSelected
-                ? "bg-card-action text-text-inverted shadow-sm"
-                : "bg-bg-primary border border-border-strong text-text-secondary hover:border-border-strong"
+                ? "bg-card-action text-white dark:text-white shadow-sm"
+                : "bg-card dark:bg-card/90 border border-border dark:border-border/50 text-muted-foreground dark:text-muted-foreground/80 hover:border-border dark:border-border/50"
             )}
             aria-current={isSelected ? "page" : undefined}
           >

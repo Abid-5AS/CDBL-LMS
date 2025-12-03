@@ -1,0 +1,274 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e3]:
+    - navigation "Main navigation" [ref=e5]:
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - link "Go to dashboard" [ref=e10] [cursor=pointer]:
+            - /url: /dashboard
+            - img "Central Depository Bangladesh Limited" [ref=e12]
+          - navigation "Primary navigation" [ref=e14]:
+            - list [ref=e15]:
+              - listitem [ref=e16]:
+                - link "Home" [ref=e17] [cursor=pointer]:
+                  - /url: /dashboard/employee
+                  - img [ref=e18]
+                  - generic [ref=e21]: Home
+              - listitem [ref=e22]:
+                - link "My Leaves" [ref=e23] [cursor=pointer]:
+                  - /url: /leaves
+                  - img [ref=e24]
+                  - generic [ref=e27]: My Leaves
+              - listitem [ref=e28]:
+                - link "Balance" [ref=e29] [cursor=pointer]:
+                  - /url: /balance
+                  - img [ref=e30]
+                  - generic [ref=e33]: Balance
+              - listitem [ref=e34]:
+                - link "Holidays" [ref=e35] [cursor=pointer]:
+                  - /url: /holidays
+                  - img [ref=e36]
+                  - generic [ref=e38]: Holidays
+              - listitem [ref=e39]:
+                - link "Policies" [ref=e40] [cursor=pointer]:
+                  - /url: /policies
+                  - img [ref=e41]
+                  - generic [ref=e43]: Policies
+        - generic [ref=e44]:
+          - button "Search leaves and related information" [ref=e46]:
+            - generic [ref=e47]:
+              - img
+            - generic [ref=e48]:
+              - text: Search
+              - generic [ref=e49]:
+                - img
+                - text: K
+          - button "Apply for leave" [ref=e50]:
+            - generic [ref=e51]:
+              - img
+            - generic [ref=e52]: Apply
+          - generic [ref=e53]:
+            - button "Notifications" [ref=e54]:
+              - generic [ref=e55]:
+                - img
+            - button "Switch to dark mode" [ref=e57]:
+              - generic [ref=e58]:
+                - generic [ref=e59]: Switch to dark mode
+                - generic [ref=e60]:
+                  - img
+            - generic [ref=e62]:
+              - button "Employee One IT EO" [ref=e63]:
+                - generic [ref=e64]:
+                  - generic [ref=e65]: Employee One
+                  - generic [ref=e66]: IT
+                - generic [ref=e69]: EO
+              - img [ref=e71]
+    - main "Main content" [ref=e73]:
+      - main [ref=e75]:
+        - generic [ref=e78]:
+          - heading "Apply for Leave" [level=1] [ref=e80]: Apply for Leave
+          - generic [ref=e82]:
+            - form "Leave application form" [ref=e85]:
+              - generic [ref=e86]:
+                - generic [ref=e87]:
+                  - generic [ref=e88]:
+                    - paragraph [ref=e89]: Current
+                    - paragraph [ref=e90]:
+                      - text: "18"
+                      - generic [ref=e91]: days
+                  - generic [ref=e94]:
+                    - paragraph [ref=e95]: Requesting
+                    - paragraph [ref=e96]:
+                      - text: —
+                      - generic [ref=e97]: days
+                  - generic [ref=e98]:
+                    - paragraph [ref=e99]: After
+                    - paragraph [ref=e100]:
+                      - text: "18"
+                      - generic [ref=e101]: days
+                - generic [ref=e105]:
+                  - generic [ref=e106]:
+                    - generic [ref=e107]:
+                      - generic [ref=e108]:
+                        - text: Leave Type
+                        - generic [ref=e109]: "*"
+                      - button [ref=e110]:
+                        - img [ref=e111]
+                    - combobox "Leave type" [active] [ref=e114]:
+                      - generic: Earned Leave
+                      - img
+                    - combobox [ref=e115]
+                  - generic [ref=e116]:
+                    - generic [ref=e117]:
+                      - text: Leave Dates
+                      - generic [ref=e118]: "*"
+                    - generic [ref=e119]:
+                      - img [ref=e120]
+                      - paragraph [ref=e122]:
+                        - text: This leave type can be backdated up to
+                        - strong [ref=e123]: 30 days
+                        - text: from today.
+                    - button "Select leave date range" [ref=e126]:
+                      - generic [ref=e127]:
+                        - generic [ref=e128]:
+                          - img [ref=e129]
+                          - generic [ref=e132]: Select dates
+                        - img [ref=e133]
+                - separator [ref=e135]
+                - generic [ref=e136]:
+                  - generic [ref=e137]:
+                    - img [ref=e138]
+                    - text: Reason
+                    - generic [ref=e140]: "*"
+                  - generic [ref=e141]:
+                    - textbox "Reason for leave" [ref=e142]:
+                      - /placeholder: Describe your reason for leave (min 10 characters)
+                    - generic: 0/10
+                  - paragraph [ref=e144]: Minimum 10 meaningful characters. Give context so approvers can decide quickly.
+                - separator [ref=e145]
+                - button "Add supporting document (optional)" [ref=e147]:
+                  - img [ref=e148]
+                  - text: Add supporting document (optional)
+              - generic [ref=e150]:
+                - paragraph [ref=e151]: Auto-saves
+                - generic [ref=e152]:
+                  - button "Cancel" [ref=e153]:
+                    - generic [ref=e154]: Cancel
+                  - button "Save" [ref=e155]:
+                    - generic [ref=e156]:
+                      - img
+                      - text: Save
+                  - button "Submit" [ref=e157]:
+                    - generic [ref=e158]:
+                      - img
+                      - text: Submit
+            - complementary [ref=e159]:
+              - generic [ref=e160]:
+                - generic [ref=e161]:
+                  - heading "Leave Summary" [level=4] [ref=e162]:
+                    - img [ref=e163]
+                    - text: Leave Summary
+                  - generic [ref=e166]:
+                    - generic [ref=e167]:
+                      - generic [ref=e168]: "Type:"
+                      - generic [ref=e169]: Earned Leave
+                    - generic [ref=e170]:
+                      - generic [ref=e171]: "Duration:"
+                      - generic [ref=e172]: —
+                    - generic [ref=e173]:
+                      - generic [ref=e174]: "After Request:"
+                      - generic [ref=e175]: 18 days
+                  - paragraph [ref=e176]: Select leave type and dates to preview balance.
+                - separator [ref=e177]
+                - generic [ref=e178]:
+                  - generic [ref=e179]:
+                    - img [ref=e180]
+                    - paragraph [ref=e182]: Policy Info
+                  - paragraph [ref=e183]: Submit ≥ 5 working days before start. Accrues 2 days per month. Balance carries forward up to 60 days.
+                  - generic [ref=e184]:
+                    - link "Policies" [ref=e185] [cursor=pointer]:
+                      - /url: /policies
+                    - link "Help" [ref=e186] [cursor=pointer]:
+                      - /url: /help
+    - contentinfo [ref=e187]:
+      - generic [ref=e188]:
+        - generic [ref=e189]:
+          - generic [ref=e190]:
+            - heading "Resources" [level=3] [ref=e191]
+            - list [ref=e192]:
+              - listitem [ref=e193]:
+                - link "Leave Policies" [ref=e194] [cursor=pointer]:
+                  - /url: /policies
+              - listitem [ref=e195]:
+                - link "FAQ" [ref=e196] [cursor=pointer]:
+                  - /url: /faq
+              - listitem [ref=e197]:
+                - link "Leave Guidelines" [ref=e198] [cursor=pointer]:
+                  - /url: /guidelines
+              - listitem [ref=e199]:
+                - link "Holiday Calendar" [ref=e200] [cursor=pointer]:
+                  - /url: /holidays
+          - generic [ref=e201]:
+            - heading "Company" [level=3] [ref=e202]
+            - list [ref=e203]:
+              - listitem [ref=e204]:
+                - link "About CDBL" [ref=e205] [cursor=pointer]:
+                  - /url: https://cdbl.com.bd/about/
+                  - text: About CDBL
+                  - img [ref=e206]
+              - listitem [ref=e210]:
+                - link "Contact Us" [ref=e211] [cursor=pointer]:
+                  - /url: https://cdbl.com.bd/contact/
+                  - text: Contact Us
+                  - img [ref=e212]
+              - listitem [ref=e216]:
+                - link "Careers" [ref=e217] [cursor=pointer]:
+                  - /url: https://cdbl.com.bd/careers/
+                  - text: Careers
+                  - img [ref=e218]
+              - listitem [ref=e222]:
+                - link "News & Events" [ref=e223] [cursor=pointer]:
+                  - /url: https://cdbl.com.bd/news-events/
+                  - text: News & Events
+                  - img [ref=e224]
+          - generic [ref=e228]:
+            - heading "Support" [level=3] [ref=e229]
+            - list [ref=e230]:
+              - listitem [ref=e231]:
+                - link "Help Center" [ref=e232] [cursor=pointer]:
+                  - /url: /help
+              - listitem [ref=e233]:
+                - link "Send Feedback" [ref=e234] [cursor=pointer]:
+                  - /url: /feedback
+              - listitem [ref=e235]:
+                - link "Report an Issue" [ref=e236] [cursor=pointer]:
+                  - /url: /report-issue
+              - listitem [ref=e237]:
+                - link "Contact Support" [ref=e238] [cursor=pointer]:
+                  - /url: mailto:support@cdbl.com.bd
+                  - img [ref=e239]
+                  - text: Contact Support
+          - generic [ref=e242]:
+            - heading "Quick Links" [level=3] [ref=e243]
+            - list [ref=e244]:
+              - listitem [ref=e245]:
+                - link "Main Website" [ref=e246] [cursor=pointer]:
+                  - /url: https://cdbl.com.bd
+                  - text: Main Website
+                  - img [ref=e247]
+              - listitem [ref=e251]:
+                - link "E-Services" [ref=e252] [cursor=pointer]:
+                  - /url: https://cdbl.com.bd/e-services/
+                  - text: E-Services
+                  - img [ref=e253]
+              - listitem [ref=e257]:
+                - link "HR Department" [ref=e258] [cursor=pointer]:
+                  - /url: mailto:hr@cdbl.com.bd
+                  - img [ref=e259]
+                  - text: HR Department
+              - listitem [ref=e262]:
+                - link "IT Support" [ref=e263] [cursor=pointer]:
+                  - /url: mailto:itsupport@cdbl.com.bd
+                  - img [ref=e264]
+                  - text: IT Support
+        - generic [ref=e268]:
+          - paragraph [ref=e269]: © 2025 Central Depository Bangladesh Limited. All rights reserved. | Leave Management System | Developed and Maintained by CDBL VAS
+          - generic [ref=e270]:
+            - link "Privacy Policy" [ref=e271] [cursor=pointer]:
+              - /url: /privacy
+            - generic [ref=e272]: •
+            - link "Terms of Use" [ref=e273] [cursor=pointer]:
+              - /url: /terms
+            - generic [ref=e274]: •
+            - link "Feedback" [ref=e275] [cursor=pointer]:
+              - /url: mailto:feedback@cdbl.com.bd
+  - region "Notifications"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e281] [cursor=pointer]:
+    - img [ref=e282]
+  - alert [ref=e285]
+```

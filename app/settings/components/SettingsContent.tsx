@@ -44,11 +44,11 @@ export function SettingsContent({ user }: SettingsContentProps) {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-full bg-data-info dark:bg-data-info flex items-center justify-center">
-              <User className="h-6 w-6 text-data-info dark:text-data-info" />
+            <div className="h-12 w-12 rounded-full bg-info dark:bg-info/80 flex items-center justify-center">
+              <User className="h-6 w-6 text-white dark:text-white" />
             </div>
             <div>
-              <p className="font-medium text-text-secondary dark:text-text-secondary">{user.name || "User"}</p>
+              <p className="font-medium text-foreground dark:text-foreground/90">{user.name || "User"}</p>
               <p className="text-sm text-muted-foreground">{user.email}</p>
             </div>
           </div>
@@ -123,7 +123,7 @@ export function SettingsContent({ user }: SettingsContentProps) {
                 </SelectContent>
               </Select>
             ) : (
-              <div className="h-9 w-[180px] bg-bg-secondary dark:bg-bg-secondary rounded animate-pulse" />
+              <div className="h-9 w-[180px] bg-muted dark:bg-muted/80 rounded animate-pulse" />
             )}
           </div>
         </CardContent>

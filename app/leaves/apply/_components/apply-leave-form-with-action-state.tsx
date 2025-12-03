@@ -136,8 +136,8 @@ export function ApplyLeaveFormWithActionState() {
         remainingBalance < 0
           ? "text-destructive"
           : remainingBalance < 2
-          ? "text-data-warning"
-          : "text-data-success",
+          ? "text-warning dark:text-warning/90"
+          : "text-success dark:text-success/90",
     },
   ];
 
@@ -222,7 +222,7 @@ export function ApplyLeaveFormWithActionState() {
                   {lastSavedTime && (
                     <Badge
                       variant="secondary"
-                      className="bg-data-success/15 text-data-success border border-data-success/40 dark:bg-data-success/20 dark:text-data-success"
+                      className="bg-success dark:bg-success/80/15 text-success dark:text-success/90 border border-success/40 dark:bg-success dark:bg-success/80/20 dark:text-success dark:text-success/90"
                     >
                       <CheckCircle2 className="w-3 h-3 mr-1" />
                       Saved just now

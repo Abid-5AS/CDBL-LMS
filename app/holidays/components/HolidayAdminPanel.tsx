@@ -127,7 +127,7 @@ export function HolidayAdminPanel({ onCreated }: HolidayAdminPanelProps) {
           </div>
         </form>
         {error && (
-          <p className="mt-2 text-sm text-data-error" role="alert">
+          <p className="mt-2 text-sm text-danger dark:text-danger/90" role="alert">
             {error}
           </p>
         )}

@@ -28,8 +28,8 @@ function AdminHolidaysSkeleton() {
   return (
     <div className="w-full">
       <div className="space-y-4">
-        <div className="h-10 w-48 bg-bg-secondary rounded animate-pulse" />
-        <div className="h-64 w-full bg-bg-secondary rounded animate-pulse" />
+        <div className="h-10 w-48 bg-muted dark:bg-muted/80 rounded animate-pulse" />
+        <div className="h-64 w-full bg-muted dark:bg-muted/80 rounded animate-pulse" />
       </div>
     </div>
   );

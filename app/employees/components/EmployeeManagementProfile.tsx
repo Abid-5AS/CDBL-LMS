@@ -69,13 +69,13 @@ const getRoleBadgeVariant = (role: AppRole) => {
     case "CEO":
       return "bg-card-summary/10 text-card-summary border-card-summary/20";
     case "HR_HEAD":
-      return "bg-data-info/10 text-data-info border-data-info/20";
+      return "bg-info dark:bg-info/80/10 text-info dark:text-info/90 border-info/20";
     case "HR_ADMIN":
-      return "bg-data-info/10 text-data-info border-data-info/20";
+      return "bg-info dark:bg-info/80/10 text-info dark:text-info/90 border-info/20";
     case "DEPT_HEAD":
-      return "bg-data-success/10 text-data-success border-data-success/20";
+      return "bg-success dark:bg-success/80/10 text-success dark:text-success/90 border-success/20";
     case "EMPLOYEE":
-      return "bg-bg-secondary text-text-secondary border-border-strong";
+      return "bg-muted dark:bg-muted/80 text-muted-foreground dark:text-muted-foreground/80 border-border dark:border-border/50";
   }
 };
 

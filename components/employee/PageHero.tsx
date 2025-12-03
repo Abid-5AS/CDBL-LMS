@@ -24,8 +24,8 @@ const stateClasses: Record<
   string
 > = {
   default: "text-foreground",
-  success: "text-data-success",
-  warning: "text-data-warning",
+  success: "text-success dark:text-success/90",
+  warning: "text-warning dark:text-warning/90",
   danger: "text-destructive",
 };
 
