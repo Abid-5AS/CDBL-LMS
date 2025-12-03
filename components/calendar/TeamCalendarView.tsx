@@ -134,7 +134,7 @@ export function TeamCalendarView({ currentUserRole }: TeamCalendarViewProps) {
   const pendingCount = events.filter(e => e.status === "PENDING").length;
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6">
+    <div className="w-full mx-auto space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h2 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
           <Users className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />

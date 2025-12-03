@@ -54,7 +54,7 @@ const roleConfigs = {
     accentSoft: "var(--role-employee-accent-soft, #eef2ff)",
     gradient:
       "from-indigo-50 via-blue-50/30 to-purple-50/50 dark:from-slate-900 dark:via-indigo-900/20 dark:to-slate-900",
-    maxWidth: "max-w-7xl",
+    maxWidth: "",
     padding: "px-4 sm:px-6 lg:px-8",
   },
   MANAGER: {
@@ -62,7 +62,7 @@ const roleConfigs = {
     accentSoft: "var(--role-manager-accent-soft, #ecfdf5)",
     gradient:
       "from-emerald-50 via-green-50/30 to-teal-50/50 dark:from-slate-900 dark:via-emerald-900/20 dark:to-slate-900",
-    maxWidth: "max-w-7xl",
+    maxWidth: "",
     padding: "px-4 sm:px-6 lg:px-8",
   },
   DEPT_HEAD: {
@@ -70,7 +70,7 @@ const roleConfigs = {
     accentSoft: "var(--role-dept-head-accent-soft, #fef2f2)",
     gradient:
       "from-red-50 via-orange-50/30 to-pink-50/50 dark:from-slate-900 dark:via-red-900/20 dark:to-slate-900",
-    maxWidth: "max-w-[1600px]", // Wider for data tables
+    maxWidth: "",
     padding: "px-3 sm:px-4 lg:px-6",
   },
   HR_ADMIN: {
@@ -78,7 +78,7 @@ const roleConfigs = {
     accentSoft: "var(--role-hr-admin-accent-soft, #f3f4f6)",
     gradient:
       "from-violet-50 via-purple-50/30 to-indigo-50/50 dark:from-slate-900 dark:via-violet-900/20 dark:to-slate-900",
-    maxWidth: "max-w-[1600px]", // Wider for HR data
+    maxWidth: "",
     padding: "px-3 sm:px-4 lg:px-6",
   },
   HR_HEAD: {
@@ -86,7 +86,7 @@ const roleConfigs = {
     accentSoft: "var(--role-hr-head-accent-soft, #fff7ed)",
     gradient:
       "from-orange-50 via-amber-50/30 to-yellow-50/50 dark:from-slate-900 dark:via-orange-900/20 dark:to-slate-900",
-    maxWidth: "max-w-[1600px]", // Wider for executive view
+    maxWidth: "",
     padding: "px-3 sm:px-4 lg:px-6",
   },
   CEO: {
@@ -94,7 +94,7 @@ const roleConfigs = {
     accentSoft: "var(--role-ceo-accent-soft, #f9fafb)",
     gradient:
       "from-slate-50 via-gray-50/30 to-zinc-50/50 dark:from-slate-900 dark:via-gray-900/20 dark:to-slate-900",
-    maxWidth: "max-w-[1800px]", // Widest for executive dashboard
+    maxWidth: "",
     padding: "px-3 sm:px-4 lg:px-6",
   },
   SYSTEM_ADMIN: {
@@ -102,7 +102,7 @@ const roleConfigs = {
     accentSoft: "var(--role-system-admin-accent-soft, #ecfeff)",
     gradient:
       "from-cyan-50 via-blue-50/30 to-indigo-50/50 dark:from-slate-900 dark:via-cyan-900/20 dark:to-slate-900",
-    maxWidth: "max-w-[1600px]", // Wide for system data
+    maxWidth: "",
     padding: "px-3 sm:px-4 lg:px-6",
   },
 };

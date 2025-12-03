@@ -83,9 +83,6 @@ importers:
       '@react-pdf/renderer':
         specifier: ^4.3.1
         version: 4.3.1(react@19.2.0)
-      auth-jwt:
-        specifier: link:@/lib/auth-jwt
-        version: link:@/lib/auth-jwt
       bcryptjs:
         specifier: ^3.0.2
         version: 3.0.3
