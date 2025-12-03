@@ -380,6 +380,10 @@ export class LeaveService {
       // Send cancellation notification to approvers
       await NotificationService.notifyLeaveCancelled(leaveId);
 
+      // Remove from Calendar
+      const { CalendarService } = await import("@/lib/integrations/calendar/calendar-service");
+      await CalendarService.deleteLeaveEvent(leaveId, userId);
+
       return {
         success: true,
         data: { cancelled: true },

@@ -171,6 +171,10 @@ export class ApprovalService {
         if (approver) {
           await NotificationService.notifyLeaveApproved(leaveId, approver.name);
         }
+
+        // 7. Sync to Calendar
+        const { CalendarService } = await import("@/lib/integrations/calendar/calendar-service");
+        await CalendarService.syncLeaveEvent(leaveId, leave.requesterId);
       }
 
       return {

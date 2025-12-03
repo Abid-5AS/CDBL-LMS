@@ -51,40 +51,44 @@ model User {
   // Scheduled Reports Relations
   scheduledReports ScheduledReport[] @relation("ReportCreator")
 
+  // Calendar Integration Relations
+  calendarConfigs CalendarConfig[]
+
   @@index([deptHeadId])
 }
 
 model LeaveRequest {
-  id                    Int            @id @default(autoincrement())
+  id                    Int                    @id @default(autoincrement())
   requesterId           Int
   type                  LeaveType
   startDate             DateTime
   endDate               DateTime
   workingDays           Int
   reason                String
-  needsCertificate      Boolean        @default(false)
+  needsCertificate      Boolean                @default(false)
   certificateUrl        String?
-  status                LeaveStatus    @default(DRAFT)
+  status                LeaveStatus            @default(DRAFT)
   policyVersion         String
-  createdAt             DateTime       @default(now())
-  updatedAt             DateTime       @updatedAt
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
   fitnessCertificateUrl String?
-  isModified            Boolean        @default(false)
+  isModified            Boolean                @default(false)
   incidentDate          DateTime?
-  isExtension           Boolean        @default(false)
+  isExtension           Boolean                @default(false)
   parentLeaveId         Int?
   payCalculation        Json?
   studyLeaveDocuments   Json?
   cancellationReason    String?
-  isCancellationRequest Boolean        @default(false)
-  isPartialCancellation Boolean        @default(false)
+  isCancellationRequest Boolean                @default(false)
+  isPartialCancellation Boolean                @default(false)
   originalEndDate       DateTime?
   approvals             Approval[]
   comments              LeaveComment[]
-  parentLeave           LeaveRequest?  @relation("LeaveExtension", fields: [parentLeaveId], references: [id])
-  extensions            LeaveRequest[] @relation("LeaveExtension")
-  requester             User           @relation(fields: [requesterId], references: [id])
+  parentLeave           LeaveRequest?          @relation("LeaveExtension", fields: [parentLeaveId], references: [id])
+  extensions            LeaveRequest[]         @relation("LeaveExtension")
+  requester             User                   @relation(fields: [requesterId], references: [id])
   versions              LeaveVersion[]
+  calendarMappings      LeaveCalendarMapping[]
 
   @@index([requesterId, status])
   @@index([parentLeaveId])
@@ -364,6 +368,11 @@ enum ExecutionStatus {
   CANCELLED
 }
 
+enum CalendarProvider {
+  GOOGLE
+  OUTLOOK
+}
+
 // Balance Adjustment Model
 // For manual balance corrections by SYSTEM_ADMIN
 model BalanceAdjustment {
@@ -596,4 +605,49 @@ model ReportExecution {
 
   @@index([reportId, status])
   @@index([startedAt])
+}
+
+// Calendar Integration - User's calendar configurations
+model CalendarConfig {
+  id                Int              @id @default(autoincrement())
+  userId            Int
+  provider          CalendarProvider
+  providerAccountId String // External account ID (email, etc.)
+  accessToken       String           @db.Text // Encrypted access token
+  refreshToken      String           @db.Text // Encrypted refresh token
+  tokenExpiry       DateTime
+  calendarId        String? // Specific calendar ID to sync to
+  isActive          Boolean          @default(true)
+  lastSyncAt        DateTime?
+  syncErrors        Json? // Array of error messages
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  user     User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mappings LeaveCalendarMapping[]
+
+  @@unique([userId, provider])
+  @@index([userId, isActive])
+  @@index([provider])
+}
+
+// Calendar Integration - Leave to Calendar event mapping
+model LeaveCalendarMapping {
+  id               Int      @id @default(autoincrement())
+  leaveId          Int
+  calendarConfigId Int
+  externalEventId  String // Event ID in external calendar
+  lastSyncedAt     DateTime @default(now())
+  syncStatus       String   @default("synced") // "synced", "pending", "failed", "deleted"
+  errorMessage     String?  @db.Text
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  leave          LeaveRequest   @relation(fields: [leaveId], references: [id], onDelete: Cascade)
+  calendarConfig CalendarConfig @relation(fields: [calendarConfigId], references: [id], onDelete: Cascade)
+
+  @@unique([leaveId, calendarConfigId])
+  @@index([leaveId])
+  @@index([calendarConfigId])
+  @@index([syncStatus])
 }
