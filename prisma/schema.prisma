@@ -54,6 +54,9 @@ model User {
   // Calendar Integration Relations
   calendarConfigs CalendarConfig[]
 
+  // Webhook Relations
+  webhooks Webhook[]
+
   @@index([deptHeadId])
 }
 
@@ -650,4 +653,77 @@ model LeaveCalendarMapping {
   @@index([leaveId])
   @@index([calendarConfigId])
   @@index([syncStatus])
+}
+
+// Webhook System for External Integrations
+model Webhook {
+  id          Int      @id @default(autoincrement())
+  name        String
+  url         String   @db.Text
+  events      Json     // Array of event types: ["leave.submitted", "leave.approved", etc.]
+  secret      String   @db.Text // HMAC secret for signature verification
+  enabled     Boolean  @default(true)
+
+  // Metadata
+  description String?  @db.Text
+  headers     Json?    // Custom headers to include in webhook requests
+
+  // Status tracking
+  lastTriggeredAt DateTime?
+  failureCount    Int      @default(0)
+  lastFailureAt   DateTime?
+
+  // Audit
+  createdBy   Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  creator     User              @relation(fields: [createdBy], references: [id])
+  deliveries  WebhookDelivery[]
+
+  @@index([enabled])
+  @@index([createdBy])
+  @@index([lastTriggeredAt])
+}
+
+model WebhookDelivery {
+  id          Int      @id @default(autoincrement())
+  webhookId   Int
+  event       String   // Event type that triggered this delivery
+  payload     Json     // Event payload
+
+  // Request details
+  requestUrl      String   @db.Text
+  requestHeaders  Json?
+  requestBody     Json
+
+  // Response details
+  responseStatus  Int?
+  responseHeaders Json?
+  responseBody    String?  @db.Text
+
+  // Delivery status
+  status      String   // "pending", "success", "failed", "retrying"
+  attempts    Int      @default(0)
+  maxAttempts Int      @default(3)
+
+  // Error tracking
+  errorMessage String?  @db.Text
+  errorCode    String?
+
+  // Timing
+  deliveredAt DateTime?
+  nextRetryAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  webhook     Webhook  @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@index([webhookId])
+  @@index([event])
+  @@index([status])
+  @@index([createdAt])
+  @@index([nextRetryAt])
 }

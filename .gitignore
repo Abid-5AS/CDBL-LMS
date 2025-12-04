@@ -94,3 +94,6 @@ $RECYCLE.BIN/
 .cursor/
 .serena/
 .todo/
+
+*storybook.log
+storybook-static

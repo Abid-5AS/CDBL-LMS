@@ -7,6 +7,7 @@ import { LeaveStatus } from "@prisma/client";
 import { z } from "zod";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
+import { notifyLeaveRejected } from "@/lib/webhooks/events";
 
 export const cache = "no-store";
 
@@ -153,6 +154,21 @@ export async function POST(
         step,
       },
     },
+  });
+
+  // Trigger webhook notification
+  await notifyLeaveRejected({
+    leaveId: leave.id,
+    employeeId: leave.requesterId,
+    employeeName: leave.requester.email.split('@')[0], // Fallback if name not in select
+    leaveType: leave.type,
+    startDate: leave.startDate,
+    endDate: leave.endDate,
+    rejectedBy: user.id,
+    rejectorName: user.name,
+    rejectorRole: userRole,
+    rejectedAt: new Date(),
+    reason: parsed.data.comment || "Leave request rejected",
   });
 
   return NextResponse.json({

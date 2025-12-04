@@ -18,6 +18,7 @@ import { calculateCLConversion, formatCLConversionBreakdown } from "@/lib/leaves
 import { fetchHolidaysInRange } from "@/lib/leaves/leave-validation";
 import { countWorkingDays } from "@/lib/leaves/working-days";
 import { deductBalance, deductMultipleBalances } from "@/lib/leaves/balance-manager";
+import { notifyLeaveApproved, notifyLeaveCancelled } from "@/lib/webhooks/events";
 
 export const cache = "no-store";
 
@@ -496,6 +497,40 @@ export async function POST(
       },
     },
   });
+
+  // Trigger webhook notification
+  if (isCancellationRequest) {
+    // Cancellation approved = Leave is now CANCELLED
+    await notifyLeaveCancelled({
+      leaveId: leave.id,
+      employeeId: leave.requesterId,
+      employeeName: leave.requester.email.split('@')[0],
+      employeeEmail: leave.requester.email,
+      leaveType: leave.type,
+      startDate: leave.startDate,
+      endDate: leave.endDate,
+      workingDays: leave.workingDays,
+      cancelledBy: user.id,
+      cancellerName: user.name,
+      cancelledAt: new Date(),
+    });
+  } else {
+    // Regular leave approval
+    await notifyLeaveApproved({
+      leaveId: leave.id,
+      employeeId: leave.requesterId,
+      employeeName: leave.requester.email.split('@')[0],
+      employeeEmail: leave.requester.email,
+      leaveType: leave.type,
+      startDate: leave.startDate,
+      endDate: leave.endDate,
+      workingDays: leave.workingDays,
+      approvedBy: user.id,
+      approverName: user.name,
+      approverRole: userRole,
+      approvedAt: new Date(),
+    });
+  }
 
   return NextResponse.json({
     ok: true,

@@ -8,6 +8,7 @@ import { LeaveRepository } from "@/lib/repositories/leave.repository";
 import { LeaveValidator } from "./leave-validator";
 import { NotificationService } from "./notification.service";
 import { prisma } from "@/lib/prisma";
+import { notifyLeaveSubmitted } from "@/lib/webhooks/events";
 import { daysInclusive } from "@/lib/policy";
 import { getStepForRole } from "@/lib/workflow";
 import { promises as fs } from "fs";
@@ -184,6 +185,20 @@ export class LeaveService {
 
       // 10. Send notifications to approvers and requester
       await NotificationService.notifyLeaveSubmitted(leaveRequest.id, userId);
+
+      // 11. Trigger webhook notification
+      await notifyLeaveSubmitted({
+        leaveId: leaveRequest.id,
+        employeeId: userId,
+        employeeName: user.email.split('@')[0], // Will be improved when we add name to user select
+        employeeEmail: user.email,
+        leaveType: dto.type,
+        startDate: dto.startDate,
+        endDate: dto.endDate,
+        workingDays: workingDays,
+        reason: dto.reason,
+        status: 'SUBMITTED',
+      });
 
       return {
         success: true,

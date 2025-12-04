@@ -12,6 +12,7 @@ import {
   Wallet,
   PieChart,
   HelpCircle,
+  Webhook,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { Role } from "@prisma/client";
@@ -59,6 +60,7 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
     { icon: Users, label: "Employees", href: "/employees" },
     { icon: ChartBar, label: "Reports", href: "/reports" },
     { icon: Calendar, label: "Holidays", href: "/holidays" },
+    { icon: Webhook, label: "Webhooks", href: "/webhooks" },
     { icon: Activity, label: "Audit", href: "/admin/audit" },
     { icon: HelpCircle, label: "FAQ", href: "/faq" },
   ],
@@ -81,6 +83,7 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
     { icon: Shield, label: "Admin", href: "/admin" },
     { icon: Users, label: "Employees", href: "/employees" },
     { icon: Calendar, label: "Holidays", href: "/holidays" },
+    { icon: Webhook, label: "Webhooks", href: "/webhooks" },
     { icon: Activity, label: "Audit", href: "/admin/audit" },
     { icon: HelpCircle, label: "FAQ", href: "/faq" },
   ],

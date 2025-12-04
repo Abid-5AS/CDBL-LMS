@@ -87,7 +87,11 @@ export function useNavbarState(): NavbarState {
       if (href === "/leaves") {
         return pathname === "/leaves" || pathname.startsWith("/leaves/");
       }
-      
+
+      if (href === "/webhooks") {
+        return pathname === "/webhooks" || pathname.startsWith("/webhooks/");
+      }
+
       return pathname === href || pathname.startsWith(`${href}/`);
     },
     [pathname],

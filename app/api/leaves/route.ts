@@ -31,6 +31,69 @@ const ApplySchema = z.object({
   incidentDate: z.string().optional(), // For Special Disability Leave - when the disabling incident occurred
 });
 
+/**
+ * @swagger
+ * /api/leaves:
+ *   get:
+ *     summary: List leave requests
+ *     description: Retrieve a list of leave requests. Can be filtered by status and limited to current user's leaves.
+ *     tags:
+ *       - Leaves
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: status
+ *         in: query
+ *         description: Filter by leave status
+ *         required: false
+ *         schema:
+ *           $ref: '#/components/schemas/LeaveStatus'
+ *       - name: mine
+ *         in: query
+ *         description: Set to '1' to only return current user's leave requests
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: ['0', '1']
+ *           example: '1'
+ *       - name: limit
+ *         in: query
+ *         description: Maximum number of results to return (max 100)
+ *         required: false
+ *         schema:
+ *           type: number
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 50
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved leave requests
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/LeaveRequest'
+ *             example:
+ *               items:
+ *                 - id: 1
+ *                   requesterId: 42
+ *                   type: EARNED
+ *                   startDate: '2025-12-10'
+ *                   endDate: '2025-12-15'
+ *                   workingDays: 4
+ *                   reason: 'Family emergency'
+ *                   status: PENDING
+ *                   createdAt: '2025-12-01T10:00:00Z'
+ *                   updatedAt: '2025-12-01T10:00:00Z'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       500:
+ *         description: Internal server error
+ */
 export async function GET(req: Request) {
   console.log("[GET /api/leaves] Request received");
   let traceId = "unknown";
@@ -96,6 +159,123 @@ export async function GET(req: Request) {
   }
 }
 
+/**
+ * @swagger
+ * /api/leaves:
+ *   post:
+ *     summary: Create a new leave request
+ *     description: Submit a new leave request. Supports both JSON and multipart/form-data for file upload.
+ *     tags:
+ *       - Leaves
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - type
+ *               - startDate
+ *               - endDate
+ *               - reason
+ *             properties:
+ *               type:
+ *                 type: string
+ *                 enum: [EARNED, CASUAL, MEDICAL, EXTRAWITHPAY, EXTRAWITHOUTPAY, MATERNITY, PATERNITY, STUDY, SPECIAL_DISABILITY, QUARANTINE, SPECIAL]
+ *                 description: Type of leave being requested
+ *                 example: EARNED
+ *               startDate:
+ *                 type: string
+ *                 format: date
+ *                 description: Leave start date (ISO 8601 format)
+ *                 example: '2025-12-10'
+ *               endDate:
+ *                 type: string
+ *                 format: date
+ *                 description: Leave end date (ISO 8601 format)
+ *                 example: '2025-12-15'
+ *               reason:
+ *                 type: string
+ *                 minLength: 3
+ *                 description: Reason for leave request
+ *                 example: 'Family emergency'
+ *               workingDays:
+ *                 type: number
+ *                 minimum: 1
+ *                 description: Number of working days (optional, calculated if not provided)
+ *                 example: 4
+ *               needsCertificate:
+ *                 type: boolean
+ *                 description: Whether medical certificate is required
+ *                 example: false
+ *               incidentDate:
+ *                 type: string
+ *                 format: date
+ *                 description: For Special Disability Leave - when the disabling incident occurred
+ *                 example: '2025-12-01'
+ *           example:
+ *             type: EARNED
+ *             startDate: '2025-12-10'
+ *             endDate: '2025-12-15'
+ *             reason: 'Family emergency'
+ *             workingDays: 4
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - type
+ *               - startDate
+ *               - endDate
+ *               - reason
+ *             properties:
+ *               type:
+ *                 type: string
+ *               startDate:
+ *                 type: string
+ *               endDate:
+ *                 type: string
+ *               reason:
+ *                 type: string
+ *               workingDays:
+ *                 type: number
+ *               needsCertificate:
+ *                 type: boolean
+ *               incidentDate:
+ *                 type: string
+ *               certificate:
+ *                 type: string
+ *                 format: binary
+ *                 description: Medical certificate file (PDF, JPG, PNG)
+ *     responses:
+ *       200:
+ *         description: Leave request created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:
+ *                   type: boolean
+ *                   example: true
+ *                 id:
+ *                   type: number
+ *                   description: ID of the created leave request
+ *                   example: 123
+ *                 warnings:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   description: Any warnings about the leave request
+ *                   example: []
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       500:
+ *         description: Internal server error
+ */
 export async function POST(req: Request) {
   const traceId = getTraceId(req as any);
   const me = await getCurrentUser();
