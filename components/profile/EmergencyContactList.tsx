@@ -1,20 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useState, useActionState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 import {
     Dialog,
     DialogContent,
@@ -22,84 +11,84 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-
-const contactSchema = z.object({
-    id: z.number().optional(),
-    name: z.string().min(1, "Name is required"),
-    relation: z.string().min(1, "Relation is required"),
-    phone: z.string().min(1, "Phone number is required"),
-    address: z.string().optional(),
-});
+import { addEmergencyContact, updateEmergencyContact, deleteEmergencyContact } from "@/app/actions/profile-actions";
 
 export function EmergencyContactList({ contacts, onUpdate }: any) {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingContact, setEditingContact] = useState<any>(null);
-    const [isSaving, setIsSaving] = useState(false);
+    const formRef = useRef<HTMLFormElement>(null);
 
-    const form = useForm<z.infer<typeof contactSchema>>({
-        resolver: zodResolver(contactSchema),
-        defaultValues: {
-            name: "",
-            relation: "",
-            phone: "",
-            address: "",
+    const [state, formAction, isPending] = useActionState(
+        async (prevState: any, formData: FormData) => {
+            const name = formData.get("name") as string;
+            const relationship = formData.get("relationship") as string;
+            const phone = formData.get("phone") as string;
+            const alternatePhone = formData.get("alternatePhone") as string;
+
+            // Client-side validation
+            if (!name || name.length < 1) {
+                return { success: false, error: "Name is required" };
+            }
+            if (!relationship || relationship.length < 1) {
+                return { success: false, error: "Relationship is required" };
+            }
+            if (!phone || phone.length < 1) {
+                return { success: false, error: "Phone number is required" };
+            }
+
+            // Update or add contact
+            const result = editingContact
+                ? await updateEmergencyContact(editingContact.id, formData)
+                : await addEmergencyContact(formData);
+
+            if (result.success) {
+                onUpdate?.();
+            }
+
+            return result;
         },
-    });
+        { success: false, error: null }
+    );
+
+    useEffect(() => {
+        if (state.success) {
+            toast.success(editingContact ? "Contact updated" : "Contact added");
+            setIsDialogOpen(false);
+            setEditingContact(null);
+            formRef.current?.reset();
+        } else if (state.error) {
+            toast.error(state.error);
+        }
+    }, [state, editingContact]);
 
     const handleEdit = (contact: any) => {
         setEditingContact(contact);
-        form.reset({
-            id: contact.id,
-            name: contact.name,
-            relation: contact.relation,
-            phone: contact.phone,
-            address: contact.address || "",
-        });
         setIsDialogOpen(true);
     };
 
     const handleAdd = () => {
         setEditingContact(null);
-        form.reset({
-            name: "",
-            relation: "",
-            phone: "",
-            address: "",
-        });
-        setIsDialogOpen(true);
+        setIsDialogOpen(false);
+        // Small delay to ensure state is cleared
+        setTimeout(() => setIsDialogOpen(true), 0);
     };
 
-    async function onSubmit(values: z.infer<typeof contactSchema>) {
-        setIsSaving(true);
-        try {
-            const response = await fetch("/api/user/profile", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    section: "emergency",
-                    data: values,
-                }),
-            });
+    const handleDelete = async (contactId: number) => {
+        if (!confirm("Are you sure you want to delete this contact?")) return;
 
-            if (response.ok) {
-                toast.success(editingContact ? "Contact updated" : "Contact added");
-                setIsDialogOpen(false);
-                onUpdate();
-            } else {
-                toast.error("Failed to save contact");
-            }
-        } catch (error) {
-            toast.error("Error saving contact");
-        } finally {
-            setIsSaving(false);
+        const result = await deleteEmergencyContact(contactId);
+        if (result.success) {
+            toast.success("Contact deleted");
+            onUpdate?.();
+        } else {
+            toast.error(result.error || "Failed to delete contact");
         }
-    }
+    };
 
     return (
         <Card>
@@ -125,9 +114,9 @@ export function EmergencyContactList({ contacts, onUpdate }: any) {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Name</TableHead>
-                                <TableHead>Relation</TableHead>
+                                <TableHead>Relationship</TableHead>
                                 <TableHead>Phone</TableHead>
-                                <TableHead>Address</TableHead>
+                                <TableHead>Alternate Phone</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -135,19 +124,28 @@ export function EmergencyContactList({ contacts, onUpdate }: any) {
                             {contacts.map((contact: any) => (
                                 <TableRow key={contact.id}>
                                     <TableCell className="font-medium">{contact.name}</TableCell>
-                                    <TableCell>{contact.relation}</TableCell>
+                                    <TableCell>{contact.relationship}</TableCell>
                                     <TableCell>{contact.phone}</TableCell>
-                                    <TableCell className="max-w-[200px] truncate">
-                                        {contact.address}
+                                    <TableCell className="text-muted-foreground">
+                                        {contact.alternatePhone || "—"}
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => handleEdit(contact)}
-                                        >
-                                            <Pencil className="h-4 w-4" />
-                                        </Button>
+                                        <div className="flex justify-end gap-1">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleEdit(contact)}
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleDelete(contact.id)}
+                                            >
+                                                <Trash2 className="h-4 w-4 text-destructive" />
+                                            </Button>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -165,69 +163,62 @@ export function EmergencyContactList({ contacts, onUpdate }: any) {
                                 Add details for someone we can contact in case of emergency.
                             </DialogDescription>
                         </DialogHeader>
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                                <FormField
-                                    control={form.control}
+                        <form ref={formRef} action={formAction} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="name">Name</Label>
+                                <Input
+                                    id="name"
                                     name="name"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Name</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="Contact Name" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
+                                    placeholder="Contact Name"
+                                    defaultValue={editingContact?.name || ""}
+                                    required
+                                    disabled={isPending}
                                 />
-                                <div className="grid grid-cols-2 gap-4">
-                                    <FormField
-                                        control={form.control}
-                                        name="relation"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Relation</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="e.g. Spouse, Parent" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="phone"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Phone</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Phone Number" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="relationship">Relationship</Label>
+                                    <Input
+                                        id="relationship"
+                                        name="relationship"
+                                        placeholder="e.g. Spouse, Parent"
+                                        defaultValue={editingContact?.relationship || ""}
+                                        required
+                                        disabled={isPending}
                                     />
                                 </div>
-                                <FormField
-                                    control={form.control}
-                                    name="address"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Address (Optional)</FormLabel>
-                                            <FormControl>
-                                                <Textarea placeholder="Contact Address" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
+                                <div className="space-y-2">
+                                    <Label htmlFor="phone">Phone</Label>
+                                    <Input
+                                        id="phone"
+                                        name="phone"
+                                        placeholder="Phone Number"
+                                        defaultValue={editingContact?.phone || ""}
+                                        required
+                                        disabled={isPending}
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="alternatePhone">Alternate Phone (Optional)</Label>
+                                <Input
+                                    id="alternatePhone"
+                                    name="alternatePhone"
+                                    placeholder="Alternate Phone"
+                                    defaultValue={editingContact?.alternatePhone || ""}
+                                    disabled={isPending}
                                 />
-                                <DialogFooter>
-                                    <Button type="submit" disabled={isSaving}>
-                                        {isSaving ? "Saving..." : "Save Contact"}
-                                    </Button>
-                                </DialogFooter>
-                            </form>
-                        </Form>
+                            </div>
+                            <DialogFooter>
+                                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isPending}>
+                                    Cancel
+                                </Button>
+                                <Button type="submit" disabled={isPending}>
+                                    {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    {isPending ? "Saving..." : "Save Contact"}
+                                </Button>
+                            </DialogFooter>
+                        </form>
                     </DialogContent>
                 </Dialog>
             </CardContent>

@@ -1,68 +1,36 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useActionState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info } from "lucide-react";
-
-const formSchema = z.object({
-    bankName: z.string().min(1, "Bank name is required"),
-    accountNumber: z.string().min(1, "Account number is required"),
-    branchName: z.string().optional(),
-    routingNumber: z.string().optional(),
-});
+import { updateBankDetails } from "@/app/actions/profile-actions";
 
 export function BankDetailsForm({ details, onUpdate }: any) {
-    const [isSaving, setIsSaving] = useState(false);
+    const formRef = useRef<HTMLFormElement>(null);
 
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            bankName: details?.bankName || "",
-            accountNumber: details?.accountNumber || "",
-            branchName: details?.branchName || "",
-            routingNumber: details?.routingNumber || "",
-        },
-    });
-
-    async function onSubmit(values: z.infer<typeof formSchema>) {
-        setIsSaving(true);
-        try {
-            const response = await fetch("/api/user/profile", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    section: "banking",
-                    data: values,
-                }),
-            });
-
-            if (response.ok) {
-                toast.success("Bank details updated successfully");
-                onUpdate();
-            } else {
-                toast.error("Failed to update bank details");
+    const [state, formAction, isPending] = useActionState(
+        async (prevState: any, formData: FormData) => {
+            const result = await updateBankDetails(formData);
+            if (result.success) {
+                onUpdate?.();
             }
-        } catch (error) {
-            toast.error("Error updating bank details");
-        } finally {
-            setIsSaving(false);
+            return result;
+        },
+        { success: false, error: null }
+    );
+
+    useEffect(() => {
+        if (state.success) {
+            toast.success("Bank details updated successfully");
+        } else if (state.error) {
+            toast.error(state.error);
         }
-    }
+    }, [state]);
 
     return (
         <Card>
@@ -81,73 +49,61 @@ export function BankDetailsForm({ details, onUpdate }: any) {
                     </AlertDescription>
                 </Alert>
 
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <FormField
-                                control={form.control}
+                <form ref={formRef} action={formAction} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="bankName">Bank Name</Label>
+                            <Input
+                                id="bankName"
                                 name="bankName"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Bank Name</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="e.g. Dutch Bangla Bank" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                                placeholder="e.g. Dutch Bangla Bank"
+                                defaultValue={details?.bankName || ""}
+                                required
+                                disabled={isPending}
                             />
+                        </div>
 
-                            <FormField
-                                control={form.control}
+                        <div className="space-y-2">
+                            <Label htmlFor="accountNumber">Account Number</Label>
+                            <Input
+                                id="accountNumber"
                                 name="accountNumber"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Account Number</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Account Number" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                                placeholder="Account Number"
+                                defaultValue={details?.accountNumber || ""}
+                                required
+                                disabled={isPending}
                             />
+                        </div>
 
-                            <FormField
-                                control={form.control}
+                        <div className="space-y-2">
+                            <Label htmlFor="branchName">Branch Name</Label>
+                            <Input
+                                id="branchName"
                                 name="branchName"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Branch Name</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Branch Name" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                                placeholder="Branch Name"
+                                defaultValue={details?.branchName || ""}
+                                disabled={isPending}
                             />
+                        </div>
 
-                            <FormField
-                                control={form.control}
+                        <div className="space-y-2">
+                            <Label htmlFor="routingNumber">Routing Number</Label>
+                            <Input
+                                id="routingNumber"
                                 name="routingNumber"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Routing Number</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Routing Number" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                                placeholder="Routing Number"
+                                defaultValue={details?.routingNumber || ""}
+                                disabled={isPending}
                             />
                         </div>
+                    </div>
 
-                        <div className="flex justify-end">
-                            <Button type="submit" disabled={isSaving}>
-                                {isSaving ? "Saving..." : "Save Bank Details"}
-                            </Button>
-                        </div>
-                    </form>
-                </Form>
+                    <div className="flex justify-end">
+                        <Button type="submit" disabled={isPending}>
+                            {isPending ? "Saving..." : "Save Bank Details"}
+                        </Button>
+                    </div>
+                </form>
             </CardContent>
         </Card>
     );

@@ -6,6 +6,18 @@ import { prisma } from "@/lib/prisma";
 import { Role } from "@prisma/client";
 import { canEditEmployee, canAssignRole, type AppRole } from "@/lib/rbac";
 
+export async function updateEmployeeFromForm(employeeId: number, formData: FormData) {
+  const updates = {
+    name: formData.get("name") as string,
+    email: formData.get("email") as string,
+    department: formData.get("department") as string,
+    role: formData.get("role") as string,
+    empCode: formData.get("empCode") as string,
+  };
+
+  return updateEmployee(employeeId, updates);
+}
+
 export async function updateEmployee(employeeId: number, updates: {
   name?: string;
   email?: string;

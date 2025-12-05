@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "NODE_OPTIONS='--max-old-space-size=4096' next dev",
+    "dev": "npx @react-grab/cursor@latest && NODE_OPTIONS='--max-old-space-size=4096' next dev",
     "dev:low-memory": "NODE_OPTIONS='--max-old-space-size=2048 --optimize-for-size --always-opt' next dev",
     "dev:turbo": "NODE_OPTIONS='--max-old-space-size=4096' next dev --turbopack",
     "build": "NODE_OPTIONS='--max-old-space-size=6144' prisma generate && next build --turbopack",
@@ -31,7 +31,7 @@
     "memory:test": "node scripts/test-memory-optimization.mjs",
     "memory:analyze": "node scripts/memory-analysis.mjs",
     "validate:colors": "node scripts/validate-colors.js",
-    "storybook": "storybook dev -p 6006",
+    "storybook": "NODE_OPTIONS='--max-old-space-size=4096' storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
   "dependencies": {
@@ -134,6 +134,7 @@
     "@vitest/ui": "^4.0.6",
     "babel-plugin-react-compiler": "^1.0.0",
     "baseline-browser-mapping": "^2.9.2",
+    "chromatic": "^13.3.4",
     "commander": "^14.0.2",
     "dotenv": "^17.2.3",
     "eslint": "^9",

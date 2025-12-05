@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CalendarProvider } from '@prisma/client';
 import { Calendar, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 interface CalendarConnectionCardProps {
@@ -15,50 +16,53 @@ interface CalendarConnectionCardProps {
 }
 
 export function CalendarConnectionCard({ provider, isConnected, lastSyncedAt, userId }: CalendarConnectionCardProps) {
-    const [isLoading, setIsLoading] = useState(false);
+    const [isPending, startTransition] = useTransition();
+    const router = useRouter();
 
     const handleConnect = async () => {
-        setIsLoading(true);
-        try {
-            const endpoint = provider === 'GOOGLE_CALENDAR' 
-                ? '/api/calendar/google/auth' 
-                : '/api/calendar/outlook/auth';
-            
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                body: JSON.stringify({ userId }), // Ideally handled by session
-            });
-            
-            if (!response.ok) throw new Error('Failed to initiate auth');
-            
-            const { url } = await response.json();
-            window.location.href = url;
-        } catch (error) {
-            console.error(error);
-            toast.error('Failed to connect calendar');
-            setIsLoading(false);
-        }
+        startTransition(async () => {
+            try {
+                const endpoint = provider === 'GOOGLE_CALENDAR'
+                    ? '/api/calendar/google/auth'
+                    : '/api/calendar/outlook/auth';
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    body: JSON.stringify({ userId }), // Ideally handled by session
+                });
+
+                if (!response.ok) throw new Error('Failed to initiate auth');
+
+                const { url } = await response.json();
+                // Use router.push for OAuth redirects (external URLs still need window.location)
+                // For external OAuth URLs, window.location is appropriate
+                window.location.href = url;
+            } catch (error) {
+                console.error(error);
+                toast.error('Failed to connect calendar');
+            }
+        });
     };
 
     const handleDisconnect = async () => {
-        setIsLoading(true);
-        try {
-            const response = await fetch('/api/calendar/disconnect', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, provider }),
-            });
+        startTransition(async () => {
+            try {
+                const response = await fetch('/api/calendar/disconnect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, provider }),
+                });
 
-            if (!response.ok) throw new Error('Failed to disconnect');
-            
-            toast.success('Calendar disconnected');
-            window.location.reload(); // Simple reload to refresh state
-        } catch (error) {
-            console.error(error);
-            toast.error('Failed to disconnect calendar');
-        } finally {
-            setIsLoading(false);
-        }
+                if (!response.ok) throw new Error('Failed to disconnect');
+
+                toast.success('Calendar disconnected');
+                // Use router.refresh() instead of window.location.reload()
+                router.refresh();
+            } catch (error) {
+                console.error(error);
+                toast.error('Failed to disconnect calendar');
+            }
+        });
     };
 
     const providerName = provider === 'GOOGLE_CALENDAR' ? 'Google Calendar' : 'Outlook Calendar';
@@ -91,22 +95,22 @@ export function CalendarConnectionCard({ provider, isConnected, lastSyncedAt, us
                     </div>
                     
                     {isConnected ? (
-                        <Button 
-                            variant="destructive" 
-                            size="sm" 
+                        <Button
+                            variant="destructive"
+                            size="sm"
                             onClick={handleDisconnect}
-                            disabled={isLoading}
+                            disabled={isPending}
                         >
-                            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Disconnect'}
+                            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Disconnect'}
                         </Button>
                     ) : (
-                        <Button 
-                            variant="outline" 
-                            size="sm" 
+                        <Button
+                            variant="outline"
+                            size="sm"
                             onClick={handleConnect}
-                            disabled={isLoading}
+                            disabled={isPending}
                         >
-                            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Connect'}
+                            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Connect'}
                         </Button>
                     )}
                 </div>

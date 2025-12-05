@@ -67,7 +67,7 @@ export function UserProvider({ user: initialUser, children }: { user: User | nul
   const loading = !initialUser && swrUser === undefined && !error;
   const status = loading ? "loading" : "ready";
 
-  return <UserContext.Provider value={{ user, loading, status }}>{children}</UserContext.Provider>;
+  return <UserContext value={{ user, loading, status }}>{children}</UserContext>;
 }
 
 export function useUser() {

@@ -58,7 +58,7 @@ const CustomTooltip = ({ active, payload }: any) => {
           </div>
           <div className="flex items-center justify-between gap-3 text-xs">
             <span className="text-muted-foreground">Percentage:</span>
-            <span className="font-semibold text-foreground">{data.percent.toFixed(1)}%</span>
+            <span className="font-semibold text-foreground">{data.share.toFixed(1)}%</span>
           </div>
         </div>
       </div>
@@ -69,7 +69,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 
 // Custom label renderer with better styling
 const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
-  if (percent < 5) return null; // Hide labels for small slices
+  if (percent < 0.05) return null; // Hide labels for small slices (< 5%)
 
   const RADIAN = Math.PI / 180;
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -86,7 +86,7 @@ const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent
       className="text-xs font-semibold"
       style={{ textShadow: "0 0 4px rgba(0,0,0,0.8)" }}
     >
-      {`${(percent * 100).toFixed(0)}%`}
+      {`${(percent * 100).toFixed(1)}%`}
     </text>
   );
 };
@@ -119,7 +119,7 @@ export function TypePie({
       return {
         name: displayName,
         value: slice.value,
-        percent: (slice.value / total) * 100,
+        share: (slice.value / total) * 100, // Renamed from percent to share to avoid Recharts collision
         type: slice.type,
         originalIndex: index,
       };
@@ -189,7 +189,7 @@ export function TypePie({
                 const data = entry.payload;
                 return (
                   <span className="text-xs text-muted-foreground">
-                    {value}: <span className="font-semibold text-foreground">{data.value}</span> ({data.percent.toFixed(1)}%)
+                    {value}: <span className="font-semibold text-foreground">{data.value}</span> ({data.share.toFixed(1)}%)
                   </span>
                 );
               }}

@@ -300,6 +300,9 @@ importers:
       baseline-browser-mapping:
         specifier: ^2.9.2
         version: 2.9.2
+      chromatic:
+        specifier: ^13.3.4
+        version: 13.3.4
       commander:
         specifier: ^14.0.2
         version: 14.0.2

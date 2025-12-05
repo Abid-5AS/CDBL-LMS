@@ -1,20 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useActionState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 import {
     Select,
     SelectContent,
@@ -25,61 +15,31 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { format } from "date-fns";
-
-const formSchema = z.object({
-    phone: z.string().optional(),
-    address: z.string().optional(),
-    permanentAddress: z.string().optional(),
-    dob: z.string().optional(),
-    gender: z.string().optional(),
-    bloodGroup: z.string().optional(),
-    maritalStatus: z.string().optional(),
-    nid: z.string().optional(),
-    tin: z.string().optional(),
-});
+import { updatePersonalDetails } from "@/app/actions/profile-actions";
 
 export function PersonalDetailsForm({ user, profile, onUpdate }: any) {
-    const [isSaving, setIsSaving] = useState(false);
+    const formRef = useRef<HTMLFormElement>(null);
 
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            phone: profile?.phone || "",
-            address: profile?.address || "",
-            permanentAddress: profile?.permanentAddress || "",
-            dob: profile?.dob ? format(new Date(profile.dob), "yyyy-MM-dd") : "",
-            gender: profile?.gender || "",
-            bloodGroup: profile?.bloodGroup || "",
-            maritalStatus: profile?.maritalStatus || "",
-            nid: profile?.nid || "",
-            tin: profile?.tin || "",
-        },
-    });
-
-    async function onSubmit(values: z.infer<typeof formSchema>) {
-        setIsSaving(true);
-        try {
-            const response = await fetch("/api/user/profile", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    section: "personal",
-                    data: values,
-                }),
-            });
-
-            if (response.ok) {
-                toast.success("Profile updated successfully");
-                onUpdate();
-            } else {
-                toast.error("Failed to update profile");
+    const [state, formAction, isPending] = useActionState(
+        async (prevState: any, formData: FormData) => {
+            const result = await updatePersonalDetails(formData);
+            if (result.success) {
+                onUpdate?.();
             }
-        } catch (error) {
-            toast.error("Error updating profile");
-        } finally {
-            setIsSaving(false);
+            return result;
+        },
+        { success: false, error: null }
+    );
+
+    useEffect(() => {
+        if (state.success) {
+            toast.success("Profile updated successfully");
+        } else if (state.error) {
+            toast.error(state.error);
         }
-    }
+    }, [state]);
+
+    const defaultDob = profile?.dob ? format(new Date(profile.dob), "yyyy-MM-dd") : "";
 
     return (
         <Card>
@@ -90,183 +50,136 @@ export function PersonalDetailsForm({ user, profile, onUpdate }: any) {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <FormField
-                                control={form.control}
+                <form ref={formRef} action={formAction} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="phone">Phone Number</Label>
+                            <Input
+                                id="phone"
                                 name="phone"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Phone Number</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="+880..." {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                                placeholder="+880..."
+                                defaultValue={profile?.phone || ""}
+                                disabled={isPending}
                             />
+                        </div>
 
-                            <FormField
-                                control={form.control}
+                        <div className="space-y-2">
+                            <Label htmlFor="dob">Date of Birth</Label>
+                            <Input
+                                id="dob"
                                 name="dob"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Date of Birth</FormLabel>
-                                        <FormControl>
-                                            <Input type="date" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                                type="date"
+                                defaultValue={defaultDob}
+                                disabled={isPending}
                             />
+                        </div>
 
-                            <FormField
-                                control={form.control}
-                                name="gender"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Gender</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select gender" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="Male">Male</SelectItem>
-                                                <SelectItem value="Female">Female</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                        <div className="space-y-2">
+                            <Label htmlFor="gender">Gender</Label>
+                            <Select name="gender" defaultValue={profile?.gender || ""} disabled={isPending}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select gender" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Male">Male</SelectItem>
+                                    <SelectItem value="Female">Female</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-                            <FormField
-                                control={form.control}
-                                name="bloodGroup"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Blood Group</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select blood group" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="A+">A+</SelectItem>
-                                                <SelectItem value="A-">A-</SelectItem>
-                                                <SelectItem value="B+">B+</SelectItem>
-                                                <SelectItem value="B-">B-</SelectItem>
-                                                <SelectItem value="O+">O+</SelectItem>
-                                                <SelectItem value="O-">O-</SelectItem>
-                                                <SelectItem value="AB+">AB+</SelectItem>
-                                                <SelectItem value="AB-">AB-</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                        <div className="space-y-2">
+                            <Label htmlFor="bloodGroup">Blood Group</Label>
+                            <Select name="bloodGroup" defaultValue={profile?.bloodGroup || ""} disabled={isPending}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select blood group" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="A+">A+</SelectItem>
+                                    <SelectItem value="A-">A-</SelectItem>
+                                    <SelectItem value="B+">B+</SelectItem>
+                                    <SelectItem value="B-">B-</SelectItem>
+                                    <SelectItem value="O+">O+</SelectItem>
+                                    <SelectItem value="O-">O-</SelectItem>
+                                    <SelectItem value="AB+">AB+</SelectItem>
+                                    <SelectItem value="AB-">AB-</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-                            <FormField
-                                control={form.control}
-                                name="maritalStatus"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Marital Status</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select status" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="Single">Single</SelectItem>
-                                                <SelectItem value="Married">Married</SelectItem>
-                                                <SelectItem value="Divorced">Divorced</SelectItem>
-                                                <SelectItem value="Widowed">Widowed</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                        <div className="space-y-2">
+                            <Label htmlFor="maritalStatus">Marital Status</Label>
+                            <Select name="maritalStatus" defaultValue={profile?.maritalStatus || ""} disabled={isPending}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Single">Single</SelectItem>
+                                    <SelectItem value="Married">Married</SelectItem>
+                                    <SelectItem value="Divorced">Divorced</SelectItem>
+                                    <SelectItem value="Widowed">Widowed</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-                            <FormField
-                                control={form.control}
+                        <div className="space-y-2">
+                            <Label htmlFor="nid">National ID (NID)</Label>
+                            <Input
+                                id="nid"
                                 name="nid"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>National ID (NID)</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="NID Number" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                                placeholder="NID Number"
+                                defaultValue={profile?.nid || ""}
+                                disabled={isPending}
                             />
+                        </div>
 
-                            <FormField
-                                control={form.control}
+                        <div className="space-y-2">
+                            <Label htmlFor="tin">TIN Number</Label>
+                            <Input
+                                id="tin"
                                 name="tin"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>TIN Number</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="TIN Number" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                                placeholder="TIN Number"
+                                defaultValue={profile?.tin || ""}
+                                disabled={isPending}
                             />
                         </div>
+                    </div>
 
-                        <div className="grid grid-cols-1 gap-6">
-                            <FormField
-                                control={form.control}
+                    <div className="grid grid-cols-1 gap-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="address">Present Address</Label>
+                            <Textarea
+                                id="address"
                                 name="address"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Present Address</FormLabel>
-                                        <FormControl>
-                                            <Textarea placeholder="Full address" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                                placeholder="Full address"
+                                defaultValue={profile?.address || ""}
+                                disabled={isPending}
                             />
+                        </div>
 
-                            <FormField
-                                control={form.control}
+                        <div className="space-y-2">
+                            <Label htmlFor="permanentAddress">Permanent Address</Label>
+                            <Textarea
+                                id="permanentAddress"
                                 name="permanentAddress"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Permanent Address</FormLabel>
-                                        <FormControl>
-                                            <Textarea placeholder="Full address" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                                placeholder="Full address"
+                                defaultValue={profile?.permanentAddress || ""}
+                                disabled={isPending}
                             />
                         </div>
+                    </div>
 
-                        <div className="flex justify-end">
-                            <Button type="submit" disabled={isSaving}>
-                                {isSaving ? (
-                                    <>
-                                        <span className="animate-spin mr-2">⏳</span> Saving...
-                                    </>
-                                ) : (
-                                    "Save Changes"
-                                )}
-                            </Button>
-                        </div>
-                    </form>
-                </Form>
+                    <div className="flex justify-end">
+                        <Button type="submit" disabled={isPending}>
+                            {isPending ? (
+                                <>
+                                    <span className="animate-spin mr-2">⏳</span> Saving...
+                                </>
+                            ) : (
+                                "Save Changes"
+                            )}
+                        </Button>
+                    </div>
+                </form>
             </CardContent>
         </Card>
     );

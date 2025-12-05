@@ -187,6 +187,102 @@ export class WebhookService {
   }
 
   /**
+   * Get all webhooks
+   */
+  static async getAll() {
+    return prisma.webhook.findMany({
+      include: {
+        _count: {
+          select: { deliveries: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  /**
+   * Get webhook by ID
+   */
+  static async getById(id: number) {
+    return prisma.webhook.findUnique({
+      where: { id },
+    });
+  }
+
+  /**
+   * Get webhook deliveries with pagination
+   */
+  static async getDeliveries(webhookId: number, page = 1, limit = 20) {
+    const skip = (page - 1) * limit;
+    const [deliveries, total] = await Promise.all([
+      prisma.webhookDelivery.findMany({
+        where: { webhookId },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.webhookDelivery.count({
+        where: { webhookId },
+      }),
+    ]);
+
+    return {
+      deliveries,
+      pagination: {
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit),
+        hasNext: skip + limit < total,
+      },
+    };
+  }
+
+  /**
+   * Retry a failed delivery
+   */
+  static async retryDelivery(deliveryId: number) {
+    const delivery = await prisma.webhookDelivery.findUnique({
+      where: { id: deliveryId },
+      include: { webhook: true },
+    });
+
+    if (!delivery) throw new Error('Delivery not found');
+    if (!delivery.webhook) throw new Error('Webhook not found');
+
+    // Cast payload safely
+    const payload = delivery.payload as unknown as WebhookPayload;
+
+    // We reuse the original event and data from payload
+    return this.deliverWebhook(
+      delivery.webhook,
+      delivery.event as WebhookEvent,
+      payload.data
+    );
+  }
+
+  /**
+   * Get webhook statistics
+   */
+  static async getStats(webhookId: number) {
+    const [total, successful, failed] = await Promise.all([
+      prisma.webhookDelivery.count({ where: { webhookId } }),
+      prisma.webhookDelivery.count({ where: { webhookId, status: 'success' } }),
+      prisma.webhookDelivery.count({ where: { webhookId, status: 'failed' } }),
+    ]);
+
+    return {
+      totalDeliveries: total,
+      successfulDeliveries: successful,
+      failedDeliveries: failed,
+      successRate: total > 0 ? (successful / total) * 100 : 0,
+      lastDeliveryAt: null, // TODO: Implement last delivery tracking if needed efficiently
+      lastSuccessAt: null,
+      lastFailureAt: null,
+    };
+  }
+
+  /**
    * Test webhook endpoint
    */
   static async test(webhookId: number) {

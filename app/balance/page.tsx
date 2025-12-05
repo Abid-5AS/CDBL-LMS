@@ -269,33 +269,33 @@ function BalanceContent() {
 
                 <div className="space-y-1.5 min-h-[60px]">
                   {showExpiryWarning && (
-                    <Alert variant="default" className="py-1">
-                      <AlertCircle className="h-3 w-3" />
-                      <AlertDescription className="text-xs flex items-center gap-2">
-                        <span>{available} days will expire on Dec 31.</span>
+                    <div className="rounded-md border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20 px-3 py-2 flex items-start gap-2">
+                      <AlertCircle className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                      <p className="text-xs text-amber-700 dark:text-amber-300">
+                        <span className="font-medium">{available} days</span> will expire on Dec 31.{" "}
                         <Link
                           href="/policies#casual"
-                          className="underline text-foreground text-[11px]"
+                          className="underline hover:text-amber-800 dark:hover:text-amber-200"
                         >
                           Policy
                         </Link>
-                      </AlertDescription>
-                    </Alert>
+                      </p>
+                    </div>
                   )}
 
                   {showCarryForwardWarning && (
-                    <Alert variant="default" className="py-1">
-                      <AlertCircle className="h-3 w-3" />
-                      <AlertDescription className="text-xs flex items-center gap-2">
-                        <span>Max {config.maxCarryForward} days can be carried forward.</span>
+                    <div className="rounded-md border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20 px-3 py-2 flex items-start gap-2">
+                      <AlertCircle className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                      <p className="text-xs text-blue-700 dark:text-blue-300">
+                        Max <span className="font-medium">{config.maxCarryForward} days</span> can be carried forward.{" "}
                         <Link
                           href="/policies#earned"
-                          className="underline text-foreground text-[11px]"
+                          className="underline hover:text-blue-800 dark:hover:text-blue-200"
                         >
                           See rules
                         </Link>
-                      </AlertDescription>
-                    </Alert>
+                      </p>
+                    </div>
                   )}
 
                   {!showExpiryWarning && !showCarryForwardWarning && (

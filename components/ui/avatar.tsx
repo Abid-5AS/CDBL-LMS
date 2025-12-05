@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import Image from "next/image"
 
 interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string
@@ -44,12 +45,25 @@ AvatarFallback.displayName = "AvatarFallback"
 
 const AvatarImage = React.forwardRef<
   HTMLImageElement,
-  React.ImgHTMLAttributes<HTMLImageElement>
->(({ className, ...props }, ref) => {
+  Omit<React.ComponentProps<typeof Image>, "alt"> & { alt?: string }
+>(({ className, src, alt = "Avatar", ...props }, ref) => {
+  // If no src is provided, we can't render next/image properly without crashing or empty.
+  // The fallback should handle this case if this component returns null, but Radix primitive usually handles switching.
+  // Since this is a custom implementation, the AvatarFallback is likely rendered as a sibling.
+  // But here, Avatar renders children. Usually usage is: <Avatar><AvatarImage /><AvatarFallback /></Avatar>.
+  // If Image fails to load, we want Fallback to show.
+  // next/image has an onError prop we can use if needed, but for now let's just render it.
+  // Note: next/image with fill requires parent to have relative position (Avatar has it).
+  
+  if (!src) return null;
+
   return (
-    <img
-      ref={ref}
-      className={cn("aspect-square h-full w-full", className)}
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      sizes="40px"
+      className={cn("aspect-square h-full w-full object-cover", className)}
       {...props}
     />
   )

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useDeferredValue, useEffect } from 'react';
 import {
   Table,
   TableHeader,
@@ -54,19 +54,19 @@ export function ModernTable<T extends Record<string, any>>({
 }: ModernTableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
-  const [searchInput, setSearchInput] = useState(''); // User input
-  const [searchTerm, setSearchTerm] = useState(''); // Debounced search term
+  const [searchInput, setSearchInput] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Debounce search input for better performance on large datasets
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setSearchTerm(searchInput);
-      setCurrentPage(1); // Reset to first page on search
-    }, 300);
+  // Use React 19's useDeferredValue instead of manual debouncing
+  // This allows React to prioritize urgent updates (like typing) over expensive filtering
+  const deferredSearchTerm = useDeferredValue(searchInput);
 
-    return () => clearTimeout(timeoutId);
-  }, [searchInput]);
+  // Reset to first page when search changes
+  useEffect(() => {
+    if (deferredSearchTerm !== searchInput) {
+      setCurrentPage(1);
+    }
+  }, [deferredSearchTerm, searchInput]);
 
   // Sorting logic
   const sortedData = useMemo(() => {
@@ -98,12 +98,13 @@ export function ModernTable<T extends Record<string, any>>({
   );
 
   // Search/filter logic - optimized with pre-computed search strings
+  // Uses deferredSearchTerm so UI remains responsive while filtering
   const filteredData = useMemo(() => {
-    if (!searchTerm) return searchableData;
+    if (!deferredSearchTerm) return searchableData;
 
-    const term = searchTerm.toLowerCase();
+    const term = deferredSearchTerm.toLowerCase();
     return searchableData.filter(row => row._searchText.includes(term));
-  }, [searchableData, searchTerm]);
+  }, [searchableData, deferredSearchTerm]);
 
   // Pagination logic
   const paginatedData = useMemo(() => {

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
@@ -15,12 +15,15 @@ import {
   AlertCircle,
   ClipboardList,
   BookOpen,
+  User,
 } from "lucide-react";
 
 import {
   Button,
   Card,
   CardContent,
+  CardHeader,
+  CardTitle,
   Skeleton,
   Tooltip,
   TooltipContent,
@@ -40,6 +43,7 @@ import {
 import { TabbedContent } from "../shared/ProgressiveDisclosure";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
+import { Role } from "@/lib/enums";
 
 // Extracted components
 import { EmployeeActionCenter } from "./components/EmployeeActionCenter";
@@ -53,10 +57,11 @@ import { BalanceProjectionWidget } from "./components/BalanceProjectionWidget";
 import { KPIGridSkeleton } from "@/components/shared/skeletons";
 import { useMounted } from "@/hooks/useMounted";
 import { useEmployeeDashboardData } from "./hooks/useEmployeeDashboardData";
-import { WhosOutToday } from "@/app/dashboard/shared/WhosOutToday";
+
 
 type EmployeeDashboardContentProps = {
   username: string;
+  whosOutTodaySlot: React.ReactNode;
 };
 
 const containerVariants = {
@@ -83,6 +88,7 @@ const itemVariants = {
 
 export function ModernEmployeeDashboard({
   username,
+  whosOutTodaySlot,
 }: EmployeeDashboardContentProps) {
   const router = useRouter();
   const [activeLeaveTab, setActiveLeaveTab] = useState<string>("overview");
@@ -171,7 +177,7 @@ export function ModernEmployeeDashboard({
     <TooltipProvider>
       <FloatingQuickActions actions={quickActions} />
       <RoleBasedDashboard
-        role="EMPLOYEE"
+        role={Role.EMPLOYEE}
         animate={true}
         backgroundVariant="transparent"
       >
@@ -315,7 +321,7 @@ export function ModernEmployeeDashboard({
                     : "No actions required"
                 }
                 icon={AlertCircle}
-                role="EMPLOYEE"
+                role={Role.EMPLOYEE}
                 animate={true}
                 onClick={() => scrollToSection("action-center")}
                 clickLabel="Jump to Action Center"
@@ -368,7 +374,7 @@ export function ModernEmployeeDashboard({
                     : "Awaiting approval"
                 }
                 icon={Clock}
-                role="EMPLOYEE"
+                role={Role.EMPLOYEE}
                 animate={true}
                 onClick={() => router.push("/leaves?status=pending")}
                 clickLabel="View requests awaiting approval"
@@ -408,7 +414,7 @@ export function ModernEmployeeDashboard({
                 value={dashboardData.totalBalance}
                 subtitle="Days available"
                 icon={Calendar}
-                role="EMPLOYEE"
+                role={Role.EMPLOYEE}
                 animate={true}
                 onClick={() => scrollToSection("leave-details", "balance")}
                 clickLabel="View detailed balance breakdown"
@@ -477,7 +483,7 @@ export function ModernEmployeeDashboard({
                     : "Plan your time off"
                 }
                 icon={TrendingUp}
-                role="EMPLOYEE"
+                role={Role.EMPLOYEE}
                 animate={true}
                 onClick={() => router.push("/leaves")}
                 clickLabel="View all your leave requests"
@@ -506,7 +512,7 @@ export function ModernEmployeeDashboard({
 
           {/* Who's Out Today Widget */}
           <motion.div variants={itemVariants}>
-            <WhosOutToday scope="team" />
+            {whosOutTodaySlot}
           </motion.div>
 
           {/* Dashboard with Sidebar */}
