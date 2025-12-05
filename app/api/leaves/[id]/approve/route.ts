@@ -19,6 +19,7 @@ import { fetchHolidaysInRange } from "@/lib/leaves/leave-validation";
 import { countWorkingDays } from "@/lib/leaves/working-days";
 import { deductBalance, deductMultipleBalances } from "@/lib/leaves/balance-manager";
 import { notifyLeaveApproved, notifyLeaveCancelled } from "@/lib/webhooks/events";
+import { calendarService } from "@/lib/integrations/calendar/service";
 
 export const cache = "no-store";
 
@@ -498,22 +499,25 @@ export async function POST(
     },
   });
 
-  // Trigger webhook notification
+    // Trigger webhook notification
   if (isCancellationRequest) {
     // Cancellation approved = Leave is now CANCELLED
     await notifyLeaveCancelled({
       leaveId: leave.id,
       employeeId: leave.requesterId,
       employeeName: leave.requester.email.split('@')[0],
-      employeeEmail: leave.requester.email,
       leaveType: leave.type,
       startDate: leave.startDate,
       endDate: leave.endDate,
-      workingDays: leave.workingDays,
-      cancelledBy: user.id,
-      cancellerName: user.name,
       cancelledAt: new Date(),
     });
+
+    // Remove from calendar
+    try {
+      await calendarService.removeLeaveFromCalendar(leave.id);
+    } catch (e) {
+      console.error("Failed to remove leave from calendar:", e);
+    }
   } else {
     // Regular leave approval
     await notifyLeaveApproved({
@@ -530,6 +534,13 @@ export async function POST(
       approverRole: userRole,
       approvedAt: new Date(),
     });
+
+    // Sync to calendar
+    try {
+      await calendarService.syncLeaveToCalendar(leave.id);
+    } catch (e) {
+      console.error("Failed to sync leave to calendar:", e);
+    }
   }
 
   return NextResponse.json({

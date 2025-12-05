@@ -317,6 +317,22 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
         closeDialog();
       });
 
+      // Handle Offline Action
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        const { queueSyncAction } = await import("@/lib/offline/db");
+        
+        const actionType = 
+          action === "approve" ? "APPROVE_LEAVE" :
+          action === "reject" ? "REJECT_LEAVE" :
+          action === "forward" ? "FORWARD_LEAVE" :
+          "RETURN_LEAVE";
+
+        await queueSyncAction(actionType as any, { id: Number(id), comment });
+        
+        toast.success("You are offline. Action queued and will sync when online.");
+        return;
+      }
+
       // Execute Server Action
       startTransition(async () => {
         let result;

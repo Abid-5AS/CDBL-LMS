@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { LayoutProvider } from "./LayoutProvider";
@@ -8,15 +8,22 @@ import { NotificationProvider } from "@/context/NotificationContext";
 import { NotificationProvider as RealtimeNotificationProvider } from "@/lib/contexts/notification-context";
 import { ToastContainer } from "@/components/notifications";
 import { HydrationWarningSuppress } from "@/components/HydrationWarningSuppress";
+import { OfflineIndicator } from "@/components/offline/OfflineIndicator";
+import { InstallPrompt } from "@/components/offline/InstallPrompt";
 
 export const metadata: Metadata = {
   title: "CDBL LMS - Leave Management System",
   description:
     "Central Depository Bangladesh Limited - Leave Management System",
+  manifest: "/manifest.json",
   icons: {
     icon: "/brand/cdbl-lms.png",
     apple: "/brand/cdbl-lms.png",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0f172a",
 };
 
 export default function RootLayout({
@@ -45,6 +52,8 @@ export default function RootLayout({
               <RealtimeNotificationProvider>
                 <LayoutProvider>
                   <main id="main-content">{children}</main>
+                  <OfflineIndicator />
+                  <InstallPrompt />
                 </LayoutProvider>
                 {/* Toast notification container */}
                 <ToastContainer position="top-right" maxWidth="md:max-w-sm" />

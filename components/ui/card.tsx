@@ -46,6 +46,8 @@ interface CardProps
   asChild?: boolean;
 }
 
+import { motion } from "framer-motion";
+
 function Card({
   className,
   variant,
@@ -55,12 +57,14 @@ function Card({
   ...props
 }: CardProps) {
   return (
-    <div
+    <motion.div
+      {...({} as any)}
       data-slot="card"
       className={cn(
         cardVariants({ variant, size, interactive, padding }),
         className
       )}
+      {...(interactive ? { whileHover: { y: -4, transition: { duration: 0.2 } } } : {})}
       {...props}
     />
   );

@@ -439,6 +439,25 @@ export function useApplyLeaveForm() {
         payload.incidentDate = incidentDate.toISOString();
       }
 
+      // Handle Offline Submission
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        const { queueSyncAction } = await import("@/lib/offline/db");
+        
+        if (file) {
+          payload.file = file;
+        }
+
+        await queueSyncAction("CREATE_LEAVE", payload);
+        
+        // Clear draft and show offline success
+        clearDraft();
+        toast.success("You are offline. Request saved and will sync when online.", {
+          duration: 5000,
+        });
+        router.push("/leaves");
+        return;
+      }
+
       let response: Response;
 
       if (file) {

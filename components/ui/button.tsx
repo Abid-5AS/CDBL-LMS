@@ -55,6 +55,8 @@ interface ButtonProps
   rightIcon?: React.ReactNode;
 }
 
+import { motion } from "framer-motion";
+
 function Button({
   className,
   variant,
@@ -68,7 +70,7 @@ function Button({
   disabled,
   ...props
 }: ButtonProps) {
-  const Comp = asChild ? Slot : "button";
+  const Comp = asChild ? Slot : (motion.button as any);
   const isDisabled = disabled || loading;
   const buttonContent = (
     <>
@@ -117,6 +119,7 @@ function Button({
       className={cn(buttonVariants({ variant, size, loading }), className)}
       disabled={isDisabled}
       aria-disabled={isDisabled}
+      {...(!asChild && !isDisabled ? { whileTap: { scale: 0.97 } } : {})}
       {...props}
     >
       {asChild ? children : buttonContent}

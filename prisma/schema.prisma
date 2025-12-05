@@ -408,6 +408,8 @@ model ApprovalDelegation {
   endDate     DateTime // When delegation ends
   isActive    Boolean  @default(true) // Can be manually revoked
   reason      String? // Optional reason for delegation
+  leaveTypes  Json?    // Array of LeaveType enums to delegate (null = all)
+  isPermanent Boolean  @default(false) // If true, ignore endDate (indefinite)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -417,6 +419,19 @@ model ApprovalDelegation {
   @@index([delegatorId, isActive])
   @@index([delegateId, isActive])
   @@index([startDate, endDate])
+}
+
+// Escalation Rules for Auto-Escalation
+model EscalationRule {
+  id             Int      @id @default(autoincrement())
+  role           Role     // Role this rule applies to (e.g., DEPT_HEAD)
+  timeoutHours   Int      // Hours before escalation triggers
+  escalateToRole Role     // Role to escalate to (e.g., HR_ADMIN)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([role, escalateToRole])
 }
 
 // User Dashboard Preferences

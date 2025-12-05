@@ -241,6 +241,7 @@ export function EnhancedDatePicker({
                     onMouseLeave={() => setHoveredDate(null)}
                     disabled={isDisabledDate(date)}
                     title={holiday ? holiday.name : undefined}
+                    aria-label={`Select ${format(date, "PPPP")}${holiday ? `, ${holiday.name}` : ""}`}
                   >
                     {format(date, "d")}
 
