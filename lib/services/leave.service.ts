@@ -200,6 +200,18 @@ export class LeaveService {
         status: 'SUBMITTED',
       });
 
+      // 12. Dispatch Webhook Event
+      const { WebhookService } = await import("./webhook.service");
+      await WebhookService.dispatch('leave.created', {
+        leaveId: leaveRequest.id,
+        userId: userId,
+        leaveType: dto.type,
+        startDate: dto.startDate,
+        endDate: dto.endDate,
+        status: 'SUBMITTED',
+        reason: dto.reason,
+      });
+
       return {
         success: true,
         data: leaveRequest,

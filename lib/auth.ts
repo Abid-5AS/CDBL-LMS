@@ -42,6 +42,17 @@ export async function verifyJwt(token: string) {
   return payload as JwtClaims;
 }
 
+export async function rotateToken(token: string) {
+  try {
+    const claims = await verifyJwt(token);
+    // Remove exp/iat/nbf to allow refreshing
+    const { exp, iat, nbf, ...rest } = claims as any;
+    return signJwt(rest);
+  } catch (error) {
+    return null;
+  }
+}
+
 export const getCurrentUser = cache(async function getCurrentUser() {
   const store = await cookies();
   const token = store.get(JWT_COOKIE)?.value;

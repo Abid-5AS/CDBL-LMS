@@ -110,45 +110,37 @@ export async function GET(req: Request) {
     
     if (!me) return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
 
-    // Parse query parameters
     const url = new URL(req.url);
     const statusFilter = url.searchParams.get("status");
     const mine = url.searchParams.get("mine") === "1";
-    const limit = Math.min(parseInt(url.searchParams.get("limit") || "50"), 100); // Cap at 100 for performance
+    const limit = Math.min(parseInt(url.searchParams.get("limit") || "50"), 100);
+    const cursor = url.searchParams.get("cursor") ? parseInt(url.searchParams.get("cursor")!) : undefined;
 
     let items;
 
     if (mine) {
-      // Use repository method for user-specific queries
-      console.log("[GET /api/leaves] Fetching leaves for user:", me.id, "statusFilter:", statusFilter, "limit:", limit);
+      console.log("[GET /api/leaves] Fetching for user:", me.id, "cursor:", cursor);
       if (statusFilter && statusFilter !== "all") {
-        items = await LeaveRepository.findByUserId(me.id, statusFilter as any, { limit });
+        items = await LeaveRepository.findByUserId(me.id, statusFilter as any, { limit, cursor });
       } else {
-        items = await LeaveRepository.findByUserId(me.id, undefined, { limit });
+        items = await LeaveRepository.findByUserId(me.id, undefined, { limit, cursor });
       }
-      console.log("[GET /api/leaves] Found items:", items?.length);
     } else {
-      // Use repository method for all queries
-      // Ensure status filter is passed correctly, even for CANCELLATION_REQUESTED
-      console.log("[GET /api/leaves] Fetching all leaves");
+      console.log("[GET /api/leaves] Fetching all leaves", "cursor:", cursor);
       items = await LeaveRepository.findAll({
         status: statusFilter && statusFilter !== "all" ? statusFilter as any : undefined,
         limit,
+        cursor,
       });
-      console.log("[GET /api/leaves] Found items:", items?.length);
     }
+    
+    // Calculate nextCursor
+    const nextCursor = items.length === limit ? items[items.length - 1].id : undefined;
 
-    console.log("[GET /api/leaves] Attempting serialization check...");
-    try {
-      JSON.stringify(items);
-      console.log("[GET /api/leaves] Serialization check passed");
-    } catch (serErr) {
-      console.error("[GET /api/leaves] Serialization failed:", serErr);
-      throw new Error("Response serialization failed: " + String(serErr));
-    }
-
-    console.log("[GET /api/leaves] Returning response");
-    return NextResponse.json({ items });
+    return NextResponse.json({ 
+      items,
+      nextCursor
+    });
   } catch (err) {
     console.error("GET /api/leaves error:", err);
     console.error("Error stack:", err instanceof Error ? err.stack : "No stack trace");

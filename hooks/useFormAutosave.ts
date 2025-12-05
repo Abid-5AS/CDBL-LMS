@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback, useState } from "react";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 
 export interface AutoSaveOptions<T> {
   key: string;
@@ -91,11 +91,23 @@ export function useFormAutoSave<T extends Record<string, any>>({
     [enabled, key, serialize, getFilteredData, onSave, onError]
   );
 
-  // Debounced save function
-  const debouncedSave = useCallback(debounce(saveToStorage, debounceMs), [
-    saveToStorage,
-    debounceMs,
-  ]);
+  // Debounced save function using useRef to avoid recreation on every render
+  const debouncedSaveRef = useRef<ReturnType<typeof debounce<typeof saveToStorage>>>();
+
+  useEffect(() => {
+    // Create new debounced function when dependencies change
+    debouncedSaveRef.current = debounce(saveToStorage, debounceMs);
+
+    // Cleanup: cancel any pending debounced calls when dependencies change
+    return () => {
+      debouncedSaveRef.current?.cancel();
+    };
+  }, [saveToStorage, debounceMs]);
+
+  // Helper to call debounced save
+  const debouncedSave = useCallback((data: T) => {
+    debouncedSaveRef.current?.(data);
+  }, []);
 
   // Load data from storage
   const loadFromStorage = useCallback((): T | null => {
@@ -170,7 +182,7 @@ export function useFormAutoSave<T extends Record<string, any>>({
 
     // Cleanup function to cancel pending saves
     return () => {
-      debouncedSave.cancel();
+      debouncedSaveRef.current?.cancel();
     };
   }, [data, enabled, hasDataChanged, debouncedSave]);
 
@@ -202,16 +214,16 @@ export function useFormAutoSave<T extends Record<string, any>>({
   // Force save (bypass debounce)
   const forceSave = useCallback(() => {
     if (!enabled || !data) return;
-    debouncedSave.cancel();
+    debouncedSaveRef.current?.cancel();
     saveToStorage(data);
-  }, [enabled, data, debouncedSave, saveToStorage]);
+  }, [enabled, data, saveToStorage]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      debouncedSave.cancel();
+      debouncedSaveRef.current?.cancel();
     };
-  }, [debouncedSave]);
+  }, []);
 
   return {
     // State
@@ -231,6 +243,8 @@ export function useFormAutoSave<T extends Record<string, any>>({
 }
 
 // Hook for managing multiple form drafts
+// NOTE: This hook requires forms array to have stable length and order across renders
+// to comply with React's Rules of Hooks
 export function useMultiFormAutoSave<T extends Record<string, any>>(
   forms: Array<{
     key: string;
@@ -238,13 +252,29 @@ export function useMultiFormAutoSave<T extends Record<string, any>>(
     options?: Partial<AutoSaveOptions<T>>;
   }>
 ) {
-  const autoSaveHooks = forms.map(({ key, data, options = {} }) =>
-    useFormAutoSave({
-      key,
-      data,
-      ...options,
-    })
-  );
+  // Store forms count to validate stability
+  const formsCountRef = useRef(forms.length);
+
+  // Validate that forms array length is stable
+  if (process.env.NODE_ENV === 'development') {
+    if (formsCountRef.current !== forms.length) {
+      console.error(
+        `useMultiFormAutoSave: Forms array length changed from ${formsCountRef.current} to ${forms.length}. ` +
+        'This violates Rules of Hooks. Ensure forms array has stable length across renders.'
+      );
+    }
+  }
+
+  // Call hooks for each form - this is safe if forms array length is stable
+  // We call the hooks in a fixed order based on the initial forms array length
+  const hook0 = forms[0] ? useFormAutoSave({ key: forms[0].key, data: forms[0].data, ...forms[0].options }) : null;
+  const hook1 = forms[1] ? useFormAutoSave({ key: forms[1].key, data: forms[1].data, ...forms[1].options }) : null;
+  const hook2 = forms[2] ? useFormAutoSave({ key: forms[2].key, data: forms[2].data, ...forms[2].options }) : null;
+  const hook3 = forms[3] ? useFormAutoSave({ key: forms[3].key, data: forms[3].data, ...forms[3].options }) : null;
+  const hook4 = forms[4] ? useFormAutoSave({ key: forms[4].key, data: forms[4].data, ...forms[4].options }) : null;
+
+  // Collect active hooks
+  const autoSaveHooks = [hook0, hook1, hook2, hook3, hook4].filter((hook): hook is NonNullable<typeof hook> => hook !== null);
 
   const clearAllDrafts = useCallback(() => {
     autoSaveHooks.forEach((hook) => hook.clearSavedData());

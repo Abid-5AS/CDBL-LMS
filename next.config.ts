@@ -1,9 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  compress: true,
   distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
   cacheComponents: false, // Disable cache components in development to reduce memory usage
-  reactCompiler: false, // Disable React compiler in development to reduce memory usage
+  reactCompiler: true, // Enable React compiler for automatic optimization
   serverExternalPackages: ["@prisma/client", ".prisma/client", "prisma", "@prisma/adapter-mariadb", "mariadb", "nodemailer"],
 
   // Development-specific optimizations for memory usage
@@ -86,11 +87,12 @@ const nextConfig: NextConfig = {
   },
 };
 
-const withPWA = require('next-pwa')({
-  dest: 'public',
-  disable: process.env.NODE_ENV === 'development',
+const withPWA = require("@ducanh2912/next-pwa").default({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development",
   register: true,
   skipWaiting: true,
 });
 
 export default withPWA(nextConfig);
+// export default nextConfig;

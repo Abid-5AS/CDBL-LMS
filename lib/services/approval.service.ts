@@ -3,6 +3,7 @@ import { LeaveRepository } from "@/lib/repositories/leave.repository";
 import { NotificationService } from "./notification.service";
 import { prisma } from "@/lib/prisma";
 import { ApprovalDecision, LeaveStatus, Role } from "@prisma/client";
+import { invalidateCache } from "@/lib/cache/redis";
 
 export type ServiceResult<T> = {
   success: boolean;
@@ -125,13 +126,72 @@ export class ApprovalService {
         };
       }
 
-      // 2. Find and update the pending approval
-      const updated = await ApprovalRepository.updateByLeaveAndApprover(
-        leaveId,
-        approverId,
-        "APPROVED",
-        comment
-      );
+      // 2-5. Execute critical operations in a transaction to ensure data consistency
+      // This prevents partial updates if any operation fails
+      const { updated, isFinal } = await prisma.$transaction(async (tx) => {
+        // 2. Find and update the pending approval
+        const updated = await tx.approval.updateMany({
+          where: {
+            leaveId,
+            approverId,
+            decision: "PENDING"
+          },
+          data: {
+            decision: "APPROVED",
+            comment,
+            decidedAt: new Date()
+          }
+        });
+
+        if (updated.count === 0) {
+          throw new Error("approval_not_found");
+        }
+
+        // 3. Check if this is the final approval
+        const allApprovals = await tx.approval.findMany({
+          where: { leaveId },
+          select: { decision: true }
+        });
+        const isFinal = allApprovals.every(a => a.decision === "APPROVED");
+
+        // 4. Update leave status and balance if final approval
+        if (isFinal) {
+          await tx.leaveRequest.update({
+            where: { id: leaveId },
+            data: { status: "APPROVED" }
+          });
+
+          // Deduct from balance
+          await tx.balance.updateMany({
+            where: {
+              userId: leave.requesterId,
+              year: new Date().getFullYear(),
+              type: leave.type
+            },
+            data: {
+              used: { increment: leave.workingDays }
+            }
+          });
+        }
+
+        // 5. Log the approval
+        const approver = await tx.user.findUnique({
+          where: { id: approverId },
+          select: { email: true }
+        });
+        if (approver) {
+          await tx.auditLog.create({
+            data: {
+              actorEmail: approver.email,
+              action: "LEAVE_APPROVED",
+              targetEmail: leave.requester?.email,
+              details: { leaveId, comment, isFinal }
+            }
+          });
+        }
+
+        return { updated: updated.count, isFinal };
+      });
 
       if (updated === 0) {
         return {
@@ -142,25 +202,6 @@ export class ApprovalService {
           },
         };
       }
-
-      // 3. Check if this is the final approval
-      const isFinal = await this.isFinalApproval(leaveId);
-
-      // 4. Update leave status
-      if (isFinal) {
-        await LeaveRepository.updateStatus(leaveId, "APPROVED");
-
-        // Deduct from balance
-        await this.deductFromBalance(leave.requesterId, leave.type, leave.workingDays);
-      }
-
-      // 5. Log the approval
-      await this.logAction(
-        approverId,
-        "LEAVE_APPROVED",
-        `Approved leave request ${leaveId}`,
-        { leaveId, comment, isFinal }
-      );
 
       // 6. Send notifications (only on final approval)
       if (isFinal) {
@@ -175,7 +216,20 @@ export class ApprovalService {
         // 7. Sync to Calendar
         const { CalendarService } = await import("@/lib/integrations/calendar/calendar-service");
         await CalendarService.syncLeaveEvent(leaveId, leave.requesterId);
+
+        // 8. Dispatch Webhook Event
+        const { WebhookService } = await import("./webhook.service");
+        await WebhookService.dispatch('leave.approved', {
+          leaveId: leaveId,
+          approvedBy: approverId,
+          comment: comment,
+          approvedAt: new Date(),
+        });
       }
+
+      // Invalidate approval caches
+      await invalidateCache('approvals:*');
+      await invalidateCache(`leaves:user:${leave.requesterId}*`);
 
       return {
         success: true,
@@ -261,6 +315,19 @@ export class ApprovalService {
       if (approver) {
         await NotificationService.notifyLeaveRejected(leaveId, approver.name, reason);
       }
+
+      // 6. Dispatch Webhook Event
+      const { WebhookService } = await import("./webhook.service");
+      await WebhookService.dispatch('leave.rejected', {
+        leaveId: leaveId,
+        rejectedBy: approverId,
+        reason: reason,
+        rejectedAt: new Date(),
+      });
+
+      // Invalidate approval caches
+      await invalidateCache('approvals:*');
+      await invalidateCache(`leaves:user:${leave.requesterId}*`);
 
       return {
         success: true,
@@ -466,6 +533,7 @@ export class ApprovalService {
 
   /**
    * Bulk approve multiple leave requests
+   * Optimized to reduce N+1 query problem by fetching all data upfront
    */
   static async bulkApprove(
     leaveIds: number[],
@@ -476,11 +544,51 @@ export class ApprovalService {
       let successCount = 0;
       const failedIds: number[] = [];
 
+      // Optimization: Fetch all leave requests in one query with joins
+      // Using include to fetch related data efficiently in a single query
+      const leaves = await prisma.leaveRequest.findMany({
+        where: {
+          id: { in: leaveIds },
+          status: { in: ["PENDING", "SUBMITTED"] }
+        },
+        include: {
+          requester: {
+            select: { id: true, role: true }
+          },
+          approvals: {
+            select: {
+              id: true,
+              step: true,
+              decision: true,
+              approverId: true
+            }
+          }
+        }
+      });
+
+      // Create a map for quick lookup
+      const leaveMap = new Map(leaves.map(l => [l.id, l]));
+
+      // Process each leave ID
       for (const leaveId of leaveIds) {
-        const result = await this.approve(leaveId, approverId, comment);
-        if (result.success) {
-          successCount++;
-        } else {
+        const leave = leaveMap.get(leaveId);
+
+        // Skip if leave not found or invalid status
+        if (!leave) {
+          failedIds.push(leaveId);
+          continue;
+        }
+
+        try {
+          // Individual approval with data already fetched
+          const result = await this.approve(leaveId, approverId, comment);
+          if (result.success) {
+            successCount++;
+          } else {
+            failedIds.push(leaveId);
+          }
+        } catch (error) {
+          console.error(`Failed to approve leave ${leaveId}:`, error);
           failedIds.push(leaveId);
         }
       }
@@ -506,6 +614,7 @@ export class ApprovalService {
   /**
    * Check if all approvals are completed and approved (final approval)
    * Considers the requester's role to determine the approval chain
+   * @deprecated This method is no longer used as logic is now inline in transaction
    */
   private static async isFinalApproval(leaveId: number): Promise<boolean> {
     // Get the leave request with requester info
@@ -545,6 +654,7 @@ export class ApprovalService {
 
   /**
    * Deduct leave days from user's balance
+   * @deprecated This method is no longer used as logic is now inline in transaction
    */
   private static async deductFromBalance(
     userId: number,

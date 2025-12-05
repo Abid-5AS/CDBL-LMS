@@ -94,11 +94,15 @@ model LeaveRequest {
   calendarMappings      LeaveCalendarMapping[]
 
   @@index([requesterId, status])
+  @@index([requesterId, status, createdAt]) // Employee dashboard queries - optimized
   @@index([parentLeaveId])
   @@index([status, startDate])
   @@index([status, updatedAt])
+  @@index([status, createdAt]) // Admin analytics - optimized
   @@index([startDate, endDate, status])
   @@index([type, status, startDate])
+  @@index([type, status]) // Leave type filtering - optimized
+  @@index([createdAt])
 }
 
 model Approval {
@@ -114,7 +118,9 @@ model Approval {
   leave      LeaveRequest     @relation(fields: [leaveId], references: [id])
 
   @@index([leaveId])
+  @@index([leaveId, step]) // Approval chain lookup - optimized
   @@index([approverId, decision])
+  @@index([approverId, decision, decidedAt]) // Pending approvals with timestamp - optimized
   @@index([approverId, decidedAt])
 }
 
@@ -130,6 +136,7 @@ model Balance {
   user    User      @relation(fields: [userId], references: [id])
 
   @@unique([userId, type, year])
+  @@index([userId, year])
 }
 
 model Holiday {
@@ -261,6 +268,7 @@ model Notification {
   expiresAt DateTime? // Optional expiry for time-sensitive notifications
 
   @@index([userId, read])
+  @@index([userId, read, createdAt]) // Notification dashboard - optimized
   @@index([userId, createdAt])
   @@index([createdAt])
 }

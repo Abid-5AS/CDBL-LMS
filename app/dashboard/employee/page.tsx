@@ -1,10 +1,18 @@
 import { Suspense } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { ModernEmployeeDashboard } from "@/components/dashboards";
+import dynamic from "next/dynamic";
 import { DashboardLoadingFallback } from "../shared/LoadingFallback";
 import { RoleBasedDashboard } from "@/components/dashboards/shared/RoleBasedDashboard";
 import { SelectionProvider } from "@/components/providers";
+import { Role } from "@/lib/enums";
+
+const ModernEmployeeDashboard = dynamic(
+  () => import("@/components/dashboards").then((mod) => mod.ModernEmployeeDashboard),
+  {
+    loading: () => <DashboardLoadingFallback />,
+  }
+);
 
 async function EmployeeDashboardPageContent() {
   const user = await getCurrentUser();
@@ -14,7 +22,7 @@ async function EmployeeDashboardPageContent() {
   }
 
   // Only allow EMPLOYEE role
-  if (user.role !== "EMPLOYEE") {
+  if (user.role !== Role.EMPLOYEE) {
     redirect("/dashboard");
   }
 
@@ -23,7 +31,7 @@ async function EmployeeDashboardPageContent() {
   return (
     <SelectionProvider>
       <RoleBasedDashboard
-        role="EMPLOYEE"
+        role={Role.EMPLOYEE}
         title={undefined}
         description={undefined}
         compactHeader

@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
-import { unstable_noStore as noStore } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { getHomePageForRole, type UserRole } from "@/lib/ui/navigation";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
-  noStore();
   const user = await getCurrentUser();
   
   if (user) {

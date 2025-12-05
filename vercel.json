@@ -1,12 +1,33 @@
 {
-  "crons": [
+  "cron": {
+    "items": [
+      {
+        "path": "/api/cron/el-accrual",
+        "schedule": "0 0 1 * *"
+      },
+      {
+        "path": "/api/cron/auto-lapse",
+        "schedule": "0 0 1 1 *"
+      }
+    ]
+  },
+  "headers": [
     {
-      "path": "/api/cron/el-accrual",
-      "schedule": "0 0 1 * *"
-    },
-    {
-      "path": "/api/cron/auto-lapse",
-      "schedule": "59 17 31 12 *"
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
     }
   ]
 }

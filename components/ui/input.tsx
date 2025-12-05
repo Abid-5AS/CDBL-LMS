@@ -45,124 +45,49 @@ interface InputProps
   floating?: boolean;
 }
 
-const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  (
-    {
-      className,
-      type,
-      variant,
-      size,
-      label,
-      helperText,
-      errorMessage,
-      leftIcon,
-      rightIcon,
-      floating = false,
-      placeholder,
-      ...props
-    },
-    ref
-  ) => {
-    const [focused, setFocused] = React.useState(false);
-    const [hasValue, setHasValue] = React.useState(false);
-    const inputId = React.useId();
+const Input = (
+  {
+    className,
+    type,
+    variant,
+    size,
+    label,
+    helperText,
+    errorMessage,
+    leftIcon,
+    rightIcon,
+    floating = false,
+    placeholder,
+    ref,
+    ...props
+  }: InputProps
+) => {
+  const [focused, setFocused] = React.useState(false);
+  const [hasValue, setHasValue] = React.useState(false);
+  const inputId = React.useId();
 
-    // Auto-detect variant based on errorMessage
-    const actualVariant = errorMessage ? "error" : variant;
-    const showFloatingLabel = floating && (focused || hasValue || placeholder);
+  // Auto-detect variant based on errorMessage
+  const actualVariant = errorMessage ? "error" : variant;
+  const showFloatingLabel = floating && (focused || hasValue || placeholder);
 
-    const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-      setFocused(true);
-      props.onFocus?.(e);
-    };
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setFocused(true);
+    props.onFocus?.(e);
+  };
 
-    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-      setFocused(false);
-      props.onBlur?.(e);
-    };
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    setFocused(false);
+    props.onBlur?.(e);
+  };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setHasValue(e.target.value.length > 0);
-      props.onChange?.(e);
-    };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setHasValue(e.target.value.length > 0);
+    props.onChange?.(e);
+  };
 
-    if (floating && label) {
-      return (
-        <div className="relative">
-          <div className="relative">
-            {leftIcon && (
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                {leftIcon}
-              </div>
-            )}
-            <input
-              type={type}
-              id={inputId}
-              ref={ref}
-              className={cn(
-                inputVariants({ variant: actualVariant, size }),
-                leftIcon && "pl-10",
-                rightIcon && "pr-10",
-                floating && "placeholder-transparent",
-                className
-              )}
-              placeholder={placeholder}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              onChange={handleChange}
-              aria-describedby={
-                helperText || errorMessage
-                  ? `${inputId}-description`
-                  : undefined
-              }
-              aria-invalid={actualVariant === "error"}
-              {...props}
-            />
-            {rightIcon && (
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                {rightIcon}
-              </div>
-            )}
-            <label
-              htmlFor={inputId}
-              className={cn(
-                "absolute left-4 transition-all duration-200 pointer-events-none text-muted-foreground",
-                leftIcon && "left-10",
-                showFloatingLabel
-                  ? "-top-2 text-xs bg-background px-1 text-primary"
-                  : "top-1/2 -translate-y-1/2 text-sm"
-              )}
-            >
-              {label}
-            </label>
-          </div>
-          {(helperText || errorMessage) && (
-            <p
-              id={`${inputId}-description`}
-              className={cn(
-                "mt-1.5 text-xs",
-                actualVariant === "error"
-                  ? "text-destructive"
-                  : "text-muted-foreground"
-              )}
-            >
-              {errorMessage || helperText}
-            </p>
-          )}
-        </div>
-      );
-    }
-
+  if (floating && label) {
     return (
-      <div className="space-y-1.5">
-        {label && (
-          <label
-            htmlFor={inputId}
-            className="text-sm font-medium text-foreground"
-          >
-            {label}
-          </label>
-        )}
+      <div className="relative">
         <div className="relative">
           {leftIcon && (
             <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -177,11 +102,17 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               inputVariants({ variant: actualVariant, size }),
               leftIcon && "pl-10",
               rightIcon && "pr-10",
+              floating && "placeholder-transparent",
               className
             )}
             placeholder={placeholder}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onChange={handleChange}
             aria-describedby={
-              helperText || errorMessage ? `${inputId}-description` : undefined
+              helperText || errorMessage
+                ? `${inputId}-description`
+                : undefined
             }
             aria-invalid={actualVariant === "error"}
             {...props}
@@ -191,12 +122,24 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               {rightIcon}
             </div>
           )}
+          <label
+            htmlFor={inputId}
+            className={cn(
+              "absolute left-4 transition-all duration-200 pointer-events-none text-muted-foreground",
+              leftIcon && "left-10",
+              showFloatingLabel
+                ? "-top-2 text-xs bg-background px-1 text-primary"
+                : "top-1/2 -translate-y-1/2 text-sm"
+            )}
+          >
+            {label}
+          </label>
         </div>
         {(helperText || errorMessage) && (
           <p
             id={`${inputId}-description`}
             className={cn(
-              "text-xs",
+              "mt-1.5 text-xs",
               actualVariant === "error"
                 ? "text-destructive"
                 : "text-muted-foreground"
@@ -208,7 +151,62 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       </div>
     );
   }
-);
+
+  return (
+    <div className="space-y-1.5">
+      {label && (
+        <label
+          htmlFor={inputId}
+          className="text-sm font-medium text-foreground"
+        >
+          {label}
+        </label>
+      )}
+      <div className="relative">
+        {leftIcon && (
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+            {leftIcon}
+          </div>
+        )}
+        <input
+          type={type}
+          id={inputId}
+          ref={ref}
+          className={cn(
+            inputVariants({ variant: actualVariant, size }),
+            leftIcon && "pl-10",
+            rightIcon && "pr-10",
+            className
+          )}
+          placeholder={placeholder}
+          aria-describedby={
+            helperText || errorMessage ? `${inputId}-description` : undefined
+          }
+          aria-invalid={actualVariant === "error"}
+          {...props}
+        />
+        {rightIcon && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+            {rightIcon}
+          </div>
+        )}
+      </div>
+      {(helperText || errorMessage) && (
+        <p
+          id={`${inputId}-description`}
+          className={cn(
+            "text-xs",
+            actualVariant === "error"
+              ? "text-destructive"
+              : "text-muted-foreground"
+          )}
+        >
+          {errorMessage || helperText}
+        </p>
+      )}
+    </div>
+  );
+}
 
 Input.displayName = "Input";
 

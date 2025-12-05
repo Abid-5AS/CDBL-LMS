@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { checkRateLimit } from "@/lib/rateLimit";
 import { createOtpCode } from "@/lib/otp";
 import { sendOtpEmail } from "@/lib/email";
+import { LoginSchema } from "@/lib/validators";
 
 export const cache = "no-store";
 
@@ -25,14 +26,16 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { email, password, skipOtp } = body;
+    const result = LoginSchema.safeParse(body);
 
-    if (!email || !password) {
+    if (!result.success) {
       return NextResponse.json(
-        { error: "Missing email or password" },
+        { error: "Invalid input", details: result.error.format() },
         { status: 400 }
       );
     }
+
+    const { email, password, skipOtp } = result.data;
 
     // Find user by email
     const user = await prisma.user.findUnique({

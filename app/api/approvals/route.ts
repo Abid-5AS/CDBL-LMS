@@ -4,10 +4,7 @@ import { ApprovalService } from "@/lib/services/approval.service";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
 import { LeaveStatus } from "@prisma/client";
-
-// Short cache for pending approvals (30 seconds)
-let approvalCache: Map<number, { data: any; timestamp: number }> = new Map();
-const APPROVAL_CACHE_TTL = 30 * 1000; // 30 seconds
+import { cached } from "@/lib/cache/redis";
 
 /**
  * GET /api/approvals
@@ -31,20 +28,13 @@ export async function GET(req: Request) {
     );
   }
 
-  // Check cache first
-  const now = Date.now();
-  const cached = approvalCache.get(me.id);
-  if (cached && now - cached.timestamp < APPROVAL_CACHE_TTL) {
-    return NextResponse.json(cached.data, {
-      headers: {
-        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
-      },
-    });
-  }
-
   try {
-    // Use ApprovalService to get pending approvals
-    const result = await ApprovalService.getPendingForApprover(me.id);
+    // Use Redis cache with 30 second TTL for better performance
+    const result = await cached(
+      `approvals:pending:${me.id}`,
+      30, // 30 seconds TTL
+      async () => await ApprovalService.getPendingForApprover(me.id)
+    );
 
     if (!result.success) {
       return NextResponse.json(
@@ -95,12 +85,6 @@ export async function GET(req: Request) {
 
     const responseData = { items };
 
-    // Update cache
-    approvalCache.set(me.id, {
-      data: responseData,
-      timestamp: Date.now(),
-    });
-
     return NextResponse.json(responseData, {
       headers: {
         "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
@@ -115,11 +99,5 @@ export async function GET(req: Request) {
   }
 }
 
-// Clear cache on write operations
-export function clearApprovalCache(userId?: number) {
-  if (userId) {
-    approvalCache.delete(userId);
-  } else {
-    approvalCache.clear();
-  }
-}
+// Cache invalidation is now handled by Redis invalidateCache() function
+// Call invalidateCache('approvals:*') after approval operations

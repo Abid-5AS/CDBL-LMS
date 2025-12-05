@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getOutlookTokens } from '@/lib/integrations/calendar/outlook-auth';
 import { prisma } from '@/lib/prisma';
 import { CalendarProvider } from '@prisma/client';
-import { getSession } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;

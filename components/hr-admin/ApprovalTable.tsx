@@ -17,7 +17,12 @@ import clsx from "clsx";
 import {
   Card,
   CardContent,
-  ModernTable,
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
   Checkbox,
   AlertDialog,
   AlertDialogAction,
@@ -757,11 +762,12 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
           </CardContent>
         </Card>
       ) : (
-        <ModernTable>
-          <ModernTable.Header>
-            <ModernTable.Row>
+        <div className="rounded-md border">
+          <Table>
+          <TableHeader>
+            <TableRow>
               {viewMode === "queue" && (
-                <ModernTable.Head className="w-12">
+                <TableHead className="w-12">
                   <Checkbox
                     checked={allSelected}
                     onCheckedChange={(checked) =>
@@ -772,29 +778,29 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                       someSelected ? "data-[state=checked]:bg-card-action" : ""
                     }
                   />
-                </ModernTable.Head>
+                </TableHead>
               )}
-              <ModernTable.Head>Employee</ModernTable.Head>
-              <ModernTable.Head>Type</ModernTable.Head>
-              <ModernTable.Head>Dates</ModernTable.Head>
-              <ModernTable.Head>Days</ModernTable.Head>
-              <ModernTable.Head>Reason</ModernTable.Head>
+              <TableHead>Employee</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Dates</TableHead>
+              <TableHead>Days</TableHead>
+              <TableHead>Reason</TableHead>
               {viewMode === "queue" ? (
                 <>
-                  <ModernTable.Head>Stage</ModernTable.Head>
-                  <ModernTable.Head className="text-right">
+                  <TableHead>Stage</TableHead>
+                  <TableHead className="text-right">
                     Actions
-                  </ModernTable.Head>
+                  </TableHead>
                 </>
               ) : (
                 <>
-                  <ModernTable.Head>Decision</ModernTable.Head>
-                  <ModernTable.Head>Processed On</ModernTable.Head>
+                  <TableHead>Decision</TableHead>
+                  <TableHead>Processed On</TableHead>
                 </>
               )}
-            </ModernTable.Row>
-          </ModernTable.Header>
-          <ModernTable.Body>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {items.map((item) => {
               const start = formatDate(item.start);
               const end = formatDate(item.end);
@@ -802,7 +808,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                 item.approvals?.[item.currentStageIndex]?.status ?? item.status;
               const decisionMeta = item.approvals?.[0];
               return (
-                <ModernTable.Row
+                <TableRow
                   key={item.id}
                   className={clsx(
                     "cursor-pointer transition",
@@ -822,7 +828,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                   }}
                 >
                   {viewMode === "queue" && (
-                    <ModernTable.Cell>
+                    <TableCell>
                       <Checkbox
                         checked={selectedIds.has(item.id)}
                         onCheckedChange={(checked) =>
@@ -831,41 +837,41 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                         onClick={(e) => e.stopPropagation()}
                         aria-label={`Select row ${item.id}`}
                       />
-                    </ModernTable.Cell>
+                    </TableCell>
                   )}
-                  <ModernTable.Cell>
+                  <TableCell>
                     <div className="font-medium text-foreground dark:text-foreground/90">
                       {item.requestedByName}
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {item.requestedByEmail ?? "—"}
                     </div>
-                  </ModernTable.Cell>
-                  <ModernTable.Cell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
                     {leaveTypeLabel[item.type] ?? item.type}
-                  </ModernTable.Cell>
-                  <ModernTable.Cell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
                     <div>{start}</div>
                     {start !== end && (
                       <div className="text-xs text-muted-foreground">
                         to {end}
                       </div>
                     )}
-                  </ModernTable.Cell>
-                  <ModernTable.Cell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
                     {item.requestedDays}
-                  </ModernTable.Cell>
-                  <ModernTable.Cell className="max-w-xs text-sm text-muted-foreground dark:text-muted-foreground/80">
+                  </TableCell>
+                  <TableCell className="max-w-xs text-sm text-muted-foreground dark:text-muted-foreground/80">
                     <p className="whitespace-pre-wrap wrap-break-word">
                       {item.reason}
                     </p>
-                  </ModernTable.Cell>
+                  </TableCell>
                   {viewMode === "queue" ? (
                     <>
-                      <ModernTable.Cell className="text-sm font-medium capitalize text-muted-foreground dark:text-muted-foreground/80">
+                      <TableCell className="text-sm font-medium capitalize text-muted-foreground dark:text-muted-foreground/80">
                         {stage.toLowerCase()}
-                      </ModernTable.Cell>
-                      <ModernTable.Cell className="text-right">
+                      </TableCell>
+                      <TableCell className="text-right">
                         <div
                           className="flex justify-end"
                           onClick={(e) => e.stopPropagation()}
@@ -918,25 +924,26 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                             loadingAction={null}
                           />
                         </div>
-                      </ModernTable.Cell>
+                      </TableCell>
                     </>
                   ) : (
                     <>
-                      <ModernTable.Cell className="text-sm font-semibold capitalize text-muted-foreground dark:text-muted-foreground/80">
+                      <TableCell className="text-sm font-semibold capitalize text-muted-foreground dark:text-muted-foreground/80">
                         {item.status.toLowerCase()}
-                      </ModernTable.Cell>
-                      <ModernTable.Cell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
                         {decisionMeta?.decidedAt
                           ? formatDate(decisionMeta.decidedAt)
                           : "—"}
-                      </ModernTable.Cell>
+                      </TableCell>
                     </>
                   )}
-                </ModernTable.Row>
+                </TableRow>
               );
             })}
-          </ModernTable.Body>
-        </ModernTable>
+          </TableBody>
+        </Table>
+        </div>
       )}
       {items.length !== displayedItems.length && displayedItems.length > 0 && (
         <p className="text-sm text-muted-foreground text-center">

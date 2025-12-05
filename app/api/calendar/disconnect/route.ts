@@ -1,50 +1,54 @@
-import { prisma } from '@/lib/prisma';
-import { NextRequest, NextResponse } from 'next/server';
-import { jwtVerify } from 'jose';
+import { GoogleCalendarService } from '@/lib/integrations/calendar/google-calendar';
+import { OutlookCalendarService } from '@/lib/integrations/calendar/outlook-calendar';
+import { getCurrentUser } from '@/lib/auth';
 import { CalendarProvider } from '@prisma/client';
+import { NextResponse } from 'next/server';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'secret';
+export const dynamic = 'force-dynamic';
 
-async function getUserIdFromRequest(req: NextRequest): Promise<number | null> {
-  const token = req.cookies.get('token')?.value;
-  if (!token) return null;
+export async function POST(req: Request) {
+    try {
+        // Authenticate user
+        const user = await getCurrentUser();
 
-  try {
-    const { payload } = await jwtVerify(
-      token,
-      new TextEncoder().encode(JWT_SECRET)
-    );
-    return payload.userId as number;
-  } catch (e) {
-    return null;
-  }
-}
+        if (!user?.id) {
+            return new NextResponse('Unauthorized - Please log in', { status: 401 });
+        }
 
-export async function POST(req: NextRequest) {
-  const userId = await getUserIdFromRequest(req);
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+        // Parse request body with proper error handling
+        let body;
+        try {
+            body = await req.json();
+        } catch (parseError) {
+            return new NextResponse('Invalid JSON in request body', { status: 400 });
+        }
 
-  const body = await req.json();
-  const { provider } = body;
+        const { provider } = body;
 
-  if (!provider || !['GOOGLE', 'OUTLOOK'].includes(provider)) {
-    return NextResponse.json({ error: 'Invalid provider' }, { status: 400 });
-  }
+        if (!provider) {
+            return new NextResponse('Missing required field: provider', { status: 400 });
+        }
 
-  // Deactivate config
-  await prisma.calendarConfig.updateMany({
-    where: {
-      userId,
-      provider: provider as CalendarProvider
-    },
-    data: {
-      isActive: false,
-      accessToken: '', // Clear tokens for security
-      refreshToken: ''
+        // Validate provider type
+        if (provider !== 'GOOGLE_CALENDAR' && provider !== 'OUTLOOK') {
+            return new NextResponse('Invalid provider. Must be GOOGLE_CALENDAR or OUTLOOK', { status: 400 });
+        }
+
+        // Use authenticated user's ID instead of accepting it from body (security)
+        const userId = user.id.toString();
+
+        if (provider === 'GOOGLE_CALENDAR') {
+            const service = new GoogleCalendarService();
+            await service.disconnectGoogleCalendar(userId);
+        } else if (provider === 'OUTLOOK') {
+            const service = new OutlookCalendarService('');
+            await service.disconnectOutlook(userId);
+        }
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('Error disconnecting calendar:', error);
+        const message = error instanceof Error ? error.message : 'Internal Server Error';
+        return new NextResponse(message, { status: 500 });
     }
-  });
-
-  return NextResponse.json({ success: true });
 }

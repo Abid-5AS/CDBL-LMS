@@ -2,13 +2,16 @@ import { Suspense } from "react";
 import { UserProvider } from "@/components/providers";
 import { LayoutWrapper } from "@/components/layout/LayoutWrapper";
 import { getCurrentUser } from "@/lib/auth";
+import { NotificationProvider as RealtimeNotificationProvider } from "@/lib/contexts/notification-context";
 
 async function LayoutContent({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
 
   return (
     <UserProvider user={user}>
-      <LayoutWrapper>{children}</LayoutWrapper>
+      <RealtimeNotificationProvider>
+        <LayoutWrapper>{children}</LayoutWrapper>
+      </RealtimeNotificationProvider>
     </UserProvider>
   );
 }

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getGoogleTokens } from '@/lib/integrations/calendar/google-auth';
 import { prisma } from '@/lib/prisma';
 import { CalendarProvider } from '@prisma/client';
-import { getSession } from '@/lib/auth'; // Assuming auth helper exists
+import { getCurrentUser } from '@/lib/auth'; // Assuming auth helper exists
 
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;

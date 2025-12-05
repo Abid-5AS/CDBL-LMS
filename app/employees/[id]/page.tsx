@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
-import { unstable_noStore as noStore } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { canViewAllRequests, canViewEmployee, canEditEmployee, type AppRole } from "@/lib/rbac";
 import { getEmployeeDashboardData } from "@/lib/employee";
@@ -10,6 +9,8 @@ import { prisma } from "@/lib/prisma";
 
 // Note: dynamic export removed - incompatible with Next.js 16 cacheComponents
 // Using unstable_noStore() inside component for dynamic behavior
+
+export const dynamic = "force-dynamic";
 
 type EmployeePageProps = {
   params: Promise<{ id: string }>;
@@ -25,7 +26,6 @@ export default function EmployeeDetailPage(props: EmployeePageProps) {
 }
 
 async function EmployeeDashboardSection({ params, searchParams }: EmployeePageProps) {
-  noStore();
   const user = await getCurrentUser();
   
   if (!user) {

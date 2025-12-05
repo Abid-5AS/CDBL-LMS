@@ -9,6 +9,7 @@ import React, {
   useRef,
 } from "react";
 import { toast } from "sonner";
+import { useUser } from "@/components/providers/UserContext";
 
 export type NotificationType =
   | "APPROVAL_REQUIRED"
@@ -65,6 +66,7 @@ interface NotificationProviderProps {
 }
 
 export function NotificationProvider({ children }: NotificationProviderProps) {
+  const user = useUser();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isConnected, setIsConnected] = useState(false);
@@ -75,6 +77,8 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
 
   // Function to connect to SSE
   const connect = useCallback(() => {
+    if (!user) return;
+
     // Close existing connection
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
@@ -145,11 +149,19 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
         );
       }
     };
-  }, []);
+  }, [user]);
 
   // Connect on mount
   useEffect(() => {
-    connect();
+    if (user) {
+      connect();
+    } else {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+        setIsConnected(false);
+      }
+    }
 
     // Cleanup on unmount
     return () => {
@@ -160,7 +172,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
         clearTimeout(reconnectTimeoutRef.current);
       }
     };
-  }, [connect]);
+  }, [connect, user]);
 
   // Function to show toast based on notification type
   const showToast = (notification: Notification) => {

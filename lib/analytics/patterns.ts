@@ -210,7 +210,7 @@ export class PatternDetector {
   /**
    * Detect sick leave clustering (multiple sick leaves in short period)
    */
-  static async detectSickLeaveClus tering(
+  static async detectSickLeaveClustering(
     lookbackMonths: number = 6,
     department?: string
   ): Promise<LeavePattern[]> {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 
 export interface ValidationRule<T = any> {
   field: keyof T;
@@ -58,6 +58,8 @@ export function useRealTimeValidation<T extends Record<string, any>>({
     if (validateOnMount) {
       validateAllFields();
     }
+    // Only run on mount - rules should be stable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const validateField = useCallback(
