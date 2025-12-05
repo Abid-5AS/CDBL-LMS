@@ -29,6 +29,7 @@ import {
   TooltipContent,
   TooltipTrigger,
   TooltipProvider,
+  Badge,
 } from "@/components/ui";
 import { useApiQuery } from "@/lib/apiClient";
 import { useLeaveRequests } from "@/hooks";
@@ -215,19 +216,21 @@ export function ModernEmployeeDashboard({
                 </Button>
               </div>
               {dashboardData.nextScheduledLeave && (
-                <div className="rounded-xl border border-border/60 px-4 py-3 bg-muted/30">
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
-                    Next Approved Leave
-                  </p>
-                  <p className="text-base font-semibold text-foreground">
-                    {formatDate(dashboardData.nextScheduledLeave.startDate)} →{" "}
+                <div className="mt-4 inline-flex items-center gap-3 rounded-lg border border-border/40 bg-muted/20 px-3 py-2 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1.5 font-medium text-foreground">
+                    <Calendar className="h-4 w-4 text-primary" />
+                    Next Leave:
+                  </span>
+                  <span className="text-foreground">
+                    {formatDate(dashboardData.nextScheduledLeave.startDate)} —{" "}
                     {formatDate(dashboardData.nextScheduledLeave.endDate)}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {leaveTypeLabel[dashboardData.nextScheduledLeave.type] ||
-                      dashboardData.nextScheduledLeave.type}{" "}
-                    · {dashboardData.nextScheduledLeave.workingDays} days
-                  </p>
+                  </span>
+                  <Badge variant="outline" className="text-[10px] font-normal h-5 border-border/50">
+                    {leaveTypeLabel[dashboardData.nextScheduledLeave.type] || dashboardData.nextScheduledLeave.type}
+                  </Badge>
+                  <span className="text-xs opacity-80">
+                    ({dashboardData.nextScheduledLeave.workingDays} {dashboardData.nextScheduledLeave.workingDays === 1 ? 'day' : 'days'})
+                  </span>
                 </div>
               )}
             </div>
