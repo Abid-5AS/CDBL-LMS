@@ -314,7 +314,7 @@ function PolicyCard({ policy }: PolicyCardProps) {
     <div className="neo-card p-6 rounded-2xl border bg-card text-card-foreground shadow-sm">
       <div className="flex flex-col gap-6">
         {/* Header */}
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className={cn("p-2.5 rounded-xl bg-muted/50", policy.color)}>
               <Icon className="size-6" />
@@ -333,7 +333,7 @@ function PolicyCard({ policy }: PolicyCardProps) {
               )}
             </div>
           </div>
-          <Badge variant="secondary" className="text-sm px-3 py-1 h-auto">
+          <Badge variant="secondary" className="text-sm px-3 py-1 h-auto self-start sm:self-auto shrink-0">
             {policy.availability}
           </Badge>
         </div>
@@ -571,7 +571,7 @@ export function PolicyPageContent() {
 
       {/* Tabs for Organization */}
       <Tabs defaultValue="all" className="w-full surface-card p-4 rounded-3xl">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 bg-muted/50 rounded-2xl">
+        <TabsList className="grid w-full h-auto grid-cols-2 lg:grid-cols-6 bg-muted/50 rounded-2xl">
           <TabsTrigger value="all">All Policies</TabsTrigger>
           <TabsTrigger value="cl">CL</TabsTrigger>
           <TabsTrigger value="el">EL</TabsTrigger>

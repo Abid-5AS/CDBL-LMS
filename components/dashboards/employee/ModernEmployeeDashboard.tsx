@@ -188,80 +188,62 @@ export function ModernEmployeeDashboard({
           className="space-y-6 lg:space-y-8"
         >
           <motion.section variants={itemVariants}>
-            <div className="surface-card p-4 sm:p-6">
-              <div className="flex items-center justify-between gap-4 mb-4">
-                <div>
-                  <h1 className="text-xl sm:text-2xl font-semibold text-foreground">
-                    {username}
+            <div className="surface-card p-4 sm:p-5 rounded-2xl border bg-card/50 backdrop-blur-sm">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                {/* Welcome & Date */}
+                <div className="space-y-1">
+                  <h1 className="text-xl font-semibold text-foreground tracking-tight">
+                    Welcome back, {username.split(' ')[0]}
                   </h1>
-                  <p className="text-sm text-muted-foreground">
-                    {mounted
-                      ? new Date().toLocaleDateString("en-GB", {
-                          weekday: "long",
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })
-                      : "..."}
-                  </p>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span>
+                      {mounted
+                        ? new Date().toLocaleDateString("en-GB", {
+                            weekday: "short",
+                            day: "numeric",
+                            month: "short",
+                          })
+                        : "..."}
+                    </span>
+                    {/* Next Leave Inline */}
+                    {dashboardData.nextScheduledLeave && (
+                      <>
+                        <span className="h-1 w-1 rounded-full bg-border" />
+                        <div className="flex items-center gap-1.5 text-foreground/80 font-medium bg-muted/30 px-2 py-0.5 rounded-md">
+                          <Calendar className="h-3.5 w-3.5 text-primary" />
+                          <span className="text-xs">
+                             Next: {formatDate(dashboardData.nextScheduledLeave.startDate)}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
-                <Button
-                  variant="default"
-                  size="sm"
-                  leftIcon={<Plus className="h-4 w-4" aria-hidden="true" />}
-                  onClick={() => router.push("/leaves/apply")}
-                >
-                  Apply for Leave
-                </Button>
-              </div>
-              {dashboardData.nextScheduledLeave && (
-                <div className="mt-4 inline-flex items-center gap-3 rounded-lg border border-border/40 bg-muted/20 px-3 py-2 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1.5 font-medium text-foreground">
-                    <Calendar className="h-4 w-4 text-primary" />
-                    Next Leave:
-                  </span>
-                  <span className="text-foreground">
-                    {formatDate(dashboardData.nextScheduledLeave.startDate)} —{" "}
-                    {formatDate(dashboardData.nextScheduledLeave.endDate)}
-                  </span>
-                  <Badge variant="outline" className="text-[10px] font-normal h-5 border-border/50">
-                    {leaveTypeLabel[dashboardData.nextScheduledLeave.type] || dashboardData.nextScheduledLeave.type}
-                  </Badge>
-                  <span className="text-xs opacity-80">
-                    ({dashboardData.nextScheduledLeave.workingDays} {dashboardData.nextScheduledLeave.workingDays === 1 ? 'day' : 'days'})
-                  </span>
-                </div>
-              )}
-            </div>
-          </motion.section>
 
-          <motion.section variants={itemVariants}>
-            <div className="sticky top-4 z-20 hidden md:block">
-              <div className="surface-card flex flex-wrap items-center justify-between gap-3 border border-border/70 px-4 py-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-muted-foreground">
-                  Quick Navigation
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    variant="ghost"
+                {/* Actions */}
+                <div className="flex items-center gap-2 self-start lg:self-auto">
+                   <Button
+                    variant="outline"
                     size="sm"
-                    className="rounded-full border border-border/70"
+                    className="hidden sm:flex"
                     onClick={() => scrollToSection("action-center")}
                   >
                     Action Center
                   </Button>
                   <Button
-                    variant="ghost"
+                    variant="default"
                     size="sm"
-                    className="rounded-full border border-border/70"
-                    onClick={() => scrollToSection("leave-details", "balance")}
+                    leftIcon={<Plus className="h-4 w-4" aria-hidden="true" />}
+                    onClick={() => router.push("/leaves/apply")}
                   >
-                    Leave Details
+                    Apply Leave
                   </Button>
                 </div>
               </div>
             </div>
           </motion.section>
+
+
 
           {/* Quick Stats Grid */}
           <DashboardSection
@@ -272,7 +254,7 @@ export function ModernEmployeeDashboard({
             animate={true}
           >
             <ResponsiveDashboardGrid
-              columns="2:2:3:3"
+              columns="1:2:4:4"
               gap="md"
               animate={true}
               staggerChildren={0.1}
