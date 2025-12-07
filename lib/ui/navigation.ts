@@ -31,7 +31,7 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
   EMPLOYEE: [
     { icon: Home, label: "Home", href: "/dashboard/employee" },
     { icon: ClipboardList, label: "My Leaves", href: "/leaves" },
-    { icon: Wallet, label: "Balance", href: "/leaves?view=balances" },
+    { icon: Wallet, label: "Balance", href: "/balance" },
     { icon: BookOpen, label: "Policies", href: "/policies" },
   ],
 

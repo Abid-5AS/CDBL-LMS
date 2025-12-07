@@ -57,6 +57,19 @@ const nextConfig: NextConfig = {
   // Empty turbopack config to silence migration warning
   turbopack: {},
 
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "api.dicebear.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      }
+    ],
+  },
+
   async headers() {
     return [
       {

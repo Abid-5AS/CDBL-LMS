@@ -176,7 +176,6 @@ export function ModernEmployeeDashboard({
 
   return (
     <TooltipProvider>
-      <FloatingQuickActions actions={quickActions} />
       <RoleBasedDashboard
         role={Role.EMPLOYEE}
         animate={true}

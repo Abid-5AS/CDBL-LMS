@@ -1,28 +1,39 @@
 "use client";
 
 import * as React from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
-  Search,
-  Command,
   Calendar,
   Users,
   FileText,
   Settings,
   Clock,
   TrendingUp,
-  X,
-  ArrowRight,
   History,
+  ArrowRight,
+  Loader2,
+  Moon,
+  Sun,
+  Monitor,
+  HelpCircle,
+  LogOut,
 } from "lucide-react";
-import Link from "next/link";
+
+import { useTheme } from "next-themes";
 
 import { cn } from "@/lib/utils";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useUser } from "@/components/providers/UserContext";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import useSWR from "swr";
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from "@/components/ui/command";
 
 // Simple fetcher for API calls
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -110,18 +121,15 @@ const quickActions = [
 
 export function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [query, setQuery] = React.useState("");
-  const [filteredResults, setFilteredResults] = React.useState<SearchResult[]>(
-    []
-  );
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const [filteredResults, setFilteredResults] = React.useState<SearchResult[]>([]);
   const [recentSearches, setRecentSearches] = React.useState<string[]>([]);
-  const inputRef = React.useRef<HTMLInputElement>(null);
   const user = useUser();
+  const { setTheme } = useTheme();
 
-  // Debounce the query to avoid too many API calls
+  // Debounce the query
   const debouncedQuery = useDebounce(query, 300);
 
-  // Fetch leave requests when searching
+  // Fetch leave requests
   const { data: leavesData, isLoading: isLoadingLeaves } = useSWR(
     debouncedQuery.trim() && isOpen
       ? `/api/leaves?mine=1&limit=5`
@@ -129,7 +137,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     fetcher
   );
 
-  // Fetch employees when searching (if admin/manager)
+  // Fetch employees
   const { data: employeesData, isLoading: isLoadingEmployees } = useSWR(
     debouncedQuery.trim() && isOpen && (user?.role === "SYSTEM_ADMIN" || user?.role === "HR_ADMIN" || user?.role === "DEPT_HEAD")
       ? `/api/employees?limit=5`
@@ -137,18 +145,19 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     fetcher
   );
 
-  // Combine static navigation results with dynamic API results
+  const isLoading = isLoadingLeaves || isLoadingEmployees;
+
+  // Filter Logic
   React.useEffect(() => {
     if (!debouncedQuery.trim()) {
       setFilteredResults([]);
-      setSelectedIndex(0);
       return;
     }
 
     const results: SearchResult[] = [];
     const searchText = debouncedQuery.toLowerCase();
 
-    // Add filtered static navigation results
+    // Static
     const filteredStatic = staticResults.filter((result) =>
       result.title.toLowerCase().includes(searchText) ||
       result.description?.toLowerCase().includes(searchText) ||
@@ -159,7 +168,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     );
     results.push(...filteredStatic);
 
-    // Add leave requests from API
+    // Leaves
     if (leavesData?.leaves && Array.isArray(leavesData.leaves)) {
       const leaveResults = leavesData.leaves
         .filter((leave: any) => {
@@ -170,16 +179,17 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
         .map((leave: any) => ({
           id: `leave-${leave.id}`,
           title: `Leave Request #${leave.id}`,
-          description: `${leave.type} - ${leave.status} (${new Date(leave.startDate).toLocaleDateString()} to ${new Date(leave.endDate).toLocaleDateString()})`,
+          description: `${leave.type} - ${leave.status}`,
           href: `/leaves/${leave.id}`,
           icon: Calendar,
           category: "Leaves",
           badge: leave.status,
+          keywords: []
         }));
       results.push(...leaveResults);
     }
 
-    // Add employees from API (for admins/managers)
+    // Employees
     if (employeesData?.employees && Array.isArray(employeesData.employees)) {
       const employeeResults = employeesData.employees
         .filter((emp: any) => {
@@ -190,304 +200,140 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
         .map((emp: any) => ({
           id: `employee-${emp.id}`,
           title: emp.name,
-          description: `${emp.email}${emp.department ? ` - ${emp.department}` : ""}`,
+          description: emp.department ? `${emp.department} • ${emp.email}` : emp.email,
           href: `/employees/${emp.id}`,
           icon: Users,
           category: "Employees",
           badge: emp.role,
+           keywords: []
         }));
       results.push(...employeeResults);
     }
 
     setFilteredResults(results);
-    setSelectedIndex(0);
   }, [debouncedQuery, leavesData, employeesData]);
 
-  // Handle keyboard navigation
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isOpen) return;
-
-      switch (e.key) {
-        case "ArrowDown":
-          e.preventDefault();
-          setSelectedIndex((prev) =>
-            Math.min(
-              prev + 1,
-              Math.max(filteredResults.length - 1, quickActions.length - 1)
-            )
-          );
-          break;
-        case "ArrowUp":
-          e.preventDefault();
-          setSelectedIndex((prev) => Math.max(prev - 1, 0));
-          break;
-        case "Enter":
-          e.preventDefault();
-          if (query.trim() && filteredResults.length > 0) {
-            const selected = filteredResults[selectedIndex];
-            if (selected) {
-              handleResultClick(selected);
-            }
-          } else if (!query.trim() && quickActions.length > 0) {
-            const selected = quickActions[selectedIndex];
-            if (selected) {
-              window.location.href = selected.href;
-              onClose();
-            }
-          }
-          break;
-        case "Escape":
-          onClose();
-          break;
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, filteredResults, selectedIndex, query, onClose]);
-
-  // Focus input when modal opens
-  React.useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isOpen]);
-
-  const handleResultClick = (result: SearchResult) => {
-    // Add to recent searches
+  const handleSelect = (href: string) => {
     setRecentSearches((prev) => {
-      const updated = [query, ...prev.filter((s) => s !== query)].slice(0, 5);
+      const updated = [query.trim() || "Navigation", ...prev.filter((s) => s !== query.trim())].slice(0, 5);
       return updated;
     });
-
     onClose();
-    window.location.href = result.href;
-  };
-
-  const handleRecentSearchClick = (search: string) => {
-    setQuery(search);
-  };
-
-  const clearRecentSearches = () => {
-    setRecentSearches([]);
+    window.location.href = href;
   };
 
   if (!user) return null;
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-start justify-center pt-[10vh] px-4"
-        >
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/50"
-            onClick={onClose}
-          />
+    <CommandDialog open={isOpen} onOpenChange={onClose}>
+      <CommandInput 
+        placeholder="Type a command or search..." 
+        value={query}
+        onValueChange={setQuery}
+      />
+      <CommandList>
+        <CommandEmpty>
+           {isLoading ? (
+             <div className="flex flex-col items-center justify-center py-6 gap-2">
+               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+               <p className="text-sm text-muted-foreground">Searching...</p>
+             </div>
+           ) : (
+             "No results found."
+           )}
+        </CommandEmpty>
 
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -20 }}
-            transition={{ type: "spring", duration: 0.4 }}
-            className="relative w-full max-w-2xl glass-modal shadow-2xl border border-white/20 dark:border-white/10 rounded-3xl overflow-hidden"
-          >
-            {/* Header */}
-            <div className="flex items-center gap-4 p-6 border-b border-white/10">
-              <Search className="h-5 w-5 text-muted-foreground" />
-              <Input
-                ref={inputRef}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search for leaves, employees, settings..."
-                className="flex-1 border-none bg-transparent text-lg placeholder:text-muted-foreground focus-visible:ring-0"
-                variant="ghost"
-              />
-              <button
-                onClick={onClose}
-                className="p-2 rounded-xl hover:bg-white/10 transition-colors focus-ring"
-                aria-label="Close search"
+        {/* Quick Actions (Show when query is empty) */}
+        {!query && (
+          <CommandGroup heading="Quick Actions">
+            {quickActions.map((action) => (
+              <CommandItem
+                key={action.href}
+                value={action.title}
+                onSelect={() => handleSelect(action.href)}
+                className="cursor-pointer"
               >
-                <X className="h-5 w-5" aria-hidden="true" />
-              </button>
-            </div>
-
-            {/* Content */}
-            <div className="max-h-96 overflow-y-auto soft-scrollbar">
-              {query.trim() ? (
-                // Search Results
-                <div className="p-4">
-                  {isLoadingLeaves || isLoadingEmployees ? (
-                    <div className="text-center py-12">
-                      <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent mb-4" />
-                      <p className="text-sm text-muted-foreground">
-                        Searching...
-                      </p>
-                    </div>
-                  ) : filteredResults.length > 0 ? (
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground px-3 py-2">
-                        {filteredResults.length} result
-                        {filteredResults.length !== 1 ? "s" : ""} for "{query}"
-                      </p>
-                      {filteredResults.map((result, index) => {
-                        const Icon = result.icon;
-                        return (
-                          <motion.button
-                            key={result.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            onClick={() => handleResultClick(result)}
-                            className={cn(
-                              "w-full flex items-center gap-4 p-4 rounded-2xl text-left transition-all duration-200 focus-ring",
-                              selectedIndex === index
-                                ? "bg-primary/10 border border-primary/20"
-                                : "hover:bg-white/5"
-                            )}
-                          >
-                            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
-                              <Icon className="h-5 w-5" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <h3 className="font-medium text-foreground truncate">
-                                  {result.title}
-                                </h3>
-                                <Badge variant="outline" size="xs">
-                                  {result.category}
-                                </Badge>
-                                {result.badge && (
-                                  <Badge variant="secondary" size="xs">
-                                    {result.badge}
-                                  </Badge>
-                                )}
-                              </div>
-                              {result.description && (
-                                <p className="text-sm text-muted-foreground truncate">
-                                  {result.description}
-                                </p>
-                              )}
-                            </div>
-                            <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                          </motion.button>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="text-center py-12">
-                      <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="font-medium text-foreground mb-2">
-                        No results found
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        Try searching for something else
-                      </p>
-                    </div>
-                  )}
+                <div className="mr-2 flex h-4 w-4 items-center justify-center">
+                  <action.icon className="h-3 w-3" />
                 </div>
-              ) : (
-                // Quick Actions & Recent Searches
-                <div className="p-4 space-y-6">
-                  {/* Quick Actions */}
-                  <div>
-                    <h3 className="text-sm font-medium text-foreground mb-3 px-3">
-                      Quick Actions
-                    </h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      {quickActions.map((action, index) => {
-                        const Icon = action.icon;
-                        return (
-                          <Link
-                            key={action.href}
-                            href={action.href}
-                            onClick={onClose}
-                            className={cn(
-                              "flex items-center gap-3 p-4 rounded-2xl transition-all duration-200 focus-ring hover:bg-white/5",
-                              selectedIndex === index && !query.trim()
-                                ? "bg-primary/10 border border-primary/20"
-                                : ""
-                            )}
-                          >
-                            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
-                              <Icon className="h-4 w-4" />
-                            </div>
-                            <span className="font-medium text-foreground">
-                              {action.title}
-                            </span>
-                          </Link>
-                        );
-                      })}
-                    </div>
+                <span>{action.title}</span>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        )}
+
+        {/* Recent Searches (Show when query is empty) */}
+        {!query && recentSearches.length > 0 && (
+           <>
+            <CommandSeparator />
+            <CommandGroup heading="Recent">
+              {recentSearches.map((search, i) => (
+                <CommandItem key={i} value={search} onSelect={() => setQuery(search)}>
+                  <History className="mr-2 h-4 w-4" />
+                  <span>{search}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+           </>
+        )}
+
+        {/* Search Results */}
+        {query && (
+          <CommandGroup heading="Suggestions">
+            {filteredResults.map((result) => {
+               const Icon = result.icon;
+               return (
+                <CommandItem
+                  key={result.id}
+                  value={result.title + result.description} // Search against both title and desc
+                  onSelect={() => handleSelect(result.href)}
+                  className="cursor-pointer"
+                >
+                  <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-md border border-border bg-muted/50">
+                    <Icon className="h-4 w-4 text-muted-foreground" />
                   </div>
-
-                  {/* Recent Searches */}
-                  {recentSearches.length > 0 && (
-                    <div>
-                      <div className="flex items-center justify-between mb-3 px-3">
-                        <h3 className="text-sm font-medium text-foreground">
-                          Recent Searches
-                        </h3>
-                        <button
-                          onClick={clearRecentSearches}
-                          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          Clear
-                        </button>
-                      </div>
-                      <div className="space-y-1">
-                        {recentSearches.map((search, index) => (
-                          <button
-                            key={index}
-                            onClick={() => handleRecentSearchClick(search)}
-                            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors text-left focus-ring"
-                          >
-                            <History className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm text-foreground">
-                              {search}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{result.title}</span>
+                      {result.badge && (
+                        <Badge variant="outline" className="h-5 px-1.5 text-[10px]">
+                          {result.badge}
+                        </Badge>
+                      )}
                     </div>
-                  )}
-                </div>
-              )}
-            </div>
+                     {result.description && (
+                      <span className="text-xs text-muted-foreground">{result.description}</span>
+                    )}
+                  </div>
+                  <ArrowRight className="ml-auto h-4 w-4 text-muted-foreground/50 opacity-0 group-data-[selected=true]:opacity-100" />
+                </CommandItem>
+              )
+            })}
+          </CommandGroup>
+        )}
 
-            {/* Footer */}
-            <div className="flex items-center justify-between p-4 border-t border-white/10 text-xs text-muted-foreground">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1">
-                  <kbd className="px-2 py-1 bg-muted rounded text-xs">↑↓</kbd>
-                  <span>Navigate</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <kbd className="px-2 py-1 bg-muted rounded text-xs">↵</kbd>
-                  <span>Select</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <kbd className="px-2 py-1 bg-muted rounded text-xs">esc</kbd>
-                  <span>Close</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-1">
-                <Command className="h-3 w-3" />
-                <span>Search</span>
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        {/* System & Help Commands */}
+        <CommandSeparator />
+        <CommandGroup heading="System & Preferences">
+          <CommandItem onSelect={() => { setTheme("light"); onClose(); }}>
+            <Sun className="mr-2 h-4 w-4" />
+            <span>Switch to Light Mode</span>
+          </CommandItem>
+          <CommandItem onSelect={() => { setTheme("dark"); onClose(); }}>
+            <Moon className="mr-2 h-4 w-4" />
+            <span>Switch to Dark Mode</span>
+          </CommandItem>
+          <CommandItem onSelect={() => { setTheme("system"); onClose(); }}>
+             <Monitor className="mr-2 h-4 w-4" />
+             <span>System Theme</span>
+          </CommandItem>
+          <CommandItem onSelect={() => handleSelect("/help")}>
+             <HelpCircle className="mr-2 h-4 w-4" />
+             <span>Help Center</span>
+          </CommandItem>
+        </CommandGroup>
+
+      </CommandList>
+    </CommandDialog>
   );
 }
