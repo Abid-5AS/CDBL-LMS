@@ -127,7 +127,7 @@ export function LeaveDetailsContent({ leave, comments, currentUserId, currentUse
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {/* Breadcrumbs */}
         <BreadcrumbList className="mb-6">

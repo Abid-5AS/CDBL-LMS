@@ -269,8 +269,8 @@ export function LeaveBalanceView() {
 
                 <div className="space-y-1.5 min-h-[60px]">
                   {showExpiryWarning && (
-                    <Alert variant="default" className="py-1">
-                      <AlertCircle className="h-3 w-3" />
+                    <Alert variant="warning" className="py-2 px-3 flex items-center gap-2 [&>svg]:static [&>svg]:translate-y-0 [&>svg~*]:pl-0">
+                      <AlertCircle className="h-4 w-4" />
                       <AlertDescription className="text-xs flex items-center gap-2">
                         <span>{available} days will expire on Dec 31.</span>
                         <Link
@@ -284,8 +284,8 @@ export function LeaveBalanceView() {
                   )}
 
                   {showCarryForwardWarning && (
-                    <Alert variant="default" className="py-1">
-                      <AlertCircle className="h-3 w-3" />
+                    <Alert variant="warning" className="py-2 px-3 flex items-center gap-2 [&>svg]:static [&>svg]:translate-y-0 [&>svg~*]:pl-0">
+                      <AlertCircle className="h-4 w-4" />
                       <AlertDescription className="text-xs flex items-center gap-2">
                         <span>Max {config.maxCarryForward} days can be carried forward.</span>
                         <Link

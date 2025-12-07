@@ -159,7 +159,7 @@ export function SettingsContent({ user }: SettingsContentProps) {
                     setTheme={setTheme}
                     icon={Sun}
                     label="Light"
-                    previewClass="bg-[#ffffff] border-slate-200"
+                    previewClass="bg-white border-slate-200"
                   />
                   <ThemeCard
                     value="dark"
@@ -167,7 +167,7 @@ export function SettingsContent({ user }: SettingsContentProps) {
                     setTheme={setTheme}
                     icon={Moon}
                     label="Dark"
-                    previewClass="bg-[#09090b] border-slate-800"
+                    previewClass="bg-slate-950 border-slate-800"
                   />
                   <ThemeCard
                     value="system"
