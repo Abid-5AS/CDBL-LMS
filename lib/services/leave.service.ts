@@ -162,18 +162,30 @@ export class LeaveService {
       });
 
       // 8. Create initial approval record
-      // First approver is always HR_ADMIN (step 1)
-      const approverRole = "HR_ADMIN";
-      const approver = await this.findApprover(userId, approverRole);
-      if (approver) {
-        await prisma.approval.create({
-          data: {
-            leaveId: leaveRequest.id,
-            approverId: approver.id,
-            step: 1,
-            decision: ApprovalDecision.PENDING,
-          },
-        });
+      // Dynamically determine first approver based on workflow chain
+      const { getChainFor } = await import('@/lib/workflow');
+      const chain = getChainFor(dto.type, user.role as any);
+
+      if (chain.length > 0) {
+        const firstApproverRole = chain[0];
+        const approver = await this.findApprover(userId, firstApproverRole);
+
+        if (approver) {
+          await prisma.approval.create({
+            data: {
+              leaveId: leaveRequest.id,
+              approverId: approver.id,
+              step: 1,
+              decision: ApprovalDecision.PENDING,
+            },
+          });
+        } else {
+          console.warn(`No approver found for role ${firstApproverRole} for user ${userId}`);
+        }
+      } else {
+        // No approval chain (e.g., CEO), auto-approve? 
+        // For now, we leave it as SUBMITTED without approval steps or auto-approve.
+        // Policy implies even CEO informs Board/HRD, so maybe handled offline or different process.
       }
 
       // 9. Log the creation

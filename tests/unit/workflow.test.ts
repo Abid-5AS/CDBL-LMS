@@ -5,106 +5,100 @@ import {
   canPerformAction,
   getNextRoleInChain,
   getStepForRole,
-  WORKFLOW_CHAINS,
+  MASTER_WORKFLOW_CHAIN,
+  WORKFLOW_CHAINS
 } from "@/lib/workflow";
 import type { LeaveType } from "@/src/generated/prisma/client";
 
 describe("lib/workflow", () => {
   describe("getChainFor()", () => {
-    it("should return correct chain for EARNED", () => {
-      const chain = getChainFor("EARNED");
-      expect(chain).toEqual(["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"]);
+    it("should return Master Chain for EMPLOYEE requester", () => {
+      const chain = getChainFor("EARNED", "EMPLOYEE");
+      expect(chain).toEqual(["DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"]);
     });
 
-    it("should return correct chain for CASUAL (shorter chain)", () => {
-      const chain = getChainFor("CASUAL");
-      expect(chain).toEqual(["DEPT_HEAD"]);
+    it("should return Sub-Chain for DEPT_HEAD requester", () => {
+      const chain = getChainFor("EARNED", "DEPT_HEAD");
+      expect(chain).toEqual(["HR_ADMIN", "HR_HEAD", "CEO"]);
     });
 
-    it("should return correct chain for MEDICAL", () => {
-      const chain = getChainFor("MEDICAL");
-      expect(chain).toEqual(["HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"]);
+    it("should return Sub-Chain for HR_ADMIN requester", () => {
+      const chain = getChainFor("EARNED", "HR_ADMIN");
+      expect(chain).toEqual(["HR_HEAD", "CEO"]);
     });
 
-    it("should return default chain for unknown type", () => {
-      const chain = getChainFor("EXTRAWITHPAY" as LeaveType);
-      expect(chain).toEqual(WORKFLOW_CHAINS.DEFAULT);
+    it("should return Sub-Chain for HR_HEAD requester", () => {
+      const chain = getChainFor("EARNED", "HR_HEAD");
+      expect(chain).toEqual(["CEO"]);
+    });
+
+    it("should return empty chain for CEO requester", () => {
+      const chain = getChainFor("EARNED", "CEO");
+      expect(chain).toEqual([]);
     });
   });
 
   describe("isFinalApprover()", () => {
-    it("should return true for CEO in EARNED chain", () => {
-      expect(isFinalApprover("CEO", "EARNED")).toBe(true);
+    it("should identify CEO as final approver for standard flow", () => {
+      expect(isFinalApprover("CEO", "EARNED", "EMPLOYEE")).toBe(true);
     });
 
-    it("should return false for DEPT_HEAD in EARNED chain", () => {
-      expect(isFinalApprover("DEPT_HEAD", "EARNED")).toBe(false);
+    it("should identify DEPT_HEAD as NOT final approver for standard flow", () => {
+      expect(isFinalApprover("DEPT_HEAD", "EARNED", "EMPLOYEE")).toBe(false);
     });
 
-    it("should return true for DEPT_HEAD in CASUAL chain (final approver)", () => {
-      expect(isFinalApprover("DEPT_HEAD", "CASUAL")).toBe(true);
-    });
-
-    it("should return false for HR_ADMIN in CASUAL chain", () => {
-      expect(isFinalApprover("HR_ADMIN", "CASUAL")).toBe(false);
+    it("should identify CEO as final approver for HR_HEAD request", () => {
+      expect(isFinalApprover("CEO", "EARNED", "HR_HEAD")).toBe(true);
     });
   });
 
   describe("canPerformAction()", () => {
-    it("should allow FORWARD for intermediate approvers", () => {
-      expect(canPerformAction("DEPT_HEAD", "FORWARD", "EARNED")).toBe(true);
-      expect(canPerformAction("HR_HEAD", "FORWARD", "EARNED")).toBe(true);
+    it("should allow FORWARD for DEPT_HEAD (first approver)", () => {
+      expect(canPerformAction("DEPT_HEAD", "FORWARD", "EARNED", "EMPLOYEE")).toBe(true);
     });
 
-    it("should not allow FORWARD for final approver", () => {
-      expect(canPerformAction("CEO", "FORWARD", "EARNED")).toBe(false);
-      expect(canPerformAction("DEPT_HEAD", "FORWARD", "CASUAL")).toBe(false);
+    it("should allow FORWARD for HR_ADMIN", () => {
+      expect(canPerformAction("HR_ADMIN", "FORWARD", "EARNED", "EMPLOYEE")).toBe(true);
     });
 
-    it("should allow APPROVE only for final approver", () => {
-      expect(canPerformAction("CEO", "APPROVE", "EARNED")).toBe(true);
-      expect(canPerformAction("DEPT_HEAD", "APPROVE", "CASUAL")).toBe(true);
-      expect(canPerformAction("DEPT_HEAD", "APPROVE", "EARNED")).toBe(false);
+    it("should NOT allow FORWARD for CEO (final approver)", () => {
+      expect(canPerformAction("CEO", "FORWARD", "EARNED", "EMPLOYEE")).toBe(false);
     });
 
-    it("should allow REJECT only for final approver", () => {
-      expect(canPerformAction("CEO", "REJECT", "EARNED")).toBe(true);
-      expect(canPerformAction("DEPT_HEAD", "REJECT", "CASUAL")).toBe(true);
-      expect(canPerformAction("HR_HEAD", "REJECT", "EARNED")).toBe(false);
+    it("should allow APPROVE only for final approver (CEO)", () => {
+      expect(canPerformAction("CEO", "APPROVE", "EARNED", "EMPLOYEE")).toBe(true);
+      expect(canPerformAction("DEPT_HEAD", "APPROVE", "EARNED", "EMPLOYEE")).toBe(false);
+    });
+
+    it("should allow REJECT/RETURN for any approver in chain", () => {
+      expect(canPerformAction("DEPT_HEAD", "REJECT", "EARNED", "EMPLOYEE")).toBe(true);
+      expect(canPerformAction("HR_ADMIN", "RETURN", "EARNED", "EMPLOYEE")).toBe(true);
     });
   });
 
   describe("getNextRoleInChain()", () => {
-    it("should return next role for intermediate approver", () => {
-      expect(getNextRoleInChain("HR_ADMIN", "EARNED")).toBe("DEPT_HEAD");
-      expect(getNextRoleInChain("DEPT_HEAD", "EARNED")).toBe("HR_HEAD");
+    it("should follow Master Chain sequence", () => {
+      expect(getNextRoleInChain("DEPT_HEAD", "EARNED", "EMPLOYEE")).toBe("HR_ADMIN");
+      expect(getNextRoleInChain("HR_ADMIN", "EARNED", "EMPLOYEE")).toBe("HR_HEAD");
+      expect(getNextRoleInChain("HR_HEAD", "EARNED", "EMPLOYEE")).toBe("CEO");
     });
 
-    it("should return null for final approver", () => {
-      expect(getNextRoleInChain("CEO", "EARNED")).toBeNull();
-      expect(getNextRoleInChain("DEPT_HEAD", "CASUAL")).toBeNull();
-    });
-
-    it("should return null for role not in chain", () => {
-      expect(getNextRoleInChain("EMPLOYEE", "EARNED")).toBeNull();
+    it("should follow Sub-Chain sequence for DEPT_HEAD requester", () => {
+      expect(getNextRoleInChain("HR_ADMIN", "EARNED", "DEPT_HEAD")).toBe("HR_HEAD");
     });
   });
 
   describe("getStepForRole()", () => {
-    it("should return correct step numbers (1-indexed)", () => {
-      expect(getStepForRole("HR_ADMIN", "EARNED")).toBe(1);
-      expect(getStepForRole("DEPT_HEAD", "EARNED")).toBe(2);
-      expect(getStepForRole("HR_HEAD", "EARNED")).toBe(3);
-      expect(getStepForRole("CEO", "EARNED")).toBe(4);
+    it("should return correct step numbers for EMPLOYEE request", () => {
+      expect(getStepForRole("DEPT_HEAD", "EARNED", "EMPLOYEE")).toBe(1);
+      expect(getStepForRole("HR_ADMIN", "EARNED", "EMPLOYEE")).toBe(2);
+      expect(getStepForRole("HR_HEAD", "EARNED", "EMPLOYEE")).toBe(3);
+      expect(getStepForRole("CEO", "EARNED", "EMPLOYEE")).toBe(4);
     });
 
-    it("should return 1 for DEPT_HEAD in CASUAL chain", () => {
-      expect(getStepForRole("DEPT_HEAD", "CASUAL")).toBe(1);
-    });
-
-    it("should return 0 for role not in chain", () => {
-      expect(getStepForRole("EMPLOYEE", "EARNED")).toBe(0);
+    it("should return correct step numbers for DEPT_HEAD request", () => {
+      expect(getStepForRole("HR_ADMIN", "EARNED", "DEPT_HEAD")).toBe(1);
+      expect(getStepForRole("CEO", "EARNED", "DEPT_HEAD")).toBe(3);
     });
   });
 });
-

@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { LeaveService } from '@/lib/services/leave.service';
 import { ApprovalService } from '@/lib/services/approval.service';
 import { prisma } from '@/lib/prisma';
+import { LeaveRepository } from '@/lib/repositories/leave.repository';
 
 // Mock Prisma
 vi.mock('@/lib/prisma', () => ({
@@ -18,6 +19,7 @@ vi.mock('@/lib/prisma', () => ({
       findFirst: vi.fn(),
       update: vi.fn(),
       updateMany: vi.fn(),
+      findMany: vi.fn(),
     },
     leaveBalance: {
       findFirst: vi.fn(),
@@ -47,6 +49,8 @@ vi.mock('@/lib/services/notification.service', () => ({
     notifyLeaveApproved: vi.fn(),
     notifyLeaveRejected: vi.fn(),
     notifyApprover: vi.fn(),
+    notifyLeaveForwarded: vi.fn(),
+    notifyLeaveReturned: vi.fn(),
   },
 }));
 
@@ -102,12 +106,11 @@ vi.mock('@/lib/integrations/calendar/calendar-service', () => ({
 
 // Mock Workflow
 vi.mock('@/lib/workflow', () => ({
-  getChainFor: vi.fn().mockReturnValue(['HR_ADMIN', 'DEPT_HEAD', 'HR_HEAD']),
+  getChainFor: vi.fn().mockReturnValue(['DEPT_HEAD', 'HR_ADMIN', 'HR_HEAD', 'CEO']), // Master Chain for Employee
   getStepForRole: vi.fn(),
-  getNextRoleInChain: vi.fn().mockReturnValue('DEPT_HEAD'),
+  getNextRoleInChain: vi.fn().mockReturnValue('HR_ADMIN'),
+  isFinalApprover: vi.fn().mockReturnValue(true), // Default for simple tests, override inside specific tests
 }));
-
-import { LeaveRepository } from '@/lib/repositories/leave.repository';
 
 describe('Leave Workflow Integration', () => {
   const mockUser = {
@@ -117,6 +120,7 @@ describe('Leave Workflow Integration', () => {
     department: 'IT',
     joinDate: new Date('2020-01-01'),
     retirementDate: new Date('2050-01-01'),
+    deptHeadId: 2,
   };
 
   const mockLeaveRequest = {
@@ -130,30 +134,25 @@ describe('Leave Workflow Integration', () => {
     status: 'SUBMITTED',
     createdAt: new Date(),
     updatedAt: new Date(),
-  };
-
-  const mockBalance = {
-    id: 1,
-    userId: 1,
-    year: 2025,
-    type: 'CASUAL',
-    opening: 10,
-    accrued: 0,
-    used: 0,
-    closing: 10,
+    requester: { role: 'EMPLOYEE' }
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should create a leave request successfully', async () => {
+  it('should create a leave request successfully with DEPT_HEAD as first approver', async () => {
     // Setup mocks
     (prisma.user.findUnique as any).mockResolvedValue(mockUser);
     (prisma.leaveRequest.findFirst as any).mockResolvedValue(null); // No duplicate
     (LeaveRepository.create as any).mockResolvedValue(mockLeaveRequest);
     (prisma.approval.create as any).mockResolvedValue({ id: 1 });
-    (prisma.user.findFirst as any).mockResolvedValue({ id: 2 }); // Approver
+
+    // Mock finding dept head
+    (prisma.user.findUnique as any).mockResolvedValueOnce(mockUser)
+      .mockResolvedValueOnce({ deptHeadId: 2 }); // findApprover call for DEPT_HEAD uses findUnique logic
+
+    (prisma.user.findFirst as any).mockResolvedValue(undefined); // Fallback
 
     // Execute
     const result = await LeaveService.createLeaveRequest(1, {
@@ -163,80 +162,67 @@ describe('Leave Workflow Integration', () => {
       reason: 'Vacation',
     });
 
-
-
     // Verify
     expect(result).toMatchObject({ success: true });
-    expect(result.data).toBeDefined();
     expect(LeaveRepository.create).toHaveBeenCalled();
+    // Should create approval for DEPT_HEAD (id 2)
+    // Note: leave.service.ts logic calls findApprover, which we mocked via prisma.user.findUnique/findFirst
+    // We expect prisma.approval.create to be called
     expect(prisma.approval.create).toHaveBeenCalled();
   });
 
-  it('should approve a leave request and update balance on final approval', async () => {
-    // Setup mocks for final approval
+  it('should approve a leave request and update type if provided (Superior Edit)', async () => {
     const leaveId = 100;
-    const approverId = 2; // HR Head
-    
-    (LeaveRepository.findById as any).mockResolvedValue(mockLeaveRequest);
-    
-    // Mock finding the pending approval
-    (prisma.approval.findFirst as any).mockResolvedValue({
-      id: 50,
-      leaveId: leaveId,
-      approverId: approverId,
-      status: 'PENDING',
-      step: 3, // Final step
-      approver: { role: 'HR_HEAD' }
-    });
+    const approverId = 3; // HR Admin
 
-    // Mock updating approval via repository
-    // (ApprovalRepository.updateByLeaveAndApprover as any).mockResolvedValue(1); // Already mocked globally
-
-    // Mock checking if it's the final approval
-    // We need to mock isFinalApproval private method logic or its dependencies
-    // Since isFinalApproval uses prisma.leaveRequest.findUnique with includes, we need to mock that
-    (prisma.leaveRequest.findUnique as any).mockResolvedValue({
+    // Mock existing leave
+    const leaveWithRelations = {
       ...mockLeaveRequest,
-      requester: { role: 'EMPLOYEE' },
-      approvals: [
-        { step: 3, decision: 'APPROVED', approver: { role: 'HR_HEAD' } },
-        { step: 2, decision: 'APPROVED', approver: { role: 'DEPT_HEAD' } },
-        { step: 1, decision: 'APPROVED', approver: { role: 'HR_ADMIN' } },
-      ]
+      requester: { role: 'EMPLOYEE', email: 'emp@test.com' },
+      approvals: []
+    };
+    (LeaveRepository.findById as any).mockResolvedValue(mockLeaveRequest);
+    (prisma.leaveRequest.findUnique as any).mockResolvedValue(leaveWithRelations);
+
+    // Mock transaction
+    // Mock prisma.$transaction to execute the callback immediately
+    (prisma.$transaction as any).mockImplementation(async (callback: any) => {
+      return callback(prisma);
     });
 
-    // Mock workflow chain (already mocked at top level)
+    // Mocks for transaction operations
+    (prisma.approval.updateMany as any).mockResolvedValue({ count: 1 });
+    (prisma.approval.findMany as any).mockResolvedValue([{ decision: 'APPROVED' }]);
+    (prisma.user.findUnique as any).mockResolvedValue({ id: approverId, name: 'HR Admin', role: 'HR_ADMIN' });
 
-    // Mock user for notification
-    (prisma.user.findUnique as any).mockResolvedValue({ id: approverId, name: 'HR Head' });
+    // Mock isFinalApprover to return false (intermediate step)
+    const workflow = await import('@/lib/workflow');
+    (workflow.isFinalApprover as any).mockReturnValue(false);
 
-    // Mock balance for deduction
-    // Note: deductFromBalance uses prisma.balance (not leaveBalance) based on code inspection
-    // Mock balance for deduction
-    (prisma.balance.findUnique as any).mockResolvedValue({
-      id: 1,
-      userId: 1,
-      type: 'CASUAL',
-      year: 2025,
-      opening: 10,
-      accrued: 0,
-      used: 0,
-      closing: 10,
-    });
-    (prisma.balance.update as any).mockResolvedValue({ id: 1 });
-
-    // Execute
-    const result = await ApprovalService.approve(leaveId, approverId, 'Approved');
-
-    if (!result.success) {
-      console.log('Approve Leave Failed:', JSON.stringify(result, null, 2));
-    }
+    // Execute with new leave type
+    const result = await ApprovalService.approve(
+      leaveId,
+      approverId,
+      'Approved with type change',
+      false,
+      'EARNED' // Changing CASUAL to EARNED
+    );
 
     // Verify
-    expect(result).toMatchObject({ success: true });
-    expect(result.data?.isFinal).toBe(true);
-    expect(LeaveRepository.updateStatus).toHaveBeenCalledWith(leaveId, 'APPROVED');
-    // Balance deduction verification
-    expect(prisma.balance.update).toHaveBeenCalled();
+    expect(result).toMatchObject({ success: true, data: { approved: true, isFinal: false } });
+
+    // Verify Leave Type Update
+    expect(prisma.leaveRequest.update).toHaveBeenCalledWith({
+      where: { id: leaveId },
+      data: { type: 'EARNED', isModified: true }
+    });
+
+    // Verify Audit Log for type change
+    expect(prisma.auditLog.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        action: 'LEAVE_TYPE_CHANGED',
+        details: expect.objectContaining({ oldType: 'CASUAL', newType: 'EARNED' })
+      })
+    }));
   });
 });

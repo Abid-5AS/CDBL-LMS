@@ -2,7 +2,7 @@ import { ApprovalRepository, ApprovalWithRelations } from "@/lib/repositories/ap
 import { LeaveRepository } from "@/lib/repositories/leave.repository";
 import { NotificationService } from "./notification.service";
 import { prisma } from "@/lib/prisma";
-import { ApprovalDecision, LeaveStatus, Role } from "@/src/generated/prisma/client";
+import { LeaveType, LeaveStatus, ApprovalDecision, Role } from "@/src/generated/prisma/client";
 import { invalidateCache } from "@/lib/cache/redis";
 
 export type ServiceResult<T> = {
@@ -101,7 +101,9 @@ export class ApprovalService {
   static async approve(
     leaveId: number,
     approverId: number,
-    comment?: string
+    comment?: string,
+    ignoreWarnings: boolean = false,
+    newLeaveType?: LeaveType // New: Allow changing leave type
   ): Promise<ServiceResult<{ approved: boolean; isFinal: boolean }>> {
     try {
       // 1. Verify leave exists and is in valid state
@@ -129,6 +131,26 @@ export class ApprovalService {
       // 2-5. Execute critical operations in a transaction to ensure data consistency
       // This prevents partial updates if any operation fails
       const { updated, isFinal } = await prisma.$transaction(async (tx) => {
+        // 1.5 Update leave type if provided (Superior Edit Capability)
+        if (newLeaveType && newLeaveType !== leave.type) {
+          await tx.leaveRequest.update({
+            where: { id: leaveId },
+            data: { type: newLeaveType, isModified: true }
+          });
+
+          await tx.auditLog.create({
+            data: {
+              actorEmail: (await tx.user.findUnique({ where: { id: approverId }, select: { email: true } }))?.email || "unknown",
+              action: "LEAVE_TYPE_CHANGED",
+              targetEmail: leave.requester?.email,
+              details: { leaveId, oldType: leave.type, newType: newLeaveType }
+            }
+          });
+
+          // Update local leave object for subsequent checks
+          leave.type = newLeaveType;
+        }
+
         // 2. Find and update the pending approval
         const updated = await tx.approval.updateMany({
           where: {
@@ -147,12 +169,19 @@ export class ApprovalService {
           throw new Error("approval_not_found");
         }
 
-        // 3. Check if this is the final approval
-        const allApprovals = await tx.approval.findMany({
-          where: { leaveId },
-          select: { decision: true }
+        // 3. Check if this is the final approval using dynamic chain logic
+        const { isFinalApprover } = await import('@/lib/workflow');
+        const approver = await tx.user.findUnique({ where: { id: approverId }, select: { role: true } });
+        const requestWithRole = await tx.leaveRequest.findUnique({
+          where: { id: leaveId },
+          include: { requester: { select: { role: true } } }
         });
-        const isFinal = allApprovals.every(a => a.decision === "APPROVED");
+
+        const isFinal = isFinalApprover(
+          approver!.role as any,
+          leave.type,
+          requestWithRole?.requester?.role as any
+        );
 
         // 4. Update leave status and balance if final approval
         if (isFinal) {
@@ -175,17 +204,17 @@ export class ApprovalService {
         }
 
         // 5. Log the approval
-        const approver = await tx.user.findUnique({
+        const approverUser = await tx.user.findUnique({
           where: { id: approverId },
           select: { email: true }
         });
-        if (approver) {
+        if (approverUser) {
           await tx.auditLog.create({
             data: {
-              actorEmail: approver.email,
+              actorEmail: approverUser.email,
               action: "LEAVE_APPROVED",
               targetEmail: leave.requester?.email,
-              details: { leaveId, comment, isFinal }
+              details: { leaveId, comment, isFinal, leaveType: leave.type }
             }
           });
         }
@@ -352,7 +381,8 @@ export class ApprovalService {
     leaveId: number,
     currentApproverId: number,
     nextApproverRole: Role,
-    comment?: string
+    comment?: string,
+    newLeaveType?: LeaveType // New: Allow changing leave type
   ): Promise<ServiceResult<{ forwarded: boolean }>> {
     try {
       // 1. Verify leave exists
@@ -365,6 +395,24 @@ export class ApprovalService {
             message: "Leave request not found",
           },
         };
+      }
+
+      // Superior Edit: Update leave type if requested
+      if (newLeaveType && newLeaveType !== leave.type) {
+        await prisma.leaveRequest.update({
+          where: { id: leaveId },
+          data: { type: newLeaveType, isModified: true }
+        });
+
+        await this.logAction(
+          currentApproverId,
+          "LEAVE_TYPE_CHANGED",
+          `Changed leave type from ${leave.type} to ${newLeaveType}`,
+          { leaveId, oldType: leave.type, newType: newLeaveType }
+        );
+
+        // Update local object for downstream logic
+        leave.type = newLeaveType;
       }
 
       // 2. Find next approver

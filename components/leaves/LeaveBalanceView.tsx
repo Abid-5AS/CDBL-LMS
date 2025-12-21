@@ -118,7 +118,7 @@ export function LeaveBalanceView() {
   ] as const;
 
   return (
-    <div className="mx-auto max-w-5xl space-y-4 py-4">
+    <div className="mx-auto max-w-7xl space-y-4 py-4">
       {/* Compact Hero Section */}
       <div className="bg-card border border-border rounded-lg p-4">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -149,7 +149,7 @@ export function LeaveBalanceView() {
             </Button>
           </div>
         </div>
-        
+
         {/* Inline Stats */}
         <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-border/50">
           {heroStats.map((stat) => (
@@ -163,9 +163,9 @@ export function LeaveBalanceView() {
                   className={cn(
                     "text-base font-semibold",
                     stat.state === "danger" ? "text-destructive" :
-                    stat.state === "warning" ? "text-warning dark:text-warning/90" :
-                    stat.state === "success" ? "text-success dark:text-success/90" :
-                    "text-foreground"
+                      stat.state === "warning" ? "text-warning dark:text-warning/90" :
+                        stat.state === "success" ? "text-success dark:text-success/90" :
+                          "text-foreground"
                   )}
                 >
                   {stat.value}
