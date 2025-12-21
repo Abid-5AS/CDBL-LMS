@@ -2,7 +2,7 @@
 
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Role } from "@prisma/client";
+import { Role } from "@/src/generated/prisma/client";
 import { revalidatePath } from "next/cache";
 
 export type EscalationRuleState = {

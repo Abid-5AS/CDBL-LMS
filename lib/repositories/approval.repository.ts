@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Prisma, ApprovalDecision } from "@prisma/client";
+import { Prisma, ApprovalDecision } from "@/src/generated/prisma/client";
 
 // Type for approval with all relations
 export type ApprovalWithRelations = Prisma.ApprovalGetPayload<{

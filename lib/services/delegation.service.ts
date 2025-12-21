@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Role } from "@prisma/client";
+import { Role } from "@/src/generated/prisma/client";
 import { startOfDay, endOfDay, isWithinInterval, isBefore, isAfter } from "date-fns";
 
 export interface DelegationResult {

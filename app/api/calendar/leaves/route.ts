@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { LeaveStatus, LeaveType } from "@prisma/client";
+import { LeaveStatus, LeaveType } from "@/src/generated/prisma/client";
 import { getCalendarEvents } from "@/lib/services/calendar-service";
 
 /**

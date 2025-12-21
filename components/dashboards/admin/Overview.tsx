@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { Role } from "@prisma/client";
+import { Role } from "@/src/generated/prisma/client";
 
 import { Button } from "@/components/ui/button";
 import { DashboardSection } from "@/app/dashboard/shared/DashboardLayout";

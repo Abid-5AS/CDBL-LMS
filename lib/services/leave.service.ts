@@ -3,7 +3,7 @@
  * Orchestrates business logic for leave management
  */
 
-import { LeaveType, LeaveStatus, ApprovalDecision, Role } from "@prisma/client";
+import { LeaveType, LeaveStatus, ApprovalDecision, Role } from "@/src/generated/prisma/client";
 import { LeaveRepository } from "@/lib/repositories/leave.repository";
 import { LeaveValidator } from "./leave-validator";
 import { NotificationService } from "./notification.service";

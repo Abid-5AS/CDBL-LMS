@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { LeaveType } from "@prisma/client";
+import { LeaveType } from "@/src/generated/prisma/client";
 
 export interface LeaveTemplateData {
   name: string;

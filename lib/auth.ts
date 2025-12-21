@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@/src/generated/prisma/client";
 
 const SECRET =
   process.env.JWT_SECRET || process.env.AUTH_SECRET || "dev-secret";

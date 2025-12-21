@@ -17,7 +17,7 @@ import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui/ui";
 import Link from "next/link";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import type { LeaveRequest, LeaveComment, Approval } from "@prisma/client";
+import type { LeaveRequest, LeaveComment, Approval } from "@/src/generated/prisma/client";
 import { FitnessCertificateModal } from "@/components/leaves/FitnessCertificateModal";
 import { DutyReturnFlow } from "@/components/leaves/DutyReturnFlow";
 import { ConversionDisplay, type ConversionDetails } from "@/components/leaves/ConversionDisplay";

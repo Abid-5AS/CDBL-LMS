@@ -1,5 +1,5 @@
 import { prisma } from "./lib/prisma";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/src/generated/prisma/client";
 
 async function debugApprovals() {
   console.log("=== DEBUGGING HR_ADMIN APPROVAL VISIBILITY ===\n");

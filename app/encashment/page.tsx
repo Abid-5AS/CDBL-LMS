@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { LeaveType } from "@prisma/client";
+import { LeaveType } from "@/src/generated/prisma/client";
 import {
   EncashmentService,
   ENCASHMENT_POLICY,

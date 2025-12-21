@@ -12,7 +12,7 @@
  * This gives you a clean slate to test leave request functionality.
  */
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/src/generated/prisma/client";
 
 const prisma = new PrismaClient();
 

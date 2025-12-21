@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { getDailyProcessingTarget } from "@/lib/config/system-settings";
-import type { User } from "@prisma/client";
+import type { User } from "@/src/generated/prisma/client";
 
 export type HRAdminDashboardStats = {
   employeesOnLeave: number;

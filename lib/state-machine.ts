@@ -1,4 +1,4 @@
-import type { LeaveStatus } from "@prisma/client";
+import type { LeaveStatus } from "@/src/generated/prisma/client";
 
 /**
  * Leave Request State Machine

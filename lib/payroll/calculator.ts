@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { LeaveType, LeaveStatus } from "@prisma/client";
+import { LeaveType, LeaveStatus } from "@/src/generated/prisma/client";
 import { startOfMonth, endOfMonth, eachDayOfInterval, isWeekend } from "date-fns";
 
 export interface PayrollSummary {

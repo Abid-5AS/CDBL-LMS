@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui/ui";
-import type { Balance } from "@prisma/client";
+import type { Balance } from "@/src/generated/prisma/client";
 import { LeaveType, LeaveStatus } from "@/lib/enums";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 

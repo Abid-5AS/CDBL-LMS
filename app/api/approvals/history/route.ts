@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ApprovalDecision } from "@prisma/client";
+import { ApprovalDecision } from "@/src/generated/prisma/client";
 import { getCurrentUser } from "@/lib/auth";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";

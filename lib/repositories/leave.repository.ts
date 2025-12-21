@@ -4,7 +4,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
-import { LeaveType, LeaveStatus, LeaveRequest, Prisma, ApprovalDecision } from "@prisma/client";
+import { LeaveType, LeaveStatus, LeaveRequest, Prisma, ApprovalDecision } from "@/src/generated/prisma/client";
 
 /**
  * Standard includes for leave requests

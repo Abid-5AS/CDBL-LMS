@@ -9,7 +9,7 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import type { LeaveType } from "@prisma/client";
+import type { LeaveType } from "@/src/generated/prisma/client";
 import { invalidateHRAdminStatsCache } from "@/lib/dashboard/hr-admin-data";
 
 export async function changeLeaveType(

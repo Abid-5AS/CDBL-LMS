@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle, AlertTriangle, Shield } from "lucide-react";
-import type { Balance } from "@prisma/client";
+import type { Balance } from "@/src/generated/prisma/client";
 import { LeaveType } from "@/lib/enums";
 import { policy } from "@/lib/policy";
 

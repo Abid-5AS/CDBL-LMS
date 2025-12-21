@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/src/generated/prisma/client";
 
 type Decision = "APPROVED" | "REJECTED";
 

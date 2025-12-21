@@ -1,4 +1,4 @@
-import { CalendarConfig, LeaveRequest, User, LeaveType } from "@prisma/client";
+import { CalendarConfig, LeaveRequest, User, LeaveType } from "@/src/generated/prisma/client";
 
 export interface CalendarEvent {
   id?: string;

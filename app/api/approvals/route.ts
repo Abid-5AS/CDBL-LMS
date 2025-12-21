@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { ApprovalService } from "@/lib/services/approval.service";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/src/generated/prisma/client";
 import { cached } from "@/lib/cache/redis";
 
 /**

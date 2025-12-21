@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { LeaveType, Role } from "@prisma/client";
+import { LeaveType, Role } from "@/src/generated/prisma/client";
 
 export interface BalanceAdjustmentResult {
   success: boolean;

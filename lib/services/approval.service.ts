@@ -2,7 +2,7 @@ import { ApprovalRepository, ApprovalWithRelations } from "@/lib/repositories/ap
 import { LeaveRepository } from "@/lib/repositories/leave.repository";
 import { NotificationService } from "./notification.service";
 import { prisma } from "@/lib/prisma";
-import { ApprovalDecision, LeaveStatus, Role } from "@prisma/client";
+import { ApprovalDecision, LeaveStatus, Role } from "@/src/generated/prisma/client";
 import { invalidateCache } from "@/lib/cache/redis";
 
 export type ServiceResult<T> = {

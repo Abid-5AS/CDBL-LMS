@@ -35,7 +35,7 @@ import {
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui/ui";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import type { LeaveRequest, Approval, Balance } from "@prisma/client";
+import type { LeaveRequest, Approval, Balance } from "@/src/generated/prisma/client";
 import { LeaveType, LeaveStatus } from "@/lib/enums";
 import { ApprovalActionCard } from "./approval-action-card";
 import { EmployeeStatsCard } from "./employee-stats-card";

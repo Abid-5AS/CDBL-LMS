@@ -2,7 +2,7 @@
 
 import { getCurrentUser } from "@/lib/auth";
 import { DelegationService } from "@/lib/services/delegation-service";
-import { LeaveType } from "@prisma/client";
+import { LeaveType } from "@/src/generated/prisma/client";
 import { revalidatePath } from "next/cache";
 
 export type DelegationState = {

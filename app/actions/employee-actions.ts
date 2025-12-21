@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Role } from "@prisma/client";
+import { Role } from "@/src/generated/prisma/client";
 import { canEditEmployee, canAssignRole, type AppRole } from "@/lib/rbac";
 
 export async function updateEmployeeFromForm(employeeId: number, formData: FormData) {

@@ -46,7 +46,7 @@ import { Badge } from "@/components/ui/badge";
 import { Autocomplete, type AutocompleteOption } from "@/components/ui/autocomplete";
 
 import { createDelegation, revokeDelegation } from "@/app/actions/delegation-actions";
-import { LeaveType } from "@prisma/client";
+import { LeaveType } from "@/src/generated/prisma/client";
 import { LEAVE_TYPE_LABELS } from "@/lib/constants";
 
 const formSchema = z.object({

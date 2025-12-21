@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { EncashmentStatus } from "@prisma/client";
+import { EncashmentStatus } from "@/src/generated/prisma/client";
 
 export type PaymentStatus = "PENDING" | "PROCESSING" | "PAID" | "FAILED";
 export type PaymentMethod = "BANK_TRANSFER" | "CHEQUE" | "CASH";

@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { PayrollCalculator } from "@/lib/payroll/calculator";
 import { PayrollExportService } from "@/lib/payroll/export.service";
 import { prisma } from "@/lib/prisma";
-import { Role } from "@prisma/client";
+import { Role } from "@/src/generated/prisma/client";
 
 export async function GET(request: NextRequest) {
     try {

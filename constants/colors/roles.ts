@@ -5,7 +5,7 @@
  * Used by RoleBasedDashboard and role-specific components.
  */
 
-import { Role } from "@prisma/client";
+import { Role } from "@/src/generated/prisma/client";
 
 export interface RoleColorPalette {
   /** Primary accent color */

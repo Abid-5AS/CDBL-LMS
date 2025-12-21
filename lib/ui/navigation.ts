@@ -15,7 +15,7 @@ import {
   Webhook,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import type { Role } from "@prisma/client";
+import type { Role } from "@/src/generated/prisma/client";
 
 export type UserRole = Role;
 

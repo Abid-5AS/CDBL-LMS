@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { LeaveDetailsContent } from "./_components/leave-details-content";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/src/generated/prisma/client";
 import { getLeaveConversionDetails } from "@/lib/repositories/conversion.repository";
 
 async function LeaveDetailsPageWrapper({ params }: { params: Promise<{ id: string }> }) {

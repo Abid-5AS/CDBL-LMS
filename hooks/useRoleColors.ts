@@ -5,7 +5,7 @@
  */
 
 import { useMemo } from "react";
-import { Role } from "@prisma/client";
+import { Role } from "@/src/generated/prisma/client";
 import {
   getRoleColors,
   getRoleAccentColor,

@@ -1,5 +1,5 @@
 import type { AppRole } from "./rbac";
-import type { LeaveType } from "@prisma/client";
+import type { LeaveType } from "@/src/generated/prisma/client";
 
 /**
  * Per-type approval chains - Updated 2025-11-17

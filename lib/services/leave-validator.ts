@@ -3,7 +3,7 @@
  * Centralizes all validation logic for leave requests
  */
 
-import { LeaveType } from "@prisma/client";
+import { LeaveType } from "@/src/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   policy,

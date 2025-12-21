@@ -7,7 +7,7 @@ import {
   getStepForRole,
   WORKFLOW_CHAINS,
 } from "@/lib/workflow";
-import type { LeaveType } from "@prisma/client";
+import type { LeaveType } from "@/src/generated/prisma/client";
 
 describe("lib/workflow", () => {
   describe("getChainFor()", () => {

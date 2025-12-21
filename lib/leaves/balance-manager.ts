@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { Prisma, LeaveType } from "@prisma/client";
+import type { Prisma, LeaveType } from "@/src/generated/prisma/client";
 
 /**
  * Balance Manager - Atomic Operations for Leave Balance

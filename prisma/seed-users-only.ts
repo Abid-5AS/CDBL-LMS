@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { Role } from "@prisma/client";
+import { Role } from "@/src/generated/prisma/client";
 import { prisma } from "../lib/prisma";
 
 const DEMO_PASSWORD = "demo123";

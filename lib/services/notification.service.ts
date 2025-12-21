@@ -3,7 +3,7 @@ import {
   CreateNotificationData,
   NotificationWithRelations,
 } from "@/lib/repositories/notification.repository";
-import { LeaveType, LeaveStatus, ApprovalDecision } from "@prisma/client";
+import { LeaveType, LeaveStatus, ApprovalDecision } from "@/src/generated/prisma/client";
 import { formatDate } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 import {

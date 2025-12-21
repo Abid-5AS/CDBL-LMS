@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { LeaveStatus, LeaveType } from "@prisma/client";
+import { LeaveStatus, LeaveType } from "@/src/generated/prisma/client";
 
 export type CalendarViewType = "my" | "team" | "department" | "all";
 

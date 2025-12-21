@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/src/generated/prisma/client";
 import { notificationEvents, NOTIFICATION_EVENT } from "@/lib/events";
 
 // Type for notification with all relations

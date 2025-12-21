@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { Role } from "@prisma/client";
+import { Role } from "@/src/generated/prisma/client";
 
 import { Button } from "@/components/ui/button";
 import {

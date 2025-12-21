@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { ApprovalDecision, Role } from "@prisma/client";
+import { ApprovalDecision, Role } from "@/src/generated/prisma/client";
 import { addHours, isBefore } from "date-fns";
 
 export class EscalationService {

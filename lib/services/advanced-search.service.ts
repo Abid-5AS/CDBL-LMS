@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { LeaveStatus, LeaveType, Prisma } from "@prisma/client";
+import { LeaveStatus, LeaveType, Prisma } from "@/src/generated/prisma/client";
 
 export interface SearchFilters {
   // Text search

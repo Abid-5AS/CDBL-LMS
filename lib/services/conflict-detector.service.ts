@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/src/generated/prisma/client";
 import { isWithinInterval, parseISO, startOfDay, endOfDay } from "date-fns";
 
 export interface TeamMemberOnLeave {

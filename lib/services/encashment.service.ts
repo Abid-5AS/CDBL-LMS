@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { EncashmentStatus, LeaveType } from "@prisma/client";
+import { EncashmentStatus, LeaveType } from "@/src/generated/prisma/client";
 import { NotificationService } from "./notification.service";
 import { z } from "zod";
 import { ENCASHMENT_POLICY } from "@/lib/schemas/encashment";

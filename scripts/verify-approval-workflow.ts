@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { LeaveService } from "@/lib/services/leave.service";
 import { ApprovalService } from "@/lib/services/approval.service";
 import { NotificationService } from "@/lib/services/notification.service";
-import { Role, LeaveType } from "@prisma/client";
+import { Role, LeaveType } from "@/src/generated/prisma/client";
 
 type CreatedEntities = {
   userIds: number[];

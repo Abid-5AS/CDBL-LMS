@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { BalanceAdjustmentService } from "@/lib/services/balance-adjustment.service";
-import { LeaveType, Role } from "@prisma/client";
+import { LeaveType, Role } from "@/src/generated/prisma/client";
 import { z } from "zod";
 
 const adjustBalanceSchema = z.object({

@@ -25,7 +25,7 @@ import { AlertCircle, Info, RotateCcw, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/ui/toast-messages";
 import { DateRangePicker, FileUploadSection } from "@/components/shared";
-import type { LeaveRequest, LeaveComment } from "@prisma/client";
+import type { LeaveRequest, LeaveComment } from "@/src/generated/prisma/client";
 import { formatDate } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui/ui";
 import Link from "next/link";

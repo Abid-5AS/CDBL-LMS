@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/src/generated/prisma/client";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
 import { normalizeToDhakaMidnight } from "@/lib/date-utils";

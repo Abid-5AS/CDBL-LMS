@@ -9,7 +9,7 @@
  *   pnpm tsx scripts/verify-demo-data.ts
  */
 
-import { PrismaClient, LeaveType, LeaveStatus, Role } from "@prisma/client";
+import { PrismaClient, LeaveType, LeaveStatus, Role } from "@/src/generated/prisma/client";
 
 const prisma = new PrismaClient();
 

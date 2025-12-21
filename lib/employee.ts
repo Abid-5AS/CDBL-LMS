@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { addMonths, format } from "date-fns";
-import type { LeaveType, LeaveStatus } from "@prisma/client";
+import type { LeaveType, LeaveStatus } from "@/src/generated/prisma/client";
 
 export type LeaveHistoryEntry = {
   id: number;

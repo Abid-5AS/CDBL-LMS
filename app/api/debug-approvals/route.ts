@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { LeaveStatus, ApprovalDecision } from "@prisma/client";
+import { LeaveStatus, ApprovalDecision } from "@/src/generated/prisma/client";
 
 export const cache = "no-store";
 

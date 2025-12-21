@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export const cache = "no-store";
-import { LeaveType } from "@prisma/client";
+import { LeaveType } from "@/src/generated/prisma/client";
 import { getCurrentUser } from "@/lib/auth";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
