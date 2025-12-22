@@ -15,7 +15,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (user.role !== "HR_ADMIN") return NextResponse.json({ error: "forbidden" }, { status: 403 });
+
+  const { canApprove } = await import("@/lib/rbac");
+  if (!canApprove(user.role)) {
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  }
 
   const body = await request.json();
   const parsed = bodySchema.safeParse(body);

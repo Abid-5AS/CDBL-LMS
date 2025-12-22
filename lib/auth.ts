@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
@@ -54,10 +54,19 @@ export async function rotateToken(token: string) {
 }
 
 export const getCurrentUser = cache(async function getCurrentUser() {
-  const store = await cookies();
-  const token = store.get(JWT_COOKIE)?.value;
-  const emailCookie = store.get("auth_user_email")?.value;
-  const nameCookie = store.get("auth_user_name")?.value;
+  const cookieStore = await cookies();
+  let token = cookieStore.get(JWT_COOKIE)?.value;
+
+  if (!token) {
+    const headersList = await headers();
+    const authHeader = headersList.get("Authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      token = authHeader.substring(7);
+    }
+  }
+
+  const emailCookie = cookieStore.get("auth_user_email")?.value;
+  const nameCookie = cookieStore.get("auth_user_name")?.value;
 
   const where: Prisma.UserWhereInput = {};
 
