@@ -33,6 +33,8 @@ function getApiBaseUrl(): string {
         return `http://${debuggerHost}:3000`;
       }
       // Fallback for Android Emulator
+      // If you are on a physical device and network inspector fails, try your machine's IP
+      // return 'http://192.168.1.4:3000'; 
       return 'http://10.0.2.2:3000';
     } else {
       // iOS Simulator/Device: try to use the debugger host

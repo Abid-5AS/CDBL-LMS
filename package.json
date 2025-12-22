@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npx @react-grab/cursor@latest && NODE_OPTIONS='--max-old-space-size=4096' next dev",
-    "dev:low-memory": "NODE_OPTIONS='--max-old-space-size=2048 --optimize-for-size --always-opt' next dev",
-    "dev:turbo": "NODE_OPTIONS='--max-old-space-size=4096' next dev --turbopack",
+    "dev": "npx @react-grab/cursor@latest && NODE_OPTIONS='--max-old-space-size=4096' next dev -H 0.0.0.0",
+    "dev:low-memory": "NODE_OPTIONS='--max-old-space-size=2048 --optimize-for-size --always-opt' next dev -H 0.0.0.0",
+    "dev:turbo": "NODE_OPTIONS='--max-old-space-size=4096' next dev --turbopack -H 0.0.0.0",
     "build": "NODE_OPTIONS='--max-old-space-size=6144' prisma generate && next build --turbopack",
     "start": "NODE_OPTIONS='--max-old-space-size=4096' next start",
     "lint": "eslint",

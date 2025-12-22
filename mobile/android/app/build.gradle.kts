@@ -6,6 +6,9 @@ plugins {
     id("kotlin-kapt")
 }
 
+import java.util.Properties
+import java.io.FileInputStream
+
 android {
     namespace = "com.cdbl.leavemanager"
     compileSdk = 34
@@ -18,6 +21,15 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        // Read API_URL from local.properties
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(FileInputStream(localPropertiesFile))
+        }
+        val apiUrl = localProperties.getProperty("API_URL") ?: "http://10.0.2.2:3000/api/"
+        buildConfigField("String", "API_BASE_URL", "\"$apiUrl\"")
     }
 
     buildTypes {
@@ -38,6 +50,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

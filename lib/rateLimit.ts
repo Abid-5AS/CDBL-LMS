@@ -50,9 +50,14 @@ export async function checkRateLimit(ip: string): Promise<boolean> {
 
       if (attempts > MAX_ATTEMPTS) return false;
       return true;
-    } catch (error) {
+    } catch (error: any) {
       // If Redis fails, fall back to in-memory
-      console.warn("Redis rate limit failed, using fallback:", error);
+      // Suppress connection errors which are expected in local dev without Redis
+      if (error?.message === 'Connection is closed.' || error?.code === 'ECONNREFUSED') {
+         // silently fail back to memory
+      } else {
+         console.warn("Redis rate limit failed, using fallback:", error);
+      }
     }
   }
 
