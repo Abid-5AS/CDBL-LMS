@@ -4,7 +4,7 @@
  */
 
 import type { TimelineItem } from "./SharedTimeline";
-import { APPROVAL_CHAIN } from "@/lib/workflow";
+import { MASTER_WORKFLOW_CHAIN } from "@/lib/workflow";
 
 // Approval Timeline Adapter
 type ApprovalRecord = {
@@ -55,7 +55,7 @@ export function ApprovalTimelineAdapter(
   });
 
   // Process each step in the approval chain
-  APPROVAL_CHAIN.forEach((role, index) => {
+  MASTER_WORKFLOW_CHAIN.forEach((role, index) => {
     const step = index + 1; // Steps are 1-indexed
     const approval = approvalMap.get(step);
 
@@ -75,7 +75,7 @@ export function ApprovalTimelineAdapter(
         subtitle = approval.comment || undefined;
       } else if (approval.decision === "FORWARDED") {
         timelineStatus = "FORWARDED";
-        const nextRole = approval.toRole || APPROVAL_CHAIN[index + 1];
+        const nextRole = approval.toRole || MASTER_WORKFLOW_CHAIN[index + 1];
         title = nextRole
           ? `Forwarded to ${formatRoleLabel(nextRole)}`
           : "Forwarded";
@@ -101,9 +101,9 @@ export function ApprovalTimelineAdapter(
       });
     } else {
       // No approval record yet - check if it should be pending
-      const hasAnyLaterApproval = APPROVAL_CHAIN.slice(index + 1).some(
+      const hasAnyLaterApproval = MASTER_WORKFLOW_CHAIN.slice(index + 1).some(
         (laterRole) => {
-          const laterStep = APPROVAL_CHAIN.indexOf(laterRole) + 1;
+          const laterStep = MASTER_WORKFLOW_CHAIN.indexOf(laterRole) + 1;
           return approvalMap.has(laterStep);
         }
       );
