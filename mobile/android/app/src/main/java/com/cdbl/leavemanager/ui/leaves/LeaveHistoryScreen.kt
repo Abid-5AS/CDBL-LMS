@@ -1,88 +1,215 @@
 package com.cdbl.leavemanager.ui.leaves
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.CalendarToday
+import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.outlined.FilterList
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Dashboard
+import androidx.compose.material.icons.rounded.History
+import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.cdbl.leavemanager.data.model.LeaveRequest
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import com.cdbl.leavemanager.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeaveHistoryScreen(
-    token: String,
+    token: String, // Kept for signature compatibility
     onBackClick: (() -> Unit)? = null,
     onApplyClick: () -> Unit,
-    onEncashmentClick: () -> Unit,
-    onLeaveClick: (Int) -> Unit,
+    onEncashmentClick: () -> Unit, // Kept for signature compatibility
+    onLeaveClick: (Int) -> Unit, // Kept for signature compatibility
     viewModel: LeaveHistoryViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    // Mock Data
+    val mockLeaves = listOf(
+        MockLeave(
+            "Sick Leave",
+            "Pending",
+            "1 Day",
+            "Full Day",
+            "Feeling feverish and headache since morning...",
+            "24", "OCT",
+            "This Month"
+        ),
+        MockLeave(
+            "Annual Leave",
+            "Approved",
+            "Oct 12 - Oct 14",
+            "3 Days",
+            "Family trip to the mountains.",
+            "12", "OCT",
+            "This Month"
+        ),
+        MockLeave(
+            "Casual Leave",
+            "Rejected",
+            "1 Day",
+            "See Reason",
+            "Personal matters to attend to.",
+            "28", "SEP",
+            "September"
+        ),
+         MockLeave(
+            "Sick Leave",
+            "Approved",
+            "Half Day (Morning)",
+             "1 Day",
+            "Dental appointment.",
+            "02", "SEP",
+            "September"
+        )
+    )
 
-    LaunchedEffect(Unit) {
-        viewModel.loadLeaves(token)
-    }
+    val groups = mockLeaves.groupBy { it.group }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Leave History") },
-                navigationIcon = {
-                    if (onBackClick != null) {
-                        IconButton(onClick = onBackClick) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                        }
-                    }
-                },
-                actions = {
-                    TextButton(onClick = onEncashmentClick) {
-                        Text("Encashment", color = MaterialTheme.colorScheme.onPrimaryContainer)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            )
-        },
+        containerColor = MaterialTheme.colorScheme.background,
         floatingActionButton = {
-            ExtendedFloatingActionButton(
+            FloatingActionButton(
                 onClick = onApplyClick,
-                icon = { Icon(Icons.Filled.Add, "Apply") },
-                text = { Text("Apply") }
-            )
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = Color.White,
+                shape = RoundedCornerShape(16.dp),
+                 modifier = Modifier.size(64.dp)
+            ) {
+                Icon(Icons.Rounded.Add, contentDescription = "Apply", modifier = Modifier.size(32.dp))
+            }
         }
     ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
-            if (uiState.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            } else if (uiState.error != null) {
-                Text(
-                    text = "Error: ${uiState.error}",
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else {
-                LazyColumn(
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            // Header
+            Column(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    items(uiState.leaves) { leave ->
-                        LeaveItemCard(leave, onClick = { onLeaveClick(leave.id) })
+                    Text(
+                        text = "My Leaves",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(Icons.Outlined.Notifications, contentDescription = "Notifications")
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                // Search Bar
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextField(
+                        value = "",
+                        onValueChange = {},
+                        placeholder = { Text("Search leaves...") },
+                        leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null) },
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.weight(1f)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(
+                        onClick = { /*TODO*/ },
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                            .size(56.dp)
+                    ) {
+                        Icon(Icons.Outlined.FilterList, contentDescription = "Filter")
+                    }
+                }
+            }
+
+            // Tabs
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                items(listOf("All", "Pending", "Approved", "Rejected", "Casual")) { tab ->
+                    val isSelected = tab == "All"
+                    val bgColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+                    val contentColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
+                    val borderColor = if (isSelected) Color.Transparent else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(bgColor)
+                            .border(1.dp, borderColor, RoundedCornerShape(8.dp))
+                            .clickable { }
+                            .padding(horizontal = 20.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = tab,
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = contentColor
+                        )
+                    }
+                }
+            }
+
+            // List
+            LazyColumn(
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                groups.forEach { (group, leaves) ->
+                     item {
+                        Text(
+                            text = group,
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    }
+                    items(leaves) { leave ->
+                        LeaveHistoryCardNew(leave)
                     }
                 }
             }
@@ -90,78 +217,125 @@ fun LeaveHistoryScreen(
     }
 }
 
+data class MockLeave(
+    val type: String,
+    val status: String,
+    val dateRange: String,
+    val duration: String,
+    val reason: String,
+    val startDay: String,
+    val startMonth: String,
+    val group: String
+)
+
 @Composable
-fun LeaveItemCard(leave: LeaveRequest, onClick: () -> Unit) {
-    val statusColor = when (leave.status) {
-        "APPROVED" -> Color.Green
-        "REJECTED" -> Color.Red
-        "PENDING" -> Color(0xFFFFA500) // Orange
+fun LeaveHistoryCardNew(leave: MockLeave) {
+    val statusBg = when(leave.status) {
+        "Pending" -> StatusYellowBg
+        "Approved" -> StatusGreenBg
+        "Rejected" -> StatusRedBg
+        else -> MaterialTheme.colorScheme.surfaceVariant
+    }
+    val statusText = when(leave.status) {
+        "Pending" -> StatusYellowText
+        "Approved" -> StatusGreenText
+        "Rejected" -> StatusRedText
         else -> MaterialTheme.colorScheme.onSurface
     }
 
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onClick
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+         border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.Top
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            // Date Box
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .size(width = 56.dp, height = 64.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
             ) {
                 Text(
-                    text = leave.type,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = leave.status,
+                    text = leave.startMonth,
                     style = MaterialTheme.typography.labelSmall,
-                    color = statusColor,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = leave.startDay,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
-            
-            Spacer(modifier = Modifier.height(4.dp))
-            
-            Text(
-                text = "${formatDate(leave.startDate)} - ${formatDate(leave.endDate)}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            
-            if (leave.workingDays != null) {
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Text(
+                        text = leave.type,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Surface(
+                        color = statusBg,
+                        shape = RoundedCornerShape(12.dp) // Pill shape
+                    ) {
+                        Text(
+                            text = leave.status,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = statusText
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "${leave.workingDays} days",
+                    text = leave.reason,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.outline
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1
                 )
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            leave.reason?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 2
-                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Outlined.CalendarToday,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = leave.dateRange,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (leave.status != "Rejected") {
+                         Text(
+                            text = " • ",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = leave.duration,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
         }
-    }
-}
-
-private fun formatDate(dateString: String): String {
-    return try {
-        // Assuming ISO format from API
-        val date = LocalDate.parse(dateString.take(10))
-        date.format(DateTimeFormatter.ofPattern("dd MMM yyyy"))
-    } catch (e: Exception) {
-        dateString
     }
 }

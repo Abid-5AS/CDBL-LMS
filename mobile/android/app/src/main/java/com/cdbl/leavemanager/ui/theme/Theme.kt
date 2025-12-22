@@ -16,17 +16,17 @@ private val DarkColorScheme = darkColorScheme(
     onPrimary = Color.White,
     primaryContainer = Indigo900,
     onPrimaryContainer = Indigo100,
-    secondary = Zinc700,
+    secondary = Slate700,
     onSecondary = Color.White,
-    background = Zinc950,
-    onBackground = Zinc50,
-    surface = Zinc900,
-    onSurface = Zinc50,
-    surfaceVariant = Zinc800,
-    onSurfaceVariant = Zinc400,
-    error = ErrorRedDark,
+    background = Slate950,
+    onBackground = Slate50,
+    surface = Slate900,
+    onSurface = Slate50,
+    surfaceVariant = Slate800,
+    onSurfaceVariant = Slate400,
+    error = StatusRedTextDark,
     onError = Color.Black,
-    outline = Zinc700
+    outline = Slate700
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -34,17 +34,17 @@ private val LightColorScheme = lightColorScheme(
     onPrimary = Color.White,
     primaryContainer = Indigo100,
     onPrimaryContainer = Indigo900,
-    secondary = Zinc200, // Used for subtle backgrounds
-    onSecondary = Zinc900,
-    background = Color.White,
-    onBackground = Zinc900,
+    secondary = Slate200,
+    onSecondary = Slate900,
+    background = Slate50,
+    onBackground = Slate900,
     surface = Color.White,
-    onSurface = Zinc900,
-    surfaceVariant = Zinc100,
-    onSurfaceVariant = Zinc600,
-    error = ErrorRed,
+    onSurface = Slate900,
+    surfaceVariant = Slate100,
+    onSurfaceVariant = Slate600,
+    error = StatusRedText,
     onError = Color.White,
-    outline = Zinc300
+    outline = Slate300
 )
 
 @Composable
