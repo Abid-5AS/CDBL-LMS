@@ -43,3 +43,16 @@ data class LeaveComment(
 data class LeaveCommentListResponse(
     val items: List<LeaveComment>
 )
+
+data class ManagerLeaveResponse(
+    val rows: List<LeaveRequest>,
+    val counts: ManagerCounts,
+    val total: Int
+)
+
+data class ManagerCounts(
+    val pending: Int,
+    val forwarded: Int,
+    val returned: Int,
+    val cancelled: Int
+)

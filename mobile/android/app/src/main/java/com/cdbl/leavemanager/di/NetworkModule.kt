@@ -64,6 +64,12 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun providePolicyService(retrofit: Retrofit): com.cdbl.leavemanager.data.api.PolicyService {
+        return retrofit.create(com.cdbl.leavemanager.data.api.PolicyService::class.java)
+    }
+
+    @Provides
+    @Singleton
     fun provideAnalyticsService(retrofit: Retrofit): com.cdbl.leavemanager.data.api.AnalyticsService {
         return retrofit.create(com.cdbl.leavemanager.data.api.AnalyticsService::class.java)
     }
@@ -72,5 +78,10 @@ object NetworkModule {
     @Singleton
     fun provideEncashmentService(retrofit: Retrofit): com.cdbl.leavemanager.data.api.EncashmentService {
         return retrofit.create(com.cdbl.leavemanager.data.api.EncashmentService::class.java)
+    }
+    @Provides
+    @Singleton
+    fun provideGson(): com.google.gson.Gson {
+        return com.google.gson.GsonBuilder().create()
     }
 }

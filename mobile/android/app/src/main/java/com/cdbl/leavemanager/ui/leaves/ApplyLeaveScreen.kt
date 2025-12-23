@@ -41,6 +41,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cdbl.leavemanager.ui.theme.*
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import android.net.Uri
+import androidx.compose.ui.res.stringResource
+import com.cdbl.leavemanager.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,20 +60,55 @@ fun ApplyLeaveScreen(
     // UI State
     var selectedType by remember { mutableStateOf("Annual") }
     var reason by remember { mutableStateOf("") }
+    var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
+    
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        selectedFileUri = uri
+    }
     
     // Mock Data
-    val leaveTypes = listOf(
-        LeaveTypeItem("Annual", Icons.Rounded.FlightTakeoff, Indigo600),
-        LeaveTypeItem("Sick Leave", Icons.Rounded.Sick, ErrorRed),
-        LeaveTypeItem("Casual", Icons.Rounded.Weekend, WarningAmber),
-        LeaveTypeItem("Unpaid", Icons.Rounded.WorkOff, Color(0xFF14b8a6)) // Teal
-    )
+    // Dynamic Leave Types
+    val leaveTypes = remember(uiState.leavePolicies) {
+        uiState.leavePolicies.map { policy ->
+            val (icon, color) = when (policy.code) {
+                "AL" -> Icons.Rounded.FlightTakeoff to Indigo600
+                "SL" -> Icons.Rounded.Sick to ErrorRed
+                "CL" -> Icons.Rounded.Weekend to WarningAmber
+                "LWP" -> Icons.Rounded.WorkOff to Color(0xFF14b8a6) // Teal
+                else -> Icons.Rounded.Event to Color.Gray
+            }
+            LeaveTypeItem(name = policy.title, icon = icon, color = color)
+        }
+    }
+
+    // Date State
+    var showStartDatePicker by remember { mutableStateOf(false) }
+    var showEndDatePicker by remember { mutableStateOf(false) }
+    var startDateMillis by remember { mutableStateOf(System.currentTimeMillis()) }
+    var endDateMillis by remember { mutableStateOf(System.currentTimeMillis() + 86400000) } // +1 day
+
+    // Format dates for display and calculation
+    val dateFormatter = java.time.format.DateTimeFormatter.ofPattern("MMM dd")
+    val dayFormatter = java.time.format.DateTimeFormatter.ofPattern("EEEE, yyyy")
+    
+    val startLocalDate = java.time.Instant.ofEpochMilli(startDateMillis).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+    val endLocalDate = java.time.Instant.ofEpochMilli(endDateMillis).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+    
+    // Calculate days
+    val daysDiff = java.time.temporal.ChronoUnit.DAYS.between(startLocalDate, endLocalDate) + 1
 
     LaunchedEffect(uiState.success) {
         if (uiState.success) {
             onSuccess()
             viewModel.resetState()
         }
+    }
+    
+    LaunchedEffect(Unit) {
+        viewModel.loadBalance(token)
+        viewModel.loadPolicies(token)
     }
 
     Scaffold(
@@ -82,10 +122,10 @@ fun ApplyLeaveScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBackClick) {
-                    Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
+                    Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
                 }
                 Text(
-                    text = "Apply Leave",
+                    text = stringResource(R.string.apply_leave_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -106,22 +146,37 @@ fun ApplyLeaveScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Total Days", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("3 Days", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.total_days), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("$daysDiff " + stringResource(R.string.total), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = { 
-                        // Mock Submit
-                        viewModel.submitLeave(token, selectedType, "2024-10-24", "2024-10-26", reason) 
+                        // Submit with selected dates
+                        if (!uiState.isLoading) {
+                            val formatter = java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
+                            viewModel.submitLeave(
+                                token, 
+                                selectedType, 
+                                startLocalDate.format(formatter), 
+                                endLocalDate.format(formatter), 
+                                reason,
+                                selectedFileUri
+                            ) 
+                        }
                     },
+                    enabled = !uiState.isLoading,
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text("Submit Request", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Icon(Icons.Rounded.Send, contentDescription = null, modifier = Modifier.size(18.dp))
+                    if (uiState.isLoading) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                    } else {
+                        Text(stringResource(R.string.submit_application), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(Icons.Rounded.Send, contentDescription = null, modifier = Modifier.size(18.dp))
+                    }
                 }
             }
         }
@@ -154,10 +209,15 @@ fun ApplyLeaveScreen(
                         verticalAlignment = Alignment.Top
                     ) {
                         Column {
-                            Text("Available Balance", style = MaterialTheme.typography.labelMedium, color = Indigo100)
+                            Text(stringResource(R.string.available_balance), style = MaterialTheme.typography.labelMedium, color = Indigo100)
                             Row(verticalAlignment = Alignment.Bottom) {
-                                Text("12", style = MaterialTheme.typography.displayMedium, fontWeight = FontWeight.Bold, color = Color.White)
-                                Text(" days", style = MaterialTheme.typography.titleMedium, color = Indigo100, modifier = Modifier.padding(bottom = 6.dp))
+                                Text(
+                                    text = uiState.balance?.EARNED?.toInt()?.toString() ?: "--", 
+                                    style = MaterialTheme.typography.displayMedium, 
+                                    fontWeight = FontWeight.Bold, 
+                                    color = Color.White
+                                )
+                                Text(" " + stringResource(R.string.days_left), style = MaterialTheme.typography.titleMedium, color = Indigo100, modifier = Modifier.padding(bottom = 6.dp))
                             }
                         }
                         Box(
@@ -186,7 +246,7 @@ fun ApplyLeaveScreen(
                             )
                         }
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Updated today", style = MaterialTheme.typography.labelSmall, color = Indigo100, modifier = Modifier.align(Alignment.End))
+                        Text(stringResource(R.string.updated_today), style = MaterialTheme.typography.labelSmall, color = Indigo100, modifier = Modifier.align(Alignment.End))
                     }
                 }
             }
@@ -194,7 +254,7 @@ fun ApplyLeaveScreen(
             // Leave Type Selection
             Column {
                 Text(
-                    "Select Leave Type", 
+                    stringResource(R.string.select_leave_type), 
                     style = MaterialTheme.typography.labelLarge, 
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 12.dp)
@@ -203,7 +263,18 @@ fun ApplyLeaveScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    items(leaveTypes) { item ->
+                    if (leaveTypes.isEmpty()) {
+                        // Skeleton/Loading State
+                        items(3) {
+                            Box(
+                                modifier = Modifier
+                                    .size(width = 100.dp, height = 50.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                            )
+                        }
+                    } else {
+                        items(leaveTypes) { item ->
                         val isSelected = selectedType == item.name
                         val bgColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
                         val contentColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
@@ -223,10 +294,47 @@ fun ApplyLeaveScreen(
                             Text(item.name, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = contentColor)
                         }
                     }
+                    }
                 }
             }
 
             // Date Selection
+            if (showStartDatePicker) {
+               val datePickerState = rememberDatePickerState(initialSelectedDateMillis = startDateMillis)
+                DatePickerDialog(
+                    onDismissRequest = { showStartDatePicker = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            datePickerState.selectedDateMillis?.let { startDateMillis = it }
+                            showStartDatePicker = false
+                        }) { Text("OK") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showStartDatePicker = false }) { Text("Cancel") }
+                    }
+                ) {
+                    DatePicker(state = datePickerState)
+                }
+            }
+
+            if (showEndDatePicker) {
+                val datePickerState = rememberDatePickerState(initialSelectedDateMillis = endDateMillis)
+                DatePickerDialog(
+                    onDismissRequest = { showEndDatePicker = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            datePickerState.selectedDateMillis?.let { endDateMillis = it }
+                            showEndDatePicker = false
+                        }) { Text("OK") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showEndDatePicker = false }) { Text("Cancel") }
+                    }
+                ) {
+                    DatePicker(state = datePickerState)
+                }
+            }
+
             Column {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -234,12 +342,12 @@ fun ApplyLeaveScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "Select Dates", 
+                        stringResource(R.string.select_dates), 
                         style = MaterialTheme.typography.labelLarge, 
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        "3 Days Selected", 
+                        stringResource(R.string.days_selected, daysDiff.toInt()), 
                         style = MaterialTheme.typography.labelSmall, 
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
@@ -253,14 +361,16 @@ fun ApplyLeaveScreen(
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                         border = androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
                         shape = RoundedCornerShape(20.dp),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { showStartDatePicker = true }
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                              Icon(Icons.Rounded.CalendarToday, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.align(Alignment.End))
                              Spacer(modifier = Modifier.height(8.dp))
-                             Text("Start Date", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                             Text("Oct 24", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                             Text("Thursday, 2024", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                             Text(stringResource(R.string.start_date), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                             Text(startLocalDate.format(dateFormatter), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                             Text(startLocalDate.format(dayFormatter), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                     // End Date
@@ -268,14 +378,16 @@ fun ApplyLeaveScreen(
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                          border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)),
                         shape = RoundedCornerShape(20.dp),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { showEndDatePicker = true }
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                              Icon(Icons.Rounded.Event, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.align(Alignment.End))
                              Spacer(modifier = Modifier.height(8.dp))
-                             Text("End Date", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                             Text("Oct 26", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                             Text("Saturday, 2024", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                             Text(stringResource(R.string.end_date), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                             Text(endLocalDate.format(dateFormatter), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                             Text(endLocalDate.format(dayFormatter), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 }
@@ -284,7 +396,7 @@ fun ApplyLeaveScreen(
             // Reason
             Column {
                 Text(
-                    "Reason for Leave", 
+                    stringResource(R.string.reason), 
                     style = MaterialTheme.typography.labelLarge, 
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 12.dp)
@@ -292,7 +404,7 @@ fun ApplyLeaveScreen(
                 OutlinedTextField(
                     value = reason,
                     onValueChange = { reason = it },
-                    placeholder = { Text("I need to take some time off for personal matters...") },
+                    placeholder = { Text(stringResource(R.string.reason_hint)) },
                     modifier = Modifier.fillMaxWidth().height(140.dp),
                     shape = RoundedCornerShape(20.dp),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -312,13 +424,49 @@ fun ApplyLeaveScreen(
             }
             
             // Supporting Document Button
-            TextButton(
-                onClick = { },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp)
+                    .clickable { launcher.launch("*/*") }
             ) {
-                 Icon(Icons.Rounded.AttachFile, contentDescription = null, modifier = Modifier.size(18.dp))
-                 Spacer(modifier = Modifier.width(8.dp))
-                 Text("Add supporting document", fontWeight = FontWeight.SemiBold)
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                   Box(
+                       modifier = Modifier
+                           .size(40.dp)
+                           .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
+                       contentAlignment = Alignment.Center
+                   ) {
+                       Icon(Icons.Rounded.AttachFile, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                   }
+                   Spacer(modifier = Modifier.width(16.dp))
+                   Column(modifier = Modifier.weight(1f)) {
+                       Text(
+                           text = if (selectedFileUri != null) stringResource(R.string.file_attached) else stringResource(R.string.add_document),
+                           style = MaterialTheme.typography.titleMedium,
+                           fontWeight = FontWeight.SemiBold
+                       )
+                       Text(
+                           text = selectedFileUri?.path?.let { 
+                               val name = it.split("/").last() 
+                               if (name.length > 20) "..." + name.takeLast(20) else name
+                           } ?: stringResource(R.string.tap_to_select),
+                           style = MaterialTheme.typography.bodySmall,
+                           color = if (selectedFileUri != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                       )
+                   }
+                   if (selectedFileUri != null) {
+                       IconButton(onClick = { selectedFileUri = null }) {
+                           Icon(Icons.Rounded.WorkOff, contentDescription = "Clear", tint = ErrorRed) // Using WorkOff as a close icon replacement if Close not avail
+                       }
+                   }
+                }
             }
         }
     }

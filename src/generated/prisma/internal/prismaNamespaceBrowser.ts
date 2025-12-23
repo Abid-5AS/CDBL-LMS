@@ -64,6 +64,7 @@ export const ModelName = {
   OrgSettings: 'OrgSettings',
   OtpCode: 'OtpCode',
   Notification: 'Notification',
+  DeviceToken: 'DeviceToken',
   BalanceAdjustment: 'BalanceAdjustment',
   ApprovalDelegation: 'ApprovalDelegation',
   EscalationRule: 'EscalationRule',
@@ -304,6 +305,18 @@ export const NotificationScalarFieldEnum = {
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+export const DeviceTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  token: 'token',
+  platform: 'platform',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DeviceTokenScalarFieldEnum = (typeof DeviceTokenScalarFieldEnum)[keyof typeof DeviceTokenScalarFieldEnum]
 
 
 export const BalanceAdjustmentScalarFieldEnum = {
@@ -744,6 +757,14 @@ export const NotificationOrderByRelevanceFieldEnum = {
 } as const
 
 export type NotificationOrderByRelevanceFieldEnum = (typeof NotificationOrderByRelevanceFieldEnum)[keyof typeof NotificationOrderByRelevanceFieldEnum]
+
+
+export const DeviceTokenOrderByRelevanceFieldEnum = {
+  token: 'token',
+  platform: 'platform'
+} as const
+
+export type DeviceTokenOrderByRelevanceFieldEnum = (typeof DeviceTokenOrderByRelevanceFieldEnum)[keyof typeof DeviceTokenOrderByRelevanceFieldEnum]
 
 
 export const BalanceAdjustmentOrderByRelevanceFieldEnum = {

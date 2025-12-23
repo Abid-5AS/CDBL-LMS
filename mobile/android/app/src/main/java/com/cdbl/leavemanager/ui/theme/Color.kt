@@ -3,16 +3,19 @@ package com.cdbl.leavemanager.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // Indigo Palette (Primary)
-val Indigo50 = Color(0xFFeef2ff)
-val Indigo100 = Color(0xFFe0e7ff)
-val Indigo200 = Color(0xFFc7d2fe)
-val Indigo300 = Color(0xFFa5b4fc)
-val Indigo400 = Color(0xFF818cf8)
-val Indigo500 = Color(0xFF6366f1)
-val Indigo600 = Color(0xFF4338ca) // Primary Brand Color
-val Indigo700 = Color(0xFF3730a3)
-val Indigo800 = Color(0xFF312e81)
-val Indigo900 = Color(0xFF1e1b4b)
+// Premium Indigo Palette
+val Indigo50 = Color(0xFFEFF6FF)
+val Indigo100 = Color(0xFFDBEAFE)
+val Indigo500 = Color(0xFF3B82F6) // Brighter Primary
+val Indigo600 = Color(0xFF2563EB) // Deep Primary
+val Indigo700 = Color(0xFF1D4ED8)
+val Indigo900 = Color(0xFF1E3A8A) // Midnight Blue
+
+// Premium Neutral / Surface
+val SurfaceLight = Color(0xFFFFFFFF)
+val BackgroundLight = Color(0xFFF8FAFC) // Very light slate
+val SurfaceDark = Color(0xFF1E293B) // Dark Slate
+val BackgroundDark = Color(0xFF0F172A) // Darker Slate
 
 // Slate Palette (Neutrals - Blue-ish Grays)
 val Slate50 = Color(0xFFf8fafc)

@@ -11,18 +11,21 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import com.cdbl.leavemanager.data.repository.ApprovalRepository
 
 data class LeaveDetailUiState(
     val isLoading: Boolean = false,
+    val isSubmitting: Boolean = false,
     val leave: LeaveRequest? = null,
     val comments: List<LeaveComment> = emptyList(),
-    val error: String? = null
+    val error: String? = null,
+    val actionSuccess: Boolean = false
 )
 
 @HiltViewModel
 class LeaveDetailViewModel @Inject constructor(
-    private val repository: LeaveRepository
+    private val repository: LeaveRepository,
+    private val approvalRepository: ApprovalRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LeaveDetailUiState())
@@ -30,9 +33,8 @@ class LeaveDetailViewModel @Inject constructor(
 
     fun loadDetails(token: String, leaveId: Int) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update { it.copy(isLoading = true, error = null, actionSuccess = false) }
             
-            // Parallel fetch using async/await pattern ideally, but sequential is fine for now
             val leaveResult = repository.getLeaveDetails(token, leaveId)
             val commentsResult = repository.getComments(token, leaveId)
 
@@ -47,9 +49,31 @@ class LeaveDetailViewModel @Inject constructor(
             } else {
                 _uiState.update {
                     val errorMsg = leaveResult.exceptionOrNull()?.message
-                    println("LeaveDetailViewModel error: $errorMsg")
                     it.copy(isLoading = false, error = errorMsg)
                 }
+            }
+        }
+    }
+
+    fun approveLeave(token: String, leaveId: Int, comment: String?) {
+        submitDecision(token, leaveId, "APPROVE", comment)
+    }
+
+    fun rejectLeave(token: String, leaveId: Int, comment: String?) {
+        submitDecision(token, leaveId, "REJECT", comment)
+    }
+
+    private fun submitDecision(token: String, leaveId: Int, decision: String, comment: String?) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSubmitting = true) }
+            val result = approvalRepository.submitDecision(token, leaveId.toString(), decision, comment)
+            
+            result.onSuccess {
+                _uiState.update { it.copy(isSubmitting = false, actionSuccess = true) }
+                // Reload details to show updated status
+                loadDetails(token, leaveId)
+            }.onFailure { e ->
+                _uiState.update { it.copy(isSubmitting = false, error = e.message) }
             }
         }
     }

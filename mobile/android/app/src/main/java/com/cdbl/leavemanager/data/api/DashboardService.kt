@@ -1,6 +1,7 @@
 package com.cdbl.leavemanager.data.api
 
 import com.cdbl.leavemanager.data.model.BalanceResponse
+import com.cdbl.leavemanager.data.model.TeamOnLeaveResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -8,4 +9,41 @@ import retrofit2.http.Header
 interface DashboardService {
     @GET("balance/mine")
     suspend fun getMyBalance(@Header("Authorization") token: String): Response<BalanceResponse>
+
+    @GET("team/on-leave?scope=team")
+    suspend fun getTeamOnLeave(@Header("Authorization") token: String): Response<TeamOnLeaveResponse>
+
+    @GET("admin/system-stats")
+    suspend fun getSystemStats(@Header("Authorization") token: String): Response<com.cdbl.leavemanager.data.model.SystemStatsResponse>
+
+    @GET("admin/audit-logs")
+    suspend fun getAuditLogs(@Header("Authorization") token: String): Response<List<com.cdbl.leavemanager.data.model.AuditLog>>
+
+    @GET("dashboard/hr/stats")
+    suspend fun getHRStats(@Header("Authorization") token: String): Response<com.cdbl.leavemanager.data.model.HRAdminStats>
+
+    @GET("dashboard/ceo/stats")
+    suspend fun getCEOStats(@Header("Authorization") token: String): Response<com.cdbl.leavemanager.data.model.CEOStats>
+
+    @GET("dashboard/hr-head/stats")
+    suspend fun getHRHeadStats(@Header("Authorization") token: String): Response<com.cdbl.leavemanager.data.model.HRHeadStats>
+
+    @GET("admin/users")
+    suspend fun getUsers(@Header("Authorization") token: String): Response<com.cdbl.leavemanager.data.model.AdminUserListResponse>
+
+    @POST("admin/users/create")
+    suspend fun createUser(
+        @Header("Authorization") token: String,
+        @Body request: com.cdbl.leavemanager.data.model.CreateUserRequest
+    ): Response<com.cdbl.leavemanager.data.model.CreateUserResponse>
+
+    @PATCH("admin/users/{id}")
+    suspend fun updateUser(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
+        @Body request: com.cdbl.leavemanager.data.model.UpdateUserRequest
+    ): Response<com.cdbl.leavemanager.data.model.UpdateUserResponse>
+
+    @GET("holidays")
+    suspend fun getHolidays(@Header("Authorization") token: String): Response<com.cdbl.leavemanager.data.model.HolidayResponse>
 }

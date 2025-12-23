@@ -57,6 +57,9 @@ model User {
   // Webhook Relations
   webhooks Webhook[]
 
+  // Notification - Device Tokens (FCM)
+  deviceTokens DeviceToken[]
+
   @@index([deptHeadId])
 }
 
@@ -271,6 +274,20 @@ model Notification {
   @@index([userId, read, createdAt]) // Notification dashboard - optimized
   @@index([userId, createdAt])
   @@index([createdAt])
+}
+
+// Device Tokens for Push Notifications (FCM)
+model DeviceToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  token     String   @unique // FCM Token
+  platform  String   @default("android") // android, ios, web
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 enum Role {

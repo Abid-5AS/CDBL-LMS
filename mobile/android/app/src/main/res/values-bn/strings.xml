@@ -1,0 +1,123 @@
+<resources>
+    <string name="app_name">CDBL ছুটি ব্যবস্থাপনা</string>
+
+    <!-- Auth -->
+    <string name="login_title">স্বাগতম</string>
+    <string name="login_subtitle">অ্যাক্সেস করতে আপনার ক্রেডেনশিয়াল দিন</string>
+    <string name="otp_title">ওটিপি যাচাই করুন</string>
+    <string name="otp_subtitle">%1$s ঠিকানায় পাঠানো ৬-ডিজিটের কোডটি দিন</string>
+    <string name="otp_hint">ভেরিফিকেশন কোড</string>
+    <string name="verify_button">যাচাই করুন এবং লগ ইন করুন</string>
+    <string name="email">ইমেল ঠিকানা</string>
+    <string name="password">পাসওয়ার্ড</string>
+    <string name="login_button">লগ ইন</string>
+    <string name="login_loading">লগ ইন হচ্ছে...</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">হোম</string>
+    <string name="nav_leaves">ছুটি</string>
+    <string name="nav_profile">প্রোফাইল</string>
+    <string name="nav_approvals">অনুমোদন</string>
+
+    <!-- Leave Details -->
+    <string name="leave_details">ছুটির বিস্তারিত</string>
+    <string name="reject">প্রত্যাখ্যান</string>
+    <string name="approve">অনুমোদন</string>
+    <string name="status_label">অবস্থা</string>
+    <string name="type_label">ধরন</string>
+    <string name="duration_label">সময়কাল</string>
+    <string name="reason_label">কারণ</string>
+    <string name="no_reason">কোন কারণ উল্লেখ করা হয়নি।</string>
+    <string name="timeline">টাইমলাইন</string>
+    <string name="approve_leave_confirm">ছুটি অনুমোদন করুন</string>
+    <string name="reject_leave_confirm">ছুটি প্রত্যাখ্যান করুন</string>
+    <string name="comment_optional">একটি মন্তব্য যোগ করুন (ঐচ্ছিক):</string>
+    <string name="final_status">চূড়ান্ত অবস্থা</string>
+    <string name="applied_label">আবেদন করা হয়েছে</string>
+    <string name="applied_desc">আবেদন জমা দেওয়া হয়েছে</string>
+    <string name="comment_label">%1$s মন্তব্য</string>
+    <string name="search_leaves">ছুটি খুঁজুন...</string>
+    <string name="tab_all">সব</string>
+    <string name="tab_pending">অপেক্ষমান</string>
+    <string name="tab_approved">অনুমোদিত</string>
+    <string name="tab_rejected">প্রত্যাখ্যাত</string>
+    <string name="tab_casual">ক্যাজুয়াল</string>
+    <string name="no_history">কোন ছুটির ইতিহাস পাওয়া যায়নি</string>
+    <string name="days_count">%1$s দিন</string>
+    <string name="good_morning">শুভ সকাল!</string>
+    <string name="needs_action">আপনার পদক্ষেপ প্রয়োজন</string>
+    <string name="action_required">পদক্ষেপ প্রয়োজন</string>
+    <string name="under_review">পর্যালোচনাধীন</string>
+    <string name="next_leave">পরবর্তী ছুটি</string>
+    <string name="total_balance">মোট ছুটি</string>
+    <string name="apply_leave">ছুটির আবেদন</string>
+    <string name="leave_history">ছুটির ইতিহাস</string>
+    <string name="recent_leaves">সাম্প্রতিক ছুটি</string>
+    <string name="view_all">সব দেখুন</string>
+    <string name="no_recent_leaves">কোন সাম্প্রতিক ছুটির আবেদন নেই</string>
+    <string name="leave_balance">ছুটির ব্যালেন্স</string>
+    <string name="whos_out">আজ যারা ছুটিতে</string>
+    <string name="everyone_present">আজ সবাই উপস্থিত আছেন!</string>
+    <string name="days_left">বাকি</string>
+    <string name="used">ব্যবহৃত</string>
+    <string name="total">মোট</string>
+    <string name="returned_requests">আপনার %1$dটি ফেরত আসা আবেদন আছে</string>
+    <string name="pending_requests">অপেক্ষমান আবেদন</string>
+
+    <!-- Leave Status -->
+    <string name="status_pending">অপেক্ষমান</string>
+    <string name="status_approved">অনুমোদিত</string>
+    <string name="status_rejected">প্রত্যাখ্যাত</string>
+    <string name="status_forwarded">ফরোয়ার্ড করা হয়েছে</string>
+
+    <!-- Apply Leave -->
+    <string name="apply_leave_title">ছুটির আবেদন</string>
+    <string name="available_balance">অবশিষ্ট ছুটি</string>
+    <string name="updated_today">আজ আপডেট করা হয়েছে</string>
+    <string name="select_leave_type">ছুটির ধরন নির্বাচন করুন</string>
+    <string name="select_dates">তারিখ নির্বাচন করুন</string>
+    <string name="days_selected">%1$d দিন নির্বাচিত</string>
+    <string name="total_days">মোট দিন</string>
+    <string name="reason_hint">ব্যক্তিগত কারণে আমার কিছু সময়ের জন্য ছুটির প্রয়োজন...</string>
+    <string name="add_document">প্রয়োজনীয় ডকুমেন্ট যোগ করুন</string>
+    <string name="file_attached">ফাইল সংযুক্ত করা হয়েছে</string>
+    <string name="tap_to_select">ফাইল নির্বাচন করতে ট্যাপ করুন</string>
+    <string name="leave_type">ছুটির ধরন</string>
+    <string name="start_date">শুরুর তারিখ</string>
+    <string name="end_date">শেষ তারিখ</string>
+    <string name="reason">ছুটির কারণ</string>
+    <string name="upload_document">ডকুমেন্ট আপলোড করুন</string>
+    <string name="submit_application">আবেদন জমা দিন</string>
+    <string name="submitting">জমা দেওয়া হচ্ছে...</string>
+    <string name="select_date">তারিখ নির্বাচন করুন</string>
+    
+    <!-- Profile -->
+    <string name="profile_title">প্রোফাইল</string>
+    <string name="error_load_profile">প্রোফাইল লোড করতে সমস্যা হয়েছে</string>
+    <string name="retry">আবার চেষ্টা করুন</string>
+    <string name="personal_info">ব্যক্তিগত তথ্য</string>
+    <string name="policies">নীতিমালা এবং নির্দেশিকা</string>
+    <string name="holidays">সরকারি ছুটির তালিকা</string>
+    <string name="notifications">নোটিফিকেশন</string>
+    <string name="change_password">পাসওয়ার্ড পরিবর্তন</string>
+    <string name="help_support">সাহায্য এবং সহায়তা</string>
+    <string name="logout">লগ আউট</string>
+    <string name="employee_id">এমপ্লয়ী আইডি</string>
+    <string name="department">বিভাগ</string>
+    <string name="phone">ফোন</string>
+    <string name="address">ঠিকানা</string>
+
+    <!-- Admin -->
+    <string name="admin_console">অ্যাডমিন কনসোল</string>
+    <string name="manage_users">ব্যবহারকারী ব্যবস্থাপনা</string>
+    <string name="total_users">মোট ব্যবহারকারী</string>
+    <string name="on_leave">ছুটিতে আছেন</string>
+    <string name="audit_logs">সাম্প্রতিক অডিট লগ</string>
+
+    <!-- Common -->
+    <string name="error_generic">কিছু ভুল হয়েছে</string>
+    <string name="success_generic">অপারেশন সফল হয়েছে</string>
+    <string name="save">পরিবর্তন সেভ করুন</string>
+    <string name="cancel">বাতিল</string>
+    <string name="back">পেছনে</string>
+</resources>

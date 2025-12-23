@@ -51,11 +51,8 @@ type CorporateEmployeeDashboardProps = {
 };
 
 // Leave entitlements (these should come from API in production)
-const LEAVE_ENTITLEMENTS = {
-  CASUAL: 14,
-  MEDICAL: 14, // Changed from SICK to MEDICAL to match LeaveType
-  EARNED: 20,
-};
+// Leave entitlements now come from API
+// const LEAVE_ENTITLEMENTS = { ... }
 
 /**
  * Corporate Employee Dashboard
@@ -97,8 +94,9 @@ export function CorporateEmployeeDashboard({
     enableSelection: false,
   });
 
+  // Fetch detailed balance to get total entitlements + used
   const { data: balanceData, isLoading: isLoadingBalance } =
-    useApiQuery<Record<string, number>>("/api/balance/mine");
+    useApiQuery<any>("/api/balance/mine?detailed=true");
 
   const { data: holidaysData, isLoading: isLoadingHolidays } = useSWR(
     "/api/holidays?upcoming=true",
@@ -107,6 +105,38 @@ export function CorporateEmployeeDashboard({
 
   // Process data using existing hook
   const dashboardData = useEmployeeDashboardData(leaves, balanceData);
+
+  // Calculate entitlements from API response
+  const entitlements = React.useMemo(() => {
+    if (!balanceData || !balanceData.balances) {
+        // Fallback or loading state
+        return {
+            CASUAL: { total: 14, available: 0, used: 0 },
+            MEDICAL: { total: 14, available: 0, used: 0 },
+            EARNED: { total: 20, available: 0, used: 0 }
+        };
+    }
+    
+    const getEntitlement = (type: string) => {
+        const record = balanceData.balances.find((b: any) => b.type === type);
+        if (!record) return { total: 0, available: 0, used: 0 };
+        // Total entitlement = opening (carry over) + accrued (this year)
+        // Note: Accrued usually means "earned so far". But for Casual/Medical it's usually fixed annual.
+        // Assuming API returns 'accrued' as total annual quota for fixed types.
+        const total = (record.opening || 0) + (record.accrued || 0);
+        return {
+            total,
+            available: record.closing ?? (total - (record.used || 0)),
+            used: record.used || 0
+        };
+    };
+
+    return {
+        CASUAL: getEntitlement("CASUAL"),
+        MEDICAL: getEntitlement("MEDICAL"),
+        EARNED: getEntitlement("EARNED")
+    };
+  }, [balanceData]);
 
   // Filter leaves for the activity list (preserved logic)
   const filteredLeaves = React.useMemo(() => {
@@ -130,11 +160,6 @@ export function CorporateEmployeeDashboard({
       formattedDates: `${formatDate(leave.startDate)} - ${formatDate(leave.endDate)}`,
     }));
   }, [leaves, activityFilter]);
-
-  // Calculate balance data for cards
-  const casualBalance = dashboardData.balanceData?.CASUAL || 0;
-  const medicalBalance = dashboardData.balanceData?.MEDICAL || 0;
-  const earnedBalance = dashboardData.balanceData?.EARNED || 0;
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -180,25 +205,25 @@ export function CorporateEmployeeDashboard({
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <BalanceCard
               type={LeaveType.CASUAL}
-              available={casualBalance}
-              used={LEAVE_ENTITLEMENTS.CASUAL - casualBalance}
-              total={LEAVE_ENTITLEMENTS.CASUAL}
+              available={entitlements.CASUAL.available}
+              used={entitlements.CASUAL.used}
+              total={entitlements.CASUAL.total}
               density={density}
               onClick={() => router.push("/balance")}
             />
             <BalanceCard
               type={LeaveType.MEDICAL}
-              available={medicalBalance}
-              used={LEAVE_ENTITLEMENTS.MEDICAL - medicalBalance}
-              total={LEAVE_ENTITLEMENTS.MEDICAL}
+              available={entitlements.MEDICAL.available}
+              used={entitlements.MEDICAL.used}
+              total={entitlements.MEDICAL.total}
               density={density}
               onClick={() => router.push("/balance")}
             />
             <BalanceCard
               type={LeaveType.EARNED}
-              available={earnedBalance}
-              used={LEAVE_ENTITLEMENTS.EARNED - earnedBalance}
-              total={LEAVE_ENTITLEMENTS.EARNED}
+              available={entitlements.EARNED.available}
+              used={entitlements.EARNED.used}
+              total={entitlements.EARNED.total}
               density={density}
               onClick={() => router.push("/balance")}
             />

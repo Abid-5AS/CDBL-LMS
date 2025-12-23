@@ -14,6 +14,7 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.MoneyOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -153,6 +154,77 @@ fun EncashmentScreen(
                         }
                     }
                      Text("Updated today", style = MaterialTheme.typography.labelSmall, color = Indigo100, modifier = Modifier.align(Alignment.End))
+                }
+                }
+            }
+
+            // Payroll/Deduction Card
+            Spacer(modifier = Modifier.height(16.dp))
+            val deductionAmount = uiState.lwpDays * 1666.0 // Mock daily rate
+            
+            if (deductionAmount > 0) {
+                 Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                    shape = RoundedCornerShape(24.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(24.dp).fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text("Projected Salary Deduction", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onErrorContainer)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "BDT ${String.format("%,.0f", deductionAmount)}",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                            Text(
+                                text = "${uiState.lwpDays} days Unpaid Leave",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f)
+                            )
+                        }
+                        Icon(
+                            Icons.Rounded.MoneyOff, 
+                            contentDescription = null, 
+                            tint = MaterialTheme.colorScheme.onErrorContainer,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                }
+            } else {
+                 // Optional: Show "No Deductions" or hiding it is fine.
+                 // Show "Salary Safe" card?
+                  Card(
+                    colors = CardDefaults.cardColors(containerColor = SuccessGreen.copy(alpha=0.1f)),
+                    shape = RoundedCornerShape(24.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(24.dp).fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text("Salary Status", style = MaterialTheme.typography.labelMedium, color = SuccessGreen)
+                            Text(
+                                text = "No Deductions",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = SuccessGreen
+                            )
+                        }
+                         Icon(
+                            Icons.Rounded.CheckCircle, 
+                            contentDescription = null, 
+                            tint = SuccessGreen,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
                 }
             }
 

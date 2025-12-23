@@ -23,6 +23,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cdbl.leavemanager.ui.theme.Indigo600
+import androidx.compose.ui.platform.LocalContext
+import androidx.fragment.app.FragmentActivity
+import com.cdbl.leavemanager.util.BiometricHelper
+import androidx.compose.material.icons.rounded.Fingerprint
+
+import androidx.compose.ui.res.stringResource
+import com.cdbl.leavemanager.R
 
 @Composable
 fun LoginScreen(
@@ -38,6 +45,15 @@ fun LoginScreen(
         if (uiState.token != null) {
             onLoginSuccess(uiState.token!!)
         }
+    }
+
+    // OTP Flow Interception
+    if (uiState.requiresOtp) {
+        OtpVerificationScreen(
+            onVerifySuccess = { /* Handled by LaunchedEffect(token) above */ },
+            viewModel = viewModel
+        )
+        return
     }
 
     Scaffold(
@@ -56,13 +72,13 @@ fun LoginScreen(
             
             // Header
             Text(
-                text = "Welcome Back",
+                text = stringResource(R.string.login_title),
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
             )
             Text(
-                text = "Sign in to continue",
+                text = stringResource(R.string.login_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -73,7 +89,7 @@ fun LoginScreen(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email Address") },
+                label = { Text(stringResource(R.string.email)) },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 leadingIcon = { Icon(Icons.Rounded.Email, contentDescription = null) },
@@ -90,7 +106,7 @@ fun LoginScreen(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password") },
+                label = { Text(stringResource(R.string.password)) },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -138,19 +154,40 @@ fun LoginScreen(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
-                    Text("Login", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.login_button), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
             }
 
-            Spacer(modifier = Modifier.height(48.dp))
+            // Biometric Login
+            val context = LocalContext.current
+            val isBiometricAvailable = remember { BiometricHelper.isBiometricAvailable(context) }
+            
+            if (uiState.hasSavedToken && isBiometricAvailable) {
+                Spacer(modifier = Modifier.height(16.dp))
+                OutlinedButton(
+                    onClick = {
+                        BiometricHelper.authenticate(
+                            context as FragmentActivity,
+                            onSuccess = { viewModel.loginWithSavedToken() },
+                            onError = { /* Error handled by Helper usually or we can show snackbar */ }
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(Icons.Rounded.Fingerprint, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Login with Biometrics")
+                }
+            }
 
-            // Dev Options
+            // Dev Options (Restored)
+            Spacer(modifier = Modifier.height(48.dp))
             Text(
                 text = "Quick Login (Dev Only)",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            
             Spacer(modifier = Modifier.height(16.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

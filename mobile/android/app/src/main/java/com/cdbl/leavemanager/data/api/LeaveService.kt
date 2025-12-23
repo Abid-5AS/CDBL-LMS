@@ -7,19 +7,36 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Query
+import retrofit2.http.Multipart
+import retrofit2.http.Part
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 
 interface LeaveService {
     @GET("leaves")
     suspend fun getLeaves(
         @Header("Authorization") token: String,
         @Query("mine") mine: String = "1",
-        @Query("limit") limit: Int = 50
+        @Query("limit") limit: Int = 50,
+        @Query("startDate") startDate: String? = null,
+        @Query("endDate") endDate: String? = null
     ): Response<LeaveListResponse>
 
     @POST("leaves")
     suspend fun createLeave(
         @Header("Authorization") token: String,
         @Body request: com.cdbl.leavemanager.data.model.ApplyLeaveRequest
+    ): Response<com.cdbl.leavemanager.data.model.CreateLeaveResponse>
+
+    @Multipart
+    @POST("leaves")
+    suspend fun createLeaveMultipart(
+        @Header("Authorization") token: String,
+        @Part("type") type: RequestBody,
+        @Part("startDate") startDate: RequestBody,
+        @Part("endDate") endDate: RequestBody,
+        @Part("reason") reason: RequestBody,
+        @Part file: MultipartBody.Part?
     ): Response<com.cdbl.leavemanager.data.model.CreateLeaveResponse>
 
     @GET("leaves/{id}")
@@ -33,4 +50,11 @@ interface LeaveService {
         @Header("Authorization") token: String,
         @retrofit2.http.Path("id") id: Int
     ): Response<com.cdbl.leavemanager.data.model.LeaveCommentListResponse>
+
+    @GET("manager/pending")
+    suspend fun getManagerPendingLeaves(
+        @Header("Authorization") token: String,
+        @Query("limit") limit: Int = 20,
+        @Query("offset") offset: Int = 0
+    ): Response<com.cdbl.leavemanager.data.model.ManagerLeaveResponse>
 }

@@ -251,4 +251,42 @@ export class NotificationRepository {
       read: total - unread,
     };
   }
+  /**
+   * Register a device token for push notifications
+   */
+  static async registerDeviceToken(userId: number, token: string, platform: string = "android"): Promise<void> {
+    await prisma.deviceToken.upsert({
+      where: { token },
+      update: {
+        userId,
+        platform,
+        updatedAt: new Date(),
+      },
+      create: {
+        userId,
+        token,
+        platform,
+      },
+    });
+  }
+
+  /**
+   * Get all device tokens for a user
+   */
+  static async getDeviceTokens(userId: number): Promise<string[]> {
+    const tokens = await prisma.deviceToken.findMany({
+      where: { userId },
+      select: { token: true },
+    });
+    return tokens.map((t) => t.token);
+  }
+
+  /**
+   * Remove a device token (e.g., on logout or invalid token)
+   */
+  static async removeDeviceToken(token: string): Promise<void> {
+    await prisma.deviceToken.deleteMany({
+      where: { token },
+    });
+  }
 }

@@ -83,6 +83,11 @@ export type OtpCode = Prisma.OtpCodeModel
  */
 export type Notification = Prisma.NotificationModel
 /**
+ * Model DeviceToken
+ * 
+ */
+export type DeviceToken = Prisma.DeviceTokenModel
+/**
  * Model BalanceAdjustment
  * 
  */

@@ -6,6 +6,8 @@ import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import useSWR from "swr";
+import { apiFetcher } from "@/lib/apiClient";
 
 interface CoverageDay {
   date: Date;
@@ -17,7 +19,28 @@ interface CoverageDay {
 export function TeamCoverageCalendar() {
   const [currentDate, setCurrentDate] = React.useState(new Date());
 
-  // Mock data generation for the heatmap (replace with real API later)
+  // Fetch calendar coverage data
+  const { data: coverageData, isLoading } = useSWR<{
+    range: { start: string; end: string };
+    days: Record<string, { count: number; members: any[] }>;
+  }>(() => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth(); // 0-indexed
+    // Get first day of month
+    const start = new Date(year, month, 1);
+    // Get last day of month
+    const end = new Date(year, month + 1, 0);
+    
+    // Convert to simplified date string for API: YYYY-MM-DD
+    // Using local time to avoid timezone shifts
+    const toDateString = (d: Date) => {
+        const offset = d.getTimezoneOffset() * 60000;
+        return new Date(d.getTime() - offset).toISOString().split('T')[0];
+    };
+
+    return `/api/team/on-leave?scope=department&startDate=${toDateString(start)}&endDate=${toDateString(end)}`;
+  }, apiFetcher);
+
   const calendarDays = React.useMemo(() => {
     const days: CoverageDay[] = [];
     const year = currentDate.getFullYear();
@@ -26,40 +49,38 @@ export function TeamCoverageCalendar() {
 
     for (let i = 1; i <= daysInMonth; i++) {
       const date = new Date(year, month, i);
-      const count = Math.floor(Math.random() * 5); // Mock count 0-4
+      // Format as YYYY-MM-DD for lookup
+      const offset = date.getTimezoneOffset() * 60000;
+      const dateKey = new Date(date.getTime() - offset).toISOString().split('T')[0];
+      
+      const dayData = coverageData?.days[dateKey];
+      const count = dayData?.count || 0;
+      
       let intensity: CoverageDay["intensity"] = "none";
       if (count > 0) intensity = "low";
       if (count > 2) intensity = "medium";
-      if (count > 3) intensity = "high";
+      if (count > 3) intensity = "high"; // Assuming team size ~10-15, >3 is significant
 
       days.push({
         date,
         count,
         intensity,
-        employees: count > 0 ? Array(count).fill("Employee Name") : [],
+        employees: dayData?.members?.map((m: any) => m.employeeName) || [],
       });
     }
     return days;
-  }, [currentDate]);
-
-  const nextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
-  };
-
-  const prevMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
-  };
+  }, [currentDate, coverageData]);
 
   const getIntensityColor = (intensity: CoverageDay["intensity"]) => {
     switch (intensity) {
       case "high":
-        return "bg-red-500 dark:bg-red-600";
+        return "bg-red-500 dark:bg-red-600 shadow-sm";
       case "medium":
         return "bg-orange-400 dark:bg-orange-500";
       case "low":
         return "bg-emerald-400 dark:bg-emerald-500";
       default:
-        return "bg-muted/30";
+        return "bg-muted/30 border border-transparent";
     }
   };
 

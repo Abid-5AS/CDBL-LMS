@@ -118,10 +118,10 @@ export function CorporateManagerDashboard() {
   };
 
   const data =
-    rawData && rawData.items
+    rawData && rawData.rows
       ? {
-          rows: rawData.items as any[],
-          total: rawData.items.length,
+          rows: rawData.rows as any[],
+          total: rawData.total || rawData.rows.length,
           counts: rawData.counts,
         }
       : undefined;

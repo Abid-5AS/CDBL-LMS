@@ -20,14 +20,20 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.CloudOff
+import androidx.compose.material.icons.rounded.CloudUpload
 import androidx.compose.material.icons.rounded.Dashboard
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,59 +41,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.res.stringResource
+import com.cdbl.leavemanager.R
 import com.cdbl.leavemanager.ui.theme.*
+import androidx.compose.ui.platform.LocalContext
+import com.cdbl.leavemanager.util.PdfGenerator
+import androidx.compose.material.icons.rounded.Download
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeaveHistoryScreen(
-    token: String, // Kept for signature compatibility
+    token: String,
     onBackClick: (() -> Unit)? = null,
     onApplyClick: () -> Unit,
-    onEncashmentClick: () -> Unit, // Kept for signature compatibility
-    onLeaveClick: (Int) -> Unit, // Kept for signature compatibility
+    onEncashmentClick: () -> Unit,
+    onLeaveClick: (Int) -> Unit,
     viewModel: LeaveHistoryViewModel = hiltViewModel()
 ) {
-    // Mock Data
-    val mockLeaves = listOf(
-        MockLeave(
-            "Sick Leave",
-            "Pending",
-            "1 Day",
-            "Full Day",
-            "Feeling feverish and headache since morning...",
-            "24", "OCT",
-            "This Month"
-        ),
-        MockLeave(
-            "Annual Leave",
-            "Approved",
-            "Oct 12 - Oct 14",
-            "3 Days",
-            "Family trip to the mountains.",
-            "12", "OCT",
-            "This Month"
-        ),
-        MockLeave(
-            "Casual Leave",
-            "Rejected",
-            "1 Day",
-            "See Reason",
-            "Personal matters to attend to.",
-            "28", "SEP",
-            "September"
-        ),
-         MockLeave(
-            "Sick Leave",
-            "Approved",
-            "Half Day (Morning)",
-             "1 Day",
-            "Dental appointment.",
-            "02", "SEP",
-            "September"
-        )
-    )
-
-    val groups = mockLeaves.groupBy { it.group }
+    val uiState by viewModel.uiState.collectAsState()
+    
+    LaunchedEffect(Unit) {
+        viewModel.loadLeaves(token)
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -99,7 +74,7 @@ fun LeaveHistoryScreen(
                 shape = RoundedCornerShape(16.dp),
                  modifier = Modifier.size(64.dp)
             ) {
-                Icon(Icons.Rounded.Add, contentDescription = "Apply", modifier = Modifier.size(32.dp))
+                Icon(Icons.Rounded.Add, contentDescription = stringResource(R.string.apply_leave), modifier = Modifier.size(32.dp))
             }
         }
     ) { paddingValues ->
@@ -120,12 +95,18 @@ fun LeaveHistoryScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "My Leaves",
+                        text = stringResource(R.string.my_leaves),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Outlined.Notifications, contentDescription = "Notifications")
+
+                    val context = LocalContext.current
+                    IconButton(onClick = { 
+                         if (uiState.leaves.isNotEmpty()) {
+                            PdfGenerator.generateLeaveHistoryPdf(context, uiState.leaves)
+                         }
+                    }) {
+                        Icon(Icons.Rounded.Download, contentDescription = "Export PDF")
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
@@ -137,7 +118,7 @@ fun LeaveHistoryScreen(
                     TextField(
                         value = "",
                         onValueChange = {},
-                        placeholder = { Text("Search leaves...") },
+                        placeholder = { Text(stringResource(R.string.search_leaves)) },
                         leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null) },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
@@ -161,6 +142,15 @@ fun LeaveHistoryScreen(
             }
 
             // Tabs
+            val tabs = listOf(
+                stringResource(R.string.tab_all) to "All",
+                stringResource(R.string.tab_pending) to "Pending",
+                stringResource(R.string.tab_approved) to "Approved",
+                stringResource(R.string.tab_rejected) to "Rejected",
+                stringResource(R.string.tab_casual) to "Casual"
+            )
+            var selectedTab by remember { mutableStateOf("All") }
+
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -168,8 +158,8 @@ fun LeaveHistoryScreen(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
             ) {
-                items(listOf("All", "Pending", "Approved", "Rejected", "Casual")) { tab ->
-                    val isSelected = tab == "All"
+                items(tabs) { (label, value) ->
+                    val isSelected = value == selectedTab
                     val bgColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
                     val contentColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
                     val borderColor = if (isSelected) Color.Transparent else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
@@ -179,11 +169,21 @@ fun LeaveHistoryScreen(
                             .clip(RoundedCornerShape(8.dp))
                             .background(bgColor)
                             .border(1.dp, borderColor, RoundedCornerShape(8.dp))
-                            .clickable { }
+                            .clickable {
+                                selectedTab = value
+                                when(value) {
+                                    "All" -> viewModel.loadLeaves(token)
+                                    "Pending" -> viewModel.loadLeaves(token, status = "PENDING")
+                                    "Approved" -> viewModel.loadLeaves(token, status = "APPROVED")
+                                    "Rejected" -> viewModel.loadLeaves(token, status = "REJECTED")
+                                    "Casual" -> viewModel.loadLeaves(token, type = "CASUAL")
+                                    else -> viewModel.loadLeaves(token)
+                                }
+                            }
                             .padding(horizontal = 20.dp, vertical = 8.dp)
                     ) {
                         Text(
-                            text = tab,
+                            text = label,
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.Bold,
                             color = contentColor
@@ -193,23 +193,22 @@ fun LeaveHistoryScreen(
             }
 
             // List
-            LazyColumn(
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                groups.forEach { (group, leaves) ->
-                     item {
-                        Text(
-                            text = group,
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
-                    }
-                    items(leaves) { leave ->
-                        LeaveHistoryCardNew(leave)
+            if (uiState.isLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else if (uiState.leaves.isEmpty()) {
+                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(stringResource(R.string.no_history), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            } else {
+                LazyColumn(
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                   items(uiState.leaves) { leave ->
+                        LeaveHistoryCardNew(leave, onClick = { onLeaveClick(leave.id) })
                     }
                 }
             }
@@ -217,38 +216,49 @@ fun LeaveHistoryScreen(
     }
 }
 
-data class MockLeave(
-    val type: String,
-    val status: String,
-    val dateRange: String,
-    val duration: String,
-    val reason: String,
-    val startDay: String,
-    val startMonth: String,
-    val group: String
-)
+
 
 @Composable
-fun LeaveHistoryCardNew(leave: MockLeave) {
+fun LeaveHistoryCardNew(leave: com.cdbl.leavemanager.data.model.LeaveRequest, onClick: () -> Unit) {
     val statusBg = when(leave.status) {
-        "Pending" -> StatusYellowBg
-        "Approved" -> StatusGreenBg
-        "Rejected" -> StatusRedBg
+        "PENDING" -> StatusYellowBg
+        "APPROVED" -> StatusGreenBg
+        "REJECTED" -> StatusRedBg
+        "SYNC_PENDING" -> MaterialTheme.colorScheme.surfaceVariant
+        "SYNC_FAILED" -> MaterialTheme.colorScheme.errorContainer
         else -> MaterialTheme.colorScheme.surfaceVariant
     }
     val statusText = when(leave.status) {
-        "Pending" -> StatusYellowText
-        "Approved" -> StatusGreenText
-        "Rejected" -> StatusRedText
+        "PENDING" -> StatusYellowText
+        "APPROVED" -> StatusGreenText
+        "REJECTED" -> StatusRedText
+        "SYNC_PENDING" -> MaterialTheme.colorScheme.onSurfaceVariant
+        "SYNC_FAILED" -> MaterialTheme.colorScheme.onErrorContainer
         else -> MaterialTheme.colorScheme.onSurface
     }
+    val statusIcon = when(leave.status) {
+        "SYNC_PENDING" -> Icons.Rounded.CloudUpload
+        "SYNC_FAILED" -> Icons.Rounded.CloudOff
+        else -> null
+    }
+
+    // Parse date safely
+    val startDateObj = try {
+         java.time.LocalDate.parse(leave.startDate.take(10))
+    } catch (e: Exception) {
+         java.time.LocalDate.now()
+    }
+    val startMonth = startDateObj.month.name.take(3)
+    val startDay = startDateObj.dayOfMonth.toString()
 
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
          border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)),
         shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -263,13 +273,13 @@ fun LeaveHistoryCardNew(leave: MockLeave) {
                     .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
             ) {
                 Text(
-                    text = leave.startMonth,
+                    text = startMonth,
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = leave.startDay,
+                    text = startDay,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -302,12 +312,14 @@ fun LeaveHistoryCardNew(leave: MockLeave) {
                     }
                 }
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = leave.reason,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1
-                )
+                if (leave.reason != null) {
+                    Text(
+                        text = leave.reason,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
@@ -318,18 +330,13 @@ fun LeaveHistoryCardNew(leave: MockLeave) {
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = leave.dateRange,
+                        text = "${leave.startDate.take(10)} - ${leave.endDate.take(10)}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    if (leave.status != "Rejected") {
-                         Text(
-                            text = " • ",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                    if (leave.workingDays != null) {
                         Text(
-                            text = leave.duration,
+                            text = " • " + stringResource(R.string.days_count, leave.workingDays.toString()),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

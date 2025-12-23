@@ -248,6 +248,7 @@ export async function getHRAdminStatsData(
     pendingRequests,
     totalLeavesThisYear,
     processedToday,
+    encashmentPending,
   ] = await Promise.all([
     prisma.leaveRequest.count({
       where: {
@@ -281,6 +282,11 @@ export async function getHRAdminStatsData(
           gte: today,
           lt: tomorrow,
         },
+      },
+    }),
+    prisma.encashmentRequest.count({
+      where: {
+        status: "PENDING",
       },
     }),
   ]);
@@ -412,7 +418,7 @@ export async function getHRAdminStatsData(
     employeesOnLeave,
     pendingRequests,
     avgApprovalTime: Number(avgApprovalTime.toFixed(1)),
-    encashmentPending: 0,
+    encashmentPending,
     totalLeavesThisYear,
     processedToday,
     dailyTarget,
