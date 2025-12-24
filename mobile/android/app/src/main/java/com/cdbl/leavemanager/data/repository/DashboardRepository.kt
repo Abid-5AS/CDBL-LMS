@@ -1,6 +1,7 @@
 package com.cdbl.leavemanager.data.repository
 
 import com.cdbl.leavemanager.data.api.DashboardService
+// import com.cdbl.leavemanager.data.api.AdminService // TODO: AdminService not implemented yet
 import com.cdbl.leavemanager.data.model.BalanceResponse
 import com.cdbl.leavemanager.data.model.TeamOnLeaveResponse
 import com.cdbl.leavemanager.data.local.CacheManager
@@ -8,9 +9,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-@Singleton
 class DashboardRepository @Inject constructor(
     private val dashboardService: DashboardService,
+    // private val adminService: AdminService, // TODO: AdminService not implemented yet
     private val cacheManager: CacheManager
 ) {
     suspend fun getMyBalance(token: String): Result<BalanceResponse> {
@@ -130,9 +131,11 @@ class DashboardRepository @Inject constructor(
         }
     }
 
+    // TODO: Admin user management methods commented out until AdminService is implemented
+    /*
     suspend fun getUsers(token: String): Result<List<com.cdbl.leavemanager.data.model.User>> {
         return try {
-            val response = api.getUsers("Bearer $token")
+            val response = adminService.getUsers("Bearer $token")
             if (response.isSuccessful && response.body() != null) {
                 // Prefer 'users' list, fall back to empty
                 Result.success(response.body()?.users ?: emptyList())
@@ -146,7 +149,7 @@ class DashboardRepository @Inject constructor(
 
     suspend fun createUser(token: String, request: com.cdbl.leavemanager.data.model.CreateUserRequest): Result<String> {
         return try {
-            val response = api.createUser("Bearer $token", request)
+            val response = adminService.createUser("Bearer $token", request)
             if (response.isSuccessful && response.body()?.ok == true) {
                 Result.success("User created successfully")
             } else {
@@ -160,7 +163,7 @@ class DashboardRepository @Inject constructor(
 
     suspend fun updateUser(token: String, userId: String, request: com.cdbl.leavemanager.data.model.UpdateUserRequest): Result<String> {
         return try {
-            val response = api.updateUser("Bearer $token", userId, request)
+            val response = adminService.updateUser("Bearer $token", userId, request)
             if (response.isSuccessful && response.body()?.item != null) {
                 Result.success("User updated successfully")
             } else {
@@ -171,4 +174,5 @@ class DashboardRepository @Inject constructor(
             Result.failure(e)
         }
     }
+    */
 }

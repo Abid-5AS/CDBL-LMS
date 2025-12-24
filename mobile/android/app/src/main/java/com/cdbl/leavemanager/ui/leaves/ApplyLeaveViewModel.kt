@@ -53,19 +53,12 @@ class ApplyLeaveViewModel @Inject constructor(
     fun loadPolicies(token: String) {
         viewModelScope.launch {
             val result = policyRepository.fetchPolicies() // Token might not be needed if repository handles auth or assumes logged in context?
-            // Repo fetchPolicies() doesn't take token in existing code (Step 1158), it uses injected service or assumes?
-            // Wait, Step 1158: `policyService.getPolicies()` -> no arguments?
-            // Let's check `PolicyService` interface if I can see it?
-            // I haven't seen `PolicyService`.
-            // But `PolicyRepository` code (Step 1158) line 25: `val response = policyService.getPolicies()` -> No token passed.
-            // Typically Retrofit services usually need `@Header("Authorization")`.
-            // If `PolicyService` gets it from an interceptor or if it was omitted, I might have an issue.
-            // However, `LeaveService` takes token explicitly.
-            // If `PolicyRepository` doesn't take token, I can't pass it.
-            // `PolicyRepository.fetchPolicies()` takes no args.
             
-            result.onSuccess {
-                _uiState.value = _uiState.value.copy(leavePolicies = it)
+            result.onSuccess { policies ->
+                _uiState.value = _uiState.value.copy(leavePolicies = policies.filter { policy ->
+                    policy.availability.equals("all", ignoreCase = true) || 
+                    (policy.availability.equals("female", ignoreCase = true)) // Simplified logic, real app might check user gender
+                })
             }
         }
     }

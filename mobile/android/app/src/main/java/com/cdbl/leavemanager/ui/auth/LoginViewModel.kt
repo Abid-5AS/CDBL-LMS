@@ -49,13 +49,23 @@ class LoginViewModel @Inject constructor(
             result.onSuccess { response ->
                 if (response.success && response.data != null) {
                     if (response.data.requiresOtp) {
-                         _uiState.value = LoginUiState(
-                             requiresOtp = true,
-                             email = email,
-                             error = response.data.message // Optional: Show "OTP Sent" as message? No, keep error for errors.
-                         )
+                        // In debug builds, automatically verify with default OTP
+                        if (com.cdbl.leavemanager.BuildConfig.DEBUG) {
+                            _uiState.value = LoginUiState(
+                                isLoading = true,
+                                email = email
+                            )
+                            // Auto-verify with default OTP code "000000"
+                            verifyOtp("000000")
+                        } else {
+                            _uiState.value = LoginUiState(
+                                requiresOtp = true,
+                                email = email,
+                                error = response.data.message // Optional: Show "OTP Sent" as message? No, keep error for errors.
+                            )
+                        }
                     } else {
-                        tokenManager.saveToken(response.data.token)
+                        response.data.token?.let { tokenManager.saveToken(it) }
                         _uiState.value = LoginUiState(
                             user = response.data.user,
                             token = response.data.token
@@ -64,7 +74,7 @@ class LoginViewModel @Inject constructor(
                 } else {
                     _uiState.value = LoginUiState(error = response.error ?: "Unknown error")
                 }
-            }.onFailure {
+            }.onFailure { 
                 _uiState.value = LoginUiState(error = it.message)
             }
         }
@@ -77,7 +87,7 @@ class LoginViewModel @Inject constructor(
             val result = authRepository.verifyOtp(currentEmail, code)
             result.onSuccess { response ->
                 if (response.success && response.data != null) {
-                    tokenManager.saveToken(response.data.token)
+                    response.data.token?.let { tokenManager.saveToken(it) }
                      _uiState.value = LoginUiState(
                         user = response.data.user,
                         token = response.data.token
@@ -85,7 +95,7 @@ class LoginViewModel @Inject constructor(
                 } else {
                     _uiState.value = _uiState.value.copy(isLoading = false, error = response.error ?: "Invalid OTP")
                 }
-            }.onFailure {
+            }.onFailure { 
                  _uiState.value = _uiState.value.copy(isLoading = false, error = it.message)
             }
         }

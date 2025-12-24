@@ -155,7 +155,7 @@ fun EncashmentScreen(
                     }
                      Text("Updated today", style = MaterialTheme.typography.labelSmall, color = Indigo100, modifier = Modifier.align(Alignment.End))
                 }
-                }
+
             }
 
             // Payroll/Deduction Card

@@ -249,4 +249,4 @@ fun EventItem(event: CalendarEvent) {
         }
     }
 }
-}
+

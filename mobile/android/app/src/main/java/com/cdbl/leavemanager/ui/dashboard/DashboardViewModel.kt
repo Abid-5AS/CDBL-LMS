@@ -2,9 +2,7 @@ package com.cdbl.leavemanager.ui.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cdbl.leavemanager.data.model.BalanceResponse
-import com.cdbl.leavemanager.data.model.AnalyticsTrendResponse
-import com.cdbl.leavemanager.data.model.TeamMemberOnLeave
+import com.cdbl.leavemanager.data.model.* 
 import com.cdbl.leavemanager.data.repository.DashboardRepository
 import com.cdbl.leavemanager.data.repository.AnalyticsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +13,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-import com.cdbl.leavemanager.data.model.LeaveRequest
 import com.cdbl.leavemanager.data.repository.LeaveRepository
 import com.cdbl.leavemanager.data.repository.ApprovalRepository
 
@@ -43,11 +40,11 @@ class DashboardViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
 
-    private val _hrHeadStats = MutableStateFlow<Result<HRHeadStats>?>(null)
-    val hrHeadStats: StateFlow<Result<HRHeadStats>?> = _hrHeadStats.asStateFlow()
+    private val _hrHeadStats = MutableStateFlow<Result<com.cdbl.leavemanager.data.model.HRHeadStats>?>(null)
+    val hrHeadStats: StateFlow<Result<com.cdbl.leavemanager.data.model.HRHeadStats>?> = _hrHeadStats.asStateFlow()
 
-    private val _users = MutableStateFlow<Result<List<User>>?>(null)
-    val users: StateFlow<Result<List<User>>?> = _users.asStateFlow()
+    private val _users = MutableStateFlow<Result<List<com.cdbl.leavemanager.data.model.User>>?>(null)
+    val users: StateFlow<Result<List<com.cdbl.leavemanager.data.model.User>>?> = _users.asStateFlow()
 
     fun loadDashboard(token: String) {
         viewModelScope.launch {
@@ -71,10 +68,10 @@ class DashboardViewModel @Inject constructor(
 
             _uiState.update { state ->
                 val recentLeaves = recentLeavesResult.getOrDefault(emptyList())
-                val needsAttention = recentLeaves.count { it.status == "RETURNED" || it.status == "REJECTED" } // Expanded definition
-                val underReview = recentLeaves.count { it.status == "PENDING" || it.status == "SUBMITTED" }
+                val needsAttention = recentLeaves.count { leave -> leave.status == "RETURNED" || leave.status == "REJECTED" } // Expanded definition
+                val underReview = recentLeaves.count { leave -> leave.status == "PENDING" || leave.status == "SUBMITTED" }
                 val nextApproved = recentLeaves
-                    .filter { it.status == "APPROVED" } // Filter for future dates if possible, assuming list is sorted or we parse dates
+                    .filter { leave -> leave.status == "APPROVED" } // Filter for future dates if possible, assuming list is sorted or we parse dates
                     // For simplicity in MVP, we take the first approved leave. 
                     // Ideally check startDate > today.
                     .firstOrNull()

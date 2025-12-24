@@ -11,8 +11,6 @@ import com.cdbl.leavemanager.data.model.PolicyExample
 import com.cdbl.leavemanager.data.model.PolicyRule
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.firstOrNull
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class PolicyRepository @Inject constructor(

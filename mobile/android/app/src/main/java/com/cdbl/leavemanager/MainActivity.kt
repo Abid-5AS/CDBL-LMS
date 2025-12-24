@@ -2,6 +2,9 @@ package com.cdbl.leavemanager
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -25,6 +28,7 @@ import com.cdbl.leavemanager.ui.profile.EditProfileScreen
 import com.cdbl.leavemanager.ui.admin.UserListScreen
 import com.cdbl.leavemanager.ui.admin.UserManagementScreen
 import com.cdbl.leavemanager.ui.policy.PolicyScreen
+import com.cdbl.leavemanager.ui.holidays.HolidaysScreen
 import com.cdbl.leavemanager.ui.help.HelpScreen
 import com.cdbl.leavemanager.ui.leaves.LeaveHistoryScreen
 import com.cdbl.leavemanager.ui.leaves.ApplyLeaveScreen
@@ -59,9 +63,8 @@ class MainActivity : ComponentActivity() {
                 // Monitor network
                 val isOnline by networkMonitor.isOnline.collectAsState(initial = true)
                 
-                val role = com.cdbl.leavemanager.util.JwtUtils.getUserRole(token)
+                var role = com.cdbl.leavemanager.util.JwtUtils.getUserRole(token)
                 val isApprover = role in listOf("DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN")
-                // ... (abbreviated for tool call, assuming surrounding code matches)
 
                 // Determine if we should show bottom bar
                 val showBottomBar = currentRoute in listOf(
@@ -71,8 +74,8 @@ class MainActivity : ComponentActivity() {
                     Screen.Profile.route
                 )
 
-                androidx.compose.foundation.layout.Column(
-                    modifier = Modifier.androidx.compose.foundation.layout.fillMaxSize()
+                Column(
+                    modifier = Modifier.fillMaxSize()
                 ) {
                      com.cdbl.leavemanager.ui.components.OfflineIndicator(isOnline = isOnline)
                      
@@ -262,7 +265,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("admin/users") {
-                            com.cdbl.leavemanager.ui.admin.UserListScreen(
+                            UserListScreen(
                                 token = token,
                                 onBackClick = { navController.popBackStack() },
                                 onAddClick = { navController.navigate("admin/users/manage") },
@@ -288,7 +291,7 @@ class MainActivity : ComponentActivity() {
                                 com.google.gson.Gson().fromJson(userJson, com.cdbl.leavemanager.data.model.User::class.java)
                             } else null
 
-                            com.cdbl.leavemanager.ui.admin.UserManagementScreen(
+                            UserManagementScreen(
                                 token = token,
                                 userToEdit = userToEdit,
                                 onBackClick = { navController.popBackStack() },
@@ -299,6 +302,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
+                }
                 }
             }
         }

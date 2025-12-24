@@ -17,22 +17,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.cdbl.leavemanager.data.model.User
 import com.cdbl.leavemanager.ui.dashboard.DashboardViewModel
 
+// TODO: UserAdminViewModel not implemented yet, using stub
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserListScreen(
     token: String,
     onBackClick: () -> Unit,
     onUserClick: (User) -> Unit,
-    onAddClick: () -> Unit,
-    viewModel: DashboardViewModel = hiltViewModel()
+    onAddClick: () -> Unit
+    // viewModel: UserAdminViewModel = hiltViewModel() // TODO: Not implemented yet
 ) {
-    val usersResult by viewModel.users.collectAsState()
-    var searchQuery by remember { mutableStateOf("") }
-
-    LaunchedEffect(Unit) {
-        viewModel.fetchUsers(token)
-    }
-
+    // Stub implementation - show placeholder
     Scaffold(
         topBar = {
             TopAppBar(
@@ -43,63 +38,32 @@ fun UserListScreen(
                     }
                 }
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = onAddClick) {
-                Icon(Icons.Rounded.Add, contentDescription = "Add User")
-            }
         }
     ) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
-            // Search Bar
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                placeholder = { Text("Search by name or email") },
-                leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
-                singleLine = true
-            )
-
-            // Content
-            if (usersResult == null) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            } else {
-                usersResult!!.onSuccess { users ->
-                     val filteredUsers = users.filter { 
-                        it.name?.contains(searchQuery, ignoreCase = true) == true || 
-                        it.email.contains(searchQuery, ignoreCase = true)
-                    }
-
-                    LazyColumn {
-                        items(filteredUsers) { user ->
-                            ListItem(
-                                headlineContent = { Text(user.name ?: "Unknown") },
-                                supportingContent = { Text("${user.email} • ${user.role}") },
-                                leadingContent = {
-                                    Icon(Icons.Rounded.Person, contentDescription = null)
-                                },
-                                modifier = Modifier.clickable { onUserClick(user) }
-                            )
-                            HorizontalDivider()
-                        }
-                        if (filteredUsers.isEmpty()) {
-                            item {
-                                Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = androidx.compose.ui.Alignment.Center) {
-                                    Text("No users found", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                }
-                            }
-                        }
-                    }
-                }.onFailure {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
-                        Text("Failed to load users: ${it.message}", color = MaterialTheme.colorScheme.error)
-                    }
-                }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            contentAlignment = androidx.compose.ui.Alignment.Center
+        ) {
+            Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+                Icon(
+                    Icons.Rounded.Person,
+                    contentDescription = null,
+                    modifier = Modifier.size(64.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    "User Management",
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    "This feature is not yet implemented",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }

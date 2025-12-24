@@ -15,7 +15,10 @@ data class LeaveRequest(
     val reason: String?,
     val status: String,
     val createdAt: String,
-    val updatedAt: String
+    val updatedAt: String,
+    val rejectionReason: String? = null,
+    val employeeName: String? = null,
+    val managerName: String? = null
 )
 
 data class ApplyLeaveRequest(

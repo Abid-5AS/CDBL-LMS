@@ -52,9 +52,9 @@ import com.cdbl.leavemanager.R
 import com.cdbl.leavemanager.ui.theme.*
 import com.cdbl.leavemanager.ui.components.FullScreenLoading
 import com.cdbl.leavemanager.ui.components.ErrorView
+import com.cdbl.leavemanager.ui.components.KpiCard
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import com.cdbl.leavemanager.ui.components.KPICard
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -145,11 +145,11 @@ fun EmployeeDashboardScreen(
                                         modifier = Modifier
                                             .size(40.dp)
                                             .clip(CircleShape)
-                                            .background(Indigo200)
+                                            .background(MaterialTheme.colorScheme.primaryContainer)
                                             .border(2.dp, MaterialTheme.colorScheme.surface, CircleShape),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        Icon(Icons.Outlined.Person, contentDescription = null, tint = Indigo800)
+                                        Icon(Icons.Outlined.Person, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer)
                                     }
                                 }
                             }
@@ -183,46 +183,42 @@ fun EmployeeDashboardScreen(
                             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                     // Needs Attention
-                                     KPICard(
+                                     KpiCard(
                                          title = stringResource(R.string.needs_action),
                                          value = state.needsAttentionCount.toString(),
-                                         icon = Icons.Rounded.Notifications,
-                                         color = if (state.needsAttentionCount > 0) ErrorRed else MaterialTheme.colorScheme.onSurfaceVariant,
-                                         desc = "Returned/Rejected",
+                                         subtitle = "Returned/Rejected",
                                          modifier = Modifier.weight(1f),
-                                         onClick = onNavigateToApprovals
+                                         bg = if (state.needsAttentionCount > 0) ErrorRed.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant,
+                                         contentColor = if (state.needsAttentionCount > 0) ErrorRed else MaterialTheme.colorScheme.onSurfaceVariant
                                      )
                                      // Under Review
-                                     KPICard(
+                                     KpiCard(
                                          title = stringResource(R.string.under_review),
                                          value = state.underReviewCount.toString(),
-                                         icon = Icons.Rounded.History,
-                                         color = if (state.underReviewCount > 0) WarningAmber else MaterialTheme.colorScheme.onSurfaceVariant,
-                                         desc = stringResource(R.string.pending_requests),
+                                         subtitle = stringResource(R.string.pending_requests),
                                          modifier = Modifier.weight(1f),
-                                         onClick = onNavigateToApprovals
+                                         bg = if (state.underReviewCount > 0) WarningAmber.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant,
+                                         contentColor = if (state.underReviewCount > 0) WarningAmber else MaterialTheme.colorScheme.onSurfaceVariant
                                      )
                                 }
                                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                     // Total Balance
-                                    KPICard(
+                                    KpiCard(
                                          title = stringResource(R.string.total_balance),
                                          value = "${state.balance?.EARNED?.toInt() ?: 0}",
-                                         icon = Icons.Rounded.Flight,
-                                         color = Indigo600,
-                                         desc = "Earned Leave",
-                                         modifier = Modifier.weight(1f), 
-                                         onClick = {}
+                                         subtitle = "Earned Leave",
+                                         modifier = Modifier.weight(1f),
+                                         bg = Indigo600.copy(alpha = 0.1f),
+                                         contentColor = Indigo600
                                      )
                                      // Next Leave
-                                     KPICard(
+                                     KpiCard(
                                          title = stringResource(R.string.next_leave),
                                          value = state.nextApprovedLeave?.let { "${it.startDate.take(10)}" } ?: "-",
-                                         icon = Icons.Rounded.CalendarMonth,
-                                         color = SuccessGreen,
-                                         desc = state.nextApprovedLeave?.type ?: "None booked",
+                                         subtitle = state.nextApprovedLeave?.type ?: "None booked",
                                          modifier = Modifier.weight(1f),
-                                         onClick = { state.nextApprovedLeave?.let { onNavigateToLeaveDetails(it.id) } }
+                                         bg = SuccessGreen.copy(alpha = 0.1f),
+                                         contentColor = SuccessGreen
                                      )
                                 }
                             }
@@ -303,10 +299,10 @@ fun EmployeeDashboardScreen(
                                                         modifier = Modifier
                                                             .size(56.dp)
                                                             .clip(CircleShape)
-                                                            .background(Indigo100),
+                                                            .background(MaterialTheme.colorScheme.primaryContainer),
                                                         contentAlignment = Alignment.Center
                                                     ) {
-                                                         Icon(Icons.Outlined.Person, contentDescription = null, tint = Indigo600)
+                                                         Icon(Icons.Outlined.Person, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer)
                                                     }
                                                     Spacer(modifier = Modifier.height(8.dp))
                                                     Text(

@@ -1,3 +1,5 @@
+package com.cdbl.leavemanager.data.repository
+
 import com.cdbl.leavemanager.data.local.dao.LeaveDao
 import com.cdbl.leavemanager.data.local.entity.LeaveRequestEntity
 import kotlinx.coroutines.flow.combine
@@ -15,7 +17,6 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.MultipartBody
 import java.io.File
 
-@Singleton
 @Singleton
 class LeaveRepository @Inject constructor(
     private val leaveService: LeaveService,
@@ -65,6 +66,8 @@ class LeaveRepository @Inject constructor(
             workingDays = this.days,
             rejectionReason = this.rejectionReason,
             createdAt = this.createdAt,
+            requesterId = 0, // Not stored
+            updatedAt = "", // Not stored
             employeeName = "", // Not stored for self
             managerName = ""
         )
@@ -81,6 +84,8 @@ class LeaveRepository @Inject constructor(
             workingDays = null,
             rejectionReason = this.errorMessage,
             createdAt = java.time.format.DateTimeFormatter.ISO_INSTANT.format(java.time.Instant.ofEpochMilli(this.createdAt)),
+            requesterId = 0,
+            updatedAt = "",
             employeeName = "Me",
             managerName = "Pending Sync"
         )
@@ -124,7 +129,7 @@ class LeaveRepository @Inject constructor(
                 val reasonPart = request.reason.toRequestBody("text/plain".toMediaTypeOrNull())
 
                 val fileReq = file.asRequestBody("application/octet-stream".toMediaTypeOrNull())
-                val filePart = MultipartBody.Part.createFormData("file", file.name, fileReq) // "file" is the field name on server? Checking ApplyLeaveForm.tsx: formData.append('file', file)
+                val filePart = MultipartBody.Part.createFormData("file", file.name, fileReq)
 
                 leaveService.createLeaveMultipart("Bearer $token", typePart, startPart, endPart, reasonPart, filePart)
             } else {
@@ -140,7 +145,7 @@ class LeaveRepository @Inject constructor(
         } catch (e: Exception) {
             // Offline fallback: Save to DB
             val offlineRequest = com.cdbl.leavemanager.data.local.entity.OfflineLeaveRequestEntity(
-                type = request.leaveType,
+                type = request.type,
                 startDate = request.startDate,
                 endDate = request.endDate,
                 reason = request.reason

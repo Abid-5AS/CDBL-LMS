@@ -11,8 +11,6 @@ import com.cdbl.leavemanager.data.local.dao.UserDao
 import com.cdbl.leavemanager.data.local.entity.UserEntity
 import com.cdbl.leavemanager.data.model.User
 import kotlinx.coroutines.flow.firstOrNull
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class AuthRepository @Inject constructor(
@@ -21,7 +19,7 @@ class AuthRepository @Inject constructor(
 ) {
     suspend fun login(email: String, password: String): Result<LoginResponse> {
         return try {
-            val response = authService.login(LoginRequest(email, password))
+            val response = authService.login(LoginRequest(email, password, skipOtp = com.cdbl.leavemanager.BuildConfig.DEBUG))
             if (response.isSuccessful && response.body() != null) {
                 val loginResponse = response.body()!!
                 // Cache user if login successful and user data provided

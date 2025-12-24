@@ -1,48 +1,30 @@
 package com.cdbl.leavemanager.ui.admin
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.cdbl.leavemanager.data.model.CreateUserRequest
-import com.cdbl.leavemanager.data.model.UpdateUserRequest
 import com.cdbl.leavemanager.data.model.User
-import com.cdbl.leavemanager.ui.dashboard.DashboardViewModel
 
+// TODO: UserAdminViewModel not implemented yet, using stub
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserManagementScreen(
     token: String,
     userToEdit: User?, // If null, we are creating a new user
     onBackClick: () -> Unit,
-    onSuccess: () -> Unit,
-    viewModel: DashboardViewModel = hiltViewModel()
+    onSuccess: () -> Unit
+    // viewModel: UserAdminViewModel = hiltViewModel() // TODO: Not implemented yet
 ) {
-    var name by remember { mutableStateOf(userToEdit?.name ?: "") }
-    var email by remember { mutableStateOf(userToEdit?.email ?: "") }
-    var empCode by remember { mutableStateOf(userToEdit?.employeeId ?: "") }
-    var department by remember { mutableStateOf(userToEdit?.department ?: "") }
-    var role by remember { mutableStateOf(userToEdit?.role ?: "EMPLOYEE") }
-    
-    var isLoading by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
-    
-    val isEditMode = userToEdit != null
-    val roles = listOf("EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN")
-    
-    // Dropdown state
-    var expanded by remember { mutableStateOf(false) }
-
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (isEditMode) "Edit User" else "Create User") },
+                title = { Text(if (userToEdit != null) "Edit User" else "Create User") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
@@ -51,132 +33,30 @@ fun UserManagementScreen(
             )
         }
     ) { padding ->
-        Column(
+        Box(
             modifier = Modifier
-                .padding(padding)
                 .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(padding),
+            contentAlignment = Alignment.Center
         ) {
-            
-            // Name (Read-only in edit mode typically for many systems, but let's allow edit if Create. 
-            // Actually API Update only allows role/dept. So if Edit Mode, disable Name/Email/EmpCode)
-            
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Full Name") },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isEditMode
-            )
-            
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email Address") },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isEditMode
-            )
-
-            OutlinedTextField(
-                value = empCode,
-                onValueChange = { empCode = it },
-                label = { Text("Employee ID") },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isEditMode
-            )
-
-            OutlinedTextField(
-                value = department,
-                onValueChange = { department = it },
-                label = { Text("Department") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            // Role Dropdown
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = it }
-            ) {
-                OutlinedTextField(
-                    value = role,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Role") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.menuAnchor().fillMaxWidth()
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    Icons.Rounded.Person,
+                    contentDescription = null,
+                    modifier = Modifier.size(64.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    roles.forEach { r ->
-                        DropdownMenuItem(
-                            text = { Text(r) },
-                            onClick = {
-                                role = r
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
-            
-            if (isEditMode) {
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    "Note: Only Role and Department can be updated for existing users.",
-                    style = MaterialTheme.typography.bodySmall,
+                    "User Management",
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    "This feature is not yet implemented",
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            }
-
-            if (error != null) {
-                Text(error!!, color = MaterialTheme.colorScheme.error)
-            }
-
-            Button(
-                onClick = {
-                    isLoading = true
-                    error = null
-                    
-                    if (isEditMode) {
-                        val request = UpdateUserRequest(
-                            role = role,
-                            department = department
-                        )
-                        viewModel.updateUser(token, userToEdit!!.id, request, 
-                            onSuccess = onSuccess,
-                            onError = { 
-                                isLoading = false
-                                error = it
-                            }
-                        )
-                    } else {
-                        val request = CreateUserRequest(
-                            name = name,
-                            email = email,
-                            empCode = empCode,
-                            department = department,
-                            role = role
-                        )
-                        viewModel.createUser(token, request,
-                            onSuccess = onSuccess,
-                            onError = { 
-                                isLoading = false
-                                error = it
-                            }
-                        )
-                    }
-                },
-                modifier = Modifier.fillMaxWidth().height(50.dp),
-                enabled = !isLoading
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
-                } else {
-                    Text(if (isEditMode) "Save Changes" else "Create User")
-                }
             }
         }
     }

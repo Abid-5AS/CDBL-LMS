@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,12 +36,10 @@ class EncashmentViewModel @Inject constructor(
             val result = encashmentRepository.getEncashmentRequests(token)
             
             // Also fetch leaves for Payroll calculation
-            val leavesResult = leaveRepository.getMyLeaves(token)
-            val lwpCount = if (leavesResult.isSuccess) {
-                leavesResult.getOrDefault(emptyList())
-                    .filter { (it.type.equals("LWP", ignoreCase = true) || it.type.equals("Unpaid", ignoreCase = true)) && it.status == "APPROVED" }
-                    .sumOf { it.workingDays ?: 1.0 }
-            } else 0.0
+            val myLeaves = leaveRepository.getMyLeavesFlow(token).first()
+            val lwpCount = myLeaves
+                .filter { (it.type.equals("LWP", ignoreCase = true) || it.type.equals("Unpaid", ignoreCase = true)) && it.status == "APPROVED" }
+                .sumOf { (it.workingDays ?: 1).toDouble() }
 
             result.onSuccess {
                 _uiState.value = _uiState.value.copy(isLoading = false, requests = it, lwpDays = lwpCount)

@@ -4,7 +4,10 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.cdbl.leavemanager.data.local.dao.UserDao
+import com.cdbl.leavemanager.data.local.dao.LeaveDao
 import com.cdbl.leavemanager.data.local.dao.PolicyDao
+import com.cdbl.leavemanager.data.local.entity.LeaveRequestEntity
+import com.cdbl.leavemanager.data.local.entity.OfflineLeaveRequestEntity
 import com.cdbl.leavemanager.data.local.entity.UserEntity
 import com.cdbl.leavemanager.data.local.entity.PolicyEntity
 import com.cdbl.leavemanager.data.local.entity.PolicyTypeConverters

@@ -34,7 +34,7 @@ class SyncLeaveWorker @AssistedInject constructor(
             pendingRequests.forEach { request ->
                 try {
                     val apiRequest = ApplyLeaveRequest(
-                        leaveType = request.type,
+                        type = request.type,
                         startDate = request.startDate,
                         endDate = request.endDate,
                         reason = request.reason

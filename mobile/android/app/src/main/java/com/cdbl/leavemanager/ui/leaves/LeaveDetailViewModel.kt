@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.cdbl.leavemanager.data.repository.ApprovalRepository
+import javax.inject.Inject
 
 data class LeaveDetailUiState(
     val isLoading: Boolean = false,
@@ -24,7 +25,7 @@ data class LeaveDetailUiState(
 
 @HiltViewModel
 class LeaveDetailViewModel @Inject constructor(
-    private val repository: LeaveRepository,
+    private val leaveRepository: LeaveRepository,
     private val approvalRepository: ApprovalRepository
 ) : ViewModel() {
 
@@ -35,8 +36,8 @@ class LeaveDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null, actionSuccess = false) }
             
-            val leaveResult = repository.getLeaveDetails(token, leaveId)
-            val commentsResult = repository.getComments(token, leaveId)
+            val leaveResult = leaveRepository.getLeaveDetails(token, leaveId)
+            val commentsResult = leaveRepository.getComments(token, leaveId)
 
             if (leaveResult.isSuccess) {
                 _uiState.update {

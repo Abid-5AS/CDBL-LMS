@@ -95,7 +95,7 @@ fun LeaveHistoryScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = stringResource(R.string.my_leaves),
+                        text = stringResource(R.string.nav_leaves),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )

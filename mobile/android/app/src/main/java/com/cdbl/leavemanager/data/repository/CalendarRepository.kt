@@ -25,8 +25,8 @@ class CalendarRepository @Inject constructor(
                 endDate = endDate
             )
 
-            if (response.isSuccessful && response.body()?.success == true) {
-                Result.success(response.body()!!.data)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!.items)
             } else {
                 Result.failure(Exception(response.message()))
             }

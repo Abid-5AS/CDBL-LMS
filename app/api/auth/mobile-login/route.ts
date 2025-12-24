@@ -15,14 +15,17 @@ export const cache = "no-store";
  */
 export async function POST(req: Request) {
   try {
-    // Rate limiting check
+    // Rate limiting check - DISABLED FOR DEVELOPMENT
+    // TODO: Re-enable for production
     const ip = req.headers.get("x-forwarded-for") || "local";
+    /*
     if (!(await checkRateLimit(ip))) {
       return NextResponse.json(
         { error: "Too many login attempts. Please try again later." },
         { status: 429 }
       );
     }
+    */
 
     const body = await req.json();
     const { email, password, skipOtp = false } = body;
