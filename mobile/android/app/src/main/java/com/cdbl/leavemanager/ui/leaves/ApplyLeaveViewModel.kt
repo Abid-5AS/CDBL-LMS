@@ -52,15 +52,40 @@ class ApplyLeaveViewModel @Inject constructor(
 
     fun loadPolicies(token: String) {
         viewModelScope.launch {
-            val result = policyRepository.fetchPolicies() // Token might not be needed if repository handles auth or assumes logged in context?
+            val result = policyRepository.fetchPolicies()
             
             result.onSuccess { policies ->
-                _uiState.value = _uiState.value.copy(leavePolicies = policies.filter { policy ->
+                val filtered = policies.filter { policy ->
                     policy.availability.equals("all", ignoreCase = true) || 
-                    (policy.availability.equals("female", ignoreCase = true)) // Simplified logic, real app might check user gender
-                })
+                    policy.availability.equals("female", ignoreCase = true) ||
+                    permissionsAllows(policy.availability) // Placeholder for future logic
+                }
+                
+                if (filtered.isNotEmpty()) {
+                    _uiState.value = _uiState.value.copy(leavePolicies = filtered)
+                } else {
+                    // Fallback to defaults if API returns empty or everything is filtered
+                    useDefaultPolicies()
+                }
+            }.onFailure {
+                // Fallback to defaults on error
+                useDefaultPolicies()
             }
         }
+    }
+
+    private fun permissionsAllows(availability: String?): Boolean {
+        return true // For dev: allow everything
+    }
+
+    private fun useDefaultPolicies() {
+        val defaults = listOf(
+            PolicySection("Annual Leave", "AL", "all", "Annual leave entitlement", emptyList(), emptyList()),
+            PolicySection("Sick Leave", "SL", "all", "Medical leave", emptyList(), emptyList()),
+            PolicySection("Casual Leave", "CL", "all", "Casual leave", emptyList(), emptyList()),
+            PolicySection("Leave Without Pay", "LWP", "all", "Unpaid leave", emptyList(), emptyList())
+        )
+        _uiState.value = _uiState.value.copy(leavePolicies = defaults)
     }
 
     fun submitLeave(token: String, type: String, startDate: String, endDate: String, reason: String, attachmentUri: Uri? = null) {
