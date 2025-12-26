@@ -172,77 +172,71 @@
 }
 
 .dark {
-  /* Dark Mode - Zinc + Indigo Theme */
-  --background: #09090b;
-  /* Zinc 950 */
-  --foreground: #fafafa;
-  /* Zinc 50 */
+  /* Dark Mode - Slate + Indigo Theme (Android Aligned) */
+  --background: #0f172a;
+  /* Slate 900 */
+  --foreground: #f8fafc;
+  /* Slate 50 */
 
-  --card: #18181b;
-  /* Zinc 900 */
-  --card-foreground: #fafafa;
+  --card: #1e293b;
+  /* Slate 800 */
+  --card-foreground: #f8fafc;
 
-  --popover: #18181b;
-  --popover-foreground: #fafafa;
+  --popover: #1e293b;
+  --popover-foreground: #f8fafc;
 
-  --primary: #6366f1;
-  /* Indigo 500 */
+  --primary: #3b82f6;
+  /* Android Indigo 500 */
   --primary-foreground: #ffffff;
 
-  --secondary: #27272a;
-  /* Zinc 800 */
-  --secondary-foreground: #fafafa;
+  --secondary: #334155;
+  /* Slate 700 */
+  --secondary-foreground: #f8fafc;
 
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
-  /* Zinc 400 */
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
+  /* Slate 400 */
 
-  --accent: #27272a;
-  --accent-foreground: #fafafa;
+  --accent: #334155;
+  --accent-foreground: #f8fafc;
 
   --success: #34d399;
-  /* Emerald 400 */
   --success-foreground: #022c22;
   --warning: #fbbf24;
-  /* Amber 400 */
   --warning-foreground: #451a03;
   --danger: #f87171;
-  /* Rose 400 */
   --danger-foreground: #450a0a;
   --info: #60a5fa;
-  /* Blue 400 */
   --info-foreground: #172554;
 
   --destructive: #7f1d1d;
-  /* Rose 900 */
-  --destructive-foreground: #fafafa;
+  --destructive-foreground: #f8fafc;
 
-  --border: #27272a;
-  /* Zinc 800 */
-  --input: #27272a;
+  --border: #334155;
+  /* Slate 700 */
+  --input: #334155;
   --ring: #6366f1;
-  /* Indigo 500 */
-  --outline: #27272a;
+  
+  --outline: #334155;
   --focus-ring: #6366f1;
 
-  --surface-1: #09090b;
-  --surface-2: #18181b;
-  --surface-3: #27272a;
+  --surface-1: #0f172a;
+  --surface-2: #1e293b;
+  --surface-3: #334155;
 
-  --chart-1: 226 70% 50%;
-  --chart-2: 160 60% 45%;
-  --chart-3: 30 80% 55%;
-  --chart-4: 280 65% 60%;
-  --chart-5: 340 75% 55%;
+  --chart-1: 221 83% 53%;
+  --chart-2: 142 71% 45%;
+  --chart-3: 217 91% 60%;
+  --chart-4: 45 93% 47%;
+  --chart-5: 340 82% 52%;
 
-  --sidebar: #09090b;
-  /* Zinc 950 */
-  --sidebar-foreground: #fafafa;
-  --sidebar-primary: #6366f1;
+  --sidebar: #0f172a;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #3b82f6;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #27272a;
-  --sidebar-accent-foreground: #fafafa;
-  --sidebar-border: #27272a;
+  --sidebar-accent: #334155;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border: #334155;
   --sidebar-ring: #6366f1;
 }
 

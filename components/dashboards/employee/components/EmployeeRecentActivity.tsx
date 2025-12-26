@@ -41,7 +41,7 @@ export function EmployeeRecentActivity({
 
   if (isLoading) {
     return (
-      <Card className="rounded-xl border border-border shadow-sm">
+      <Card className="rounded-[20px] border border-border shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg">Recent Leave History</CardTitle>
         </CardHeader>
@@ -59,7 +59,7 @@ export function EmployeeRecentActivity({
   // Improved Empty State
   if (leaves.length === 0) {
     return (
-      <Card className="rounded-xl border border-border/60 shadow-sm overflow-hidden h-full">
+      <Card className="rounded-[20px] border border-border/60 shadow-sm overflow-hidden h-full">
         <CardHeader>
           <CardTitle className="text-lg">Recent Leave History</CardTitle>
         </CardHeader>
@@ -90,7 +90,7 @@ export function EmployeeRecentActivity({
 
   // Compact Table Layout
   return (
-    <Card className="rounded-xl border border-border/60 shadow-sm overflow-hidden">
+    <Card className="rounded-[20px] border border-border/60 shadow-sm overflow-hidden">
       <CardHeader className="flex flex-row items-center justify-between py-4 px-6 border-b border-border/40">
         <CardTitle className="text-lg">Recent Leave History</CardTitle>
         <Button variant="ghost" size="sm" className="text-xs h-8" onClick={() => router.push("/leaves")}>
