@@ -384,8 +384,7 @@ export function RoleKPICard({
         "group relative flex h-full min-h-[160px] flex-col overflow-hidden",
         "px-5 py-5 sm:px-6 sm:py-6",
         // Visual Refinement: Remove borders, add shadow, specific light/dark adjustments
-        "border-0 shadow-sm hover:shadow-md transition-all duration-300",
-        "border-0 shadow-sm hover:shadow-md transition-all duration-300",
+        "border-0 shadow-md hover:shadow-lg transition-all duration-300",
         "bg-white dark:bg-card/95 rounded-[20px]", // Brighter white in light mode, slightly lighter card in dark mode
         "dark:border dark:border-white/5", // Faint border only in dark mode
         className

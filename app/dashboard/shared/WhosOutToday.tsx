@@ -108,7 +108,7 @@ export async function WhosOutToday({ scope = "team", title }: WhosOutTodayProps)
 
   if (!data) {
     return (
-      <Card className="rounded-xl border border-border/50 bg-background/50 shadow-sm backdrop-blur-sm">
+      <Card className="rounded-[20px] border border-border/50 bg-card shadow-md backdrop-blur-sm">
         <CardHeader className="pb-2 pt-4 px-4 flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-base font-medium flex items-center gap-2">
             <User className="h-4 w-4 text-muted-foreground" />
@@ -125,7 +125,7 @@ export async function WhosOutToday({ scope = "team", title }: WhosOutTodayProps)
   }
 
   return (
-    <Card className="rounded-xl border border-border/50 bg-background/50 shadow-sm backdrop-blur-sm overflow-hidden">
+    <Card className="rounded-[20px] border border-border/50 bg-card shadow-md backdrop-blur-sm overflow-hidden">
       <CardHeader className="pb-3 pt-4 px-4 flex flex-row items-center justify-between space-y-0">
         <CardTitle className="text-base font-medium flex items-center gap-2 text-foreground/80">
           <User className="h-4 w-4 text-muted-foreground" />
@@ -163,14 +163,14 @@ export async function WhosOutToday({ scope = "team", title }: WhosOutTodayProps)
                     </span>
                   </div>
                 </div>
-                
+
                 <div className="pt-2 mt-auto border-t border-border/30 flex items-center justify-between text-[10px] text-muted-foreground">
                   <span className="bg-muted/50 px-1.5 py-0.5 rounded text-foreground/70">
-                     {new Date(member.start).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                    {new Date(member.start).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                   </span>
                   <span className="text-muted-foreground/50">→</span>
                   <span className="bg-muted/50 px-1.5 py-0.5 rounded text-foreground/70">
-                     {new Date(member.end).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                    {new Date(member.end).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                   </span>
                 </div>
               </div>

@@ -45,26 +45,23 @@ export function EmployeePageHero({
   });
 
   return (
-    <div className={cn("surface-card p-4 space-y-4", className)}>
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="space-y-2">
-          <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
-            {eyebrow}
-          </p>
-          <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
+    <div className={cn("p-1 space-y-6", className)}>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-1">
+            <span className="uppercase tracking-[0.2em] text-[10px]">{eyebrow}</span>
+            <span>•</span>
+            <span>{todayLabel}</span>
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">{title}</h1>
           {description && (
-            <p className="text-sm text-muted-foreground leading-6 max-w-3xl">
+            <p className="text-base text-muted-foreground leading-relaxed max-w-2xl">
               {description}
             </p>
           )}
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-          <div className="rounded-xl border border-border/70 px-3 py-2 text-center text-sm text-muted-foreground shadow-sm">
-            <p className="text-xs uppercase tracking-widest">Today</p>
-            <p className="text-xl font-semibold text-foreground">{todayLabel}</p>
-          </div>
-          {actions && <div className="flex items-center gap-2">{actions}</div>}
-        </div>
+
+        {actions && <div className="flex items-center gap-3 pt-2">{actions}</div>}
       </div>
 
       {stats && stats.length > 0 && (
@@ -72,7 +69,7 @@ export function EmployeePageHero({
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="rounded-2xl border border-border/70 px-3 py-2 hover:border-border/90 transition"
+              className="rounded-[20px] bg-card border border-border/60 px-4 py-3 hover:border-border/90 transition shadow-sm"
             >
               <p className="text-xs uppercase tracking-wide text-muted-foreground">
                 {stat.label}

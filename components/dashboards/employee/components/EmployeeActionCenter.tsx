@@ -32,7 +32,7 @@ export function EmployeeActionCenter({
   const router = useRouter();
 
   return (
-    <Card className="rounded-[20px] border-border/60 bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-sm shadow-sm overflow-hidden">
+    <Card className="rounded-[20px] border-border/60 bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-sm shadow-md overflow-hidden">
       <CardHeader className="pb-4 pt-5 px-6 border-b border-border/40">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base sm:text-lg font-semibold flex items-center gap-2.5">

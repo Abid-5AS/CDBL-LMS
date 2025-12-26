@@ -76,7 +76,7 @@ export function EmployeeLeaveBalance({
         {[1, 2, 3, 4, 5, 6].map((i) => (
           <div
             key={i}
-            className="animate-pulse p-4 rounded-xl border border-border-soft dark:border-border/50"
+            className="animate-pulse p-4 rounded-[20px] border border-border-soft dark:border-border/50 shadow-md"
           >
             <div className="h-4 bg-muted dark:bg-muted/80 rounded w-2/3 mb-3"></div>
             <div className="h-8 bg-muted dark:bg-muted/80 rounded w-1/3 mb-2"></div>
@@ -110,7 +110,7 @@ export function EmployeeLeaveBalance({
           <div
             key={type}
             className={cn(
-              "p-4 rounded-xl border border-white/20 dark:border-border-soft/50",
+              "p-4 rounded-[20px] border border-white/20 dark:border-border-soft/50 shadow-md",
               color.light
             )}
           >

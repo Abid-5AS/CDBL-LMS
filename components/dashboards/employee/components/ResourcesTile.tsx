@@ -3,7 +3,7 @@ import { Button, Card, CardContent, CardHeader, CardTitle } from "@/components/u
 
 export function ResourcesTile() {
     return (
-        <Card className="rounded-[20px] border border-outline/60 dark:border-border/60 bg-surface-1 shadow-sm h-full">
+        <Card className="rounded-[20px] border border-outline/60 dark:border-border/60 bg-surface-1 shadow-md h-full">
             <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                     Resources

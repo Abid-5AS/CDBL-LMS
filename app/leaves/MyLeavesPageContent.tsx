@@ -58,7 +58,7 @@ function LeaveRequestCard({ request, onClick }: { request: any; onClick: () => v
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
       onClick={onClick}
-      className="group relative overflow-hidden rounded-xl border border-border bg-card p-4 transition-all hover:shadow-md dark:hover:border-primary/20 cursor-pointer"
+      className="group relative overflow-hidden rounded-[20px] border border-border/60 bg-card p-4 transition-all shadow-md hover:shadow-lg dark:hover:border-primary/20 cursor-pointer"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4">

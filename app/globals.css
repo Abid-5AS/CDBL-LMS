@@ -94,7 +94,8 @@
 
 :root {
   /* Light Mode - Zinc + Indigo Theme */
-  --background: #ffffff;
+  --background: #f1f5f9;
+  /* Zinc 50 renamed to Slate 100 */
   --foreground: #09090b;
   /* Zinc 950 */
 
@@ -216,7 +217,7 @@
   /* Slate 700 */
   --input: #334155;
   --ring: #6366f1;
-  
+
   --outline: #334155;
   --focus-ring: #6366f1;
 

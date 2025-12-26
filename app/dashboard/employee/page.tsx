@@ -12,7 +12,7 @@ import { User } from "lucide-react";
 
 function WhosOutTodaySkeleton() {
   return (
-    <Card className="rounded-xl border border-outline/60 dark:border-border bg-surface-1 shadow-card">
+    <Card className="rounded-[20px] border border-outline/60 dark:border-border bg-surface-1 shadow-md">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <User className="h-5 w-5" />
