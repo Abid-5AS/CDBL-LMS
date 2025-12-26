@@ -381,8 +381,12 @@ export function RoleKPICard({
     <div
       className={cn(
         onClick ? "card-interactive" : "corporate-card",
-        "group relative flex h-full min-h-[190px] flex-col overflow-hidden",
+        "group relative flex h-full min-h-[160px] flex-col overflow-hidden",
         "px-5 py-5 sm:px-6 sm:py-6",
+        // Visual Refinement: Remove borders, add shadow, specific light/dark adjustments
+        "border-0 shadow-sm hover:shadow-md transition-all duration-300",
+        "bg-white dark:bg-card/95", // Brighter white in light mode, slightly lighter card in dark mode
+        "dark:border dark:border-white/5", // Faint border only in dark mode
         className
       )}
       style={accentVars}
@@ -402,61 +406,66 @@ export function RoleKPICard({
       title={onClick && clickLabel ? clickLabel : undefined}
       aria-label={onClick && clickLabel ? clickLabel : undefined}
     >
-      {/* Removed gradient effect for professional look */}
-      <div className="relative flex items-start justify-between gap-4">
-        <div className="flex-1 space-y-3">
-          <div className="flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.35em] text-[color:var(--color-foreground-subtle)]">
-            {title}
-            {tooltip && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      className="cursor-help rounded-full p-0.5 hover:bg-muted/20"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Info className="h-3 w-3 opacity-70" />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="max-w-xs text-xs">{tooltip}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
+      <div className="relative flex items-start justify-between gap-4 h-full">
+        <div className="flex-1 flex flex-col justify-between h-full">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.1em] text-muted-foreground">
+              {title}
+              {tooltip && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        className="cursor-help rounded-full p-0.5 hover:bg-muted/20"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Info className="h-3 w-3 opacity-70" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs text-xs">{tooltip}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
+
+            <div className="flex items-end gap-2">
+              <p className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-foreground tracking-tight">
+                {value}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-3xl font-semibold text-foreground sm:text-4xl">
-              {value}
-            </p>
+
+          <div className="mt-4">
             {subtitle && (
-              <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400 line-clamp-2">
                 {subtitle}
               </p>
             )}
+            {trend && (
+              <div className="inline-flex items-center gap-2 mt-2 rounded-full bg-[var(--role-kpi-accent-soft)]/70 px-2.5 py-0.5 text-xs font-bold text-[color:var(--role-kpi-accent)] w-fit">
+                {trendGlyph}
+                <span>
+                  {trend.direction === "down"
+                    ? "-"
+                    : trend.direction === "up"
+                      ? "+"
+                      : ""}
+                  {Math.abs(trend.value)}%
+                </span>
+                <span className="text-[color:var(--color-foreground-subtle)]/80">
+                  {trend.label}
+                </span>
+              </div>
+            )}
           </div>
-          {trend && (
-            <div className="inline-flex items-center gap-2 rounded-full bg-[var(--role-kpi-accent-soft)]/70 px-3 py-1 text-xs font-semibold text-[color:var(--role-kpi-accent)]">
-              {trendGlyph}
-              <span>
-                {trend.direction === "down"
-                  ? "-"
-                  : trend.direction === "up"
-                    ? "+"
-                    : ""}
-                {Math.abs(trend.value)}%
-              </span>
-              <span className="text-[color:var(--color-foreground-subtle)]/80">
-                {trend.label}
-              </span>
-            </div>
-          )}
         </div>
         {Icon && (
           <div
-            className="rounded-xl border border-border/50 p-3 bg-accent/10"
+            className="rounded-2xl p-3.5 bg-[var(--role-kpi-accent-soft)]/50 dark:bg-[var(--role-kpi-accent-soft)]/10"
             style={{
               color: "var(--role-kpi-accent)",
             }}

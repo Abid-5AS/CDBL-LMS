@@ -51,7 +51,7 @@ export function EmployeeActionCenter({
           )}
         </div>
       </CardHeader>
-      
+
       <CardContent className="p-0">
         {actionItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
@@ -72,13 +72,13 @@ export function EmployeeActionCenter({
                 item.variant === "destructive"
                   ? "bg-destructive text-destructive-foreground"
                   : item.variant === "warning"
-                  ? "bg-amber-500 text-white"
-                  : "bg-blue-500 text-white";
+                    ? "bg-amber-500 text-white"
+                    : "bg-blue-500 text-white";
 
-              const icon = 
+              const icon =
                 item.variant === "destructive" ? AlertCircle :
-                item.variant === "warning" ? AlertTriangle : Clock;
-                
+                  item.variant === "warning" ? AlertTriangle : Clock;
+
               const ItemIcon = icon;
 
               return (
@@ -91,12 +91,12 @@ export function EmployeeActionCenter({
                 >
                   <div className="flex gap-4 items-start sm:items-center">
                     {/* Status Indicator Orbit */}
-                    <div className={cn("mt-1 sm:mt-0 shrink-0 h-2 w-2 rounded-full ring-4 ring-opacity-20", 
+                    <div className={cn("mt-1 sm:mt-0 shrink-0 h-2 w-2 rounded-full ring-4 ring-opacity-20",
                       item.variant === "destructive" ? "bg-destructive ring-destructive" :
-                      item.variant === "warning" ? "bg-amber-500 ring-amber-500" :
-                      "bg-blue-500 ring-blue-500"
+                        item.variant === "warning" ? "bg-amber-500 ring-amber-500" :
+                          "bg-blue-500 ring-blue-500"
                     )} />
-                    
+
                     <div className="space-y-1">
                       <h4 className="text-sm font-medium text-foreground leading-none">
                         {item.title}
@@ -109,10 +109,12 @@ export function EmployeeActionCenter({
 
                   <Button
                     size="sm"
-                    variant={item.variant === "destructive" ? "destructive" : "outline"}
+                    variant={item.variant === "destructive" ? "outline" : "outline"}
                     className={cn(
                       "rounded-full text-xs h-8 px-4 sm:ml-auto w-full sm:w-[160px] shadow-none justify-center",
-                      item.variant !== "destructive" && "border-primary/20 hover:border-primary/50 hover:bg-primary/5 text-primary"
+                      item.variant === "destructive" && "border-amber-500/50 text-amber-600 hover:bg-amber-50 hover:text-amber-700 dark:text-amber-400 dark:hover:bg-amber-950/30",
+                      item.variant === "warning" && "border-amber-500/50 text-amber-600 hover:bg-amber-50 hover:text-amber-700 dark:text-amber-400 dark:hover:bg-amber-950/30",
+                      item.variant === "info" && "border-primary/20 hover:border-primary/50 hover:bg-primary/5 text-primary"
                     )}
                     onClick={() => router.push(item.actionLink)}
                   >

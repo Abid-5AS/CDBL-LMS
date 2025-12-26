@@ -58,7 +58,8 @@ import { BalanceProjectionWidget } from "./components/BalanceProjectionWidget";
 import { KPIGridSkeleton } from "@/components/shared/skeletons";
 import { useMounted } from "@/hooks/useMounted";
 import { useEmployeeDashboardData } from "./hooks/useEmployeeDashboardData";
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { ResourcesTile } from "./components/ResourcesTile";
 
 type EmployeeDashboardContentProps = {
   username: string;
@@ -94,6 +95,7 @@ export function ModernEmployeeDashboard({
   const router = useRouter();
   const [activeLeaveTab, setActiveLeaveTab] = useState<string>("overview");
   const [scrollTimeoutId, setScrollTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false);
   const mounted = useMounted();
 
   // Cleanup timeout on unmount
@@ -199,10 +201,10 @@ export function ModernEmployeeDashboard({
                     <span>
                       {mounted
                         ? new Date().toLocaleDateString("en-GB", {
-                            weekday: "short",
-                            day: "numeric",
-                            month: "short",
-                          })
+                          weekday: "short",
+                          day: "numeric",
+                          month: "short",
+                        })
                         : "..."}
                     </span>
                     {/* Next Leave Inline */}
@@ -212,7 +214,7 @@ export function ModernEmployeeDashboard({
                         <div className="flex items-center gap-1.5 text-foreground/80 font-medium bg-muted/30 px-2 py-0.5 rounded-md">
                           <Calendar className="h-3.5 w-3.5 text-primary" />
                           <span className="text-xs">
-                             Next: {formatDate(dashboardData.nextScheduledLeave.startDate)}
+                            Next: {formatDate(dashboardData.nextScheduledLeave.startDate)}
                           </span>
                         </div>
                       </>
@@ -222,7 +224,7 @@ export function ModernEmployeeDashboard({
 
                 {/* Actions */}
                 <div className="flex items-center gap-2 self-start lg:self-auto">
-                   <Button
+                  <Button
                     variant="outline"
                     size="sm"
                     className="hidden sm:flex"
@@ -400,7 +402,7 @@ export function ModernEmployeeDashboard({
                 icon={Calendar}
                 role={Role.EMPLOYEE}
                 animate={true}
-                onClick={() => scrollToSection("leave-details", "balance")}
+                onClick={() => setIsBalanceModalOpen(true)}
                 clickLabel="View detailed balance breakdown"
               />
 
@@ -452,18 +454,16 @@ export function ModernEmployeeDashboard({
                     ? dashboardData.daysUntilNextLeave === 0
                       ? "Today"
                       : dashboardData.daysUntilNextLeave === 1
-                      ? "Tomorrow"
-                      : `${dashboardData.daysUntilNextLeave} days`
+                        ? "Tomorrow"
+                        : `${dashboardData.daysUntilNextLeave} days`
                     : "—"
                 }
                 subtitle={
                   dashboardData.nextScheduledLeave
-                    ? `${
-                        leaveTypeLabel[dashboardData.nextScheduledLeave.type] ||
-                        dashboardData.nextScheduledLeave.type
-                      } (${
-                        dashboardData.nextScheduledLeave.workingDays || 0
-                      } days)`
+                    ? `${leaveTypeLabel[dashboardData.nextScheduledLeave.type] ||
+                    dashboardData.nextScheduledLeave.type
+                    } (${dashboardData.nextScheduledLeave.workingDays || 0
+                    } days)`
                     : "Plan your time off"
                 }
                 icon={TrendingUp}
@@ -475,116 +475,79 @@ export function ModernEmployeeDashboard({
             </ResponsiveDashboardGrid>
           </DashboardSection>
 
-          {/* Action Center */}
-          <DashboardSection
-            title="Action Center"
-            description="Handle returned requests, certificate tasks, and expiring balances"
-            isLoading={isLoadingLeaves}
-            animate={true}
-          >
-            <div id="action-center">
-              <motion.div variants={itemVariants}>
-                <EmployeeActionCenter actionItems={dashboardData.actionItems} />
-              </motion.div>
-            </div>
-          </DashboardSection>
+          {/* Main Grid Layout (70/30 Split) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
 
-          {/* Conversion Summary Card */}
-          <motion.div variants={itemVariants}>
-            <ConversionSummaryCard year={new Date().getFullYear()} />
-          </motion.div>
+            {/* Left Column (Main Content) - Spans 8 cols */}
+            <div className="lg:col-span-8 space-y-6 lg:space-y-8">
 
-          {/* Who's Out Today Widget */}
-          <motion.div variants={itemVariants}>
-            {whosOutTodaySlot}
-          </motion.div>
+              {/* Action Center */}
+              <DashboardSection
+                title="Action Center"
+                description="Handle returned requests, certificate tasks, and expiring balances"
+                isLoading={isLoadingLeaves}
+                animate={true}
+              >
+                <div id="action-center">
+                  <motion.div variants={itemVariants}>
+                    <EmployeeActionCenter actionItems={dashboardData.actionItems} />
+                  </motion.div>
+                </div>
+              </DashboardSection>
 
-          {/* Dashboard with Sidebar */}
-          <DashboardSection
-            title="Leave Details"
-            description="Balance breakdown, recent activity, and trends"
-            isLoading={isLoadingLeaves || isLoadingBalance}
-            animate={true}
-          >
-            <div id="leave-details">
-              <DashboardWithSidebar>
-                <motion.div variants={itemVariants} className="flex-1">
-                  <TabbedContent
-                    title="Leave Details"
-                    defaultTab="overview"
-                    value={activeLeaveTab}
-                    onValueChange={setActiveLeaveTab}
-                    tabs={[
-                      {
-                        id: "overview",
-                        label: "Overview",
-                        icon: Activity,
-                        badge: dashboardData.needsAttentionCount.toString(),
-                        content: (
-                          <div className="flex flex-col items-center justify-center gap-2 py-6 sm:py-8">
-                            {dashboardData.needsAttentionCount === 0 ? (
-                              <>
-                                <p className="text-base font-medium">
-                                  You&apos;re all caught up on leave actions.
-                                </p>
-                                <p className="text-sm text-muted-foreground text-center">
-                                  Explore your balance or recent history using the tabs.
-                                </p>
-                              </>
-                            ) : (
-                              <>
-                                <p className="text-base font-medium text-center">
-                                  {dashboardData.needsAttentionCount} request
-                                  {dashboardData.needsAttentionCount === 1 ? " needs" : "s need"} your input.
-                                </p>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => scrollToSection("action-center")}
-                                >
-                                  Review in Action Center
-                                </Button>
-                              </>
-                            )}
-                          </div>
-                        ),
-                      },
-                      {
-                        id: "balance",
-                        label: "Leave Balance",
-                        icon: PieChart,
-                        badge: dashboardData.totalBalance.toString(),
-                        content: (
-                          <EmployeeLeaveBalance
-                            balanceData={dashboardData.balanceData}
-                            isLoading={isLoadingBalance}
-                          />
-                        ),
-                      },
-                      {
-                        id: "projection",
-                        label: "Balance Projection",
-                        icon: TrendingUp,
-                        content: <BalanceProjectionWidget />,
-                      },
-                      {
-                        id: "activity",
-                        label: "Recent Activity",
-                        icon: Activity,
-                        badge: dashboardData.recentLeaves.length.toString(),
-                        content: (
-                          <EmployeeRecentActivity
-                            leaves={dashboardData.recentLeaves}
-                            isLoading={isLoadingLeaves}
-                          />
-                        ),
-                      },
-                    ]}
+              {/* Recent Activity (Table) */}
+              <DashboardSection
+                title="Recent Activity"
+                description="Your latest leave requests and their status"
+                isLoading={isLoadingLeaves}
+                animate={true}
+              >
+                <motion.div variants={itemVariants}>
+                  <EmployeeRecentActivity
+                    leaves={dashboardData.recentLeaves}
+                    isLoading={isLoadingLeaves}
                   />
                 </motion.div>
-              </DashboardWithSidebar>
+              </DashboardSection>
+
             </div>
-          </DashboardSection>
+
+            {/* Right Column (Sidebar) - Spans 4 cols */}
+            <div className="lg:col-span-4 space-y-6 lg:space-y-8 sticky top-4 self-start">
+
+              {/* Who's Out Today */}
+              <motion.div variants={itemVariants}>
+                {whosOutTodaySlot}
+              </motion.div>
+
+              {/* Quick Resources / Utility Tile */}
+              <motion.div variants={itemVariants}>
+                <ResourcesTile />
+              </motion.div>
+
+            </div>
+          </div>
+
+          {/* Balance Details Modal */}
+          <Dialog open={isBalanceModalOpen} onOpenChange={setIsBalanceModalOpen}>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Leave Balance Details</DialogTitle>
+                <DialogDescription>
+                  Breakdown of your available leave credits and history
+                </DialogDescription>
+              </DialogHeader>
+              <div className="mt-4">
+                <EmployeeLeaveBalance
+                  balanceData={dashboardData.balanceData}
+                  isLoading={isLoadingBalance}
+                />
+                <div className="mt-8">
+                  <BalanceProjectionWidget />
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </motion.div>
       </RoleBasedDashboard>
     </TooltipProvider>
