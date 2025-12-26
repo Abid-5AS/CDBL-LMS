@@ -78,18 +78,18 @@ export function DesktopNav({
                     <Link
                       href={link.href}
                       className={cn(
-                        "group/link relative flex flex-nowrap items-center gap-2 overflow-hidden whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 focus-ring border border-transparent",
+                        "group/link relative flex flex-nowrap items-center gap-2 overflow-hidden whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 border border-transparent",
                         active
-                          ? "bg-surface-2 text-foreground border-outline/60 dark:border-border/60 shadow-sm"
-                          : "text-muted-foreground hover:bg-surface-2 hover:text-foreground"
+                          ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md hover:shadow-lg dark:from-indigo-500 dark:to-violet-500"
+                          : "text-muted-foreground hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-950/30 dark:hover:text-indigo-400"
                       )}
                     >
                       <Icon
                         className={cn(
-                          "h-4 w-4 shrink-0 transition-all duration-200",
+                          "h-4 w-4 shrink-0 transition-all duration-300",
                           active
-                            ? "text-foreground"
-                            : "text-muted-foreground group-hover/link:text-foreground"
+                            ? "text-white"
+                            : "text-muted-foreground group-hover/link:text-indigo-600 dark:group-hover/link:text-indigo-400"
                         )}
                       />
                       <span className="relative hidden lg:inline whitespace-nowrap font-medium">
@@ -115,14 +115,14 @@ export function DesktopNav({
           <Button
             variant="outline"
             size="sm"
-            className="gap-2 text-muted-foreground hover:text-foreground bg-surface-1 border-outline/60 dark:border-border/60"
+            className="gap-2 text-muted-foreground hover:text-indigo-600 bg-muted/50 border-transparent hover:bg-white hover:shadow-sm dark:hover:bg-muted dark:bg-muted/30 rounded-full pl-3 pr-2 h-9 transition-all duration-200"
             onClick={openSearch}
             leftIcon={<Search className="h-4 w-4" />}
             aria-label="Search leaves and related information"
           >
-            Search
-            <kbd className="ml-1 hidden xl:inline-flex items-center gap-1 rounded-md border border-border bg-muted px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground">
-              <Command className="h-3 w-3" />K
+            <span className="font-normal text-xs mr-2">Search...</span>
+            <kbd className="inline-flex items-center gap-1 rounded-full border border-border/50 bg-background px-2 py-0.5 text-[10px] font-medium text-muted-foreground shadow-sm">
+              <Command className="h-2.5 w-2.5" />K
             </kbd>
           </Button>
         </div>
@@ -142,7 +142,7 @@ export function DesktopNav({
         {user.role !== "CEO" && (
           <Button
             size="sm"
-            className="gap-1.5 shadow-sm"
+            className="gap-1.5 shadow-md bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
             leftIcon={<CalendarPlus className="h-4 w-4" />}
             onClick={() => router.push("/leaves/apply")}
             aria-label="Apply for leave"
