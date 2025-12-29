@@ -169,15 +169,20 @@ export function ApplyLeaveForm() {
               noValidate
               className="flex flex-col min-h-[600px]"
             >
-              <div className="p-8 space-y-10 flex-1">
+              <div className="p-8 space-y-2 flex-1 relative">
+                {/* Connecting Line */}
+                <div className="absolute left-[2.25rem] top-12 bottom-12 w-px bg-gradient-to-b from-indigo-100 via-indigo-50 to-transparent dark:from-indigo-900/50 dark:via-indigo-900/30" />
+
                 {/* Section 1: Leave Details */}
-                <section className="space-y-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold shadow-sm">1</div>
-                    <h3 className="text-xl font-semibold text-foreground">Leave Details</h3>
+                <section className="relative pb-10">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="relative z-10 flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 ring-4 ring-white dark:ring-card transition-transform group-hover:scale-110">
+                      <span className="font-bold text-sm">1</span>
+                    </div>
+                    <h3 className="text-lg font-semibold tracking-tight text-foreground/90">Leave Details</h3>
                   </div>
 
-                  <div className="pl-0 md:pl-12 space-y-6 max-w-xl">
+                  <div className="pl-16 space-y-6 max-w-xl">
                     <div className="space-y-1">
                       <LeaveTypeField
                         type={type}
@@ -208,13 +213,15 @@ export function ApplyLeaveForm() {
                 <Separator className="bg-slate-100 dark:bg-slate-800" />
 
                 {/* Section 2: Reason */}
-                <section className="space-y-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="h-10 w-10 rounded-full bg-violet-50 flex items-center justify-center text-violet-600 font-bold shadow-sm">2</div>
-                    <h3 className="text-xl font-semibold text-foreground">Reason & Support</h3>
+                <section className="relative">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="relative z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-muted text-muted-foreground border-2 border-slate-100 dark:border-slate-700 shadow-sm ring-4 ring-white dark:ring-card group-hover:border-indigo-500 group-hover:text-indigo-500 transition-colors">
+                      <span className="font-bold text-sm">2</span>
+                    </div>
+                    <h3 className="text-lg font-semibold tracking-tight text-foreground/90">Reason & Support</h3>
                   </div>
 
-                  <div className="pl-0 md:pl-12 space-y-6">
+                  <div className="pl-16 space-y-8">
                     <ReasonField
                       reason={reason}
                       setReason={setReason}
@@ -224,26 +231,28 @@ export function ApplyLeaveForm() {
                       clearReasonError={clearErrors}
                     />
 
-                    <FileUploadField
-                      file={file}
-                      setFile={setFile}
-                      error={errors.file}
-                      required={requiresCertificate}
-                      submitting={submitting}
-                      showOptionalUpload={showOptionalUpload}
-                      setShowOptionalUpload={setShowOptionalUpload}
-                      requiresCertificate={requiresCertificate}
-                      handleFileError={handleFileError}
-                    />
+                    <div className="bg-slate-50/50 dark:bg-muted/30 p-2 rounded-2xl border border-slate-100 dark:border-border/50">
+                      <FileUploadField
+                        file={file}
+                        setFile={setFile}
+                        error={errors.file}
+                        required={requiresCertificate}
+                        submitting={submitting}
+                        showOptionalUpload={showOptionalUpload}
+                        setShowOptionalUpload={setShowOptionalUpload}
+                        requiresCertificate={requiresCertificate}
+                        handleFileError={handleFileError}
+                      />
+                    </div>
                   </div>
                 </section>
 
-                {/* Logic for Special Disability Leave fields if type matches... (simplified for brevity, included below) */}
+                {/* Special Disability Leave Logic */}
                 {type === "SPECIAL_DISABILITY" && (
-                  <div className="pl-0 md:pl-14 pt-4">
-                    <div className="space-y-3 p-4 rounded-xl bg-slate-50 border border-slate-100">
-                      <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-muted-foreground" />
+                  <div className="pl-16 pt-8">
+                    <div className="space-y-3 p-5 rounded-2xl bg-amber-50/50 border border-amber-100 dark:bg-amber-950/10 dark:border-amber-900/30">
+                      <label className="text-sm font-medium text-amber-900 dark:text-amber-100 flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-amber-600" />
                         Date of Disabling Incident
                       </label>
                       <input
@@ -254,7 +263,7 @@ export function ApplyLeaveForm() {
                           setIncidentDate(value ? new Date(value) : undefined);
                           setErrors((prev) => ({ ...prev, incidentDate: undefined }));
                         }}
-                        className="flex h-10 w-full rounded-lg border border-input bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all shadow-sm"
+                        className="flex h-11 w-full rounded-xl border-0 bg-white dark:bg-card shadow-sm ring-1 ring-inset ring-amber-200 focus:ring-2 focus:ring-amber-500 px-3 py-2 text-sm outline-none transition-all"
                       />
                     </div>
                   </div>

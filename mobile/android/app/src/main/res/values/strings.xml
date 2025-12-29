@@ -14,6 +14,7 @@
     <string name="login_loading">Signing in...</string>
 
     <!-- Navigation -->
+    <string name="nav_dashboard">Dashboard</string>
     <string name="nav_home">Home</string>
     <string name="nav_leaves">Leaves</string>
     <string name="nav_profile">Profile</string>
@@ -90,7 +91,7 @@
     <string name="submit_application">Submit Application</string>
     <string name="submitting">Submitting...</string>
     <string name="select_date">Select Date</string>
-    
+
     <!-- Profile -->
     <string name="profile_title">Profile</string>
     <string name="error_load_profile">Error loading profile</string>

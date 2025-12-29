@@ -43,10 +43,10 @@ export function ReasonField({
           placeholder={`Describe your reason for leave (min ${minLength} characters)`}
           rows={4}
           className={cn(
-            "min-h-[140px] resize-none leading-6 transition-all focus-visible:ring-2 pr-24 pb-12",
+            "min-h-[140px] resize-none leading-6 transition-all focus-visible:ring-2 pr-24 pb-12 rounded-xl shadow-sm bg-white dark:bg-card",
             error
               ? "border-destructive focus-visible:ring-destructive"
-              : "border-border dark:border-border/50 dark:border-border dark:border-border/50 focus-visible:ring-card-action/40 hover:border-card-action dark:hover:border-card-action"
+              : "border-slate-200 dark:border-border focus-visible:ring-indigo-500 hover:border-indigo-400"
           )}
           aria-label="Reason for leave"
           aria-required="true"

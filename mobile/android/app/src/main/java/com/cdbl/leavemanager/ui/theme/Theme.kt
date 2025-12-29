@@ -50,8 +50,8 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun CDBLLeaveManagerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // We default dynamicColor to FALSE to enforce our brand identity
-    dynamicColor: Boolean = false,
+    // Dynamic color is available on Android 12+
+    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

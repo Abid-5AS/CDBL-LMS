@@ -21,11 +21,11 @@ interface DateRangePickerProps {
   showQuickSelect?: boolean;
 }
 
-export function DateRangePicker({ 
-  value, 
-  onChange, 
-  holidays, 
-  disabled, 
+export function DateRangePicker({
+  value,
+  onChange,
+  holidays,
+  disabled,
   minDate,
   showQuickSelect = true,
 }: DateRangePickerProps) {
@@ -42,7 +42,7 @@ export function DateRangePicker({
     // Auto-swap if end < start
     if (range.from && range.to && range.to < range.from) {
       const swappedRange = { from: range.to, to: range.from };
-      
+
       // Validate swapped dates
       if (isWeekendOrHoliday(swappedRange.from, holidays)) {
         toast.error("Start date cannot be on Friday, Saturday, or a company holiday");
@@ -52,7 +52,7 @@ export function DateRangePicker({
         toast.error("End date cannot be on Friday, Saturday, or a company holiday");
         return;
       }
-      
+
       onChange({ start: swappedRange.from, end: swappedRange.to });
       return;
     }
@@ -78,10 +78,10 @@ export function DateRangePicker({
   const handleQuickSelect = (type: "nextWorkingDay" | "nextWeek") => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     let start: Date;
     let end: Date;
-    
+
     switch (type) {
       case "nextWorkingDay":
         // Find next working day from today
@@ -92,17 +92,17 @@ export function DateRangePicker({
         // Next week: Find next Monday that's a working day (skip holidays)
         const daysUntilNextMonday = (8 - today.getDay()) % 7 || 7;
         let potentialMonday = addDays(today, daysUntilNextMonday);
-        
+
         // If potential Monday is on a holiday, find the next working day
         while (isWeekendOrHoliday(potentialMonday, holidays)) {
           potentialMonday = addDays(potentialMonday, 1);
         }
-        
+
         start = potentialMonday;
         end = addDays(start, 2); // 3 days total
         break;
     }
-    
+
     onChange({ start, end });
   };
 
@@ -125,7 +125,7 @@ export function DateRangePicker({
               aria-label="Select leave date range"
               aria-expanded={open}
               className={cn(
-                "w-full rounded-lg border bg-background px-3 py-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                "w-full rounded-xl border border-slate-200 dark:border-border bg-white dark:bg-card px-3 shadow-sm h-12 flex items-center text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500",
                 disabled && "cursor-not-allowed opacity-50"
               )}
             >
@@ -177,7 +177,7 @@ export function DateRangePicker({
             </Button>
           )}
         </div>
-        
+
         <PopoverContent className="w-auto p-0" align="start">
           <div className="p-4 space-y-4">
             {/* Quick Select Buttons - Updated for "Next Working Day" and "Next Week" */}
@@ -204,7 +204,7 @@ export function DateRangePicker({
                 </Button>
               </div>
             )}
-            
+
             {/* Hover Preview */}
             {previewStart && previewEnd && previewDays > 0 && (
               <div className="text-xs text-muted-foreground px-1 pb-2 border-b border-border">
@@ -216,7 +216,7 @@ export function DateRangePicker({
                 </span>
               </div>
             )}
-            
+
             {/* Calendar */}
             <Calendar
               mode="range"

@@ -1,5 +1,6 @@
 package com.cdbl.leavemanager.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,10 +21,11 @@ fun KpiCard(
     subtitle: String,
     modifier: Modifier = Modifier,
     bg: Color,
-    contentColor: Color
+    contentColor: Color,
+    onClick: (() -> Unit)? = null
 ) {
     Card(
-        modifier = modifier,
+        modifier = if (onClick != null) modifier.clickable(onClick = onClick) else modifier,
         colors = CardDefaults.cardColors(containerColor = bg),
         shape = RoundedCornerShape(20.dp)
     ) {

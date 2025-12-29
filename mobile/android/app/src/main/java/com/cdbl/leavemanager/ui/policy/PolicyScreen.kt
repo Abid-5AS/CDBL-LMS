@@ -18,7 +18,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.cdbl.leavemanager.data.model.PolicyRule
 import com.cdbl.leavemanager.data.model.PolicySection
-
+import com.cdbl.leavemanager.ui.designsystem.component.CDBLButton
+import com.cdbl.leavemanager.ui.designsystem.component.CDBLTopAppBar
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,13 +32,11 @@ fun PolicyScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Leave Policies") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
-                    }
-                }
+            CDBLTopAppBar(
+                title = "Leave Policies",
+                navigationIcon = Icons.AutoMirrored.Rounded.ArrowBack,
+                navigationIconContentDescription = "Back",
+                onNavigationClick = onBackClick
             )
         }
     ) { padding ->
@@ -53,7 +52,7 @@ fun PolicyScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(uiState.error!!, color = MaterialTheme.colorScheme.error)
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = { viewModel.fetchPolicies() }) {
+                    CDBLButton(onClick = { viewModel.fetchPolicies() }) {
                         Text("Retry")
                     }
                 }

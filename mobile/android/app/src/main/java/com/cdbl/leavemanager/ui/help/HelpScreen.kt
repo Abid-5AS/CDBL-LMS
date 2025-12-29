@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.cdbl.leavemanager.data.model.FaqData
 import com.cdbl.leavemanager.data.model.FaqItem
+import com.cdbl.leavemanager.ui.designsystem.component.CDBLTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,13 +27,11 @@ fun HelpScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Help & Support") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
-                    }
-                }
+            CDBLTopAppBar(
+                title = "Help & Support",
+                navigationIcon = Icons.AutoMirrored.Rounded.ArrowBack,
+                navigationIconContentDescription = "Back",
+                onNavigationClick = onBackClick
             )
         }
     ) { padding ->

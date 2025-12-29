@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cdbl.leavemanager.data.model.Holiday
+import com.cdbl.leavemanager.ui.designsystem.component.CDBLTopAppBar
 import com.cdbl.leavemanager.ui.theme.ErrorRed
 import com.cdbl.leavemanager.ui.theme.Indigo600
 import com.cdbl.leavemanager.ui.theme.SuccessGreen
@@ -44,17 +45,11 @@ fun HolidaysScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(
-                title = { Text("Holidays", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground
-                )
+            CDBLTopAppBar(
+                title = "Holidays",
+                navigationIcon = Icons.AutoMirrored.Rounded.ArrowBack,
+                navigationIconContentDescription = "Back",
+                onNavigationClick = onBackClick
             )
         }
     ) { paddingValues ->

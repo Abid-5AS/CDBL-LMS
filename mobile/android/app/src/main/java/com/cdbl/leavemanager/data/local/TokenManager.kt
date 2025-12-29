@@ -6,6 +6,9 @@ import androidx.security.crypto.MasterKey
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.Flow
 
 @Singleton
 class TokenManager @Inject constructor(
@@ -28,8 +31,12 @@ class TokenManager @Inject constructor(
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
 
+    private val _tokenFlow = kotlinx.coroutines.flow.MutableStateFlow<String?>(getToken())
+    val tokenFlow: kotlinx.coroutines.flow.Flow<String?> = _tokenFlow.asStateFlow()
+
     fun saveToken(token: String) {
         sharedPreferences.edit().putString(KEY_JWT_TOKEN, token).apply()
+        _tokenFlow.value = token
     }
 
     fun getToken(): String? {
@@ -38,5 +45,6 @@ class TokenManager @Inject constructor(
 
     fun clearToken() {
         sharedPreferences.edit().remove(KEY_JWT_TOKEN).apply()
+        _tokenFlow.value = null
     }
 }

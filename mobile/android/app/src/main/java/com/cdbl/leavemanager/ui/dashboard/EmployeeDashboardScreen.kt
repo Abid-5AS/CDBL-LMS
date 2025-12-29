@@ -43,6 +43,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material.icons.rounded.FlightTakeoff
+import androidx.compose.material.icons.automirrored.rounded.Help
+import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,7 +68,8 @@ fun EmployeeDashboardScreen(
     onNavigateToApply: () -> Unit = {},
     onNavigateToEncashment: () -> Unit = {},
     onNavigateToApprovals: () -> Unit = {},
-    onNavigateToLeaveDetails: (Int) -> Unit = {}
+    onNavigateToLeaveDetails: (Int) -> Unit = {},
+    onNavigateToHolidays: () -> Unit = {}
 ) {
     // Collect UI State
     val state by viewModel.uiState.collectAsState()
@@ -181,44 +185,58 @@ fun EmployeeDashboardScreen(
                         // KPI Grid
                         item {
                             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    modifier = Modifier.height(IntrinsicSize.Max)
+                                ) {
                                     // Needs Attention
                                      KpiCard(
                                          title = stringResource(R.string.needs_action),
                                          value = state.needsAttentionCount.toString(),
                                          subtitle = "Returned/Rejected",
-                                         modifier = Modifier.weight(1f),
+                                         modifier = Modifier.weight(1f).fillMaxHeight(),
                                          bg = if (state.needsAttentionCount > 0) ErrorRed.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant,
-                                         contentColor = if (state.needsAttentionCount > 0) ErrorRed else MaterialTheme.colorScheme.onSurfaceVariant
+                                         contentColor = if (state.needsAttentionCount > 0) ErrorRed else MaterialTheme.colorScheme.onSurfaceVariant,
+                                         onClick = onNavigateToApprovals
                                      )
                                      // Under Review
                                      KpiCard(
                                          title = stringResource(R.string.under_review),
                                          value = state.underReviewCount.toString(),
                                          subtitle = stringResource(R.string.pending_requests),
-                                         modifier = Modifier.weight(1f),
+                                         modifier = Modifier.weight(1f).fillMaxHeight(),
                                          bg = if (state.underReviewCount > 0) WarningAmber.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant,
-                                         contentColor = if (state.underReviewCount > 0) WarningAmber else MaterialTheme.colorScheme.onSurfaceVariant
+                                         contentColor = if (state.underReviewCount > 0) WarningAmber else MaterialTheme.colorScheme.onSurfaceVariant,
+                                         onClick = { /* Navigate to Leave History filtered by Pending - currently just leaves */
+                                              onNavigateToLeaveDetails(-1) // Signal to go to list
+                                         }
                                      )
                                 }
-                                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    modifier = Modifier.height(IntrinsicSize.Max)
+                                ) {
                                     // Total Balance
                                     KpiCard(
                                          title = stringResource(R.string.total_balance),
                                          value = "${state.balance?.EARNED?.toInt() ?: 0}",
                                          subtitle = "Earned Leave",
-                                         modifier = Modifier.weight(1f),
+                                         modifier = Modifier.weight(1f).fillMaxHeight(),
                                          bg = Indigo600.copy(alpha = 0.1f),
-                                         contentColor = Indigo600
+                                         contentColor = Indigo600,
+                                         onClick = { /* Navigate to Balance details if needed */ }
                                      )
                                      // Next Leave
                                      KpiCard(
                                          title = stringResource(R.string.next_leave),
                                          value = state.nextApprovedLeave?.let { "${it.startDate.take(10)}" } ?: "-",
                                          subtitle = state.nextApprovedLeave?.type ?: "None booked",
-                                         modifier = Modifier.weight(1f),
+                                         modifier = Modifier.weight(1f).fillMaxHeight(),
                                          bg = SuccessGreen.copy(alpha = 0.1f),
-                                         contentColor = SuccessGreen
+                                         contentColor = SuccessGreen,
+                                         onClick = {
+                                              state.nextApprovedLeave?.let { onNavigateToLeaveDetails(it.id) }
+                                         }
                                      )
                                 }
                             }
@@ -240,7 +258,8 @@ fun EmployeeDashboardScreen(
                                     text = stringResource(R.string.view_all),
                                     style = MaterialTheme.typography.labelLarge,
                                     color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.Medium
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.clickable { onNavigateToLeaveDetails(-1) }
                                 )
                             }
                             Spacer(modifier = Modifier.height(16.dp))
@@ -276,7 +295,7 @@ fun EmployeeDashboardScreen(
                                     fontWeight = FontWeight.Bold
                                 )
                                 IconButton(
-                                    onClick = { /*TODO*/ },
+                                    onClick = onNavigateToHolidays,
                                     modifier = Modifier.size(32.dp).background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
                                 ) {
                                     Icon(Icons.Rounded.CalendarMonth, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -368,14 +387,14 @@ fun BalanceCardNew(item: BalanceItem) {
                     // Circular Progress
                     Box(contentAlignment = Alignment.Center, modifier = Modifier.size(64.dp)) {
                         CircularProgressIndicator(
-                            progress = 1f,
+                            progress = { 1f },
                             modifier = Modifier.fillMaxSize(),
                             color = MaterialTheme.colorScheme.surfaceVariant,
                             strokeWidth = 6.dp,
-                             trackColor =  MaterialTheme.colorScheme.surfaceVariant,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
                         )
                         CircularProgressIndicator(
-                            progress = item.left.toFloat() / item.total,
+                            progress = { item.left.toFloat() / item.total },
                             modifier = Modifier.fillMaxSize(),
                             color = item.color,
                             strokeWidth = 6.dp,
