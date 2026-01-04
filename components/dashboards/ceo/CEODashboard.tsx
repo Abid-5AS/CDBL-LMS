@@ -1,7 +1,8 @@
 "use client";
 
-import { Suspense } from "react";
+import { useMemo } from "react";
 import useSWR from "swr";
+import { useRouter } from "next/navigation";
 import { apiFetcher } from "@/lib/apiClient";
 import {
   Users,
@@ -9,643 +10,356 @@ import {
   Clock,
   DollarSign,
   Activity,
-  Target,
   AlertCircle,
-  Briefcase,
-  BarChart3,
-  Sparkles,
-  CheckCircle2,
-  Calendar,
-  Building2,
   Shield,
   Info,
+  BarChart3
 } from "lucide-react";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  TooltipProvider,
-} from "@/components/ui/tooltip";
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
 import {
-  RoleKPICard,
-  ResponsiveDashboardGrid,
-  DashboardSection,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+// Shared Patterns
+import { RoleBasedDashboard, RoleKPICard } from "../shared/RoleBasedDashboard";
+import { ResponsiveDashboardGrid, DashboardSection } from "../shared/ResponsiveDashboardGrid";
+import { KPIGridSkeleton } from "@/components/shared/skeletons";
+import { Role } from "@/lib/enums";
+import { useUser } from "@/lib";
+
+// Reusing shared analytics charts if they are generic enough, otherwise we might need to inline or adapt
+import {
   AnalyticsLineChart,
   AnalyticsBarChart,
   AnalyticsPieChart,
-  ExportButton,
 } from "@/components/dashboards/shared";
-import {
-  KPIGridSkeleton,
-  DashboardCardSkeleton,
-} from "@/components/shared/skeletons";
-import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
-import { METRIC_LABELS } from "@/constants/dashboard-labels";
 
 interface CEOStats {
-  // Organization metrics
   totalEmployees: number;
   activeEmployees: number;
   onLeaveToday: number;
   utilizationRate: number;
-
-  // Performance metrics
   pendingApprovals: number;
   avgApprovalTime: number;
   complianceScore: number;
   criticalRequests: number;
-
-  // Financial metrics
   totalLeaveDays: number;
   estimatedCost: number;
   avgCostPerDay: number;
-
-  // Year-over-year comparison
-  thisYear: {
-    requests: number;
-    days: number;
-  };
-  lastYear: {
-    requests: number;
-    days: number;
-  };
+  thisYear: { requests: number; days: number };
+  lastYear: { requests: number; days: number };
   yoyGrowth: number;
-
-  // Analytics
-  leaveTypes: Array<{
-    type: string;
-    count: number;
-    days: number; // API returns days, not avgDuration directly
-  }>;
-
-  departments: Array<{
-    name: string; // API returns name
-    employees: number; // API returns employees count
-  }>;
-
-  monthlyTrend: Array<{
-    month: string;
-    requests: number;
-    days: number;
-  }>;
-
-  // Strategic Alerts (formerly AI Insights)
-  insights: Array<{
-    type: string; // API returns trend, efficiency, risk, utilization
-    priority: string;
-    message: string;
-  }>;
-  
-  // System health (mocked data in API, but we ignore it in UI)
-  systemHealth?: any;
+  leaveTypes: Array<{ type: string; count: number; days: number }>;
+  departments: Array<{ name: string; employees: number }>;
+  monthlyTrend: Array<{ month: string; requests: number; days: number }>;
+  insights: Array<{ type: string; priority: string; message: string }>;
 }
 
 export function CEODashboard() {
-  const { data: stats, isLoading, error } = useSWR<CEOStats>(
+  const user = useUser();
+  const router = useRouter();
+
+  const { data: stats, isLoading } = useSWR<CEOStats>(
     "/api/dashboard/ceo/stats",
     apiFetcher,
-    {
-      refreshInterval: 60000, // Refresh every minute
-      revalidateOnFocus: true,
-    }
+    { refreshInterval: 60000 }
   );
 
-  if (error) {
-    return (
-      <div className="rounded-2xl border border-danger/20 bg-danger dark:bg-danger/80/5 p-6 text-center">
-        <AlertCircle className="h-12 w-12 mx-auto mb-3 text-danger dark:text-danger/90" />
-        <p className="text-sm text-danger dark:text-danger/90 font-medium">
-          Failed to load executive dashboard
-        </p>
-        <p className="text-xs text-muted-foreground mt-1">
-          Please try refreshing the page
-        </p>
-      </div>
-    );
-  }
-
-  // Helper to map API insight types to UI styles
-  const getInsightStyle = (type: string, priority: string) => {
-    if (priority === "high") return "bg-warning dark:bg-warning/80/10 border-warning/30 text-warning dark:text-warning/90";
-    if (type === "efficiency" || type === "success") return "bg-success dark:bg-success/80/10 border-success/30 text-success dark:text-success/90";
-    return "bg-info dark:bg-info/80/10 border-info/30 text-info dark:text-info/90";
-  };
+  // Fallback/Safety
+  const safeStats = useMemo(() => stats || {
+    totalEmployees: 0,
+    activeEmployees: 0,
+    onLeaveToday: 0,
+    utilizationRate: 0,
+    pendingApprovals: 0,
+    avgApprovalTime: 0,
+    complianceScore: 100,
+    criticalRequests: 0,
+    totalLeaveDays: 0,
+    estimatedCost: 0,
+    avgCostPerDay: 0,
+    thisYear: { requests: 0, days: 0 },
+    lastYear: { requests: 0, days: 0 },
+    yoyGrowth: 0,
+    leaveTypes: [],
+    departments: [],
+    monthlyTrend: [],
+    insights: []
+  }, [stats]);
 
   return (
-    <TooltipProvider>
-      <div className="space-y-6">
-        {/* Primary Executive KPIs */}
+    <RoleBasedDashboard
+      role={Role.CEO}
+      title="Executive Overview"
+      description="Strategic insights and organization-wide leave metrics"
+      animate={true}
+      backgroundVariant="transparent"
+    >
+      <div className="space-y-8">
+        {/* KPI Grid */}
         <DashboardSection
-          title="Executive Overview"
-          description="Key organizational and performance metrics at a glance"
-          isLoading={false}
-          loadingFallback={<KPIGridSkeleton cards={4} />}
+          title="Key Metrics"
+          description="Performance indicators"
+          loadingFallback={<KPIGridSkeleton />}
         >
-          {isLoading ? (
-            <KPIGridSkeleton cards={4} />
-          ) : (
-            <ResponsiveDashboardGrid columns="2:2:4:4" gap="md">
+          <ResponsiveDashboardGrid columns="1:2:4:4" gap="md">
+            {/* 1. Workforce Availability */}
             <RoleKPICard
-                title={
-                  <div className="flex items-center gap-2">
-                    <span>{METRIC_LABELS.TOTAL_WORKFORCE}</span>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          aria-label="Information about total workforce"
-                          className="hover:opacity-70 transition-opacity"
-                        >
-                          <Info className="h-4 w-4 text-muted-foreground" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom" className="max-w-xs">
-                        <p className="text-sm font-semibold mb-1">What this shows:</p>
-                        <p className="text-sm mb-2">
-                          Total number of employees across the entire organization, including all departments and roles.
-                        </p>
-                        <p className="text-sm font-semibold mb-1">Strategic insight:</p>
-                        <p className="text-sm mb-2">
-                          Core organizational capacity metric. Track growth trends and plan for scaling HR resources accordingly.
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          "Active" count excludes system/admin accounts.
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                }
-                value={stats?.totalEmployees || 0}
-                subtitle={`${stats?.activeEmployees || 0} active`}
-                icon={Users}
-                role="CEO"
-              />
-              <RoleKPICard
-                title={
-                  <div className="flex items-center gap-2">
-                    <span>{METRIC_LABELS.WORKFORCE_AVAILABILITY}</span>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          aria-label="Information about employees on leave"
-                          className="hover:opacity-70 transition-opacity"
-                        >
-                          <Info className="h-4 w-4 text-muted-foreground" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom" className="max-w-xs">
-                        <p className="text-sm font-semibold mb-1">What this shows:</p>
-                        <p className="text-sm mb-2">
-                          Number of employees on approved leave today, with workforce utilization percentage.
-                        </p>
-                        <p className="text-sm font-semibold mb-1">Strategic impact:</p>
-                        <p className="text-sm mb-2">
-                          Low utilization (below 85%) may indicate operational risks, seasonal patterns, or organizational issues requiring attention.
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Target: Maintain 90%+ utilization for optimal operations.
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                }
-                value={`${stats?.utilizationRate || 0}%`}
-                subtitle={`${stats?.onLeaveToday || 0} on leave`}
-                icon={Activity}
-                role="CEO"
-                trend={
-                  stats && stats.utilizationRate
-                    ? {
-                        value: stats.utilizationRate >= 90 ? 3 : 2,
-                        label: "vs target",
-                        direction: stats.utilizationRate >= 90 ? "up" : "down"
-                      }
-                    : undefined
-                }
-              />
-              <RoleKPICard
-                title={
-                  <div className="flex items-center gap-2">
-                    <span>{METRIC_LABELS.PENDING_APPROVALS}</span>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          aria-label="Information about pending approvals"
-                          className="hover:opacity-70 transition-opacity"
-                        >
-                          <Info className="h-4 w-4 text-muted-foreground" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom" className="max-w-xs">
-                        <p className="text-sm font-semibold mb-1">What this shows:</p>
-                        <p className="text-sm mb-2">
-                          Leave requests awaiting YOUR approval as CEO, typically escalated cases requiring executive decision.
-                        </p>
-                        <p className="text-sm font-semibold mb-1">Why this matters:</p>
-                        <p className="text-sm mb-2">
-                          High backlog indicates bottleneck at executive level. Avg approval time tracks organizational efficiency.
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Target: Process within 2-3 days to avoid employee frustration.
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                }
-                value={stats?.pendingApprovals || 0}
-                subtitle={`${stats?.avgApprovalTime?.toFixed(1) || 0}d avg time`}
-                icon={Clock}
-                role="CEO"
-                trend={stats && stats.pendingApprovals > 20 ? {
-                  value: stats.pendingApprovals - 20,
-                  label: "above normal",
-                  direction: "up"
-                } : undefined}
-              />
-              <RoleKPICard
-                title={
-                  <div className="flex items-center gap-2">
-                    <span>Compliance Score</span>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          aria-label="Information about compliance score"
-                          className="hover:opacity-70 transition-opacity"
-                        >
-                          <Info className="h-4 w-4 text-muted-foreground" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom" className="max-w-xs">
-                        <p className="text-sm font-semibold mb-1">What this shows:</p>
-                        <p className="text-sm mb-2">
-                          Percentage of leave requests processed within policy guidelines and SLA targets.
-                        </p>
-                        <p className="text-sm font-semibold mb-1">Executive concern:</p>
-                        <p className="text-sm mb-2">
-                          Low scores (below 90%) indicate process inefficiencies, policy violations, or training gaps that need executive intervention.
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Target: Maintain 95%+ for regulatory compliance and employee satisfaction.
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                }
-                value={`${stats?.complianceScore || 0}%`}
-                subtitle="Policy adherence"
-                icon={Shield}
-                role="CEO"
-                trend={
-                  stats && stats.complianceScore
-                    ? {
-                        value: stats.complianceScore >= 90 ? 2 : 1,
-                        label: "this quarter",
-                        direction: stats.complianceScore >= 90 ? "up" : "down"
-                      }
-                    : undefined
-                }
-              />
-            </ResponsiveDashboardGrid>
-          )}
+              title="Availability"
+              value={`${safeStats.utilizationRate}%`}
+              subtitle={`${safeStats.onLeaveToday} on leave today`}
+              icon={Activity}
+              role={Role.CEO}
+              tooltip="Percentage of active workforce available today"
+              trend={{
+                value: safeStats.utilizationRate >= 90 ? 2 : -2,
+                direction: safeStats.utilizationRate >= 90 ? "up" : "down",
+                label: "vs target"
+              }}
+            />
+
+            {/* 2. Total Workforce */}
+            <RoleKPICard
+              title="Total Workforce"
+              value={safeStats.totalEmployees}
+              subtitle={`${safeStats.activeEmployees} active accounts`}
+              icon={Users}
+              role={Role.CEO}
+              color="text-blue-600 dark:text-blue-400"
+              bgColor="bg-blue-50 dark:bg-blue-900/20"
+            />
+
+            {/* 3. Pending Approvals */}
+            <RoleKPICard
+              title="Pending Approvals"
+              value={safeStats.pendingApprovals}
+              subtitle={`${safeStats.avgApprovalTime.toFixed(1)}d avg time`}
+              icon={Clock}
+              role={Role.CEO}
+              variant={safeStats.pendingApprovals > 5 ? "highlight" : "default"}
+              onClick={() => router.push("/approvals")}
+              clickLabel="View pending approvals"
+            />
+
+            {/* 4. Compliance */}
+            <RoleKPICard
+              title="Compliance"
+              value={`${safeStats.complianceScore}%`}
+              subtitle="Policy adherence"
+              icon={Shield}
+              role={Role.CEO}
+              color={safeStats.complianceScore >= 95 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600"}
+              bgColor={safeStats.complianceScore >= 95 ? "bg-emerald-50 dark:bg-emerald-900/20" : "bg-amber-50"}
+            />
+          </ResponsiveDashboardGrid>
         </DashboardSection>
 
-      {/* Analytics & Insights - MOVED UP (Priority for strategic decision making) */}
-      <DashboardSection
-        title="Analytics & Trends"
-        description="Visual insights, department performance, and leave patterns"
-        isLoading={isLoading}
-      >
-        <div className="flex flex-col xl:flex-row gap-4 sm:gap-6">
-        {/* Main Charts Section */}
-        {!isLoading && stats && (stats.monthlyTrend?.length > 0 || stats.departments?.length > 0 || stats.leaveTypes?.length > 0) && (
-          <div className="flex-1 space-y-4 sm:space-y-6 min-w-0">
-            {/* Monthly Trend Chart */}
-            {stats.monthlyTrend && stats.monthlyTrend.length > 0 && (
-              <AnalyticsLineChart
-                title="Leave Request Trend"
-                subtitle="12-month historical view"
-                data={stats.monthlyTrend.map((item) => ({
-                  name: item.month,
-                  requests: item.requests,
-                  days: item.days,
-                }))}
-                dataKeys={[
-                  { key: "requests", name: "Requests", color: "hsl(var(--chart-1))" },
-                  { key: "days", name: "Total Days", color: "hsl(var(--chart-2))" },
-                ]}
-                xAxisKey="name"
-              />
-            )}
+        {/* Main Content Details */}
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
 
-            {/* Department Performance */}
-            {stats.departments && stats.departments.length > 0 && (
-              <AnalyticsBarChart
-                title="Department Headcount"
-                subtitle="Total employees by department"
-                data={stats.departments.map((dept) => ({
-                  name: dept.name,
-                  employees: dept.employees,
-                }))}
-                dataKeys={[
-                  { key: "employees", name: "Employees", color: "hsl(var(--chart-1))" },
-                ]}
-                xAxisKey="name"
-              />
-            )}
+          {/* Left Column: Charts and Analysis (8 cols) */}
+          <div className="xl:col-span-8 space-y-6">
 
-            {/* Leave Type Distribution */}
-            {stats.leaveTypes && stats.leaveTypes.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                <AnalyticsPieChart
-                  title="Leave Type Distribution"
-                  subtitle="By request count"
-                  data={stats.leaveTypes.map((item) => ({
-                    name: item.type,
-                    value: item.count,
-                  }))}
-                  showPercentage={true}
-                />
-
-                <GlassCard variant="hover" className="surface-card rounded-2xl">
-                  <GlassCardHeader>
-                    <GlassCardTitle className="text-base">Leave Type Details</GlassCardTitle>
-                  </GlassCardHeader>
-                  <GlassCardContent>
-                    <div className="space-y-3">
-                      {stats.leaveTypes.slice(0, 5).map((type, index) => (
-                        <div key={index}>
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="text-sm font-medium">{type.type}</span>
-                            <span className="text-sm text-muted-foreground">
-                              {type.count} requests
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center text-xs text-muted-foreground">
-                            <span>Avg duration: {(type.days / (type.count || 1)).toFixed(1)} days</span>
-                          </div>
-                          {index < stats.leaveTypes.length - 1 && <Separator className="mt-3" />}
-                        </div>
-                      ))}
-                    </div>
-                  </GlassCardContent>
-                </GlassCard>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Sidebar - Insights & Quick Stats */}
-        <div className="xl:w-80 shrink-0 space-y-4 sm:space-y-6">
-          {/* Strategic Alerts (formerly AI Insights) */}
-          {!isLoading && stats && stats.insights && stats.insights.length > 0 && (
-            <GlassCard variant="hover" className="surface-card rounded-2xl">
-              <GlassCardHeader>
-                <GlassCardTitle className="text-base flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4 text-info dark:text-info/90" />
-                  Strategic Alerts
-                </GlassCardTitle>
-              </GlassCardHeader>
-              <GlassCardContent className="space-y-3">
-                {stats.insights.map((insight, index) => (
-                  <div
-                    key={index}
-                    className={cn(
-                      "p-3 rounded-lg border text-sm",
-                      getInsightStyle(insight.type, insight.priority)
-                    )}
-                  >
-                    {insight.message}
+            {/* Monthly Trends */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                  Leave Request Trends
+                </CardTitle>
+                <CardDescription>12-month historical view of request volume</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {safeStats.monthlyTrend.length > 0 ? (
+                  <AnalyticsLineChart
+                    data={safeStats.monthlyTrend.map(item => ({
+                      name: item.month,
+                      requests: item.requests,
+                      days: item.days,
+                    }))}
+                    dataKeys={[
+                      { key: "requests", name: "Requests", color: "hsl(var(--primary))" },
+                      { key: "days", name: "Total Days", color: "hsl(var(--muted-foreground))" },
+                    ]}
+                    xAxisKey="name"
+                  />
+                ) : (
+                  <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                    No trend data available
                   </div>
-                ))}
-              </GlassCardContent>
-            </GlassCard>
-          )}
+                )}
+              </CardContent>
+            </Card>
 
-          {/* Quick Financial Summary */}
-          {!isLoading && stats && (
-            <GlassCard variant="hover" className="surface-card rounded-2xl">
-              <GlassCardHeader>
-                <div className="flex items-center justify-between">
-                  <GlassCardTitle className="text-base flex items-center gap-2">
-                    <DollarSign className="h-4 w-4" />
-                    Financial Summary
-                  </GlassCardTitle>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        aria-label="Cost methodology information"
-                        className="hover:opacity-70 transition-opacity"
-                      >
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom" className="max-w-xs">
-                      <p className="text-sm font-semibold mb-1">Methodology:</p>
-                      <p className="text-sm mb-2">
-                        Leave cost is estimated using average employee daily rate multiplied by total approved leave days YTD.
-                      </p>
-                      <p className="text-sm font-semibold mb-1">Calculation:</p>
-                      <p className="text-sm mb-2">
-                        Cost = (Total Leave Days × Avg Daily Rate). Daily rate assumes standard salary distribution across workforce.
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        This is an estimate. Actual cost may vary based on employee salaries and benefits.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              </GlassCardHeader>
-              <GlassCardContent className="space-y-3">
-                <div>
-                  <p className="text-2xl font-bold">
-                    ${((stats.estimatedCost || 0) / 1000).toFixed(1)}K
-                  </p>
-                  <p className="text-xs text-muted-foreground">Estimated YTD cost</p>
-                </div>
-                <Separator />
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Leave Days</span>
-                    <span className="font-medium">{stats.totalLeaveDays || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">YoY Growth</span>
-                    <span className={cn("font-medium", stats.yoyGrowth > 10 && "text-warning dark:text-warning/90")}>
-                      {(stats.yoyGrowth ?? 0) > 0 ? "+" : ""}{stats.yoyGrowth ?? 0}%
-                    </span>
-                  </div>
-                </div>
-              </GlassCardContent>
-            </GlassCard>
-          )}
-          
-          {/* Removed Fake System Health Monitor */}
-        </div>
-        </div>
-      </DashboardSection>
-
-      {/* Department Scorecard */}
-      {!isLoading && stats && stats.departments && stats.departments.length > 0 && (
-        <DashboardSection
-          title="Department Scorecard"
-          description="Performance metrics by department"
-          isLoading={isLoading}
-        >
-          <GlassCard variant="hover" className="surface-card">
-            <GlassCardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="bg-muted/30 border-b border-border">
-                    <tr>
-                      <th className="text-left p-3 font-medium">Department</th>
-                      <th className="text-left p-3 font-medium">Headcount</th>
-                      <th className="text-left p-3 font-medium">On Leave</th>
-                      <th className="text-left p-3 font-medium">Utilization</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {stats.departments.map((dept, index) => {
-                      // Calculate estimated on leave (this is simplified - ideally from API)
-                      const estimatedOnLeave = Math.round((stats.onLeaveToday / stats.totalEmployees) * dept.employees);
-                      const utilization = dept.employees > 0 ? Math.round(((dept.employees - estimatedOnLeave) / dept.employees) * 100) : 100;
+            {/* Department Scorecard */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">Department Scorecard</CardTitle>
+                <CardDescription>Headcount and utilization by department</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Department</TableHead>
+                      <TableHead>Headcount</TableHead>
+                      <TableHead>On Leave (Est)</TableHead>
+                      <TableHead>Utilization</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {safeStats.departments.map((dept, index) => {
+                      const estimatedOnLeave = Math.round(
+                        (safeStats.onLeaveToday / safeStats.totalEmployees) * dept.employees
+                      ) || 0;
+                      const utilization = dept.employees > 0
+                        ? Math.round(((dept.employees - estimatedOnLeave) / dept.employees) * 100)
+                        : 100;
 
                       return (
-                        <tr key={index} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
-                          <td className="p-3 font-medium">{dept.name}</td>
-                          <td className="p-3 text-muted-foreground">{dept.employees}</td>
-                          <td className="p-3">
+                        <TableRow key={index}>
+                          <TableCell className="font-medium">{dept.name}</TableCell>
+                          <TableCell>{dept.employees}</TableCell>
+                          <TableCell>{estimatedOnLeave}</TableCell>
+                          <TableCell>
                             <div className="flex items-center gap-2">
-                              <span>{estimatedOnLeave}</span>
-                              <span className="text-xs text-muted-foreground">
-                                ({((estimatedOnLeave / dept.employees) * 100).toFixed(0)}%)
-                              </span>
-                            </div>
-                          </td>
-                          <td className="p-3">
-                            <div className="flex items-center gap-2">
-                              <div className="w-full max-w-[100px]">
-                                <Progress value={utilization} className="h-2" />
-                              </div>
-                              <span className={cn(
-                                "text-xs font-medium",
-                                utilization >= 90 ? "text-success dark:text-success/90" :
-                                utilization >= 85 ? "text-warning dark:text-warning/90" :
-                                "text-danger dark:text-danger/90"
-                              )}>
+                              <Progress value={utilization} className="w-20 h-2" />
+                              <span className={utilization < 85 ? "text-destructive font-medium" : "text-muted-foreground"}>
                                 {utilization}%
                               </span>
                             </div>
-                          </td>
-                        </tr>
+                          </TableCell>
+                        </TableRow>
                       );
                     })}
-                  </tbody>
-                </table>
-              </div>
-              <div className="p-4 bg-muted/20 border-t border-border text-xs text-muted-foreground">
-                <p>Note: On Leave and Utilization are estimated based on organization-wide averages. For accurate department-specific data, contact HR.</p>
-              </div>
-            </GlassCardContent>
-          </GlassCard>
-        </DashboardSection>
-      )}
+                    {safeStats.departments.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
+                          No department data available
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </div>
 
-      {/* Financial & Strategic Metrics - MOVED DOWN (Detail view after trends) */}
-      <DashboardSection
-        title="Financial & Strategic Details"
-        description="Detailed financial analysis and year-over-year comparisons"
-        isLoading={false}
-        loadingFallback={<KPIGridSkeleton cards={3} className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" />}
-      >
-        {isLoading ? (
-          <KPIGridSkeleton cards={3} className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" />
-        ) : (
-          <ResponsiveDashboardGrid columns="1:2:2:2" gap="md">
-            {/* Financial Impact Card */}
-            <GlassCard variant="hover" className="surface-card rounded-2xl">
-              <GlassCardHeader className="pb-3">
-                <GlassCardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
-                  Financial Impact
-                </GlassCardTitle>
-              </GlassCardHeader>
-              <GlassCardContent className="space-y-3">
-                <div>
-                  <p className="text-3xl font-bold">
-                    ${((stats?.estimatedCost || 0) / 1000).toFixed(1)}K
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Est. leave cost (YTD)
-                  </p>
-                </div>
-                <Separator />
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">Total Leave Days</span>
-                  <span className="font-semibold">{stats?.totalLeaveDays || 0}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">Avg Cost/Day</span>
-                  <span className="font-semibold">
-                    ${stats && stats.totalLeaveDays > 0
-                      ? ((stats.estimatedCost / stats.totalLeaveDays)).toFixed(0)
-                      : 0}
-                  </span>
-                </div>
-              </GlassCardContent>
-            </GlassCard>
+          {/* Right Column: Insights & Financials (4 cols) */}
+          <div className="xl:col-span-4 space-y-6">
 
-            {/* Year-over-Year Comparison */}
-            <GlassCard variant="hover" className="surface-card rounded-2xl">
-              <GlassCardHeader className="pb-3">
-                <GlassCardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  Year-over-Year Growth
-                </GlassCardTitle>
-              </GlassCardHeader>
-              <GlassCardContent className="space-y-3">
-                <div className="flex items-end justify-between">
-                  <div>
-                    <p className="text-3xl font-bold">
-                      {(stats?.yoyGrowth ?? 0) > 0 ? "+" : ""}{stats?.yoyGrowth ?? 0}%
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      vs last year
-                    </p>
+            {/* Strategic Alerts */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-blue-500" />
+                  Strategic Alerts
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {safeStats.insights.length > 0 ? (
+                  safeStats.insights.map((insight, idx) => (
+                    <div key={idx} className={`p-4 rounded-lg border text-sm ${insight.priority === 'high'
+                      ? 'bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-900/20 dark:border-amber-900/50 dark:text-amber-200'
+                      : 'bg-muted/50 border-border text-foreground'
+                      }`}>
+                      {insight.message}
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-sm text-muted-foreground italic">
+                    No active alerts at this time.
                   </div>
-                  <Badge
-                    variant={
-                      stats && stats.yoyGrowth > 10
-                        ? "destructive"
-                        : stats && stats.yoyGrowth > 5
-                        ? "secondary"
-                        : "default"
-                    }
-                  >
-                    {stats && stats.yoyGrowth > 10 ? "High" : stats && stats.yoyGrowth > 5 ? "Moderate" : "Normal"}
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Financial Summary */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-emerald-600" />
+                  Financial Impact
+                </CardTitle>
+                <CardDescription>Estimated leave costs YTD</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <div className="text-3xl font-bold tracking-tight text-foreground">
+                    ${(safeStats.estimatedCost / 1000).toFixed(1)}K
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Based on avg daily rate
+                  </p>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Total Leave Days</span>
+                    <span className="font-semibold">{safeStats.totalLeaveDays}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Avg Cost/Day</span>
+                    <span className="font-semibold">
+                      ${safeStats.totalLeaveDays > 0 ? (safeStats.estimatedCost / safeStats.totalLeaveDays).toFixed(0) : 0}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* YoY Growth */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-purple-500" />
+                  Year-over-Year
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-end justify-between mb-4">
+                  <div>
+                    <div className="text-3xl font-bold tracking-tight">
+                      {safeStats.yoyGrowth > 0 ? "+" : ""}{safeStats.yoyGrowth}%
+                    </div>
+                    <p className="text-xs text-muted-foreground">vs last year</p>
+                  </div>
+                  <Badge variant={safeStats.yoyGrowth > 10 ? "destructive" : "secondary"}>
+                    {safeStats.yoyGrowth > 10 ? "High Growth" : "Normal"}
                   </Badge>
                 </div>
-                <Separator />
-                <div className="space-y-2 text-sm">
+                <div className="space-y-2 text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">This Year</span>
-                    <span className="font-semibold">{stats?.thisYear?.requests || 0} requests</span>
+                    <span>Current Year</span>
+                    <span className="font-medium text-foreground">{safeStats.thisYear.requests} reqs</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Last Year</span>
-                    <span className="font-semibold">{stats?.lastYear?.requests || 0} requests</span>
+                    <span>Last Year</span>
+                    <span className="font-medium text-foreground">{safeStats.lastYear.requests} reqs</span>
                   </div>
                 </div>
-              </GlassCardContent>
-            </GlassCard>
-            
-            {/* Removed Fake System Health Card */}
-          </ResponsiveDashboardGrid>
-        )}
-      </DashboardSection>
-    </div>
-    </TooltipProvider>
+              </CardContent>
+            </Card>
+
+          </div>
+        </div>
+      </div>
+    </RoleBasedDashboard>
   );
 }

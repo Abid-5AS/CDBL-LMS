@@ -74,7 +74,6 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
     { icon: Home, label: "Home", href: "/dashboard/ceo" },
     { icon: ClipboardList, label: "Approvals", href: "/approvals" },
     { icon: ChartBar, label: "Reports", href: "/reports" },
-    { icon: Shield, label: "Admin", href: "/admin" },
     { icon: GitGraph, label: "Workflows", href: "/dashboard/admin/workflows" },
     { icon: Activity, label: "Audit", href: "/admin/audit" },
     { icon: Users, label: "Employees", href: "/employees" },

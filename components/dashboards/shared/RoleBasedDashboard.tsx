@@ -335,6 +335,9 @@ export function RoleKPICard({
   onClick,
   clickLabel,
   tooltip,
+  color,
+  bgColor,
+  variant = "default",
 }: {
   title: string | ReactNode;
   value: string | number;
@@ -351,6 +354,12 @@ export function RoleKPICard({
   onClick?: () => void;
   clickLabel?: string;
   tooltip?: string;
+  /** Custom text/icon color override (e.g. "text-blue-600") */
+  color?: string;
+  /** Custom background color override for icon (e.g. "bg-blue-50") */
+  bgColor?: string;
+  /** Visual variant */
+  variant?: "default" | "highlight";
 }) {
   const config = role
     ? roleConfigs[role] || roleConfigs.EMPLOYEE
@@ -387,6 +396,7 @@ export function RoleKPICard({
         "border-0 shadow-md hover:shadow-lg transition-all duration-300",
         "bg-white dark:bg-card/95 rounded-[20px]", // Brighter white in light mode, slightly lighter card in dark mode
         "dark:border dark:border-white/5", // Faint border only in dark mode
+        variant === "highlight" && "ring-2 ring-primary/20 bg-primary/5",
         className
       )}
       style={accentVars}
@@ -432,8 +442,8 @@ export function RoleKPICard({
               )}
             </div>
 
-            <div className="flex items-end gap-2">
-              <p className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-foreground tracking-tight">
+            <div className={cn("flex items-end gap-2", color)}>
+              <p className={cn("text-4xl sm:text-5xl font-bold tracking-tight", !color && "text-slate-900 dark:text-foreground")}>
                 {value}
               </p>
             </div>
@@ -465,12 +475,16 @@ export function RoleKPICard({
         </div>
         {Icon && (
           <div
-            className="rounded-2xl p-3.5 bg-[var(--role-kpi-accent-soft)]/50 dark:bg-[var(--role-kpi-accent-soft)]/10"
+            className={cn(
+              "rounded-2xl p-3.5 transition-colors",
+              !bgColor && "bg-[var(--role-kpi-accent-soft)]/50 dark:bg-[var(--role-kpi-accent-soft)]/10",
+              bgColor
+            )}
             style={{
-              color: "var(--role-kpi-accent)",
+              color: color ? undefined : "var(--role-kpi-accent)",
             }}
           >
-            <Icon className="h-6 w-6" />
+            <Icon className={cn("h-6 w-6", color)} />
           </div>
         )}
       </div>
