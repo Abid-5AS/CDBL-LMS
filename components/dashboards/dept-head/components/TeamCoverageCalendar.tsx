@@ -1,6 +1,8 @@
 "use client";
 
+
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -37,9 +39,7 @@ export function TeamCoverageCalendar({
   // Internal state fallback if not controlled (optional, but requested to lift state)
   // For this refactor, we assume controlled usage from Dashboard, but keep defaults safe
 
-  const router = import("next/navigation").then(mod => mod.useRouter());
-  // We need to use useRouter hook at top level
-  const { push } = require("next/navigation").useRouter();
+  const router = useRouter();
 
 
   const calendarDays = React.useMemo(() => {
@@ -77,7 +77,7 @@ export function TeamCoverageCalendar({
     // Format: YYYY-MM-DD
     const offset = date.getTimezoneOffset() * 60000;
     const dateStr = new Date(date.getTime() - offset).toISOString().split('T')[0];
-    push(`/leaves?scope=team&date=${dateStr}`);
+    router.push(`/leaves?scope=team&date=${dateStr}`);
   };
 
   const getIntensityColor = (intensity: CoverageDay["intensity"]) => {
