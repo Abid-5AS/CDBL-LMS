@@ -9,7 +9,11 @@ import {
   FileText,
   Mail,
   Settings,
-  ChevronDown,
+  Shield,
+  Stethoscope,
+  PenTool,
+  Server,
+  LifeBuoy
 } from "lucide-react";
 import {
   Card,
@@ -20,25 +24,34 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { EmployeePageHero } from "@/components/employee/PageHero";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUser } from "@/components/providers/UserContext";
 
 // ============================================
-// FAQ Data
+// FAQ Data & Configuration
 // ============================================
 
-const faqData = {
+const categoryConfig = {
+  general: { label: "General", icon: BookOpen },
+  casualLeave: { label: "Casual Leave", icon: Clock },
+  earnedLeave: { label: "Earned Leave", icon: Calendar },
+  medicalLeave: { label: "Medical Leave", icon: Stethoscope },
+  modifications: { label: "Modifications", icon: PenTool },
+  technical: { label: "Technical & System", icon: Server },
+};
+
+type CategoryKey = keyof typeof categoryConfig;
+
+const faqData: Record<CategoryKey, { question: string; answer: string }[]> = {
   general: [
     {
       question: "How do I apply for leave?",
@@ -178,388 +191,229 @@ const faqData = {
   ],
 };
 
-const categoryPolicyLink: Record<string, { href: string; label: string } | null> = {
-  general: null,
+const categoryPolicyLink: Record<string, { href: string; label: string }> = {
   casualLeave: { href: "/policies?tab=cl", label: "Casual Leave policy" },
   earnedLeave: { href: "/policies?tab=el", label: "Earned Leave policy" },
   medicalLeave: { href: "/policies?tab=ml", label: "Medical Leave policy" },
   modifications: { href: "/policies", label: "Policy handbook" },
-  technical: null,
-};
-
-const totalFaqCount = Object.values(faqData).reduce(
-  (sum, faqs) => sum + faqs.length,
-  0
-);
-const categoryTabMap: Record<string, string> = {
-  general: "general",
-  casualLeave: "casual",
-  earnedLeave: "earned",
-  medicalLeave: "medical",
-  modifications: "modifications",
-  technical: "technical",
-};
-const categoryLabels: Record<string, string> = {
-  general: "General",
-  casualLeave: "Casual Leave",
-  earnedLeave: "Earned Leave",
-  medicalLeave: "Medical",
-  modifications: "Modifications",
-  technical: "Technical",
 };
 
 // ============================================
-// FAQ Accordion Component
-// ============================================
-
-interface FAQAccordionProps {
-  faqs: { question: string; answer: string }[];
-  category: string;
-}
-
-function FAQAccordion({ faqs, category }: FAQAccordionProps) {
-  const policyLink = categoryPolicyLink[category];
-  return (
-    <Accordion type="multiple" className="space-y-2">
-      {faqs.map((faq, index) => (
-        <AccordionItem
-          key={`${category}-${index}`}
-          value={`${category}-${index}`}
-          className="border rounded-lg px-4"
-        >
-          <AccordionTrigger className="hover:no-underline justify-between gap-3">
-            <span className="text-left font-medium">{faq.question}</span>
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
-              View answer
-              <ChevronDown className="size-4 transition-transform data-[state=open]:rotate-180" />
-            </span>
-          </AccordionTrigger>
-          <AccordionContent className="text-muted-foreground space-y-2">
-            <p>{faq.answer}</p>
-            {policyLink && (
-              <p className="text-xs">
-                Need the full rule?{' '}
-                <Link href={policyLink.href} className="underline font-medium">
-                  {policyLink.label}
-                </Link>
-              </p>
-            )}
-          </AccordionContent>
-        </AccordionItem>
-      ))}
-    </Accordion>
-  );
-}
-
-// ============================================
-// Main FAQ Page Component
+// Main Component
 // ============================================
 
 export function FAQPageContent() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = React.useState("");
-  const [activeTab, setActiveTab] = React.useState("general");
+  const [activeTab, setActiveTab] = React.useState<CategoryKey>("general");
   const user = useUser();
-  const canManageFaq =
-    !!user && ["HR_ADMIN", "HR_HEAD", "SYSTEM_ADMIN"].includes(user.role);
+  const canManageFaq = !!user && ["HR_ADMIN", "HR_HEAD", "SYSTEM_ADMIN"].includes(user.role);
 
-  // Filter FAQs based on search
+  // Search Logic
   const filteredFAQs = React.useMemo(() => {
-    if (!searchTerm) return faqData;
+    if (!searchTerm) {
+      if (activeTab === "general" && !searchTerm) return faqData[activeTab]; // Show only active tab when not searching? No, searching should search global.
+      return faqData[activeTab];
+    }
 
     const term = searchTerm.toLowerCase();
-    const filtered: any = {};
-
-    Object.entries(faqData).forEach(([category, faqs]) => {
-      const matchedFAQs = faqs.filter(
-        (faq) =>
-          faq.question.toLowerCase().includes(term) ||
-          faq.answer.toLowerCase().includes(term)
-      );
-      if (matchedFAQs.length > 0) {
-        filtered[category] = matchedFAQs;
-      }
-    });
-
-    return filtered;
-  }, [searchTerm]);
-
-  const totalResults = Object.values(filteredFAQs).reduce(
-    (sum: number, faqs: any) => sum + faqs.length,
-    0 as number
-  );
-
-  const suggestionList = React.useMemo(() => {
-    const term = searchTerm.trim().toLowerCase();
-    if (term.length < 1) return [];
-    const matches: Array<{ category: string; question: string }> = [];
-    Object.entries(faqData).forEach(([category, faqs]) => {
-      faqs.forEach((faq) => {
-        if (faq.question.toLowerCase().includes(term)) {
-          matches.push({ category, question: faq.question });
-        }
-      });
-    });
-    return matches.slice(0, 5);
-  }, [searchTerm]);
-
-  const heroStats = [
-    { label: "FAQ Categories", value: Object.keys(faqData).length },
-    { label: "Answers Documented", value: totalFaqCount },
-    { label: "Support SLA", value: "< 2 hrs", helper: "HR response window" },
-  ];
+    // When searching, we search across ALL categories
+    const allFaqs = Object.values(faqData).flat();
+    return allFaqs.filter(
+      (faq) =>
+        faq.question.toLowerCase().includes(term) ||
+        faq.answer.toLowerCase().includes(term)
+    );
+  }, [searchTerm, activeTab]);
 
   return (
-    <div className="space-y-6 py-6">
-      <EmployeePageHero
-        eyebrow="Help Center"
-        title="Frequently Asked Questions"
-        description="Search curated answers about applying for leave, balances, policy compliance, and troubleshooting."
-        stats={heroStats}
-        actions={
-          <div className="flex flex-wrap gap-2">
-            {canManageFaq && (
-              <Button
-                variant="secondary"
-                size="sm"
-                leftIcon={<Settings className="size-4" aria-hidden="true" />}
-                onClick={() => router.push("/admin/tools")}
-              >
-                Update FAQs
-              </Button>
-            )}
-            <Button
-              size="sm"
-              leftIcon={<Mail className="size-4" aria-hidden="true" />}
-              onClick={() => router.push("/help")}
-            >
-              Contact Support
-            </Button>
-          </div>
-        }
-      />
+    <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/20 pb-20">
+      {/* Hero Header */}
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 py-16 px-6 lg:px-8 text-center">
+        <div className="max-w-2xl mx-auto space-y-6">
+          <Badge variant="secondary" className="mb-2">Help Center</Badge>
+          <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            How can we help you?
+          </h1>
+          <p className="text-lg text-slate-600 dark:text-slate-400">
+            Browse through common questions or search for specific topics related to leave management.
+          </p>
 
-      {/* Search */}
-      <div className="surface-card p-4 rounded-3xl">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <Input
-            placeholder="Search FAQs..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 h-12 text-base"
-          />
-        </div>
-        <p className="text-xs text-muted-foreground mt-1">
-          Results update instantly—no need to press Enter.
-        </p>
-        {suggestionList.length > 0 && (
-          <div className="mt-3 rounded-2xl border border-border/60 bg-muted/30 p-3 space-y-2">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">
-              Suggested matches
-            </p>
-            <div className="flex flex-col gap-1.5">
-              {suggestionList.map((suggestion, index) => (
-                <button
-                  key={`${suggestion.category}-${suggestion.question}-${index}`}
-                  type="button"
-                  className="flex flex-col rounded-xl border border-transparent px-2 py-1 text-left text-sm text-foreground hover:border-primary/20 hover:text-primary transition-colors"
-                  onClick={() => {
-                    setActiveTab(
-                      categoryTabMap[suggestion.category] ?? "general"
-                    );
-                    setSearchTerm(suggestion.question);
-                  }}
-                >
-                  <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                    {categoryLabels[suggestion.category] ?? "FAQ"}
-                  </span>
-                  <span className="font-medium">{suggestion.question}</span>
-                </button>
-              ))}
-            </div>
+          <div className="relative max-w-lg mx-auto mt-8">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <Input
+              placeholder="Search for answers..."
+              className="pl-11 h-12 rounded-full shadow-sm border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-base"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Search Results Count */}
-      {searchTerm && (
-        <Alert className="surface-card border border-border/70">
-          <Search className="size-4" />
-          <AlertDescription>
-            Found {totalResults} result{totalResults !== 1 ? "s" : ""} for
-            &quot;
-            {searchTerm}&quot;
-          </AlertDescription>
-        </Alert>
-      )}
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
-      {/* FAQ Categories */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="w-full surface-card p-4 rounded-3xl"
-      >
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 bg-muted/50 rounded-2xl">
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="casual">Casual Leave</TabsTrigger>
-          <TabsTrigger value="earned">Earned Leave</TabsTrigger>
-          <TabsTrigger value="medical">Medical Leave</TabsTrigger>
-          <TabsTrigger value="modifications">Modifications</TabsTrigger>
-          <TabsTrigger value="technical">Technical</TabsTrigger>
-        </TabsList>
+          {/* Sidebar Navigation */}
+          <div className="hidden lg:block lg:col-span-3 space-y-8">
+            <div>
+              <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-4 px-3">Categories</h3>
+              <nav className="space-y-1">
+                {(Object.keys(categoryConfig) as CategoryKey[]).map((key) => {
+                  const config = categoryConfig[key];
+                  const Icon = config.icon;
+                  const isActive = activeTab === key && !searchTerm;
 
-        <TabsContent value="general" className="mt-6 space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Badge variant="secondary">
-              {filteredFAQs.general?.length || 0} Questions
-            </Badge>
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => {
+                        setActiveTab(key);
+                        setSearchTerm("");
+                      }}
+                      className={cn(
+                        "flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium rounded-lg transition-colors",
+                        isActive
+                          ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                          : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900"
+                      )}
+                    >
+                      <Icon className={cn("w-4 h-4", isActive ? "text-primary" : "text-slate-400")} />
+                      {config.label}
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+
+            {canManageFaq && (
+              <Card className="bg-slate-50 dark:bg-slate-900 border-dashed">
+                <CardContent className="p-4 space-y-3">
+                  <p className="text-xs text-muted-foreground">Admin Controls</p>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start gap-2"
+                    onClick={() => router.push("/admin/tools")}
+                  >
+                    <Settings className="w-4 h-4" />
+                    Manage FAQs
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           </div>
-          {filteredFAQs.general && filteredFAQs.general.length > 0 ? (
-            <FAQAccordion faqs={filteredFAQs.general} category="general" />
-          ) : (
-            <p className="text-center py-8 text-muted-foreground">
-              No questions found in this category
-            </p>
-          )}
-        </TabsContent>
 
-        <TabsContent value="casual" className="mt-6 space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Badge variant="secondary">
-              {filteredFAQs.casualLeave?.length || 0} Questions
-            </Badge>
-          </div>
-          {filteredFAQs.casualLeave && filteredFAQs.casualLeave.length > 0 ? (
-            <FAQAccordion
-              faqs={filteredFAQs.casualLeave}
-              category="casualLeave"
-            />
-          ) : (
-            <p className="text-center py-8 text-muted-foreground">
-              No questions found in this category
-            </p>
-          )}
-        </TabsContent>
-
-        <TabsContent value="earned" className="mt-6 space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Badge variant="secondary">
-              {filteredFAQs.earnedLeave?.length || 0} Questions
-            </Badge>
-          </div>
-          {filteredFAQs.earnedLeave && filteredFAQs.earnedLeave.length > 0 ? (
-            <FAQAccordion
-              faqs={filteredFAQs.earnedLeave}
-              category="earnedLeave"
-            />
-          ) : (
-            <p className="text-center py-8 text-muted-foreground">
-              No questions found in this category
-            </p>
-          )}
-        </TabsContent>
-
-        <TabsContent value="medical" className="mt-6 space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Badge variant="secondary">
-              {filteredFAQs.medicalLeave?.length || 0} Questions
-            </Badge>
-          </div>
-          {filteredFAQs.medicalLeave && filteredFAQs.medicalLeave.length > 0 ? (
-            <FAQAccordion
-              faqs={filteredFAQs.medicalLeave}
-              category="medicalLeave"
-            />
-          ) : (
-            <p className="text-center py-8 text-muted-foreground">
-              No questions found in this category
-            </p>
-          )}
-        </TabsContent>
-
-        <TabsContent value="modifications" className="mt-6 space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Badge variant="secondary">
-              {filteredFAQs.modifications?.length || 0} Questions
-            </Badge>
-          </div>
-          {filteredFAQs.modifications &&
-          filteredFAQs.modifications.length > 0 ? (
-            <FAQAccordion
-              faqs={filteredFAQs.modifications}
-              category="modifications"
-            />
-          ) : (
-            <p className="text-center py-8 text-muted-foreground">
-              No questions found in this category
-            </p>
-          )}
-        </TabsContent>
-
-        <TabsContent value="technical" className="mt-6 space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Badge variant="secondary">
-              {filteredFAQs.technical?.length || 0} Questions
-            </Badge>
-          </div>
-          {filteredFAQs.technical && filteredFAQs.technical.length > 0 ? (
-            <FAQAccordion faqs={filteredFAQs.technical} category="technical" />
-          ) : (
-            <p className="text-center py-8 text-muted-foreground">
-              No questions found in this category
-            </p>
-          )}
-        </TabsContent>
-      </Tabs>
-
-      {/* Quick Links */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Still need help?</CardTitle>
-          <CardDescription>Additional resources and support</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button
-              type="button"
-              onClick={() => router.push("/policies")}
-              className="neo-card group block p-6 text-left cursor-pointer"
+          {/* Mobile Category Selector */}
+          <div className="lg:hidden col-span-1">
+            <select
+              className="w-full p-3 rounded-lg border bg-background"
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value as CategoryKey)}
             >
-              <BookOpen className="size-6 mb-3 text-primary" />
-              <h4 className="font-semibold mb-2 text-foreground">
-                Leave Policies
-              </h4>
-              <p className="text-sm text-muted-foreground">
-                Complete policy documentation
-              </p>
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/leaves/apply")}
-              className="neo-card group block p-6 text-left cursor-pointer"
-            >
-              <Calendar className="size-6 mb-3 text-primary" />
-              <h4 className="font-semibold mb-2 text-foreground">
-                Apply for Leave
-              </h4>
-              <p className="text-sm text-muted-foreground">
-                Start a new leave request
-              </p>
-            </button>
-            <a
-              href="mailto:hr@cdbl.com"
-              className="neo-card group block p-6 cursor-pointer"
-            >
-              <Mail className="size-6 mb-3 text-primary" />
-              <h4 className="font-semibold mb-2 text-foreground">Contact HR</h4>
-              <p className="text-sm text-muted-foreground">
-                Email us for specific queries
-              </p>
-            </a>
+              {Object.entries(categoryConfig).map(([key, config]) => (
+                <option key={key} value={key}>{config.label}</option>
+              ))}
+            </select>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Main Content */}
+          <div className="lg:col-span-9 space-y-10">
+            {searchTerm ? (
+              <div>
+                <h2 className="text-xl font-semibold mb-6">Search Results</h2>
+                {filteredFAQs.length === 0 ? (
+                  <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-200">
+                    <Search className="w-12 h-12 mx-auto text-slate-300 mb-3" />
+                    <p className="text-slate-500">No matching answers found for "{searchTerm}"</p>
+                    <Button variant="link" onClick={() => setSearchTerm("")}>Clear search</Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {filteredFAQs.map((faq, idx) => (
+                      <Card key={idx}>
+                        <CardHeader>
+                          <CardTitle className="text-base">{faq.question}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-muted-foreground text-sm">
+                          {faq.answer}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-5">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-3">
+                    {React.createElement(categoryConfig[activeTab].icon, { className: "w-6 h-6 text-primary" })}
+                    {categoryConfig[activeTab].label}
+                  </h2>
+                  <Badge variant="outline" className="text-slate-500">
+                    {faqData[activeTab].length} articles
+                  </Badge>
+                </div>
+
+                <Accordion type="single" collapsible className="w-full space-y-4">
+                  {faqData[activeTab].map((faq, index) => (
+                    <AccordionItem
+                      key={index}
+                      value={`item-${index}`}
+                      className="border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl px-6 data-[state=open]:shadow-sm"
+                    >
+                      <AccordionTrigger className="hover:no-underline py-4 text-base font-medium">
+                        {faq.question}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-slate-600 dark:text-slate-400 pb-4 leading-relaxed">
+                        {faq.answer}
+                        {categoryPolicyLink[activeTab] && (
+                          <div className="mt-4 pt-4 border-t border-dashed border-slate-200 dark:border-slate-800">
+                            <Link
+                              href={categoryPolicyLink[activeTab].href}
+                              className="text-sm font-medium text-primary hover:underline flex items-center gap-1"
+                            >
+                              <BookOpen className="w-3 h-3" />
+                              Read full {categoryPolicyLink[activeTab].label}
+                            </Link>
+                          </div>
+                        )}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </div>
+            )}
+
+            {/* Support Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-10 border-t border-slate-200 dark:border-slate-800 mt-12">
+              <div className="group rounded-2xl bg-slate-50 dark:bg-slate-900 p-6 transition-colors hover:bg-white hover:shadow-md border border-slate-100 dark:border-slate-800 cursor-pointer" onClick={() => router.push("/policies")}>
+                <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <h3 className="font-semibold text-slate-900 dark:text-slate-100">Policy Handbook</h3>
+                <p className="text-sm text-slate-500 mt-2">Read detailed documentation about all leave policies.</p>
+              </div>
+
+              <div className="group rounded-2xl bg-slate-50 dark:bg-slate-900 p-6 transition-colors hover:bg-white hover:shadow-md border border-slate-100 dark:border-slate-800 cursor-pointer" onClick={() => router.push("/leaves/apply")}>
+                <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Calendar className="w-5 h-5" />
+                </div>
+                <h3 className="font-semibold text-slate-900 dark:text-slate-100">Apply for Leave</h3>
+                <p className="text-sm text-slate-500 mt-2">Ready to take time off? Start your request here.</p>
+              </div>
+
+              <div className="group rounded-2xl bg-slate-50 dark:bg-slate-900 p-6 transition-colors hover:bg-white hover:shadow-md border border-slate-100 dark:border-slate-800 cursor-pointer" onClick={() => router.push("/help")}>
+                <div className="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <LifeBuoy className="w-5 h-5" />
+                </div>
+                <h3 className="font-semibold text-slate-900 dark:text-slate-100">Contact HR</h3>
+                <p className="text-sm text-slate-500 mt-2">Need personal assistance? Reach out to the HR team.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
