@@ -37,7 +37,7 @@ import { KPIGridSkeleton } from "@/components/shared/skeletons";
 
 // Feature Components
 import { DashboardPendingList } from "./components/DashboardPendingList";
-import { TeamCoverageCalendar } from "./components/TeamCoverageCalendar"; // Reusing existing
+import { TeamAvailability } from "./TeamAvailability";
 
 
 // Hooks
@@ -252,16 +252,7 @@ export function CorporateManagerDashboard() {
                 description="Member availability this month"
               >
                 <motion.div variants={itemVariants}>
-                  <div className="rounded-[20px] border border-border/60 shadow-sm bg-card overflow-hidden">
-                    <Suspense fallback={<div className="h-64 bg-muted animate-pulse" />}>
-                      <TeamCoverageCalendar
-                        currentDate={calendarDate}
-                        onPrevMonth={prevMonth}
-                        onNextMonth={nextMonth}
-                        coverageData={coverageData}
-                      />
-                    </Suspense>
-                  </div>
+                  <TeamAvailability />
                 </motion.div>
               </DashboardSection>
 
