@@ -48,12 +48,12 @@ export function MetricCard({
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className={cn(typography.label, "text-muted-foreground")}>{label}</p>
-          <p className={cn(typography.kpiNumber, "mt-2 text-foreground")}>{value}</p>
+          <div className={cn(typography.label, "text-muted-foreground")}>{label}</div>
+          <div className={cn(typography.kpiNumber, "mt-2 text-foreground")}>{value}</div>
           {subtitle && (
-            <p className={cn(typography.body, "mt-1 text-muted-foreground")}>
+            <div className={cn(typography.body, "mt-1 text-muted-foreground")}>
               {subtitle}
-            </p>
+            </div>
           )}
           {trend && (
             <div className="mt-2 flex items-center gap-1">

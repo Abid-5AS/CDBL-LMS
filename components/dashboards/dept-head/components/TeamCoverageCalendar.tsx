@@ -19,6 +19,14 @@ interface CoverageDay {
 export function TeamCoverageCalendar() {
   const [currentDate, setCurrentDate] = React.useState(new Date());
 
+  const prevMonth = () => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+  };
+
+  const nextMonth = () => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+  };
+
   // Fetch calendar coverage data
   const { data: coverageData, isLoading } = useSWR<{
     range: { start: string; end: string };
@@ -30,12 +38,12 @@ export function TeamCoverageCalendar() {
     const start = new Date(year, month, 1);
     // Get last day of month
     const end = new Date(year, month + 1, 0);
-    
+
     // Convert to simplified date string for API: YYYY-MM-DD
     // Using local time to avoid timezone shifts
     const toDateString = (d: Date) => {
-        const offset = d.getTimezoneOffset() * 60000;
-        return new Date(d.getTime() - offset).toISOString().split('T')[0];
+      const offset = d.getTimezoneOffset() * 60000;
+      return new Date(d.getTime() - offset).toISOString().split('T')[0];
     };
 
     return `/api/team/on-leave?scope=department&startDate=${toDateString(start)}&endDate=${toDateString(end)}`;
@@ -52,10 +60,10 @@ export function TeamCoverageCalendar() {
       // Format as YYYY-MM-DD for lookup
       const offset = date.getTimezoneOffset() * 60000;
       const dateKey = new Date(date.getTime() - offset).toISOString().split('T')[0];
-      
+
       const dayData = coverageData?.days[dateKey];
       const count = dayData?.count || 0;
-      
+
       let intensity: CoverageDay["intensity"] = "none";
       if (count > 0) intensity = "low";
       if (count > 2) intensity = "medium";
@@ -118,7 +126,7 @@ export function TeamCoverageCalendar() {
           {Array.from({ length: new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay() }).map((_, i) => (
             <div key={`pad-${i}`} className="aspect-square" />
           ))}
-          
+
           {calendarDays.map((day, i) => (
             <TooltipProvider key={i}>
               <Tooltip>
