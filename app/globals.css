@@ -462,3 +462,12 @@
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
+
+/* Surface Card - Clean, distinct containers */
+.surface-card {
+  @apply bg-card border border-border/60 rounded-xl shadow-sm transition-all duration-200;
+}
+
+.surface-card:hover {
+  @apply border-border shadow-md;
+}
