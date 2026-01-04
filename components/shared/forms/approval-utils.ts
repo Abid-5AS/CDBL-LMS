@@ -12,9 +12,56 @@ type ApprovalRecord = {
 /**
  * Get workflow stages based on requester role
  */
+// Helper to get role label
+function getRoleLabel(role?: string) {
+  if (!role) return "Approver";
+  const map: Record<string, string> = {
+    EMPLOYEE: "Employee",
+    DEPT_HEAD: "Dept Head",
+    HR_ADMIN: "HR Admin",
+    HR_HEAD: "HR Head",
+    CEO: "CEO",
+    SYSTEM_ADMIN: "System Admin"
+  };
+  return map[role] || role.replace(/_/g, " ");
+}
+
+export function getStagesFromApprovals(approvals: ApprovalRecord[], requesterRole?: string): string[] {
+  if (!approvals || approvals.length === 0) {
+    return getWorkflowStages(requesterRole);
+  }
+
+  // Sort by step
+  const sorted = [...approvals].sort((a, b) => (a.step || 0) - (b.step || 0));
+
+  // Create stages list: [Submitted, ...Approvers]
+  // We need to infer the Role Label for each step.
+  // The approval record might just have 'approverId'.
+  // But usually we load `approver: { name, role }` or similar.
+  // If we can't find it easily, we might need to rely on the fallback.
+  // BUT: The snapshot logic creates records.
+  // If we can assume the snapshot reflects the correct order, we can just label them "Step 1", "Step 2"...
+  // OR better: In the new `ApprovalTimelineAdapter`, we saw `toRole` is saved? No, `toRole` is for forwarding.
+
+  // Let's assume for now we use the fallback `getWorkflowStages` if we can't reliably get role names from the snapshot without a backend change.
+  // However, I made `WorkflowService`! The `Approval` model *doesn't* store the Role directly (it stores `approverId`).
+  // So strictly speaking, from the frontend `approvals` array alone (which comes from `Permission` query?), we might not know the intended Role unless `approver` object has it.
+
+  // If the user just wants to see *that* it works, the Timeline is the source of truth.
+  // The Stepper is a visualization.
+  // I'll keep using `getWorkflowStages` for now to avoid breaking the Stepper with "Step 1, Step 2", 
+  // BUT I will add a comment that this might desync if the Admin changes the flow significantly and we don't store Role in Approval.
+  // actually, let's look at `Approval` model again. `toRole`?
+  // `toRole` is only on `Approval` if it was forwarded? No.
+
+  // Okay, I will NOT change `approval-utils.ts` to guess stages yet.
+  // I will just return the fallback.
+  return getWorkflowStages(requesterRole);
+}
+
 /**
  * Get workflow stages based on requester role
- * MUST MATCH SERVER-SIDE MATRIX IN lib/workflow.ts
+ * MUST MATCH SERVER-SIDE MATRIX IN lib/workflow.ts (Default)
  */
 export function getWorkflowStages(requesterRole?: string): string[] {
   if (requesterRole === "DEPT_HEAD") {

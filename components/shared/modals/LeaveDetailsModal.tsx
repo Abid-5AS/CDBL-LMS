@@ -49,14 +49,14 @@ type LeaveDetails = {
   endDate: string;
   workingDays: number;
   status:
-    | "SUBMITTED"
-    | "PENDING"
-    | "APPROVED"
-    | "REJECTED"
-    | "CANCELLED"
-    | "RETURNED"
-    | "CANCELLATION_REQUESTED"
-    | "RECALLED";
+  | "SUBMITTED"
+  | "PENDING"
+  | "APPROVED"
+  | "REJECTED"
+  | "CANCELLED"
+  | "RETURNED"
+  | "CANCELLATION_REQUESTED"
+  | "RECALLED";
   reason?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -177,6 +177,8 @@ export function LeaveDetailsModal({
             <ApprovalStepper
               currentIndex={currentIndex}
               requesterRole={requesterRole as any}
+            // In the future, pass `stages` dynamically derived from `leave.approvals`
+            // stages={getStagesFromApprovals(leave.approvals)}
             />
           </div>
 
