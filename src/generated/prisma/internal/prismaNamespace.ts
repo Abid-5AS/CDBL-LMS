@@ -397,7 +397,6 @@ export const ModelName = {
   OrgSettings: 'OrgSettings',
   OtpCode: 'OtpCode',
   Notification: 'Notification',
-  DeviceToken: 'DeviceToken',
   BalanceAdjustment: 'BalanceAdjustment',
   ApprovalDelegation: 'ApprovalDelegation',
   EscalationRule: 'EscalationRule',
@@ -415,7 +414,8 @@ export const ModelName = {
   CalendarConfig: 'CalendarConfig',
   LeaveCalendarMapping: 'LeaveCalendarMapping',
   Webhook: 'Webhook',
-  WebhookDelivery: 'WebhookDelivery'
+  WebhookDelivery: 'WebhookDelivery',
+  WorkflowPolicy: 'WorkflowPolicy'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -431,7 +431,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "leaveRequest" | "approval" | "balance" | "holiday" | "policyConfig" | "auditLog" | "leaveComment" | "leaveVersion" | "encashmentRequest" | "orgSettings" | "otpCode" | "notification" | "deviceToken" | "balanceAdjustment" | "approvalDelegation" | "escalationRule" | "userPreferences" | "hRISSync" | "hRISConflict" | "leaveTemplate" | "policyVersion" | "userProfile" | "emergencyContact" | "bankDetails" | "userDocument" | "scheduledReport" | "reportExecution" | "calendarConfig" | "leaveCalendarMapping" | "webhook" | "webhookDelivery"
+    modelProps: "user" | "leaveRequest" | "approval" | "balance" | "holiday" | "policyConfig" | "auditLog" | "leaveComment" | "leaveVersion" | "encashmentRequest" | "orgSettings" | "otpCode" | "notification" | "balanceAdjustment" | "approvalDelegation" | "escalationRule" | "userPreferences" | "hRISSync" | "hRISConflict" | "leaveTemplate" | "policyVersion" | "userProfile" | "emergencyContact" | "bankDetails" | "userDocument" | "scheduledReport" | "reportExecution" | "calendarConfig" | "leaveCalendarMapping" | "webhook" | "webhookDelivery" | "workflowPolicy"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1290,72 +1290,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.NotificationCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.NotificationCountAggregateOutputType> | number
-        }
-      }
-    }
-    DeviceToken: {
-      payload: Prisma.$DeviceTokenPayload<ExtArgs>
-      fields: Prisma.DeviceTokenFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.DeviceTokenFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceTokenPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.DeviceTokenFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceTokenPayload>
-        }
-        findFirst: {
-          args: Prisma.DeviceTokenFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceTokenPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.DeviceTokenFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceTokenPayload>
-        }
-        findMany: {
-          args: Prisma.DeviceTokenFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceTokenPayload>[]
-        }
-        create: {
-          args: Prisma.DeviceTokenCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceTokenPayload>
-        }
-        createMany: {
-          args: Prisma.DeviceTokenCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        delete: {
-          args: Prisma.DeviceTokenDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceTokenPayload>
-        }
-        update: {
-          args: Prisma.DeviceTokenUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceTokenPayload>
-        }
-        deleteMany: {
-          args: Prisma.DeviceTokenDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.DeviceTokenUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        upsert: {
-          args: Prisma.DeviceTokenUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeviceTokenPayload>
-        }
-        aggregate: {
-          args: Prisma.DeviceTokenAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateDeviceToken>
-        }
-        groupBy: {
-          args: Prisma.DeviceTokenGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.DeviceTokenGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.DeviceTokenCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.DeviceTokenCountAggregateOutputType> | number
         }
       }
     }
@@ -2547,6 +2481,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    WorkflowPolicy: {
+      payload: Prisma.$WorkflowPolicyPayload<ExtArgs>
+      fields: Prisma.WorkflowPolicyFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.WorkflowPolicyFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkflowPolicyPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.WorkflowPolicyFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkflowPolicyPayload>
+        }
+        findFirst: {
+          args: Prisma.WorkflowPolicyFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkflowPolicyPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.WorkflowPolicyFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkflowPolicyPayload>
+        }
+        findMany: {
+          args: Prisma.WorkflowPolicyFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkflowPolicyPayload>[]
+        }
+        create: {
+          args: Prisma.WorkflowPolicyCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkflowPolicyPayload>
+        }
+        createMany: {
+          args: Prisma.WorkflowPolicyCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.WorkflowPolicyDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkflowPolicyPayload>
+        }
+        update: {
+          args: Prisma.WorkflowPolicyUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkflowPolicyPayload>
+        }
+        deleteMany: {
+          args: Prisma.WorkflowPolicyDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.WorkflowPolicyUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.WorkflowPolicyUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkflowPolicyPayload>
+        }
+        aggregate: {
+          args: Prisma.WorkflowPolicyAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWorkflowPolicy>
+        }
+        groupBy: {
+          args: Prisma.WorkflowPolicyGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkflowPolicyGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.WorkflowPolicyCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkflowPolicyCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2790,18 +2790,6 @@ export const NotificationScalarFieldEnum = {
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
-
-
-export const DeviceTokenScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  token: 'token',
-  platform: 'platform',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type DeviceTokenScalarFieldEnum = (typeof DeviceTokenScalarFieldEnum)[keyof typeof DeviceTokenScalarFieldEnum]
 
 
 export const BalanceAdjustmentScalarFieldEnum = {
@@ -3097,6 +3085,19 @@ export const WebhookDeliveryScalarFieldEnum = {
 export type WebhookDeliveryScalarFieldEnum = (typeof WebhookDeliveryScalarFieldEnum)[keyof typeof WebhookDeliveryScalarFieldEnum]
 
 
+export const WorkflowPolicyScalarFieldEnum = {
+  id: 'id',
+  requesterRole: 'requesterRole',
+  leaveType: 'leaveType',
+  chain: 'chain',
+  isActive: 'isActive',
+  updatedAt: 'updatedAt',
+  updatedBy: 'updatedBy'
+} as const
+
+export type WorkflowPolicyScalarFieldEnum = (typeof WorkflowPolicyScalarFieldEnum)[keyof typeof WorkflowPolicyScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -3242,14 +3243,6 @@ export const NotificationOrderByRelevanceFieldEnum = {
 } as const
 
 export type NotificationOrderByRelevanceFieldEnum = (typeof NotificationOrderByRelevanceFieldEnum)[keyof typeof NotificationOrderByRelevanceFieldEnum]
-
-
-export const DeviceTokenOrderByRelevanceFieldEnum = {
-  token: 'token',
-  platform: 'platform'
-} as const
-
-export type DeviceTokenOrderByRelevanceFieldEnum = (typeof DeviceTokenOrderByRelevanceFieldEnum)[keyof typeof DeviceTokenOrderByRelevanceFieldEnum]
 
 
 export const BalanceAdjustmentOrderByRelevanceFieldEnum = {
@@ -3643,7 +3636,6 @@ export type GlobalOmitConfig = {
   orgSettings?: Prisma.OrgSettingsOmit
   otpCode?: Prisma.OtpCodeOmit
   notification?: Prisma.NotificationOmit
-  deviceToken?: Prisma.DeviceTokenOmit
   balanceAdjustment?: Prisma.BalanceAdjustmentOmit
   approvalDelegation?: Prisma.ApprovalDelegationOmit
   escalationRule?: Prisma.EscalationRuleOmit
@@ -3662,6 +3654,7 @@ export type GlobalOmitConfig = {
   leaveCalendarMapping?: Prisma.LeaveCalendarMappingOmit
   webhook?: Prisma.WebhookOmit
   webhookDelivery?: Prisma.WebhookDeliveryOmit
+  workflowPolicy?: Prisma.WorkflowPolicyOmit
 }
 
 /* Types for Logging */

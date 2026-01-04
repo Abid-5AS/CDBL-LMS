@@ -3,27 +3,16 @@
 import { CheckCircle2, Circle } from "lucide-react";
 import clsx from "clsx";
 
-type Stage = "Submitted" | "HR Admin" | "HR Head" | "Dept Head" | "CEO";
+import { getWorkflowStages } from "./approval-utils";
+
+type Stage = string; // Relaxed type since stages are dynamic strings now
 
 type ApprovalStepperProps = {
   stages?: Stage[];
   currentIndex: number;
   className?: string;
-  requesterRole?: "EMPLOYEE" | "DEPT_HEAD" | "HR_ADMIN" | "HR_HEAD" | "CEO";
+  requesterRole?: string;
 };
-
-/**
- * Get approval stages based on requester role
- * Regular employees: Submitted → HR Admin → HR Head → Dept Head
- * Dept heads: Submitted → HR Admin → HR Head → CEO
- */
-function getStagesForRole(role?: string): Stage[] {
-  if (role === "DEPT_HEAD") {
-    return ["Submitted", "HR Admin", "HR Head", "CEO"];
-  }
-  // Default for employees and other roles
-  return ["Submitted", "HR Admin", "HR Head", "Dept Head"];
-}
 
 export function ApprovalStepper({
   stages,
@@ -32,7 +21,7 @@ export function ApprovalStepper({
   requesterRole,
 }: ApprovalStepperProps) {
   // Use provided stages or determine from requester role
-  const displayStages = stages || getStagesForRole(requesterRole);
+  const displayStages = stages || getWorkflowStages(requesterRole);
 
   return (
     <div className={clsx("w-full", className)}>
@@ -57,8 +46,8 @@ export function ApprovalStepper({
                   i < currentIndex
                     ? "bg-success dark:bg-success/80 dark:bg-success dark:bg-success/80"
                     : i === currentIndex
-                    ? "bg-warning dark:bg-warning/80 dark:bg-warning dark:bg-warning/80"
-                    : "bg-muted dark:bg-muted/80 dark:bg-muted dark:bg-muted/80"
+                      ? "bg-warning dark:bg-warning/80 dark:bg-warning dark:bg-warning/80"
+                      : "bg-muted dark:bg-muted/80 dark:bg-muted dark:bg-muted/80"
                 )}
                 aria-hidden="true"
               />

@@ -301,7 +301,7 @@ export type UserWhereInput = {
   scheduledReports?: Prisma.ScheduledReportListRelationFilter
   calendarConfigs?: Prisma.CalendarConfigListRelationFilter
   webhooks?: Prisma.WebhookListRelationFilter
-  deviceTokens?: Prisma.DeviceTokenListRelationFilter
+  policyUpdates?: Prisma.WorkflowPolicyListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -342,7 +342,7 @@ export type UserOrderByWithRelationInput = {
   scheduledReports?: Prisma.ScheduledReportOrderByRelationAggregateInput
   calendarConfigs?: Prisma.CalendarConfigOrderByRelationAggregateInput
   webhooks?: Prisma.WebhookOrderByRelationAggregateInput
-  deviceTokens?: Prisma.DeviceTokenOrderByRelationAggregateInput
+  policyUpdates?: Prisma.WorkflowPolicyOrderByRelationAggregateInput
   _relevance?: Prisma.UserOrderByRelevanceInput
 }
 
@@ -387,7 +387,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   scheduledReports?: Prisma.ScheduledReportListRelationFilter
   calendarConfigs?: Prisma.CalendarConfigListRelationFilter
   webhooks?: Prisma.WebhookListRelationFilter
-  deviceTokens?: Prisma.DeviceTokenListRelationFilter
+  policyUpdates?: Prisma.WorkflowPolicyListRelationFilter
 }, "id" | "email" | "empCode">
 
 export type UserOrderByWithAggregationInput = {
@@ -464,7 +464,7 @@ export type UserCreateInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -504,7 +504,7 @@ export type UserUncheckedCreateInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUpdateInput = {
@@ -543,7 +543,7 @@ export type UserUpdateInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -583,7 +583,7 @@ export type UserUncheckedUpdateInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -892,20 +892,6 @@ export type UserUpdateOneWithoutEncashmentProcessedNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutEncashmentProcessedInput, Prisma.UserUpdateWithoutEncashmentProcessedInput>, Prisma.UserUncheckedUpdateWithoutEncashmentProcessedInput>
 }
 
-export type UserCreateNestedOneWithoutDeviceTokensInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutDeviceTokensInput, Prisma.UserUncheckedCreateWithoutDeviceTokensInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeviceTokensInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserUpdateOneRequiredWithoutDeviceTokensNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutDeviceTokensInput, Prisma.UserUncheckedCreateWithoutDeviceTokensInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeviceTokensInput
-  upsert?: Prisma.UserUpsertWithoutDeviceTokensInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDeviceTokensInput, Prisma.UserUpdateWithoutDeviceTokensInput>, Prisma.UserUncheckedUpdateWithoutDeviceTokensInput>
-}
-
 export type UserCreateNestedOneWithoutBalanceAdjustmentsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutBalanceAdjustmentsInput, Prisma.UserUncheckedCreateWithoutBalanceAdjustmentsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutBalanceAdjustmentsInput
@@ -1148,6 +1134,22 @@ export type UserUpdateOneRequiredWithoutWebhooksNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutWebhooksInput, Prisma.UserUpdateWithoutWebhooksInput>, Prisma.UserUncheckedUpdateWithoutWebhooksInput>
 }
 
+export type UserCreateNestedOneWithoutPolicyUpdatesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPolicyUpdatesInput, Prisma.UserUncheckedCreateWithoutPolicyUpdatesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPolicyUpdatesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutPolicyUpdatesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPolicyUpdatesInput, Prisma.UserUncheckedCreateWithoutPolicyUpdatesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPolicyUpdatesInput
+  upsert?: Prisma.UserUpsertWithoutPolicyUpdatesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPolicyUpdatesInput, Prisma.UserUpdateWithoutPolicyUpdatesInput>, Prisma.UserUncheckedUpdateWithoutPolicyUpdatesInput>
+}
+
 export type UserCreateWithoutTeamMembersInput = {
   name: string
   email: string
@@ -1183,7 +1185,7 @@ export type UserCreateWithoutTeamMembersInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutTeamMembersInput = {
@@ -1222,7 +1224,7 @@ export type UserUncheckedCreateWithoutTeamMembersInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutTeamMembersInput = {
@@ -1265,7 +1267,7 @@ export type UserCreateWithoutDeptHeadInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutDeptHeadInput = {
@@ -1304,7 +1306,7 @@ export type UserUncheckedCreateWithoutDeptHeadInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutDeptHeadInput = {
@@ -1363,7 +1365,7 @@ export type UserUpdateWithoutTeamMembersInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeamMembersInput = {
@@ -1402,7 +1404,7 @@ export type UserUncheckedUpdateWithoutTeamMembersInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithWhereUniqueWithoutDeptHeadInput = {
@@ -1474,7 +1476,7 @@ export type UserCreateWithoutLeavesInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutLeavesInput = {
@@ -1513,7 +1515,7 @@ export type UserUncheckedCreateWithoutLeavesInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutLeavesInput = {
@@ -1567,7 +1569,7 @@ export type UserUpdateWithoutLeavesInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLeavesInput = {
@@ -1606,7 +1608,7 @@ export type UserUncheckedUpdateWithoutLeavesInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutApprovalsInput = {
@@ -1644,7 +1646,7 @@ export type UserCreateWithoutApprovalsInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutApprovalsInput = {
@@ -1683,7 +1685,7 @@ export type UserUncheckedCreateWithoutApprovalsInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutApprovalsInput = {
@@ -1737,7 +1739,7 @@ export type UserUpdateWithoutApprovalsInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutApprovalsInput = {
@@ -1776,7 +1778,7 @@ export type UserUncheckedUpdateWithoutApprovalsInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutBalancesInput = {
@@ -1814,7 +1816,7 @@ export type UserCreateWithoutBalancesInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutBalancesInput = {
@@ -1853,7 +1855,7 @@ export type UserUncheckedCreateWithoutBalancesInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutBalancesInput = {
@@ -1907,7 +1909,7 @@ export type UserUpdateWithoutBalancesInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBalancesInput = {
@@ -1946,7 +1948,7 @@ export type UserUncheckedUpdateWithoutBalancesInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutEncashmentRequestsInput = {
@@ -1984,7 +1986,7 @@ export type UserCreateWithoutEncashmentRequestsInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutEncashmentRequestsInput = {
@@ -2023,7 +2025,7 @@ export type UserUncheckedCreateWithoutEncashmentRequestsInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutEncashmentRequestsInput = {
@@ -2066,7 +2068,7 @@ export type UserCreateWithoutEncashmentApprovalsInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutEncashmentApprovalsInput = {
@@ -2105,7 +2107,7 @@ export type UserUncheckedCreateWithoutEncashmentApprovalsInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutEncashmentApprovalsInput = {
@@ -2148,7 +2150,7 @@ export type UserCreateWithoutEncashmentProcessedInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutEncashmentProcessedInput = {
@@ -2187,7 +2189,7 @@ export type UserUncheckedCreateWithoutEncashmentProcessedInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutEncashmentProcessedInput = {
@@ -2241,7 +2243,7 @@ export type UserUpdateWithoutEncashmentRequestsInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEncashmentRequestsInput = {
@@ -2280,7 +2282,7 @@ export type UserUncheckedUpdateWithoutEncashmentRequestsInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutEncashmentApprovalsInput = {
@@ -2329,7 +2331,7 @@ export type UserUpdateWithoutEncashmentApprovalsInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEncashmentApprovalsInput = {
@@ -2368,7 +2370,7 @@ export type UserUncheckedUpdateWithoutEncashmentApprovalsInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutEncashmentProcessedInput = {
@@ -2417,7 +2419,7 @@ export type UserUpdateWithoutEncashmentProcessedInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEncashmentProcessedInput = {
@@ -2456,177 +2458,7 @@ export type UserUncheckedUpdateWithoutEncashmentProcessedInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
-}
-
-export type UserCreateWithoutDeviceTokensInput = {
-  name: string
-  email: string
-  password?: string | null
-  empCode?: string | null
-  role?: $Enums.Role
-  department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
-  approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
-  encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
-  encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
-  hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
-  hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
-  scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
-  webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-}
-
-export type UserUncheckedCreateWithoutDeviceTokensInput = {
-  id?: number
-  name: string
-  email: string
-  password?: string | null
-  empCode?: string | null
-  role?: $Enums.Role
-  department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
-  approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
-  encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
-  encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
-  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
-  hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
-  scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
-  webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-}
-
-export type UserCreateOrConnectWithoutDeviceTokensInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutDeviceTokensInput, Prisma.UserUncheckedCreateWithoutDeviceTokensInput>
-}
-
-export type UserUpsertWithoutDeviceTokensInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutDeviceTokensInput, Prisma.UserUncheckedUpdateWithoutDeviceTokensInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutDeviceTokensInput, Prisma.UserUncheckedCreateWithoutDeviceTokensInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutDeviceTokensInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutDeviceTokensInput, Prisma.UserUncheckedUpdateWithoutDeviceTokensInput>
-}
-
-export type UserUpdateWithoutDeviceTokensInput = {
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
-  approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
-  encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
-  encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
-  hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
-  hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
-  scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
-  webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-}
-
-export type UserUncheckedUpdateWithoutDeviceTokensInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
-  approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
-  encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
-  encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
-  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
-  hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
-  scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
-  webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutBalanceAdjustmentsInput = {
@@ -2664,7 +2496,7 @@ export type UserCreateWithoutBalanceAdjustmentsInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutBalanceAdjustmentsInput = {
@@ -2703,7 +2535,7 @@ export type UserUncheckedCreateWithoutBalanceAdjustmentsInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutBalanceAdjustmentsInput = {
@@ -2746,7 +2578,7 @@ export type UserCreateWithoutAdjustmentsMadeInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutAdjustmentsMadeInput = {
@@ -2785,7 +2617,7 @@ export type UserUncheckedCreateWithoutAdjustmentsMadeInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutAdjustmentsMadeInput = {
@@ -2839,7 +2671,7 @@ export type UserUpdateWithoutBalanceAdjustmentsInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBalanceAdjustmentsInput = {
@@ -2878,7 +2710,7 @@ export type UserUncheckedUpdateWithoutBalanceAdjustmentsInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutAdjustmentsMadeInput = {
@@ -2927,7 +2759,7 @@ export type UserUpdateWithoutAdjustmentsMadeInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdjustmentsMadeInput = {
@@ -2966,7 +2798,7 @@ export type UserUncheckedUpdateWithoutAdjustmentsMadeInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutDelegationsDelegatedInput = {
@@ -3004,7 +2836,7 @@ export type UserCreateWithoutDelegationsDelegatedInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutDelegationsDelegatedInput = {
@@ -3043,7 +2875,7 @@ export type UserUncheckedCreateWithoutDelegationsDelegatedInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutDelegationsDelegatedInput = {
@@ -3086,7 +2918,7 @@ export type UserCreateWithoutDelegationsReceivedInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutDelegationsReceivedInput = {
@@ -3125,7 +2957,7 @@ export type UserUncheckedCreateWithoutDelegationsReceivedInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutDelegationsReceivedInput = {
@@ -3179,7 +3011,7 @@ export type UserUpdateWithoutDelegationsDelegatedInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDelegationsDelegatedInput = {
@@ -3218,7 +3050,7 @@ export type UserUncheckedUpdateWithoutDelegationsDelegatedInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutDelegationsReceivedInput = {
@@ -3267,7 +3099,7 @@ export type UserUpdateWithoutDelegationsReceivedInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDelegationsReceivedInput = {
@@ -3306,7 +3138,7 @@ export type UserUncheckedUpdateWithoutDelegationsReceivedInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutPreferencesInput = {
@@ -3344,7 +3176,7 @@ export type UserCreateWithoutPreferencesInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutPreferencesInput = {
@@ -3383,7 +3215,7 @@ export type UserUncheckedCreateWithoutPreferencesInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutPreferencesInput = {
@@ -3437,7 +3269,7 @@ export type UserUpdateWithoutPreferencesInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPreferencesInput = {
@@ -3476,7 +3308,7 @@ export type UserUncheckedUpdateWithoutPreferencesInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutHrisSyncsInput = {
@@ -3514,7 +3346,7 @@ export type UserCreateWithoutHrisSyncsInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutHrisSyncsInput = {
@@ -3553,7 +3385,7 @@ export type UserUncheckedCreateWithoutHrisSyncsInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutHrisSyncsInput = {
@@ -3607,7 +3439,7 @@ export type UserUpdateWithoutHrisSyncsInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHrisSyncsInput = {
@@ -3646,7 +3478,7 @@ export type UserUncheckedUpdateWithoutHrisSyncsInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutHrisConflictsEmployeeInput = {
@@ -3684,7 +3516,7 @@ export type UserCreateWithoutHrisConflictsEmployeeInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutHrisConflictsEmployeeInput = {
@@ -3723,7 +3555,7 @@ export type UserUncheckedCreateWithoutHrisConflictsEmployeeInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutHrisConflictsEmployeeInput = {
@@ -3766,7 +3598,7 @@ export type UserCreateWithoutHrisConflictsResolverInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutHrisConflictsResolverInput = {
@@ -3805,7 +3637,7 @@ export type UserUncheckedCreateWithoutHrisConflictsResolverInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutHrisConflictsResolverInput = {
@@ -3859,7 +3691,7 @@ export type UserUpdateWithoutHrisConflictsEmployeeInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHrisConflictsEmployeeInput = {
@@ -3898,7 +3730,7 @@ export type UserUncheckedUpdateWithoutHrisConflictsEmployeeInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutHrisConflictsResolverInput = {
@@ -3947,7 +3779,7 @@ export type UserUpdateWithoutHrisConflictsResolverInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHrisConflictsResolverInput = {
@@ -3986,7 +3818,7 @@ export type UserUncheckedUpdateWithoutHrisConflictsResolverInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutLeaveTemplatesInput = {
@@ -4024,7 +3856,7 @@ export type UserCreateWithoutLeaveTemplatesInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutLeaveTemplatesInput = {
@@ -4063,7 +3895,7 @@ export type UserUncheckedCreateWithoutLeaveTemplatesInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutLeaveTemplatesInput = {
@@ -4117,7 +3949,7 @@ export type UserUpdateWithoutLeaveTemplatesInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLeaveTemplatesInput = {
@@ -4156,7 +3988,7 @@ export type UserUncheckedUpdateWithoutLeaveTemplatesInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutPolicyVersionsInput = {
@@ -4194,7 +4026,7 @@ export type UserCreateWithoutPolicyVersionsInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutPolicyVersionsInput = {
@@ -4233,7 +4065,7 @@ export type UserUncheckedCreateWithoutPolicyVersionsInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutPolicyVersionsInput = {
@@ -4287,7 +4119,7 @@ export type UserUpdateWithoutPolicyVersionsInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPolicyVersionsInput = {
@@ -4326,7 +4158,7 @@ export type UserUncheckedUpdateWithoutPolicyVersionsInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutProfileInput = {
@@ -4364,7 +4196,7 @@ export type UserCreateWithoutProfileInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutProfileInput = {
@@ -4403,7 +4235,7 @@ export type UserUncheckedCreateWithoutProfileInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutProfileInput = {
@@ -4457,7 +4289,7 @@ export type UserUpdateWithoutProfileInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProfileInput = {
@@ -4496,7 +4328,7 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutEmergencyContactsInput = {
@@ -4534,7 +4366,7 @@ export type UserCreateWithoutEmergencyContactsInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutEmergencyContactsInput = {
@@ -4573,7 +4405,7 @@ export type UserUncheckedCreateWithoutEmergencyContactsInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutEmergencyContactsInput = {
@@ -4627,7 +4459,7 @@ export type UserUpdateWithoutEmergencyContactsInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmergencyContactsInput = {
@@ -4666,7 +4498,7 @@ export type UserUncheckedUpdateWithoutEmergencyContactsInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutBankDetailsInput = {
@@ -4704,7 +4536,7 @@ export type UserCreateWithoutBankDetailsInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutBankDetailsInput = {
@@ -4743,7 +4575,7 @@ export type UserUncheckedCreateWithoutBankDetailsInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutBankDetailsInput = {
@@ -4797,7 +4629,7 @@ export type UserUpdateWithoutBankDetailsInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBankDetailsInput = {
@@ -4836,7 +4668,7 @@ export type UserUncheckedUpdateWithoutBankDetailsInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutDocumentsInput = {
@@ -4874,7 +4706,7 @@ export type UserCreateWithoutDocumentsInput = {
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutDocumentsInput = {
@@ -4913,7 +4745,7 @@ export type UserUncheckedCreateWithoutDocumentsInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutDocumentsInput = {
@@ -4967,7 +4799,7 @@ export type UserUpdateWithoutDocumentsInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDocumentsInput = {
@@ -5006,7 +4838,7 @@ export type UserUncheckedUpdateWithoutDocumentsInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutScheduledReportsInput = {
@@ -5044,7 +4876,7 @@ export type UserCreateWithoutScheduledReportsInput = {
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutScheduledReportsInput = {
@@ -5083,7 +4915,7 @@ export type UserUncheckedCreateWithoutScheduledReportsInput = {
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutScheduledReportsInput = {
@@ -5137,7 +4969,7 @@ export type UserUpdateWithoutScheduledReportsInput = {
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutScheduledReportsInput = {
@@ -5176,7 +5008,7 @@ export type UserUncheckedUpdateWithoutScheduledReportsInput = {
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutCalendarConfigsInput = {
@@ -5214,7 +5046,7 @@ export type UserCreateWithoutCalendarConfigsInput = {
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCalendarConfigsInput = {
@@ -5253,7 +5085,7 @@ export type UserUncheckedCreateWithoutCalendarConfigsInput = {
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutCalendarConfigsInput = {
@@ -5307,7 +5139,7 @@ export type UserUpdateWithoutCalendarConfigsInput = {
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCalendarConfigsInput = {
@@ -5346,7 +5178,7 @@ export type UserUncheckedUpdateWithoutCalendarConfigsInput = {
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutWebhooksInput = {
@@ -5384,7 +5216,7 @@ export type UserCreateWithoutWebhooksInput = {
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
-  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutWebhooksInput = {
@@ -5423,7 +5255,7 @@ export type UserUncheckedCreateWithoutWebhooksInput = {
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserCreateOrConnectWithoutWebhooksInput = {
@@ -5477,7 +5309,7 @@ export type UserUpdateWithoutWebhooksInput = {
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWebhooksInput = {
@@ -5516,7 +5348,177 @@ export type UserUncheckedUpdateWithoutWebhooksInput = {
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserCreateWithoutPolicyUpdatesInput = {
+  name: string
+  email: string
+  password?: string | null
+  empCode?: string | null
+  role?: $Enums.Role
+  department?: string | null
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
+  encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
+  hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
+}
+
+export type UserUncheckedCreateWithoutPolicyUpdatesInput = {
+  id?: number
+  name: string
+  email: string
+  password?: string | null
+  empCode?: string | null
+  role?: $Enums.Role
+  department?: string | null
+  deptHeadId?: number | null
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
+  encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
+  hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
+}
+
+export type UserCreateOrConnectWithoutPolicyUpdatesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPolicyUpdatesInput, Prisma.UserUncheckedCreateWithoutPolicyUpdatesInput>
+}
+
+export type UserUpsertWithoutPolicyUpdatesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPolicyUpdatesInput, Prisma.UserUncheckedUpdateWithoutPolicyUpdatesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPolicyUpdatesInput, Prisma.UserUncheckedCreateWithoutPolicyUpdatesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPolicyUpdatesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPolicyUpdatesInput, Prisma.UserUncheckedUpdateWithoutPolicyUpdatesInput>
+}
+
+export type UserUpdateWithoutPolicyUpdatesInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
+  encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
+  hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPolicyUpdatesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
+  encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
+  hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type UserCreateManyDeptHeadInput = {
@@ -5568,7 +5570,7 @@ export type UserUpdateWithoutDeptHeadInput = {
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeptHeadInput = {
@@ -5607,7 +5609,7 @@ export type UserUncheckedUpdateWithoutDeptHeadInput = {
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutDeptHeadInput = {
@@ -5651,7 +5653,7 @@ export type UserCountOutputType = {
   scheduledReports: number
   calendarConfigs: number
   webhooks: number
-  deviceTokens: number
+  policyUpdates: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -5676,7 +5678,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   scheduledReports?: boolean | UserCountOutputTypeCountScheduledReportsArgs
   calendarConfigs?: boolean | UserCountOutputTypeCountCalendarConfigsArgs
   webhooks?: boolean | UserCountOutputTypeCountWebhooksArgs
-  deviceTokens?: boolean | UserCountOutputTypeCountDeviceTokensArgs
+  policyUpdates?: boolean | UserCountOutputTypeCountPolicyUpdatesArgs
 }
 
 /**
@@ -5839,8 +5841,8 @@ export type UserCountOutputTypeCountWebhooksArgs<ExtArgs extends runtime.Types.E
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountDeviceTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.DeviceTokenWhereInput
+export type UserCountOutputTypeCountPolicyUpdatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WorkflowPolicyWhereInput
 }
 
 
@@ -5882,7 +5884,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   scheduledReports?: boolean | Prisma.User$scheduledReportsArgs<ExtArgs>
   calendarConfigs?: boolean | Prisma.User$calendarConfigsArgs<ExtArgs>
   webhooks?: boolean | Prisma.User$webhooksArgs<ExtArgs>
-  deviceTokens?: boolean | Prisma.User$deviceTokensArgs<ExtArgs>
+  policyUpdates?: boolean | Prisma.User$policyUpdatesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -5930,7 +5932,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   scheduledReports?: boolean | Prisma.User$scheduledReportsArgs<ExtArgs>
   calendarConfigs?: boolean | Prisma.User$calendarConfigsArgs<ExtArgs>
   webhooks?: boolean | Prisma.User$webhooksArgs<ExtArgs>
-  deviceTokens?: boolean | Prisma.User$deviceTokensArgs<ExtArgs>
+  policyUpdates?: boolean | Prisma.User$policyUpdatesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 
@@ -5962,7 +5964,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     scheduledReports: Prisma.$ScheduledReportPayload<ExtArgs>[]
     calendarConfigs: Prisma.$CalendarConfigPayload<ExtArgs>[]
     webhooks: Prisma.$WebhookPayload<ExtArgs>[]
-    deviceTokens: Prisma.$DeviceTokenPayload<ExtArgs>[]
+    policyUpdates: Prisma.$WorkflowPolicyPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -6342,7 +6344,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   scheduledReports<T extends Prisma.User$scheduledReportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$scheduledReportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScheduledReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   calendarConfigs<T extends Prisma.User$calendarConfigsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$calendarConfigsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CalendarConfigPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   webhooks<T extends Prisma.User$webhooksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$webhooksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WebhookPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  deviceTokens<T extends Prisma.User$deviceTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$deviceTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeviceTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  policyUpdates<T extends Prisma.User$policyUpdatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$policyUpdatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkflowPolicyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7307,27 +7309,27 @@ export type User$webhooksArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 }
 
 /**
- * User.deviceTokens
+ * User.policyUpdates
  */
-export type User$deviceTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$policyUpdatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the DeviceToken
+   * Select specific fields to fetch from the WorkflowPolicy
    */
-  select?: Prisma.DeviceTokenSelect<ExtArgs> | null
+  select?: Prisma.WorkflowPolicySelect<ExtArgs> | null
   /**
-   * Omit specific fields from the DeviceToken
+   * Omit specific fields from the WorkflowPolicy
    */
-  omit?: Prisma.DeviceTokenOmit<ExtArgs> | null
+  omit?: Prisma.WorkflowPolicyOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.DeviceTokenInclude<ExtArgs> | null
-  where?: Prisma.DeviceTokenWhereInput
-  orderBy?: Prisma.DeviceTokenOrderByWithRelationInput | Prisma.DeviceTokenOrderByWithRelationInput[]
-  cursor?: Prisma.DeviceTokenWhereUniqueInput
+  include?: Prisma.WorkflowPolicyInclude<ExtArgs> | null
+  where?: Prisma.WorkflowPolicyWhereInput
+  orderBy?: Prisma.WorkflowPolicyOrderByWithRelationInput | Prisma.WorkflowPolicyOrderByWithRelationInput[]
+  cursor?: Prisma.WorkflowPolicyWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.DeviceTokenScalarFieldEnum | Prisma.DeviceTokenScalarFieldEnum[]
+  distinct?: Prisma.WorkflowPolicyScalarFieldEnum | Prisma.WorkflowPolicyScalarFieldEnum[]
 }
 
 /**

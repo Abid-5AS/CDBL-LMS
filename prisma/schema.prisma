@@ -57,6 +57,9 @@ model User {
   // Webhook Relations
   webhooks Webhook[]
 
+  // Workflow Policy Relations
+  policyUpdates WorkflowPolicy[] @relation("PolicyUpdates")
+
   @@index([deptHeadId])
 }
 
@@ -749,4 +752,17 @@ model WebhookDelivery {
   @@index([status])
   @@index([createdAt])
   @@index([nextRetryAt])
+}
+
+// Dynamic Workflow Policy
+model WorkflowPolicy {
+  id            Int        @id @default(autoincrement())
+  requesterRole Role       @unique // One policy per requester role
+  leaveType     LeaveType? // Optional: Specific chain for leave types
+  chain         Json       // Stored as ["DEPT_HEAD", "HR_ADMIN"]
+  isActive      Boolean    @default(true)
+  updatedAt     DateTime   @updatedAt
+  updatedBy     Int?
+
+  updatedByUser User?      @relation("PolicyUpdates", fields: [updatedBy], references: [id])
 }

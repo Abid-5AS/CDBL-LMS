@@ -13,6 +13,7 @@ import {
   PieChart,
   HelpCircle,
   Webhook,
+  GitGraph,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { Role } from "@/src/generated/prisma/client";
@@ -59,6 +60,7 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
     { icon: Users, label: "Employees", href: "/employees" },
     { icon: ChartBar, label: "Reports", href: "/reports" },
     { icon: Calendar, label: "Holidays", href: "/holidays" },
+    { icon: GitGraph, label: "Workflows", href: "/dashboard/admin/workflows" },
     { icon: Webhook, label: "Webhooks", href: "/webhooks" },
     { icon: Activity, label: "Audit", href: "/admin/audit" },
     { icon: HelpCircle, label: "FAQ", href: "/faq" },
@@ -69,6 +71,7 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
     { icon: ClipboardList, label: "Approvals", href: "/approvals" },
     { icon: ChartBar, label: "Reports", href: "/reports" },
     { icon: Shield, label: "Admin", href: "/admin" },
+    { icon: GitGraph, label: "Workflows", href: "/dashboard/admin/workflows" },
     { icon: Activity, label: "Audit", href: "/admin/audit" },
     { icon: Users, label: "Employees", href: "/employees" },
     { icon: Calendar, label: "Holidays", href: "/holidays" },
@@ -81,6 +84,7 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
     { icon: ChartBar, label: "Reports", href: "/reports" },
     { icon: Shield, label: "Admin", href: "/admin" },
     { icon: Users, label: "Employees", href: "/employees" },
+    { icon: GitGraph, label: "Workflows", href: "/dashboard/admin/workflows" },
     { icon: Calendar, label: "Holidays", href: "/holidays" },
     { icon: Webhook, label: "Webhooks", href: "/webhooks" },
     { icon: Activity, label: "Audit", href: "/admin/audit" },

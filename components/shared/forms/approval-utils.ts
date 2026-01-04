@@ -12,12 +12,25 @@ type ApprovalRecord = {
 /**
  * Get workflow stages based on requester role
  */
-function getWorkflowStages(requesterRole?: string): string[] {
+/**
+ * Get workflow stages based on requester role
+ * MUST MATCH SERVER-SIDE MATRIX IN lib/workflow.ts
+ */
+export function getWorkflowStages(requesterRole?: string): string[] {
   if (requesterRole === "DEPT_HEAD") {
-    return ["Submitted", "HR Admin", "HR Head", "CEO"];
+    return ["Submitted", "HR Head", "CEO"];
+  }
+  if (requesterRole === "HR_ADMIN") {
+    return ["Submitted", "HR Head", "CEO"];
+  }
+  if (requesterRole === "HR_HEAD") {
+    return ["Submitted", "CEO"];
+  }
+  if (requesterRole === "CEO") {
+    return ["Submitted"];
   }
   // Default for regular employees
-  return ["Submitted", "HR Admin", "HR Head", "Dept Head"];
+  return ["Submitted", "Dept Head", "HR Admin", "HR Head", "CEO"];
 }
 
 /**
@@ -83,7 +96,7 @@ export function getLatestApprovalDate(approvals: ApprovalRecord[]): string | nul
     .filter((a) => a.decidedAt)
     .map((a) => a.decidedAt!)
     .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
-  
+
   return dates.length > 0 ? dates[0] : null;
 }
 

@@ -93,19 +93,50 @@ export class ApprovalRepository {
   ): Promise<ApprovalWithRelations[]> {
     const { limit = 50, offset = 0 } = options || {};
 
-    return prisma.approval.findMany({
+    // Fetch all pending approvals for the user
+    // We fetch all because we need to filter "Future PENDING" ones efficiently in memory
+    // (Prisma doesn't support "Where NOT EXISTS step < this.step" easily)
+    const allPending = await prisma.approval.findMany({
       where: {
         approverId,
         decision: ApprovalDecision.PENDING,
       },
-      include: this.DEFAULT_INCLUDES,
+      include: {
+        ...this.DEFAULT_INCLUDES,
+        // Include sibling approvals to check if I am the active step
+        leave: {
+          include: {
+            requester: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+              },
+            },
+            approvals: {
+              select: { step: true, decision: true },
+            },
+          },
+        },
+      },
       orderBy: [
-        { leave: { createdAt: "desc" } }, // Most recent first
+        { leave: { createdAt: "desc" } },
         { step: "asc" },
       ],
-      take: limit,
-      skip: offset,
     });
+
+    // Filter: Only show if I am the "Lowest Pending Step"
+    // i.e., No other approval exists with step < myStep AND decision == PENDING
+    const activePending = allPending.filter((myApproval) => {
+      const earlierPendingSteps = myApproval.leave.approvals.some(
+        (other) => other.step < myApproval.step && other.decision === ApprovalDecision.PENDING
+      );
+      return !earlierPendingSteps;
+    });
+
+    // Apply pagination manually after filtering
+    return activePending.slice(offset, offset + limit);
   }
 
   /**
@@ -319,11 +350,32 @@ export class ApprovalRepository {
    * Count pending approvals by approver
    */
   static async countPendingByApprover(approverId: number): Promise<number> {
-    return prisma.approval.count({
+    // Fetch potential pending approvals to filter "Future Pending"
+    const allPending = await prisma.approval.findMany({
       where: {
         approverId,
         decision: ApprovalDecision.PENDING,
       },
+      select: {
+        step: true,
+        leave: {
+          select: {
+            approvals: {
+              select: { step: true, decision: true },
+            },
+          },
+        },
+      },
     });
+
+    // Filter: Only count if I am the "Lowest Pending Step"
+    const activePendingCount = allPending.filter((myApproval) => {
+      const earlierPendingSteps = myApproval.leave.approvals.some(
+        (other) => other.step < myApproval.step && other.decision === ApprovalDecision.PENDING
+      );
+      return !earlierPendingSteps;
+    }).length;
+
+    return activePendingCount;
   }
 }

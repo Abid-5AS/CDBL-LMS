@@ -491,6 +491,23 @@ export type EnumCalendarProviderWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumCalendarProviderFilter<$PrismaModel>
 }
 
+export type EnumLeaveTypeNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.LeaveType | Prisma.EnumLeaveTypeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.LeaveType[] | null
+  notIn?: $Enums.LeaveType[] | null
+  not?: Prisma.NestedEnumLeaveTypeNullableFilter<$PrismaModel> | $Enums.LeaveType | null
+}
+
+export type EnumLeaveTypeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LeaveType | Prisma.EnumLeaveTypeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.LeaveType[] | null
+  notIn?: $Enums.LeaveType[] | null
+  not?: Prisma.NestedEnumLeaveTypeNullableWithAggregatesFilter<$PrismaModel> | $Enums.LeaveType | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLeaveTypeNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLeaveTypeNullableFilter<$PrismaModel>
+}
+
 export type NestedIntFilter<$PrismaModel = never> = {
   equals?: number | Prisma.IntFieldRefInput<$PrismaModel>
   in?: number[]
@@ -929,6 +946,23 @@ export type NestedEnumCalendarProviderWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumCalendarProviderFilter<$PrismaModel>
   _max?: Prisma.NestedEnumCalendarProviderFilter<$PrismaModel>
+}
+
+export type NestedEnumLeaveTypeNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.LeaveType | Prisma.EnumLeaveTypeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.LeaveType[] | null
+  notIn?: $Enums.LeaveType[] | null
+  not?: Prisma.NestedEnumLeaveTypeNullableFilter<$PrismaModel> | $Enums.LeaveType | null
+}
+
+export type NestedEnumLeaveTypeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LeaveType | Prisma.EnumLeaveTypeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.LeaveType[] | null
+  notIn?: $Enums.LeaveType[] | null
+  not?: Prisma.NestedEnumLeaveTypeNullableWithAggregatesFilter<$PrismaModel> | $Enums.LeaveType | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLeaveTypeNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLeaveTypeNullableFilter<$PrismaModel>
 }
 
 

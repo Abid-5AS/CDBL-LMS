@@ -4,7 +4,7 @@
  */
 
 import type { TimelineItem } from "./SharedTimeline";
-import { MASTER_WORKFLOW_CHAIN } from "@/lib/workflow";
+
 
 // Approval Timeline Adapter
 type ApprovalRecord = {
@@ -27,6 +27,7 @@ function formatRoleLabel(role: string): string {
   return ROLE_LABELS[role] || role.replace(/_/g, " ");
 }
 
+// Approval Timeline Adapter - Refactored for Dynamic Chains
 export function ApprovalTimelineAdapter(
   approvals: ApprovalRecord[],
   createdAt?: string,
@@ -42,100 +43,68 @@ export function ApprovalTimelineAdapter(
       actor: "You",
       status: "FORWARDED",
       title: "Request submitted",
-      subtitle: "Request sent to HR Admin",
+      subtitle: "Request sent for approval",
     });
   }
 
-  // Create a map of step -> approval for quick lookup
-  const approvalMap = new Map<number, ApprovalRecord>();
-  approvals.forEach((approval) => {
-    if (approval.step) {
-      approvalMap.set(approval.step, approval);
-    }
-  });
+  // Sort approvals by step to ensure correct order
+  const sortedApprovals = [...approvals].sort((a, b) => (a.step || 0) - (b.step || 0));
 
-  // Process each step in the approval chain
-  MASTER_WORKFLOW_CHAIN.forEach((role, index) => {
-    const step = index + 1; // Steps are 1-indexed
-    const approval = approvalMap.get(step);
+  sortedApprovals.forEach((approval, index) => {
+    // Infer role/title handling
+    // Since we don't have the static chain, we rely on the approval record or fallback
+    // In the new Snapshot system, typically we know the role.
+    // For now, we will use a generic "Approver" label if we can't determine it,
+    // or try to extract it if passed in 'toRole' of previous step?
 
-    if (approval) {
-      // Approval record exists
-      let timelineStatus: TimelineItem["status"];
-      let title: string;
-      let subtitle: string | undefined;
+    // Actually, looking at the UI, we want to show "Approved by Dept Head".
+    // If 'approver' is an object { name, role? }, we might have it.
+    // Let's assume for now we use the valid approver name if available.
 
-      if (approval.decision === "APPROVED") {
-        timelineStatus = "APPROVED";
-        title = `Approved by ${formatRoleLabel(role)}`;
-        subtitle = approval.comment || undefined;
-      } else if (approval.decision === "REJECTED") {
-        timelineStatus = "REJECTED";
-        title = `Rejected by ${formatRoleLabel(role)}`;
-        subtitle = approval.comment || undefined;
-      } else if (approval.decision === "FORWARDED") {
-        timelineStatus = "FORWARDED";
-        const nextRole = approval.toRole || MASTER_WORKFLOW_CHAIN[index + 1];
-        title = nextRole
-          ? `Forwarded to ${formatRoleLabel(nextRole)}`
-          : "Forwarded";
-        subtitle = approval.comment || undefined;
-      } else {
-        timelineStatus = "PENDING";
-        title = `Awaiting review by ${formatRoleLabel(role)}`;
-      }
+    const approverName =
+      typeof approval.approver === "string"
+        ? approval.approver
+        : approval.approver?.name || "Approver";
 
-      const approverName =
-        typeof approval.approver === "string"
-          ? approval.approver
-          : approval.approver?.name || undefined;
+    let timelineStatus: TimelineItem["status"];
+    let title: string;
+    let subtitle: string | undefined;
 
-      items.push({
-        id: `approval-${step}`,
-        at: approval.decidedAt || createdAt || new Date().toISOString(),
-        actor: formatRoleLabel(role),
-        status: timelineStatus,
-        title,
-        subtitle,
-        meta: approverName ? { approverName } : undefined,
-      });
+    if (approval.decision === "APPROVED") {
+      timelineStatus = "APPROVED";
+      title = `Approved by ${approverName}`;
+      subtitle = approval.comment || undefined;
+    } else if (approval.decision === "REJECTED") {
+      timelineStatus = "REJECTED";
+      title = `Rejected by ${approverName}`;
+      subtitle = approval.comment || undefined;
+    } else if (approval.decision === "FORWARDED") {
+      timelineStatus = "FORWARDED";
+      const nextRole = approval.toRole;
+      title = nextRole
+        ? `Forwarded to ${formatRoleLabel(nextRole)}`
+        : "Forwarded";
+      subtitle = approval.comment || undefined;
     } else {
-      // No approval record yet - check if it should be pending
-      const hasAnyLaterApproval = MASTER_WORKFLOW_CHAIN.slice(index + 1).some(
-        (laterRole) => {
-          const laterStep = MASTER_WORKFLOW_CHAIN.indexOf(laterRole) + 1;
-          return approvalMap.has(laterStep);
-        }
-      );
-
-      // Find the highest completed step
-      const completedSteps = Array.from(approvalMap.keys()).sort((a, b) => b - a);
-      const highestStep = completedSteps.length > 0 ? completedSteps[0] : 0;
-
-      // Show as pending if:
-      // 1. There's a later approval (stage was skipped somehow), OR
-      // 2. This step is the next one after the highest completed step, OR
-      // 3. No approvals exist yet and this is the first step (HR_ADMIN), OR
-      // 4. Status is not final (APPROVED/REJECTED/CANCELLED)
-      const shouldShowAsPending =
-        hasAnyLaterApproval ||
-        step === highestStep + 1 ||
-        (highestStep === 0 && step === 1) ||
-        (status !== "APPROVED" &&
-          status !== "REJECTED" &&
-          status !== "CANCELLED" &&
-          highestStep < step);
-
-      if (shouldShowAsPending) {
-        items.push({
-          id: `pending-${step}`,
-          at: createdAt || new Date().toISOString(),
-          actor: formatRoleLabel(role),
-          status: "PENDING",
-          title: `Awaiting review by ${formatRoleLabel(role)}`,
-        });
+      timelineStatus = "PENDING";
+      // Pending items usually don't have an approver name yet if it's a role queue
+      // But in snapshot, they have an assigned approverId (if found).
+      // We can genericize the title.
+      title = `Awaiting review`;
+      if (approverName !== "Approver") {
+        title += ` by ${approverName}`;
       }
     }
+
+    items.push({
+      id: `approval-${approval.step || index}`,
+      at: approval.decidedAt || createdAt || new Date().toISOString(),
+      actor: approverName, // Use name here
+      status: timelineStatus,
+      title,
+      subtitle,
+      meta: approverName ? { approverName } : undefined,
+    });
   });
 
   return items;

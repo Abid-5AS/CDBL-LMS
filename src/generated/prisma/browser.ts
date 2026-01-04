@@ -83,11 +83,6 @@ export type OtpCode = Prisma.OtpCodeModel
  */
 export type Notification = Prisma.NotificationModel
 /**
- * Model DeviceToken
- * 
- */
-export type DeviceToken = Prisma.DeviceTokenModel
-/**
  * Model BalanceAdjustment
  * 
  */
@@ -177,3 +172,8 @@ export type Webhook = Prisma.WebhookModel
  * 
  */
 export type WebhookDelivery = Prisma.WebhookDeliveryModel
+/**
+ * Model WorkflowPolicy
+ * 
+ */
+export type WorkflowPolicy = Prisma.WorkflowPolicyModel

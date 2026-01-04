@@ -64,7 +64,6 @@ export const ModelName = {
   OrgSettings: 'OrgSettings',
   OtpCode: 'OtpCode',
   Notification: 'Notification',
-  DeviceToken: 'DeviceToken',
   BalanceAdjustment: 'BalanceAdjustment',
   ApprovalDelegation: 'ApprovalDelegation',
   EscalationRule: 'EscalationRule',
@@ -82,7 +81,8 @@ export const ModelName = {
   CalendarConfig: 'CalendarConfig',
   LeaveCalendarMapping: 'LeaveCalendarMapping',
   Webhook: 'Webhook',
-  WebhookDelivery: 'WebhookDelivery'
+  WebhookDelivery: 'WebhookDelivery',
+  WorkflowPolicy: 'WorkflowPolicy'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -305,18 +305,6 @@ export const NotificationScalarFieldEnum = {
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
-
-
-export const DeviceTokenScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  token: 'token',
-  platform: 'platform',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type DeviceTokenScalarFieldEnum = (typeof DeviceTokenScalarFieldEnum)[keyof typeof DeviceTokenScalarFieldEnum]
 
 
 export const BalanceAdjustmentScalarFieldEnum = {
@@ -612,6 +600,19 @@ export const WebhookDeliveryScalarFieldEnum = {
 export type WebhookDeliveryScalarFieldEnum = (typeof WebhookDeliveryScalarFieldEnum)[keyof typeof WebhookDeliveryScalarFieldEnum]
 
 
+export const WorkflowPolicyScalarFieldEnum = {
+  id: 'id',
+  requesterRole: 'requesterRole',
+  leaveType: 'leaveType',
+  chain: 'chain',
+  isActive: 'isActive',
+  updatedAt: 'updatedAt',
+  updatedBy: 'updatedBy'
+} as const
+
+export type WorkflowPolicyScalarFieldEnum = (typeof WorkflowPolicyScalarFieldEnum)[keyof typeof WorkflowPolicyScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -757,14 +758,6 @@ export const NotificationOrderByRelevanceFieldEnum = {
 } as const
 
 export type NotificationOrderByRelevanceFieldEnum = (typeof NotificationOrderByRelevanceFieldEnum)[keyof typeof NotificationOrderByRelevanceFieldEnum]
-
-
-export const DeviceTokenOrderByRelevanceFieldEnum = {
-  token: 'token',
-  platform: 'platform'
-} as const
-
-export type DeviceTokenOrderByRelevanceFieldEnum = (typeof DeviceTokenOrderByRelevanceFieldEnum)[keyof typeof DeviceTokenOrderByRelevanceFieldEnum]
 
 
 export const BalanceAdjustmentOrderByRelevanceFieldEnum = {

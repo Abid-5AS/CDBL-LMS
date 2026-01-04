@@ -161,31 +161,40 @@ export class LeaveService {
         payCalculation: payCalculation,
       });
 
-      // 8. Create initial approval record
-      // Dynamically determine first approver based on workflow chain
-      const { getChainFor } = await import('@/lib/workflow');
-      const chain = getChainFor(dto.type, user.role as any);
+      // 8. Create full approval chain (Snapshotting)
+      // This locks the policy at the time of creation
+      const { WorkflowService } = await import('@/lib/workflow-service');
+      const chain = await WorkflowService.getChainFor(user.role as any, dto.type);
 
       if (chain.length > 0) {
-        const firstApproverRole = chain[0];
-        const approver = await this.findApprover(userId, firstApproverRole);
+        // Create approvals for the entire chain
+        for (let i = 0; i < chain.length; i++) {
+          const role = chain[i];
+          const step = i + 1;
+          const approver = await this.findApprover(userId, role);
 
-        if (approver) {
-          await prisma.approval.create({
-            data: {
-              leaveId: leaveRequest.id,
-              approverId: approver.id,
-              step: 1,
-              decision: ApprovalDecision.PENDING,
-            },
-          });
-        } else {
-          console.warn(`No approver found for role ${firstApproverRole} for user ${userId}`);
+          if (approver) {
+            await prisma.approval.create({
+              data: {
+                leaveId: leaveRequest.id,
+                approverId: approver.id,
+                step: step,
+                decision: ApprovalDecision.PENDING,
+              },
+            });
+          } else {
+            // If we can't find an approver (e.g., waiting for HR Head hiring),
+            // we stop creating the chain here. The request will get stuck at the previous step
+            // until an admin fixes it or adds the user.
+            console.warn(`Snapshotting stopped: No approver found for role ${role} (request ${leaveRequest.id})`);
+            // We could consider erroring here, but it's better to allow submission 
+            // and let it pending at Dept Head level than to block the employee.
+          }
         }
       } else {
-        // No approval chain (e.g., CEO), auto-approve? 
-        // For now, we leave it as SUBMITTED without approval steps or auto-approve.
-        // Policy implies even CEO informs Board/HRD, so maybe handled offline or different process.
+        // No chain (e.g. CEO), auto-approval?
+        // Policy: CEO needs to inform board, implemented as self-approval for now or manual handling.
+        // If empty chain, status remains SUBMITTED.
       }
 
       // 9. Log the creation
