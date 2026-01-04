@@ -485,6 +485,7 @@ export function RoleKPICard({
         transition={{ duration: 0.2 }}
         onClick={onClick}
         style={{ cursor: onClick ? "pointer" : "default" }}
+        className="h-full"
       >
         {content}
       </motion.div>
