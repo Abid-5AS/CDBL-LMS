@@ -11,10 +11,13 @@ async function ApplyLeavePageWrapper() {
     redirect("/login");
   }
 
-  const role = await getUserRole();
+  const role = await getUserRole() || "";
   const userData = { name: user.name, email: user.email };
 
-  if (role !== "EMPLOYEE") {
+  // Allow all roles to apply for leave EXCEPT CEO and SYSTEM_ADMIN
+  // Department Heads, HR Admins, and HR Heads are also employees who need leave
+  const restrictedRoles = ["CEO", "SYSTEM_ADMIN"];
+  if (restrictedRoles.includes(role)) {
     redirect("/dashboard");
   }
 

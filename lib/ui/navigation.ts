@@ -39,16 +39,20 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
 
   DEPT_HEAD: [
     { icon: Home, label: "Home", href: "/dashboard/dept-head" },
-    { icon: ClipboardList, label: "Requests", href: "/approvals" },
     { icon: Users, label: "Team", href: "/employees" },
+    { icon: ClipboardList, label: "Requests", href: "/approvals" },
+    { icon: ClipboardList, label: "My Leaves", href: "/leaves" },
+    { icon: Wallet, label: "Balance", href: "/balance" },
     { icon: Calendar, label: "Holidays", href: "/holidays" },
     { icon: HelpCircle, label: "FAQ", href: "/faq" },
   ],
 
   HR_ADMIN: [
     { icon: Home, label: "Home", href: "/dashboard/hr-admin" },
-    { icon: ClipboardList, label: "Requests", href: "/approvals" },
     { icon: Users, label: "Employees", href: "/employees" },
+    { icon: ClipboardList, label: "Requests", href: "/approvals" },
+    { icon: ClipboardList, label: "My Leaves", href: "/leaves" },
+    { icon: Wallet, label: "Balance", href: "/balance" },
     { icon: ChartBar, label: "Reports", href: "/reports" },
     { icon: Calendar, label: "Holidays", href: "/holidays" },
     { icon: BookOpen, label: "Policies", href: "/policies" },
@@ -58,6 +62,8 @@ export const roleNavConfig: Record<UserRole, NavItem[]> = {
   HR_HEAD: [
     { icon: Home, label: "Home", href: "/dashboard/hr-head" },
     { icon: ClipboardList, label: "Approvals", href: "/approvals" },
+    { icon: ClipboardList, label: "My Leaves", href: "/leaves" },
+    { icon: Wallet, label: "Balance", href: "/balance" },
     { icon: Users, label: "Employees", href: "/employees" },
     { icon: ChartBar, label: "Reports", href: "/reports" },
     { icon: Calendar, label: "Holidays", href: "/holidays" },
