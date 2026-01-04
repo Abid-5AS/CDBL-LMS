@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { CorporateHRAdminDashboard } from "@/components/dashboards/hr-admin/CorporateHRAdminDashboard";
+import { ModernHRAdminDashboard } from "@/components/dashboards/hr-admin/ModernHRAdminDashboard";
 import { DashboardLoadingFallback } from "../shared/LoadingFallback";
 import { EncashmentService } from "@/lib/services/encashment.service";
 
@@ -21,7 +21,7 @@ async function HRAdminDashboardContent() {
   const pendingEncashmentRequests = await EncashmentService.getPendingRequests();
 
   return (
-    <CorporateHRAdminDashboard
+    <ModernHRAdminDashboard
       initialEncashmentRequests={pendingEncashmentRequests}
     />
   );

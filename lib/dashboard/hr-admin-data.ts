@@ -23,6 +23,18 @@ export type HRAdminDashboardStats = {
     month: string;
     count: number;
   }>;
+  whoIsOut: Array<{
+    id: number;
+    name: string;
+    image?: string | null;
+  }>;
+  recentActivity: Array<{
+    id: number;
+    user: string;
+    action: string;
+    target: string;
+    time: string; // ISO string 
+  }>;
 };
 
 export class DashboardAccessError extends Error {
@@ -199,15 +211,15 @@ export async function getHRAdminKPIData(user?: MinimalUser): Promise<HRAdminDash
     // Compliance score: proportion of processed requests with required documentation
     complianceScore: recentApprovals.length > 0
       ? Math.round((await prisma.leaveRequest.count({
-          where: {
-            id: { in: recentApprovals.map(r => r.id).filter(Boolean) }, // Filter from the recent batch
-            OR: [
-              { needsCertificate: true, certificateUrl: { not: null } },
-              { type: "MEDICAL", certificateUrl: { not: null } },
-              { type: "SPECIAL_DISABILITY", fitnessCertificateUrl: { not: null } },
-            ],
-          }
-        }) / recentApprovals.length) * 100)
+        where: {
+          id: { in: recentApprovals.map(r => r.id).filter(Boolean) }, // Filter from the recent batch
+          OR: [
+            { needsCertificate: true, certificateUrl: { not: null } },
+            { type: "MEDICAL", certificateUrl: { not: null } },
+            { type: "SPECIAL_DISABILITY", fitnessCertificateUrl: { not: null } },
+          ],
+        }
+      }) / recentApprovals.length) * 100)
       : 100,
     // Empty arrays in fast endpoint, populated in /stats
     leaveTypeBreakdown: [],

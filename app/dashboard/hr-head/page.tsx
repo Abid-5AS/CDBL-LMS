@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { CorporateHRHeadDashboard } from "@/components/dashboards/hr-head/CorporateHRHeadDashboard";
+import { ModernHRHeadDashboard } from "@/components/dashboards/hr-head/ModernHRHeadDashboard";
 import { DashboardLoadingFallback } from "../shared/LoadingFallback";
 
 async function HRHeadDashboardContent() {
@@ -16,7 +16,7 @@ async function HRHeadDashboardContent() {
     redirect("/dashboard");
   }
 
-  return <CorporateHRHeadDashboard />;
+  return <ModernHRHeadDashboard />;
 }
 
 export default function HRHeadDashboardPage() {

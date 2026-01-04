@@ -63,6 +63,7 @@ import {
   getToastMessage,
   useUser,
 } from "@/lib";
+import { usePendingRequests } from "@/components/dashboards/dept-head/hooks/usePendingRequests";
 import { isFinalApprover } from "@/lib/workflow";
 import type { AppRole } from "@/lib/rbac";
 import { LEAVE_TYPE_OPTIONS } from "@/lib/constants";
@@ -200,48 +201,80 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     return () => setSelection([]);
   }, [selectedIds, setSelection]);
 
+  // Use the shared hook for fetching requests
+  // This simplifies logic and ensures consistency with the dashboard
+  // NOTE: usePendingRequests currently optimized for Dept Head/Manager view logic
+  // customized for this table view
+  const {
+    requests: hookRequests,
+    isLoading: isHookLoading,
+    error: hookError,
+    refresh: refreshHook
+  } = usePendingRequests({
+    autoFetch: true,
+    initialFilters: {
+      // In queue mode, we generally want PENDING, but let component filter handle detailed status
+      status: viewMode === 'queue' ? (queueStatusFilter === "all" ? "PENDING" : queueStatusFilter) : undefined
+    }
+  });
+
+  // If viewMode is history, we might need a different hook or endpoint since usePendingRequests focuses on pending.
+  // For now, let's keep the existing logic for history but use the hook for the queue to fix the reported bug (which is likely about queue)
+  // Actually, looking at the error "Unable to load approvals", replacing the queue logic is the priority.
+  // However, completely removing SWR for history would break history view. 
+  // Let's rely on usePendingRequests for queue and generic fetch for history for now, or unified if usePendingRequests supports it.
+  // Checking usePendingRequests source: it calls `/api/approvals?status=...`. 
+  // It handles pagination and filters well.
+
+  // Let's refactor to use the hook fully if possible, but for minimal regression, let's substitute the SWR call for queue.
+
   const cacheKey = useMemo(() => {
     if (viewMode === "history") {
       return `/api/approvals/history?decision=${historyDecision}`;
     }
-    // DEPT_HEAD should use the manager endpoint for consistency with dashboard
-    if (userRole === "DEPT_HEAD") {
-      return `/api/manager/pending?status=${queueStatusFilter === 'all' ? 'PENDING' : queueStatusFilter}`;
-    }
-    return "/api/approvals";
-  }, [viewMode, historyDecision, userRole, queueStatusFilter]);
+    return null; // Don't fetch history here if queue
+  }, [viewMode, historyDecision]);
 
-  const { data: rawData, error, isLoading, mutate } = useSWR<any>(
+  const { data: historyData, error: historyError, isLoading: isHistoryLoading, mutate: mutateHistory } = useSWR<any>(
     cacheKey,
-    apiFetcher,
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: true,
-    }
+    apiFetcher
   );
 
-  // Normalize data structure since endpoints differ
-  // /api/approvals returns { items: [...] }
-  // /api/manager/pending returns { rows: [...], counts: ... }
+  // Normalize data
   const data = useMemo(() => {
-    if (!rawData) return { items: [] };
-    if ('rows' in rawData) {
-      // Map manager endpoint data format to HRApprovalItem format
-      const mappedItems = (rawData.rows as any[]).map(row => ({
-        ...row,
-        // Map missing fields expected by the table
-        requestedByName: row.requester?.name || "Unknown",
-        requestedByEmail: row.requester?.email || "",
-        requestedById: String(row.requester?.id || ""),
-        start: row.startDate, // Table expects 'start'
-        end: row.endDate,     // Table expects 'end'
-        currentStageIndex: 0, // Default for manager view
-        approvals: [],        // Default empty for now
-      })) as HRApprovalItem[];
-      return { items: mappedItems };
+    if (viewMode === 'queue') {
+      // Map items from hook
+      return {
+        items: hookRequests.map(req => ({
+          id: String(req.id),
+          type: req.type as any,
+          status: req.status,
+          reason: req.reason,
+          start: req.startDate,
+          end: req.endDate,
+          workingDays: req.workingDays,
+          requestedByName: req.requester.name,
+          requestedByEmail: req.requester.email,
+          requestedById: String(req.requester.id),
+          requestedAt: '', // Hook might need to return this if needed
+          approvals: [],
+          currentStageIndex: 0
+        })) as HRApprovalItem[]
+      };
     }
-    return rawData as ApprovalsResponse;
-  }, [rawData]);
+
+    // History logic
+    if (!historyData) return { items: [] };
+    if ('items' in historyData) return historyData;
+    return { items: [] };
+  }, [viewMode, hookRequests, historyData]);
+
+  const isLoading = viewMode === 'queue' ? isHookLoading : isHistoryLoading;
+  const error = viewMode === 'queue' ? hookError : historyError;
+  const mutate = async () => {
+    if (viewMode === 'queue') await refreshHook();
+    else await mutateHistory();
+  };
 
   // React 19 useOptimistic for instant UI updates
   const [optimisticItems, setOptimisticItems] = useOptimistic(
