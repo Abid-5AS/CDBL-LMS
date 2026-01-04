@@ -50,6 +50,7 @@ const glassTooltipStyle = {
   borderRadius: "12px",
   padding: "12px",
   boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
+  color: "hsl(var(--foreground))",
 };
 
 interface BaseChartProps {
