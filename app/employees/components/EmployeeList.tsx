@@ -1,26 +1,14 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import Link from "next/link";
 import useSWR from "swr";
-import { Users, User, Pencil } from "lucide-react";
+import { Users } from "lucide-react";
 
 // UI Components (barrel export)
 import {
   Card,
   CardContent,
-  EnhancedTable,
-  EnhancedTableHeader,
-  EnhancedTableBody,
-  EnhancedTableHead,
-  EnhancedTableRow,
-  EnhancedTableCell,
   Button,
-  Badge,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
 } from "@/components/ui";
 
 // Shared Components (barrel export)
@@ -29,16 +17,23 @@ import { CompletePagination } from "@/components/shared/pagination/Pagination";
 
 // Lib utilities (barrel export)
 import { useUser } from "@/lib";
-import { canEditEmployee, type AppRole } from "@/lib/rbac";
-import { getRoleBadgeClasses, getRoleLabel } from "@/lib/ui/ui-utils";
+import { EmployeeCard } from "./EmployeeCard";
 
-type EmployeeRecord = {
+export type EmployeeRecord = {
   id: number;
   name: string;
   email: string;
   empCode: string | null;
   department: string | null;
   role: "EMPLOYEE" | "DEPT_HEAD" | "HR_ADMIN" | "HR_HEAD" | "CEO";
+  leaves?: {
+    id: number;
+    type: string;
+    endDate: string;
+  }[];
+  profile?: {
+    phone: string | null;
+  } | null;
 };
 
 const fetcher = async (url: string) => {
@@ -49,20 +44,12 @@ const fetcher = async (url: string) => {
   return res.json();
 };
 
-const ROLE_OPTIONS = [
-  { value: "EMPLOYEE", label: "Employee" },
-  { value: "DEPT_HEAD", label: "Department Head" },
-  { value: "HR_ADMIN", label: "HR Admin" },
-  { value: "HR_HEAD", label: "HR Head" },
-  { value: "CEO", label: "CEO" },
-];
-
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 12; // Adjusted for grid view
 
 export function EmployeeList() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [departmentFilter, setDepartmentFilter] = useState("all");
-  const [roleFilter, setRoleFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const user = useUser();
 
@@ -107,30 +94,34 @@ export function EmployeeList() {
       );
     }
 
+    // Status Filter (Active vs On Leave)
+    if (statusFilter !== "all") {
+      if (statusFilter === "on_leave") {
+        filtered = filtered.filter(emp => emp.leaves && emp.leaves.length > 0);
+      } else if (statusFilter === "active") {
+        filtered = filtered.filter(emp => !emp.leaves || emp.leaves.length === 0);
+      }
+    }
+
     // Department filter
     if (departmentFilter !== "all") {
       filtered = filtered.filter((emp) => emp.department === departmentFilter);
     }
 
-    // Role filter
-    if (roleFilter !== "all") {
-      filtered = filtered.filter((emp) => emp.role === roleFilter);
-    }
-
     return filtered;
-  }, [allEmployees, searchQuery, departmentFilter, roleFilter]);
+  }, [allEmployees, searchQuery, departmentFilter, statusFilter]);
 
   const clearFilters = () => {
     setSearchQuery("");
     setDepartmentFilter("all");
-    setRoleFilter("all");
+    setStatusFilter("all");
     setCurrentPage(1);
   };
 
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, departmentFilter, roleFilter]);
+  }, [searchQuery, departmentFilter, statusFilter]);
 
   // Pagination calculations
   const totalPages = Math.ceil(filteredEmployees.length / PAGE_SIZE);
@@ -143,11 +134,11 @@ export function EmployeeList() {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent className="py-12 text-center text-sm text-muted-foreground">
-          Loading employees...
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="h-[280px] rounded-xl bg-muted/50 animate-pulse border border-border/50" />
+        ))}
+      </div>
     );
   }
 
@@ -162,25 +153,28 @@ export function EmployeeList() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <FilterBar
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
         searchPlaceholder="Search by name, email, code, or department..."
-        statusFilter={
-          departmentOptions.length > 0
+        statusFilter={{
+          value: statusFilter,
+          onChange: setStatusFilter,
+          options: [
+            { value: "active", label: "Active" },
+            { value: "on_leave", label: "On Leave" },
+          ],
+        }}
+        typeFilter={
+          departmentOptions.length > 1
             ? {
-                value: departmentFilter,
-                onChange: setDepartmentFilter,
-                options: departmentOptions,
-              }
+              value: departmentFilter,
+              onChange: setDepartmentFilter,
+              options: departmentOptions,
+            }
             : undefined
         }
-        typeFilter={{
-          value: roleFilter,
-          onChange: setRoleFilter,
-          options: ROLE_OPTIONS,
-        }}
         onClear={clearFilters}
       />
 
@@ -203,95 +197,15 @@ export function EmployeeList() {
           </CardContent>
         </Card>
       ) : (
-        <div className="max-h-[70vh] overflow-y-auto">
-          <EnhancedTable>
-            <EnhancedTableHeader>
-              <EnhancedTableRow>
-                <EnhancedTableHead>Name</EnhancedTableHead>
-                <EnhancedTableHead className="hidden sm:table-cell">Email</EnhancedTableHead>
-                <EnhancedTableHead className="hidden md:table-cell">
-                  Employee Code
-                </EnhancedTableHead>
-                <EnhancedTableHead className="hidden lg:table-cell">
-                  Department
-                </EnhancedTableHead>
-                <EnhancedTableHead>Role</EnhancedTableHead>
-                <EnhancedTableHead className="text-right">Actions</EnhancedTableHead>
-              </EnhancedTableRow>
-            </EnhancedTableHeader>
-            <EnhancedTableBody>
-                {paginatedEmployees.map((employee) => (
-                  <EnhancedTableRow
-                    key={employee.id}
-                    className="hover:bg-muted/50 dark:hover:bg-muted/30 transition-colors duration-100"
-                  >
-                    <EnhancedTableCell className="font-medium text-foreground dark:text-foreground/90">
-                      {employee.name}
-                    </EnhancedTableCell>
-                    <EnhancedTableCell className="hidden sm:table-cell text-muted-foreground">
-                      {employee.email}
-                    </EnhancedTableCell>
-                    <EnhancedTableCell className="hidden md:table-cell text-muted-foreground">
-                      {employee.empCode || "—"}
-                    </EnhancedTableCell>
-                    <EnhancedTableCell className="hidden lg:table-cell text-muted-foreground">
-                      {employee.department || "—"}
-                    </EnhancedTableCell>
-                    <EnhancedTableCell>
-                      <Badge
-                        variant="outline"
-                        className={getRoleBadgeClasses(employee.role)}
-                      >
-                        {getRoleLabel(employee.role)}
-                      </Badge>
-                    </EnhancedTableCell>
-                    <EnhancedTableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Link href={`/employees/${employee.id}`}>
-                                <Button variant="ghost" size="sm">
-                                  View
-                                </Button>
-                              </Link>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              View employee profile
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                        {user &&
-                          canEditEmployee(
-                            user.role as AppRole,
-                            employee.role
-                          ) && (
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Link
-                                    href={`/employees/${employee.id}?edit=true`}
-                                  >
-                                    <Button variant="ghost" size="sm">
-                                      <Pencil className="h-4 w-4" />
-                                    </Button>
-                                  </Link>
-                                </TooltipTrigger>
-                                <TooltipContent>Update employee</TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          )}
-                      </div>
-                    </EnhancedTableCell>
-                  </EnhancedTableRow>
-                ))}
-            </EnhancedTableBody>
-          </EnhancedTable>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {paginatedEmployees.map((employee) => (
+            <EmployeeCard key={employee.id} employee={employee} />
+          ))}
         </div>
       )}
 
       {filteredEmployees.length > 0 && (
-        <div className="mt-6">
+        <div className="mt-8 flex justify-center">
           <CompletePagination
             currentPage={currentPage}
             totalPages={totalPages}
