@@ -20,14 +20,7 @@ async function CEODashboardContent() {
   const username = user.name ?? "Executive";
 
   return (
-    <RoleBasedDashboard
-      role="CEO"
-      title={`Welcome, ${username}`}
-      description="Executive dashboard for strategic insights and organization-wide leave management."
-      animate={true}
-    >
-      <SuperAdminDashboard username={username} />
-    </RoleBasedDashboard>
+    <SuperAdminDashboard username={username} />
   );
 }
 
