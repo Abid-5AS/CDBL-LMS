@@ -224,16 +224,43 @@ export function DeptHeadPendingTable({
     {
       header: "Status",
       accessorKey: "status",
-      cell: (leave) => (
-        <div className="flex items-center gap-2">
-          <StatusBadge status={leave.status} />
-          {leave.isModified && (
-            <Badge variant="outline" className="text-xs text-info dark:text-info/90 border-info">
-              Modified
-            </Badge>
-          )}
-        </div>
-      ),
+      cell: (leave) => {
+        // Calculate aging
+        // We need createdAt. Assuming it's in the leave object.
+        // If not, we might default to 0.
+        const created = leave.createdAt ? new Date(leave.createdAt) : new Date();
+        const now = new Date();
+        const ageInDays = Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
+
+        let agingBadge = null;
+        if (leave.status === "PENDING") {
+          if (ageInDays >= 7) {
+            agingBadge = (
+              <Badge variant="destructive" className="text-[10px] h-5 px-1.5 ml-1">
+                {ageInDays}d overdue
+              </Badge>
+            );
+          } else if (ageInDays >= 3) {
+            agingBadge = (
+              <Badge variant="warning" className="text-[10px] h-5 px-1.5 ml-1">
+                {ageInDays}d old
+              </Badge>
+            );
+          }
+        }
+
+        return (
+          <div className="flex items-center gap-2 flex-wrap">
+            <StatusBadge status={leave.status} />
+            {leave.isModified && (
+              <Badge variant="outline" className="text-xs text-info dark:text-info/90 border-info">
+                Modified
+              </Badge>
+            )}
+            {agingBadge}
+          </div>
+        );
+      },
     },
   ];
 

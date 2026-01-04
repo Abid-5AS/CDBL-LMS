@@ -16,38 +16,31 @@ interface CoverageDay {
   employees: string[];
 }
 
-export function TeamCoverageCalendar() {
-  const [currentDate, setCurrentDate] = React.useState(new Date());
-
-  const prevMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
-  };
-
-  const nextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
-  };
-
-  // Fetch calendar coverage data
-  const { data: coverageData, isLoading } = useSWR<{
+interface TeamCoverageCalendarProps {
+  currentDate?: Date;
+  onPrevMonth?: () => void;
+  onNextMonth?: () => void;
+  coverageData?: {
     range: { start: string; end: string };
     days: Record<string, { count: number; members: any[] }>;
-  }>(() => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth(); // 0-indexed
-    // Get first day of month
-    const start = new Date(year, month, 1);
-    // Get last day of month
-    const end = new Date(year, month + 1, 0);
+  };
+  isLoading?: boolean;
+}
 
-    // Convert to simplified date string for API: YYYY-MM-DD
-    // Using local time to avoid timezone shifts
-    const toDateString = (d: Date) => {
-      const offset = d.getTimezoneOffset() * 60000;
-      return new Date(d.getTime() - offset).toISOString().split('T')[0];
-    };
+export function TeamCoverageCalendar({
+  currentDate = new Date(),
+  onPrevMonth,
+  onNextMonth,
+  coverageData,
+  isLoading = false,
+}: TeamCoverageCalendarProps) {
+  // Internal state fallback if not controlled (optional, but requested to lift state)
+  // For this refactor, we assume controlled usage from Dashboard, but keep defaults safe
 
-    return `/api/team/on-leave?scope=department&startDate=${toDateString(start)}&endDate=${toDateString(end)}`;
-  }, apiFetcher);
+  const router = import("next/navigation").then(mod => mod.useRouter());
+  // We need to use useRouter hook at top level
+  const { push } = require("next/navigation").useRouter();
+
 
   const calendarDays = React.useMemo(() => {
     const days: CoverageDay[] = [];
@@ -79,6 +72,14 @@ export function TeamCoverageCalendar() {
     return days;
   }, [currentDate, coverageData]);
 
+  const handleDayClick = (date: Date) => {
+    // Navigate to leaves list filtered by this date
+    // Format: YYYY-MM-DD
+    const offset = date.getTimezoneOffset() * 60000;
+    const dateStr = new Date(date.getTime() - offset).toISOString().split('T')[0];
+    push(`/leaves?scope=team&date=${dateStr}`);
+  };
+
   const getIntensityColor = (intensity: CoverageDay["intensity"]) => {
     switch (intensity) {
       case "high":
@@ -101,13 +102,13 @@ export function TeamCoverageCalendar() {
             Team Coverage
           </CardTitle>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={prevMonth}>
+            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onPrevMonth} disabled={isLoading}>
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <span className="text-xs font-medium min-w-[60px] text-center">
               {currentDate.toLocaleDateString(undefined, { month: "short", year: "numeric" })}
             </span>
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={nextMonth}>
+            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onNextMonth} disabled={isLoading}>
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
@@ -132,6 +133,7 @@ export function TeamCoverageCalendar() {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div
+                    onClick={() => handleDayClick(day.date)}
                     className={cn(
                       "aspect-square rounded-sm flex items-center justify-center text-[10px] cursor-pointer transition-colors hover:opacity-80",
                       getIntensityColor(day.intensity),

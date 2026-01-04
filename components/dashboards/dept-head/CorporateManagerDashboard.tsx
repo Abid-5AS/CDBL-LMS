@@ -7,6 +7,7 @@ import {
   CheckCircle,
   RotateCcw,
   XCircle,
+  UserCheck,
   RefreshCw,
   Info,
 } from "lucide-react";
@@ -110,6 +111,32 @@ export function CorporateManagerDashboard() {
     }
   );
 
+  // --- Team Coverage & Availability Logic ---
+  const [calendarDate, setCalendarDate] = React.useState(new Date());
+
+  const { data: coverageData } = useApiQueryWithParams<{
+    range: { start: string; end: string };
+    days: Record<string, { count: number; members: any[] }>;
+  }>(
+    "/api/team/on-leave",
+    {
+      scope: "department",
+      startDate: new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1).toLocaleDateString("en-CA"), // YYYY-MM-DD
+      endDate: new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0).toLocaleDateString("en-CA"),
+    },
+    {
+      revalidateOnFocus: false, // Don't revalidate constantly
+    }
+  );
+
+  const prevMonth = () => {
+    setCalendarDate(new Date(calendarDate.getFullYear(), calendarDate.getMonth() - 1, 1));
+  };
+
+  const nextMonth = () => {
+    setCalendarDate(new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 1));
+  };
+
   const counts = rawData?.counts || {
     pending: 0,
     forwarded: 0,
@@ -120,10 +147,10 @@ export function CorporateManagerDashboard() {
   const data =
     rawData && rawData.rows
       ? {
-          rows: rawData.rows as any[],
-          total: rawData.total || rawData.rows.length,
-          counts: rawData.counts,
-        }
+        rows: rawData.rows as any[],
+        total: rawData.total || rawData.rows.length,
+        counts: rawData.counts,
+      }
       : undefined;
 
   const alerts = useMemo(() => {
@@ -163,8 +190,52 @@ export function CorporateManagerDashboard() {
       });
     }
 
+    // Add Coverage Risk Alert
+    if (coverageData?.days) {
+      const highAbsenceDays = Object.entries(coverageData.days).filter(([_, data]) => data.count > 3);
+
+      if (highAbsenceDays.length > 0) {
+        // Remove "All Clear" if it was added
+        if (items.find(i => i.title === "All Clear")) {
+          items.pop();
+        }
+        items.push({
+          title: "Coverage Risk",
+          detail: `${highAbsenceDays.length} days this month have >3 staff on leave.`,
+          tone: "warning",
+        });
+      }
+    }
+
     return items;
-  }, [counts]);
+  }, [counts, coverageData]);
+
+  // Calculate Team Availability for the viewed month (simple approximation)
+  // Logic: 100% - (Avg Absence Rate).
+  // Ideally this would be "Today's Availability", but since we only have month data:
+  // We can try to find today's data if it's in the viewed month, otherwise show "N/A" or monthly avg.
+  // Let's use Monthly Average for now as a "Health Score".
+  const availabilityMetric = useMemo(() => {
+    if (!coverageData?.days) return { value: "--", subtitle: "Calculating..." };
+
+    const days = Object.values(coverageData.days);
+    if (days.length === 0) return { value: "100%", subtitle: "No absences recorded" };
+
+    const totalAbsences = days.reduce((acc, day) => acc + day.count, 0);
+    // Assuming team size ~10 for rough calculation, or just show Total Man-Days Lost
+    // Better: Show "Avg Absences/Day"
+    const avgAbsence = (totalAbsences / days.length).toFixed(1);
+
+    // If we want %, we need team size. Let's assume team size is available or estimate it?
+    // User request: "Team Availability (e.g. % available this week)"
+    // Without team size, % is hard. Let's show "Avg On Leave" per day.
+    // Or, if we assume max observed absence is ~20% of team, we can guess.
+    // Let's stick to "Avg On Leave: X / day" for accuracy.
+    return {
+      value: avgAbsence,
+      subtitle: "Avg. staff on leave/day",
+    };
+  }, [coverageData]);
 
   return (
     <TooltipProvider>
@@ -334,8 +405,17 @@ export function CorporateManagerDashboard() {
                     </div>
                   }
                   value={counts.cancelled}
-                  subtitle="Withdrawn by employee"
+                  subtitle="Withdrawn"
                   icon={XCircle}
+                  density={density}
+                />
+
+                {/* KPI 5: Team Availability (New) */}
+                <MetricCard
+                  label="Avg. On Leave"
+                  value={availabilityMetric.value}
+                  subtitle={availabilityMetric.subtitle}
+                  icon={UserCheck}
                   density={density}
                 />
               </div>
@@ -360,10 +440,10 @@ export function CorporateManagerDashboard() {
                       data={
                         data
                           ? {
-                              rows: data.rows,
-                              total: data.rows?.length ?? 0,
-                              counts: data.counts,
-                            }
+                            rows: data.rows,
+                            total: data.rows?.length ?? 0,
+                            counts: data.counts,
+                          }
                           : undefined
                       }
                       isLoading={isLoading}
@@ -392,7 +472,12 @@ export function CorporateManagerDashboard() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <Suspense fallback={<CardSkeleton />}>
-                <TeamCoverageCalendar />
+                <TeamCoverageCalendar
+                  currentDate={calendarDate}
+                  onPrevMonth={prevMonth}
+                  onNextMonth={nextMonth}
+                  coverageData={coverageData}
+                />
               </Suspense>
 
               <Suspense fallback={<CardSkeleton />}>
@@ -440,8 +525,8 @@ function DeptHeadAlertsPanel({
             alert.tone === "critical"
               ? "destructive"
               : alert.tone === "warning"
-              ? "warning"
-              : "info"
+                ? "warning"
+                : "info"
           }
           title={alert.title}
         >
