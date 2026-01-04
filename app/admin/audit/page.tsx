@@ -2,102 +2,155 @@ import { Suspense } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { getBackdateSettings } from "@/lib/org-settings";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ShieldCheck, Activity, Database, Clock } from "lucide-react";
 
 export default function AuditViewerPage() {
   return (
-    <Suspense fallback={<div className="space-y-6 animate-pulse"><div className="h-64 bg-muted dark:bg-muted/80 rounded-xl" /></div>}>
+    <Suspense fallback={<AuditSkeleton />}>
       <AuditContent />
     </Suspense>
   );
 }
 
+function AuditSkeleton() {
+  return (
+    <div className="space-y-6 pt-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-32 bg-muted/50 rounded-xl animate-pulse" />
+        ))}
+      </div>
+      <div className="h-96 bg-muted/50 rounded-xl animate-pulse" />
+    </div>
+  );
+}
+
 async function AuditContent() {
   const user = await getCurrentUser();
-  const allowedRoles = ["HR_ADMIN", "HR_HEAD", "CEO"];
-  
-  if (!user || !allowedRoles.includes(user.role as string)) {
+  // Restricted access: System Admin & CEO only
+  const allowedRoles = ["CEO", "SYSTEM_ADMIN"];
+
+  if (!user || (user.role && !allowedRoles.includes(user.role))) {
     redirect("/dashboard");
   }
 
   const recentLogs = await prisma.auditLog.findMany({
     orderBy: { createdAt: "desc" },
-    take: 50,
+    take: 100,
   });
 
-  // Get EL backdate setting for banner
-  const backdateSettings = await getBackdateSettings();
-  const elBackdateSetting = backdateSettings.EL;
-  const elBackdateDisplay = typeof elBackdateSetting === "boolean" 
-    ? elBackdateSetting.toString() 
-    : elBackdateSetting;
+  const weekLogs = recentLogs.filter(
+    (log) => new Date(log.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+  ).length;
 
   return (
-    <div className="space-y-6">
-      {/* EL Backdate Conflict Banner */}
-      <div className="rounded-xl border border-warning bg-warning dark:bg-warning/80 p-4 shadow-sm">
-        <div className="flex items-start gap-3">
-          <div className="flex-shrink-0">
-            <svg className="h-5 w-5 text-warning dark:text-warning/90" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-            </svg>
-          </div>
-          <div className="flex-1">
-            <h3 className="text-sm font-semibold text-warning dark:text-warning/90 mb-1">
-              Policy Toggle Active: EL backdate = {elBackdateDisplay}
-            </h3>
-            <p className="text-sm text-warning dark:text-warning/90">
-              Source notes conflict. Confirm with HR before go-live.
-            </p>
-          </div>
-        </div>
+    <div className="space-y-8 p-6 lg:p-10 max-w-[1600px] mx-auto">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">System Audit Log</h1>
+        <p className="text-muted-foreground mt-2">
+          Track sensitive actions, access patterns, and system modifications.
+        </p>
       </div>
 
-      <section className="rounded-xl border border-border dark:border-border/50 bg-card dark:bg-card/90 p-6 shadow-sm hover:shadow-md transition-all duration-100">
-        <h2 className="text-lg font-medium mb-4">Recent Activity</h2>
-        <div className="space-y-2">
-          {recentLogs.length === 0 ? (
-            <p className="text-sm text-muted-foreground dark:text-muted-foreground/80">No audit logs found.</p>
-          ) : (
-            recentLogs.map((log) => (
-              <div key={log.id} className="flex items-center justify-between border-b pb-2">
-                <div>
-                  <span className="font-medium text-foreground dark:text-foreground/90">{log.action}</span> by{" "}
-                  <span className="text-foreground dark:text-foreground/90">{log.actorEmail}</span>
-                  {log.targetEmail && log.targetEmail !== log.actorEmail && (
-                    <span className="text-muted-foreground dark:text-muted-foreground/80 text-sm"> (target: {log.targetEmail})</span>
-                  )}
-                </div>
-                <time className="text-sm text-muted-foreground dark:text-muted-foreground/80">
-                  {new Date(log.createdAt).toLocaleString()}
-                </time>
-              </div>
-            ))
-          )}
-        </div>
-      </section>
+      {/* System Health Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Database Connection</CardTitle>
+            <Database className="h-4 w-4 text-emerald-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-emerald-600">Active</div>
+            <p className="text-xs text-muted-foreground">PostgreSQL / Prisma</p>
+          </CardContent>
+        </Card>
 
-      <section className="rounded-xl border border-border dark:border-border/50 bg-card dark:bg-card/90 p-6 shadow-sm hover:shadow-md transition-all duration-100">
-        <h2 className="text-lg font-medium mb-4">System Health</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 bg-success dark:bg-success/80 border border-success rounded-lg hover:shadow-md transition-all duration-100">
-            <div className="text-sm text-success dark:text-success/90 font-medium">Database</div>
-            <div className="text-2xl font-bold text-success dark:text-success/90 mt-1">Connected</div>
-          </div>
-          <div className="p-4 bg-info dark:bg-info/80 border border-info rounded-lg hover:shadow-md transition-all duration-100">
-            <div className="text-sm text-info dark:text-info/90 font-medium">Total Actions</div>
-            <div className="text-2xl font-bold text-info dark:text-info/90 mt-1">{recentLogs.length}</div>
-          </div>
-          <div className="p-4 bg-card-summary border border-card-summary rounded-lg hover:shadow-md transition-all duration-100">
-            <div className="text-sm text-card-summary font-medium">This Week</div>
-            <div className="text-2xl font-bold text-card-summary mt-1">
-              {recentLogs.filter(
-                (log) => new Date(log.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-              ).length}
-            </div>
-          </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Logged Actions</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{recentLogs.length}+</div>
+            <p className="text-xs text-muted-foreground">Last 100 records fetched</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Weekly Volume</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{weekLogs}</div>
+            <p className="text-xs text-muted-foreground">Actions in last 7 days</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Audit Table */}
+      <Card className="overflow-hidden">
+        <CardHeader>
+          <CardTitle>Recent Activity</CardTitle>
+        </CardHeader>
+        <div className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[180px]">Timestamp</TableHead>
+                <TableHead className="w-[200px]">Action</TableHead>
+                <TableHead className="w-[250px]">Actor</TableHead>
+                <TableHead>Target / Details</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {recentLogs.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="h-24 text-center">
+                    No logs found.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                recentLogs.map((log) => (
+                  <TableRow key={log.id}>
+                    <TableCell className="text-muted-foreground font-mono text-xs">
+                      {new Date(log.createdAt).toLocaleString()}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="font-mono text-xs">
+                        {log.action}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-sm">{log.actorEmail}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">
+                        {log.targetEmail && log.targetEmail !== log.actorEmail
+                          ? `Target: ${log.targetEmail}`
+                          : "System Action"
+                        }
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
         </div>
-      </section>
+      </Card>
     </div>
   );
 }
