@@ -8,57 +8,44 @@ datasource db {
 }
 
 model User {
-  id             Int       @id @default(autoincrement())
-  name           String
-  email          String    @unique
-  password       String?
-  empCode        String?   @unique
-  role           Role      @default(EMPLOYEE)
-  department     String?
-  deptHeadId     Int? // User ID of department head (self-relation)
-  joinDate       DateTime? // Service start date for eligibility calculations (Policy 6.18)
-  retirementDate DateTime? // Expected retirement date for study leave validation (Policy 6.25.a)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-
-  leaves               LeaveRequest[]
-  balances             Balance[]
-  approvals            Approval[]           @relation("ApprovalApprover")
-  deptHead             User?                @relation("HeadToMembers", fields: [deptHeadId], references: [id])
-  teamMembers          User[]               @relation("HeadToMembers")
-  encashmentRequests   EncashmentRequest[]
-  encashmentApprovals  EncashmentRequest[]  @relation("EncashmentApprover")
-  encashmentProcessed  EncashmentRequest[]  @relation("EncashmentProcessor")
-  balanceAdjustments   BalanceAdjustment[]  @relation("BalanceAdjustments")
-  adjustmentsMade      BalanceAdjustment[]  @relation("AdjustmentsMade")
-  delegationsDelegated ApprovalDelegation[] @relation("DelegationsDelegated")
-  delegationsReceived  ApprovalDelegation[] @relation("DelegationsReceived")
-  preferences          UserPreferences?
-  leaveTemplates       LeaveTemplate[]
-  policyVersions       PolicyVersion[]
-
-  // Enhanced Profile Relations
-  profile           UserProfile?
-  emergencyContacts EmergencyContact[]
-  bankDetails       BankDetails?
-  documents         UserDocument[]
-
-  // HRIS Integration Relations
-  hrisSyncs             HRISSync[]     @relation("HRISSyncs")
-  hrisConflictsEmployee HRISConflict[] @relation("HRISConflictsEmployee")
-  hrisConflictsResolver HRISConflict[] @relation("HRISConflictsResolver")
-
-  // Scheduled Reports Relations
-  scheduledReports ScheduledReport[] @relation("ReportCreator")
-
-  // Calendar Integration Relations
-  calendarConfigs CalendarConfig[]
-
-  // Webhook Relations
-  webhooks Webhook[]
-
-  // Workflow Policy Relations
-  policyUpdates WorkflowPolicy[] @relation("PolicyUpdates")
+  id                    Int                  @id @default(autoincrement())
+  empCode               String?              @unique
+  name                  String
+  email                 String               @unique
+  role                  Role                 @default(EMPLOYEE)
+  department            String?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  joinDate              DateTime?
+  retirementDate        DateTime?
+  password              String?
+  deptHeadId            Int?
+  approvals             Approval[]           @relation("ApprovalApprover")
+  delegationsReceived   ApprovalDelegation[] @relation("DelegationsReceived")
+  delegationsDelegated  ApprovalDelegation[] @relation("DelegationsDelegated")
+  balances              Balance[]
+  adjustmentsMade       BalanceAdjustment[]  @relation("AdjustmentsMade")
+  balanceAdjustments    BalanceAdjustment[]  @relation("BalanceAdjustments")
+  bankDetails           BankDetails?
+  calendarConfigs       CalendarConfig[]
+  emergencyContacts     EmergencyContact[]
+  encashmentApprovals   EncashmentRequest[]  @relation("EncashmentApprover")
+  encashmentProcessed   EncashmentRequest[]  @relation("EncashmentProcessor")
+  encashmentRequests    EncashmentRequest[]
+  hrisConflictsEmployee HRISConflict[]       @relation("HRISConflictsEmployee")
+  hrisConflictsResolver HRISConflict[]       @relation("HRISConflictsResolver")
+  hrisSyncs             HRISSync[]           @relation("HRISSyncs")
+  leaves                LeaveRequest[]
+  leaveTemplates        LeaveTemplate[]
+  policyVersions        PolicyVersion[]
+  scheduledReports      ScheduledReport[]    @relation("ReportCreator")
+  deptHead              User?                @relation("HeadToMembers", fields: [deptHeadId], references: [id])
+  teamMembers           User[]               @relation("HeadToMembers")
+  documents             UserDocument[]
+  preferences           UserPreferences?
+  profile               UserProfile?
+  webhooks              Webhook[]
+  policyUpdates         WorkflowPolicy[]     @relation("PolicyUpdates")
 
   @@index([deptHeadId])
 }
@@ -78,33 +65,33 @@ model LeaveRequest {
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
   fitnessCertificateUrl String?
-  isModified            Boolean                @default(false)
-  incidentDate          DateTime?
-  isExtension           Boolean                @default(false)
   parentLeaveId         Int?
-  payCalculation        Json?
-  studyLeaveDocuments   Json?
+  isExtension           Boolean                @default(false)
+  isModified            Boolean                @default(false)
   cancellationReason    String?
+  incidentDate          DateTime?
   isCancellationRequest Boolean                @default(false)
   isPartialCancellation Boolean                @default(false)
   originalEndDate       DateTime?
+  payCalculation        Json?
+  studyLeaveDocuments   Json?
   approvals             Approval[]
+  calendarMappings      LeaveCalendarMapping[]
   comments              LeaveComment[]
   parentLeave           LeaveRequest?          @relation("LeaveExtension", fields: [parentLeaveId], references: [id])
   extensions            LeaveRequest[]         @relation("LeaveExtension")
   requester             User                   @relation(fields: [requesterId], references: [id])
   versions              LeaveVersion[]
-  calendarMappings      LeaveCalendarMapping[]
 
   @@index([requesterId, status])
-  @@index([requesterId, status, createdAt]) // Employee dashboard queries - optimized
+  @@index([requesterId, status, createdAt])
   @@index([parentLeaveId])
   @@index([status, startDate])
   @@index([status, updatedAt])
-  @@index([status, createdAt]) // Admin analytics - optimized
+  @@index([status, createdAt])
   @@index([startDate, endDate, status])
   @@index([type, status, startDate])
-  @@index([type, status]) // Leave type filtering - optimized
+  @@index([type, status])
   @@index([createdAt])
 }
 
@@ -121,9 +108,9 @@ model Approval {
   leave      LeaveRequest     @relation(fields: [leaveId], references: [id])
 
   @@index([leaveId])
-  @@index([leaveId, step]) // Approval chain lookup - optimized
+  @@index([leaveId, step])
   @@index([approverId, decision])
-  @@index([approverId, decision, decidedAt]) // Pending approvals with timestamp - optimized
+  @@index([approverId, decision, decidedAt])
   @@index([approverId, decidedAt])
 }
 
@@ -197,37 +184,35 @@ model LeaveVersion {
   @@index([leaveId, version])
 }
 
-// EL Encashment Request (Policy 6.19.f)
-// Employees can encash EL balance exceeding 10 days
 model EncashmentRequest {
   id                Int              @id @default(autoincrement())
   userId            Int
-  year              Int // Year of EL balance being encashed
-  daysRequested     Int // Days employee wants to encash
-  balanceAtRequest  Int // EL balance at time of request (for audit)
-  reason            String? // Optional reason for encashment
+  year              Int
+  daysRequested     Int
+  balanceAtRequest  Int
+  reason            String?
   status            EncashmentStatus @default(PENDING)
-  approvedBy        Int? // User ID of approver (typically CEO)
+  approvedBy        Int?
   approvedAt        DateTime?
   rejectionReason   String?
-  paidAt            DateTime? // When payment was processed
-  // Payment tracking fields
-  paymentStatus     String? // PENDING, PROCESSING, PAID, FAILED
-  paymentMethod     String? // BANK_TRANSFER, CHEQUE, CASH
-  paymentReference  String? // Payment reference number/transaction ID
-  paymentDate       DateTime? // Actual payment completion date
-  paymentReceiptUrl String? // URL to payment receipt/proof
-  processedBy       Int? // User ID who processed the payment (usually HR_HEAD or CEO)
+  paidAt            DateTime?
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
-
-  user      User  @relation(fields: [userId], references: [id])
-  approver  User? @relation("EncashmentApprover", fields: [approvedBy], references: [id])
-  processor User? @relation("EncashmentProcessor", fields: [processedBy], references: [id])
+  paymentDate       DateTime?
+  paymentMethod     String?
+  paymentReceiptUrl String?
+  paymentReference  String?
+  paymentStatus     String?
+  processedBy       Int?
+  approver          User?            @relation("EncashmentApprover", fields: [approvedBy], references: [id])
+  processor         User?            @relation("EncashmentProcessor", fields: [processedBy], references: [id])
+  user              User             @relation(fields: [userId], references: [id])
 
   @@index([userId, status])
   @@index([status])
   @@index([paymentStatus])
+  @@index([approvedBy], map: "EncashmentRequest_approvedBy_fkey")
+  @@index([processedBy], map: "EncashmentRequest_processedBy_fkey")
 }
 
 model OrgSettings {
@@ -236,19 +221,18 @@ model OrgSettings {
   value       Json
   description String?
   updatedAt   DateTime @updatedAt
-  updatedBy   Int? // User ID
+  updatedBy   Int?
 }
 
-// 2FA OTP (One-Time Password) Model
 model OtpCode {
   id        Int      @id @default(autoincrement())
   userId    Int
   email     String
-  code      String // 6-digit code
+  code      String
   expiresAt DateTime
   verified  Boolean  @default(false)
-  attempts  Int      @default(0) // Track verification attempts
-  ipAddress String? // Track IP for security
+  attempts  Int      @default(0)
+  ipAddress String?
   createdAt DateTime @default(now())
 
   @@index([email, verified])
@@ -256,24 +240,353 @@ model OtpCode {
   @@map("OtpCode")
 }
 
-// Real-time notification system
 model Notification {
   id        Int              @id @default(autoincrement())
-  userId    Int // Recipient user ID
+  userId    Int
   type      NotificationType
   title     String
   message   String
-  link      String? // Optional link to related resource (e.g., /leaves/123)
-  leaveId   Int? // Related leave request ID
+  link      String?
+  leaveId   Int?
   read      Boolean          @default(false)
-  readAt    DateTime?
   createdAt DateTime         @default(now())
-  expiresAt DateTime? // Optional expiry for time-sensitive notifications
+  expiresAt DateTime?
+  readAt    DateTime?
 
   @@index([userId, read])
-  @@index([userId, read, createdAt]) // Notification dashboard - optimized
+  @@index([userId, read, createdAt])
   @@index([userId, createdAt])
   @@index([createdAt])
+}
+
+model BalanceAdjustment {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  leaveType       LeaveType
+  year            Int
+  amount          Int
+  reason          String
+  previousBalance Int
+  newBalance      Int
+  adjustedBy      Int
+  createdAt       DateTime  @default(now())
+  adjustedByUser  User      @relation("AdjustmentsMade", fields: [adjustedBy], references: [id])
+  user            User      @relation("BalanceAdjustments", fields: [userId], references: [id])
+
+  @@index([userId, leaveType, year])
+  @@index([adjustedBy])
+  @@index([createdAt])
+}
+
+model ApprovalDelegation {
+  id          Int      @id @default(autoincrement())
+  delegatorId Int
+  delegateId  Int
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(true)
+  reason      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isPermanent Boolean  @default(false)
+  leaveTypes  Json?
+  delegate    User     @relation("DelegationsReceived", fields: [delegateId], references: [id])
+  delegator   User     @relation("DelegationsDelegated", fields: [delegatorId], references: [id])
+
+  @@index([delegatorId, isActive])
+  @@index([delegateId, isActive])
+  @@index([startDate, endDate])
+}
+
+model EscalationRule {
+  id             Int      @id @default(autoincrement())
+  role           Role
+  timeoutHours   Int
+  escalateToRole Role
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([role, escalateToRole])
+}
+
+model UserPreferences {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @unique
+  dashboardLayout Json?
+  theme           String?  @default("system")
+  notifications   Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model HRISSync {
+  id            Int            @id @default(autoincrement())
+  provider      String
+  status        String
+  startedAt     DateTime       @default(now())
+  completedAt   DateTime?
+  recordsTotal  Int
+  recordsSynced Int            @default(0)
+  recordsFailed Int            @default(0)
+  errors        Json?
+  createdBy     Int
+  conflicts     HRISConflict[]
+  user          User           @relation("HRISSyncs", fields: [createdBy], references: [id])
+
+  @@index([status, startedAt])
+  @@index([createdBy])
+}
+
+model HRISConflict {
+  id           Int       @id @default(autoincrement())
+  syncId       Int
+  employeeId   Int?
+  conflictType String
+  hrisData     Json
+  systemData   Json
+  resolution   String?
+  resolvedBy   Int?
+  resolvedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  employee     User?     @relation("HRISConflictsEmployee", fields: [employeeId], references: [id])
+  resolver     User?     @relation("HRISConflictsResolver", fields: [resolvedBy], references: [id])
+  sync         HRISSync  @relation(fields: [syncId], references: [id], onDelete: Cascade)
+
+  @@index([syncId, resolution])
+  @@index([employeeId])
+  @@index([resolvedBy], map: "HRISConflict_resolvedBy_fkey")
+}
+
+model LeaveTemplate {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  name      String
+  leaveType LeaveType
+  duration  Int
+  reason    String
+  isShared  Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model PolicyVersion {
+  id            Int      @id @default(autoincrement())
+  version       String
+  changes       Json
+  changedBy     Int
+  effectiveFrom DateTime
+  createdAt     DateTime @default(now())
+  changedByUser User     @relation(fields: [changedBy], references: [id])
+
+  @@index([effectiveFrom])
+  @@index([changedBy], map: "PolicyVersion_changedBy_fkey")
+}
+
+model UserProfile {
+  id               Int       @id @default(autoincrement())
+  userId           Int       @unique
+  phone            String?
+  address          String?   @db.Text
+  permanentAddress String?   @db.Text
+  dob              DateTime?
+  gender           String?
+  bloodGroup       String?
+  maritalStatus    String?
+  nid              String?
+  tin              String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EmergencyContact {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  name      String
+  relation  String
+  phone     String
+  address   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model BankDetails {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  bankName      String
+  accountNumber String
+  branchName    String?
+  routingNumber String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserDocument {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  title      String
+  type       String
+  fileUrl    String
+  uploadedAt DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model ScheduledReport {
+  id           Int               @id @default(autoincrement())
+  name         String
+  reportType   ReportType
+  format       ReportFormat
+  frequency    ReportFrequency
+  recipients   Json
+  filters      Json?
+  scheduleTime String?
+  scheduleDay  Int?
+  isActive     Boolean           @default(true)
+  lastRunAt    DateTime?
+  nextRunAt    DateTime?
+  createdBy    Int
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  executions   ReportExecution[]
+  creator      User              @relation("ReportCreator", fields: [createdBy], references: [id])
+
+  @@index([createdBy])
+  @@index([isActive, nextRunAt])
+  @@index([reportType, isActive])
+}
+
+model ReportExecution {
+  id          Int             @id @default(autoincrement())
+  reportId    Int
+  status      ExecutionStatus @default(PENDING)
+  startedAt   DateTime        @default(now())
+  completedAt DateTime?
+  fileUrl     String?
+  fileSize    Int?
+  recordCount Int?
+  errorLog    String?         @db.Text
+  sentTo      Json?
+  report      ScheduledReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId, status])
+  @@index([startedAt])
+}
+
+model CalendarConfig {
+  id                Int                    @id @default(autoincrement())
+  userId            Int
+  provider          CalendarProvider
+  providerAccountId String
+  accessToken       String                 @db.Text
+  refreshToken      String                 @db.Text
+  tokenExpiry       DateTime
+  calendarId        String?
+  isActive          Boolean                @default(true)
+  lastSyncAt        DateTime?
+  syncErrors        Json?
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  user              User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mappings          LeaveCalendarMapping[]
+
+  @@unique([userId, provider])
+  @@index([userId, isActive])
+  @@index([provider])
+}
+
+model LeaveCalendarMapping {
+  id               Int            @id @default(autoincrement())
+  leaveId          Int
+  calendarConfigId Int
+  externalEventId  String
+  lastSyncedAt     DateTime       @default(now())
+  syncStatus       String         @default("synced")
+  errorMessage     String?        @db.Text
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  calendarConfig   CalendarConfig @relation(fields: [calendarConfigId], references: [id], onDelete: Cascade)
+  leave            LeaveRequest   @relation(fields: [leaveId], references: [id], onDelete: Cascade)
+
+  @@unique([leaveId, calendarConfigId])
+  @@index([leaveId])
+  @@index([calendarConfigId])
+  @@index([syncStatus])
+}
+
+model Webhook {
+  id              Int               @id @default(autoincrement())
+  name            String
+  url             String            @db.Text
+  events          Json
+  secret          String            @db.Text
+  enabled         Boolean           @default(true)
+  description     String?           @db.Text
+  headers         Json?
+  lastTriggeredAt DateTime?
+  failureCount    Int               @default(0)
+  lastFailureAt   DateTime?
+  createdBy       Int
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  creator         User              @relation(fields: [createdBy], references: [id])
+  deliveries      WebhookDelivery[]
+
+  @@index([enabled])
+  @@index([createdBy])
+  @@index([lastTriggeredAt])
+}
+
+model WebhookDelivery {
+  id              Int       @id @default(autoincrement())
+  webhookId       Int
+  event           String
+  payload         Json
+  requestUrl      String    @db.Text
+  requestHeaders  Json?
+  requestBody     Json
+  responseStatus  Int?
+  responseHeaders Json?
+  responseBody    String?   @db.Text
+  status          String
+  attempts        Int       @default(0)
+  maxAttempts     Int       @default(3)
+  errorMessage    String?   @db.Text
+  errorCode       String?
+  deliveredAt     DateTime?
+  nextRetryAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  webhook         Webhook   @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@index([webhookId])
+  @@index([event])
+  @@index([status])
+  @@index([createdAt])
+  @@index([nextRetryAt])
+}
+
+model WorkflowPolicy {
+  id            Int        @id @default(autoincrement())
+  requesterRole Role       @unique
+  leaveType     LeaveType?
+  chain         Json
+  isActive      Boolean    @default(true)
+  updatedAt     DateTime   @updatedAt
+  updatedBy     Int?
+  updatedByUser User?      @relation("PolicyUpdates", fields: [updatedBy], references: [id])
+
+  @@index([updatedBy], map: "WorkflowPolicy_updatedBy_fkey")
 }
 
 enum Role {
@@ -343,18 +656,18 @@ enum NotificationType {
 }
 
 enum ReportType {
-  LEAVE_SUMMARY // Overall leave statistics
-  LEAVE_BALANCE // Current balance status
-  LEAVE_UTILIZATION // Utilization analysis
-  ATTENDANCE_REPORT // Attendance patterns
-  APPROVAL_TIMES // Approval efficiency
-  DEPARTMENT_ANALYTICS // Department-wise breakdown
-  EMPLOYEE_HISTORY // Individual employee leave history
-  BURNOUT_RISK // Wellbeing and burnout analysis
-  COST_ANALYSIS // Financial impact
-  PATTERN_DETECTION // Abuse pattern detection
-  FORECAST_REPORT // Future leave predictions
-  COMPLIANCE_AUDIT // Policy compliance check
+  LEAVE_SUMMARY
+  LEAVE_BALANCE
+  LEAVE_UTILIZATION
+  ATTENDANCE_REPORT
+  APPROVAL_TIMES
+  DEPARTMENT_ANALYTICS
+  EMPLOYEE_HISTORY
+  BURNOUT_RISK
+  COST_ANALYSIS
+  PATTERN_DETECTION
+  FORECAST_REPORT
+  COMPLIANCE_AUDIT
 }
 
 enum ReportFormat {
@@ -385,384 +698,4 @@ enum ExecutionStatus {
 enum CalendarProvider {
   GOOGLE
   OUTLOOK
-}
-
-// Balance Adjustment Model
-// For manual balance corrections by SYSTEM_ADMIN
-model BalanceAdjustment {
-  id              Int       @id @default(autoincrement())
-  userId          Int // Employee whose balance is being adjusted
-  leaveType       LeaveType
-  year            Int
-  amount          Int // Positive for credit, negative for debit
-  reason          String // Required explanation for audit trail
-  previousBalance Int // Balance before adjustment
-  newBalance      Int // Balance after adjustment
-  adjustedBy      Int // SYSTEM_ADMIN who made the adjustment
-  createdAt       DateTime  @default(now())
-
-  user           User @relation("BalanceAdjustments", fields: [userId], references: [id])
-  adjustedByUser User @relation("AdjustmentsMade", fields: [adjustedBy], references: [id])
-
-  @@index([userId, leaveType, year])
-  @@index([adjustedBy])
-  @@index([createdAt])
-}
-
-// Approval Delegation Model
-// Allows approvers to delegate their approval authority temporarily
-model ApprovalDelegation {
-  id          Int      @id @default(autoincrement())
-  delegatorId Int // User who is delegating (original approver)
-  delegateId  Int // User who will act as delegate
-  startDate   DateTime // When delegation starts
-  endDate     DateTime // When delegation ends
-  isActive    Boolean  @default(true) // Can be manually revoked
-  reason      String? // Optional reason for delegation
-  leaveTypes  Json?    // Array of LeaveType enums to delegate (null = all)
-  isPermanent Boolean  @default(false) // If true, ignore endDate (indefinite)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  delegator User @relation("DelegationsDelegated", fields: [delegatorId], references: [id])
-  delegate  User @relation("DelegationsReceived", fields: [delegateId], references: [id])
-
-  @@index([delegatorId, isActive])
-  @@index([delegateId, isActive])
-  @@index([startDate, endDate])
-}
-
-// Escalation Rules for Auto-Escalation
-model EscalationRule {
-  id             Int      @id @default(autoincrement())
-  role           Role     // Role this rule applies to (e.g., DEPT_HEAD)
-  timeoutHours   Int      // Hours before escalation triggers
-  escalateToRole Role     // Role to escalate to (e.g., HR_ADMIN)
-  isActive       Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  @@unique([role, escalateToRole])
-}
-
-// User Dashboard Preferences
-model UserPreferences {
-  id              Int      @id @default(autoincrement())
-  userId          Int      @unique
-  dashboardLayout Json? // Widget arrangement and visibility
-  theme           String?  @default("system") // light, dark, system
-  notifications   Json? // Notification preferences
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-// HRIS Integration - Sync tracking
-model HRISSync {
-  id            Int       @id @default(autoincrement())
-  provider      String // "csv", "excel", "api"
-  status        String // "pending", "running", "completed", "failed"
-  startedAt     DateTime  @default(now())
-  completedAt   DateTime?
-  recordsTotal  Int
-  recordsSynced Int       @default(0)
-  recordsFailed Int       @default(0)
-  errors        Json?
-  createdBy     Int
-
-  user      User           @relation("HRISSyncs", fields: [createdBy], references: [id])
-  conflicts HRISConflict[]
-
-  @@index([status, startedAt])
-  @@index([createdBy])
-}
-
-// HRIS Integration - Conflict resolution
-model HRISConflict {
-  id           Int       @id @default(autoincrement())
-  syncId       Int
-  employeeId   Int?
-  conflictType String // "duplicate", "mismatch", "missing"
-  hrisData     Json // Data from HRIS
-  systemData   Json // Current system data
-  resolution   String? // "keep_hris", "keep_system", "merge", "skip"
-  resolvedBy   Int?
-  resolvedAt   DateTime?
-  createdAt    DateTime  @default(now())
-
-  sync     HRISSync @relation(fields: [syncId], references: [id], onDelete: Cascade)
-  employee User?    @relation("HRISConflictsEmployee", fields: [employeeId], references: [id])
-  resolver User?    @relation("HRISConflictsResolver", fields: [resolvedBy], references: [id])
-
-  @@index([syncId, resolution])
-  @@index([employeeId])
-}
-
-// Leave Templates for quick application
-model LeaveTemplate {
-  id        Int       @id @default(autoincrement())
-  userId    Int
-  name      String // Template name (e.g., "Annual Vacation")
-  leaveType LeaveType
-  duration  Int // Typical duration in days
-  reason    String // Pre-filled reason
-  isShared  Boolean   @default(false) // Can be shared with team
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-// Policy Version Tracking
-model PolicyVersion {
-  id            Int      @id @default(autoincrement())
-  version       String // e.g., "v2.1"
-  changes       Json // Description of changes
-  changedBy     Int // User who made changes
-  effectiveFrom DateTime // When this version takes effect
-  createdAt     DateTime @default(now())
-
-  changedByUser User @relation(fields: [changedBy], references: [id])
-
-  @@index([effectiveFrom])
-}
-
-// Enhanced User Profile Models
-
-model UserProfile {
-  id               Int       @id @default(autoincrement())
-  userId           Int       @unique
-  phone            String?
-  address          String?   @db.Text
-  permanentAddress String?   @db.Text
-  dob              DateTime?
-  gender           String?
-  bloodGroup       String?
-  maritalStatus    String?
-  nid              String?
-  tin              String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model EmergencyContact {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  name      String
-  relation  String
-  phone     String
-  address   String?  @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-model BankDetails {
-  id            Int      @id @default(autoincrement())
-  userId        Int      @unique
-  bankName      String
-  accountNumber String
-  branchName    String?
-  routingNumber String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model UserDocument {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  title      String
-  type       String // e.g., "NID", "Passport", "Certificate"
-  fileUrl    String
-  uploadedAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-// Scheduled Reports System
-model ScheduledReport {
-  id           Int             @id @default(autoincrement())
-  name         String // Report name (e.g., "Monthly Leave Summary")
-  reportType   ReportType // Type of report
-  format       ReportFormat // Output format (PDF, Excel, CSV)
-  frequency    ReportFrequency // How often to generate
-  recipients   Json // Array of email addresses
-  filters      Json? // Report filters (department, date range, etc.)
-  scheduleTime String? // Cron expression or time (e.g., "09:00")
-  scheduleDay  Int? // Day of month (1-31) or week (1-7)
-  isActive     Boolean         @default(true)
-  lastRunAt    DateTime?
-  nextRunAt    DateTime?
-  createdBy    Int
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-
-  creator    User              @relation("ReportCreator", fields: [createdBy], references: [id])
-  executions ReportExecution[]
-
-  @@index([createdBy])
-  @@index([isActive, nextRunAt])
-  @@index([reportType, isActive])
-}
-
-// Report Execution History
-model ReportExecution {
-  id          Int             @id @default(autoincrement())
-  reportId    Int
-  status      ExecutionStatus @default(PENDING)
-  startedAt   DateTime        @default(now())
-  completedAt DateTime?
-  fileUrl     String? // Generated file path
-  fileSize    Int? // File size in bytes
-  recordCount Int? // Number of records in report
-  errorLog    String?         @db.Text
-  sentTo      Json? // Emails successfully sent to
-
-  report ScheduledReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
-
-  @@index([reportId, status])
-  @@index([startedAt])
-}
-
-// Calendar Integration - User's calendar configurations
-model CalendarConfig {
-  id                Int              @id @default(autoincrement())
-  userId            Int
-  provider          CalendarProvider
-  providerAccountId String // External account ID (email, etc.)
-  accessToken       String           @db.Text // Encrypted access token
-  refreshToken      String           @db.Text // Encrypted refresh token
-  tokenExpiry       DateTime
-  calendarId        String? // Specific calendar ID to sync to
-  isActive          Boolean          @default(true)
-  lastSyncAt        DateTime?
-  syncErrors        Json? // Array of error messages
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
-
-  user     User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  mappings LeaveCalendarMapping[]
-
-  @@unique([userId, provider])
-  @@index([userId, isActive])
-  @@index([provider])
-}
-
-// Calendar Integration - Leave to Calendar event mapping
-model LeaveCalendarMapping {
-  id               Int      @id @default(autoincrement())
-  leaveId          Int
-  calendarConfigId Int
-  externalEventId  String // Event ID in external calendar
-  lastSyncedAt     DateTime @default(now())
-  syncStatus       String   @default("synced") // "synced", "pending", "failed", "deleted"
-  errorMessage     String?  @db.Text
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  leave          LeaveRequest   @relation(fields: [leaveId], references: [id], onDelete: Cascade)
-  calendarConfig CalendarConfig @relation(fields: [calendarConfigId], references: [id], onDelete: Cascade)
-
-  @@unique([leaveId, calendarConfigId])
-  @@index([leaveId])
-  @@index([calendarConfigId])
-  @@index([syncStatus])
-}
-
-// Webhook System for External Integrations
-model Webhook {
-  id          Int      @id @default(autoincrement())
-  name        String
-  url         String   @db.Text
-  events      Json     // Array of event types: ["leave.submitted", "leave.approved", etc.]
-  secret      String   @db.Text // HMAC secret for signature verification
-  enabled     Boolean  @default(true)
-
-  // Metadata
-  description String?  @db.Text
-  headers     Json?    // Custom headers to include in webhook requests
-
-  // Status tracking
-  lastTriggeredAt DateTime?
-  failureCount    Int      @default(0)
-  lastFailureAt   DateTime?
-
-  // Audit
-  createdBy   Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  creator     User              @relation(fields: [createdBy], references: [id])
-  deliveries  WebhookDelivery[]
-
-  @@index([enabled])
-  @@index([createdBy])
-  @@index([lastTriggeredAt])
-}
-
-model WebhookDelivery {
-  id          Int      @id @default(autoincrement())
-  webhookId   Int
-  event       String   // Event type that triggered this delivery
-  payload     Json     // Event payload
-
-  // Request details
-  requestUrl      String   @db.Text
-  requestHeaders  Json?
-  requestBody     Json
-
-  // Response details
-  responseStatus  Int?
-  responseHeaders Json?
-  responseBody    String?  @db.Text
-
-  // Delivery status
-  status      String   // "pending", "success", "failed", "retrying"
-  attempts    Int      @default(0)
-  maxAttempts Int      @default(3)
-
-  // Error tracking
-  errorMessage String?  @db.Text
-  errorCode    String?
-
-  // Timing
-  deliveredAt DateTime?
-  nextRetryAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  webhook     Webhook  @relation(fields: [webhookId], references: [id], onDelete: Cascade)
-
-  @@index([webhookId])
-  @@index([event])
-  @@index([status])
-  @@index([createdAt])
-  @@index([nextRetryAt])
-}
-
-// Dynamic Workflow Policy
-model WorkflowPolicy {
-  id            Int        @id @default(autoincrement())
-  requesterRole Role       @unique // One policy per requester role
-  leaveType     LeaveType? // Optional: Specific chain for leave types
-  chain         Json       // Stored as ["DEPT_HEAD", "HR_ADMIN"]
-  isActive      Boolean    @default(true)
-  updatedAt     DateTime   @updatedAt
-  updatedBy     Int?
-
-  updatedByUser User?      @relation("PolicyUpdates", fields: [updatedBy], references: [id])
 }

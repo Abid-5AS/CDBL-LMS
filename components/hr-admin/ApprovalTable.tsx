@@ -33,8 +33,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   Textarea,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from "@/components/ui";
-import { CheckCircle, FilterX, Loader2, XCircle } from "lucide-react";
+import { CheckCircle, FilterX, Loader2, XCircle, MoreHorizontal, Forward, RotateCcw } from "lucide-react";
 
 // Shared Components (barrel export)
 import {
@@ -52,6 +63,7 @@ import {
   getToastMessage,
   useUser,
 } from "@/lib";
+import { isFinalApprover } from "@/lib/workflow";
 import type { AppRole } from "@/lib/rbac";
 import { LEAVE_TYPE_OPTIONS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -188,12 +200,18 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     return () => setSelection([]);
   }, [selectedIds, setSelection]);
 
-  const cacheKey =
-    viewMode === "history"
-      ? `/api/approvals/history?decision=${historyDecision}`
-      : "/api/approvals";
+  const cacheKey = useMemo(() => {
+    if (viewMode === "history") {
+      return `/api/approvals/history?decision=${historyDecision}`;
+    }
+    // DEPT_HEAD should use the manager endpoint for consistency with dashboard
+    if (userRole === "DEPT_HEAD") {
+      return `/api/manager/pending?status=${queueStatusFilter === 'all' ? 'PENDING' : queueStatusFilter}`;
+    }
+    return "/api/approvals";
+  }, [viewMode, historyDecision, userRole, queueStatusFilter]);
 
-  const { data, error, isLoading, mutate } = useSWR<ApprovalsResponse>(
+  const { data: rawData, error, isLoading, mutate } = useSWR<any>(
     cacheKey,
     apiFetcher,
     {
@@ -201,6 +219,29 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
       revalidateOnReconnect: true,
     }
   );
+
+  // Normalize data structure since endpoints differ
+  // /api/approvals returns { items: [...] }
+  // /api/manager/pending returns { rows: [...], counts: ... }
+  const data = useMemo(() => {
+    if (!rawData) return { items: [] };
+    if ('rows' in rawData) {
+      // Map manager endpoint data format to HRApprovalItem format
+      const mappedItems = (rawData.rows as any[]).map(row => ({
+        ...row,
+        // Map missing fields expected by the table
+        requestedByName: row.requester?.name || "Unknown",
+        requestedByEmail: row.requester?.email || "",
+        requestedById: String(row.requester?.id || ""),
+        start: row.startDate, // Table expects 'start'
+        end: row.endDate,     // Table expects 'end'
+        currentStageIndex: 0, // Default for manager view
+        approvals: [],        // Default empty for now
+      })) as HRApprovalItem[];
+      return { items: mappedItems };
+    }
+    return rawData as ApprovalsResponse;
+  }, [rawData]);
 
   // React 19 useOptimistic for instant UI updates
   const [optimisticItems, setOptimisticItems] = useOptimistic(
@@ -325,15 +366,15 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
       // Handle Offline Action
       if (typeof navigator !== "undefined" && !navigator.onLine) {
         const { queueSyncAction } = await import("@/lib/offline/db");
-        
-        const actionType = 
+
+        const actionType =
           action === "approve" ? "APPROVE_LEAVE" :
-          action === "reject" ? "REJECT_LEAVE" :
-          action === "forward" ? "FORWARD_LEAVE" :
-          "RETURN_LEAVE";
+            action === "reject" ? "REJECT_LEAVE" :
+              action === "forward" ? "FORWARD_LEAVE" :
+                "RETURN_LEAVE";
 
         await queueSyncAction(actionType as any, { id: Number(id), comment });
-        
+
         toast.success("You are offline. Action queued and will sync when online.");
         return;
       }
@@ -522,8 +563,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
         if (result.success) {
           toast.success(
-            `Successfully rejected ${result.rejected} leave request${
-              result.rejected > 1 ? "s" : ""
+            `Successfully rejected ${result.rejected} leave request${result.rejected > 1 ? "s" : ""
             }` + (result.failed > 0 ? `. ${result.failed} failed.` : "")
           );
 
@@ -616,9 +656,9 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
               viewMode === "history"
                 ? undefined
                 : {
-                    label: "View Past Approvals",
-                    href: "/approvals?view=history",
-                  }
+                  label: "View Past Approvals",
+                  href: "/approvals?view=history",
+                }
             }
             className="py-8"
           />
@@ -764,185 +804,212 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
       ) : (
         <div className="rounded-md border">
           <Table>
-          <TableHeader>
-            <TableRow>
-              {viewMode === "queue" && (
-                <TableHead className="w-12">
-                  <Checkbox
-                    checked={allSelected}
-                    onCheckedChange={(checked) =>
-                      handleSelectAll(checked === true)
-                    }
-                    aria-label="Select all rows"
-                    className={
-                      someSelected ? "data-[state=checked]:bg-card-action" : ""
-                    }
-                  />
-                </TableHead>
-              )}
-              <TableHead>Employee</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Dates</TableHead>
-              <TableHead>Days</TableHead>
-              <TableHead>Reason</TableHead>
-              {viewMode === "queue" ? (
-                <>
-                  <TableHead>Stage</TableHead>
-                  <TableHead className="text-right">
-                    Actions
+            <TableHeader>
+              <TableRow>
+                {viewMode === "queue" && (
+                  <TableHead className="w-12">
+                    <Checkbox
+                      checked={allSelected}
+                      onCheckedChange={(checked) =>
+                        handleSelectAll(checked === true)
+                      }
+                      aria-label="Select all rows"
+                      className={
+                        someSelected ? "data-[state=checked]:bg-card-action" : ""
+                      }
+                    />
                   </TableHead>
-                </>
-              ) : (
-                <>
-                  <TableHead>Decision</TableHead>
-                  <TableHead>Processed On</TableHead>
-                </>
-              )}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {items.map((item) => {
-              const start = formatDate(item.start);
-              const end = formatDate(item.end);
-              const stage =
-                item.approvals?.[item.currentStageIndex]?.status ?? item.status;
-              const decisionMeta = item.approvals?.[0];
-              return (
-                <TableRow
-                  key={item.id}
-                  className={clsx(
-                    "cursor-pointer transition",
-                    statusStyle(item.status),
-                    selectedIds.has(item.id) &&
+                )}
+                <TableHead>Employee</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Dates</TableHead>
+                <TableHead>Days</TableHead>
+                <TableHead>Reason</TableHead>
+                {viewMode === "queue" ? (
+                  <>
+                    <TableHead>Stage</TableHead>
+                    <TableHead className="text-right">
+                      Actions
+                    </TableHead>
+                  </>
+                ) : (
+                  <>
+                    <TableHead>Decision</TableHead>
+                    <TableHead>Processed On</TableHead>
+                  </>
+                )}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {items.map((item) => {
+                const start = formatDate(item.start);
+                const end = formatDate(item.end);
+                const stage =
+                  item.approvals?.[item.currentStageIndex]?.status ?? item.status;
+                const decisionMeta = item.approvals?.[0];
+                return (
+                  <TableRow
+                    key={item.id}
+                    className={clsx(
+                      "cursor-pointer transition",
+                      statusStyle(item.status),
+                      selectedIds.has(item.id) &&
                       "bg-card-action dark:bg-card-action/20"
-                  )}
-                  onClick={(e) => {
-                    // Don't trigger onSelect if clicking on checkbox
-                    if (
-                      !(e.target as HTMLElement).closest(
-                        'input[type="checkbox"]'
-                      )
-                    ) {
-                      onSelect?.(item);
-                    }
-                  }}
-                >
-                  {viewMode === "queue" && (
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedIds.has(item.id)}
-                        onCheckedChange={(checked) =>
-                          handleSelectRow(item.id, checked === true)
-                        }
-                        onClick={(e) => e.stopPropagation()}
-                        aria-label={`Select row ${item.id}`}
-                      />
-                    </TableCell>
-                  )}
-                  <TableCell>
-                    <div className="font-medium text-foreground dark:text-foreground/90">
-                      {item.requestedByName}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {item.requestedByEmail ?? "—"}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
-                    {leaveTypeLabel[item.type] ?? item.type}
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
-                    <div>{start}</div>
-                    {start !== end && (
-                      <div className="text-xs text-muted-foreground">
-                        to {end}
-                      </div>
                     )}
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
-                    {item.requestedDays}
-                  </TableCell>
-                  <TableCell className="max-w-xs text-sm text-muted-foreground dark:text-muted-foreground/80">
-                    <p className="whitespace-pre-wrap wrap-break-word">
-                      {item.reason}
-                    </p>
-                  </TableCell>
-                  {viewMode === "queue" ? (
-                    <>
-                      <TableCell className="text-sm font-medium capitalize text-muted-foreground dark:text-muted-foreground/80">
-                        {stage.toLowerCase()}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div
-                          className="flex justify-end"
+                    onClick={(e) => {
+                      // Don't trigger onSelect if clicking on checkbox
+                      if (
+                        !(e.target as HTMLElement).closest(
+                          'input[type="checkbox"]'
+                        )
+                      ) {
+                        onSelect?.(item);
+                      }
+                    }}
+                  >
+                    {viewMode === "queue" && (
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedIds.has(item.id)}
+                          onCheckedChange={(checked) =>
+                            handleSelectRow(item.id, checked === true)
+                          }
                           onClick={(e) => e.stopPropagation()}
-                        >
-                          <ApprovalActionButtons
-                            ceoMode={
-                              userRole === "CEO" || userRole === "HR_HEAD"
-                            }
-                            onForward={
-                              userRole === "HR_ADMIN" ||
-                              userRole === "DEPT_HEAD"
-                                ? () =>
-                                    handleDecision(
-                                      item.id,
-                                      "forward",
-                                      item.requestedByName || undefined
-                                    )
-                                : undefined
-                            }
-                            onReturn={
-                              userRole === "HR_ADMIN" ||
-                              userRole === "DEPT_HEAD"
-                                ? () =>
-                                    handleDecision(
-                                      item.id,
-                                      "return",
-                                      item.requestedByName || undefined
-                                    )
-                                : undefined
-                            }
-                            onCancel={() =>
-                              handleDecision(
-                                item.id,
-                                "reject",
-                                item.requestedByName || undefined
-                              )
-                            }
-                            onApprove={
-                              userRole === "CEO" || userRole === "HR_HEAD"
-                                ? () =>
-                                    handleDecision(
-                                      item.id,
-                                      "approve",
-                                      item.requestedByName || undefined
-                                    )
-                                : undefined
-                            }
-                            disabled={isPending}
-                            loading={isPending}
-                            loadingAction={null}
-                          />
+                          aria-label={`Select row ${item.id}`}
+                        />
+                      </TableCell>
+                    )}
+                    <TableCell>
+                      <div className="font-medium text-foreground dark:text-foreground/90">
+                        {item.requestedByName}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {item.requestedByEmail ?? "—"}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
+                      {leaveTypeLabel[item.type] ?? item.type}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
+                      <div>{start}</div>
+                      {start !== end && (
+                        <div className="text-xs text-muted-foreground">
+                          to {end}
                         </div>
-                      </TableCell>
-                    </>
-                  ) : (
-                    <>
-                      <TableCell className="text-sm font-semibold capitalize text-muted-foreground dark:text-muted-foreground/80">
-                        {item.status.toLowerCase()}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
-                        {decisionMeta?.decidedAt
-                          ? formatDate(decisionMeta.decidedAt)
-                          : "—"}
-                      </TableCell>
-                    </>
-                  )}
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
+                      {item.requestedDays}
+                    </TableCell>
+                    <TableCell className="max-w-xs text-sm text-muted-foreground dark:text-muted-foreground/80">
+                      <p className="whitespace-pre-wrap wrap-break-word">
+                        {item.reason}
+                      </p>
+                    </TableCell>
+                    {viewMode === "queue" ? (
+                      <>
+                        <TableCell className="text-sm font-medium capitalize text-muted-foreground dark:text-muted-foreground/80">
+                          {stage.toLowerCase()}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div
+                            className="flex justify-end"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <div className="flex items-center justify-end gap-1">
+                              {/* Approve Button */}
+                              {(userRole === "HR_ADMIN" || userRole === "DEPT_HEAD" || userRole === "CEO" || userRole === "HR_HEAD") && (
+                                <TooltipProvider>
+                                  <Tooltip delayDuration={300}>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDecision(item.id, "approve", item.requestedByName || undefined);
+                                        }}
+                                        disabled={isPending}
+                                        className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                                      >
+                                        {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-5 w-5" />}
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top">
+                                      {isFinalApprover(userRole as any, item.type as any, item.requestedByRole as any)
+                                        ? "Final Approve"
+                                        : "Approve & Forward"}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              )}
+
+
+
+                              {/* Return Button */}
+                              {(userRole === "HR_ADMIN" || userRole === "DEPT_HEAD") && (
+                                <TooltipProvider>
+                                  <Tooltip delayDuration={300}>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDecision(item.id, "return", item.requestedByName || undefined);
+                                        }}
+                                        disabled={isPending}
+                                        className="h-8 w-8 text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/30"
+                                      >
+                                        <RotateCcw className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top">Return for Edit</TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              )}
+
+                              {/* Reject Button */}
+                              <TooltipProvider>
+                                <Tooltip delayDuration={300}>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDecision(item.id, "reject", item.requestedByName || undefined);
+                                      }}
+                                      disabled={isPending}
+                                      className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
+                                    >
+                                      <XCircle className="h-5 w-5" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top">Reject Request</TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
+                          </div>
+                        </TableCell>
+                      </>
+                    ) : (
+                      <>
+                        <TableCell className="text-sm font-semibold capitalize text-muted-foreground dark:text-muted-foreground/80">
+                          {item.status.toLowerCase()}
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
+                          {decisionMeta?.decidedAt
+                            ? formatDate(decisionMeta.decidedAt)
+                            : "—"}
+                        </TableCell>
+                      </>
+                    )}
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         </div>
       )}
       {items.length !== displayedItems.length && displayedItems.length > 0 && (

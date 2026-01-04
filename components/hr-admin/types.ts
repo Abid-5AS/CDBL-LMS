@@ -19,4 +19,5 @@ export type HRApprovalItem = {
   requestedById?: string | null;
   requestedByName: string | null;
   requestedByEmail: string | null;
+  requestedByRole: string | null;
 };

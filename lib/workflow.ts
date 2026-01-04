@@ -102,7 +102,7 @@ export function canPerformAction(role: AppRole, action: ApprovalAction, type?: L
       case "FORWARD":
         return !isFinal; // Can forward if not final
       case "APPROVE":
-        return isFinal; // Can approve only if final
+        return true; // Any approver can approve (auto-forwards if not final)
       case "REJECT":
         return true; // Any approver in chain can reject
       case "RETURN":

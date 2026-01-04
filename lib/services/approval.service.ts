@@ -183,7 +183,7 @@ export class ApprovalService {
           requestWithRole?.requester?.role as any
         );
 
-        // 4. Update leave status and balance if final approval
+        // 4. Update leave status and balance if final approval or forward if not
         if (isFinal) {
           await tx.leaveRequest.update({
             where: { id: leaveId },
@@ -201,6 +201,43 @@ export class ApprovalService {
               used: { increment: leave.workingDays }
             }
           });
+        } else {
+          // AUTO-FORWARD LOGIC
+          const { getNextRoleInChain } = await import('@/lib/workflow');
+          const nextRole = getNextRoleInChain(
+            approver!.role as any,
+            leave.type,
+            requestWithRole?.requester?.role as any
+          );
+
+          if (nextRole) {
+            // Find next approver
+            const nextApprover = await tx.user.findFirst({
+              where: { role: nextRole },
+              select: { id: true, name: true },
+            });
+
+            if (nextApprover) {
+              // Update current approval to FORWARDED instead of APPROVED to keep history clean (optional, keeping APPROVED is also fine but FORWARDED implies handoff)
+              // Actually, keeping as APPROVED is better for "I approved this", but we need to ensure the chain continues.
+              // Let's stick to the plan: The current step is APPROVED. The *next* step is created PENDING.
+
+              // Check if next step already exists (handling re-approvals)
+              const nextStepNum = await ApprovalRepository.getNextStep(leaveId);
+
+              await tx.approval.create({
+                data: {
+                  leaveId,
+                  approverId: nextApprover.id,
+                  step: nextStepNum,
+                  decision: "PENDING",
+                }
+              });
+
+              // Notify the next approver (Forwarded Notification)
+              // We'll handle this in the notification block below by checking !isFinal
+            }
+          }
         }
 
         // 5. Log the approval
@@ -212,7 +249,7 @@ export class ApprovalService {
           await tx.auditLog.create({
             data: {
               actorEmail: approverUser.email,
-              action: "LEAVE_APPROVED",
+              action: isFinal ? "LEAVE_APPROVED" : "LEAVE_FORWARDED_AUTO",
               targetEmail: leave.requester?.email,
               details: { leaveId, comment, isFinal, leaveType: leave.type }
             }
@@ -233,6 +270,7 @@ export class ApprovalService {
       }
 
       // 6. Send notifications (only on final approval)
+      // 6. Send notifications
       if (isFinal) {
         const approver = await prisma.user.findUnique({
           where: { id: approverId },
@@ -254,6 +292,23 @@ export class ApprovalService {
           comment: comment,
           approvedAt: new Date(),
         });
+      } else {
+        // Notify next approver(s) for the new pending step
+        // We need to re-fetch the new pending approval to get the approver ID
+        const nextPending = await prisma.approval.findFirst({
+          where: { leaveId, decision: 'PENDING', step: { gt: 1 } }, // Assuming step > 1 for forwarded
+          orderBy: { step: 'desc' },
+          include: { approver: true }
+        });
+
+        const currentApprover = await prisma.user.findUnique({
+          where: { id: approverId },
+          select: { name: true }
+        });
+
+        if (nextPending && currentApprover) {
+          await NotificationService.notifyLeaveForwarded(leaveId, nextPending.approverId, currentApprover.name);
+        }
       }
 
       // Invalidate approval caches

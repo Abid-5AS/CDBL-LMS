@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -141,231 +143,157 @@ export function ApprovalDetailsContent({
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid gap-6 lg:grid-cols-[1fr_2fr]">
-          {/* Left Column: Employee Context & Actions */}
-          <div className="space-y-6">
+        <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+          {/* Left Column: Main Request Info & Actions */}
+          <div className="space-y-6 order-2 lg:order-1">
             {/* Approval Actions Card - Most Prominent */}
             {canTakeAction && (
               <ApprovalActionCard
                 leaveId={leave.id}
                 leaveType={leave.type as unknown as LeaveType}
                 currentUserRole={currentUserRole}
+                requesterRole={leave.requester.role}
               />
             )}
 
-            {/* Employee Stats Card */}
-            <EmployeeStatsCard
-              employee={leave.requester}
-              balances={balances}
-              leaveHistory={leaveHistory}
-            />
-
-            {/* Policy Compliance Check */}
-            <PolicyComplianceCheck
-              leaveType={leave.type as unknown as LeaveType}
-              workingDays={leave.workingDays}
-              startDate={leave.startDate}
-              endDate={leave.endDate}
-              balances={balances}
-            />
-
-            {/* Team Impact */}
-            {overlappingLeaves.length > 0 && (
-              <TeamImpactCard overlappingLeaves={overlappingLeaves} />
-            )}
-          </div>
-
-          {/* Right Column: Request Details & History */}
-          <div className="space-y-6">
             {/* Basic Information */}
             <Card className="rounded-2xl border-muted shadow-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <FileText className="h-5 w-5 text-primary" />
                   Request Details
                 </CardTitle>
                 <CardDescription>
                   Submitted on {formatDate(leave.createdAt.toISOString())}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-1">
+              <CardContent className="space-y-6">
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">
                       Leave Type
                     </p>
-                    <Badge variant="outline" className="text-base">
+                    <Badge variant="outline" className="text-base px-3 py-1">
                       {leaveTypeLabel[leave.type] ?? leave.type}
                     </Badge>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-1">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">
                       Duration
                     </p>
-                    <p className="text-base font-medium">
+                    <p className="text-base font-semibold">
                       {leave.workingDays} working days
                     </p>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-1">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">
                       Start Date
                     </p>
                     <p className="text-base font-medium flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
                       {formatDate(leave.startDate)}
                     </p>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-1">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">
                       End Date
                     </p>
                     <p className="text-base font-medium flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
                       {formatDate(leave.endDate)}
                     </p>
                   </div>
                 </div>
 
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-2">
+                <Separator />
+
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">
                     Reason
                   </p>
-                  <p className="text-sm whitespace-pre-wrap bg-muted/50 rounded-lg p-3">
+                  <div className="text-sm leading-relaxed whitespace-pre-wrap bg-muted/30 border border-border rounded-lg p-4">
                     {leave.reason}
-                  </p>
+                  </div>
                 </div>
 
                 {leave.certificateUrl && (
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-2">
-                      Medical Certificate
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Attachments
                     </p>
-                    <Button asChild variant="outline" size="sm">
+                    <Button asChild variant="outline" size="sm" className="gap-2">
                       <a
                         href={leave.certificateUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <FileText className="h-4 w-4 mr-2" />
-                        View Certificate
+                        <FileText className="h-4 w-4" />
+                        Medical Certificate
                       </a>
                     </Button>
                   </div>
                 )}
-
-                <div className="pt-4 border-t border-muted">
-                  <p className="text-sm font-medium text-muted-foreground mb-2">
-                    Employee
-                  </p>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium">
-                        {leave.requester.name}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground ml-6">
-                      {leave.requester.email}
-                    </p>
-                    <div className="flex items-center gap-2 ml-6">
-                      <Badge variant="secondary" className="text-xs">
-                        {leave.requester.role}
-                      </Badge>
-                      {leave.requester.department && (
-                        <Badge variant="outline" className="text-xs">
-                          {leave.requester.department}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </div>
               </CardContent>
             </Card>
 
             {/* Approval Timeline */}
             <Card className="rounded-2xl border-muted shadow-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Clock className="h-5 w-5 text-primary" />
                   Approval Timeline
                 </CardTitle>
-                <CardDescription>
-                  {leave.approvals.filter((a) => a.decision !== "PENDING")
-                    .length}{" "}
-                  of {leave.approvals.length} steps completed
-                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="relative pl-4 border-l border-border space-y-8 py-2">
                   {leave.approvals.map((approval, index) => (
-                    <div key={approval.id} className="flex items-start gap-4">
-                      <div className="flex-shrink-0">
-                        <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center ${approval.decision === "APPROVED"
-                            ? "bg-green-100 dark:bg-green-950"
-                            : approval.decision === "REJECTED"
-                              ? "bg-red-100 dark:bg-red-950"
-                              : approval.decision === "FORWARDED"
-                                ? "bg-blue-100 dark:bg-blue-950"
-                                : (approval.decision as string) === "RETURNED"
-                                  ? "bg-yellow-100 dark:bg-yellow-950"
-                                  : "bg-muted"
-                            }`}
-                        >
-                          {approval.decision === "APPROVED" && (
-                            <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-                          )}
-                          {approval.decision === "REJECTED" && (
-                            <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
-                          )}
-                          {approval.decision === "FORWARDED" && (
-                            <Forward className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                          )}
-                          {(approval.decision as string) === "RETURNED" && (
-                            <RotateCcw className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-                          )}
-                          {approval.decision === "PENDING" && (
-                            <Clock className="h-5 w-5 text-muted-foreground" />
-                          )}
-                        </div>
-                        {index < leave.approvals.length - 1 && (
-                          <div className="w-0.5 h-8 bg-muted ml-5 mt-2" />
-                        )}
+                    <div key={approval.id} className="relative">
+                      {/* Timeline Node */}
+                      <div
+                        className={`absolute -left-[25px] top-0 w-6 h-6 rounded-full border-2 flex items-center justify-center bg-background ${approval.decision === "APPROVED"
+                          ? "border-green-500 text-green-500"
+                          : approval.decision === "REJECTED"
+                            ? "border-red-500 text-red-500"
+                            : approval.decision === "FORWARDED"
+                              ? "border-blue-500 text-blue-500"
+                              : (approval.decision as string) === "RETURNED"
+                                ? "border-amber-500 text-amber-500"
+                                : "border-muted-foreground text-muted-foreground"
+                          }`}
+                      >
+                        {approval.decision === "APPROVED" && <CheckCircle2 className="h-3 w-3" />}
+                        {approval.decision === "REJECTED" && <XCircle className="h-3 w-3" />}
+                        {approval.decision === "FORWARDED" && <Forward className="h-3 w-3" />}
+                        {(approval.decision as string) === "RETURNED" && <RotateCcw className="h-3 w-3" />}
+                        {approval.decision === "PENDING" && <div className="w-2 h-2 rounded-full bg-muted-foreground" />}
                       </div>
-                      <div className="flex-1 pt-2">
-                        <div className="flex items-center justify-between mb-1">
-                          <p className="text-sm font-semibold">
-                            Step {approval.step}: {approval.approver?.name || "Unassigned"}
-                          </p>
-                          <Badge variant="outline" className="text-xs">
+
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-semibold text-sm">Step {approval.step}:</span>
+                          <span className="text-sm">{approval.approver?.name || "Unassigned"}</span>
+                          <Badge variant="secondary" className="text-[10px] h-5 px-1.5">
                             {approval.approver?.role}
                           </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {approval.decision === "APPROVED" &&
-                            "✓ Approved"}
-                          {approval.decision === "REJECTED" &&
-                            "✗ Rejected"}
-                          {approval.decision === "FORWARDED" &&
-                            `→ Forwarded to ${approval.toRole || "Next Approver"}`}
-                          {(approval.decision as string) === "RETURNED" &&
-                            "⟲ Returned for modification"}
-                          {approval.decision === "PENDING" && (
-                            <span className="flex items-center gap-1">
-                              <span className="inline-block w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
-                              Pending review
+                          {approval.decidedAt && (
+                            <span className="text-xs text-muted-foreground ml-auto">
+                              {formatDate(approval.decidedAt.toISOString())}
                             </span>
                           )}
-                        </p>
+                        </div>
+
+                        <div className="text-sm">
+                          {approval.decision === "APPROVED" && <span className="text-green-600 font-medium">Approved</span>}
+                          {approval.decision === "REJECTED" && <span className="text-red-600 font-medium">Rejected</span>}
+                          {approval.decision === "FORWARDED" && <span className="text-blue-600 font-medium">Forwarded to {approval.toRole || "Next"}</span>}
+                          {(approval.decision as string) === "RETURNED" && <span className="text-amber-600 font-medium">Returned</span>}
+                          {approval.decision === "PENDING" && <span className="text-muted-foreground italic">Pending review...</span>}
+                        </div>
+
                         {approval.comment && (
-                          <p className="text-sm text-foreground mt-2 bg-muted/50 rounded-md p-2 italic">
+                          <div className="mt-2 text-sm bg-muted/50 p-2 rounded-md border border-border text-muted-foreground italic">
                             "{approval.comment}"
-                          </p>
-                        )}
-                        {approval.decidedAt && (
-                          <p className="text-xs text-muted-foreground mt-2">
-                            {formatDate(approval.decidedAt.toISOString())}
-                          </p>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -378,8 +306,8 @@ export function ApprovalDetailsContent({
             {comments.length > 0 && (
               <Card className="rounded-2xl border-muted shadow-sm">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <Users className="h-5 w-5 text-primary" />
                     Discussion ({comments.length})
                   </CardTitle>
                 </CardHeader>
@@ -388,22 +316,23 @@ export function ApprovalDetailsContent({
                     {comments.map((comment) => (
                       <div
                         key={comment.id}
-                        className="border-l-2 border-muted pl-4 py-2"
+                        className="flex gap-4 p-4 rounded-xl bg-muted/30 border border-border"
                       >
-                        <div className="flex items-center justify-between mb-1">
-                          <p className="text-sm font-medium">
-                            {comment.authorName}{" "}
-                            <Badge variant="secondary" className="ml-2 text-xs">
-                              {comment.authorRole}
-                            </Badge>
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {formatDate(comment.createdAt)}
-                          </p>
+                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                          <span className="text-xs font-bold text-primary">
+                            {comment.authorName.charAt(0)}
+                          </span>
                         </div>
-                        <p className="text-sm text-foreground">
-                          {comment.comment}
-                        </p>
+                        <div className="space-y-1 flex-1">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-semibold">
+                              {comment.authorName}
+                              <span className="text-xs font-normal text-muted-foreground ml-2">({comment.authorRole})</span>
+                            </p>
+                            <span className="text-xs text-muted-foreground">{formatDate(comment.createdAt)}</span>
+                          </div>
+                          <p className="text-sm text-foreground/90 leading-relaxed">{comment.comment}</p>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -411,8 +340,68 @@ export function ApprovalDetailsContent({
               </Card>
             )}
           </div>
+
+          {/* Right Column: Context Tabs */}
+          <div className="space-y-6 order-1 lg:order-2">
+            {/* Employee Identity Card - Always Visible */}
+            <Card className="rounded-2xl border-none shadow-none bg-transparent p-0">
+              <div className="flex items-center gap-4 p-4 bg-card border border-border rounded-xl shadow-sm">
+                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">{leave.requester.name}</h3>
+                  <p className="text-sm text-muted-foreground">{leave.requester.role} • {leave.requester.department || "No Dept"}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{leave.requester.email}</p>
+                </div>
+              </div>
+            </Card>
+
+            {/* Tabbed Context Area */}
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 mb-4">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="policy">Policy</TabsTrigger>
+                <TabsTrigger value="impact" className={overlappingLeaves.length > 0 ? "text-amber-600 dark:text-amber-400" : ""}>
+                  Impact {overlappingLeaves.length > 0 && `(${overlappingLeaves.length})`}
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="overview" className="mt-0 space-y-4">
+                <EmployeeStatsCard
+                  employee={leave.requester}
+                  balances={balances}
+                  leaveHistory={leaveHistory}
+                />
+              </TabsContent>
+
+              <TabsContent value="policy" className="mt-0 space-y-4">
+                <PolicyComplianceCheck
+                  leaveType={leave.type as unknown as LeaveType}
+                  workingDays={leave.workingDays}
+                  startDate={leave.startDate}
+                  endDate={leave.endDate}
+                  balances={balances}
+                />
+              </TabsContent>
+
+              <TabsContent value="impact" className="mt-0 space-y-4">
+                {overlappingLeaves.length > 0 ? (
+                  <TeamImpactCard overlappingLeaves={overlappingLeaves} />
+                ) : (
+                  <Card className="rounded-xl border-dashed">
+                    <CardContent className="pt-6 text-center text-muted-foreground">
+                      <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>No other team members are on leave during this period.</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
       </div>
     </div>
+
   );
 }

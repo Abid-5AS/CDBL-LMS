@@ -74,6 +74,7 @@ export async function GET(req: Request) {
       requestedById: String(approval.leave.requesterId),
       requestedByName: approval.leave.requester.name,
       requestedByEmail: approval.leave.requester.email,
+      requestedByRole: approval.leave.requester.role,
       requester: {
         id: approval.leave.requesterId,
         name: approval.leave.requester.name,
