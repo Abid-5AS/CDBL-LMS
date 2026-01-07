@@ -5,6 +5,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.HTTP
 import retrofit2.http.POST
 import retrofit2.http.Query
 import retrofit2.http.Multipart
@@ -59,6 +60,22 @@ interface LeaveService {
         @Body reason: CancelLeaveRequest
     ): Response<CancelLeaveResponse>
 
+    // Full Cancel - DELETE /leaves/{id} - for employee-initiated cancellation
+    @HTTP(method = "DELETE", path = "leaves/{id}", hasBody = true)
+    suspend fun fullCancelLeave(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Body reason: FullCancelRequest
+    ): Response<FullCancelResponse>
+
+    // Partial Cancel - POST /leaves/{id}/partial-cancel - for approved leaves that started
+    @POST("leaves/{id}/partial-cancel")
+    suspend fun partialCancelLeave(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Body reason: PartialCancelRequest
+    ): Response<PartialCancelResponse>
+
     @GET("manager/pending")
     suspend fun getManagerPendingLeaves(
         @Header("Authorization") token: String,
@@ -74,6 +91,37 @@ interface LeaveService {
         @Query("page") page: Int = 1
     ): Response<ApprovalHistoryResponse>
 }
+
+// Full Cancel - DELETE /leaves/{id}
+data class FullCancelRequest(
+    val reason: String
+)
+
+data class FullCancelResponse(
+    val ok: Boolean,
+    val leaveId: Int? = null,
+    val status: String? = null,
+    val message: String? = null,
+    val error: String? = null
+)
+
+// Partial Cancel - POST /leaves/{id}/partial-cancel
+data class PartialCancelRequest(
+    val reason: String
+)
+
+data class PartialCancelResponse(
+    val ok: Boolean,
+    val leaveId: Int? = null,
+    val status: String? = null,
+    val originalEndDate: String? = null,
+    val requestedEndDate: String? = null,
+    val originalWorkingDays: Int? = null,
+    val requestedWorkingDays: Int? = null,
+    val daysToCancel: Int? = null,
+    val message: String? = null,
+    val error: String? = null
+)
 
 data class CancelLeaveRequest(
     val reason: String

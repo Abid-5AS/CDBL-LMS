@@ -73,11 +73,36 @@ class LeaveDetailViewModel @Inject constructor(
     }
 
     fun cancelLeave(token: String, leaveId: Int, reason: String) {
+        // Use fullCancelLeave for backwards compatibility
+        fullCancelLeave(token, leaveId, reason)
+    }
+
+    // Full Cancel - for entire leave request 
+    // PENDING/SUBMITTED: immediate cancellation
+    // APPROVED: changes to CANCELLATION_REQUESTED (needs approval)
+    fun fullCancelLeave(token: String, leaveId: Int, reason: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmitting = true) }
-            val result = leaveRepository.cancelLeave(token, leaveId, reason)
+            val result = leaveRepository.fullCancelLeave(token, leaveId, reason)
             
-            result.onSuccess { message ->
+            result.onSuccess { response ->
+                _uiState.update { it.copy(isSubmitting = false, actionSuccess = true) }
+                // Reload details to show updated status
+                loadDetails(token, leaveId)
+            }.onFailure { e ->
+                _uiState.update { it.copy(isSubmitting = false, error = e.message) }
+            }
+        }
+    }
+
+    // Partial Cancel - for APPROVED leaves that have started but not ended
+    // Cancels only future days
+    fun partialCancelLeave(token: String, leaveId: Int, reason: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSubmitting = true) }
+            val result = leaveRepository.partialCancelLeave(token, leaveId, reason)
+            
+            result.onSuccess { response ->
                 _uiState.update { it.copy(isSubmitting = false, actionSuccess = true) }
                 // Reload details to show updated status
                 loadDetails(token, leaveId)

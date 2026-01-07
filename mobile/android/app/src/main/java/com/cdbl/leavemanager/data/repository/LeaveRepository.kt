@@ -227,4 +227,42 @@ class LeaveRepository @Inject constructor(
             Result.failure(e)
         }
     }
+
+    // Full Cancel - DELETE /leaves/{id}
+    // For PENDING/SUBMITTED: immediate cancellation
+    // For APPROVED: changes to CANCELLATION_REQUESTED (needs approval)
+    suspend fun fullCancelLeave(token: String, leaveId: Int, reason: String): Result<com.cdbl.leavemanager.data.api.FullCancelResponse> {
+        return try {
+            val request = com.cdbl.leavemanager.data.api.FullCancelRequest(reason)
+            val response = leaveService.fullCancelLeave("Bearer $token", leaveId, request)
+            if (response.isSuccessful && response.body()?.ok == true) {
+                syncLeaves(token) // Refresh leaves after cancel
+                Result.success(response.body()!!)
+            } else {
+                val errorMsg = response.body()?.message ?: response.body()?.error ?: "Failed to cancel leave"
+                Result.failure(Exception(errorMsg))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // Partial Cancel - POST /leaves/{id}/partial-cancel
+    // Only for APPROVED leaves that have started but not ended
+    // Cancels future days only
+    suspend fun partialCancelLeave(token: String, leaveId: Int, reason: String): Result<com.cdbl.leavemanager.data.api.PartialCancelResponse> {
+        return try {
+            val request = com.cdbl.leavemanager.data.api.PartialCancelRequest(reason)
+            val response = leaveService.partialCancelLeave("Bearer $token", leaveId, request)
+            if (response.isSuccessful && response.body()?.ok == true) {
+                syncLeaves(token) // Refresh leaves after cancel
+                Result.success(response.body()!!)
+            } else {
+                val errorMsg = response.body()?.message ?: response.body()?.error ?: "Failed to request partial cancellation"
+                Result.failure(Exception(errorMsg))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

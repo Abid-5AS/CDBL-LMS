@@ -33,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.res.stringResource
 import com.cdbl.leavemanager.R
 import com.cdbl.leavemanager.ui.theme.*
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,9 +77,21 @@ fun LeaveDetailScreen(
         },
         bottomBar = {
             val leave = uiState.leave
-            // Show Cancel button for own leaves (non-manager view) that are PENDING or APPROVED
+            // Check if leave can be cancelled
             val canCancel = !isManagerView && leave != null && 
                 (leave.status == "PENDING" || leave.status == "SUBMITTED" || leave.status == "APPROVED")
+            
+            // Check if partial cancel is available (APPROVED + started but not ended)
+            val canPartialCancel = canCancel && leave?.status == "APPROVED" && run {
+                try {
+                    val today = LocalDate.now()
+                    val startDate = LocalDate.parse(leave.startDate.take(10))
+                    val endDate = LocalDate.parse(leave.endDate.take(10))
+                    today >= startDate && today <= endDate  // Leave has started but not ended
+                } catch (e: Exception) {
+                    false
+                }
+            }
             
             // Show Approve/Reject buttons if Manager View and Pending Status
             val canApprove = isManagerView && leave?.status == "PENDING"
@@ -137,15 +150,45 @@ fun LeaveDetailScreen(
                             }
                         }
                     } else if (canCancel) {
-                        Button(
-                            onClick = { actionDialogType = ActionType.CANCEL },
-                            colors = ButtonDefaults.buttonColors(containerColor = ErrorRed),
-                            modifier = Modifier.fillMaxWidth().height(50.dp),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Icon(Icons.Rounded.DoNotDisturb, contentDescription = null, modifier = Modifier.size(20.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Cancel This Leave", fontWeight = FontWeight.Bold)
+                        if (canPartialCancel) {
+                            // Show both Full and Partial cancel options
+                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                OutlinedButton(
+                                    onClick = { actionDialogType = ActionType.FULL_CANCEL },
+                                    modifier = Modifier.weight(1f).height(50.dp),
+                                    shape = RoundedCornerShape(12.dp),
+                                    border = BorderStroke(1.dp, ErrorRed),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = ErrorRed)
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text("Full Cancel", fontWeight = FontWeight.Bold)
+                                        Text("Entire leave", style = MaterialTheme.typography.labelSmall)
+                                    }
+                                }
+                                Button(
+                                    onClick = { actionDialogType = ActionType.PARTIAL_CANCEL },
+                                    colors = ButtonDefaults.buttonColors(containerColor = WarningAmber),
+                                    modifier = Modifier.weight(1f).height(50.dp),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text("Partial Cancel", fontWeight = FontWeight.Bold)
+                                        Text("Future days only", style = MaterialTheme.typography.labelSmall)
+                                    }
+                                }
+                            }
+                        } else {
+                            // Only full cancel available
+                            Button(
+                                onClick = { actionDialogType = ActionType.FULL_CANCEL },
+                                colors = ButtonDefaults.buttonColors(containerColor = ErrorRed),
+                                modifier = Modifier.fillMaxWidth().height(50.dp),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(Icons.Rounded.DoNotDisturb, contentDescription = null, modifier = Modifier.size(20.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Cancel This Leave", fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
                 }
@@ -285,7 +328,9 @@ fun LeaveDetailScreen(
         
         // Action Dialog
         if (actionDialogType != null) {
-            val isCancel = actionDialogType == ActionType.CANCEL
+            val isFullCancel = actionDialogType == ActionType.FULL_CANCEL
+            val isPartialCancel = actionDialogType == ActionType.PARTIAL_CANCEL
+            val isCancel = isFullCancel || isPartialCancel
             val isReturn = actionDialogType == ActionType.RETURN
             val isForward = actionDialogType == ActionType.FORWARD
             val isApprove = actionDialogType == ActionType.APPROVE
@@ -293,6 +338,8 @@ fun LeaveDetailScreen(
                 ActionType.APPROVE -> stringResource(R.string.approve_leave_confirm)
                 ActionType.REJECT -> stringResource(R.string.reject_leave_confirm)
                 ActionType.CANCEL -> "Cancel Leave Request?"
+                ActionType.FULL_CANCEL -> "Cancel Entire Leave?"
+                ActionType.PARTIAL_CANCEL -> "Cancel Future Days?"
                 ActionType.RETURN -> "Return for Modification?"
                 ActionType.FORWARD -> "Forward to Next Approver?"
                 else -> ""
@@ -300,7 +347,7 @@ fun LeaveDetailScreen(
             val dialogColor = when(actionDialogType) {
                 ActionType.APPROVE -> SuccessGreen
                 ActionType.FORWARD -> MaterialTheme.colorScheme.primary
-                ActionType.RETURN -> WarningAmber
+                ActionType.RETURN, ActionType.PARTIAL_CANCEL -> WarningAmber
                 else -> ErrorRed
             }
             
@@ -309,13 +356,24 @@ fun LeaveDetailScreen(
                 title = { Text(dialogTitle) },
                 text = {
                     Column {
-                        Text(if (isCancel) "Please provide a reason for cancellation:" else stringResource(R.string.comment_optional))
+                        when {
+                            isPartialCancel -> {
+                                Text("This will cancel only future days of your leave.", 
+                                     style = MaterialTheme.typography.bodySmall,
+                                     color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text("Days already taken will remain. Please provide a reason:")
+                            }
+                            isFullCancel -> Text("This will cancel your entire leave request. Please provide a reason:")
+                            else -> Text(stringResource(R.string.comment_optional))
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(
                             value = actionComment,
                             onValueChange = { actionComment = it },
                             modifier = Modifier.fillMaxWidth(),
-                            placeholder = { Text(if (isCancel) "Reason for cancellation..." else "Add a comment...") }
+                            placeholder = { Text(if (isCancel) "Reason for cancellation (min 10 chars)..." else "Add a comment...") },
+                            minLines = 2
                         )
                     }
                 },
@@ -325,7 +383,8 @@ fun LeaveDetailScreen(
                             when (actionDialogType) {
                                 ActionType.APPROVE -> viewModel.approveLeave(token, leaveId, actionComment)
                                 ActionType.REJECT -> viewModel.rejectLeave(token, leaveId, actionComment)
-                                ActionType.CANCEL -> viewModel.cancelLeave(token, leaveId, actionComment)
+                                ActionType.CANCEL, ActionType.FULL_CANCEL -> viewModel.fullCancelLeave(token, leaveId, actionComment)
+                                ActionType.PARTIAL_CANCEL -> viewModel.partialCancelLeave(token, leaveId, actionComment)
                                 ActionType.FORWARD -> viewModel.forwardLeave(token, leaveId, actionComment)
                                 ActionType.RETURN -> viewModel.returnLeave(token, leaveId, actionComment)
                                 else -> {}
@@ -334,12 +393,13 @@ fun LeaveDetailScreen(
                             actionComment = ""
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = dialogColor),
-                        enabled = !isCancel && !isReturn || actionComment.isNotBlank()
+                        enabled = !isCancel || actionComment.length >= 10 // Cancel requires 10+ char reason
                     ) {
                         Text(when(actionDialogType) {
                             ActionType.APPROVE -> stringResource(R.string.approve)
                             ActionType.REJECT -> stringResource(R.string.reject)
-                            ActionType.CANCEL -> "Cancel Leave"
+                            ActionType.CANCEL, ActionType.FULL_CANCEL -> "Cancel Leave"
+                            ActionType.PARTIAL_CANCEL -> "Cancel Future Days"
                             ActionType.FORWARD -> "Forward"
                             ActionType.RETURN -> "Return"
                             else -> ""
@@ -356,7 +416,7 @@ fun LeaveDetailScreen(
     }
 }
 
-enum class ActionType { APPROVE, REJECT, CANCEL, FORWARD, RETURN }
+enum class ActionType { APPROVE, REJECT, CANCEL, FULL_CANCEL, PARTIAL_CANCEL, FORWARD, RETURN }
 
 @Composable
 fun InfoCard(title: String, value: String, icon: ImageVector, modifier: Modifier = Modifier) {
