@@ -17,6 +17,7 @@
     <string name="nav_dashboard">Dashboard</string>
     <string name="nav_home">Home</string>
     <string name="nav_leaves">Leaves</string>
+    <string name="nav_holidays">Holidays</string>
     <string name="nav_profile">Profile</string>
     <string name="nav_approvals">Approvals</string>
 

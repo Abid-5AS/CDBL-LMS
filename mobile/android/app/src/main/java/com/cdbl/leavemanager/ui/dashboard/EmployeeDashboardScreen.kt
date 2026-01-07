@@ -72,7 +72,8 @@ fun EmployeeDashboardScreen(
     onNavigateToEncashment: () -> Unit = {},
     onNavigateToApprovals: () -> Unit = {},
     onNavigateToLeaveDetails: (Int) -> Unit = {},
-    onNavigateToHolidays: () -> Unit = {}
+    onNavigateToHolidays: () -> Unit = {},
+    onNavigateToBalance: () -> Unit = {}
 ) {
     // Collect UI State
     val state by viewModel.uiState.collectAsState()
@@ -230,7 +231,7 @@ fun EmployeeDashboardScreen(
                                          modifier = Modifier.weight(1f).fillMaxHeight(),
                                          bg = Indigo600.copy(alpha = 0.1f),
                                          contentColor = Indigo600,
-                                         onClick = { /* Navigate to Balance details if needed */ }
+                                         onClick = onNavigateToBalance
                                      )
                                      // Next Leave
                                      KpiCard(
@@ -265,7 +266,7 @@ fun EmployeeDashboardScreen(
                                     style = MaterialTheme.typography.labelLarge,
                                     color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.clickable { onNavigateToLeaveDetails(-1) }
+                                    modifier = Modifier.clickable { onNavigateToBalance() }
                                 )
                             }
                             Spacer(modifier = Modifier.height(16.dp))

@@ -6,3 +6,16 @@ data class BalanceResponse(
     val CASUAL: Double = 0.0,
     val MEDICAL: Double = 0.0
 )
+
+data class BalanceDetail(
+    val type: String,
+    val opening: Double,
+    val accrued: Double,
+    val used: Double,
+    val closing: Double
+)
+
+data class BalanceDetailResponse(
+    val year: Int,
+    val balances: List<BalanceDetail>
+)

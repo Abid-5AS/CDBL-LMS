@@ -1,6 +1,7 @@
 package com.cdbl.leavemanager.data.api
 
 import com.cdbl.leavemanager.data.model.BalanceResponse
+import com.cdbl.leavemanager.data.model.BalanceDetailResponse
 import com.cdbl.leavemanager.data.model.TeamOnLeaveResponse
 import retrofit2.Response
 import retrofit2.http.GET
@@ -13,6 +14,12 @@ import retrofit2.http.Path
 interface DashboardService {
     @GET("balance/mine")
     suspend fun getMyBalance(@Header("Authorization") token: String): Response<BalanceResponse>
+
+    @GET("balance/mine")
+    suspend fun getMyBalanceDetailed(
+        @Header("Authorization") token: String,
+        @retrofit2.http.Query("detailed") detailed: Boolean = true
+    ): Response<BalanceDetailResponse>
 
     @GET("team/on-leave?scope=team")
     suspend fun getTeamOnLeave(@Header("Authorization") token: String): Response<TeamOnLeaveResponse>

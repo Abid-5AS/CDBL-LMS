@@ -14,6 +14,7 @@ import com.cdbl.leavemanager.ui.navigation.TopLevelDestination
 import kotlinx.coroutines.CoroutineScope
 import com.cdbl.leavemanager.data.local.TokenManager
 import com.cdbl.leavemanager.util.NetworkMonitor
+import com.cdbl.leavemanager.util.JwtUtils
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -55,6 +56,7 @@ class CDBLAppState(
         @Composable get() = when (currentDestination?.route) {
             TopLevelDestination.DASHBOARD.route -> TopLevelDestination.DASHBOARD
             TopLevelDestination.LEAVES.route -> TopLevelDestination.LEAVES
+            TopLevelDestination.HOLIDAYS.route -> TopLevelDestination.HOLIDAYS
             TopLevelDestination.APPROVALS.route -> TopLevelDestination.APPROVALS
             TopLevelDestination.PROFILE.route -> TopLevelDestination.PROFILE
             else -> null
@@ -75,7 +77,31 @@ class CDBLAppState(
             initialValue = tokenManager.getToken() ?: ""
         )
 
-    val topLevelDestinations: List<TopLevelDestination> = TopLevelDestination.values().toList()
+    val userRole = token
+        .map { JwtUtils.getUserRole(it ?: "") }
+        .stateIn(
+            scope = coroutineScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = JwtUtils.getUserRole(tokenManager.getToken() ?: "")
+        )
+
+    fun topLevelDestinationsForRole(role: String?): List<TopLevelDestination> {
+        return if (role == null || role == "EMPLOYEE") {
+            listOf(
+                TopLevelDestination.DASHBOARD,
+                TopLevelDestination.LEAVES,
+                TopLevelDestination.HOLIDAYS,
+                TopLevelDestination.PROFILE
+            )
+        } else {
+            listOf(
+                TopLevelDestination.DASHBOARD,
+                TopLevelDestination.LEAVES,
+                TopLevelDestination.APPROVALS,
+                TopLevelDestination.PROFILE
+            )
+        }
+    }
 
     fun navigateToTopLevelDestination(topLevelDestination: TopLevelDestination) {
         val topLevelNavOptions = navOptions {
@@ -95,6 +121,7 @@ class CDBLAppState(
         when (topLevelDestination) {
             TopLevelDestination.DASHBOARD -> navController.navigate(topLevelDestination.route, topLevelNavOptions)
             TopLevelDestination.LEAVES -> navController.navigate(topLevelDestination.route, topLevelNavOptions)
+            TopLevelDestination.HOLIDAYS -> navController.navigate(topLevelDestination.route, topLevelNavOptions)
             TopLevelDestination.APPROVALS -> navController.navigate(topLevelDestination.route, topLevelNavOptions)
             TopLevelDestination.PROFILE -> navController.navigate(topLevelDestination.route, topLevelNavOptions)
         }

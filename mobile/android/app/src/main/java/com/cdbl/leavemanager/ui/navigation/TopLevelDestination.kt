@@ -5,6 +5,7 @@ import androidx.compose.material.icons.rounded.Dashboard
 import androidx.compose.material.icons.rounded.FlightTakeoff
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.cdbl.leavemanager.R
 
@@ -33,6 +34,13 @@ enum class TopLevelDestination(
         iconTextId = R.string.nav_leaves,
         titleTextId = R.string.nav_leaves,
         route = "leaves_route"
+    ),
+    HOLIDAYS(
+        selectedIcon = Icons.Rounded.CalendarMonth,
+        unselectedIcon = Icons.Rounded.CalendarMonth,
+        iconTextId = R.string.nav_holidays,
+        titleTextId = R.string.nav_holidays,
+        route = "holidays_route"
     ),
     APPROVALS(
         selectedIcon = Icons.Rounded.FlightTakeoff, // Placeholder icon

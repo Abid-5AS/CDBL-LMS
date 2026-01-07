@@ -3,6 +3,7 @@ package com.cdbl.leavemanager.data.repository
 import com.cdbl.leavemanager.data.api.DashboardService
 // import com.cdbl.leavemanager.data.api.AdminService // TODO: AdminService not implemented yet
 import com.cdbl.leavemanager.data.model.BalanceResponse
+import com.cdbl.leavemanager.data.model.BalanceDetailResponse
 import com.cdbl.leavemanager.data.model.TeamOnLeaveResponse
 import com.cdbl.leavemanager.data.local.CacheManager
 import javax.inject.Inject
@@ -32,6 +33,25 @@ class DashboardRepository @Inject constructor(
              val cached = cacheManager.get(CacheManager.KEY_DASHBOARD_BALANCE, BalanceResponse::class.java)
              if (cached != null) Result.success(cached)
              else Result.failure(e)
+        }
+    }
+
+    suspend fun getMyBalanceDetailed(token: String): Result<BalanceDetailResponse> {
+        return try {
+            val response = dashboardService.getMyBalanceDetailed("Bearer $token")
+            if (response.isSuccessful && response.body() != null) {
+                val data = response.body()!!
+                cacheManager.save(CacheManager.KEY_BALANCE_DETAILED, data)
+                Result.success(data)
+            } else {
+                val cached = cacheManager.get(CacheManager.KEY_BALANCE_DETAILED, BalanceDetailResponse::class.java)
+                if (cached != null) Result.success(cached)
+                else Result.failure(Exception("Failed to fetch balance details: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            val cached = cacheManager.get(CacheManager.KEY_BALANCE_DETAILED, BalanceDetailResponse::class.java)
+            if (cached != null) Result.success(cached)
+            else Result.failure(e)
         }
     }
 

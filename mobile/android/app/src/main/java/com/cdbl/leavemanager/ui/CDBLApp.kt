@@ -5,6 +5,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.cdbl.leavemanager.ui.designsystem.component.CDBLBackground
@@ -19,23 +20,22 @@ fun CDBLApp(
 ) {
     CDBLLeaveManagerTheme {
         val snackbarHostState = remember { SnackbarHostState() }
+        val roleState = appState.userRole.collectAsState()
+        val role = roleState.value
+        val destinations = appState.topLevelDestinationsForRole(role)
         
         // Check if current route requires bottom bar
         val currentDestination = appState.currentDestination
         val currentRoute = currentDestination?.route
         
-        val showBottomBar = currentRoute in appState.topLevelDestinations.map { it.route }
-        
-        // Determine role for bottom bar visibility (Approvals)
-        val token = appState.currentTopLevelDestination // This logic needs to access token from somewhere or we pass it down
-        // For now, simpler logic for bottom bar: defined in TopLevelDestination
+        val showBottomBar = currentRoute in destinations.map { it.route }
         
         Scaffold(
             snackbarHost = { SnackbarHost(snackbarHostState) },
             bottomBar = {
                 if (showBottomBar) {
                     CDBLBottomBar(
-                        destinations = appState.topLevelDestinations,
+                        destinations = destinations,
                         onNavigateToDestination = appState::navigateToTopLevelDestination,
                         currentDestination = currentDestination,
                         modifier = Modifier

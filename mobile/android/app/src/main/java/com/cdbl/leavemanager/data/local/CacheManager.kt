@@ -49,5 +49,6 @@ class CacheManager @Inject constructor(
         const val KEY_DASHBOARD_BALANCE = "dashboard_balance"
         const val KEY_DASHBOARD_TEAM = "dashboard_team"
         const val KEY_LEAVE_HISTORY = "leave_history"
+        const val KEY_BALANCE_DETAILED = "balance_detailed"
     }
 }
