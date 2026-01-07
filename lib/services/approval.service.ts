@@ -208,6 +208,7 @@ export class ApprovalService {
                 },
                 data: {
                   used: { decrement: daysToRestore },
+                  closing: { increment: daysToRestore }
                 },
               });
 
@@ -255,6 +256,7 @@ export class ApprovalService {
               },
               data: {
                 used: { increment: leave.workingDays },
+                closing: { decrement: leave.workingDays },
               },
             });
           }
