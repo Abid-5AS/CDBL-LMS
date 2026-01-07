@@ -9,6 +9,7 @@ import { Loader2, BarChart3, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 
 interface DepartmentHeatmapProps {
   currentUserRole: string;
@@ -84,10 +85,15 @@ export function DepartmentHeatmap({ currentUserRole }: DepartmentHeatmapProps) {
   return (
     <div className="w-full mx-auto space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h2 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
           <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
           Department Coverage
-        </h2>
+          </h2>
+          <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+            Mock
+          </Badge>
+        </div>
         <Button variant="outline" size="sm" className="gap-2 self-start sm:self-auto">
           <Download className="h-4 w-4" />
           Export

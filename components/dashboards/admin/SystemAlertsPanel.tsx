@@ -3,6 +3,7 @@
 import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { AlertTriangle, Info, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 interface SystemAlert {
   id: string;
@@ -55,11 +56,14 @@ export function SystemAlertsPanel() {
 
   return (
     <GlassCard variant="hover" className="surface-card">
-      <GlassCardHeader>
+      <GlassCardHeader className="flex flex-row items-center justify-between gap-2">
         <GlassCardTitle className="text-base flex items-center gap-2">
           <AlertTriangle className="h-4 w-4" />
           System Alerts
         </GlassCardTitle>
+        <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+          Mock
+        </Badge>
       </GlassCardHeader>
       <GlassCardContent className="space-y-3">
         {alerts.length === 0 ? (

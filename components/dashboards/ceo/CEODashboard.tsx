@@ -67,6 +67,14 @@ interface CEOStats {
   departments: Array<{ name: string; employees: number }>;
   monthlyTrend: Array<{ month: string; requests: number; days: number }>;
   insights: Array<{ type: string; priority: string; message: string }>;
+  meta?: {
+    mocked?: {
+      avgCostPerDay?: boolean;
+      estimatedCost?: boolean;
+      insights?: boolean;
+      systemHealth?: boolean;
+    };
+  };
 }
 
 export function CEODashboard() {
@@ -78,6 +86,9 @@ export function CEODashboard() {
     apiFetcher,
     { refreshInterval: 60000 }
   );
+
+  const mocked = stats?.meta?.mocked ?? {};
+  const hasMockedData = Object.values(mocked).some(Boolean);
 
   // Fallback/Safety
   const safeStats = useMemo(() => stats || {
@@ -109,6 +120,13 @@ export function CEODashboard() {
       animate={true}
       backgroundVariant="transparent"
     >
+      {hasMockedData && (
+        <div className="fixed bottom-4 right-4 z-50">
+          <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+            Mock data
+          </Badge>
+        </div>
+      )}
       <div className="space-y-8">
         {/* KPI Grid */}
         <DashboardSection
@@ -269,6 +287,11 @@ export function CEODashboard() {
                   <AlertCircle className="w-5 h-5 text-blue-500" />
                   Strategic Alerts
                 </CardTitle>
+                {mocked.insights && (
+                  <Badge variant="outline" className="text-[10px] uppercase tracking-wide w-fit">
+                    Mock
+                  </Badge>
+                )}
               </CardHeader>
               <CardContent className="space-y-4">
                 {safeStats.insights.length > 0 ? (
@@ -296,6 +319,11 @@ export function CEODashboard() {
                   Financial Impact
                 </CardTitle>
                 <CardDescription>Estimated leave costs YTD</CardDescription>
+                {(mocked.avgCostPerDay || mocked.estimatedCost) && (
+                  <Badge variant="outline" className="text-[10px] uppercase tracking-wide w-fit">
+                    Mock
+                  </Badge>
+                )}
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>

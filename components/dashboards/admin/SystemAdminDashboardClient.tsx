@@ -4,6 +4,7 @@ import { Suspense, ReactNode } from "react";
 import Link from "next/link";
 import { Activity, Settings, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { KPICard } from "@/components/cards/KPICard";
 import { QuickActions } from "@/components/shared/QuickActions";
 import { DashboardSection } from "@/app/dashboard/shared/DashboardLayout";
@@ -186,6 +187,11 @@ export function SystemAdminDashboardContent({
       description="System-level configuration and management"
       animate
     >
+      <div className="fixed bottom-4 right-4 z-50">
+        <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+          Mock data
+        </Badge>
+      </div>
       <div className="space-y-6">
         <SystemAdminHeader username={username} />
 
