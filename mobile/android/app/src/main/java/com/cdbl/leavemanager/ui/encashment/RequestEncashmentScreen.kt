@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.cdbl.leavemanager.ui.designsystem.component.CDBLMockTag
 import com.cdbl.leavemanager.ui.theme.Indigo100
 import com.cdbl.leavemanager.ui.theme.Indigo600
 import kotlinx.coroutines.delay
@@ -111,25 +112,30 @@ fun RequestEncashmentScreen(
 
             // Calculation Preview
             if (days.isNotEmpty()) {
-                Row(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
                         .background(MaterialTheme.colorScheme.surface)
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(16.dp)
                 ) {
-                    Column {
-                        Text("Estimated Amount", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text("Based on basic salary", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text("Estimated Amount", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text("Based on basic salary", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
+                        }
+                        Text(
+                            "৳ $estimatedAmount",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Indigo600
+                        )
                     }
-                    Text(
-                        "৳ $estimatedAmount",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = Indigo600
-                    )
+                    CDBLMockTag(modifier = Modifier.align(Alignment.TopEnd))
                 }
             }
 

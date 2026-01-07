@@ -36,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,6 +59,8 @@ import com.cdbl.leavemanager.ui.components.ErrorView
 import com.cdbl.leavemanager.ui.components.KpiCard
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,6 +76,9 @@ fun EmployeeDashboardScreen(
 ) {
     // Collect UI State
     val state by viewModel.uiState.collectAsState()
+    val formattedDate = remember {
+        LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMM dd"))
+    }
 
     LaunchedEffect(Unit) {
         viewModel.loadDashboard(token)
@@ -118,7 +124,7 @@ fun EmployeeDashboardScreen(
                             ) {
                                 Column {
                                     Text(
-                                        text = "Thursday, Oct 26", // TODO: Use real date
+                                        text = formattedDate,
                                         style = MaterialTheme.typography.labelLarge,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )

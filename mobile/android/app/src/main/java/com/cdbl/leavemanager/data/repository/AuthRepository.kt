@@ -17,9 +17,13 @@ class AuthRepository @Inject constructor(
     private val authService: AuthService,
     private val userDao: UserDao
 ) {
-    suspend fun login(email: String, password: String): Result<LoginResponse> {
+    suspend fun login(
+        email: String,
+        password: String,
+        skipOtp: Boolean = com.cdbl.leavemanager.BuildConfig.DEBUG
+    ): Result<LoginResponse> {
         return try {
-            val response = authService.login(LoginRequest(email, password, skipOtp = com.cdbl.leavemanager.BuildConfig.DEBUG))
+            val response = authService.login(LoginRequest(email, password, skipOtp = skipOtp))
             if (response.isSuccessful && response.body() != null) {
                 val loginResponse = response.body()!!
                 // Cache user if login successful and user data provided

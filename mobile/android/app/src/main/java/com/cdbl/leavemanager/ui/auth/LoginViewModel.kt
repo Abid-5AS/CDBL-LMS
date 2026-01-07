@@ -42,15 +42,15 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun login(email: String, password: String) {
+    fun login(email: String, password: String, skipOtp: Boolean) {
         viewModelScope.launch {
             _uiState.value = LoginUiState(isLoading = true)
-            val result = authRepository.login(email, password)
+            val result = authRepository.login(email, password, skipOtp)
             result.onSuccess { response ->
                 if (response.success && response.data != null) {
                     if (response.data.requiresOtp) {
                         // In debug builds, automatically verify with default OTP
-                        if (com.cdbl.leavemanager.BuildConfig.DEBUG) {
+                        if (skipOtp && com.cdbl.leavemanager.BuildConfig.DEBUG) {
                             _uiState.value = LoginUiState(
                                 isLoading = true,
                                 email = email

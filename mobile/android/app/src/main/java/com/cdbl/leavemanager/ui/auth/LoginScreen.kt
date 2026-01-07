@@ -22,7 +22,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.cdbl.leavemanager.ui.theme.Indigo600
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
 import com.cdbl.leavemanager.util.BiometricHelper
@@ -40,6 +39,7 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var skipOtp by remember { mutableStateOf(com.cdbl.leavemanager.BuildConfig.DEBUG) }
 
     LaunchedEffect(uiState.token) {
         if (uiState.token != null) {
@@ -138,8 +138,30 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            if (com.cdbl.leavemanager.BuildConfig.DEBUG) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Switch(
+                            checked = skipOtp,
+                            onCheckedChange = { skipOtp = it }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Skip OTP (Testing)",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
              Button(
-                onClick = { viewModel.login(email, password) },
+                onClick = { viewModel.login(email, password, skipOtp) },
                 enabled = !uiState.isLoading,
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -182,72 +204,74 @@ fun LoginScreen(
             }
 
             // Dev Options (Restored)
-            Spacer(modifier = Modifier.height(48.dp))
-            Text(
-                text = "Quick Login (Dev Only)",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+            if (com.cdbl.leavemanager.BuildConfig.DEBUG) {
+                Spacer(modifier = Modifier.height(48.dp))
+                Text(
+                    text = "Quick Login (Dev Only)",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    QuickLoginButton(
-                        label = "Admin",
-                        onClick = {
-                             email = "sysadmin@cdbl.local"
-                             password = "demo123"
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-                    QuickLoginButton(
-                        label = "HR Admin",
-                        onClick = {
-                             email = "hradmin@demo.local"
-                             password = "demo123"
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-                     QuickLoginButton(
-                        label = "HR Head",
-                        onClick = {
-                             email = "hrhead@demo.local"
-                             password = "demo123"
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                     QuickLoginButton(
-                        label = "Manager",
-                        onClick = {
-                             email = "manager@demo.local"
-                             password = "demo123"
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-                    QuickLoginButton(
-                        label = "CEO",
-                        onClick = {
-                             email = "ceo@demo.local"
-                             password = "demo123"
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-                    QuickLoginButton(
-                        label = "Employee",
-                        onClick = {
-                             email = "employee1@demo.local"
-                             password = "demo123"
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        QuickLoginButton(
+                            label = "Admin",
+                            onClick = {
+                                email = "admin1@test.local"
+                                password = "password123"
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                        QuickLoginButton(
+                            label = "HR Admin",
+                            onClick = {
+                                email = "hradmin1@test.local"
+                                password = "password123"
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                        QuickLoginButton(
+                            label = "HR Head",
+                            onClick = {
+                                email = "hrhead1@test.local"
+                                password = "password123"
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        QuickLoginButton(
+                            label = "Dept Head",
+                            onClick = {
+                                email = "manager1@test.local"
+                                password = "password123"
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                        QuickLoginButton(
+                            label = "CEO",
+                            onClick = {
+                                email = "ceo1@test.local"
+                                password = "password123"
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                        QuickLoginButton(
+                            label = "Employee",
+                            onClick = {
+                                email = "employee1@test.local"
+                                password = "password123"
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                 }
             }
         }

@@ -7,10 +7,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.cdbl.leavemanager.ui.designsystem.component.CDBLBackground
 import com.cdbl.leavemanager.ui.navigation.CDBLBottomBar
 import com.cdbl.leavemanager.ui.navigation.CDBLNavHost
 import com.cdbl.leavemanager.ui.theme.CDBLLeaveManagerTheme
-import com.cdbl.leavemanager.util.JwtUtils
 
 @Composable
 fun CDBLApp(
@@ -43,11 +43,13 @@ fun CDBLApp(
                 }
             }
         ) { padding ->
-            CDBLNavHost(
-                appState = appState,
-                modifier = Modifier.padding(padding),
-                startDestination = startDestination
-            )
+            CDBLBackground {
+                CDBLNavHost(
+                    appState = appState,
+                    modifier = Modifier.padding(padding),
+                    startDestination = startDestination
+                )
+            }
         }
     }
 }

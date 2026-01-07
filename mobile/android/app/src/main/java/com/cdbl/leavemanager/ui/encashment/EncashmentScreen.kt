@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cdbl.leavemanager.data.model.EncashmentRequest
+import com.cdbl.leavemanager.ui.designsystem.component.CDBLMockTag
 import com.cdbl.leavemanager.ui.theme.Indigo100
 import com.cdbl.leavemanager.ui.theme.Indigo600
 import com.cdbl.leavemanager.ui.theme.SuccessGreen
@@ -52,7 +53,8 @@ fun EncashmentScreen(
     }
     
     // Mock Data if empty
-    val displayRequests = if (uiState.requests.isEmpty()) {
+    val showMockRequests = uiState.requests.isEmpty()
+    val displayRequests = if (showMockRequests) {
         listOf(
             EncashmentRequest(
                 id = 1, 
@@ -82,6 +84,7 @@ fun EncashmentScreen(
     } else {
         uiState.requests
     }
+    val showMockBalance = true
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -155,77 +158,91 @@ fun EncashmentScreen(
                     }
                      Text("Updated today", style = MaterialTheme.typography.labelSmall, color = Indigo100, modifier = Modifier.align(Alignment.End))
                 }
+                if (showMockBalance) {
+                    CDBLMockTag(modifier = Modifier.align(Alignment.TopEnd))
+                }
 
             }
 
             // Payroll/Deduction Card
             Spacer(modifier = Modifier.height(16.dp))
             val deductionAmount = uiState.lwpDays * 1666.0 // Mock daily rate
+            val showMockPayroll = true
             
             if (deductionAmount > 0) {
-                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-                    shape = RoundedCornerShape(24.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.padding(24.dp).fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                        shape = RoundedCornerShape(24.dp),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Column {
-                            Text("Projected Salary Deduction", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onErrorContainer)
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "BDT ${String.format("%,.0f", deductionAmount)}",
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onErrorContainer
-                            )
-                            Text(
-                                text = "${uiState.lwpDays} days Unpaid Leave",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f)
+                        Row(
+                            modifier = Modifier.padding(24.dp).fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text("Projected Salary Deduction", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onErrorContainer)
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = "BDT ${String.format("%,.0f", deductionAmount)}",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                                Text(
+                                    text = "${uiState.lwpDays} days Unpaid Leave",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f)
+                                )
+                            }
+                            Icon(
+                                Icons.Rounded.MoneyOff, 
+                                contentDescription = null, 
+                                tint = MaterialTheme.colorScheme.onErrorContainer,
+                                modifier = Modifier.size(32.dp)
                             )
                         }
-                        Icon(
-                            Icons.Rounded.MoneyOff, 
-                            contentDescription = null, 
-                            tint = MaterialTheme.colorScheme.onErrorContainer,
-                            modifier = Modifier.size(32.dp)
-                        )
+                    }
+                    if (showMockPayroll) {
+                        CDBLMockTag(modifier = Modifier.align(Alignment.TopEnd).padding(8.dp))
                     }
                 }
             } else {
                  // Optional: Show "No Deductions" or hiding it is fine.
                  // Show "Salary Safe" card?
-                  Card(
-                    colors = CardDefaults.cardColors(containerColor = SuccessGreen.copy(alpha=0.1f)),
-                    shape = RoundedCornerShape(24.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.padding(24.dp).fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                  Box(modifier = Modifier.fillMaxWidth()) {
+                      Card(
+                        colors = CardDefaults.cardColors(containerColor = SuccessGreen.copy(alpha=0.1f)),
+                        shape = RoundedCornerShape(24.dp),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Column {
-                            Text("Salary Status", style = MaterialTheme.typography.labelMedium, color = SuccessGreen)
-                            Text(
-                                text = "No Deductions",
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = SuccessGreen
+                        Row(
+                            modifier = Modifier.padding(24.dp).fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text("Salary Status", style = MaterialTheme.typography.labelMedium, color = SuccessGreen)
+                                Text(
+                                    text = "No Deductions",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = SuccessGreen
+                                )
+                            }
+                             Icon(
+                                Icons.Rounded.CheckCircle, 
+                                contentDescription = null, 
+                                tint = SuccessGreen,
+                                modifier = Modifier.size(32.dp)
                             )
                         }
-                         Icon(
-                            Icons.Rounded.CheckCircle, 
-                            contentDescription = null, 
-                            tint = SuccessGreen,
-                            modifier = Modifier.size(32.dp)
-                        )
                     }
-                }
+                    if (showMockPayroll) {
+                        CDBLMockTag(modifier = Modifier.align(Alignment.TopEnd).padding(8.dp))
+                    }
+                  }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -238,7 +255,7 @@ fun EncashmentScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(displayRequests) { request ->
-                    EncashmentCard(request)
+                    EncashmentCard(request, showMockTag = showMockRequests)
                 }
             }
         }
@@ -246,54 +263,59 @@ fun EncashmentScreen(
 }
 
 @Composable
-fun EncashmentCard(request: EncashmentRequest) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)),
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primaryContainer),
-                        contentAlignment = Alignment.Center
-                    ) {
-                         Icon(Icons.Rounded.History, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+fun EncashmentCard(request: EncashmentRequest, showMockTag: Boolean = false) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Card(
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.primaryContainer),
+                            contentAlignment = Alignment.Center
+                        ) {
+                             Icon(Icons.Rounded.History, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                             Text(
+                                text = "${request.daysRequested} Days",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = formatDate(request.createdAt),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                         Text(
-                            text = "${request.daysRequested} Days",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = formatDate(request.createdAt),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    StatusBadge(request.status)
                 }
-                StatusBadge(request.status)
+
+                if (request.paymentStatus == "PAID") {
+                     HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
+                     Row(verticalAlignment = Alignment.CenterVertically) {
+                         Icon(Icons.Rounded.CheckCircle, contentDescription = null, tint = SuccessGreen, modifier = Modifier.size(16.dp))
+                         Spacer(modifier = Modifier.width(8.dp))
+                         Text("Payment Processed", style = MaterialTheme.typography.labelSmall, color = SuccessGreen, fontWeight = FontWeight.Bold)
+                     }
+                }
             }
-            
-            if (request.paymentStatus == "PAID") {
-                 HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
-                 Row(verticalAlignment = Alignment.CenterVertically) {
-                     Icon(Icons.Rounded.CheckCircle, contentDescription = null, tint = SuccessGreen, modifier = Modifier.size(16.dp))
-                     Spacer(modifier = Modifier.width(8.dp))
-                     Text("Payment Processed", style = MaterialTheme.typography.labelSmall, color = SuccessGreen, fontWeight = FontWeight.Bold)
-                 }
-            }
+        }
+        if (showMockTag) {
+            CDBLMockTag(modifier = Modifier.align(Alignment.TopEnd).padding(8.dp))
         }
     }
 }
