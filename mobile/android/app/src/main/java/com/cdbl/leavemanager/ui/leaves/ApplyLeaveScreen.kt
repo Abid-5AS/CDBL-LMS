@@ -66,17 +66,18 @@ fun ApplyLeaveScreen(
     // Leave Types - map policy codes to backend enum values
     val leaveTypes = remember(uiState.leavePolicies) {
         uiState.leavePolicies.map { policy ->
-            val (icon, color, apiCode) = when (policy.code.uppercase()) {
-                "AL", "EARNED" -> Triple(Icons.Rounded.FlightTakeoff, Indigo600, "EARNED")
-                "SL", "MEDICAL" -> Triple(Icons.Rounded.Sick, ErrorRed, "MEDICAL")
-                "CL", "CASUAL" -> Triple(Icons.Rounded.Weekend, WarningAmber, "CASUAL")
+            val normalizedCode = policy.code.uppercase()
+            val (icon, color, apiCode) = when (normalizedCode) {
+                "6.21", "AL", "EL", "EARNED" -> Triple(Icons.Rounded.FlightTakeoff, Indigo600, "EARNED")
+                "6.14", "SL", "MEDICAL" -> Triple(Icons.Rounded.Sick, ErrorRed, "MEDICAL")
+                "6.20", "CL", "CASUAL" -> Triple(Icons.Rounded.Weekend, WarningAmber, "CASUAL")
                 "LWP", "EXTRAWITHOUTPAY" -> Triple(Icons.Rounded.WorkOff, Color(0xFF14b8a6), "EXTRAWITHOUTPAY")
                 "EXTRAWITHPAY" -> Triple(Icons.Rounded.Paid, Color(0xFF10b981), "EXTRAWITHPAY")
-                "MATERNITY" -> Triple(Icons.Rounded.ChildCare, Color(0xFFec4899), "MATERNITY")
-                "PATERNITY" -> Triple(Icons.Rounded.ChildFriendly, Color(0xFF3b82f6), "PATERNITY")
+                "6.15", "MATERNITY" -> Triple(Icons.Rounded.ChildCare, Color(0xFFec4899), "MATERNITY")
+                "6.16", "PATERNITY" -> Triple(Icons.Rounded.ChildFriendly, Color(0xFF3b82f6), "PATERNITY")
                 "STUDY" -> Triple(Icons.Rounded.School, Color(0xFF8b5cf6), "STUDY")
                 "SPECIAL" -> Triple(Icons.Rounded.Star, Color(0xFFf59e0b), "SPECIAL")
-                else -> Triple(Icons.Rounded.Event, Color.Gray, policy.code.uppercase())
+                else -> Triple(Icons.Rounded.Event, Color.Gray, normalizedCode)
             }
             LeaveTypeItem(name = policy.title, apiCode = apiCode, icon = icon, color = color)
         }
