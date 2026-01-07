@@ -932,7 +932,19 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                       </div>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
-                      {leaveTypeLabel[item.type] ?? item.type}
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span>{leaveTypeLabel[item.type] ?? item.type}</span>
+                        {(item as any).isCancellationRequest && (
+                          <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300">
+                            Cancellation
+                          </span>
+                        )}
+                        {(item as any).isModified && !(item as any).isCancellationRequest && (
+                          <span className="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                            Resubmitted
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
                       <div>{start}</div>

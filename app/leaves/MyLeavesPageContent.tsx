@@ -34,18 +34,22 @@ import { Wallet, ClipboardList } from "lucide-react";
 function LeaveRequestCard({ request, onClick }: { request: any; onClick: () => void }) {
   const statusColors = {
     PENDING: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800",
+    SUBMITTED: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800",
     APPROVED: "bg-green-500/10 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800",
     REJECTED: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800",
     CANCELLED: "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800",
     RETURNED: "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800",
+    CANCELLATION_REQUESTED: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800",
   };
 
   const statusIcons = {
     PENDING: Clock,
+    SUBMITTED: Clock,
     APPROVED: CheckCircle2,
     REJECTED: XCircle,
     CANCELLED: XCircle,
     RETURNED: AlertCircle,
+    CANCELLATION_REQUESTED: XCircle,
   };
 
   const StatusIcon = statusIcons[request.status as keyof typeof statusIcons] || Clock;
@@ -77,8 +81,18 @@ function LeaveRequestCard({ request, onClick }: { request: any; onClick: () => v
                 "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border",
                 statusColor
               )}>
-                {request.status}
+                {request.status === "CANCELLATION_REQUESTED" ? "Cancellation Pending" : request.status}
               </span>
+              {request.isCancellationRequest && (
+                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300">
+                  Cancellation
+                </span>
+              )}
+              {request.isModified && !request.isCancellationRequest && (
+                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                  Resubmitted
+                </span>
+              )}
             </div>
             <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="h-3.5 w-3.5" />
@@ -122,6 +136,21 @@ function RequestsView() {
       color: "bg-info/80 hover:bg-info dark:bg-info/70 dark:hover:bg-info/80",
     },
     {
+      id: "returned",
+      title: "Returned",
+      color: "bg-orange-500/80 hover:bg-orange-500 dark:bg-orange-600/70 dark:hover:bg-orange-500/80",
+    },
+    {
+      id: "cancellations",
+      title: "Cancellations",
+      color: "bg-rose-500/80 hover:bg-rose-500 dark:bg-rose-600/70 dark:hover:bg-rose-500/80",
+    },
+    {
+      id: "modified",
+      title: "Modified",
+      color: "bg-sky-500/80 hover:bg-sky-500 dark:bg-sky-600/70 dark:hover:bg-sky-500/80",
+    },
+    {
       id: "approved",
       title: "Approved",
       color: "bg-success/80 hover:bg-success dark:bg-success/70 dark:hover:bg-success/80",
@@ -139,7 +168,22 @@ function RequestsView() {
   ];
 
   const filteredRequests = data?.items?.filter((item: any) => {
-    const matchesTab = activeTab === "all" || item.status.toLowerCase() === activeTab;
+    // Handle tab filtering
+    let matchesTab = false;
+    if (activeTab === "all") {
+      matchesTab = true;
+    } else if (activeTab === "pending") {
+      matchesTab = ["PENDING", "SUBMITTED"].includes(item.status);
+    } else if (activeTab === "returned") {
+      matchesTab = item.status === "RETURNED";
+    } else if (activeTab === "cancellations") {
+      matchesTab = item.isCancellationRequest || item.status === "CANCELLATION_REQUESTED";
+    } else if (activeTab === "modified") {
+      matchesTab = item.isModified && !item.isCancellationRequest;
+    } else {
+      matchesTab = item.status.toLowerCase() === activeTab;
+    }
+
     const typeLabel = leaveTypeLabel[item.type] || item.type || "";
     const matchesSearch = typeLabel.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.reason?.toLowerCase().includes(searchQuery.toLowerCase());

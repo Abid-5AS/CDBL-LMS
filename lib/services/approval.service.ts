@@ -187,23 +187,77 @@ export class ApprovalService {
         const isFinalStep = currentStep.step === allApprovals[allApprovals.length - 1].step;
 
         if (isFinalStep) {
-          // FINAL APPROVAL
-          await tx.leaveRequest.update({
-            where: { id: leaveId },
-            data: { status: "APPROVED" }
-          });
+          // Check if this is a cancellation request
+          if (leave.isCancellationRequest && leave.parentLeaveId) {
+            // CANCELLATION FINAL APPROVAL - handled specially
+            // Restore balance and update original leave
+            const originalLeave = await tx.leaveRequest.findUnique({
+              where: { id: leave.parentLeaveId },
+            });
 
-          // Deduct balance
-          await tx.balance.updateMany({
-            where: {
-              userId: leave.requesterId,
-              year: new Date().getFullYear(),
-              type: leave.type
-            },
-            data: {
-              used: { increment: leave.workingDays }
+            if (originalLeave) {
+              const currentYear = new Date().getFullYear();
+              const daysToRestore = leave.workingDays;
+
+              // Restore balance
+              await tx.balance.updateMany({
+                where: {
+                  userId: leave.requesterId,
+                  type: leave.type,
+                  year: currentYear,
+                },
+                data: {
+                  used: { decrement: daysToRestore },
+                },
+              });
+
+              // Update original leave status
+              if (leave.isPartialCancellation) {
+                // Partial: update original leave dates
+                await tx.leaveRequest.update({
+                  where: { id: leave.parentLeaveId },
+                  data: {
+                    startDate: leave.startDate,
+                    endDate: leave.endDate,
+                    workingDays: originalLeave.workingDays - daysToRestore,
+                    status: "APPROVED", // Back to approved with new dates
+                  },
+                });
+              } else {
+                // Full: mark as cancelled
+                await tx.leaveRequest.update({
+                  where: { id: leave.parentLeaveId },
+                  data: {
+                    status: "CANCELLED",
+                  },
+                });
+              }
             }
-          });
+
+            // Mark cancellation request as approved
+            await tx.leaveRequest.update({
+              where: { id: leaveId },
+              data: { status: "APPROVED" },
+            });
+          } else {
+            // REGULAR FINAL APPROVAL
+            await tx.leaveRequest.update({
+              where: { id: leaveId },
+              data: { status: "APPROVED" },
+            });
+
+            // Deduct balance
+            await tx.balance.updateMany({
+              where: {
+                userId: leave.requesterId,
+                year: new Date().getFullYear(),
+                type: leave.type,
+              },
+              data: {
+                used: { increment: leave.workingDays },
+              },
+            });
+          }
         }
         // Else: The next step exists (pre-generated). It is already PENDING (created as pending). 
         // We just need to notify.
