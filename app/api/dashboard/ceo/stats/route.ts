@@ -348,6 +348,15 @@ export async function GET(req: NextRequest) {
         dbStatus: "healthy",
         uptime: 99.9,
       },
+
+      meta: {
+        mocked: {
+          avgCostPerDay: true,
+          estimatedCost: true,
+          insights: true,
+          systemHealth: true,
+        },
+      },
     };
 
     return NextResponse.json(stats);
