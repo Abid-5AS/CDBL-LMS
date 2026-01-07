@@ -146,7 +146,7 @@ fun AdminDashboardScreen(
                     ) {
                         ListItem(
                             headlineContent = { Text(log.action, fontWeight = FontWeight.Medium) },
-                            supportingContent = { Text("${log.user} • ${log.timestamp}") },
+                            supportingContent = { Text("${log.actorEmail} • ${log.createdAt}") },
                             leadingContent = { 
                                 Icon(Icons.Rounded.Info, contentDescription = null, tint = MaterialTheme.colorScheme.primary) 
                             },

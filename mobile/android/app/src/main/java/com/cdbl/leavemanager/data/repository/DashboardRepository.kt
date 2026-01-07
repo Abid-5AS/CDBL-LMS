@@ -12,7 +12,6 @@ import javax.inject.Singleton
 @Singleton
 class DashboardRepository @Inject constructor(
     private val dashboardService: DashboardService,
-    // private val adminService: AdminService, // TODO: AdminService not implemented yet
     private val cacheManager: CacheManager
 ) {
     suspend fun getMyBalance(token: String): Result<BalanceResponse> {
@@ -117,7 +116,7 @@ class DashboardRepository @Inject constructor(
         return try {
             val response = dashboardService.getAuditLogs("Bearer $token")
             if (response.isSuccessful && response.body() != null) {
-                Result.success(response.body()!!)
+                Result.success(response.body()!!.items)
             } else {
                 Result.failure(Exception("Failed to fetch audit logs: ${response.code()}"))
             }
@@ -151,11 +150,9 @@ class DashboardRepository @Inject constructor(
         }
     }
 
-    // TODO: Admin user management methods commented out until AdminService is implemented
-    /*
-    suspend fun getUsers(token: String): Result<List<com.cdbl.leavemanager.data.model.User>> {
+    suspend fun getUsers(token: String): Result<List<com.cdbl.leavemanager.data.model.AdminUser>> {
         return try {
-            val response = adminService.getUsers("Bearer $token")
+            val response = dashboardService.getUsers("Bearer $token")
             if (response.isSuccessful && response.body() != null) {
                 // Prefer 'users' list, fall back to empty
                 Result.success(response.body()?.users ?: emptyList())
@@ -169,7 +166,7 @@ class DashboardRepository @Inject constructor(
 
     suspend fun createUser(token: String, request: com.cdbl.leavemanager.data.model.CreateUserRequest): Result<String> {
         return try {
-            val response = adminService.createUser("Bearer $token", request)
+            val response = dashboardService.createUser("Bearer $token", request)
             if (response.isSuccessful && response.body()?.ok == true) {
                 Result.success("User created successfully")
             } else {
@@ -183,7 +180,7 @@ class DashboardRepository @Inject constructor(
 
     suspend fun updateUser(token: String, userId: String, request: com.cdbl.leavemanager.data.model.UpdateUserRequest): Result<String> {
         return try {
-            val response = adminService.updateUser("Bearer $token", userId, request)
+            val response = dashboardService.updateUser("Bearer $token", userId, request)
             if (response.isSuccessful && response.body()?.item != null) {
                 Result.success("User updated successfully")
             } else {
@@ -194,5 +191,4 @@ class DashboardRepository @Inject constructor(
             Result.failure(e)
         }
     }
-    */
 }

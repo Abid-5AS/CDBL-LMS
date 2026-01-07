@@ -58,6 +58,10 @@ class CDBLAppState(
             TopLevelDestination.LEAVES.route -> TopLevelDestination.LEAVES
             TopLevelDestination.HOLIDAYS.route -> TopLevelDestination.HOLIDAYS
             TopLevelDestination.APPROVALS.route -> TopLevelDestination.APPROVALS
+            TopLevelDestination.TEAM.route -> TopLevelDestination.TEAM
+            TopLevelDestination.REPORTS.route -> TopLevelDestination.REPORTS
+            TopLevelDestination.ADMIN.route -> TopLevelDestination.ADMIN
+            TopLevelDestination.MORE.route -> TopLevelDestination.MORE
             TopLevelDestination.PROFILE.route -> TopLevelDestination.PROFILE
             else -> null
         }
@@ -86,18 +90,37 @@ class CDBLAppState(
         )
 
     fun topLevelDestinationsForRole(role: String?): List<TopLevelDestination> {
-        return if (role == null || role == "EMPLOYEE") {
-            listOf(
+        return when (role) {
+            null, "EMPLOYEE" -> listOf(
                 TopLevelDestination.DASHBOARD,
                 TopLevelDestination.LEAVES,
                 TopLevelDestination.HOLIDAYS,
                 TopLevelDestination.PROFILE
             )
-        } else {
-            listOf(
+            "DEPT_HEAD" -> listOf(
+                TopLevelDestination.DASHBOARD,
+                TopLevelDestination.APPROVALS,
+                TopLevelDestination.TEAM,
+                TopLevelDestination.REPORTS,
+                TopLevelDestination.PROFILE
+            )
+            "SYSTEM_ADMIN" -> listOf(
+                TopLevelDestination.DASHBOARD,
+                TopLevelDestination.ADMIN,
+                TopLevelDestination.TEAM,
+                TopLevelDestination.REPORTS,
+                TopLevelDestination.MORE
+            )
+            "CEO", "HR_ADMIN", "HR_HEAD" -> listOf(
+                TopLevelDestination.DASHBOARD,
+                TopLevelDestination.APPROVALS,
+                TopLevelDestination.TEAM,
+                TopLevelDestination.REPORTS,
+                TopLevelDestination.MORE
+            )
+            else -> listOf(
                 TopLevelDestination.DASHBOARD,
                 TopLevelDestination.LEAVES,
-                TopLevelDestination.APPROVALS,
                 TopLevelDestination.PROFILE
             )
         }
@@ -123,6 +146,10 @@ class CDBLAppState(
             TopLevelDestination.LEAVES -> navController.navigate(topLevelDestination.route, topLevelNavOptions)
             TopLevelDestination.HOLIDAYS -> navController.navigate(topLevelDestination.route, topLevelNavOptions)
             TopLevelDestination.APPROVALS -> navController.navigate(topLevelDestination.route, topLevelNavOptions)
+            TopLevelDestination.TEAM -> navController.navigate(topLevelDestination.route, topLevelNavOptions)
+            TopLevelDestination.REPORTS -> navController.navigate(topLevelDestination.route, topLevelNavOptions)
+            TopLevelDestination.ADMIN -> navController.navigate(topLevelDestination.route, topLevelNavOptions)
+            TopLevelDestination.MORE -> navController.navigate(topLevelDestination.route, topLevelNavOptions)
             TopLevelDestination.PROFILE -> navController.navigate(topLevelDestination.route, topLevelNavOptions)
         }
     }

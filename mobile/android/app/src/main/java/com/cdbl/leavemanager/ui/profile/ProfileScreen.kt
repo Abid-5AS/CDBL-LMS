@@ -17,6 +17,7 @@ import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,6 +46,8 @@ fun ProfileScreen(
     onNavigateToEditProfile: () -> Unit,
     onNavigateToPolicies: () -> Unit,
     onNavigateToHelp: () -> Unit,
+    onNavigateToNotifications: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -140,7 +143,8 @@ fun ProfileScreen(
                     ProfileMenuItem(icon = Icons.Rounded.Person, title = stringResource(R.string.personal_info), onClick = onNavigateToEditProfile)
                     ProfileMenuItem(icon = Icons.Rounded.Description, title = stringResource(R.string.policies), onClick = onNavigateToPolicies)
                     ProfileMenuItem(icon = Icons.Rounded.Event, title = stringResource(R.string.holidays), onClick = onNavigateToHolidays)
-                    ProfileMenuItem(icon = Icons.Rounded.Notifications, title = stringResource(R.string.notifications))
+                    ProfileMenuItem(icon = Icons.Rounded.Notifications, title = stringResource(R.string.notifications), onClick = onNavigateToNotifications)
+                    ProfileMenuItem(icon = Icons.Rounded.Settings, title = stringResource(R.string.settings), onClick = onNavigateToSettings)
                     ProfileMenuItem(icon = Icons.Rounded.Lock, title = stringResource(R.string.change_password), onClick = onNavigateToChangePassword)
                     ProfileMenuItem(icon = Icons.Rounded.Help, title = stringResource(R.string.help_support), onClick = onNavigateToHelp)
                 }

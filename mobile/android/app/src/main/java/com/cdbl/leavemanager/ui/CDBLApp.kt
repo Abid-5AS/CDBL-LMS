@@ -9,6 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.cdbl.leavemanager.ui.designsystem.component.CDBLBackground
+import com.cdbl.leavemanager.ui.designsystem.component.CDBLGradientBackground
 import com.cdbl.leavemanager.ui.navigation.CDBLBottomBar
 import com.cdbl.leavemanager.ui.navigation.CDBLNavHost
 import com.cdbl.leavemanager.ui.theme.CDBLLeaveManagerTheme
@@ -28,7 +29,9 @@ fun CDBLApp(
         val currentDestination = appState.currentDestination
         val currentRoute = currentDestination?.route
         
-        val showBottomBar = currentRoute in destinations.map { it.route }
+        val showBottomBar = destinations.any { destination ->
+            currentRoute?.contains(destination.route, ignoreCase = true) == true
+        }
         
         Scaffold(
             snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -44,11 +47,13 @@ fun CDBLApp(
             }
         ) { padding ->
             CDBLBackground {
-                CDBLNavHost(
-                    appState = appState,
-                    modifier = Modifier.padding(padding),
-                    startDestination = startDestination
-                )
+                CDBLGradientBackground {
+                    CDBLNavHost(
+                        appState = appState,
+                        modifier = Modifier.padding(padding),
+                        startDestination = startDestination
+                    )
+                }
             }
         }
     }

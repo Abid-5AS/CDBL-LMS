@@ -199,4 +199,52 @@ object NetworkModule {
     fun provideEncashmentService(retrofit: Retrofit): com.cdbl.leavemanager.data.api.EncashmentService {
         return retrofit.create(com.cdbl.leavemanager.data.api.EncashmentService::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun provideEmployeeService(retrofit: Retrofit): com.cdbl.leavemanager.data.api.EmployeeService {
+        return retrofit.create(com.cdbl.leavemanager.data.api.EmployeeService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNotificationService(retrofit: Retrofit): com.cdbl.leavemanager.data.api.NotificationService {
+        return retrofit.create(com.cdbl.leavemanager.data.api.NotificationService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideReportsService(retrofit: Retrofit): com.cdbl.leavemanager.data.api.ReportsService {
+        return retrofit.create(com.cdbl.leavemanager.data.api.ReportsService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDelegationService(retrofit: Retrofit): com.cdbl.leavemanager.data.api.DelegationService {
+        return retrofit.create(com.cdbl.leavemanager.data.api.DelegationService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideIntegrationService(retrofit: Retrofit): com.cdbl.leavemanager.data.api.IntegrationService {
+        return retrofit.create(com.cdbl.leavemanager.data.api.IntegrationService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWebhookService(retrofit: Retrofit): com.cdbl.leavemanager.data.api.WebhookService {
+        return retrofit.create(com.cdbl.leavemanager.data.api.WebhookService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideHrisService(retrofit: Retrofit): com.cdbl.leavemanager.data.api.HrisService {
+        return retrofit.create(com.cdbl.leavemanager.data.api.HrisService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWorkflowService(retrofit: Retrofit): com.cdbl.leavemanager.data.api.WorkflowService {
+        return retrofit.create(com.cdbl.leavemanager.data.api.WorkflowService::class.java)
+    }
 }

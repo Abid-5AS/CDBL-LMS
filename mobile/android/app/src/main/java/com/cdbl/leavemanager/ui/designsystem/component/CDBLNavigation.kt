@@ -7,7 +7,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 /**
@@ -23,8 +22,8 @@ fun CDBLNavigationBar(
 ) {
     NavigationBar(
         modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.surface, // Or NavigationBarDefaults.containerColor
-        contentColor = MaterialTheme.colorScheme.onSurface,
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = CDBLNavigationDefaults.navigationContentColor(),
         tonalElevation = 0.dp,
         content = content
     )
@@ -62,11 +61,25 @@ fun RowScope.CDBLNavigationBarItem(
         label = label,
         alwaysShowLabel = alwaysShowLabel,
         colors = NavigationBarItemDefaults.colors(
-            selectedIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            selectedTextColor = MaterialTheme.colorScheme.onSurface,
-            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            indicatorColor = MaterialTheme.colorScheme.secondaryContainer
+            selectedIconColor = CDBLNavigationDefaults.navigationSelectedItemColor(),
+            unselectedIconColor = CDBLNavigationDefaults.navigationContentColor(),
+            selectedTextColor = CDBLNavigationDefaults.navigationSelectedItemColor(),
+            unselectedTextColor = CDBLNavigationDefaults.navigationContentColor(),
+            indicatorColor = CDBLNavigationDefaults.navigationIndicatorColor()
         )
     )
+}
+
+/**
+ * CDBL navigation default values (following Now In Android patterns).
+ */
+object CDBLNavigationDefaults {
+    @Composable
+    fun navigationContentColor() = MaterialTheme.colorScheme.onSurfaceVariant
+
+    @Composable
+    fun navigationSelectedItemColor() = MaterialTheme.colorScheme.onPrimaryContainer
+
+    @Composable
+    fun navigationIndicatorColor() = MaterialTheme.colorScheme.primaryContainer
 }

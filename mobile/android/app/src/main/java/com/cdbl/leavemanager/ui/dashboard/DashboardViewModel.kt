@@ -43,8 +43,8 @@ class DashboardViewModel @Inject constructor(
     private val _hrHeadStats = MutableStateFlow<Result<com.cdbl.leavemanager.data.model.HRHeadStats>?>(null)
     val hrHeadStats: StateFlow<Result<com.cdbl.leavemanager.data.model.HRHeadStats>?> = _hrHeadStats.asStateFlow()
 
-    private val _users = MutableStateFlow<Result<List<com.cdbl.leavemanager.data.model.User>>?>(null)
-    val users: StateFlow<Result<List<com.cdbl.leavemanager.data.model.User>>?> = _users.asStateFlow()
+    private val _users = MutableStateFlow<Result<List<com.cdbl.leavemanager.data.model.AdminUser>>?>(null)
+    val users: StateFlow<Result<List<com.cdbl.leavemanager.data.model.AdminUser>>?> = _users.asStateFlow()
 
     fun loadDashboard(token: String) {
         viewModelScope.launch {

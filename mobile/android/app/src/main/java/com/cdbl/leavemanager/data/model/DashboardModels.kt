@@ -43,10 +43,15 @@ data class HRAdminStats(
 
 data class AuditLog(
     val id: String,
+    val actorEmail: String,
     val action: String,
-    val user: String,
-    val details: String,
-    val timestamp: String
+    val targetEmail: String? = null,
+    val details: String? = null,
+    val createdAt: String
+)
+
+data class AuditLogsResponse(
+    val items: List<AuditLog> = emptyList()
 )
 
 data class AdminDashboardData(

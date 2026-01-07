@@ -1,11 +1,15 @@
 package com.cdbl.leavemanager.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AdminPanelSettings
+import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Dashboard
 import androidx.compose.material.icons.rounded.FlightTakeoff
+import androidx.compose.material.icons.rounded.Group
 import androidx.compose.material.icons.rounded.History
+import androidx.compose.material.icons.rounded.MoreHoriz
 import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material.icons.rounded.Assessment
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.cdbl.leavemanager.R
 
@@ -48,6 +52,34 @@ enum class TopLevelDestination(
         iconTextId = R.string.nav_approvals,
         titleTextId = R.string.nav_approvals,
         route = "approvals_route"
+    ),
+    TEAM(
+        selectedIcon = Icons.Rounded.Group,
+        unselectedIcon = Icons.Rounded.Group,
+        iconTextId = R.string.nav_team,
+        titleTextId = R.string.nav_team,
+        route = "team_route"
+    ),
+    REPORTS(
+        selectedIcon = Icons.Rounded.Assessment,
+        unselectedIcon = Icons.Rounded.Assessment,
+        iconTextId = R.string.nav_reports,
+        titleTextId = R.string.nav_reports,
+        route = "reports_route"
+    ),
+    ADMIN(
+        selectedIcon = Icons.Rounded.AdminPanelSettings,
+        unselectedIcon = Icons.Rounded.AdminPanelSettings,
+        iconTextId = R.string.nav_admin,
+        titleTextId = R.string.nav_admin,
+        route = "admin_route"
+    ),
+    MORE(
+        selectedIcon = Icons.Rounded.MoreHoriz,
+        unselectedIcon = Icons.Rounded.MoreHoriz,
+        iconTextId = R.string.nav_more,
+        titleTextId = R.string.nav_more,
+        route = "more_route"
     ),
     PROFILE(
         selectedIcon = Icons.Rounded.Person,

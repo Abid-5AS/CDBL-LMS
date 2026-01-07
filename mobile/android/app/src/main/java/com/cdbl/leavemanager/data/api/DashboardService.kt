@@ -27,8 +27,8 @@ interface DashboardService {
     @GET("admin/system-stats")
     suspend fun getSystemStats(@Header("Authorization") token: String): Response<com.cdbl.leavemanager.data.model.SystemStatsResponse>
 
-    @GET("admin/audit-logs")
-    suspend fun getAuditLogs(@Header("Authorization") token: String): Response<List<com.cdbl.leavemanager.data.model.AuditLog>>
+    @GET("admin/logs")
+    suspend fun getAuditLogs(@Header("Authorization") token: String): Response<com.cdbl.leavemanager.data.model.AuditLogsResponse>
 
     @GET("dashboard/hr/stats")
     suspend fun getHRStats(@Header("Authorization") token: String): Response<com.cdbl.leavemanager.data.model.HRAdminStats>

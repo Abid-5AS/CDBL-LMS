@@ -115,6 +115,8 @@ val StatusRedTextDark = Color(0xFFfca5a5)
 val ErrorRed = StatusRedText
 val WarningAmber = StatusYellowText
 val SuccessGreen = StatusGreenText
+val Blue500 = Color(0xFF3B82F6) // Bright blue for informational elements
+val Purple600 = Color(0xFF9333EA) // Vibrant purple for accents
 
 // Zinc Compatibility (Mapped to Slate)
 val Zinc50 = Slate50
