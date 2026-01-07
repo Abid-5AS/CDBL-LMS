@@ -471,3 +471,28 @@
 .surface-card:hover {
   @apply border-border shadow-md;
 }
+
+/* Calendar Date Modifiers */
+.weekend-day {
+  @apply opacity-50;
+}
+
+.holiday-day {
+  @apply bg-primary/10 text-primary border border-primary/20 rounded-md;
+}
+
+.booked-day {
+  @apply bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-200 relative;
+}
+
+.booked-day::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: currentColor;
+}

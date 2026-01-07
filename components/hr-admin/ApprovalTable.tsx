@@ -451,12 +451,23 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
             toast.error(result.error || "Failed to update request");
             // Revert optimistic update on error
             await mutate();
+          } else if (result?.success) {
+            // Force refresh ALL approval-related SWR caches across the app
+            // This ensures dashboard widgets, counters, and other components update
+            await globalMutate((key) =>
+              typeof key === 'string' && (
+                key.includes('/api/approvals') ||
+                key.includes('/api/leaves') ||
+                key.includes('/api/dashboard')
+              ),
+              undefined,
+              { revalidate: true }
+            );
           }
 
-          // Server Actions auto-revalidate via revalidatePath
           // Refresh router cache for instant UI update
           router.refresh();
-          // Also revalidate SWR cache for consistency
+          // Also revalidate local SWR cache
           await mutate();
         } catch (err) {
           const message =

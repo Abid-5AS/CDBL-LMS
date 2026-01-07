@@ -72,6 +72,7 @@ export function ApplyLeaveForm() {
     payCalculation,
     conflictData,
     checkingConflicts,
+    bookedDates,
     setDateRange,
     setReason,
     setFile,
@@ -206,6 +207,7 @@ export function ApplyLeaveForm() {
                       requestedDays={requestedDays}
                       rangeValidation={rangeValidation}
                       errors={{ start: errors.start, end: errors.end }}
+                      bookedDates={bookedDates}
                     />
                   </div>
                 </section>

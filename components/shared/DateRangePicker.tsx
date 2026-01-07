@@ -19,6 +19,7 @@ interface DateRangePickerProps {
   disabled?: boolean;
   minDate?: Date;
   showQuickSelect?: boolean;
+  bookedDates?: Date[]; // Dates with existing leave requests
 }
 
 export function DateRangePicker({
@@ -28,6 +29,7 @@ export function DateRangePicker({
   disabled,
   minDate,
   showQuickSelect = true,
+  bookedDates = [],
 }: DateRangePickerProps) {
   const [open, setOpen] = useState(false);
   const [hoverPreview, setHoverPreview] = useState<{ start?: Date; end?: Date } | null>(null);
@@ -226,10 +228,12 @@ export function DateRangePicker({
               modifiers={{
                 weekend: (d) => [5, 6].includes(d.getDay()),
                 holiday: (d) => holidays.some(h => h.date === d.toISOString().slice(0, 10)),
+                booked: (d) => bookedDates.some(bd => bd.toISOString().slice(0, 10) === d.toISOString().slice(0, 10)),
               }}
               modifiersClassNames={{
                 weekend: "weekend-day",
                 holiday: "holiday-day",
+                booked: "booked-day",
               }}
               onDayMouseEnter={(day) => {
                 if (value.start && !value.end) {
@@ -261,7 +265,7 @@ export function DateRangePicker({
             )}
 
             {/* Legend */}
-            <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t border-border">
+            <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t border-border flex-wrap">
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded border border-primary/20 bg-primary/10" />
                 <span>Holiday</span>
@@ -270,6 +274,12 @@ export function DateRangePicker({
                 <div className="w-3 h-3 rounded border border-border" />
                 <span>Weekend</span>
               </div>
+              {bookedDates.length > 0 && (
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded border border-indigo-300 bg-indigo-100" />
+                  <span>My Leave</span>
+                </div>
+              )}
             </div>
           </div>
         </PopoverContent>

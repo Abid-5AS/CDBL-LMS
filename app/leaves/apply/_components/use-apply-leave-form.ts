@@ -89,6 +89,40 @@ export function useApplyLeaveForm() {
     revalidateOnReconnect: true,
   });
 
+  // Fetch user's existing leaves to highlight in calendar
+  const { data: existingLeaves } = useSWR<{
+    items: Array<{
+      id: number;
+      startDate: string;
+      endDate: string;
+      status: string;
+    }>
+  }>("/api/leaves?mine=1&limit=50", fetcher, {
+    revalidateOnFocus: false,
+  });
+
+  // Compute booked dates from existing pending/approved leaves
+  const bookedDates = useMemo(() => {
+    if (!existingLeaves?.items) return [];
+
+    const dates: Date[] = [];
+    const activeStatuses = ['PENDING', 'SUBMITTED', 'APPROVED', 'FORWARDED'];
+
+    for (const leave of existingLeaves.items) {
+      if (!activeStatuses.includes(leave.status)) continue;
+
+      const start = new Date(leave.startDate);
+      const end = new Date(leave.endDate);
+
+      // Add all dates in the range
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        dates.push(new Date(d));
+      }
+    }
+
+    return dates;
+  }, [existingLeaves]);
+
   const { holidays } = useHolidays();
 
   const { lastSaved, loadDraft, clearDraft, saveDraft } = useDraftAutosave({
@@ -442,13 +476,13 @@ export function useApplyLeaveForm() {
       // Handle Offline Submission
       if (typeof navigator !== "undefined" && !navigator.onLine) {
         const { queueSyncAction } = await import("@/lib/offline/db");
-        
+
         if (file) {
           payload.file = file;
         }
 
         await queueSyncAction("CREATE_LEAVE", payload);
-        
+
         // Clear draft and show offline success
         clearDraft();
         toast.success("You are offline. Request saved and will sync when online.", {
@@ -571,6 +605,7 @@ export function useApplyLeaveForm() {
     payCalculation,
     conflictData,
     checkingConflicts,
+    bookedDates, // New: dates with existing leave requests
     setDateRange,
     setReason,
     setFile,
