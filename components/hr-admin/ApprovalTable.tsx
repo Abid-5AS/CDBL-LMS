@@ -45,7 +45,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui";
-import { CheckCircle, FilterX, Loader2, XCircle, MoreHorizontal, Forward, RotateCcw } from "lucide-react";
+import { CheckCircle, FilterX, Loader2, XCircle, MoreHorizontal, Forward, RotateCcw, Clock, History, FileCheck, Ban } from "lucide-react";
 
 // Shared Components (barrel export)
 import {
@@ -73,6 +73,7 @@ import { cn } from "@/lib/utils";
 import { HRApprovalItem } from "./types";
 import { useSelectionContext } from "@/components/providers";
 import { apiFetcher, apiPost } from "@/lib/apiClient";
+import EnhancedSmoothTab from "@/components/ui/enhanced-smooth-tab";
 
 // Server Actions
 import {
@@ -114,6 +115,34 @@ type HistoryDecision = "ALL" | "APPROVED" | "REJECTED" | "FORWARDED";
 
 // Use shared TYPE_OPTIONS from constants
 const TYPE_OPTIONS = LEAVE_TYPE_OPTIONS;
+
+// Defining tabs configuration
+const TABS = [
+  {
+    id: "queue",
+    title: "Pending",
+    icon: Clock,
+    color: "bg-blue-500",
+  },
+  {
+    id: "approved",
+    title: "Approved",
+    icon: FileCheck,
+    color: "bg-emerald-500",
+  },
+  {
+    id: "rejected",
+    title: "Rejected",
+    icon: Ban,
+    color: "bg-red-500",
+  },
+  {
+    id: "history",
+    title: "All History",
+    icon: History,
+    color: "bg-zinc-500",
+  },
+];
 
 export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   const router = useRouter();
@@ -162,6 +191,14 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   const userRole = (user?.role as AppRole) || "EMPLOYEE";
   const isHRAdmin = userRole === "HR_ADMIN";
 
+  // Derive active tab based on viewMode and historyDecision
+  const activeTabId = useMemo(() => {
+    if (viewMode === "queue") return "queue";
+    if (historyDecision === "APPROVED") return "approved";
+    if (historyDecision === "REJECTED") return "rejected";
+    return "history";
+  }, [viewMode, historyDecision]);
+
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
     if (viewMode === "history") {
@@ -177,21 +214,12 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
       const suffix = next ? `?${next}` : "";
       router.replace(`${pathname}${suffix}`, { scroll: false });
     }
-
-    // Cleanup function - not strictly necessary for this useEffect but good practice
-    return () => {
-      // No specific cleanup needed for this component
-      // The state will be handled by React's unmounting process
-    };
   }, [historyDecision, viewMode, router, searchParams, pathname]);
 
   useEffect(() => {
     setSelectedIds(new Set());
-
-    // Cleanup function - not strictly necessary for this useEffect but good practice
     return () => {
-      // No specific cleanup needed for this component
-      // The state will be handled by React's unmounting process
+      // No specific cleanup needed
     };
   }, [viewMode]);
 
@@ -201,10 +229,26 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     return () => setSelection([]);
   }, [selectedIds, setSelection]);
 
+  // Handle tab change
+  const handleTabChange = useCallback((tabId: string) => {
+    if (tabId === "queue") {
+      setViewMode("queue");
+      setHistoryDecision("ALL");
+    } else if (tabId === "approved") {
+      setViewMode("history");
+      setHistoryDecision("APPROVED");
+    } else if (tabId === "rejected") {
+      setViewMode("history");
+      setHistoryDecision("REJECTED");
+    } else {
+      setViewMode("history");
+      setHistoryDecision("ALL");
+    }
+    // Clear selection when switching tabs
+    setSelectedIds(new Set());
+  }, []);
+
   // Use the shared hook for fetching requests
-  // This simplifies logic and ensures consistency with the dashboard
-  // NOTE: usePendingRequests currently optimized for Dept Head/Manager view logic
-  // customized for this table view
   const {
     requests: hookRequests,
     isLoading: isHookLoading,
@@ -213,26 +257,15 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   } = usePendingRequests({
     autoFetch: true,
     initialFilters: {
-      // In queue mode, we generally want PENDING, but let component filter handle detailed status
       status: viewMode === 'queue' ? (queueStatusFilter === "all" ? "PENDING" : queueStatusFilter) : undefined
     }
   });
-
-  // If viewMode is history, we might need a different hook or endpoint since usePendingRequests focuses on pending.
-  // For now, let's keep the existing logic for history but use the hook for the queue to fix the reported bug (which is likely about queue)
-  // Actually, looking at the error "Unable to load approvals", replacing the queue logic is the priority.
-  // However, completely removing SWR for history would break history view. 
-  // Let's rely on usePendingRequests for queue and generic fetch for history for now, or unified if usePendingRequests supports it.
-  // Checking usePendingRequests source: it calls `/api/approvals?status=...`. 
-  // It handles pagination and filters well.
-
-  // Let's refactor to use the hook fully if possible, but for minimal regression, let's substitute the SWR call for queue.
 
   const cacheKey = useMemo(() => {
     if (viewMode === "history") {
       return `/api/approvals/history?decision=${historyDecision}`;
     }
-    return null; // Don't fetch history here if queue
+    return null;
   }, [viewMode, historyDecision]);
 
   const { data: historyData, error: historyError, isLoading: isHistoryLoading, mutate: mutateHistory } = useSWR<any>(
@@ -243,7 +276,6 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
   // Normalize data
   const data = useMemo(() => {
     if (viewMode === 'queue') {
-      // Map items from hook
       return {
         items: hookRequests.map(req => ({
           id: String(req.id),
@@ -256,14 +288,15 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
           requestedByName: req.requester.name,
           requestedByEmail: req.requester.email,
           requestedById: String(req.requester.id),
-          requestedAt: '', // Hook might need to return this if needed
+          requestedAt: '',
           approvals: [],
-          currentStageIndex: 0
+          currentStageIndex: 0,
+          isCancellationRequest: req.isCancellationRequest,
+          isModified: req.isModified,
         })) as HRApprovalItem[]
       };
     }
 
-    // History logic
     if (!historyData) return { items: [] };
     if ('items' in historyData) return historyData;
     return { items: [] };
@@ -329,6 +362,8 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     setQueueStatusFilter("all");
     setHistoryDecision("ALL");
     setTypeFilter("all");
+    // Also reset back to queue tab if deeper in filtering history? No, user might just want to clear filters on current tab.
+    // Keeping current tab logic.
   }, []);
 
   const handleStatusFilterChange = useCallback(
@@ -346,11 +381,8 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     if (onDataChange) {
       onDataChange(viewMode === "queue" ? items : []);
     }
-
-    // Cleanup function - not strictly necessary for this useEffect but good practice
     return () => {
-      // No specific cleanup needed for this component
-      // The state will be handled by React's unmounting process
+      // No specific cleanup needed
     };
   }, [items, onDataChange, viewMode]);
 
@@ -453,7 +485,6 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
             await mutate();
           } else if (result?.success) {
             // Force refresh ALL approval-related SWR caches across the app
-            // This ensures dashboard widgets, counters, and other components update
             await globalMutate((key) =>
               typeof key === 'string' && (
                 key.includes('/api/approvals') ||
@@ -558,19 +589,15 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
             }
           );
 
-          // Server Actions auto-revalidate, refresh router and SWR cache
           router.refresh();
           await mutate();
         } else {
           toast.error(result.error || "Failed to approve selected requests");
-          // Revert optimistic update on error
           await mutate();
         }
       } catch (error) {
         console.error("Bulk approve error:", error);
         toast.error("Failed to approve selected leave requests");
-
-        // Revert optimistic update on error
         await mutate();
       }
     });
@@ -587,16 +614,12 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
       return;
     }
 
-    // Optimistically remove selected items from UI
     selectedIds.forEach((id) => setOptimisticItems(id));
-
-    // Clear selection immediately
     const idsToReject = Array.from(selectedIds);
     setSelectedIds(new Set());
     setShowBulkRejectDialog(false);
     setBulkRejectReason("");
 
-    // Execute Server Action with useTransition
     startTransition(async () => {
       try {
         const ids = idsToReject.map(Number);
@@ -610,22 +633,16 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
             `Successfully rejected ${result.rejected} leave request${result.rejected > 1 ? "s" : ""
             }` + (result.failed > 0 ? `. ${result.failed} failed.` : "")
           );
-
-          // Revalidate data
           await mutate();
         } else {
           toast.error(
             result.error || "Failed to reject selected leave requests"
           );
-
-          // Revert optimistic update on error
           await mutate();
         }
       } catch (error) {
         console.error("Bulk reject error:", error);
         toast.error("Failed to reject selected leave requests");
-
-        // Revert optimistic update on error
         await mutate();
       }
     });
@@ -680,67 +697,72 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     );
   }
 
+  const getEmptyStateProps = () => {
+    switch (activeTabId) {
+      case "queue":
+        return {
+          title: "No pending requests",
+          description: "You are all caught up! There are currently no leave requests awaiting approval."
+        };
+      case "approved":
+        return {
+          title: "No approved requests",
+          description: "No approved leave requests found in the history."
+        };
+      case "rejected":
+        return {
+          title: "No rejected requests",
+          description: "No rejected leave requests found in the history."
+        };
+      default:
+        return {
+          title: "No history found",
+          description: "No past approval decisions found matching your filters."
+        };
+    }
+  };
+
+  const emptyStateProps = getEmptyStateProps();
+
   if (!items.length && displayedItems.length === 0) {
     return (
-      <Card className={cn("bg-card shadow-md border border-border", "rounded-2xl")}>
-        <CardContent>
-          <EmptyState
-            icon={CheckCircle}
-            title={
-              viewMode === "history"
-                ? "No past approvals"
-                : "No pending requests"
-            }
-            description={
-              viewMode === "history"
-                ? "You have not processed any approvals with the current filters."
-                : "You are all caught up! There are currently no leave requests awaiting approval."
-            }
-            action={
-              viewMode === "history"
-                ? undefined
-                : {
-                  label: "View Past Approvals",
-                  href: "/approvals?view=history",
-                }
-            }
-            className="py-8"
-          />
-        </CardContent>
-      </Card>
+      <div className="space-y-4">
+        {/* Tabs are always visible even when empty */}
+        <EnhancedSmoothTab
+          items={TABS}
+          value={activeTabId}
+          onChange={handleTabChange}
+          showCardContent={false}
+          className="bg-card w-full max-w-none border-b-0 rounded-b-none p-1"
+        />
+        <Card className={cn("bg-card shadow-md border border-border", "rounded-2xl rounded-t-none")}>
+          <CardContent>
+            <EmptyState
+              icon={CheckCircle}
+              title={emptyStateProps.title}
+              description={emptyStateProps.description}
+              className="py-8"
+            />
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="inline-flex rounded-full border border-border bg-card/80 p-1">
-          {[
-            { value: "queue", label: "My Queue" },
-            { value: "history", label: "Past Decisions" },
-          ].map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => setViewMode(option.value as "queue" | "history")}
-              className={cn(
-                "px-4 py-1.5 text-sm font-medium rounded-full transition focus-ring",
-                viewMode === option.value
-                  ? "bg-card-action text-foreground shadow"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-              aria-pressed={viewMode === option.value}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-        <p className="text-sm text-muted-foreground">
-          {viewMode === "history"
-            ? "Decisions reflect your last 100 actions."
-            : "Only requests awaiting your action appear here."}
-        </p>
+      <div className="space-y-4">
+        <EnhancedSmoothTab
+          items={TABS}
+          value={activeTabId}
+          onChange={handleTabChange}
+          showCardContent={false}
+          className="bg-card w-full max-w-none border-b-0 rounded-b-none p-1"
+        />
+
+        {/* Only show description for history mode or if needed, but tabs are self-explanatory */}
       </div>
+
       <FilterBar
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
