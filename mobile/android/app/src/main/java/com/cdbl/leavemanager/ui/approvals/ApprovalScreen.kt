@@ -30,6 +30,11 @@ import com.cdbl.leavemanager.ui.designsystem.component.CDBLLoadingWheel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import com.cdbl.leavemanager.data.api.ApprovalHistoryItem
+
+enum class ApprovalTab {
+    PENDING, HISTORY
+}
 
 enum class ApprovalFilter(val label: String) {
     PENDING("Pending"),
@@ -46,6 +51,7 @@ fun ApprovalScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    var selectedTab by remember { mutableStateOf(ApprovalTab.PENDING) }
     var selectedFilter by remember { mutableStateOf(ApprovalFilter.PENDING) }
     
     // State for the decision dialog
@@ -55,6 +61,7 @@ fun ApprovalScreen(
 
     LaunchedEffect(Unit) {
         viewModel.loadApprovals(token)
+        viewModel.loadHistory(token)
     }
 
     LaunchedEffect(uiState.actionSuccess) {
@@ -172,45 +179,76 @@ fun ApprovalScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Filter Chips
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            // Tab Row for Pending/History
+            TabRow(
+                selectedTabIndex = if (selectedTab == ApprovalTab.PENDING) 0 else 1,
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.primary
             ) {
-                items(ApprovalFilter.entries) { filter ->
-                    FilterChip(
-                        selected = selectedFilter == filter,
-                        onClick = { selectedFilter = filter },
-                        label = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(filter.label)
-                                if (filter == ApprovalFilter.PENDING && pendingCount > 0) {
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        "($pendingCount)",
-                                        style = MaterialTheme.typography.labelSmall
-                                    )
+                Tab(
+                    selected = selectedTab == ApprovalTab.PENDING,
+                    onClick = { selectedTab = ApprovalTab.PENDING },
+                    text = { 
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("Pending")
+                            if (pendingCount > 0) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Badge(containerColor = MaterialTheme.colorScheme.error) {
+                                    Text("$pendingCount")
                                 }
                             }
-                        },
-                        leadingIcon = if (selectedFilter == filter) {
-                            {
-                                Icon(
-                                    Icons.Rounded.Check,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-                        } else null,
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    )
-                }
+                        }
+                    }
+                )
+                Tab(
+                    selected = selectedTab == ApprovalTab.HISTORY,
+                    onClick = { selectedTab = ApprovalTab.HISTORY },
+                    text = { Text("History") }
+                )
             }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
+            // Content based on selected tab
+            when (selectedTab) {
+                ApprovalTab.PENDING -> {
+                    // Filter Chips for Pending tab
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(ApprovalFilter.entries) { filter ->
+                            FilterChip(
+                                selected = selectedFilter == filter,
+                                onClick = { selectedFilter = filter },
+                                label = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(filter.label)
+                                        if (filter == ApprovalFilter.PENDING && pendingCount > 0) {
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text(
+                                                "($pendingCount)",
+                                                style = MaterialTheme.typography.labelSmall
+                                            )
+                                        }
+                                    }
+                                },
+                                leadingIcon = if (selectedFilter == filter) {
+                                    {
+                                        Icon(
+                                            Icons.Rounded.Check,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
+                                } else null,
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            )
+                        }
+                    }
+
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
 
             when {
                 uiState.isLoading && uiState.items.isEmpty() -> Box(
@@ -277,6 +315,55 @@ fun ApprovalScreen(
                     CDBLLoadingWheel(contentDesc = "Processing...")
                 }
             }
+                } // End Pending Tab
+                
+                ApprovalTab.HISTORY -> {
+                    // History Tab Content
+                    when {
+                        uiState.historyLoading -> Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CDBLLoadingWheel(contentDesc = "Loading history")
+                        }
+                        uiState.historyItems.isEmpty() -> Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.padding(32.dp)
+                            ) {
+                                Icon(
+                                    Icons.Rounded.History,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                    modifier = Modifier.size(64.dp)
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    "No History Yet",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    "Your past approval decisions will appear here",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                )
+                            }
+                        }
+                        else -> LazyColumn(
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(uiState.historyItems, key = { it.id }) { item ->
+                                HistoryApprovalCard(item = item)
+                            }
+                        }
+                    }
+                } // End History Tab
+            } // End when(selectedTab)
         }
     }
 }
@@ -537,5 +624,137 @@ private fun formatDate(dateString: String): String {
         date.format(DateTimeFormatter.ofPattern("dd MMM"))
     } catch (e: Exception) {
         dateString.take(10)
+    }
+}
+
+@Composable
+fun HistoryApprovalCard(item: ApprovalHistoryItem) {
+    val statusColor = when(item.status.uppercase()) {
+        "APPROVED" -> SuccessGreen
+        "REJECTED" -> ErrorRed
+        "FORWARDED" -> WarningAmber
+        else -> Color.Gray
+    }
+    val statusIcon = when(item.status.uppercase()) {
+        "APPROVED" -> Icons.Rounded.CheckCircle
+        "REJECTED" -> Icons.Rounded.Cancel
+        "FORWARDED" -> Icons.Rounded.Forward
+        else -> Icons.Rounded.Circle
+    }
+    val leaveTypeColor = getLeaveTypeColor(item.type)
+
+    Card(
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            // Header: Requester + Status
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primaryContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            item.requestedByName.firstOrNull()?.uppercase() ?: "?",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            item.requestedByName,
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            item.requestedByEmail,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1
+                        )
+                    }
+                }
+                
+                // Status Badge
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = statusColor.copy(alpha = 0.1f)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                    ) {
+                        Icon(
+                            statusIcon,
+                            contentDescription = null,
+                            tint = statusColor,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            item.status.replaceFirstChar { it.uppercase() },
+                            style = MaterialTheme.typography.labelSmall,
+                            color = statusColor,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            // Leave Type + Dates
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = leaveTypeColor.copy(alpha = 0.1f)
+                ) {
+                    Text(
+                        item.type.replace("_", " "),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = leaveTypeColor,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                
+                Text(
+                    "${formatDate(item.start)} - ${formatDate(item.end)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant
+                ) {
+                    Text(
+                        "${item.requestedDays ?: 1} day${if ((item.requestedDays ?: 1) > 1) "s" else ""}",
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
     }
 }

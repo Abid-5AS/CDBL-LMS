@@ -32,7 +32,8 @@ class HolidaysViewModel @Inject constructor(
             val result = repository.getHolidays(token)
             
             result.onSuccess { holidays ->
-                _uiState.update { it.copy(isLoading = false, holidays = holidays) }
+                // Handle null holidays by using empty list
+                _uiState.update { it.copy(isLoading = false, holidays = holidays ?: emptyList()) }
             }.onFailure { error ->
                 _uiState.update { it.copy(isLoading = false, error = error.message) }
             }

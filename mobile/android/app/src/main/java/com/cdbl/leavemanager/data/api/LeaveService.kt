@@ -9,6 +9,7 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 import retrofit2.http.Multipart
 import retrofit2.http.Part
+import retrofit2.http.Path
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
@@ -42,14 +43,21 @@ interface LeaveService {
     @GET("leaves/{id}")
     suspend fun getLeaveDetails(
         @Header("Authorization") token: String,
-        @retrofit2.http.Path("id") id: Int
-    ): Response<com.cdbl.leavemanager.data.model.LeaveRequest> // Reusing LeaveRequest for detailed view
+        @Path("id") id: Int
+    ): Response<com.cdbl.leavemanager.data.model.LeaveRequest>
 
     @GET("leaves/{id}/comments")
     suspend fun getComments(
         @Header("Authorization") token: String,
-        @retrofit2.http.Path("id") id: Int
+        @Path("id") id: Int
     ): Response<com.cdbl.leavemanager.data.model.LeaveCommentListResponse>
+
+    @POST("leaves/{id}/cancel")
+    suspend fun cancelLeave(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Body reason: CancelLeaveRequest
+    ): Response<CancelLeaveResponse>
 
     @GET("manager/pending")
     suspend fun getManagerPendingLeaves(
@@ -57,4 +65,41 @@ interface LeaveService {
         @Query("limit") limit: Int = 20,
         @Query("offset") offset: Int = 0
     ): Response<com.cdbl.leavemanager.data.model.ManagerLeaveResponse>
+
+    @GET("approvals/history")
+    suspend fun getApprovalHistory(
+        @Header("Authorization") token: String,
+        @Query("decision") decision: String = "ALL",
+        @Query("limit") limit: Int = 50,
+        @Query("page") page: Int = 1
+    ): Response<ApprovalHistoryResponse>
 }
+
+data class CancelLeaveRequest(
+    val reason: String
+)
+
+data class CancelLeaveResponse(
+    val ok: Boolean,
+    val message: String? = null,
+    val error: String? = null
+)
+
+data class ApprovalHistoryResponse(
+    val items: List<ApprovalHistoryItem>,
+    val page: Int,
+    val pageSize: Int
+)
+
+data class ApprovalHistoryItem(
+    val id: String,
+    val type: String,
+    val start: String,
+    val end: String,
+    val requestedDays: Int?,
+    val reason: String?,
+    val status: String,           // APPROVED, REJECTED, FORWARDED
+    val requestedByName: String,
+    val requestedByEmail: String
+)
+

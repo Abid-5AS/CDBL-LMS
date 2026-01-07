@@ -145,4 +145,8 @@ class AuthRepository @Inject constructor(
             Result.failure(e)
         }
     }
+
+    suspend fun clearUserCache() {
+        userDao.clearUser()
+    }
 }

@@ -64,6 +64,29 @@ class LeaveDetailViewModel @Inject constructor(
         submitDecision(token, leaveId, "REJECT", comment)
     }
 
+    fun forwardLeave(token: String, leaveId: Int, comment: String?) {
+        submitDecision(token, leaveId, "FORWARD", comment)
+    }
+
+    fun returnLeave(token: String, leaveId: Int, comment: String?) {
+        submitDecision(token, leaveId, "RETURN", comment)
+    }
+
+    fun cancelLeave(token: String, leaveId: Int, reason: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSubmitting = true) }
+            val result = leaveRepository.cancelLeave(token, leaveId, reason)
+            
+            result.onSuccess { message ->
+                _uiState.update { it.copy(isSubmitting = false, actionSuccess = true) }
+                // Reload details to show updated status
+                loadDetails(token, leaveId)
+            }.onFailure { e ->
+                _uiState.update { it.copy(isSubmitting = false, error = e.message) }
+            }
+        }
+    }
+
     private fun submitDecision(token: String, leaveId: Int, decision: String, comment: String?) {
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmitting = true) }

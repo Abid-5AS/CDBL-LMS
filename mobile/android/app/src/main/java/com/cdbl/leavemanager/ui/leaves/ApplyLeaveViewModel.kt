@@ -15,19 +15,31 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
+import java.time.LocalDate
 
 import com.cdbl.leavemanager.data.model.BalanceResponse
 import com.cdbl.leavemanager.data.repository.DashboardRepository
 import com.cdbl.leavemanager.data.model.PolicySection
 import com.cdbl.leavemanager.data.repository.PolicyRepository
+import com.cdbl.leavemanager.ui.leaves.components.DayStatus
+
+// Existing leave info for calendar display
+data class ExistingLeaveInfo(
+    val startDate: LocalDate,
+    val endDate: LocalDate,
+    val status: String,  // PENDING, APPROVED, REJECTED, CANCELLED
+    val leaveType: String
+)
 
 data class ApplyLeaveUiState(
     val isLoading: Boolean = false,
-    val result: Boolean = false, // Deprecated? 'success' is used
+    val result: Boolean = false,
     val success: Boolean = false,
     val error: String? = null,
     val balance: BalanceResponse? = null,
-    val leavePolicies: List<PolicySection> = emptyList()
+    val leavePolicies: List<PolicySection> = emptyList(),
+    val holidays: List<LocalDate> = emptyList(),
+    val existingLeaves: List<ExistingLeaveInfo> = emptyList()
 )
 
 @HiltViewModel
@@ -50,6 +62,64 @@ class ApplyLeaveViewModel @Inject constructor(
         }
     }
 
+    fun loadHolidays(token: String) {
+        viewModelScope.launch {
+            val result = dashboardRepository.getHolidays(token)
+            result.onSuccess { holidays ->
+                val holidayDates = holidays?.mapNotNull { holiday ->
+                    try {
+                        LocalDate.parse(holiday.date.take(10))
+                    } catch (e: Exception) {
+                        null
+                    }
+                } ?: emptyList()
+                _uiState.value = _uiState.value.copy(holidays = holidayDates)
+            }
+        }
+    }
+
+    fun loadExistingLeaves(token: String) {
+        viewModelScope.launch {
+            val result = leaveRepository.getRecentLeaves(token)
+            result.onSuccess { leaves ->
+                val existingLeaves = leaves.mapNotNull { leave ->
+                    try {
+                        val startDate = LocalDate.parse(leave.startDate.take(10))
+                        val endDate = LocalDate.parse(leave.endDate.take(10))
+                        ExistingLeaveInfo(
+                            startDate = startDate,
+                            endDate = endDate,
+                            status = leave.status,
+                            leaveType = leave.type
+                        )
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
+                _uiState.value = _uiState.value.copy(existingLeaves = existingLeaves)
+            }
+        }
+    }
+
+    // Convert existing leaves to a map of date -> status for calendar display
+    fun getExistingLeavesMap(): Map<LocalDate, DayStatus> {
+        val map = mutableMapOf<LocalDate, DayStatus>()
+        _uiState.value.existingLeaves.forEach { leave ->
+            var date = leave.startDate
+            while (!date.isAfter(leave.endDate)) {
+                val status = when (leave.status.uppercase()) {
+                    "PENDING" -> DayStatus.PENDING
+                    "APPROVED" -> DayStatus.APPROVED
+                    "REJECTED" -> DayStatus.REJECTED
+                    else -> DayStatus.BLOCKED
+                }
+                map[date] = status
+                date = date.plusDays(1)
+            }
+        }
+        return map
+    }
+
     fun loadPolicies(token: String) {
         viewModelScope.launch {
             val result = policyRepository.fetchPolicies()
@@ -58,24 +128,22 @@ class ApplyLeaveViewModel @Inject constructor(
                 val filtered = policies.filter { policy ->
                     policy.availability.equals("all", ignoreCase = true) || 
                     policy.availability.equals("female", ignoreCase = true) ||
-                    permissionsAllows(policy.availability) // Placeholder for future logic
+                    permissionsAllows(policy.availability)
                 }
                 
                 if (filtered.isNotEmpty()) {
                     _uiState.value = _uiState.value.copy(leavePolicies = filtered)
                 } else {
-                    // Fallback to defaults if API returns empty or everything is filtered
                     useDefaultPolicies()
                 }
             }.onFailure {
-                // Fallback to defaults on error
                 useDefaultPolicies()
             }
         }
     }
 
     private fun permissionsAllows(availability: String?): Boolean {
-        return true // For dev: allow everything
+        return true
     }
 
     private fun useDefaultPolicies() {
@@ -93,7 +161,6 @@ class ApplyLeaveViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoading = true)
             val request = ApplyLeaveRequest(type, startDate, endDate, reason)
             
-            // Prepare file if URI is present
             val file = attachmentUri?.let { uri ->
                 getFileFromUri(uri)
             }
@@ -130,3 +197,4 @@ class ApplyLeaveViewModel @Inject constructor(
         _uiState.value = ApplyLeaveUiState()
     }
 }
+

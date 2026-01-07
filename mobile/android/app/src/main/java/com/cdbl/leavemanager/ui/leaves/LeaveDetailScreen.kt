@@ -2,6 +2,7 @@ package com.cdbl.leavemanager.ui.leaves
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,6 +17,8 @@ import androidx.compose.material.icons.rounded.DateRange
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.DoNotDisturb
+import androidx.compose.material.icons.rounded.Undo
+import androidx.compose.material.icons.automirrored.rounded.Forward
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -72,30 +75,77 @@ fun LeaveDetailScreen(
             )
         },
         bottomBar = {
+            val leave = uiState.leave
+            // Show Cancel button for own leaves (non-manager view) that are PENDING or APPROVED
+            val canCancel = !isManagerView && leave != null && 
+                (leave.status == "PENDING" || leave.status == "SUBMITTED" || leave.status == "APPROVED")
+            
             // Show Approve/Reject buttons if Manager View and Pending Status
-            if (isManagerView && uiState.leave?.status == "PENDING") {
+            val canApprove = isManagerView && leave?.status == "PENDING"
+            
+            if (canCancel || canApprove) {
                 Column(
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.surface)
                         .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
                         .padding(16.dp)
                 ) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        Button(
-                            onClick = { actionDialogType = ActionType.REJECT },
-                            colors = ButtonDefaults.buttonColors(containerColor = ErrorRed.copy(alpha = 0.1f), contentColor = ErrorRed),
-                            modifier = Modifier.weight(1f).height(50.dp),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text(stringResource(R.string.reject), fontWeight = FontWeight.Bold)
+                    if (canApprove) {
+                        // Primary Actions: Reject / Approve
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Button(
+                                onClick = { actionDialogType = ActionType.REJECT },
+                                colors = ButtonDefaults.buttonColors(containerColor = ErrorRed.copy(alpha = 0.1f), contentColor = ErrorRed),
+                                modifier = Modifier.weight(1f).height(48.dp),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Text(stringResource(R.string.reject), fontWeight = FontWeight.Bold)
+                            }
+                            Button(
+                                onClick = { actionDialogType = ActionType.APPROVE },
+                                colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen),
+                                modifier = Modifier.weight(1f).height(48.dp),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Text(stringResource(R.string.approve), fontWeight = FontWeight.Bold)
+                            }
                         }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        // Secondary Actions: Return / Forward
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            OutlinedButton(
+                                onClick = { actionDialogType = ActionType.RETURN },
+                                modifier = Modifier.weight(1f).height(44.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, WarningAmber.copy(alpha = 0.5f)),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = WarningAmber)
+                            ) {
+                                Icon(Icons.Rounded.Undo, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Return", fontWeight = FontWeight.Medium)
+                            }
+                            OutlinedButton(
+                                onClick = { actionDialogType = ActionType.FORWARD },
+                                modifier = Modifier.weight(1f).height(44.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary)
+                            ) {
+                                Icon(Icons.AutoMirrored.Rounded.Forward, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Forward", fontWeight = FontWeight.Medium)
+                            }
+                        }
+                    } else if (canCancel) {
                         Button(
-                            onClick = { actionDialogType = ActionType.APPROVE },
-                            colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen),
-                            modifier = Modifier.weight(1f).height(50.dp),
+                            onClick = { actionDialogType = ActionType.CANCEL },
+                            colors = ButtonDefaults.buttonColors(containerColor = ErrorRed),
+                            modifier = Modifier.fillMaxWidth().height(50.dp),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text(stringResource(R.string.approve), fontWeight = FontWeight.Bold)
+                            Icon(Icons.Rounded.DoNotDisturb, contentDescription = null, modifier = Modifier.size(20.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Cancel This Leave", fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -235,36 +285,65 @@ fun LeaveDetailScreen(
         
         // Action Dialog
         if (actionDialogType != null) {
+            val isCancel = actionDialogType == ActionType.CANCEL
+            val isReturn = actionDialogType == ActionType.RETURN
+            val isForward = actionDialogType == ActionType.FORWARD
+            val isApprove = actionDialogType == ActionType.APPROVE
+            val dialogTitle = when(actionDialogType) {
+                ActionType.APPROVE -> stringResource(R.string.approve_leave_confirm)
+                ActionType.REJECT -> stringResource(R.string.reject_leave_confirm)
+                ActionType.CANCEL -> "Cancel Leave Request?"
+                ActionType.RETURN -> "Return for Modification?"
+                ActionType.FORWARD -> "Forward to Next Approver?"
+                else -> ""
+            }
+            val dialogColor = when(actionDialogType) {
+                ActionType.APPROVE -> SuccessGreen
+                ActionType.FORWARD -> MaterialTheme.colorScheme.primary
+                ActionType.RETURN -> WarningAmber
+                else -> ErrorRed
+            }
+            
             AlertDialog(
                 onDismissRequest = { actionDialogType = null },
-                title = { Text(if (actionDialogType == ActionType.APPROVE) stringResource(R.string.approve_leave_confirm) else stringResource(R.string.reject_leave_confirm)) },
+                title = { Text(dialogTitle) },
                 text = {
                     Column {
-                        Text(stringResource(R.string.comment_optional))
+                        Text(if (isCancel) "Please provide a reason for cancellation:" else stringResource(R.string.comment_optional))
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(
                             value = actionComment,
                             onValueChange = { actionComment = it },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            placeholder = { Text(if (isCancel) "Reason for cancellation..." else "Add a comment...") }
                         )
                     }
                 },
                 confirmButton = {
                     Button(
                         onClick = {
-                            if (actionDialogType == ActionType.APPROVE) {
-                                viewModel.approveLeave(token, leaveId, actionComment)
-                            } else {
-                                viewModel.rejectLeave(token, leaveId, actionComment)
+                            when (actionDialogType) {
+                                ActionType.APPROVE -> viewModel.approveLeave(token, leaveId, actionComment)
+                                ActionType.REJECT -> viewModel.rejectLeave(token, leaveId, actionComment)
+                                ActionType.CANCEL -> viewModel.cancelLeave(token, leaveId, actionComment)
+                                ActionType.FORWARD -> viewModel.forwardLeave(token, leaveId, actionComment)
+                                ActionType.RETURN -> viewModel.returnLeave(token, leaveId, actionComment)
+                                else -> {}
                             }
                             actionDialogType = null
                             actionComment = ""
                         },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (actionDialogType == ActionType.APPROVE) SuccessGreen else ErrorRed
-                        )
+                        colors = ButtonDefaults.buttonColors(containerColor = dialogColor),
+                        enabled = !isCancel && !isReturn || actionComment.isNotBlank()
                     ) {
-                        Text(if (actionDialogType == ActionType.APPROVE) stringResource(R.string.approve) else stringResource(R.string.reject))
+                        Text(when(actionDialogType) {
+                            ActionType.APPROVE -> stringResource(R.string.approve)
+                            ActionType.REJECT -> stringResource(R.string.reject)
+                            ActionType.CANCEL -> "Cancel Leave"
+                            ActionType.FORWARD -> "Forward"
+                            ActionType.RETURN -> "Return"
+                            else -> ""
+                        })
                     }
                 },
                 dismissButton = {
@@ -277,7 +356,7 @@ fun LeaveDetailScreen(
     }
 }
 
-enum class ActionType { APPROVE, REJECT }
+enum class ActionType { APPROVE, REJECT, CANCEL, FORWARD, RETURN }
 
 @Composable
 fun InfoCard(title: String, value: String, icon: ImageVector, modifier: Modifier = Modifier) {

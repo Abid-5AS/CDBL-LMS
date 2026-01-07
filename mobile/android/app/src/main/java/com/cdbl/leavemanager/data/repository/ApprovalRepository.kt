@@ -1,6 +1,8 @@
 package com.cdbl.leavemanager.data.repository
 
 import com.cdbl.leavemanager.data.api.ApprovalApiService
+import com.cdbl.leavemanager.data.api.ApprovalHistoryResponse
+import com.cdbl.leavemanager.data.api.LeaveService
 import com.cdbl.leavemanager.data.model.ApprovalItem
 import com.cdbl.leavemanager.data.model.DecisionRequest
 import com.cdbl.leavemanager.data.model.DecisionResponse
@@ -9,7 +11,8 @@ import javax.inject.Singleton
 
 @Singleton
 class ApprovalRepository @Inject constructor(
-    private val approvalApiService: ApprovalApiService
+    private val approvalApiService: ApprovalApiService,
+    private val leaveService: LeaveService
 ) {
     suspend fun getPendingApprovals(token: String): Result<List<ApprovalItem>> {
         return try {
@@ -17,10 +20,24 @@ class ApprovalRepository @Inject constructor(
             if (response.isSuccessful && response.body() != null) {
                 Result.success(response.body()!!.items)
             } else if (response.code() == 403) {
-                 // Return empty list efficiently for unauthorized users but log validation needs
                  Result.success(emptyList()) 
             } else {
                 Result.failure(Exception("Failed to fetch approvals: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getApprovalHistory(token: String, decision: String = "ALL"): Result<ApprovalHistoryResponse> {
+        return try {
+            val response = leaveService.getApprovalHistory("Bearer $token", decision)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else if (response.code() == 403) {
+                 Result.success(ApprovalHistoryResponse(emptyList(), 1, 25)) 
+            } else {
+                Result.failure(Exception("Failed to fetch approval history: ${response.code()}"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -41,3 +58,4 @@ class ApprovalRepository @Inject constructor(
         }
     }
 }
+

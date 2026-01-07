@@ -211,4 +211,20 @@ class LeaveRepository @Inject constructor(
             Result.failure(e)
         }
     }
+
+    suspend fun cancelLeave(token: String, leaveId: Int, reason: String): Result<String> {
+        return try {
+            val request = com.cdbl.leavemanager.data.api.CancelLeaveRequest(reason)
+            val response = leaveService.cancelLeave("Bearer $token", leaveId, request)
+            if (response.isSuccessful && response.body()?.ok == true) {
+                syncLeaves(token) // Refresh leaves after cancel
+                Result.success(response.body()?.message ?: "Leave cancelled successfully")
+            } else {
+                val errorMsg = response.body()?.error ?: "Failed to cancel leave"
+                Result.failure(Exception(errorMsg))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

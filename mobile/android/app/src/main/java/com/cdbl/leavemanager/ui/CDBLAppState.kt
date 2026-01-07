@@ -99,21 +99,35 @@ class CDBLAppState(
             )
             "DEPT_HEAD" -> listOf(
                 TopLevelDestination.DASHBOARD,
+                TopLevelDestination.LEAVES,      // For own leave management
+                TopLevelDestination.APPROVALS,   // For team approvals
+                TopLevelDestination.TEAM,
+                TopLevelDestination.MORE
+            )
+            "HR_ADMIN" -> listOf(
+                TopLevelDestination.DASHBOARD,
+                TopLevelDestination.LEAVES,      // For own leave management
                 TopLevelDestination.APPROVALS,
                 TopLevelDestination.TEAM,
-                TopLevelDestination.REPORTS,
-                TopLevelDestination.PROFILE
+                TopLevelDestination.MORE
             )
-            "SYSTEM_ADMIN" -> listOf(
+            "HR_HEAD" -> listOf(
                 TopLevelDestination.DASHBOARD,
-                TopLevelDestination.ADMIN,
+                TopLevelDestination.LEAVES,      // For own leave management
+                TopLevelDestination.APPROVALS,
+                TopLevelDestination.REPORTS,
+                TopLevelDestination.MORE
+            )
+            "CEO" -> listOf(
+                TopLevelDestination.DASHBOARD,
+                TopLevelDestination.APPROVALS,
                 TopLevelDestination.TEAM,
                 TopLevelDestination.REPORTS,
                 TopLevelDestination.MORE
             )
-            "CEO", "HR_ADMIN", "HR_HEAD" -> listOf(
+            "SYSTEM_ADMIN" -> listOf(
                 TopLevelDestination.DASHBOARD,
-                TopLevelDestination.APPROVALS,
+                TopLevelDestination.ADMIN,
                 TopLevelDestination.TEAM,
                 TopLevelDestination.REPORTS,
                 TopLevelDestination.MORE

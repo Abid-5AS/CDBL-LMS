@@ -12,22 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.outlined.AccountBalanceWallet
-import androidx.compose.material.icons.outlined.AttachFile
-import androidx.compose.material.icons.outlined.CalendarToday
-import androidx.compose.material.icons.outlined.Event
-import androidx.compose.material.icons.rounded.AccountBalanceWallet
-import androidx.compose.material.icons.rounded.AttachFile
-import androidx.compose.material.icons.rounded.CalendarToday
-import androidx.compose.material.icons.rounded.Event
-import androidx.compose.material.icons.rounded.FlightTakeoff
-import androidx.compose.material.icons.rounded.MoreVert
-import androidx.compose.material.icons.rounded.Send
-import androidx.compose.material.icons.rounded.Sick
-import androidx.compose.material.icons.rounded.Weekend
-import androidx.compose.material.icons.rounded.WorkOff
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,14 +23,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cdbl.leavemanager.ui.theme.*
+import com.cdbl.leavemanager.ui.leaves.components.LeaveCalendar
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import android.net.Uri
 import androidx.compose.ui.res.stringResource
 import com.cdbl.leavemanager.R
+import java.time.LocalDate
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,9 +47,15 @@ fun ApplyLeaveScreen(
     val uiState by viewModel.uiState.collectAsState()
     
     // UI State
-    var selectedType by remember { mutableStateOf("Annual") }
+    var selectedTypeCode by remember { mutableStateOf("CASUAL") }
+    var selectedTypeName by remember { mutableStateOf("Casual Leave") }
     var reason by remember { mutableStateOf("") }
     var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
+    
+    // Calendar State
+    var currentMonth by remember { mutableStateOf(YearMonth.now()) }
+    var selectedStartDate by remember { mutableStateOf<LocalDate?>(null) }
+    var selectedEndDate by remember { mutableStateOf<LocalDate?>(null) }
     
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -68,36 +63,38 @@ fun ApplyLeaveScreen(
         selectedFileUri = uri
     }
     
-    // Mock Data
-    // Dynamic Leave Types
+    // Leave Types - map policy codes to backend enum values
     val leaveTypes = remember(uiState.leavePolicies) {
         uiState.leavePolicies.map { policy ->
-            val (icon, color) = when (policy.code) {
-                "AL" -> Icons.Rounded.FlightTakeoff to Indigo600
-                "SL" -> Icons.Rounded.Sick to ErrorRed
-                "CL" -> Icons.Rounded.Weekend to WarningAmber
-                "LWP" -> Icons.Rounded.WorkOff to Color(0xFF14b8a6) // Teal
-                else -> Icons.Rounded.Event to Color.Gray
+            val (icon, color, apiCode) = when (policy.code.uppercase()) {
+                "AL", "EARNED" -> Triple(Icons.Rounded.FlightTakeoff, Indigo600, "EARNED")
+                "SL", "MEDICAL" -> Triple(Icons.Rounded.Sick, ErrorRed, "MEDICAL")
+                "CL", "CASUAL" -> Triple(Icons.Rounded.Weekend, WarningAmber, "CASUAL")
+                "LWP", "EXTRAWITHOUTPAY" -> Triple(Icons.Rounded.WorkOff, Color(0xFF14b8a6), "EXTRAWITHOUTPAY")
+                "EXTRAWITHPAY" -> Triple(Icons.Rounded.Paid, Color(0xFF10b981), "EXTRAWITHPAY")
+                "MATERNITY" -> Triple(Icons.Rounded.ChildCare, Color(0xFFec4899), "MATERNITY")
+                "PATERNITY" -> Triple(Icons.Rounded.ChildFriendly, Color(0xFF3b82f6), "PATERNITY")
+                "STUDY" -> Triple(Icons.Rounded.School, Color(0xFF8b5cf6), "STUDY")
+                "SPECIAL" -> Triple(Icons.Rounded.Star, Color(0xFFf59e0b), "SPECIAL")
+                else -> Triple(Icons.Rounded.Event, Color.Gray, policy.code.uppercase())
             }
-            LeaveTypeItem(name = policy.title, icon = icon, color = color)
+            LeaveTypeItem(name = policy.title, apiCode = apiCode, icon = icon, color = color)
         }
     }
-
-    // Date State
-    var showStartDatePicker by remember { mutableStateOf(false) }
-    var showEndDatePicker by remember { mutableStateOf(false) }
-    var startDateMillis by remember { mutableStateOf(System.currentTimeMillis()) }
-    var endDateMillis by remember { mutableStateOf(System.currentTimeMillis() + 86400000) } // +1 day
-
-    // Format dates for display and calculation
-    val dateFormatter = java.time.format.DateTimeFormatter.ofPattern("MMM dd")
-    val dayFormatter = java.time.format.DateTimeFormatter.ofPattern("EEEE, yyyy")
-    
-    val startLocalDate = java.time.Instant.ofEpochMilli(startDateMillis).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
-    val endLocalDate = java.time.Instant.ofEpochMilli(endDateMillis).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
     
     // Calculate days
-    val daysDiff = java.time.temporal.ChronoUnit.DAYS.between(startLocalDate, endLocalDate) + 1
+    val daysDiff = if (selectedStartDate != null && selectedEndDate != null) {
+        ChronoUnit.DAYS.between(selectedStartDate, selectedEndDate) + 1
+    } else if (selectedStartDate != null) {
+        1L
+    } else {
+        0L
+    }
+
+    // Get existing leaves map for calendar
+    val existingLeavesMap = remember(uiState.existingLeaves) {
+        viewModel.getExistingLeavesMap()
+    }
 
     LaunchedEffect(uiState.success) {
         if (uiState.success) {
@@ -109,6 +106,30 @@ fun ApplyLeaveScreen(
     LaunchedEffect(Unit) {
         viewModel.loadBalance(token)
         viewModel.loadPolicies(token)
+        viewModel.loadHolidays(token)
+        viewModel.loadExistingLeaves(token)
+    }
+
+    // Handle date selection
+    val onDateSelected: (LocalDate) -> Unit = { date ->
+        when {
+            selectedStartDate == null -> {
+                selectedStartDate = date
+                selectedEndDate = null
+            }
+            selectedEndDate == null -> {
+                if (date.isBefore(selectedStartDate)) {
+                    selectedEndDate = selectedStartDate
+                    selectedStartDate = date
+                } else {
+                    selectedEndDate = date
+                }
+            }
+            else -> {
+                selectedStartDate = date
+                selectedEndDate = null
+            }
+        }
     }
 
     Scaffold(
@@ -117,7 +138,7 @@ fun ApplyLeaveScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 48.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
+                    .padding(top = 48.dp, bottom = 8.dp, start = 8.dp, end = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -129,53 +150,84 @@ fun ApplyLeaveScreen(
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
-                IconButton(onClick = { }) {
-                    Icon(Icons.Rounded.MoreVert, contentDescription = "Menu")
-                }
+                Spacer(modifier = Modifier.width(48.dp))
             }
         },
         bottomBar = {
-            Column(
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surface)
-                    .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.05f))
-                    .padding(24.dp)
+            // Request Summary & Submit
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(stringResource(R.string.total_days), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("$daysDiff " + stringResource(R.string.total), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(
-                    onClick = { 
-                        // Submit with selected dates
-                        if (!uiState.isLoading) {
-                            val formatter = java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
-                            viewModel.submitLeave(
-                                token, 
-                                selectedType, 
-                                startLocalDate.format(formatter), 
-                                endLocalDate.format(formatter), 
-                                reason,
-                                selectedFileUri
-                            ) 
+                Column(modifier = Modifier.padding(20.dp)) {
+                    // Summary Row
+                    if (selectedStartDate != null) {
+                        Text(
+                            "Request Summary",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column {
+                                Text(
+                                    selectedTypeName,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(
+                                    if (selectedEndDate != null) {
+                                        "${selectedStartDate!!.format(DateTimeFormatter.ofPattern("MMM dd"))} - ${selectedEndDate!!.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))}"
+                                    } else {
+                                        selectedStartDate!!.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
+                                    },
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Surface(
+                                color = MaterialTheme.colorScheme.primaryContainer,
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(
+                                    "$daysDiff ${if (daysDiff == 1L) "day" else "days"}",
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
                         }
-                    },
-                    enabled = !uiState.isLoading,
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    if (uiState.isLoading) {
-                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
-                    } else {
-                        Text(stringResource(R.string.submit_application), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Icon(Icons.Rounded.Send, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                    
+                    Button(
+                        onClick = { 
+                            if (!uiState.isLoading && selectedStartDate != null) {
+                                val formatter = DateTimeFormatter.ISO_LOCAL_DATE
+                                val start = selectedStartDate!!.format(formatter)
+                                val end = (selectedEndDate ?: selectedStartDate!!).format(formatter)
+                                viewModel.submitLeave(token, selectedTypeCode, start, end, reason, selectedFileUri) 
+                            }
+                        },
+                        enabled = !uiState.isLoading && selectedStartDate != null && reason.isNotBlank(),
+                        modifier = Modifier.fillMaxWidth().height(52.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        if (uiState.isLoading) {
+                            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                        } else {
+                            Text(stringResource(R.string.submit_application), fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Icon(Icons.Rounded.Send, contentDescription = null, modifier = Modifier.size(18.dp))
+                        }
                     }
                 }
             }
@@ -186,67 +238,52 @@ fun ApplyLeaveScreen(
                 .padding(paddingValues)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Gradient Available Balance Card
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(140.dp)
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(
-                        Brush.linearGradient(
-                            colors = listOf(Indigo600, Color(0xFF4f46e5)) // Indigo to lighter indigo
-                        )
-                    )
-                    .padding(24.dp)
+            // Balance Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Indigo600),
+                shape = RoundedCornerShape(20.dp)
             ) {
-                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.Top
-                    ) {
-                        Column {
-                            Text(stringResource(R.string.available_balance), style = MaterialTheme.typography.labelMedium, color = Indigo100)
-                            Row(verticalAlignment = Alignment.Bottom) {
-                                Text(
-                                    text = uiState.balance?.EARNED?.toInt()?.toString() ?: "--", 
-                                    style = MaterialTheme.typography.displayMedium, 
-                                    fontWeight = FontWeight.Bold, 
-                                    color = Color.White
-                                )
-                                Text(" " + stringResource(R.string.days_left), style = MaterialTheme.typography.titleMedium, color = Indigo100, modifier = Modifier.padding(bottom = 6.dp))
-                            }
-                        }
-                        Box(
-                            modifier = Modifier
-                                .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
-                                .padding(8.dp)
-                        ) {
-                            Icon(Icons.Rounded.AccountBalanceWallet, contentDescription = null, tint = Indigo100)
-                        }
-                    }
-                    Column {
-                        // Progress Bar
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(6.dp)
-                                .clip(CircleShape)
-                                .background(Color.Black.copy(alpha = 0.2f))
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth(0.7f)
-                                    .fillMaxHeight()
-                                    .clip(CircleShape)
-                                    .background(Color.White)
+                Row(
+                    modifier = Modifier.padding(20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            stringResource(R.string.available_balance),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Indigo100
+                        )
+                        Row(verticalAlignment = Alignment.Bottom) {
+                            Text(
+                                text = uiState.balance?.EARNED?.toInt()?.toString() ?: "--", 
+                                style = MaterialTheme.typography.displaySmall, 
+                                fontWeight = FontWeight.Bold, 
+                                color = Color.White
+                            )
+                            Text(
+                                " days",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Indigo100,
+                                modifier = Modifier.padding(bottom = 4.dp)
                             )
                         }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(stringResource(R.string.updated_today), style = MaterialTheme.typography.labelSmall, color = Indigo100, modifier = Modifier.align(Alignment.End))
+                    }
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(Color.White.copy(alpha = 0.2f), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Rounded.AccountBalanceWallet,
+                            contentDescription = null,
+                            tint = Indigo100,
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
                 }
             }
@@ -257,219 +294,178 @@ fun ApplyLeaveScreen(
                     stringResource(R.string.select_leave_type), 
                     style = MaterialTheme.typography.labelLarge, 
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 12.dp)
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
                 LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxWidth()
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     if (leaveTypes.isEmpty()) {
-                        // Skeleton/Loading State
                         items(3) {
                             Box(
                                 modifier = Modifier
-                                    .size(width = 100.dp, height = 50.dp)
-                                    .clip(RoundedCornerShape(16.dp))
+                                    .size(width = 100.dp, height = 44.dp)
+                                    .clip(RoundedCornerShape(12.dp))
                                     .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
                             )
                         }
                     } else {
                         items(leaveTypes) { item ->
-                        val isSelected = selectedType == item.name
-                        val bgColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-                        val contentColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
-                        val borderColor = if (isSelected) Color.Transparent else MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
+                            val isSelected = selectedTypeCode == item.apiCode
+                            val bgColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+                            val contentColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                            val borderColor = if (isSelected) Color.Transparent else MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(bgColor)
-                                .border(1.dp, borderColor, RoundedCornerShape(16.dp))
-                                .clickable { selectedType = item.name }
-                                .padding(horizontal = 16.dp, vertical = 12.dp)
-                        ) {
-                            Icon(item.icon, contentDescription = null, tint = if (isSelected) Color.White else item.color, modifier = Modifier.size(20.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(item.name, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = contentColor)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(bgColor)
+                                    .border(1.dp, borderColor, RoundedCornerShape(12.dp))
+                                    .clickable { 
+                                        selectedTypeCode = item.apiCode
+                                        selectedTypeName = item.name 
+                                    }
+                                    .padding(horizontal = 14.dp, vertical = 10.dp)
+                            ) {
+                                Icon(
+                                    item.icon,
+                                    contentDescription = null,
+                                    tint = if (isSelected) Color.White else item.color,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    item.name,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = contentColor
+                                )
+                            }
                         }
                     }
-                    }
                 }
             }
 
-            // Date Selection
-            if (showStartDatePicker) {
-               val datePickerState = rememberDatePickerState(initialSelectedDateMillis = startDateMillis)
-                DatePickerDialog(
-                    onDismissRequest = { showStartDatePicker = false },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            datePickerState.selectedDateMillis?.let { startDateMillis = it }
-                            showStartDatePicker = false
-                        }) { Text("OK") }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showStartDatePicker = false }) { Text("Cancel") }
-                    }
-                ) {
-                    DatePicker(state = datePickerState)
-                }
-            }
-
-            if (showEndDatePicker) {
-                val datePickerState = rememberDatePickerState(initialSelectedDateMillis = endDateMillis)
-                DatePickerDialog(
-                    onDismissRequest = { showEndDatePicker = false },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            datePickerState.selectedDateMillis?.let { endDateMillis = it }
-                            showEndDatePicker = false
-                        }) { Text("OK") }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showEndDatePicker = false }) { Text("Cancel") }
-                    }
-                ) {
-                    DatePicker(state = datePickerState)
-                }
-            }
-
+            // Visual Calendar
             Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        stringResource(R.string.select_dates), 
-                        style = MaterialTheme.typography.labelLarge, 
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        stringResource(R.string.days_selected, daysDiff.toInt()), 
-                        style = MaterialTheme.typography.labelSmall, 
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp)).padding(horizontal = 8.dp, vertical = 4.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.height(12.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    // Start Date
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        border = androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
-                        shape = RoundedCornerShape(20.dp),
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable { showStartDatePicker = true }
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                             Icon(Icons.Rounded.CalendarToday, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.align(Alignment.End))
-                             Spacer(modifier = Modifier.height(8.dp))
-                             Text(stringResource(R.string.start_date), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                             Text(startLocalDate.format(dateFormatter), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                             Text(startLocalDate.format(dayFormatter), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                    }
-                    // End Date
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                         border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)),
-                        shape = RoundedCornerShape(20.dp),
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable { showEndDatePicker = true }
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                             Icon(Icons.Rounded.Event, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.align(Alignment.End))
-                             Spacer(modifier = Modifier.height(8.dp))
-                             Text(stringResource(R.string.end_date), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                             Text(endLocalDate.format(dateFormatter), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                             Text(endLocalDate.format(dayFormatter), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                    }
-                }
+                Text(
+                    "Select Dates",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                LeaveCalendar(
+                    currentMonth = currentMonth,
+                    onMonthChange = { currentMonth = it },
+                    selectedStartDate = selectedStartDate,
+                    selectedEndDate = selectedEndDate,
+                    onDateSelected = onDateSelected,
+                    holidays = uiState.holidays,
+                    existingLeaves = existingLeavesMap,
+                    weekendsBlocked = false
+                )
             }
 
-            // Reason
+            // Reason Input
             Column {
                 Text(
                     stringResource(R.string.reason), 
                     style = MaterialTheme.typography.labelLarge, 
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 12.dp)
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
                 OutlinedTextField(
                     value = reason,
-                    onValueChange = { reason = it },
+                    onValueChange = { if (it.length <= 200) reason = it },
                     placeholder = { Text(stringResource(R.string.reason_hint)) },
-                    modifier = Modifier.fillMaxWidth().height(140.dp),
-                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier.fillMaxWidth().height(120.dp),
+                    shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f),
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
                         focusedContainerColor = MaterialTheme.colorScheme.surface,
                         unfocusedContainerColor = MaterialTheme.colorScheme.surface
                     )
                 )
-                Spacer(modifier = Modifier.height(8.dp))
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    Text("${reason.length}/150", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        "${reason.length}/200",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
             
-            // Supporting Document Button
+            // Attachment Button
             Card(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(14.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 24.dp)
                     .clickable { launcher.launch("*/*") }
             ) {
                 Row(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(14.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                   Box(
-                       modifier = Modifier
-                           .size(40.dp)
-                           .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
-                       contentAlignment = Alignment.Center
-                   ) {
-                       Icon(Icons.Rounded.AttachFile, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                   }
-                   Spacer(modifier = Modifier.width(16.dp))
-                   Column(modifier = Modifier.weight(1f)) {
-                       Text(
-                           text = if (selectedFileUri != null) stringResource(R.string.file_attached) else stringResource(R.string.add_document),
-                           style = MaterialTheme.typography.titleMedium,
-                           fontWeight = FontWeight.SemiBold
-                       )
-                       Text(
-                           text = selectedFileUri?.path?.let { 
-                               val name = it.split("/").last() 
-                               if (name.length > 20) "..." + name.takeLast(20) else name
-                           } ?: stringResource(R.string.tap_to_select),
-                           style = MaterialTheme.typography.bodySmall,
-                           color = if (selectedFileUri != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                       )
-                   }
-                   if (selectedFileUri != null) {
-                       IconButton(onClick = { selectedFileUri = null }) {
-                           Icon(Icons.Rounded.WorkOff, contentDescription = "Clear", tint = ErrorRed) // Using WorkOff as a close icon replacement if Close not avail
-                       }
-                   }
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Rounded.AttachFile,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = if (selectedFileUri != null) stringResource(R.string.file_attached) else stringResource(R.string.add_document),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            text = selectedFileUri?.path?.split("/")?.lastOrNull()?.take(30) ?: stringResource(R.string.tap_to_select),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (selectedFileUri != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    if (selectedFileUri != null) {
+                        IconButton(onClick = { selectedFileUri = null }) {
+                            Icon(Icons.Rounded.Close, contentDescription = "Clear", tint = ErrorRed)
+                        }
+                    }
                 }
             }
+
+            // Error Message
+            if (uiState.error != null) {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = ErrorRed.copy(alpha = 0.1f)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Rounded.Error, contentDescription = null, tint = ErrorRed)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(uiState.error!!, color = ErrorRed, style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
 
-data class LeaveTypeItem(val name: String, val icon: ImageVector, val color: Color)
+data class LeaveTypeItem(val name: String, val apiCode: String, val icon: ImageVector, val color: Color)

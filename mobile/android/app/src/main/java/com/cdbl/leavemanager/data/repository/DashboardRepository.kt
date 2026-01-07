@@ -90,7 +90,8 @@ class DashboardRepository @Inject constructor(
         return try {
             val response = dashboardService.getHolidays("Bearer $token")
             if (response.isSuccessful && response.body() != null) {
-                Result.success(response.body()!!.holidays)
+                // Handle null holidays list from API
+                Result.success(response.body()!!.holidays ?: emptyList())
             } else {
                 Result.failure(Exception("Failed to fetch holidays: ${response.code()}"))
             }
