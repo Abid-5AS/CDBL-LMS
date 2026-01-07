@@ -1,5 +1,6 @@
 package com.cdbl.leavemanager.ui
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -8,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.cdbl.leavemanager.data.local.DarkThemeConfig
 import com.cdbl.leavemanager.ui.designsystem.component.CDBLBackground
 import com.cdbl.leavemanager.ui.designsystem.component.CDBLGradientBackground
 import com.cdbl.leavemanager.ui.navigation.CDBLBottomBar
@@ -17,9 +20,21 @@ import com.cdbl.leavemanager.ui.theme.CDBLLeaveManagerTheme
 @Composable
 fun CDBLApp(
     appState: CDBLAppState,
-    startDestination: String = "login_route"
+    startDestination: String = "login_route",
+    mainViewModel: MainViewModel = hiltViewModel()
 ) {
-    CDBLLeaveManagerTheme {
+    val userPreferences = mainViewModel.userPreferences.collectAsState().value
+    
+    val isDarkTheme = when (userPreferences.darkThemeConfig) {
+        DarkThemeConfig.FOLLOW_SYSTEM -> isSystemInDarkTheme()
+        DarkThemeConfig.LIGHT -> false
+        DarkThemeConfig.DARK -> true
+    }
+
+    CDBLLeaveManagerTheme(
+        darkTheme = isDarkTheme,
+        androidTheme = userPreferences.useDynamicColor
+    ) {
         val snackbarHostState = remember { SnackbarHostState() }
         val roleState = appState.userRole.collectAsState()
         val role = roleState.value
@@ -58,3 +73,4 @@ fun CDBLApp(
         }
     }
 }
+
