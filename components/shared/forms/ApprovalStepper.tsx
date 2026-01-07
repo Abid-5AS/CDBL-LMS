@@ -3,25 +3,23 @@
 import { CheckCircle2, Circle } from "lucide-react";
 import clsx from "clsx";
 
-import { getWorkflowStages } from "./approval-utils";
-
 type Stage = string; // Relaxed type since stages are dynamic strings now
 
 type ApprovalStepperProps = {
-  stages?: Stage[];
+  stages: Stage[]; // Now required - must be provided by parent
   currentIndex: number;
   className?: string;
-  requesterRole?: string;
+  requesterRole?: string; // Kept for backwards compatibility but not used
 };
 
 export function ApprovalStepper({
   stages,
   currentIndex,
   className,
-  requesterRole,
 }: ApprovalStepperProps) {
-  // Use provided stages or determine from requester role
-  const displayStages = stages || getWorkflowStages(requesterRole);
+  // Use provided stages directly (no fallback to hardcoded)
+  // Parent component must call getStagesFromApprovals(leave.approvals, requesterRole)
+  const displayStages = stages.length > 0 ? stages : ["Submitted"];
 
   return (
     <div className={clsx("w-full", className)}>

@@ -147,91 +147,114 @@ export class LeaveService {
         payCalculation = validation.warning.details.payCalculation;
       }
 
-      // 7. Create leave request
-      const leaveRequest = await LeaveRepository.create({
-        requesterId: userId,
-        type: dto.type,
-        startDate: dto.startDate,
-        endDate: dto.endDate,
-        workingDays,
-        reason: dto.reason,
-        certificateUrl,
-        needsCertificate: dto.needsCertificate,
-        incidentDate: dto.incidentDate,
-        payCalculation: payCalculation,
-      });
+      // 7. Transactional Creation
+      const { leaveRequest, approverIds } = await prisma.$transaction(async (tx) => {
+        // 7.1 Create leave request
+        const leaveRequest = await tx.leaveRequest.create({
+          data: {
+            requesterId: userId,
+            type: dto.type,
+            status: LeaveStatus.PENDING, // Explicitly PENDING initially
+            policyVersion: "v2.0",       // Default policy version
+            startDate: dto.startDate,
+            endDate: dto.endDate,
+            workingDays,
+            reason: dto.reason,
+            certificateUrl,
+            needsCertificate: dto.needsCertificate,
+            incidentDate: dto.incidentDate,
+            payCalculation: payCalculation,
+          },
+        });
 
-      // 8. Create full approval chain (Snapshotting)
-      // This locks the policy at the time of creation
-      const { WorkflowService } = await import('@/lib/workflow-service');
-      const chain = await WorkflowService.getChainFor(user.role as any, dto.type);
+        // 7.2 Create full approval chain (Snapshotting)
+        const { WorkflowService } = await import('@/lib/workflow-service');
+        const chain = await WorkflowService.getChainFor(user.role as any, dto.type);
 
-      if (chain.length > 0) {
-        // Create approvals for the entire chain
-        for (let i = 0; i < chain.length; i++) {
-          const role = chain[i];
-          const step = i + 1;
-          const approver = await this.findApprover(userId, role);
+        const createdApproverIds: number[] = [];
 
-          if (approver) {
-            await prisma.approval.create({
-              data: {
-                leaveId: leaveRequest.id,
-                approverId: approver.id,
-                step: step,
-                decision: ApprovalDecision.PENDING,
-              },
-            });
-          } else {
-            // If we can't find an approver (e.g., waiting for HR Head hiring),
-            // we stop creating the chain here. The request will get stuck at the previous step
-            // until an admin fixes it or adds the user.
-            console.warn(`Snapshotting stopped: No approver found for role ${role} (request ${leaveRequest.id})`);
-            // We could consider erroring here, but it's better to allow submission 
-            // and let it pending at Dept Head level than to block the employee.
+        if (chain.length > 0) {
+          for (let i = 0; i < chain.length; i++) {
+            const role = chain[i];
+            const step = i + 1;
+            const approver = await LeaveService.findApprover(userId, role);
+
+            if (approver) {
+              await tx.approval.create({
+                data: {
+                  leaveId: leaveRequest.id,
+                  approverId: approver.id,
+                  step: step,
+                  decision: ApprovalDecision.PENDING,
+                },
+              });
+              createdApproverIds.push(approver.id);
+            } else {
+              console.warn(`Snapshotting halted: No approver found for role ${role} (request ${leaveRequest.id})`);
+              // For now, we allow the chain to be incomplete
+            }
           }
         }
-      } else {
-        // No chain (e.g. CEO), auto-approval?
-        // Policy: CEO needs to inform board, implemented as self-approval for now or manual handling.
-        // If empty chain, status remains SUBMITTED.
+
+        // 7.3 Log the creation
+        await tx.auditLog.create({
+          data: {
+            actorEmail: user.email,
+            action: "LEAVE_CREATED",
+            targetEmail: user.email,
+            details: { leaveId: leaveRequest.id }
+          }
+        });
+
+        return { leaveRequest, approverIds: createdApproverIds };
+      });
+
+      // 8. Send Notifications (Post-transaction)
+      try {
+        // Notify Requester
+        await NotificationService.notifyLeaveSubmitted(leaveRequest.id, userId); // Or similar helper
+
+        // Notify First Approver
+        // We need to find the first step (which is approverIds[0] if ordered, but safest to query or use list)
+        // Actually, we have approverIds collected in order of chain.
+        // Chain order is correct (step 1, step 2...)
+        if (approverIds.length > 0) {
+          await NotificationService.notifyLeaveForwarded(leaveRequest.id, approverIds[0], user.email);
+        }
+      } catch (e) {
+        console.error("Failed to send notifications", e);
       }
 
-      // 9. Log the creation
-      await this.logAction(
-        user.email,
-        "LEAVE_REQUEST_CREATED",
-        { leaveId: leaveRequest.id }
-      );
+      // 9. Trigger webhook notification (non-blocking)
+      try {
+        await notifyLeaveSubmitted({
+          leaveId: leaveRequest.id,
+          employeeId: userId,
+          employeeName: user.email.split('@')[0],
+          employeeEmail: user.email,
+          leaveType: dto.type,
+          startDate: dto.startDate,
+          endDate: dto.endDate,
+          workingDays: workingDays,
+          reason: dto.reason,
+          status: 'SUBMITTED',
+        });
 
-      // 10. Send notifications to approvers and requester
-      await NotificationService.notifyLeaveSubmitted(leaveRequest.id, userId);
-
-      // 11. Trigger webhook notification
-      await notifyLeaveSubmitted({
-        leaveId: leaveRequest.id,
-        employeeId: userId,
-        employeeName: user.email.split('@')[0], // Will be improved when we add name to user select
-        employeeEmail: user.email,
-        leaveType: dto.type,
-        startDate: dto.startDate,
-        endDate: dto.endDate,
-        workingDays: workingDays,
-        reason: dto.reason,
-        status: 'SUBMITTED',
-      });
-
-      // 12. Dispatch Webhook Event
-      const { WebhookService } = await import("./webhook.service");
-      await WebhookService.dispatch('leave.created', {
-        leaveId: leaveRequest.id,
-        userId: userId,
-        leaveType: dto.type,
-        startDate: dto.startDate,
-        endDate: dto.endDate,
-        status: 'SUBMITTED',
-        reason: dto.reason,
-      });
+        // 10. Dispatch Webhook Event
+        const { WebhookService } = await import("./webhook.service");
+        await WebhookService.dispatch('leave.created', {
+          leaveId: leaveRequest.id,
+          userId: userId,
+          leaveType: dto.type,
+          startDate: dto.startDate,
+          endDate: dto.endDate,
+          status: 'SUBMITTED',
+          reason: dto.reason,
+        });
+      } catch (webhookError) {
+        console.error("Webhook dispatch failed (non-critical):", webhookError);
+        // Don't fail the request because of webhook failure
+      }
 
       return {
         success: true,
@@ -513,39 +536,25 @@ export class LeaveService {
   }
 
   private static async isFinalApproval(leaveId: number): Promise<boolean> {
-    // Get the leave request with requester info
+    // Get the leave request with all approvals
     const leave = await prisma.leaveRequest.findUnique({
       where: { id: leaveId },
       include: {
-        requester: { select: { role: true } },
         approvals: {
-          include: {
-            approver: { select: { role: true } },
-          },
-          orderBy: { step: 'desc' },
+          orderBy: { step: 'desc' }, // Highest step first
         },
       },
     });
 
-    if (!leave) {
+    if (!leave || leave.approvals.length === 0) {
+      // If no approvals defined, treating as not final (or handle as auto-approve elsewhere) 
       return false;
     }
 
-    // Get the appropriate workflow chain based on requester role
-    const { getChainFor } = await import('@/lib/workflow');
-    const chain = getChainFor(leave.type, leave.requester.role as any);
+    // The last step in the chain is the one with the highest step number (index 0 due to desc sort)
+    const lastApproval = leave.approvals[0];
 
-    // Check if we have an approval from the final approver in the chain
-    const finalRole = chain[chain.length - 1];
-
-    // Find if there's an approved approval from the final approver
-    const finalApproval = leave.approvals.find(
-      (approval) =>
-        approval.approver.role === finalRole &&
-        approval.decision === 'APPROVED'
-    );
-
-    return !!finalApproval;
+    return lastApproval.decision === ApprovalDecision.APPROVED;
   }
 
   private static async getCurrentStep(leaveId: number): Promise<number> {
@@ -561,48 +570,29 @@ export class LeaveService {
   private static async getNextApprover(
     leave: any
   ): Promise<{ id: number; role: Role } | null> {
-    // Get requester to determine the workflow chain
-    const requester = await prisma.user.findUnique({
-      where: { id: leave.requesterId },
-      select: { role: true },
-    });
+    // Logic: The "next" approver is the one responsible for the FIRST pending step.
 
-    if (!requester) {
-      return null;
-    }
-
-    // Get current approval step
-    const currentApproval = await prisma.approval.findFirst({
-      where: {
-        leaveId: leave.id,
-        decision: ApprovalDecision.PENDING,
-      },
-      orderBy: { step: 'desc' },
+    const approvals = await prisma.approval.findMany({
+      where: { leaveId: leave.id },
+      orderBy: { step: 'asc' }, // Order 1, 2, 3...
       include: {
         approver: { select: { role: true } },
       },
     });
 
-    if (!currentApproval) {
+    if (approvals.length === 0) return null;
+
+    // Find the first approval that is still PENDING
+    const nextPending = approvals.find(a => a.decision === ApprovalDecision.PENDING);
+
+    if (!nextPending) {
       return null;
     }
 
-    // Import workflow functions
-    const { getNextRoleInChain } = await import('@/lib/workflow');
-
-    // Get next role in chain based on current approver's role and requester's role
-    const nextRole = getNextRoleInChain(
-      currentApproval.approver.role as any,
-      leave.type,
-      requester.role as any
-    );
-
-    if (!nextRole) {
-      return null;
-    }
-
-    const approver = await this.findApprover(leave.requesterId, nextRole);
-    return approver ? { id: approver.id, role: nextRole } : null;
+    return {
+      id: nextPending.approverId,
+      role: nextPending.approver.role
+    };
   }
 
   private static async deductFromBalance(

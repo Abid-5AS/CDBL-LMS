@@ -31,6 +31,7 @@ import {
   getNextApproverRole,
   getLatestApprovalDate,
   formatHeaderDate,
+  getStagesFromApprovals,
 } from "@/components/shared/forms/approval-utils";
 import {
   Accordion,
@@ -135,11 +136,13 @@ export function LeaveDetailsModal({
     leave.status,
     requesterRole
   );
-  const nextApprover = getNextApproverRole(currentIndex, requesterRole);
+  const nextApprover = getNextApproverRole(currentIndex, requesterRole, leave.approvals || []);
   const latestDate = getLatestApprovalDate(leave.approvals || []);
 
+  // Dynamic stage count: approvals.length + 1 (for "Submitted")
+  const totalStages = (leave.approvals?.length || 0) + 1;
   const canNudge =
-    currentIndex < 4 &&
+    currentIndex < totalStages - 1 &&
     leave.status !== "APPROVED" &&
     leave.status !== "REJECTED" &&
     leave.status !== "CANCELLED";
@@ -177,15 +180,14 @@ export function LeaveDetailsModal({
             <ApprovalStepper
               currentIndex={currentIndex}
               requesterRole={requesterRole as any}
-            // In the future, pass `stages` dynamically derived from `leave.approvals`
-            // stages={getStagesFromApprovals(leave.approvals)}
+              stages={getStagesFromApprovals(leave.approvals || [], requesterRole)}
             />
           </div>
 
           {/* Header Row 3: Status line */}
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>
-              {currentIndex < 4 ? (
+              {currentIndex < totalStages - 1 ? (
                 <>
                   Next:{" "}
                   <span className="font-semibold text-foreground">

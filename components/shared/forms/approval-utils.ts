@@ -27,57 +27,45 @@ function getRoleLabel(role?: string) {
 }
 
 export function getStagesFromApprovals(approvals: ApprovalRecord[], requesterRole?: string): string[] {
+  // Always start with "Submitted"
+  const stages: string[] = ["Submitted"];
+
+  // If no approvals, just show Submitted (waiting for first step)
   if (!approvals || approvals.length === 0) {
-    return getWorkflowStages(requesterRole);
+    return stages;
   }
 
   // Sort by step
   const sorted = [...approvals].sort((a, b) => (a.step || 0) - (b.step || 0));
 
-  // Create stages list: [Submitted, ...Approvers]
-  // We need to infer the Role Label for each step.
-  // The approval record might just have 'approverId'.
-  // But usually we load `approver: { name, role }` or similar.
-  // If we can't find it easily, we might need to rely on the fallback.
-  // BUT: The snapshot logic creates records.
-  // If we can assume the snapshot reflects the correct order, we can just label them "Step 1", "Step 2"...
-  // OR better: In the new `ApprovalTimelineAdapter`, we saw `toRole` is saved? No, `toRole` is for forwarding.
+  // Build stages from actual approvals
+  for (const approval of sorted) {
+    let roleLabel = "Approver";
 
-  // Let's assume for now we use the fallback `getWorkflowStages` if we can't reliably get role names from the snapshot without a backend change.
-  // However, I made `WorkflowService`! The `Approval` model *doesn't* store the Role directly (it stores `approverId`).
-  // So strictly speaking, from the frontend `approvals` array alone (which comes from `Permission` query?), we might not know the intended Role unless `approver` object has it.
+    // Try to get role from approver object
+    if (typeof approval.approver === "object" && approval.approver?.role) {
+      roleLabel = getRoleLabel(approval.approver.role);
+    } else if (typeof approval.approver === "string") {
+      // If approver is a string (name), we can't infer role, use generic
+      roleLabel = approval.approver;
+    }
 
-  // If the user just wants to see *that* it works, the Timeline is the source of truth.
-  // The Stepper is a visualization.
-  // I'll keep using `getWorkflowStages` for now to avoid breaking the Stepper with "Step 1, Step 2", 
-  // BUT I will add a comment that this might desync if the Admin changes the flow significantly and we don't store Role in Approval.
-  // actually, let's look at `Approval` model again. `toRole`?
-  // `toRole` is only on `Approval` if it was forwarded? No.
+    stages.push(roleLabel);
+  }
 
-  // Okay, I will NOT change `approval-utils.ts` to guess stages yet.
-  // I will just return the fallback.
-  return getWorkflowStages(requesterRole);
+  return stages;
 }
 
 /**
- * Get workflow stages based on requester role
- * MUST MATCH SERVER-SIDE MATRIX IN lib/workflow.ts (Default)
+ * @deprecated This function is deprecated and should not be used.
+ * Workflow stages are now dynamically derived from actual approval records.
+ * Use getStagesFromApprovals instead.
  */
 export function getWorkflowStages(requesterRole?: string): string[] {
-  if (requesterRole === "DEPT_HEAD") {
-    return ["Submitted", "HR Head", "CEO"];
-  }
-  if (requesterRole === "HR_ADMIN") {
-    return ["Submitted", "HR Head", "CEO"];
-  }
-  if (requesterRole === "HR_HEAD") {
-    return ["Submitted", "CEO"];
-  }
-  if (requesterRole === "CEO") {
-    return ["Submitted"];
-  }
-  // Default for regular employees
-  return ["Submitted", "Dept Head", "HR Admin", "HR Head", "CEO"];
+  // Return minimal fallback - only "Submitted"
+  // The real stages should come from getStagesFromApprovals
+  console.warn("getWorkflowStages is deprecated. Use getStagesFromApprovals with actual approval data.");
+  return ["Submitted"];
 }
 
 /**
@@ -90,7 +78,7 @@ export function calculateCurrentStageIndex(
   status?: string,
   requesterRole?: string
 ): number {
-  const stages = getWorkflowStages(requesterRole);
+  const stages = getStagesFromApprovals(approvals, requesterRole);
   const maxIndex = stages.length - 1;
 
   // If final status, we're at the last stage
@@ -126,8 +114,8 @@ export function calculateCurrentStageIndex(
 /**
  * Get the next approver role based on current stage
  */
-export function getNextApproverRole(currentIndex: number, requesterRole?: string): string | null {
-  const stages = getWorkflowStages(requesterRole);
+export function getNextApproverRole(currentIndex: number, requesterRole?: string, approvals?: ApprovalRecord[]): string | null {
+  const stages = getStagesFromApprovals(approvals || [], requesterRole);
   if (currentIndex >= stages.length - 1) return null; // At last stage
 
   // Skip "Submitted" at index 0, roles start at index 1

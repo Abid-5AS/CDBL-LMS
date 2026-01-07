@@ -98,6 +98,9 @@ export class ApprovalService {
   /**
    * Approve a leave request
    */
+  /**
+   * Approve a leave request
+   */
   static async approve(
     leaveId: number,
     approverId: number,
@@ -106,7 +109,7 @@ export class ApprovalService {
     newLeaveType?: LeaveType // New: Allow changing leave type
   ): Promise<ServiceResult<{ approved: boolean; isFinal: boolean }>> {
     try {
-      // 1. Verify leave exists and is in valid state
+      // 1. Verify leave exists
       const leave = await LeaveRepository.findById(leaveId);
       if (!leave) {
         return {
@@ -128,16 +131,16 @@ export class ApprovalService {
         };
       }
 
-      // 2-5. Execute critical operations in a transaction to ensure data consistency
-      // This prevents partial updates if any operation fails
+      // 2. Transaction
       const { updated, isFinal } = await prisma.$transaction(async (tx) => {
-        // 1.5 Update leave type if provided (Superior Edit Capability)
+        // 2.0 Update leave type if provided
         if (newLeaveType && newLeaveType !== leave.type) {
           await tx.leaveRequest.update({
             where: { id: leaveId },
             data: { type: newLeaveType, isModified: true }
           });
 
+          // Log change
           await tx.auditLog.create({
             data: {
               actorEmail: (await tx.user.findUnique({ where: { id: approverId }, select: { email: true } }))?.email || "unknown",
@@ -146,51 +149,51 @@ export class ApprovalService {
               details: { leaveId, oldType: leave.type, newType: newLeaveType }
             }
           });
-
-          // Update local leave object for subsequent checks
           leave.type = newLeaveType;
         }
 
-        // 2. Find and update the pending approval
-        const updated = await tx.approval.updateMany({
-          where: {
-            leaveId,
-            approverId,
-            decision: "PENDING"
-          },
+        // 2.1 Enforce Sequential Usage: Find the FIRST pending step
+        const allApprovals = await tx.approval.findMany({
+          where: { leaveId },
+          orderBy: { step: 'asc' }
+        });
+
+        const currentStep = allApprovals.find(a => a.decision === 'PENDING');
+
+        if (!currentStep) {
+          throw new Error("No pending approvals found");
+        }
+
+        if (currentStep.approverId !== approverId) {
+          // Optional: Allow admins to force-approve? For now, strict turn-based.
+          // But wait, what if the user has a delegated approval? 
+          // Ideally we check if approverId has rights. 
+          // For strict bug fix: Enforce ID match.
+          throw new Error("It is not your turn to approve");
+        }
+
+        // 2.2 Update THIS specific approval
+        await tx.approval.update({
+          where: { id: currentStep.id },
           data: {
-            decision: "APPROVED",
+            decision: 'APPROVED',
             comment,
             decidedAt: new Date()
           }
         });
 
-        if (updated.count === 0) {
-          throw new Error("approval_not_found");
-        }
+        // 2.3 Check if this was the final step
+        // If there are no more steps after this one.
+        const isFinalStep = currentStep.step === allApprovals[allApprovals.length - 1].step;
 
-        // 3. Check if this is the final approval using dynamic chain logic
-        const { isFinalApprover } = await import('@/lib/workflow');
-        const approver = await tx.user.findUnique({ where: { id: approverId }, select: { role: true } });
-        const requestWithRole = await tx.leaveRequest.findUnique({
-          where: { id: leaveId },
-          include: { requester: { select: { role: true } } }
-        });
-
-        const isFinal = isFinalApprover(
-          approver!.role as any,
-          leave.type,
-          requestWithRole?.requester?.role as any
-        );
-
-        // 4. Update leave status and balance if final approval or forward if not
-        if (isFinal) {
+        if (isFinalStep) {
+          // FINAL APPROVAL
           await tx.leaveRequest.update({
             where: { id: leaveId },
             data: { status: "APPROVED" }
           });
 
-          // Deduct from balance
+          // Deduct balance
           await tx.balance.updateMany({
             where: {
               userId: leave.requesterId,
@@ -201,117 +204,61 @@ export class ApprovalService {
               used: { increment: leave.workingDays }
             }
           });
-        } else {
-          // AUTO-FORWARD LOGIC
-          const { getNextRoleInChain } = await import('@/lib/workflow');
-          const nextRole = getNextRoleInChain(
-            approver!.role as any,
-            leave.type,
-            requestWithRole?.requester?.role as any
-          );
-
-          if (nextRole) {
-            // Find next approver
-            const nextApprover = await tx.user.findFirst({
-              where: { role: nextRole },
-              select: { id: true, name: true },
-            });
-
-            if (nextApprover) {
-              // Update current approval to FORWARDED instead of APPROVED to keep history clean (optional, keeping APPROVED is also fine but FORWARDED implies handoff)
-              // Actually, keeping as APPROVED is better for "I approved this", but we need to ensure the chain continues.
-              // Let's stick to the plan: The current step is APPROVED. The *next* step is created PENDING.
-
-              // Check if next step already exists (handling re-approvals)
-              const nextStepNum = await ApprovalRepository.getNextStep(leaveId);
-
-              await tx.approval.create({
-                data: {
-                  leaveId,
-                  approverId: nextApprover.id,
-                  step: nextStepNum,
-                  decision: "PENDING",
-                }
-              });
-
-              // Notify the next approver (Forwarded Notification)
-              // We'll handle this in the notification block below by checking !isFinal
-            }
-          }
         }
+        // Else: The next step exists (pre-generated). It is already PENDING (created as pending). 
+        // We just need to notify.
 
-        // 5. Log the approval
-        const approverUser = await tx.user.findUnique({
-          where: { id: approverId },
-          select: { email: true }
-        });
+        // 2.4 Log action
+        const approverUser = await tx.user.findUnique({ where: { id: approverId }, select: { email: true } });
         if (approverUser) {
           await tx.auditLog.create({
             data: {
               actorEmail: approverUser.email,
-              action: isFinal ? "LEAVE_APPROVED" : "LEAVE_FORWARDED_AUTO",
+              action: isFinalStep ? "LEAVE_APPROVED" : "LEAVE_FORWARDED",
               targetEmail: leave.requester?.email,
-              details: { leaveId, comment, isFinal, leaveType: leave.type }
+              details: { leaveId, comment, isFinal: isFinalStep, leaveType: leave.type }
             }
           });
         }
 
-        return { updated: updated.count, isFinal };
+        return { updated: 1, isFinal: isFinalStep };
       });
 
-      if (updated === 0) {
-        return {
-          success: false,
-          error: {
-            code: "approval_not_found",
-            message: "No pending approval found for this approver",
-          },
-        };
+      // 3. Notifications (Post-transaction)
+      try {
+        if (isFinal) {
+          const approver = await prisma.user.findUnique({ where: { id: approverId }, select: { name: true } });
+          if (approver) await NotificationService.notifyLeaveApproved(leaveId, approver.name);
+
+          // Sync Calendar
+          const { CalendarService } = await import("@/lib/integrations/calendar/calendar-service");
+          await CalendarService.syncLeaveEvent(leaveId, leave.requesterId);
+
+          // Webhook
+          const { WebhookService } = await import("./webhook.service");
+          await WebhookService.dispatch('leave.approved', {
+            leaveId, approvedBy: approverId, comment, approvedAt: new Date()
+          });
+        } else {
+          // Notify Next Approver
+          // We need to find who is next (Step + 1)
+          const nextPending = await prisma.approval.findFirst({
+            where: { leaveId, decision: 'PENDING' },
+            orderBy: { step: 'asc' },
+            include: { approver: true }
+          });
+
+          const currentName = (await prisma.user.findUnique({ where: { id: approverId }, select: { name: true } }))?.name || "Appropriate Authority";
+
+          if (nextPending) {
+            await NotificationService.notifyLeaveForwarded(leaveId, nextPending.approverId, currentName);
+          }
+        }
+      } catch (e) {
+        console.error("Notification failed", e);
+        // Don't fail the request
       }
 
-      // 6. Send notifications (only on final approval)
-      // 6. Send notifications
-      if (isFinal) {
-        const approver = await prisma.user.findUnique({
-          where: { id: approverId },
-          select: { name: true },
-        });
-        if (approver) {
-          await NotificationService.notifyLeaveApproved(leaveId, approver.name);
-        }
-
-        // 7. Sync to Calendar
-        const { CalendarService } = await import("@/lib/integrations/calendar/calendar-service");
-        await CalendarService.syncLeaveEvent(leaveId, leave.requesterId);
-
-        // 8. Dispatch Webhook Event
-        const { WebhookService } = await import("./webhook.service");
-        await WebhookService.dispatch('leave.approved', {
-          leaveId: leaveId,
-          approvedBy: approverId,
-          comment: comment,
-          approvedAt: new Date(),
-        });
-      } else {
-        // Notify next approver(s) for the new pending step
-        // We need to re-fetch the new pending approval to get the approver ID
-        const nextPending = await prisma.approval.findFirst({
-          where: { leaveId, decision: 'PENDING', step: { gt: 1 } }, // Assuming step > 1 for forwarded
-          orderBy: { step: 'desc' },
-          include: { approver: true }
-        });
-
-        const currentApprover = await prisma.user.findUnique({
-          where: { id: approverId },
-          select: { name: true }
-        });
-
-        if (nextPending && currentApprover) {
-          await NotificationService.notifyLeaveForwarded(leaveId, nextPending.approverId, currentApprover.name);
-        }
-      }
-
-      // Invalidate approval caches
       await invalidateCache('approvals:*');
       await invalidateCache(`leaves:user:${leave.requesterId}*`);
 
@@ -319,13 +266,14 @@ export class ApprovalService {
         success: true,
         data: { approved: true, isFinal },
       };
-    } catch (error) {
+
+    } catch (error: any) {
       console.error("ApprovalService.approve error:", error);
       return {
         success: false,
         error: {
-          code: "internal_error",
-          message: "Failed to approve leave request",
+          code: error.message === "It is not your turn to approve" ? "not_your_turn" : "internal_error",
+          message: error.message || "Failed to approve leave request",
         },
       };
     }
