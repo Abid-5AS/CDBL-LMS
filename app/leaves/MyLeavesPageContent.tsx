@@ -1,21 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar,
   CheckCircle2,
   Clock,
   FileText,
-  Filter,
   Plus,
   Search,
   XCircle,
   AlertCircle,
   LayoutGrid,
 } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
@@ -23,13 +21,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import EnhancedSmoothTab from "@/components/ui/enhanced-smooth-tab";
 
-import { LeaveBalanceView } from "@/components/leaves/LeaveBalanceView";
-import { HolidayCalendarView } from "@/components/leaves/HolidayCalendarView";
 import { LeaveDetailsModal } from "@/components/shared/modals/LeaveDetailsModal";
 import { useLeaveData } from "@/components/providers";
 import { cn } from "@/lib/utils";
 import { leaveTypeLabel } from "@/lib/ui/ui";
-import { Wallet, ClipboardList } from "lucide-react";
 
 function LeaveRequestCard({ request, onClick }: { request: any; onClick: () => void }) {
   const statusColors = {
@@ -306,70 +301,17 @@ function RequestsView() {
 }
 
 export function MyLeavesPageContent() {
-  const searchParams = useSearchParams();
-  const initialView = searchParams.get("view");
-  const [activeTab, setActiveTab] = useState(initialView && ["requests", "balances", "holidays"].includes(initialView) ? initialView : "requests");
-
-  const mainTabs = [
-    {
-      id: "requests",
-      title: "Requests",
-      icon: ClipboardList,
-      color: "bg-blue-500",
-    },
-    {
-      id: "balances",
-      title: "Balances",
-      icon: Wallet,
-      color: "bg-green-500",
-    },
-    {
-      id: "holidays",
-      title: "Holidays",
-      icon: Calendar,
-      color: "bg-purple-500",
-    },
-  ];
-
-  // Sync tab with URL search params
-  useEffect(() => {
-    const view = searchParams.get("view");
-    if (view && ["requests", "balances", "holidays"].includes(view)) {
-      setActiveTab(view);
-    }
-  }, [searchParams]);
-
   return (
     <div className="container mx-auto py-6 space-y-8">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">Leaves</h1>
         <p className="text-muted-foreground">
-          Manage your leave requests, check balances, and view the holiday calendar.
+          View and manage your leave requests.
         </p>
       </div>
 
       <div className="space-y-6">
-        <EnhancedSmoothTab
-          items={mainTabs}
-          value={activeTab}
-          onChange={setActiveTab}
-          className="w-full max-w-md mx-auto"
-          showCardContent={false}
-        />
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-          >
-            {activeTab === "requests" && <RequestsView />}
-            {activeTab === "balances" && <LeaveBalanceView />}
-            {activeTab === "holidays" && <HolidayCalendarView />}
-          </motion.div>
-        </AnimatePresence>
+        <RequestsView />
       </div>
     </div>
   );
