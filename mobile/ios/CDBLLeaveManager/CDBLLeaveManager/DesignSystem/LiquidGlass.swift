@@ -5,9 +5,9 @@ import SwiftUI
 // that works on current iOS versions (15/16/17+) using standard Materials.
 
 public enum Glass {
-    case regular
-    case clear
-    case identity
+    case frosted
+    case transparent
+    case none
     
     // Support for tinted glass chaining (mocking the API structure)
     public func tint(_ color: Color) -> Glass {
@@ -22,8 +22,8 @@ public enum Glass {
 public extension View {
     /// Applies a "Liquid Glass" effect to the view.
     /// This implementation uses native standard Materials for high performance.
-    func glassEffect<S: Shape>(
-        _ glass: Glass = .regular,
+    func glassEffect<S: InsettableShape>(
+        _ glass: Glass = .frosted,
         in shape: S
     ) -> some View {
         self.modifier(GlassEffectModifier(style: glass, shape: shape))
@@ -31,20 +31,21 @@ public extension View {
     
     /// Legacy/Future compatibility wrapper
     @available(iOS 15.0, *)
-    func liquidGlassEffect<S: Shape>(
-        _ glass: Glass = .regular,
+    @ViewBuilder
+    func liquidGlassEffect<S: InsettableShape>(
+        _ glass: Glass = .frosted,
         in shape: S,
         isEnabled: Bool = true
     ) -> some View {
         if isEnabled {
-            return self.glassEffect(glass, in: shape)
+            self.glassEffect(glass, in: shape)
         } else {
-            return self
+            self
         }
     }
 }
 
-private struct GlassEffectModifier<S: Shape>: ViewModifier {
+private struct GlassEffectModifier<S: InsettableShape>: ViewModifier {
     let style: Glass
     let shape: S
     
@@ -52,7 +53,7 @@ private struct GlassEffectModifier<S: Shape>: ViewModifier {
         content
             .background {
                 switch style {
-                case .regular:
+                case .frosted:
                     ZStack {
                         // Main Glass Material
                         Rectangle()
@@ -66,7 +67,7 @@ private struct GlassEffectModifier<S: Shape>: ViewModifier {
                     .clipShape(shape)
                     .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
                     
-                case .clear:
+                case .transparent:
                     ZStack {
                         Rectangle()
                             .fill(.thinMaterial)
@@ -77,13 +78,13 @@ private struct GlassEffectModifier<S: Shape>: ViewModifier {
                     }
                     .clipShape(shape)
                     
-                case .identity:
+                case .none:
                     Color.clear
                 }
             }
             .overlay {
                 // Glass border/specular highlight
-                if case .identity = style {
+                if case .none = style {
                     EmptyView()
                 } else {
                     shape

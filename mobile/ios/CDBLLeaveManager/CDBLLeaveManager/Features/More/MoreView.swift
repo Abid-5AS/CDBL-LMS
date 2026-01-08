@@ -139,7 +139,7 @@ struct MoreView: View {
                     .foregroundStyle(.white.opacity(0.4))
             }
             .padding()
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
         }
         .padding(.horizontal)
     }
@@ -190,7 +190,7 @@ struct MoreView: View {
             )
         }
         .padding()
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
         .padding(.horizontal)
     }
     
@@ -249,7 +249,7 @@ struct MoreView: View {
                 )
             }
             .padding()
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
         }
         .padding(.horizontal)
     }
@@ -266,7 +266,7 @@ struct MoreView: View {
             .foregroundStyle(.red)
             .frame(maxWidth: .infinity)
             .padding()
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
         }
         .padding(.horizontal)
     }

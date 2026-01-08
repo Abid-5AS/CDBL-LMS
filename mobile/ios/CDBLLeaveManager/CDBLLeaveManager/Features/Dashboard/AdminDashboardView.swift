@@ -173,7 +173,7 @@ struct AdminDashboardView: View {
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
-                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+                .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
                 .padding(.horizontal)
             } else {
                 VStack(spacing: 8) {
@@ -182,7 +182,7 @@ struct AdminDashboardView: View {
                     }
                 }
                 .padding()
-                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+                .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
                 .padding(.horizontal)
             }
         }
@@ -259,7 +259,7 @@ struct AdminActionCard: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
         }
     }
 }

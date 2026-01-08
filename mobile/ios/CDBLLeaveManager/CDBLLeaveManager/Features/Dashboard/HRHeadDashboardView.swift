@@ -109,7 +109,7 @@ struct HRHeadDashboardView: View {
                 Spacer()
             }
             .padding()
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
         }
         .padding(.horizontal)
     }
@@ -130,7 +130,7 @@ struct HRHeadDashboardView: View {
                     }
                 }
                 .padding()
-                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+                .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
                 .padding(.horizontal)
             }
         }
@@ -176,7 +176,7 @@ struct HRHeadDashboardView: View {
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
-                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+                .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
                 .padding(.horizontal)
             }
         }

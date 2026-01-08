@@ -185,7 +185,7 @@ struct AuditLogCard: View {
             }
         }
         .padding()
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 12))
     }
     
     private var actionIcon: String {

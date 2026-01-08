@@ -110,7 +110,7 @@ struct EmployeeDetailView: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 24))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 24))
         .padding(.horizontal)
     }
     
@@ -145,7 +145,7 @@ struct EmployeeDetailView: View {
                 DetailRow(label: "Reports To", value: managerName)
             }
         }
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
         .padding(.horizontal)
     }
     
@@ -192,7 +192,7 @@ struct EmployeeDetailView: View {
                         StatusBadge(leave.status)
                     }
                     .padding()
-                    .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 12))
+                    .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 12))
                 }
             }
             .padding(.horizontal)
@@ -221,7 +221,7 @@ struct BalanceCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 

@@ -141,7 +141,7 @@ struct ChangePasswordView: View {
             )
         }
         .padding()
-        .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 12))
+        .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 12))
     }
     
     // MARK: - Success Overlay
@@ -170,7 +170,7 @@ struct ChangePasswordView: View {
             .padding(.horizontal, 60)
         }
         .padding(40)
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 28))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 28))
         .padding(40)
     }
     
@@ -233,7 +233,7 @@ struct PasswordField: View {
                 }
             }
             .padding()
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 12))
         }
     }
 }

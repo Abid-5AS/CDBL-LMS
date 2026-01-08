@@ -142,7 +142,7 @@ struct HRDashboardView: View {
                 .frame(maxWidth: .infinity)
             }
             .padding()
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
         }
     }

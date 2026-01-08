@@ -96,7 +96,7 @@ struct UserListView: View {
             }
         }
         .padding()
-        .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 12))
+        .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
         .padding(.bottom, 16)
         .onChange(of: searchText) { _, newValue in
@@ -179,7 +179,7 @@ struct UserCard: View {
             }
         }
         .padding()
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
     }
     
     private var initials: String {

@@ -112,7 +112,7 @@ struct BalanceView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 32)
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 28))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 28))
         .padding(.horizontal)
     }
     
@@ -183,7 +183,7 @@ struct BalanceView: View {
                 UsageRow(label: "Available Balance", value: "\(Int(viewModel.totalBalance)) days", highlight: true)
             }
             .padding()
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
         }
     }
@@ -250,7 +250,7 @@ struct BalanceTypeCard: View {
             }
         }
         .padding()
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 

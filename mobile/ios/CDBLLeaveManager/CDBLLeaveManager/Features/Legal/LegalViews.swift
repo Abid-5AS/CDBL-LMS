@@ -89,7 +89,7 @@ struct TermsView: View {
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
         .padding(.horizontal)
     }
 }
@@ -175,7 +175,7 @@ struct PrivacyView: View {
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
         .padding(.horizontal)
     }
 }
@@ -232,7 +232,7 @@ struct FeedbackView: View {
                             .frame(maxWidth: .infinity)
                         }
                         .padding()
-                        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+                        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
                         .padding(.horizontal)
                         
                         // Feedback Text
@@ -246,7 +246,7 @@ struct FeedbackView: View {
                                 .foregroundStyle(.white)
                                 .frame(minHeight: 150)
                                 .padding()
-                                .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 16))
+                                .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 16))
                             
                             Text("\(feedbackText.count)/1000")
                                 .font(.caption2)
@@ -320,7 +320,7 @@ struct FeedbackView: View {
             .padding(.horizontal, 60)
         }
         .padding(40)
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 28))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 28))
         .padding(40)
     }
     
@@ -412,7 +412,7 @@ struct PolicyCard: View {
             }
         }
         .padding()
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 

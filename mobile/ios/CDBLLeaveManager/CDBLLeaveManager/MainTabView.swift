@@ -87,7 +87,7 @@ struct MainTabView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 30))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 30))
         .padding(.horizontal, 20)
         .padding(.bottom, 20)
     }

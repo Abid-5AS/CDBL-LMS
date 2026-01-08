@@ -89,7 +89,7 @@ struct HolidaysView: View {
             }
         }
         .padding()
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
         .padding(.horizontal)
         .padding(.bottom, 16)
     }
@@ -171,7 +171,7 @@ struct HolidayCard: View {
             Spacer()
         }
         .padding()
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
     }
     
     private var dayOfMonth: String {

@@ -119,7 +119,7 @@ struct CalendarView: View {
             }
         }
         .padding()
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 24))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 24))
         .padding(.horizontal)
     }
     
@@ -143,7 +143,7 @@ struct CalendarView: View {
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
-                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+                .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
                 .padding(.horizontal)
             } else {
                 VStack(spacing: 8) {
@@ -303,7 +303,7 @@ struct CalendarEventCard: View {
                 .foregroundStyle(.white.opacity(0.6))
         }
         .padding()
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 12))
     }
 }
 

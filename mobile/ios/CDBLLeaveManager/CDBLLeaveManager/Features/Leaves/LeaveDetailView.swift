@@ -93,7 +93,7 @@ struct LeaveDetailView: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 24))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 24))
         .padding(.horizontal)
     }
     
@@ -126,7 +126,7 @@ struct LeaveDetailView: View {
                 .padding()
             }
         }
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
         .padding(.horizontal)
     }
     
@@ -157,7 +157,7 @@ struct LeaveDetailView: View {
                 }
             }
             .padding()
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
         }
     }
@@ -177,7 +177,7 @@ struct LeaveDetailView: View {
                 .frame(maxWidth: .infinity)
                 .padding()
             }
-            .buttonStyle(.glass(.regular))
+            .buttonStyle(.glass(.frosted))
             .foregroundStyle(.red)
         }
         .padding(.horizontal)

@@ -113,7 +113,7 @@ struct ApplyLeaveView: View {
                     .labelsHidden()
                     .colorScheme(.dark)
                     .padding()
-                    .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 12))
+                    .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 12))
                 }
                 
                 // End Date
@@ -131,7 +131,7 @@ struct ApplyLeaveView: View {
                     .labelsHidden()
                     .colorScheme(.dark)
                     .padding()
-                    .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 12))
+                    .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 12))
                 }
             }
             
@@ -167,7 +167,7 @@ struct ApplyLeaveView: View {
                     .tint(.cyan)
             }
             .padding()
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
             
             if viewModel.isHalfDay {
                 HStack(spacing: 12) {
@@ -205,7 +205,7 @@ struct ApplyLeaveView: View {
                 .foregroundStyle(.white)
                 .frame(minHeight: 100)
                 .padding()
-                .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 16))
+                .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 16))
             
             Text("\(viewModel.reason.count)/500")
                 .font(.caption2)

@@ -97,7 +97,7 @@ struct ApprovalsListView: View {
                 }
             }
         }
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
         .padding(.bottom, 16)
     }
@@ -208,7 +208,7 @@ struct ApprovalDetailCard: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
                     }
-                    .buttonStyle(.glass(.clear))
+                    .buttonStyle(.glass(.transparent))
                     .foregroundStyle(.red)
                     
                     Button(action: onApprove) {
@@ -227,7 +227,7 @@ struct ApprovalDetailCard: View {
             }
         }
         .padding()
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
     }
     
     private var initials: String {

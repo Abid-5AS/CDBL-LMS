@@ -101,7 +101,7 @@ struct LeavesListView: View {
                 }
             }
         }
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
         .padding(.bottom, 16)
     }
@@ -277,7 +277,7 @@ struct LeaveCard: View {
             StatusBadge(leave.status)
         }
         .padding()
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 

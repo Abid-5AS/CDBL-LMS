@@ -124,7 +124,7 @@ struct ProfileView: View {
             ProfileRow(icon: "person.badge.key.fill", title: "Employee ID", value: viewModel.employeeId)
         }
         .padding()
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 24))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 24))
         .padding(.horizontal)
     }
     
@@ -168,7 +168,7 @@ struct ProfileView: View {
                 }
             }
             .padding()
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 24))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 24))
         }
         .padding(.horizontal)
     }
@@ -185,7 +185,7 @@ struct ProfileView: View {
             .foregroundStyle(.red)
             .frame(maxWidth: .infinity)
             .padding()
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
         }
         .padding(.horizontal)
     }

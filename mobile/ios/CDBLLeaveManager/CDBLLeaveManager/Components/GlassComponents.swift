@@ -27,7 +27,7 @@ struct GlassCard<Content: View>: View {
     var body: some View {
         content
             .padding(padding)
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: cornerRadius))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: cornerRadius))
     }
 }
 
@@ -51,7 +51,7 @@ struct ClearGlassCard<Content: View>: View {
     var body: some View {
         content
             .padding(padding)
-            .glassEffect(.clear, in: RoundedRectangle(cornerRadius: cornerRadius))
+            .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: cornerRadius))
     }
 }
 
@@ -180,7 +180,7 @@ struct ErrorView: View {
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
                 }
-                .buttonStyle(.glass(.regular))
+                .buttonStyle(.glass(.frosted))
             }
         }
         .padding()
@@ -232,7 +232,7 @@ struct EmptyStateView: View {
                         .padding(.horizontal, 24)
                         .padding(.vertical, 12)
                 }
-                .buttonStyle(.glass(.regular))
+                .buttonStyle(.glass(.frosted))
                 .padding(.top, 8)
             }
         }

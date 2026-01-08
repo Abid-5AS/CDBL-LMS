@@ -102,7 +102,7 @@ struct HelpView: View {
             }
         }
         .padding()
-        .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 12))
+        .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
     }
     
@@ -187,7 +187,7 @@ struct FAQItem: View {
                 }
             }
             .padding()
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 12))
         }
     }
 }
@@ -222,7 +222,7 @@ struct ContactRow: View {
                 .foregroundStyle(.white.opacity(0.4))
         }
         .padding()
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 12))
     }
 }
 

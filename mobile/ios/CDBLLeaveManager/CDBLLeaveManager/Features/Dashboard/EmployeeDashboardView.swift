@@ -185,7 +185,7 @@ struct EmployeeDashboardView: View {
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
-                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+                .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
                 .padding(.horizontal)
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -309,7 +309,7 @@ struct LeaveBalanceCard: View {
         }
         .frame(width: 140)
         .padding(16)
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 24))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 24))
     }
 }
 
@@ -331,7 +331,7 @@ struct WhosOutCard: View {
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
                 )
-                .glassEffect(.regular, in: Circle())
+                .glassEffect(.frosted, in: Circle())
             
             Text(firstName)
                 .font(.caption2)
@@ -374,7 +374,7 @@ struct ActionButton: View {
                 Spacer()
             }
             .padding(16)
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
         }
     }
 }

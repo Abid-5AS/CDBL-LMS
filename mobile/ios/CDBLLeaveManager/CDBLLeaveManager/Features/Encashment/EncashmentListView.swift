@@ -130,7 +130,7 @@ struct EncashmentListView: View {
             }
         }
         .padding()
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
         .padding(.horizontal)
         .padding(.bottom, 16)
     }
@@ -195,7 +195,7 @@ struct EncashmentCard: View {
             StatusBadge(encashment.status)
         }
         .padding()
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 
@@ -227,7 +227,7 @@ struct RequestEncashmentView: View {
                                 .padding(.horizontal)
                         }
                         .padding()
-                        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+                        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
                         .padding(.horizontal)
                         
                         // Estimated Amount
@@ -243,7 +243,7 @@ struct RequestEncashmentView: View {
                                 .foregroundStyle(.green)
                         }
                         .padding()
-                        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
+                        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
                         .padding(.horizontal)
                         
                         // Info

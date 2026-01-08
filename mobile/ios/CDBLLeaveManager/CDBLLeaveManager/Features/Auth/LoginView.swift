@@ -93,7 +93,7 @@ struct LoginView: View {
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .padding()
-                .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 12))
+                .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 12))
                 .foregroundStyle(.white)
         }
     }
@@ -107,7 +107,7 @@ struct LoginView: View {
 
             SecureField("Enter password", text: $viewModel.password)
                 .padding()
-                .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 12))
+                .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 12))
                 .foregroundStyle(.white)
         }
     }
@@ -144,7 +144,7 @@ struct LoginView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 44)
                 }
-                .buttonStyle(.glass(.regular))
+                .buttonStyle(.glass(.frosted))
                 .foregroundStyle(.white.opacity(0.95))
                 .padding(.top, 8)
             }
@@ -208,7 +208,7 @@ struct LoginView: View {
         }
         .padding(.vertical, 10)
         .padding(.horizontal)
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 22))
+        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 22))
     }
     
     // MARK: - Actions
@@ -276,7 +276,7 @@ struct QuickLoginButton: View {
                 .padding(.vertical, 8)
                 .frame(maxWidth: .infinity)
         }
-        .buttonStyle(.glass(.clear))
+        .buttonStyle(.glass(.transparent))
         .foregroundStyle(.white)
         .controlSize(.small)
     }

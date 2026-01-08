@@ -79,7 +79,7 @@ struct SettingsView: View {
                 }
             }
             .padding()
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
         }
     }
@@ -105,7 +105,7 @@ struct SettingsView: View {
                 SettingsRow(icon: "envelope.fill", title: "Email Notifications", showChevron: true)
             }
             .padding()
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
         }
     }
@@ -137,7 +137,7 @@ struct SettingsView: View {
                 SettingsRow(icon: "person.2.fill", title: "Delegation Settings", showChevron: true)
             }
             .padding()
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
         }
     }
@@ -180,7 +180,7 @@ struct SettingsView: View {
                 .padding(.vertical, 12)
             }
             .padding()
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20))
+            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
         }
     }
