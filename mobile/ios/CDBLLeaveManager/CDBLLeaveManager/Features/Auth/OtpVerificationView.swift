@@ -2,7 +2,7 @@
 //  OtpVerificationView.swift
 //  CDBLLeaveManager
 //
-//  OTP verification screen with Liquid Glass design.
+//  OTP verification screen with system materials.
 //
 
 import SwiftUI
@@ -16,28 +16,27 @@ struct OtpVerificationView: View {
     
     var body: some View {
         ZStack {
-            FluidBackground()
+            Color(.systemBackground).ignoresSafeArea()
             
             VStack(spacing: 32) {
                 // Header
                 VStack(spacing: 16) {
                     Image(systemName: "lock.shield.fill")
                         .font(.system(size: 60))
-                        .foregroundStyle(.white)
-                        .shadow(color: .cyan.opacity(0.5), radius: 20, x: 0, y: 0)
+                        .foregroundStyle(.primary)
                     
                     Text("Verification")
                         .font(.system(size: 28, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                     
                     Text("Enter the 6-digit code sent to")
                         .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(.secondary)
                     
                     Text(viewModel.email)
                         .font(.subheadline)
                         .fontWeight(.semibold)
-                        .foregroundStyle(.cyan)
+                        .foregroundStyle(Color.accentColor)
                 }
                 .padding(.top, 60)
                 
@@ -69,7 +68,7 @@ struct OtpVerificationView: View {
                     HStack {
                         if viewModel.isLoading {
                             ProgressView()
-                                .tint(.white)
+                                .tint(.accentColor)
                         } else {
                             Text("Verify")
                                 .fontWeight(.semibold)
@@ -78,8 +77,8 @@ struct OtpVerificationView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 52)
                 }
-                .buttonStyle(.glassProminent)
-                .tint(.cyan)
+                .buttonStyle(.borderedProminent)
+                .tint(.accentColor)
                 .disabled(viewModel.isLoading || otpDigits.joined().count != 6)
                 .padding(.horizontal)
                 
@@ -87,7 +86,7 @@ struct OtpVerificationView: View {
                 Button(action: {}) {
                     Text("Didn't receive code? Resend")
                         .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(.secondary)
                 }
                 
                 // Back to Login
@@ -97,7 +96,7 @@ struct OtpVerificationView: View {
                         Text("Back to Login")
                     }
                     .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(.secondary)
                 }
                 
                 Spacer()
@@ -153,16 +152,16 @@ struct OtpDigitField: View {
             .textContentType(.oneTimeCode)
             .multilineTextAlignment(.center)
             .font(.system(size: 24, weight: .bold, design: .rounded))
-            .foregroundStyle(.white)
+            .foregroundStyle(.primary)
             .frame(width: 48, height: 56)
-            .glassEffect(
-                isFocused ? .regular.tint(.cyan) : .clear,
+            .surfaceBackground(
+                isFocused ? .regular : .clear,
                 in: RoundedRectangle(cornerRadius: 12)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
                     .strokeBorder(
-                        isFocused ? Color.cyan : Color.white.opacity(0.2),
+                        isFocused ? Color.accentColor : Color(.separator),
                         lineWidth: isFocused ? 2 : 1
                     )
             )

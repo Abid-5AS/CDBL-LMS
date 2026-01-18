@@ -1,9 +1,12 @@
 import SwiftUI
+import Combine
 
 struct LeavesListView: View {
     @StateObject private var viewModel = LeaveHistoryViewModel()
     @State private var showFilters = false
     @State private var selectedSegment = 0
+    @State private var showApplyLeave = false
+    @State private var selectedLeave: LeaveRequest?
     
     private let statusOptions = ["", "PENDING", "APPROVED", "REJECTED", "RETURNED", "CANCELLED"]
     private let typeOptions = ["", "EARNED", "CASUAL", "MEDICAL", "COMPENSATORY"]
@@ -30,7 +33,7 @@ struct LeavesListView: View {
                     message: "You haven't applied for any leaves yet.",
                     actionTitle: "Apply Leave"
                 ) {
-                    // Navigate to apply
+                    showApplyLeave = true
                 }
             } else {
                 leavesList
@@ -42,6 +45,12 @@ struct LeavesListView: View {
         .sheet(isPresented: $showFilters) {
             filterSheet
         }
+        .sheet(isPresented: $showApplyLeave) {
+            ApplyLeaveView()
+        }
+        .sheet(item: $selectedLeave) { leave in
+            LeaveDetailView(leaveId: leave.id)
+        }
     }
     
     // MARK: - Header
@@ -50,24 +59,24 @@ struct LeavesListView: View {
         HStack {
             Text("My Leaves")
                 .font(.largeTitle.bold())
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Spacer()
             
             Button(action: { showFilters.toggle() }) {
                 Image(systemName: "line.3.horizontal.decrease.circle")
                     .font(.title2)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .padding(12)
-                    .glassEffect(in: Circle())
+                    .surfaceBackground(in: Circle())
             }
             
-            Button(action: {}) {
+            Button(action: { showApplyLeave = true }) {
                 Image(systemName: "plus")
                     .font(.title2)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .padding(12)
-                    .glassEffect(in: Circle())
+                    .surfaceBackground(in: Circle())
             }
         }
         .padding(.horizontal)
@@ -101,7 +110,7 @@ struct LeavesListView: View {
                 }
             }
         }
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 12))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
         .padding(.bottom, 16)
     }
@@ -113,12 +122,15 @@ struct LeavesListView: View {
             LazyVStack(spacing: 12) {
                 ForEach(viewModel.filteredLeaves) { leave in
                     LeaveCard(leave: leave)
+                        .onTapGesture {
+                            selectedLeave = leave
+                        }
                 }
                 
                 // Load more indicator
                 if viewModel.hasMore {
                     ProgressView()
-                        .tint(.white)
+                        .tint(.accentColor)
                         .padding()
                         .onAppear {
                             Task { await viewModel.loadMore() }
@@ -135,14 +147,14 @@ struct LeavesListView: View {
     private var filterSheet: some View {
         NavigationStack {
             ZStack {
-                Color.black.ignoresSafeArea()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 VStack(spacing: 24) {
                     // Status Filter
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Status")
                             .font(.headline)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(.primary)
                         
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
                             ForEach(statusOptions, id: \.self) { status in
@@ -153,7 +165,7 @@ struct LeavesListView: View {
                                         .font(.subheadline)
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 12)
-                                        .glassEffect(
+                                        .surfaceBackground(
                                             viewModel.selectedStatus == status ? .regular : .clear,
                                             in: RoundedRectangle(cornerRadius: 12)
                                         )
@@ -161,12 +173,12 @@ struct LeavesListView: View {
                                             RoundedRectangle(cornerRadius: 12)
                                                 .strokeBorder(
                                                     viewModel.selectedStatus == status ?
-                                                    Color.cyan : Color.white.opacity(0.2),
+                                                    Color.accentColor : Color.white.opacity(0.2),
                                                     lineWidth: 1
                                                 )
                                         )
                                 }
-                                .foregroundStyle(.white)
+                                .foregroundStyle(.primary)
                             }
                         }
                     }
@@ -175,7 +187,7 @@ struct LeavesListView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Leave Type")
                             .font(.headline)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(.primary)
                         
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
                             ForEach(typeOptions, id: \.self) { type in
@@ -186,7 +198,7 @@ struct LeavesListView: View {
                                         .font(.subheadline)
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 12)
-                                        .glassEffect(
+                                        .surfaceBackground(
                                             viewModel.selectedType == type ? .regular : .clear,
                                             in: RoundedRectangle(cornerRadius: 12)
                                         )
@@ -194,12 +206,12 @@ struct LeavesListView: View {
                                             RoundedRectangle(cornerRadius: 12)
                                                 .strokeBorder(
                                                     viewModel.selectedType == type ?
-                                                    Color.cyan : Color.white.opacity(0.2),
+                                                    Color.accentColor : Color.white.opacity(0.2),
                                                     lineWidth: 1
                                                 )
                                         )
                                 }
-                                .foregroundStyle(.white)
+                                .foregroundStyle(.primary)
                             }
                         }
                     }
@@ -218,8 +230,8 @@ struct LeavesListView: View {
                             .frame(maxWidth: .infinity)
                             .padding()
                     }
-                    .buttonStyle(.glassProminent)
-                    .tint(.cyan)
+                    .buttonStyle(.borderedProminent)
+                    .tint(.accentColor)
                 }
                 .padding()
             }
@@ -231,7 +243,7 @@ struct LeavesListView: View {
                         viewModel.selectedStatus = ""
                         viewModel.selectedType = ""
                     }
-                    .foregroundStyle(.cyan)
+                    .foregroundStyle(Color.accentColor)
                 }
             }
         }
@@ -260,7 +272,7 @@ struct LeaveCard: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(LeaveType(rawValue: leave.type)?.displayName ?? leave.type)
                     .font(.headline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 HStack(spacing: 4) {
                     Image(systemName: "calendar")
@@ -268,7 +280,7 @@ struct LeaveCard: View {
                     Text(leave.formattedDateRange)
                 }
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(.secondary)
             }
             
             Spacer()
@@ -277,13 +289,13 @@ struct LeaveCard: View {
             StatusBadge(leave.status)
         }
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 
 #Preview {
     ZStack {
-        Color.black.ignoresSafeArea()
+        Color(.systemBackground).ignoresSafeArea()
         LeavesListView()
     }
 }

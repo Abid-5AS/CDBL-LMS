@@ -16,52 +16,52 @@ struct LoginView: View {
     // MARK: - Login Content
     
     private var loginContent: some View {
-        ZStack {
-            FluidBackground()
-            
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 24) {
-                    logoHeader
-                    
-                    // Login form card
-                    VStack(spacing: 20) {
-                        Text("Welcome Back")
-                            .font(.title2.bold())
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+        GeometryReader { geometry in
+            ZStack {
+                Color(.systemBackground).ignoresSafeArea()
+                
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 30) {
+                        logoHeader
                         
-                        emailField
-                        passwordField
-                        
-                        if let error = viewModel.error {
-                            Text(error)
-                                .font(.caption)
-                                .foregroundStyle(.red)
+                        VStack(spacing: 24) {
+                            Text("Welcome Back")
+                                .font(.title2.bold())
+                                .foregroundStyle(.primary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .lineLimit(3)
+                            
+                            emailField
+                            passwordField
+                            
+                            if let error = viewModel.error {
+                                Text(error)
+                                    .font(.caption)
+                                    .foregroundStyle(.red)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            
+                            signInButton
+                            biometricButton
                         }
+                        .padding(24)
+                        .background(Color(.secondarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 24))
+                        .padding(.horizontal, 20)
                         
-                        signInButton
-                        biometricButton
+                        #if DEBUG
+                        quickLoginSection
+                            .padding(.horizontal, 20)
+                        #endif
+                        
+                        Text("Powered by SwiftUI")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .padding(.bottom, 20)
                     }
-                    .padding(20)
-                    .background(Color.white.opacity(0.1))
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                    
-                    #if DEBUG
-                    quickLoginSection
-                    #endif
-                    
-                    Text("Powered by Liquid Glass")
-                        .font(.caption2)
-                        .foregroundStyle(.white.opacity(0.6))
-                        .padding(.bottom, 20)
+                    .frame(minHeight: geometry.size.height)
                 }
-                .padding(.horizontal, 16)
-                .frame(maxWidth: .infinity)
             }
         }
-        .ignoresSafeArea(.keyboard, edges: .bottom)
     }
     
     // MARK: - Subviews
@@ -70,12 +70,11 @@ struct LoginView: View {
         VStack(spacing: 16) {
             Image(systemName: "cube.transparent")
                 .font(.system(size: 60))
-                .foregroundStyle(.white)
-                .shadow(color: .white.opacity(0.5), radius: 20, x: 0, y: 0)
+                .foregroundStyle(.primary)
 
             Text("CDBL Connect")
                 .font(.system(size: 32, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
         }
         .padding(.top, 60)
     }
@@ -84,7 +83,7 @@ struct LoginView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Email")
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.8))
+                .foregroundStyle(.secondary)
                 .padding(.leading, 8)
 
             TextField("Enter email", text: $viewModel.email)
@@ -93,8 +92,8 @@ struct LoginView: View {
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .padding()
-                .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 12))
-                .foregroundStyle(.white)
+                .surfaceBackground(.clear, in: RoundedRectangle(cornerRadius: 12))
+                .foregroundStyle(.primary)
         }
     }
 
@@ -102,13 +101,13 @@ struct LoginView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Password")
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.8))
+                .foregroundStyle(.secondary)
                 .padding(.leading, 8)
 
             SecureField("Enter password", text: $viewModel.password)
                 .padding()
-                .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 12))
-                .foregroundStyle(.white)
+                .surfaceBackground(.clear, in: RoundedRectangle(cornerRadius: 12))
+                .foregroundStyle(.primary)
         }
     }
 
@@ -117,7 +116,7 @@ struct LoginView: View {
             HStack {
                 if viewModel.isLoading {
                     ProgressView()
-                        .tint(.white)
+                        .tint(.accentColor)
                 } else {
                     Text("Sign In")
                         .fontWeight(.semibold)
@@ -126,8 +125,8 @@ struct LoginView: View {
             .frame(maxWidth: .infinity)
             .frame(height: 52)
         }
-        .buttonStyle(.glassProminent)
-        .tint(.cyan)
+        .buttonStyle(.borderedProminent)
+        .tint(.accentColor)
         .disabled(viewModel.isLoading)
     }
 
@@ -144,8 +143,8 @@ struct LoginView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 44)
                 }
-                .buttonStyle(.glass(.frosted))
-                .foregroundStyle(.white.opacity(0.95))
+                .buttonStyle(.bordered)
+                .foregroundStyle(.secondary)
                 .padding(.top, 8)
             }
         }
@@ -155,13 +154,13 @@ struct LoginView: View {
         VStack(spacing: 12) {
             Text("Quick Login (Dev Only)")
                 .font(.caption2)
-                .foregroundStyle(.white.opacity(0.8))
+                .foregroundStyle(.secondary)
 
             HStack {
                 Toggle("Skip OTP", isOn: $viewModel.skipOtp)
                     .font(.caption)
-                    .foregroundStyle(.white)
-                    .tint(.cyan)
+                    .foregroundStyle(.primary)
+                    .tint(.accentColor)
                 
                 if viewModel.skipOtp {
                     Text("✓")
@@ -171,7 +170,7 @@ struct LoginView: View {
                 }
             }
             .padding(8)
-            .background(Color.white.opacity(0.1))
+            .background(Color(.secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 8))
             
             VStack(spacing: 8) {
@@ -208,7 +207,7 @@ struct LoginView: View {
         }
         .padding(.vertical, 10)
         .padding(.horizontal)
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 22))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 22))
     }
     
     // MARK: - Actions
@@ -276,8 +275,8 @@ struct QuickLoginButton: View {
                 .padding(.vertical, 8)
                 .frame(maxWidth: .infinity)
         }
-        .buttonStyle(.glass(.transparent))
-        .foregroundStyle(.white)
+        .buttonStyle(.bordered)
+        .foregroundStyle(.primary)
         .controlSize(.small)
     }
 }

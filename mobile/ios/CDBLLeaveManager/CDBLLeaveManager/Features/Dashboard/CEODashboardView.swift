@@ -6,9 +6,12 @@
 //
 
 import SwiftUI
+import Combine
 
 struct CEODashboardView: View {
     @StateObject private var viewModel = DashboardViewModel()
+    @State private var showReports = false
+    @State private var showApprovals = false
     @EnvironmentObject private var appState: AppState
     
     var body: some View {
@@ -26,6 +29,12 @@ struct CEODashboardView: View {
         }
         .task {
             await viewModel.loadDashboard(for: .ceo)
+        }
+        .sheet(isPresented: $showReports) {
+            ReportsView()
+        }
+        .sheet(isPresented: $showApprovals) {
+            ApprovalsListView()
         }
     }
     
@@ -97,7 +106,7 @@ struct CEODashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Performance Metrics")
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             VStack(spacing: 16) {
@@ -113,7 +122,7 @@ struct CEODashboardView: View {
                         
                         Text("Utilization")
                             .font(.caption)
-                            .foregroundStyle(.white.opacity(0.7))
+                            .foregroundStyle(.secondary)
                     }
                     
                     // Compliance Score
@@ -127,7 +136,7 @@ struct CEODashboardView: View {
                         
                         Text("Compliance")
                             .font(.caption)
-                            .foregroundStyle(.white.opacity(0.7))
+                            .foregroundStyle(.secondary)
                     }
                     
                     Spacer()
@@ -161,7 +170,7 @@ struct CEODashboardView: View {
                     
                     Text("Estimated Leave Cost")
                         .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.8))
+                        .foregroundStyle(.secondary)
                     
                     Spacer()
                     
@@ -174,7 +183,7 @@ struct CEODashboardView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
         }
     }
@@ -185,7 +194,7 @@ struct CEODashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Department Overview")
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             if let departments = viewModel.ceoStats?.departmentStats {
@@ -195,7 +204,7 @@ struct CEODashboardView: View {
                     }
                 }
                 .padding()
-                .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+                .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
                 .padding(.horizontal)
             }
         }
@@ -207,12 +216,16 @@ struct CEODashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Quick Actions")
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             HStack(spacing: 12) {
-                ActionButton(icon: "chart.bar.fill", title: "Reports", color: .purple)
-                ActionButton(icon: "checkmark.circle.fill", title: "Approvals", color: .green)
+                ActionButton(icon: "chart.bar.fill", title: "Reports", color: .purple) {
+                    showReports = true
+                }
+                ActionButton(icon: "checkmark.circle.fill", title: "Approvals", color: .green) {
+                    showApprovals = true
+                }
             }
             .padding(.horizontal)
         }
@@ -235,19 +248,19 @@ struct CEODashboardHeader: View {
             VStack(alignment: .leading) {
                 Text(formattedDate)
                     .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.8))
+                    .foregroundStyle(.secondary)
                 Text("CEO Dashboard")
                     .font(.title2.bold())
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
             }
             
             Spacer()
             
             Button(action: {}) {
                 Image(systemName: "bell.fill")
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .padding(10)
-                    .glassEffect(in: Circle())
+                    .surfaceBackground(in: Circle())
             }
         }
         .padding(.horizontal)
@@ -279,15 +292,15 @@ struct OverviewCard: View {
             Text(value)
                 .font(.title)
                 .fontWeight(.bold)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Text(title)
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
     }
 }
 
@@ -302,7 +315,7 @@ struct MetricRow: View {
         HStack {
             Text(label)
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
             Spacer()
             Text(value)
                 .font(.subheadline)
@@ -321,7 +334,7 @@ struct DepartmentStatRow: View {
         HStack {
             Text(stat.department)
                 .font(.subheadline)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Spacer()
             
@@ -333,7 +346,7 @@ struct DepartmentStatRow: View {
                         .foregroundStyle(.blue)
                     Text("total")
                         .font(.caption2)
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(.secondary)
                 }
                 
                 VStack(alignment: .trailing) {
@@ -343,7 +356,7 @@ struct DepartmentStatRow: View {
                         .foregroundStyle(.purple)
                     Text("on leave")
                         .font(.caption2)
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(.secondary)
                 }
             }
         }
@@ -353,7 +366,7 @@ struct DepartmentStatRow: View {
 
 #Preview {
     ZStack {
-        FluidBackground()
+        Color(.systemBackground).ignoresSafeArea()
         CEODashboardView()
             .environmentObject(AppState.shared)
     }

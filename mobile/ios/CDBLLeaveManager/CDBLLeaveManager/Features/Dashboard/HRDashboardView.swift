@@ -10,6 +10,10 @@ import SwiftUI
 struct HRDashboardView: View {
     @StateObject private var viewModel = DashboardViewModel()
     @EnvironmentObject private var appState: AppState
+    @State private var showApprovals = false
+    @State private var showEmployees = false
+    @State private var showReports = false
+    @State private var showEncashments = false
     
     var body: some View {
         ScrollView {
@@ -26,6 +30,18 @@ struct HRDashboardView: View {
         }
         .task {
             await viewModel.loadDashboard(for: .hrAdmin)
+        }
+        .sheet(isPresented: $showApprovals) {
+            ApprovalsListView()
+        }
+        .sheet(isPresented: $showEmployees) {
+            TeamListView()
+        }
+        .sheet(isPresented: $showReports) {
+            ReportsView()
+        }
+        .sheet(isPresented: $showEncashments) {
+            EncashmentListView()
         }
     }
     
@@ -102,7 +118,7 @@ struct HRDashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Performance Metrics")
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             HStack(spacing: 16) {
@@ -117,7 +133,7 @@ struct HRDashboardView: View {
                     
                     Text("Compliance")
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(.secondary)
                 }
                 
                 // Team Utilization
@@ -131,7 +147,7 @@ struct HRDashboardView: View {
                     
                     Text("Utilization")
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(.secondary)
                 }
                 
                 // Stats
@@ -142,7 +158,7 @@ struct HRDashboardView: View {
                 .frame(maxWidth: .infinity)
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
         }
     }
@@ -154,13 +170,13 @@ struct HRDashboardView: View {
             HStack {
                 Text("Pending Requests")
                     .font(.headline)
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundStyle(.secondary)
                 
                 Spacer()
                 
-                Button("View All") {}
+                Button("View All") { showApprovals = true }
                     .font(.caption)
-                    .foregroundStyle(.cyan)
+                    .foregroundStyle(.secondary)
             }
             .padding(.horizontal)
             
@@ -179,14 +195,22 @@ struct HRDashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Quick Actions")
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                ActionButton(icon: "checkmark.circle.fill", title: "Approvals", color: .green)
-                ActionButton(icon: "person.3.fill", title: "Employees", color: .blue)
-                ActionButton(icon: "chart.bar.fill", title: "Reports", color: .purple)
-                ActionButton(icon: "banknote.fill", title: "Encashments", color: .orange)
+                ActionButton(icon: "checkmark.circle.fill", title: "Approvals", color: .green) {
+                    showApprovals = true
+                }
+                ActionButton(icon: "person.3.fill", title: "Employees", color: .blue) {
+                    showEmployees = true
+                }
+                ActionButton(icon: "chart.bar.fill", title: "Reports", color: .purple) {
+                    showReports = true
+                }
+                ActionButton(icon: "banknote.fill", title: "Encashments", color: .orange) {
+                    showEncashments = true
+                }
             }
             .padding(.horizontal)
         }
@@ -201,10 +225,10 @@ struct HRDashboardHeader: View {
             VStack(alignment: .leading) {
                 Text(formattedDate)
                     .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.8))
+                    .foregroundStyle(.secondary)
                 Text("HR Dashboard")
                     .font(.title2.bold())
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
             }
             
             Spacer()
@@ -212,16 +236,16 @@ struct HRDashboardHeader: View {
             HStack(spacing: 12) {
                 Button(action: {}) {
                     Image(systemName: "bell.fill")
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                         .padding(10)
-                        .glassEffect(in: Circle())
+                        .surfaceBackground(in: Circle())
                 }
                 
                 Button(action: {}) {
                     Image(systemName: "magnifyingglass")
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                         .padding(10)
-                        .glassEffect(in: Circle())
+                        .surfaceBackground(in: Circle())
                 }
             }
         }
@@ -245,19 +269,19 @@ struct StatRow: View {
         HStack {
             Text(label)
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
             Spacer()
             Text(value)
                 .font(.subheadline)
                 .fontWeight(.semibold)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
         }
     }
 }
 
 #Preview {
     ZStack {
-        FluidBackground()
+        Color(.systemBackground).ignoresSafeArea()
         HRDashboardView()
             .environmentObject(AppState.shared)
     }

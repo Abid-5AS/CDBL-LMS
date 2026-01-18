@@ -2,7 +2,7 @@
 //  GlassCard.swift
 //  CDBLLeaveManager
 //
-//  Reusable glass card component with iOS 26 Liquid Glass.
+//  Reusable card components using system materials.
 //
 
 import SwiftUI
@@ -27,7 +27,7 @@ struct GlassCard<Content: View>: View {
     var body: some View {
         content
             .padding(padding)
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: cornerRadius))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: cornerRadius))
     }
 }
 
@@ -51,7 +51,7 @@ struct ClearGlassCard<Content: View>: View {
     var body: some View {
         content
             .padding(padding)
-            .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: cornerRadius))
+            .surfaceBackground(.clear, in: RoundedRectangle(cornerRadius: cornerRadius))
     }
 }
 
@@ -87,7 +87,7 @@ struct KPICard: View {
                 HStack {
                     Text(title)
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(.secondary)
                     
                     Spacer()
                     
@@ -106,7 +106,7 @@ struct KPICard: View {
                 if let subtitle = subtitle {
                     Text(subtitle)
                         .font(.caption2)
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(.secondary)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -134,12 +134,12 @@ struct LoadingView: View {
     var body: some View {
         VStack(spacing: 16) {
             ProgressView()
-                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                .progressViewStyle(.circular)
                 .scaleEffect(1.2)
             
             Text(message)
                 .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.8))
+                .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -164,11 +164,11 @@ struct ErrorView: View {
             
             Text("Oops!")
                 .font(.title2.bold())
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Text(message)
                 .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             
             if let retryAction = retryAction {
@@ -180,7 +180,7 @@ struct ErrorView: View {
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
                 }
-                .buttonStyle(.glass(.frosted))
+                .buttonStyle(.bordered)
             }
         }
         .padding()
@@ -215,15 +215,15 @@ struct EmptyStateView: View {
         VStack(spacing: 16) {
             Image(systemName: icon)
                 .font(.system(size: 48))
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(.secondary)
             
             Text(title)
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
             
             Text(message)
                 .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             
             if let actionTitle = actionTitle, let action = action {
@@ -232,7 +232,7 @@ struct EmptyStateView: View {
                         .padding(.horizontal, 24)
                         .padding(.vertical, 12)
                 }
-                .buttonStyle(.glass(.frosted))
+                .buttonStyle(.bordered)
                 .padding(.top, 8)
             }
         }
@@ -328,7 +328,7 @@ struct CircularProgressView: View {
                 Text("\(Int(progress * 100))%")
                     .font(.caption)
                     .fontWeight(.bold)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
             }
         }
     }
@@ -338,12 +338,12 @@ struct CircularProgressView: View {
 
 #Preview {
     ZStack {
-        Color.black.ignoresSafeArea()
+        Color(.systemBackground).ignoresSafeArea()
         
         VStack(spacing: 20) {
             GlassCard {
                 Text("Glass Card Content")
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
             }
             
             HStack(spacing: 12) {

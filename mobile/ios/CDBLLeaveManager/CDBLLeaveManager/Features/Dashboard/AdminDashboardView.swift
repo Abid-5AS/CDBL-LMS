@@ -6,26 +6,28 @@
 //
 
 import SwiftUI
+import Combine
 
 struct AdminDashboardView: View {
     @StateObject private var viewModel = DashboardViewModel()
-    @EnvironmentObject private var appState: AppState
     
     var body: some View {
-        ScrollView {
-            if viewModel.isLoading {
-                LoadingView()
-                    .frame(height: 400)
-            } else if let error = viewModel.error {
-                ErrorView(error) {
-                    Task { await viewModel.loadDashboard(for: .systemAdmin) }
+        NavigationStack {
+            ScrollView {
+                if viewModel.isLoading {
+                    LoadingView()
+                        .frame(height: 400)
+                } else if let error = viewModel.error {
+                    ErrorView(error) {
+                        Task { await viewModel.loadDashboard(for: .systemAdmin) }
+                    }
+                } else {
+                    dashboardContent
                 }
-            } else {
-                dashboardContent
             }
-        }
-        .task {
-            await viewModel.loadDashboard(for: .systemAdmin)
+            .task {
+                await viewModel.loadDashboard(for: .systemAdmin)
+            }
         }
     }
     
@@ -97,54 +99,60 @@ struct AdminDashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Admin Functions")
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                AdminActionCard(
+                adminActionLink(
                     icon: "person.badge.plus",
                     title: "Users",
                     subtitle: "Manage accounts",
-                    color: .blue
+                    destination: UserListView()
                 )
                 
-                AdminActionCard(
+                adminActionLink(
                     icon: "doc.text.magnifyingglass",
                     title: "Audit Logs",
                     subtitle: "View activity",
-                    color: .purple
+                    destination: AuditLogsView()
                 )
                 
-                AdminActionCard(
+                adminActionLink(
                     icon: "gearshape.2",
                     title: "Workflows",
                     subtitle: "Configure policies",
-                    color: .orange
+                    destination: WorkflowPoliciesView()
                 )
                 
-                AdminActionCard(
+                adminActionLink(
                     icon: "arrow.triangle.2.circlepath",
                     title: "HRIS Sync",
                     subtitle: "Integration",
-                    color: .green
+                    destination: HrisSyncView()
                 )
                 
-                AdminActionCard(
+                adminActionLink(
                     icon: "link",
                     title: "Webhooks",
                     subtitle: "API integrations",
-                    color: .cyan
-                )
-                
-                AdminActionCard(
-                    icon: "shield.checkered",
-                    title: "Security",
-                    subtitle: "Access control",
-                    color: .red
+                    destination: WebhooksView()
                 )
             }
             .padding(.horizontal)
         }
+    }
+
+    @ViewBuilder
+    private func adminActionLink<Destination: View>(
+        icon: String,
+        title: String,
+        subtitle: String,
+        destination: Destination
+    ) -> some View {
+        NavigationLink(destination: destination) {
+            AdminActionCard(icon: icon, title: title, subtitle: subtitle)
+        }
+        .buttonStyle(.plain)
     }
     
     // MARK: - Audit Logs Section
@@ -154,26 +162,28 @@ struct AdminDashboardView: View {
             HStack {
                 Text("Recent Activity")
                     .font(.headline)
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundStyle(.secondary)
                 
                 Spacer()
                 
-                Button("View All") {}
-                    .font(.caption)
-                    .foregroundStyle(.cyan)
+                NavigationLink(destination: AuditLogsView()) {
+                    Text("View All")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
             .padding(.horizontal)
             
             if viewModel.recentAuditLogs.isEmpty {
                 HStack {
                     Image(systemName: "doc.text")
-                        .foregroundStyle(.white.opacity(0.4))
+                        .foregroundStyle(.secondary)
                     Text("No recent activity")
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(.secondary)
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
-                .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+                .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
                 .padding(.horizontal)
             } else {
                 VStack(spacing: 8) {
@@ -182,7 +192,7 @@ struct AdminDashboardView: View {
                     }
                 }
                 .padding()
-                .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+                .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
                 .padding(.horizontal)
             }
         }
@@ -197,10 +207,10 @@ struct AdminDashboardHeader: View {
             VStack(alignment: .leading) {
                 Text(formattedDate)
                     .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.8))
+                    .foregroundStyle(.secondary)
                 Text("Admin Dashboard")
                     .font(.title2.bold())
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
             }
             
             Spacer()
@@ -208,16 +218,16 @@ struct AdminDashboardHeader: View {
             HStack(spacing: 12) {
                 Button(action: {}) {
                     Image(systemName: "bell.fill")
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                         .padding(10)
-                        .glassEffect(in: Circle())
+                        .surfaceBackground(in: Circle())
                 }
                 
                 Button(action: {}) {
                     Image(systemName: "terminal")
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                         .padding(10)
-                        .glassEffect(in: Circle())
+                        .surfaceBackground(in: Circle())
                 }
             }
         }
@@ -237,30 +247,27 @@ struct AdminActionCard: View {
     let icon: String
     let title: String
     let subtitle: String
-    let color: Color
     
     var body: some View {
-        Button(action: {}) {
-            VStack(alignment: .leading, spacing: 12) {
-                Image(systemName: icon)
-                    .font(.title2)
-                    .foregroundStyle(color)
+        VStack(alignment: .leading, spacing: 12) {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundStyle(.primary)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.primary)
                 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.white)
-                    
-                    Text(subtitle)
-                        .font(.caption2)
-                        .foregroundStyle(.white.opacity(0.6))
-                }
+                Text(subtitle)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 
@@ -284,18 +291,18 @@ struct AuditLogRow: View {
                 Text(log.action)
                     .font(.caption)
                     .fontWeight(.medium)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 Text(log.actorEmail)
                     .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(.secondary)
             }
             
             Spacer()
             
             Text(formatTime(log.createdAt))
                 .font(.caption2)
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(.secondary)
         }
         .padding(.vertical, 4)
     }
@@ -343,7 +350,7 @@ struct AuditLogRow: View {
 
 #Preview {
     ZStack {
-        FluidBackground()
+        Color(.systemBackground).ignoresSafeArea()
         AdminDashboardView()
             .environmentObject(AppState.shared)
     }

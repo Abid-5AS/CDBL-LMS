@@ -50,7 +50,7 @@ struct ApprovalsListView: View {
         HStack {
             Text("Approvals")
                 .font(.largeTitle.bold())
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Spacer()
             
@@ -97,7 +97,7 @@ struct ApprovalsListView: View {
                 }
             }
         }
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 12))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
         .padding(.bottom, 16)
     }
@@ -141,28 +141,22 @@ struct ApprovalDetailCard: View {
             HStack(spacing: 12) {
                 // Avatar
                 Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [.cyan.opacity(0.5), .purple.opacity(0.5)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .fill(Color(.tertiarySystemBackground))
                     .frame(width: 50, height: 50)
                     .overlay(
                         Text(initials)
                             .font(.headline)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(.primary)
                     )
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(approval.employeeName)
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                     
                     Text(approval.department)
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(.secondary)
                 }
                 
                 Spacer()
@@ -188,7 +182,7 @@ struct ApprovalDetailCard: View {
             if let reason = approval.reason, !reason.isEmpty {
                 Text(reason)
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
                     .background(Color.white.opacity(0.05))
@@ -208,7 +202,7 @@ struct ApprovalDetailCard: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
                     }
-                    .buttonStyle(.glass(.transparent))
+                    .buttonStyle(.bordered)
                     .foregroundStyle(.red)
                     
                     Button(action: onApprove) {
@@ -221,13 +215,13 @@ struct ApprovalDetailCard: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
                     }
-                    .buttonStyle(.glassProminent)
+                    .buttonStyle(.borderedProminent)
                     .tint(.green)
                 }
             }
         }
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
     }
     
     private var initials: String {
@@ -250,16 +244,16 @@ struct DetailItem: View {
         HStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(.secondary)
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(label)
                     .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(.secondary)
                 Text(value)
                     .font(.caption)
                     .fontWeight(.medium)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
             }
         }
     }
@@ -329,7 +323,7 @@ final class ApprovalsViewModel: ObservableObject {
 
 #Preview {
     ZStack {
-        FluidBackground()
+        Color(.systemBackground).ignoresSafeArea()
         ApprovalsListView()
     }
 }

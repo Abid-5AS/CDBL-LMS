@@ -15,7 +15,7 @@ struct NotificationsView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 if viewModel.isLoading && viewModel.notifications.isEmpty {
                     LoadingView()
@@ -38,7 +38,7 @@ struct NotificationsView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Done") { dismiss() }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 }
                 
                 if viewModel.unreadCount > 0 {
@@ -47,7 +47,7 @@ struct NotificationsView: View {
                             Task { await viewModel.markAllRead() }
                         }
                         .font(.caption)
-                        .foregroundStyle(.cyan)
+                        .foregroundStyle(Color.accentColor)
                     }
                 }
             }
@@ -94,29 +94,29 @@ struct NotificationCard: View {
                     Text(notification.title)
                         .font(.subheadline)
                         .fontWeight(notification.isRead ? .regular : .semibold)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                     
                     Spacer()
                     
                     if !notification.isRead {
                         Circle()
-                            .fill(Color.cyan)
+                            .fill(Color.accentColor)
                             .frame(width: 8, height: 8)
                     }
                 }
                 
                 Text(notification.message)
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(.secondary)
                     .lineLimit(2)
                 
                 Text(notification.timeAgo)
                     .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(.secondary)
             }
         }
         .padding()
-        .glassEffect(
+        .surfaceBackground(
             notification.isRead ? .clear : .regular,
             in: RoundedRectangle(cornerRadius: 16)
         )

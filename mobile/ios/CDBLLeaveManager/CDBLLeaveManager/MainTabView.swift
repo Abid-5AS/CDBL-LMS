@@ -3,26 +3,15 @@ import SwiftUI
 struct MainTabView: View {
     @EnvironmentObject private var appState: AppState
     @State private var selectedTab: TopLevelDestination = .dashboard
-    @Namespace private var animation
     
     var body: some View {
-        ZStack {
-            FluidBackground()
-            
-            // Tab Content
-            TabView(selection: $selectedTab) {
-                ForEach(appState.topLevelDestinations) { destination in
-                    destinationView(for: destination)
-                        .tag(destination)
-                }
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .ignoresSafeArea()
-            
-            // Custom Glass Tab Bar
-            VStack {
-                Spacer()
-                customTabBar
+        TabView(selection: $selectedTab) {
+            ForEach(appState.topLevelDestinations) { destination in
+                destinationView(for: destination)
+                    .tag(destination)
+                    .tabItem {
+                        Label(destination.title, systemImage: destination.icon)
+                    }
             }
         }
     }
@@ -69,78 +58,7 @@ struct MainTabView: View {
         }
     }
     
-    // MARK: - Custom Tab Bar
-    
-    private var customTabBar: some View {
-        HStack(spacing: 8) {
-            ForEach(appState.topLevelDestinations) { destination in
-                TabButton(
-                    destination: destination,
-                    isSelected: selectedTab == destination,
-                    namespace: animation
-                ) {
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) {
-                        selectedTab = destination
-                    }
-                }
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 30))
-        .padding(.horizontal, 20)
-        .padding(.bottom, 20)
-    }
 }
-
-// MARK: - Tab Button
-
-struct TabButton: View {
-    let destination: TopLevelDestination
-    let isSelected: Bool
-    let namespace: Namespace.ID
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            ZStack {
-                // Morphing pill background
-                if isSelected {
-                    Capsule()
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.blue.opacity(0.6),
-                                    Color.purple.opacity(0.6)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .matchedGeometryEffect(id: "TAB_PILL", in: namespace)
-                        .shadow(color: .blue.opacity(0.4), radius: 8, x: 0, y: 4)
-                }
-                
-                // Icon + Label
-                VStack(spacing: 4) {
-                    Image(systemName: isSelected ? destination.icon : destination.unselectedIcon)
-                        .font(.system(size: 20))
-                        .symbolEffect(.bounce, value: isSelected)
-                    
-                    Text(destination.title)
-                        .font(.caption2)
-                        .fontWeight(isSelected ? .semibold : .regular)
-                }
-                .foregroundStyle(isSelected ? .white : .white.opacity(0.6))
-                .frame(maxWidth: .infinity)
-                .frame(height: 52)
-            }
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-
 
 // MARK: - Admin Home View (for system admin tab)
 
@@ -154,4 +72,3 @@ struct AdminHomeView: View {
     MainTabView()
         .environmentObject(AppState.shared)
 }
-

@@ -17,7 +17,7 @@ struct AuditLogsView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 VStack(spacing: 0) {
                     // Header
@@ -56,7 +56,7 @@ struct AuditLogsView: View {
         HStack {
             Text("Audit Logs")
                 .font(.largeTitle.bold())
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Spacer()
             
@@ -64,9 +64,9 @@ struct AuditLogsView: View {
                 Task { await viewModel.loadLogs() }
             }) {
                 Image(systemName: "arrow.clockwise")
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .padding(10)
-                    .glassEffect(in: Circle())
+                    .surfaceBackground(in: Circle())
             }
         }
         .padding(.horizontal)
@@ -90,7 +90,7 @@ struct AuditLogsView: View {
                             .fontWeight(selectedFilter == filter ? .semibold : .regular)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
-                            .glassEffect(
+                            .surfaceBackground(
                                 selectedFilter == filter ? .regular : .clear,
                                 in: Capsule()
                             )
@@ -98,7 +98,7 @@ struct AuditLogsView: View {
                                 Capsule()
                                     .strokeBorder(
                                         selectedFilter == filter ?
-                                        Color.cyan : Color.white.opacity(0.2),
+                                        Color.accentColor : Color.white.opacity(0.2),
                                         lineWidth: 1
                                     )
                             )
@@ -122,7 +122,7 @@ struct AuditLogsView: View {
                 
                 if viewModel.hasMore {
                     ProgressView()
-                        .tint(.white)
+                        .tint(.accentColor)
                         .padding()
                         .onAppear {
                             Task { await viewModel.loadMore() }
@@ -157,16 +157,16 @@ struct AuditLogCard: View {
                 Text(log.action)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 Text(log.actorEmail)
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(.secondary)
                 
                 if let details = log.details {
                     Text(details)
                         .font(.caption2)
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
             }
@@ -177,15 +177,15 @@ struct AuditLogCard: View {
             VStack(alignment: .trailing, spacing: 2) {
                 Text(formatDate(log.createdAt))
                     .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(.secondary)
                 
                 Text(formatTime(log.createdAt))
                     .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.secondary)
             }
         }
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 12))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
     }
     
     private var actionIcon: String {

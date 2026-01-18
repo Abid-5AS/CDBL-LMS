@@ -39,7 +39,7 @@ struct HelpView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 24) {
@@ -64,7 +64,7 @@ struct HelpView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 }
             }
         }
@@ -89,20 +89,20 @@ struct HelpView: View {
     private var searchBar: some View {
         HStack {
             Image(systemName: "magnifyingglass")
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(.secondary)
             
             TextField("Search FAQs...", text: $searchText)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             if !searchText.isEmpty {
                 Button(action: { searchText = "" }) {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(.secondary)
                 }
             }
         }
         .padding()
-        .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 12))
+        .surfaceBackground(.clear, in: RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
     }
     
@@ -112,7 +112,7 @@ struct HelpView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text(section.section)
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             VStack(spacing: 8) {
@@ -142,7 +142,7 @@ struct HelpView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Need More Help?")
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             VStack(spacing: 8) {
@@ -169,25 +169,25 @@ struct FAQItem: View {
                     Text(question)
                         .font(.subheadline)
                         .fontWeight(.medium)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                         .multilineTextAlignment(.leading)
                     
                     Spacer()
                     
                     Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(.secondary)
                 }
                 
                 if isExpanded {
                     Text(answer)
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(.secondary)
                         .multilineTextAlignment(.leading)
                 }
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 12))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
         }
     }
 }
@@ -202,27 +202,27 @@ struct ContactRow: View {
     var body: some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
-                .foregroundStyle(.cyan)
+                .foregroundStyle(Color.accentColor)
                 .frame(width: 24)
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.subheadline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 Text(subtitle)
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(.secondary)
             }
             
             Spacer()
             
             Image(systemName: "chevron.right")
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(.secondary)
         }
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 12))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
     }
 }
 

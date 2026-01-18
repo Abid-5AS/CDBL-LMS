@@ -15,7 +15,7 @@ struct EditProfileView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 24) {
@@ -38,7 +38,7 @@ struct EditProfileView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { dismiss() }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 }
             }
             .task {
@@ -52,25 +52,19 @@ struct EditProfileView: View {
     private var avatarSection: some View {
         VStack(spacing: 16) {
             Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [.cyan.opacity(0.5), .purple.opacity(0.5)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(Color(.tertiarySystemBackground))
                 .frame(width: 100, height: 100)
                 .overlay(
                     Text(viewModel.initials)
                         .font(.system(size: 36, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 )
-                .glassEffect(in: Circle())
+                .surfaceBackground(in: Circle())
             
             Button(action: {}) {
                 Text("Change Photo")
                     .font(.caption)
-                    .foregroundStyle(.cyan)
+                    .foregroundStyle(Color.accentColor)
             }
         }
     }
@@ -149,7 +143,7 @@ struct EditProfileView: View {
             HStack {
                 if viewModel.isSaving {
                     ProgressView()
-                        .tint(.white)
+                        .tint(.accentColor)
                 } else {
                     Image(systemName: "checkmark")
                     Text("Save Changes")
@@ -159,7 +153,7 @@ struct EditProfileView: View {
             .frame(maxWidth: .infinity)
             .frame(height: 52)
         }
-        .buttonStyle(.glassProminent)
+        .buttonStyle(.borderedProminent)
         .tint(.green)
         .disabled(viewModel.isSaving)
         .padding(.horizontal)
@@ -187,11 +181,11 @@ struct ProfileTextField: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(label)
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
             
             HStack(spacing: 12) {
                 Image(systemName: icon)
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(.secondary)
                     .frame(width: 24)
                 
                 TextField("", text: $text)
@@ -199,7 +193,7 @@ struct ProfileTextField: View {
                     .disabled(isDisabled)
             }
             .padding()
-            .glassEffect(
+            .surfaceBackground(
                 isDisabled ? .clear : .regular,
                 in: RoundedRectangle(cornerRadius: 12)
             )
@@ -282,4 +276,3 @@ final class EditProfileViewModel: ObservableObject {
 #Preview {
     EditProfileView()
 }
-

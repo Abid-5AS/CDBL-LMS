@@ -24,7 +24,9 @@ struct CDBLLeaveManagerApp: App {
                 }
             }
             .animation(.easeInOut(duration: 0.3), value: appState.isAuthenticated)
-            .preferredColorScheme(.dark) // Liquid Glass looks best in dark mode
+            .preferredColorScheme(
+                appState.useSystemTheme ? nil : (appState.isDarkMode ? .dark : .light)
+            )
         }
     }
 }

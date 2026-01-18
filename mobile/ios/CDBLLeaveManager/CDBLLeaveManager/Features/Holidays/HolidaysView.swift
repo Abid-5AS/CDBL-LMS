@@ -51,13 +51,13 @@ struct HolidaysView: View {
         HStack {
             Text("Holidays")
                 .font(.largeTitle.bold())
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Spacer()
             
             Text("\(viewModel.holidays.count) holidays")
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
         }
         .padding(.horizontal)
         .padding(.top, 60)
@@ -70,26 +70,26 @@ struct HolidaysView: View {
         HStack(spacing: 16) {
             Button(action: { selectedYear -= 1 }) {
                 Image(systemName: "chevron.left")
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .padding(8)
-                    .glassEffect(in: Circle())
+                    .surfaceBackground(in: Circle())
             }
             
             Text("\(selectedYear)")
                 .font(.title3)
                 .fontWeight(.semibold)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
                 .frame(width: 80)
             
             Button(action: { selectedYear += 1 }) {
                 Image(systemName: "chevron.right")
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .padding(8)
-                    .glassEffect(in: Circle())
+                    .surfaceBackground(in: Circle())
             }
         }
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
         .padding(.horizontal)
         .padding(.bottom, 16)
     }
@@ -103,7 +103,7 @@ struct HolidaysView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(month)
                             .font(.headline)
-                            .foregroundStyle(.white.opacity(0.8))
+                            .foregroundStyle(.secondary)
                             .padding(.horizontal)
                         
                         ForEach(holidays) { holiday in
@@ -130,15 +130,15 @@ struct HolidayCard: View {
                 Text(dayOfMonth)
                     .font(.title2)
                     .fontWeight(.bold)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 Text(dayOfWeek)
                     .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(.secondary)
             }
             .frame(width: 50)
             .padding()
-            .background(holiday.isOptional ? Color.orange.opacity(0.2) : Color.cyan.opacity(0.2))
+            .background(holiday.isOptional ? Color.orange.opacity(0.2) : Color.accentColor.opacity(0.2))
             .clipShape(RoundedRectangle(cornerRadius: 12))
             
             // Details
@@ -146,7 +146,7 @@ struct HolidayCard: View {
                 HStack {
                     Text(holiday.name)
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                     
                     if holiday.isOptional {
                         Text("Optional")
@@ -163,7 +163,7 @@ struct HolidayCard: View {
                 if let description = holiday.description, !description.isEmpty {
                     Text(description)
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(.secondary)
                         .lineLimit(2)
                 }
             }
@@ -171,7 +171,7 @@ struct HolidayCard: View {
             Spacer()
         }
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
     }
     
     private var dayOfMonth: String {
@@ -247,7 +247,7 @@ final class HolidaysViewModel: ObservableObject {
 
 #Preview {
     ZStack {
-        FluidBackground()
+        Color(.systemBackground).ignoresSafeArea()
         HolidaysView()
     }
 }

@@ -14,7 +14,7 @@ struct WorkflowPoliciesView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 VStack(spacing: 0) {
                     // Header
@@ -44,7 +44,7 @@ struct WorkflowPoliciesView: View {
         HStack {
             Text("Workflow Policies")
                 .font(.largeTitle.bold())
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Spacer()
             
@@ -52,9 +52,9 @@ struct WorkflowPoliciesView: View {
                 Task { await viewModel.loadPolicies() }
             }) {
                 Image(systemName: "arrow.clockwise")
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .padding(10)
-                    .glassEffect(in: Circle())
+                    .surfaceBackground(in: Circle())
             }
         }
         .padding(.horizontal)
@@ -89,12 +89,12 @@ struct WorkflowPolicyCard: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(policy.name)
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                     
                     if let description = policy.description {
                         Text(description)
                             .font(.caption)
-                            .foregroundStyle(.white.opacity(0.6))
+                            .foregroundStyle(.secondary)
                     }
                 }
                 
@@ -127,24 +127,24 @@ struct WorkflowPolicyCard: View {
                     Text("Rules")
                         .font(.caption)
                         .fontWeight(.semibold)
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(.secondary)
                     
                     ForEach(rules.prefix(3), id: \.self) { rule in
                         HStack(spacing: 8) {
                             Circle()
-                                .fill(Color.cyan)
+                                .fill(Color.accentColor)
                                 .frame(width: 4, height: 4)
                             
                             Text(rule)
                                 .font(.caption2)
-                                .foregroundStyle(.white.opacity(0.6))
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }
             }
         }
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 
@@ -159,15 +159,15 @@ struct PolicyDetail: View {
         HStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.caption)
-                .foregroundStyle(.cyan)
+                .foregroundStyle(Color.accentColor)
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(label)
                     .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(.secondary)
                 Text(value)
                     .font(.caption)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
             }
         }
     }

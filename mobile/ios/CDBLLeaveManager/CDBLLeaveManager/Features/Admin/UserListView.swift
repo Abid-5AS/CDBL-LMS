@@ -11,12 +11,12 @@ import Combine
 struct UserListView: View {
     @StateObject private var viewModel = UserListViewModel()
     @State private var searchText = ""
-    @State private var showCreateUser = false
+    @State private var path = NavigationPath()
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 VStack(spacing: 0) {
                     // Header
@@ -48,8 +48,13 @@ struct UserListView: View {
             .task {
                 await viewModel.loadUsers()
             }
-            .sheet(isPresented: $showCreateUser) {
-                CreateUserView()
+            .navigationDestination(for: UserManagementRoute.self) { route in
+                switch route {
+                case .create:
+                    UserManagementView()
+                case .edit(let userId):
+                    UserManagementView(userId: userId)
+                }
             }
         }
     }
@@ -60,15 +65,15 @@ struct UserListView: View {
         HStack {
             Text("Users")
                 .font(.largeTitle.bold())
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Spacer()
             
-            Button(action: { showCreateUser = true }) {
+            Button(action: { path.append(UserManagementRoute.create) }) {
                 Image(systemName: "plus")
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .padding(10)
-                    .glassEffect(in: Circle())
+                    .surfaceBackground(in: Circle())
             }
         }
         .padding(.horizontal)
@@ -81,22 +86,22 @@ struct UserListView: View {
     private var searchBar: some View {
         HStack {
             Image(systemName: "magnifyingglass")
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(.secondary)
             
             TextField("Search users...", text: $searchText)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             if !searchText.isEmpty {
                 Button(action: { searchText = "" }) {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(.secondary)
                 }
             }
         }
         .padding()
-        .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 12))
+        .surfaceBackground(.clear, in: RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
         .padding(.bottom, 16)
         .onChange(of: searchText) { _, newValue in
@@ -110,18 +115,26 @@ struct UserListView: View {
         ScrollView {
             LazyVStack(spacing: 12) {
                 ForEach(viewModel.filteredUsers) { user in
-                    UserCard(
-                        user: user,
-                        onToggleStatus: {
-                            Task { await viewModel.toggleStatus(user) }
-                        }
-                    )
+                    NavigationLink(value: UserManagementRoute.edit(user.id)) {
+                        UserCard(
+                            user: user,
+                            onToggleStatus: {
+                                Task { await viewModel.toggleStatus(user) }
+                            }
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
             }
             .padding(.horizontal)
             .padding(.bottom, 100)
         }
     }
+}
+
+enum UserManagementRoute: Hashable {
+    case create
+    case edit(Int)
 }
 
 // MARK: - User Card
@@ -146,25 +159,25 @@ struct UserCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(user.name ?? user.email)
                     .font(.headline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 Text(user.email)
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(.secondary)
                 
                 HStack(spacing: 8) {
                     Text(user.role.capitalized)
                         .font(.caption2)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 2)
-                        .background(Color.cyan.opacity(0.2))
+                        .background(Color.accentColor.opacity(0.2))
                         .clipShape(Capsule())
-                        .foregroundStyle(.cyan)
+                        .foregroundStyle(Color.accentColor)
                     
                     if let dept = user.department {
                         Text(dept)
                             .font(.caption2)
-                            .foregroundStyle(.white.opacity(0.5))
+                            .foregroundStyle(.secondary)
                     }
                 }
             }
@@ -179,7 +192,7 @@ struct UserCard: View {
             }
         }
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
     }
     
     private var initials: String {
@@ -189,30 +202,6 @@ struct UserCard: View {
             return "\(parts[0].prefix(1))\(parts[1].prefix(1))".uppercased()
         }
         return name.prefix(2).uppercased()
-    }
-}
-
-// MARK: - Create User View (Placeholder)
-
-struct CreateUserView: View {
-    @Environment(\.dismiss) private var dismiss
-    
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                Color.black.ignoresSafeArea()
-                
-                Text("Create User Form")
-                    .foregroundStyle(.white)
-            }
-            .navigationTitle("New User")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") { dismiss() }
-                }
-            }
-        }
     }
 }
 

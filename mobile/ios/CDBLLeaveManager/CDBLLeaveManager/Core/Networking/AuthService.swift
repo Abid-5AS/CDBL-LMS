@@ -18,11 +18,17 @@ actor AuthService {
     
     func login(email: String, password: String, skipOtp: Bool = false) async throws -> LoginResponse {
         let request = LoginRequest(email: email, password: password, skipOtp: skipOtp)
+        
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        // Default Key encoding strategy is useDefaultKeys (camelCase), which matches what the backend wants for skipOtp
+        
         return try await client.request(
             "auth/mobile-login",
             method: .post,
             body: request,
-            requiresAuth: false
+            requiresAuth: false,
+            encoder: encoder
         )
     }
     

@@ -16,7 +16,7 @@ struct TermsView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
@@ -57,7 +57,7 @@ struct TermsView: View {
                         
                         Text("Last updated: January 2026")
                             .font(.caption)
-                            .foregroundStyle(.white.opacity(0.5))
+                            .foregroundStyle(.secondary)
                             .padding(.horizontal)
                         
                         Spacer().frame(height: 40)
@@ -70,7 +70,7 @@ struct TermsView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 }
             }
         }
@@ -80,16 +80,16 @@ struct TermsView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.headline)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Text(content)
                 .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(.secondary)
                 .lineSpacing(4)
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
         .padding(.horizontal)
     }
 }
@@ -102,7 +102,7 @@ struct PrivacyView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
@@ -143,7 +143,7 @@ struct PrivacyView: View {
                         
                         Text("Last updated: January 2026")
                             .font(.caption)
-                            .foregroundStyle(.white.opacity(0.5))
+                            .foregroundStyle(.secondary)
                             .padding(.horizontal)
                         
                         Spacer().frame(height: 40)
@@ -156,7 +156,7 @@ struct PrivacyView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 }
             }
         }
@@ -166,16 +166,16 @@ struct PrivacyView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.headline)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Text(content)
                 .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(.secondary)
                 .lineSpacing(4)
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
         .padding(.horizontal)
     }
 }
@@ -195,7 +195,7 @@ struct FeedbackView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 24) {
@@ -203,7 +203,7 @@ struct FeedbackView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Feedback Type")
                                 .font(.headline)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(.primary)
                             
                             Picker("Type", selection: $feedbackType) {
                                 ForEach(0..<feedbackTypes.count, id: \.self) { index in
@@ -218,7 +218,7 @@ struct FeedbackView: View {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("How's your experience?")
                                 .font(.headline)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(.primary)
                             
                             HStack(spacing: 16) {
                                 ForEach(1...5, id: \.self) { star in
@@ -232,25 +232,25 @@ struct FeedbackView: View {
                             .frame(maxWidth: .infinity)
                         }
                         .padding()
-                        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+                        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
                         .padding(.horizontal)
                         
                         // Feedback Text
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Tell us more")
                                 .font(.headline)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(.primary)
                             
                             TextEditor(text: $feedbackText)
                                 .scrollContentBackground(.hidden)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(.primary)
                                 .frame(minHeight: 150)
                                 .padding()
-                                .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 16))
+                                .surfaceBackground(.clear, in: RoundedRectangle(cornerRadius: 16))
                             
                             Text("\(feedbackText.count)/1000")
                                 .font(.caption2)
-                                .foregroundStyle(.white.opacity(0.5))
+                                .foregroundStyle(.secondary)
                                 .frame(maxWidth: .infinity, alignment: .trailing)
                         }
                         .padding(.horizontal)
@@ -260,7 +260,7 @@ struct FeedbackView: View {
                             HStack {
                                 if isSubmitting {
                                     ProgressView()
-                                        .tint(.white)
+                                        .tint(.accentColor)
                                 } else {
                                     Image(systemName: "paperplane.fill")
                                     Text("Send Feedback")
@@ -270,8 +270,8 @@ struct FeedbackView: View {
                             .frame(maxWidth: .infinity)
                             .frame(height: 52)
                         }
-                        .buttonStyle(.glassProminent)
-                        .tint(.cyan)
+                        .buttonStyle(.borderedProminent)
+                        .tint(.accentColor)
                         .disabled(feedbackText.isEmpty || isSubmitting)
                         .padding(.horizontal)
                         
@@ -290,7 +290,7 @@ struct FeedbackView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { dismiss() }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 }
             }
         }
@@ -305,22 +305,22 @@ struct FeedbackView: View {
             Text("Thank You!")
                 .font(.title)
                 .fontWeight(.bold)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Text("Your feedback has been submitted successfully.")
                 .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             
             Button("Done") {
                 dismiss()
             }
-            .buttonStyle(.glassProminent)
-            .tint(.cyan)
+            .buttonStyle(.borderedProminent)
+            .tint(.accentColor)
             .padding(.horizontal, 60)
         }
         .padding(40)
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 28))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 28))
         .padding(40)
     }
     
@@ -344,7 +344,7 @@ struct PolicyView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 if viewModel.isLoading {
                     LoadingView()
@@ -357,7 +357,7 @@ struct PolicyView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 }
             }
         }
@@ -386,7 +386,7 @@ struct PolicyCard: View {
             HStack {
                 Text(policy.name)
                     .font(.headline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 Spacer()
                 
@@ -395,15 +395,15 @@ struct PolicyCard: View {
                     .fontWeight(.semibold)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 4)
-                    .background(Color.cyan.opacity(0.2))
+                    .background(Color.accentColor.opacity(0.2))
                     .clipShape(Capsule())
-                    .foregroundStyle(.cyan)
+                    .foregroundStyle(Color.accentColor)
             }
             
             if let description = policy.description {
                 Text(description)
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(.secondary)
             }
             
             HStack(spacing: 16) {
@@ -412,7 +412,7 @@ struct PolicyCard: View {
             }
         }
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 
@@ -427,7 +427,7 @@ struct PolicyFeature: View {
             Text(text)
                 .font(.caption2)
         }
-        .foregroundStyle(.white.opacity(0.6))
+        .foregroundStyle(.secondary)
     }
 }
 

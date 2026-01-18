@@ -19,7 +19,7 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 24) {
@@ -31,6 +31,9 @@ struct SettingsView: View {
                         
                         // Security
                         securitySection
+
+                        // Integrations
+                        integrationsSection
                         
                         // About
                         aboutSection
@@ -47,7 +50,7 @@ struct SettingsView: View {
                     Button("Done") {
                         dismiss()
                     }
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 }
             }
         }
@@ -59,7 +62,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Appearance")
                 .font(.headline)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
                 .padding(.horizontal)
             
             VStack(spacing: 0) {
@@ -70,7 +73,7 @@ struct SettingsView: View {
                 )
                 
                 if !useSystemTheme {
-                    Divider().background(Color.white.opacity(0.1))
+                    Divider()
                     SettingsToggleRow(
                         icon: "moon.fill",
                         title: "Dark Mode",
@@ -79,7 +82,7 @@ struct SettingsView: View {
                 }
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
         }
     }
@@ -90,7 +93,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Notifications")
                 .font(.headline)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
                 .padding(.horizontal)
             
             VStack(spacing: 0) {
@@ -100,12 +103,12 @@ struct SettingsView: View {
                     isOn: $notificationsEnabled
                 )
                 
-                Divider().background(Color.white.opacity(0.1))
+                Divider()
                 
                 SettingsRow(icon: "envelope.fill", title: "Email Notifications", showChevron: true)
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
         }
     }
@@ -116,7 +119,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Security")
                 .font(.headline)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
                 .padding(.horizontal)
             
             VStack(spacing: 0) {
@@ -126,18 +129,40 @@ struct SettingsView: View {
                     isOn: $biometricsEnabled
                 )
                 
-                Divider().background(Color.white.opacity(0.1))
+                Divider()
                 
-                // TODO: Link to ChangePasswordView
-                SettingsRow(icon: "lock.fill", title: "Change Password", showChevron: true)
+                NavigationLink(destination: ChangePasswordView()) {
+                    SettingsRow(icon: "lock.fill", title: "Change Password", showChevron: true)
+                }
                 
-                Divider().background(Color.white.opacity(0.1))
+                Divider()
                 
-                // TODO: Link to DelegationView
-                SettingsRow(icon: "person.2.fill", title: "Delegation Settings", showChevron: true)
+                NavigationLink(destination: DelegationView()) {
+                    SettingsRow(icon: "person.2.fill", title: "Delegation Settings", showChevron: true)
+                }
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
+            .padding(.horizontal)
+        }
+    }
+
+    // MARK: - Integrations Section
+
+    private var integrationsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Integrations")
+                .font(.headline)
+                .foregroundStyle(.primary)
+                .padding(.horizontal)
+
+            VStack(spacing: 0) {
+                NavigationLink(destination: CalendarIntegrationView()) {
+                    SettingsRow(icon: "calendar.badge.clock", title: "Calendar Integration", showChevron: true)
+                }
+            }
+            .padding()
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
         }
     }
@@ -148,7 +173,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("About")
                 .font(.headline)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
                 .padding(.horizontal)
             
             VStack(spacing: 0) {
@@ -156,31 +181,31 @@ struct SettingsView: View {
                     SettingsRow(icon: "doc.text.fill", title: "Terms of Service", showChevron: true)
                 }
                 
-                Divider().background(Color.white.opacity(0.1))
+                Divider()
                 
                 NavigationLink(destination: PrivacyView()) {
                     SettingsRow(icon: "lock.shield.fill", title: "Privacy Policy", showChevron: true)
                 }
                 
-                Divider().background(Color.white.opacity(0.1))
+                Divider()
                 
                 HStack {
                     Image(systemName: "info.circle.fill")
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(.secondary)
                     .frame(width: 24)
                     
                     Text("Version")
-                        .foregroundStyle(.white.opacity(0.9))
+                        .foregroundStyle(.secondary)
                     
                     Spacer()
                     
                     Text("1.0.0 (Build 1)")
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(.secondary)
                 }
                 .padding(.vertical, 12)
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
         }
     }
@@ -196,18 +221,18 @@ struct SettingsRow: View {
     var body: some View {
         HStack {
             Image(systemName: icon)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
                 .frame(width: 24)
             
             Text(title)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
             
             Spacer()
             
             if showChevron {
                 Image(systemName: "chevron.right")
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.secondary)
             }
         }
         .padding(.vertical, 12)
@@ -223,17 +248,17 @@ struct SettingsToggleRow: View {
     var body: some View {
         HStack {
             Image(systemName: icon)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
                 .frame(width: 24)
             
             Text(title)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
             
             Spacer()
             
             Toggle("", isOn: $isOn)
                 .labelsHidden()
-                .tint(.cyan)
+                .tint(.accentColor)
         }
         .padding(.vertical, 8)
     }

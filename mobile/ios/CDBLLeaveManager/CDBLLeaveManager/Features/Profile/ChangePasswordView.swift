@@ -28,20 +28,20 @@ struct ChangePasswordView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 24) {
                         // Icon
                         Image(systemName: "lock.shield.fill")
                             .font(.system(size: 48))
-                            .foregroundStyle(.cyan)
+                            .foregroundStyle(Color.accentColor)
                             .padding(.top, 20)
                         
                         // Instructions
                         Text("Create a strong password that you don't use for other accounts")
                             .font(.subheadline)
-                            .foregroundStyle(.white.opacity(0.7))
+                            .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal)
                         
@@ -86,7 +86,7 @@ struct ChangePasswordView: View {
                             HStack {
                                 if isSubmitting {
                                     ProgressView()
-                                        .tint(.white)
+                                        .tint(.accentColor)
                                 } else {
                                     Image(systemName: "checkmark.shield.fill")
                                     Text("Change Password")
@@ -96,8 +96,8 @@ struct ChangePasswordView: View {
                             .frame(maxWidth: .infinity)
                             .frame(height: 52)
                         }
-                        .buttonStyle(.glassProminent)
-                        .tint(.cyan)
+                        .buttonStyle(.borderedProminent)
+                        .tint(.accentColor)
                         .disabled(!isValid || isSubmitting)
                         .padding(.horizontal)
                         
@@ -115,7 +115,7 @@ struct ChangePasswordView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { dismiss() }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 }
             }
         }
@@ -141,7 +141,7 @@ struct ChangePasswordView: View {
             )
         }
         .padding()
-        .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 12))
+        .surfaceBackground(.clear, in: RoundedRectangle(cornerRadius: 12))
     }
     
     // MARK: - Success Overlay
@@ -155,22 +155,22 @@ struct ChangePasswordView: View {
             Text("Password Changed!")
                 .font(.title)
                 .fontWeight(.bold)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Text("Your password has been updated successfully.")
                 .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             
             Button("Done") {
                 dismiss()
             }
-            .buttonStyle(.glassProminent)
-            .tint(.cyan)
+            .buttonStyle(.borderedProminent)
+            .tint(.accentColor)
             .padding(.horizontal, 60)
         }
         .padding(40)
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 28))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 28))
         .padding(40)
     }
     
@@ -216,24 +216,24 @@ struct PasswordField: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(label)
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
             
             HStack {
                 if showPassword {
                     TextField("", text: $text)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 } else {
                     SecureField("", text: $text)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 }
                 
                 Button(action: { showPassword.toggle() }) {
                     Image(systemName: showPassword ? "eye.slash" : "eye")
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(.secondary)
                 }
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 12))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
         }
     }
 }

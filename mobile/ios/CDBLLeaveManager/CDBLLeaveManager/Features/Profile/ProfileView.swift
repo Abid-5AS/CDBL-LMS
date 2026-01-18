@@ -47,29 +47,19 @@ struct ProfileView: View {
             // Avatar
             ZStack {
                 Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [.cyan.opacity(0.5), .purple.opacity(0.5)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .fill(Color(.tertiarySystemBackground))
                     .frame(width: 100, height: 100)
                 
                 Text(viewModel.initials)
                     .font(.system(size: 36, weight: .bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
             }
-            .glassEffect(in: Circle())
+            .surfaceBackground(in: Circle())
             .overlay(
                 Circle()
                     .strokeBorder(
-                        LinearGradient(
-                            colors: [.white.opacity(0.5), .clear],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        ),
-                        lineWidth: 2
+                        Color(.separator),
+                        lineWidth: 1
                     )
             )
             
@@ -77,11 +67,11 @@ struct ProfileView: View {
             VStack(spacing: 4) {
                 Text(viewModel.name)
                     .font(.title2.bold())
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 Text(viewModel.designation)
                     .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(.secondary)
                 
                 HStack(spacing: 12) {
                     // Role Badge
@@ -90,9 +80,9 @@ struct ProfileView: View {
                         .fontWeight(.semibold)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 4)
-                        .background(Color.cyan.opacity(0.2))
+                        .background(Color(.secondarySystemBackground))
                         .clipShape(Capsule())
-                        .foregroundStyle(.cyan)
+                        .foregroundStyle(.primary)
                     
                     // Edit Button
                     Button(action: { showingEditProfile = true }) {
@@ -101,9 +91,9 @@ struct ProfileView: View {
                             .fontWeight(.medium)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 4)
-                            .background(Color.white.opacity(0.1))
+                            .background(Color(.secondarySystemBackground))
                             .clipShape(Capsule())
-                            .foregroundStyle(.white)
+                            .foregroundStyle(.primary)
                     }
                 }
             }
@@ -116,15 +106,15 @@ struct ProfileView: View {
     private var infoCard: some View {
         VStack(spacing: 0) {
             ProfileRow(icon: "envelope.fill", title: "Email", value: viewModel.email)
-            Divider().background(Color.white.opacity(0.1))
+            Divider()
             ProfileRow(icon: "phone.fill", title: "Phone", value: viewModel.phone)
-            Divider().background(Color.white.opacity(0.1))
+            Divider()
             ProfileRow(icon: "building.2.fill", title: "Department", value: viewModel.department)
-            Divider().background(Color.white.opacity(0.1))
+            Divider()
             ProfileRow(icon: "person.badge.key.fill", title: "Employee ID", value: viewModel.employeeId)
         }
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 24))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 24))
         .padding(.horizontal)
     }
     
@@ -134,41 +124,40 @@ struct ProfileView: View {
         VStack(alignment: .leading) {
             Text("Settings")
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.8))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             VStack(spacing: 0) {
-                // Notifications -> Settings for now
-                NavigationLink(destination: SettingsView()) {
+                NavigationLink(destination: NotificationsView()) {
                     ProfileRow(icon: "bell.fill", title: "Notifications", value: "On", showChevron: true)
                 }
                 
-                Divider().background(Color.white.opacity(0.1))
+                Divider()
                 
                 NavigationLink(destination: SettingsView()) {
                     ProfileRow(icon: "faceid", title: "Security", value: "FaceID", showChevron: true)
                 }
                 
-                Divider().background(Color.white.opacity(0.1))
+                Divider()
                 
-                // Placeholder for Delegation
-                ProfileRow(icon: "person.crop.circle.badge.checkmark", title: "Delegation", value: "", showChevron: true)
+                NavigationLink(destination: DelegationView()) {
+                    ProfileRow(icon: "person.crop.circle.badge.checkmark", title: "Delegation", value: "", showChevron: true)
+                }
                 
-                Divider().background(Color.white.opacity(0.1))
+                Divider()
                 
-                // Change Password -> Placeholder or Settings
-                NavigationLink(destination: SettingsView()) {
+                NavigationLink(destination: ChangePasswordView()) {
                     ProfileRow(icon: "lock.fill", title: "Change Password", value: "", showChevron: true)
                 }
                 
-                Divider().background(Color.white.opacity(0.1))
+                Divider()
                 
                 NavigationLink(destination: HelpView()) {
                     ProfileRow(icon: "questionmark.circle.fill", title: "Help & Support", value: "", showChevron: true)
                 }
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 24))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 24))
         }
         .padding(.horizontal)
     }
@@ -185,7 +174,7 @@ struct ProfileView: View {
             .foregroundStyle(.red)
             .frame(maxWidth: .infinity)
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
         }
         .padding(.horizontal)
     }
@@ -202,21 +191,21 @@ struct ProfileRow: View {
     var body: some View {
         HStack {
             Image(systemName: icon)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
                 .frame(width: 24)
             
             Text(title)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
             
             Spacer()
             
             Text(value)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
             
             if showChevron {
                 Image(systemName: "chevron.right")
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.secondary)
             }
         }
         .padding(.vertical, 12)
@@ -273,7 +262,7 @@ final class ProfileViewModel: ObservableObject {
 
 #Preview {
     ZStack {
-        Color.black.ignoresSafeArea()
+        Color(.systemBackground).ignoresSafeArea()
         ProfileView()
             .environmentObject(AppState.shared)
     }

@@ -9,6 +9,8 @@ import SwiftUI
 
 struct HRHeadDashboardView: View {
     @StateObject private var viewModel = DashboardViewModel()
+    @State private var showReports = false
+    @State private var showEmployees = false
     @EnvironmentObject private var appState: AppState
     
     var body: some View {
@@ -26,6 +28,12 @@ struct HRHeadDashboardView: View {
         }
         .task {
             await viewModel.loadDashboard(for: .hrHead)
+        }
+        .sheet(isPresented: $showReports) {
+            ReportsView()
+        }
+        .sheet(isPresented: $showEmployees) {
+            TeamListView()
         }
     }
     
@@ -99,17 +107,17 @@ struct HRHeadDashboardView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Compliance Score")
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                     
                     Text("Organization compliance with leave policies")
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(.secondary)
                 }
                 
                 Spacer()
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
         }
         .padding(.horizontal)
     }
@@ -120,7 +128,7 @@ struct HRHeadDashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Department Performance")
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             if let departments = viewModel.hrHeadStats?.departmentPerformance {
@@ -130,7 +138,7 @@ struct HRHeadDashboardView: View {
                     }
                 }
                 .padding()
-                .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+                .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
                 .padding(.horizontal)
             }
         }
@@ -143,7 +151,7 @@ struct HRHeadDashboardView: View {
             HStack {
                 Text("Escalated Cases")
                     .font(.headline)
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundStyle(.secondary)
                 
                 if let count = viewModel.hrHeadStats?.escalatedCases.count, count > 0 {
                     Text("\(count)")
@@ -172,11 +180,11 @@ struct HRHeadDashboardView: View {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(.green)
                     Text("No escalated cases")
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(.secondary)
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
-                .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+                .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
                 .padding(.horizontal)
             }
         }
@@ -188,12 +196,16 @@ struct HRHeadDashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Quick Actions")
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             HStack(spacing: 12) {
-                ActionButton(icon: "chart.bar.fill", title: "Reports", color: .purple)
-                ActionButton(icon: "person.3.fill", title: "Employees", color: .blue)
+                ActionButton(icon: "chart.bar.fill", title: "Reports", color: .purple) {
+                    showReports = true
+                }
+                ActionButton(icon: "person.3.fill", title: "Employees", color: .blue) {
+                    showEmployees = true
+                }
             }
             .padding(.horizontal)
         }
@@ -209,7 +221,7 @@ struct DepartmentRow: View {
         HStack {
             Text(department.name)
                 .font(.subheadline)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Spacer()
             
@@ -221,17 +233,17 @@ struct DepartmentRow: View {
                         .foregroundStyle(.orange)
                     Text("pending")
                         .font(.caption2)
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(.secondary)
                 }
                 
                 VStack(alignment: .trailing) {
                     Text(String(format: "%.1fh", department.avgApprovalTime))
                         .font(.caption)
                         .fontWeight(.semibold)
-                        .foregroundStyle(.cyan)
+                        .foregroundStyle(Color.accentColor)
                     Text("avg time")
                         .font(.caption2)
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(.secondary)
                 }
             }
         }
@@ -254,15 +266,15 @@ struct EscalatedCaseCard: View {
                 Text(caseItem.employeeName)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 Text("\(caseItem.leaveType) • \(caseItem.days) days")
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(.secondary)
                 
                 Text(caseItem.reason)
                     .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
             
@@ -270,7 +282,7 @@ struct EscalatedCaseCard: View {
             
             Image(systemName: "chevron.right")
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(.secondary)
         }
         .padding()
         .background(Color.red.opacity(0.1))
@@ -284,7 +296,7 @@ struct EscalatedCaseCard: View {
 
 #Preview {
     ZStack {
-        FluidBackground()
+        Color(.systemBackground).ignoresSafeArea()
         HRHeadDashboardView()
             .environmentObject(AppState.shared)
     }

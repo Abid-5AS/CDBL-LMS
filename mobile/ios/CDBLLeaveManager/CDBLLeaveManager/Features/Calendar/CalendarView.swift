@@ -19,7 +19,7 @@ struct CalendarView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 24) {
@@ -55,9 +55,9 @@ struct CalendarView: View {
         HStack {
             Button(action: previousMonth) {
                 Image(systemName: "chevron.left")
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .padding(12)
-                    .glassEffect(in: Circle())
+                    .surfaceBackground(in: Circle())
             }
             
             Spacer()
@@ -65,15 +65,15 @@ struct CalendarView: View {
             Text(monthYearString)
                 .font(.title2)
                 .fontWeight(.bold)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Spacer()
             
             Button(action: nextMonth) {
                 Image(systemName: "chevron.right")
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .padding(12)
-                    .glassEffect(in: Circle())
+                    .surfaceBackground(in: Circle())
             }
         }
         .padding(.horizontal)
@@ -87,7 +87,7 @@ struct CalendarView: View {
                 Text(day)
                     .font(.caption)
                     .fontWeight(.medium)
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
             }
         }
@@ -119,7 +119,7 @@ struct CalendarView: View {
             }
         }
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 24))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 24))
         .padding(.horizontal)
     }
     
@@ -129,7 +129,7 @@ struct CalendarView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text(formattedSelectedDate)
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             let events = viewModel.events(for: selectedDate)
@@ -137,13 +137,13 @@ struct CalendarView: View {
             if events.isEmpty {
                 HStack {
                     Image(systemName: "calendar.badge.checkmark")
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(.secondary)
                     Text("No events for this day")
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(.secondary)
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
-                .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+                .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
                 .padding(.horizontal)
             } else {
                 VStack(spacing: 8) {
@@ -241,13 +241,13 @@ struct DayCell: View {
                 
                 if hasEvents {
                     Circle()
-                        .fill(Color.cyan)
+                        .fill(Color.accentColor)
                         .frame(width: 6, height: 6)
                 }
             }
             .frame(width: 40, height: 44)
             .background(
-                isSelected ? Color.cyan.opacity(0.3) :
+                isSelected ? Color.accentColor.opacity(0.3) :
                 isToday ? Color.white.opacity(0.1) :
                 Color.clear
             )
@@ -289,7 +289,7 @@ struct CalendarEventCard: View {
                 Text(event.employeeName)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 Text(event.leaveType.capitalized)
                     .font(.caption)
@@ -300,10 +300,10 @@ struct CalendarEventCard: View {
             
             Text(event.duration)
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
         }
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 12))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
     }
 }
 

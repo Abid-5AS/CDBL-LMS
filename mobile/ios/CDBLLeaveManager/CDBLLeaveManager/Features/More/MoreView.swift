@@ -14,6 +14,7 @@ struct MoreView: View {
     @State private var showNotifications = false
     @State private var showCalendar = false
     @State private var showEncashment = false
+    @State private var showBalance = false
     @State private var showPolicy = false
     @State private var showHelp = false
     @State private var showFeedback = false
@@ -69,6 +70,9 @@ struct MoreView: View {
             .sheet(isPresented: $showEncashment) {
                 EncashmentListView()
             }
+            .sheet(isPresented: $showBalance) {
+                BalanceView()
+            }
             .sheet(isPresented: $showPolicy) {
                 PolicyView()
             }
@@ -93,7 +97,7 @@ struct MoreView: View {
         HStack {
             Text("More")
                 .font(.largeTitle.bold())
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             Spacer()
         }
         .padding(.horizontal)
@@ -107,39 +111,33 @@ struct MoreView: View {
             HStack(spacing: 16) {
                 // Avatar
                 Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [.cyan.opacity(0.5), .purple.opacity(0.5)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .fill(Color(.tertiarySystemBackground))
                     .frame(width: 60, height: 60)
                     .overlay(
                         Text(userInitials)
                             .font(.title2)
                             .fontWeight(.bold)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(.primary)
                     )
-                    .glassEffect(in: Circle())
+                    .surfaceBackground(in: Circle())
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("View Profile")
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                     
                     Text(appState.userRole.displayName)
                         .font(.caption)
-                        .foregroundStyle(.cyan)
+                        .foregroundStyle(Color.accentColor)
                 }
                 
                 Spacer()
                 
                 Image(systemName: "chevron.right")
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.secondary)
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
         }
         .padding(.horizontal)
     }
@@ -162,7 +160,7 @@ struct MoreView: View {
                 action: { showNotifications = true }
             )
             
-            Divider().background(Color.white.opacity(0.1)).padding(.leading, 56)
+            Divider().padding(.leading, 56)
             
             MoreMenuItem(
                 icon: "gearshape.fill",
@@ -171,7 +169,7 @@ struct MoreView: View {
                 action: { showSettings = true }
             )
             
-            Divider().background(Color.white.opacity(0.1)).padding(.leading, 56)
+            Divider().padding(.leading, 56)
             
             MoreMenuItem(
                 icon: "calendar.badge.clock",
@@ -180,7 +178,7 @@ struct MoreView: View {
                 action: { showCalendar = true }
             )
             
-            Divider().background(Color.white.opacity(0.1)).padding(.leading, 56)
+            Divider().padding(.leading, 56)
             
             MoreMenuItem(
                 icon: "banknote.fill",
@@ -188,9 +186,18 @@ struct MoreView: View {
                 color: .green,
                 action: { showEncashment = true }
             )
+            
+            Divider().padding(.leading, 56)
+            
+            MoreMenuItem(
+                icon: "chart.pie.fill",
+                title: "Leave Balance",
+                color: .purple,
+                action: { showBalance = true }
+            )
         }
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
         .padding(.horizontal)
     }
     
@@ -201,7 +208,7 @@ struct MoreView: View {
             Text("Resources")
                 .font(.subheadline)
                 .fontWeight(.semibold)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             VStack(spacing: 0) {
@@ -212,7 +219,7 @@ struct MoreView: View {
                     action: { showPolicy = true }
                 )
                 
-                Divider().background(Color.white.opacity(0.1)).padding(.leading, 56)
+                Divider().padding(.leading, 56)
                 
                 MoreMenuItem(
                     icon: "questionmark.circle.fill",
@@ -221,7 +228,7 @@ struct MoreView: View {
                     action: { showHelp = true }
                 )
                 
-                Divider().background(Color.white.opacity(0.1)).padding(.leading, 56)
+                Divider().padding(.leading, 56)
                 
                 MoreMenuItem(
                     icon: "envelope.fill",
@@ -230,7 +237,7 @@ struct MoreView: View {
                     action: { showFeedback = true }
                 )
                 
-                Divider().background(Color.white.opacity(0.1)).padding(.leading, 56)
+                Divider().padding(.leading, 56)
                 
                 MoreMenuItem(
                     icon: "doc.fill",
@@ -239,7 +246,7 @@ struct MoreView: View {
                     action: { showTerms = true }
                 )
                 
-                Divider().background(Color.white.opacity(0.1)).padding(.leading, 56)
+                Divider().padding(.leading, 56)
                 
                 MoreMenuItem(
                     icon: "lock.shield.fill",
@@ -249,7 +256,7 @@ struct MoreView: View {
                 )
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
         }
         .padding(.horizontal)
     }
@@ -266,7 +273,7 @@ struct MoreView: View {
             .foregroundStyle(.red)
             .frame(maxWidth: .infinity)
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
         }
         .padding(.horizontal)
     }
@@ -277,10 +284,10 @@ struct MoreView: View {
         VStack(spacing: 4) {
             Text("CDBL Connect")
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(.secondary)
             Text("Version 1.0.0")
                 .font(.caption2)
-                .foregroundStyle(.white.opacity(0.3))
+                .foregroundStyle(.secondary)
         }
         .padding(.top, 8)
     }
@@ -304,13 +311,13 @@ struct MoreMenuItem: View {
                 
                 Text(title)
                     .font(.body)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 Spacer()
                 
                 Image(systemName: "chevron.right")
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.secondary)
             }
             .padding(.vertical, 12)
         }
@@ -319,7 +326,7 @@ struct MoreMenuItem: View {
 
 #Preview {
     ZStack {
-        FluidBackground()
+        Color(.systemBackground).ignoresSafeArea()
         MoreView()
             .environmentObject(AppState.shared)
     }

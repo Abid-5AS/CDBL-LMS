@@ -16,7 +16,7 @@ struct LeaveDetailView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 if viewModel.isLoading {
                     LoadingView()
@@ -33,7 +33,7 @@ struct LeaveDetailView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Close") { dismiss() }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 }
             }
             .task {
@@ -89,11 +89,11 @@ struct LeaveDetailView: View {
             // Type
             Text(LeaveType(rawValue: leave.type)?.displayName ?? leave.type)
                 .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 24))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 24))
         .padding(.horizontal)
     }
     
@@ -102,31 +102,31 @@ struct LeaveDetailView: View {
     private func detailsCard(_ leave: LeaveRequest) -> some View {
         VStack(spacing: 0) {
             DetailRow(label: "Start Date", value: formatDate(leave.startDate))
-            Divider().background(Color.white.opacity(0.1))
+            Divider()
             DetailRow(label: "End Date", value: formatDate(leave.endDate))
-            Divider().background(Color.white.opacity(0.1))
+            Divider()
             DetailRow(label: "Total Days", value: leave.totalDays != nil ? "\(Int(leave.totalDays!)) day(s)" : "-")
             
             if leave.isHalfDay == true {
-                Divider().background(Color.white.opacity(0.1))
+                Divider()
                 DetailRow(label: "Half Day", value: leave.halfDayType ?? "Yes")
             }
             
             if let reason = leave.reason, !reason.isEmpty {
-                Divider().background(Color.white.opacity(0.1))
+                Divider()
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Reason")
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(.secondary)
                     Text(reason)
                         .font(.subheadline)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
             }
         }
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
         .padding(.horizontal)
     }
     
@@ -136,7 +136,7 @@ struct LeaveDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Timeline")
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             VStack(spacing: 0) {
@@ -157,7 +157,7 @@ struct LeaveDetailView: View {
                 }
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
         }
     }
@@ -177,7 +177,7 @@ struct LeaveDetailView: View {
                 .frame(maxWidth: .infinity)
                 .padding()
             }
-            .buttonStyle(.glass(.frosted))
+            .buttonStyle(.bordered)
             .foregroundStyle(.red)
         }
         .padding(.horizontal)
@@ -220,14 +220,14 @@ struct DetailRow: View {
         HStack {
             Text(label)
                 .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
             
             Spacer()
             
             Text(value)
                 .font(.subheadline)
                 .fontWeight(.medium)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
         }
         .padding()
     }
@@ -261,11 +261,11 @@ struct TimelineItem: View {
                 Text(title)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 Text(subtitle)
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(.secondary)
             }
             
             Spacer()

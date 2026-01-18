@@ -50,13 +50,13 @@ struct TeamListView: View {
         HStack {
             Text("Team")
                 .font(.largeTitle.bold())
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Spacer()
             
             Text("\(viewModel.employees.count) members")
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
         }
         .padding(.horizontal)
         .padding(.top, 60)
@@ -68,22 +68,22 @@ struct TeamListView: View {
     private var searchBar: some View {
         HStack {
             Image(systemName: "magnifyingglass")
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(.secondary)
             
             TextField("Search team members...", text: $searchText)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             if !searchText.isEmpty {
                 Button(action: { searchText = "" }) {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(.secondary)
                 }
             }
         }
         .padding()
-        .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 12))
+        .surfaceBackground(.clear, in: RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
         .padding(.bottom, 16)
         .onChange(of: searchText) { _, newValue in
@@ -122,18 +122,18 @@ struct TeamMemberCard: View {
                         .font(.headline)
                         .foregroundStyle(employee.avatarColor)
                 )
-                .glassEffect(in: Circle())
+                .surfaceBackground(in: Circle())
             
             // Details
             VStack(alignment: .leading, spacing: 4) {
                 Text(employee.displayName)
                     .font(.headline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 if let designation = employee.designation {
                     Text(designation)
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(.secondary)
                 }
                 
                 if let department = employee.department {
@@ -143,7 +143,7 @@ struct TeamMemberCard: View {
                         Text(department)
                     }
                     .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(.secondary)
                 }
             }
             
@@ -159,11 +159,11 @@ struct TeamMemberCard: View {
                 
                 Image(systemName: "chevron.right")
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.secondary)
             }
         }
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 
@@ -206,7 +206,7 @@ final class TeamViewModel: ObservableObject {
 
 #Preview {
     ZStack {
-        FluidBackground()
+        Color(.systemBackground).ignoresSafeArea()
         TeamListView()
     }
 }

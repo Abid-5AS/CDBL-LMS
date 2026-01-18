@@ -2,7 +2,7 @@
 //  ApplyLeaveView.swift
 //  CDBLLeaveManager
 //
-//  Apply leave form with Liquid Glass design.
+//  Apply leave form with system materials.
 //
 
 import SwiftUI
@@ -15,7 +15,7 @@ struct ApplyLeaveView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 24) {
@@ -61,7 +61,7 @@ struct ApplyLeaveView: View {
                     Button("Cancel") {
                         dismiss()
                     }
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 }
             }
         }
@@ -73,7 +73,7 @@ struct ApplyLeaveView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Leave Type")
                 .font(.headline)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 ForEach(LeaveType.allCases, id: \.self) { type in
@@ -95,14 +95,14 @@ struct ApplyLeaveView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Date Range")
                 .font(.headline)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             HStack(spacing: 16) {
                 // Start Date
                 VStack(alignment: .leading, spacing: 6) {
                     Text("From")
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(.secondary)
                     
                     DatePicker(
                         "",
@@ -113,14 +113,14 @@ struct ApplyLeaveView: View {
                     .labelsHidden()
                     .colorScheme(.dark)
                     .padding()
-                    .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 12))
+                    .surfaceBackground(.clear, in: RoundedRectangle(cornerRadius: 12))
                 }
                 
                 // End Date
                 VStack(alignment: .leading, spacing: 6) {
                     Text("To")
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(.secondary)
                     
                     DatePicker(
                         "",
@@ -131,7 +131,7 @@ struct ApplyLeaveView: View {
                     .labelsHidden()
                     .colorScheme(.dark)
                     .padding()
-                    .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 12))
+                    .surfaceBackground(.clear, in: RoundedRectangle(cornerRadius: 12))
                 }
             }
             
@@ -141,7 +141,7 @@ struct ApplyLeaveView: View {
                 Text("Total: \(viewModel.totalDays) day(s)")
                     .font(.subheadline)
             }
-            .foregroundStyle(.cyan)
+            .foregroundStyle(Color.accentColor)
         }
         .padding(.horizontal)
     }
@@ -154,20 +154,20 @@ struct ApplyLeaveView: View {
                 VStack(alignment: .leading) {
                     Text("Half Day")
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                     Text("Apply for half a day only")
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(.secondary)
                 }
                 
                 Spacer()
                 
                 Toggle("", isOn: $viewModel.isHalfDay)
                     .labelsHidden()
-                    .tint(.cyan)
+                    .tint(.accentColor)
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
             
             if viewModel.isHalfDay {
                 HStack(spacing: 12) {
@@ -198,18 +198,18 @@ struct ApplyLeaveView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Reason")
                 .font(.headline)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             TextEditor(text: $viewModel.reason)
                 .scrollContentBackground(.hidden)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
                 .frame(minHeight: 100)
                 .padding()
-                .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 16))
+                .surfaceBackground(.clear, in: RoundedRectangle(cornerRadius: 16))
             
             Text("\(viewModel.reason.count)/500")
                 .font(.caption2)
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .padding(.horizontal)
@@ -220,20 +220,20 @@ struct ApplyLeaveView: View {
     private func balanceInfo(_ balance: Double) -> some View {
         HStack {
             Image(systemName: "info.circle.fill")
-                .foregroundStyle(.cyan)
+                .foregroundStyle(Color.accentColor)
             
             Text("Available balance: \(Int(balance)) days")
                 .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.8))
+                .foregroundStyle(.secondary)
             
             Spacer()
         }
         .padding()
-        .background(Color.cyan.opacity(0.1))
+        .background(Color.accentColor.opacity(0.1))
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(Color.cyan.opacity(0.3), lineWidth: 1)
+                .strokeBorder(Color.accentColor.opacity(0.3), lineWidth: 1)
         )
         .padding(.horizontal)
     }
@@ -245,7 +245,7 @@ struct ApplyLeaveView: View {
             HStack {
                 if viewModel.isSubmitting {
                     ProgressView()
-                        .tint(.white)
+                        .tint(.accentColor)
                 } else {
                     Image(systemName: "paperplane.fill")
                     Text("Submit Request")
@@ -255,7 +255,7 @@ struct ApplyLeaveView: View {
             .frame(maxWidth: .infinity)
             .frame(height: 52)
         }
-        .buttonStyle(.glassProminent)
+        .buttonStyle(.borderedProminent)
         .tint(.green)
         .disabled(viewModel.isSubmitting || !viewModel.isValid)
         .padding(.horizontal)
@@ -286,24 +286,24 @@ struct LeaveTypeOption: View {
                 
                 Text(type.displayName)
                     .font(.subheadline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 Spacer()
                 
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.cyan)
+                        .foregroundStyle(Color.accentColor)
                 }
             }
             .padding()
-            .glassEffect(
+            .surfaceBackground(
                 isSelected ? .regular : .clear,
                 in: RoundedRectangle(cornerRadius: 12)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
                     .strokeBorder(
-                        isSelected ? Color.cyan : Color.white.opacity(0.2),
+                        isSelected ? Color.accentColor : Color.white.opacity(0.2),
                         lineWidth: isSelected ? 2 : 1
                     )
             )
@@ -327,23 +327,23 @@ struct HalfDayOption: View {
                     .fontWeight(.medium)
                 Text(subtitle)
                     .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity)
             .padding()
-            .glassEffect(
+            .surfaceBackground(
                 isSelected ? .regular : .clear,
                 in: RoundedRectangle(cornerRadius: 12)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
                     .strokeBorder(
-                        isSelected ? Color.cyan : Color.white.opacity(0.2),
+                        isSelected ? Color.accentColor : Color.white.opacity(0.2),
                         lineWidth: isSelected ? 2 : 1
                     )
             )
         }
-        .foregroundStyle(.white)
+        .foregroundStyle(.primary)
     }
 }
 

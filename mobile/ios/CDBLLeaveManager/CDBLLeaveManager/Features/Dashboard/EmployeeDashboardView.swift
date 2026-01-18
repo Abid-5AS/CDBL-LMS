@@ -3,6 +3,11 @@ import SwiftUI
 struct EmployeeDashboardView: View {
     @StateObject private var viewModel = DashboardViewModel()
     @EnvironmentObject private var appState: AppState
+    @State private var showApplyLeave = false
+    @State private var showLeaveHistory = false
+    @State private var showEncashment = false
+    @State private var showSettings = false
+    @State private var showBalance = false
     
     var body: some View {
         ScrollView {
@@ -22,6 +27,21 @@ struct EmployeeDashboardView: View {
         }
         .task {
             await viewModel.loadDashboard(for: .employee)
+        }
+        .sheet(isPresented: $showApplyLeave) {
+            ApplyLeaveView()
+        }
+        .sheet(isPresented: $showLeaveHistory) {
+            LeavesListView()
+        }
+        .sheet(isPresented: $showEncashment) {
+            EncashmentListView()
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
+        }
+        .sheet(isPresented: $showBalance) {
+            BalanceView()
         }
     }
     
@@ -65,17 +85,17 @@ struct EmployeeDashboardView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Action Required")
                     .font(.headline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 Text("\(viewModel.needsAttentionCount) request(s) need your attention")
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(.secondary)
             }
             
             Spacer()
             
             Image(systemName: "chevron.right")
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(.secondary)
         }
         .padding()
         .background(Color.red.opacity(0.2))
@@ -133,13 +153,13 @@ struct EmployeeDashboardView: View {
             HStack {
                 Text("Leave Balance")
                     .font(.headline)
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundStyle(.secondary)
                 
                 Spacer()
                 
                 Button("View All") {}
                     .font(.caption)
-                    .foregroundStyle(.cyan)
+                    .foregroundStyle(Color.accentColor)
             }
             .padding(.horizontal)
             
@@ -166,13 +186,13 @@ struct EmployeeDashboardView: View {
             HStack {
                 Text("Who's Out Today")
                     .font(.headline)
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundStyle(.secondary)
                 
                 Spacer()
                 
                 Button("View All") {}
                     .font(.caption)
-                    .foregroundStyle(.cyan)
+                    .foregroundStyle(Color.accentColor)
             }
             .padding(.horizontal)
             
@@ -181,11 +201,11 @@ struct EmployeeDashboardView: View {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(.green)
                     Text("Everyone is present today!")
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(.secondary)
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
-                .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+                .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
                 .padding(.horizontal)
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -207,17 +227,30 @@ struct EmployeeDashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Quick Actions")
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
-            GlassEffectContainer(spacing: 12) {
+            VStack(spacing: 12) {
                 HStack(spacing: 12) {
-                    ActionButton(icon: "plus.circle.fill", title: "Apply Leave", color: .green)
-                    ActionButton(icon: "clock.arrow.circlepath", title: "History", color: .blue)
+                    ActionButton(icon: "plus.circle.fill", title: "Apply Leave", color: .green) {
+                        showApplyLeave = true
+                    }
+                    ActionButton(icon: "clock.arrow.circlepath", title: "History", color: .blue) {
+                        showLeaveHistory = true
+                    }
                 }
                 HStack(spacing: 12) {
-                    ActionButton(icon: "banknote.fill", title: "Encashment", color: .orange)
-                    ActionButton(icon: "gearshape.fill", title: "Settings", color: .gray)
+                    ActionButton(icon: "banknote.fill", title: "Encashment", color: .orange) {
+                        showEncashment = true
+                    }
+                    ActionButton(icon: "chart.pie.fill", title: "Balance", color: .purple) {
+                        showBalance = true
+                    }
+                }
+                HStack(spacing: 12) {
+                    ActionButton(icon: "gearshape.fill", title: "Settings", color: .gray) {
+                        showSettings = true
+                    }
                 }
             }
             .padding(.horizontal)
@@ -233,19 +266,19 @@ struct DashboardHeader: View {
             VStack(alignment: .leading) {
                 Text(formattedDate)
                     .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.8))
+                    .foregroundStyle(.secondary)
                 Text(greeting)
                     .font(.title2.bold())
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
             }
             
             Spacer()
             
             Button(action: {}) {
                 Image(systemName: "bell.fill")
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .padding(10)
-                    .glassEffect(in: Circle())
+                    .surfaceBackground(in: Circle())
             }
         }
         .padding(.horizontal)
@@ -282,16 +315,16 @@ struct LeaveBalanceCard: View {
                 Text(type)
                     .font(.caption)
                     .fontWeight(.medium)
-                    .foregroundStyle(.white.opacity(0.8))
+                    .foregroundStyle(.secondary)
             }
             
             Text("\(balance)")
                 .font(.system(size: 32, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Text("/ \(total) Days")
                 .font(.caption2)
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(.secondary)
             
             // Progress Bar
             GeometryReader { geo in
@@ -309,7 +342,7 @@ struct LeaveBalanceCard: View {
         }
         .frame(width: 140)
         .padding(16)
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 24))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 24))
     }
 }
 
@@ -319,23 +352,19 @@ struct WhosOutCard: View {
     var body: some View {
         VStack {
             Circle()
-                .fill(LinearGradient(
-                    colors: [Color.cyan.opacity(0.5), Color.purple.opacity(0.5)],
-                    startPoint: .top,
-                    endPoint: .bottom
-                ))
+                .fill(Color(.tertiarySystemBackground))
                 .frame(width: 50, height: 50)
                 .overlay(
                     Text(initials)
                         .font(.headline)
                         .fontWeight(.bold)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 )
-                .glassEffect(.frosted, in: Circle())
+                .surfaceBackground(.regular, in: Circle())
             
             Text(firstName)
                 .font(.caption2)
-                .foregroundStyle(.white.opacity(0.8))
+                .foregroundStyle(.secondary)
                 .lineLimit(1)
                 .frame(width: 60)
         }
@@ -358,30 +387,38 @@ struct ActionButton: View {
     let icon: String
     let title: String
     let color: Color
+    let action: () -> Void
+
+    init(icon: String, title: String, color: Color, action: @escaping () -> Void = {}) {
+        self.icon = icon
+        self.title = title
+        self.color = color
+        self.action = action
+    }
     
     var body: some View {
-        Button(action: {}) {
+        Button(action: action) {
             HStack {
                 Image(systemName: icon)
                     .font(.title3)
-                    .foregroundStyle(color)
+                    .foregroundStyle(.primary)
                 
                 Text(title)
                     .font(.caption)
                     .fontWeight(.semibold)
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundStyle(.primary)
                 
                 Spacer()
             }
             .padding(16)
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
         }
     }
 }
 
 #Preview {
     ZStack {
-        Color.black.ignoresSafeArea()
+        Color(.systemBackground).ignoresSafeArea()
         EmployeeDashboardView()
             .environmentObject(AppState.shared)
     }

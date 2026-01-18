@@ -16,7 +16,7 @@ struct EmployeeDetailView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 if viewModel.isLoading {
                     LoadingView()
@@ -33,7 +33,7 @@ struct EmployeeDetailView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Close") { dismiss() }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 }
             }
             .task {
@@ -73,7 +73,8 @@ struct EmployeeDetailView: View {
         VStack(spacing: 16) {
             // Avatar
             Circle()
-                .fill(employee.avatarColor.opacity(0.3))
+                .fill(employee.avatarColor)
+                .opacity(0.3)
                 .frame(width: 80, height: 80)
                 .overlay(
                     Text(employee.initials)
@@ -81,18 +82,18 @@ struct EmployeeDetailView: View {
                         .fontWeight(.bold)
                         .foregroundStyle(employee.avatarColor)
                 )
-                .glassEffect(in: Circle())
+                .surfaceBackground(in: Circle())
             
             // Name & Role
             VStack(spacing: 4) {
                 Text(employee.displayName)
                     .font(.title2.bold())
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 if let designation = employee.designation {
                     Text(designation)
                         .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(.secondary)
                 }
                 
                 // Status Badge
@@ -110,7 +111,7 @@ struct EmployeeDetailView: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 24))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 24))
         .padding(.horizontal)
     }
     
@@ -119,33 +120,33 @@ struct EmployeeDetailView: View {
     private func infoCard(_ employee: Employee) -> some View {
         VStack(spacing: 0) {
             DetailRow(label: "Email", value: employee.email)
-            Divider().background(Color.white.opacity(0.1))
+            Divider()
             
             if let employeeId = employee.employeeId {
                 DetailRow(label: "Employee ID", value: employeeId)
-                Divider().background(Color.white.opacity(0.1))
+                Divider()
             }
             
             if let department = employee.department {
                 DetailRow(label: "Department", value: department)
-                Divider().background(Color.white.opacity(0.1))
+                Divider()
             }
             
             if let phone = employee.phone {
                 DetailRow(label: "Phone", value: phone)
-                Divider().background(Color.white.opacity(0.1))
+                Divider()
             }
             
             if let role = employee.role {
                 DetailRow(label: "Role", value: role.capitalized)
-                Divider().background(Color.white.opacity(0.1))
+                Divider()
             }
             
             if let managerName = employee.managerName {
                 DetailRow(label: "Reports To", value: managerName)
             }
         }
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
         .padding(.horizontal)
     }
     
@@ -155,7 +156,7 @@ struct EmployeeDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Leave Balance")
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             HStack(spacing: 12) {
@@ -173,7 +174,7 @@ struct EmployeeDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Recent Leaves")
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             VStack(spacing: 8) {
@@ -181,18 +182,18 @@ struct EmployeeDetailView: View {
                     HStack {
                         Text(leave.type.capitalized)
                             .font(.caption)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(.primary)
                         
                         Spacer()
                         
                         Text(leave.formattedDateRange)
                             .font(.caption)
-                            .foregroundStyle(.white.opacity(0.6))
+                            .foregroundStyle(.secondary)
                         
                         StatusBadge(leave.status)
                     }
                     .padding()
-                    .glassEffect(.transparent, in: RoundedRectangle(cornerRadius: 12))
+                    .surfaceBackground(.clear, in: RoundedRectangle(cornerRadius: 12))
                 }
             }
             .padding(.horizontal)
@@ -217,11 +218,11 @@ struct BalanceCard: View {
             
             Text(title)
                 .font(.caption2)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 

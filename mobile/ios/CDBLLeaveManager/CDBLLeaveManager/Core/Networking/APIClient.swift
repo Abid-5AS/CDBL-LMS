@@ -12,9 +12,9 @@ import Combine
 
 enum APIConfiguration {
     #if DEBUG
-    static let baseURL = "http://192.168.0.14:3000/api/"
+    static let baseURL = "https://choosing-jamie-real-operators.trycloudflare.com/api/"
     #else
-    static let baseURL = "https://lms.cdbl.local/api/"
+    static let baseURL = "https://choosing-jamie-real-operators.trycloudflare.com/api/"
     #endif
     
     static let timeoutInterval: TimeInterval = 30
@@ -101,7 +101,8 @@ final class APIClient: Sendable {
         method: HTTPMethod = .get,
         body: Encodable? = nil,
         headers: [String: String]? = nil,
-        requiresAuth: Bool = true
+        requiresAuth: Bool = true,
+        encoder: JSONEncoder? = nil // Optional custom encoder
     ) async throws -> T {
         guard let url = URL(string: APIConfiguration.baseURL + endpoint) else {
             throw APIError.invalidURL
@@ -122,7 +123,9 @@ final class APIClient: Sendable {
         
         // Encode body if present
         if let body = body {
-            request.httpBody = try encoder.encode(body)
+            // Use provided encoder or default (snake_case)
+            let bodyEncoder = encoder ?? self.encoder
+            request.httpBody = try bodyEncoder.encode(body)
         }
         
         // Perform request

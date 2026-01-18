@@ -7,14 +7,16 @@
 
 import SwiftUI
 import Combine
+import Combine
 
 struct BalanceView: View {
     @StateObject private var viewModel = BalanceViewModel()
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 if viewModel.isLoading {
                     LoadingView()
@@ -28,6 +30,14 @@ struct BalanceView: View {
             }
             .task {
                 await viewModel.loadBalance()
+            }
+            .navigationTitle("Balance")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Done") { dismiss() }
+                        .foregroundStyle(.primary)
+                }
             }
         }
     }
@@ -59,7 +69,7 @@ struct BalanceView: View {
         HStack {
             Text("Balance")
                 .font(.largeTitle.bold())
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Spacer()
         }
@@ -73,15 +83,15 @@ struct BalanceView: View {
         VStack(spacing: 16) {
             Text("Total Available")
                 .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(.secondary)
             
             Text("\(Int(viewModel.totalBalance))")
                 .font(.system(size: 64, weight: .bold))
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Text("Days")
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.8))
+                .foregroundStyle(.secondary)
             
             // Progress towards year
             HStack(spacing: 20) {
@@ -92,7 +102,7 @@ struct BalanceView: View {
                         .foregroundStyle(.red)
                     Text("Used")
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(.secondary)
                 }
                 
                 Rectangle()
@@ -106,13 +116,13 @@ struct BalanceView: View {
                         .foregroundStyle(.green)
                     Text("Remaining")
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(.secondary)
                 }
             }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 32)
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 28))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 28))
         .padding(.horizontal)
     }
     
@@ -122,7 +132,7 @@ struct BalanceView: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Leave Types")
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             VStack(spacing: 12) {
@@ -170,20 +180,20 @@ struct BalanceView: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("This Year")
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             VStack(spacing: 0) {
                 UsageRow(label: "Total Entitlement", value: "\(Int(viewModel.totalEntitlement)) days")
-                Divider().background(Color.white.opacity(0.1))
+                Divider()
                 UsageRow(label: "Leaves Taken", value: "\(Int(viewModel.usedDays)) days")
-                Divider().background(Color.white.opacity(0.1))
+                Divider()
                 UsageRow(label: "Pending Requests", value: "\(viewModel.pendingDays) days")
-                Divider().background(Color.white.opacity(0.1))
+                Divider()
                 UsageRow(label: "Available Balance", value: "\(Int(viewModel.totalBalance)) days", highlight: true)
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
         }
     }
@@ -219,7 +229,7 @@ struct BalanceTypeCard: View {
                 Text(type)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 // Progress Bar
                 GeometryReader { geo in
@@ -246,11 +256,11 @@ struct BalanceTypeCard: View {
                 
                 Text("of \(Int(total))")
                     .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(.secondary)
             }
         }
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 
@@ -265,7 +275,7 @@ struct UsageRow: View {
         HStack {
             Text(label)
                 .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(.secondary)
             
             Spacer()
             

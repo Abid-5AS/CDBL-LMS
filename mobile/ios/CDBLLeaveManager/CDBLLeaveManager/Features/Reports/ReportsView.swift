@@ -45,15 +45,15 @@ struct ReportsView: View {
         HStack {
             Text("Reports")
                 .font(.largeTitle.bold())
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Spacer()
             
             Button(action: {}) {
                 Image(systemName: "square.and.arrow.up")
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .padding(10)
-                    .glassEffect(in: Circle())
+                    .surfaceBackground(in: Circle())
             }
         }
         .padding(.horizontal)
@@ -85,7 +85,7 @@ struct ReportsView: View {
                 }
             }
         }
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 12))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
     }
     
@@ -132,7 +132,7 @@ struct ReportsView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Leave Type Breakdown")
                     .font(.headline)
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundStyle(.secondary)
                 
                 VStack(spacing: 8) {
                     LeaveTypeBar(type: "Earned Leave", count: 78, total: 156, color: .indigo)
@@ -142,7 +142,7 @@ struct ReportsView: View {
                 }
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
         }
     }
@@ -173,13 +173,13 @@ struct ReportsView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Leave Utilization by Team Member")
                     .font(.headline)
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundStyle(.secondary)
                 
                 ForEach(0..<5) { index in
                     HStack {
                         Text("Team Member \(index + 1)")
                             .font(.caption)
-                            .foregroundStyle(.white.opacity(0.7))
+                            .foregroundStyle(.secondary)
                             .frame(width: 100, alignment: .leading)
                         
                         GeometryReader { geo in
@@ -188,7 +188,7 @@ struct ReportsView: View {
                                     .fill(Color.white.opacity(0.1))
                                 
                                 RoundedRectangle(cornerRadius: 4)
-                                    .fill(Color.cyan)
+                                    .fill(Color.accentColor)
                                     .frame(width: geo.size.width * CGFloat.random(in: 0.3...0.9))
                             }
                         }
@@ -196,13 +196,13 @@ struct ReportsView: View {
                         
                         Text("\(Int.random(in: 30...90))%")
                             .font(.caption2)
-                            .foregroundStyle(.white.opacity(0.5))
+                            .foregroundStyle(.secondary)
                             .frame(width: 30)
                     }
                 }
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
         }
     }
@@ -215,25 +215,19 @@ struct ReportsView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Monthly Leave Trend")
                     .font(.headline)
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundStyle(.secondary)
                 
                 // Simple bar chart
                 HStack(alignment: .bottom, spacing: 8) {
                     ForEach(["J", "F", "M", "A", "M", "J"], id: \.self) { month in
                         VStack(spacing: 4) {
                             RoundedRectangle(cornerRadius: 4)
-                                .fill(
-                                    LinearGradient(
-                                        colors: [.cyan, .purple],
-                                        startPoint: .bottom,
-                                        endPoint: .top
-                                    )
-                                )
+                                .fill(Color(.tertiarySystemBackground))
                                 .frame(width: 30, height: CGFloat.random(in: 40...120))
                             
                             Text(month)
                                 .font(.caption2)
-                                .foregroundStyle(.white.opacity(0.5))
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }
@@ -241,21 +235,21 @@ struct ReportsView: View {
                 .frame(height: 160)
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
             
             // Key Insights
             VStack(alignment: .leading, spacing: 12) {
                 Text("Key Insights")
                     .font(.headline)
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundStyle(.secondary)
                 
                 InsightRow(icon: "arrow.up.right", text: "15% increase in leave requests vs last quarter", color: .green)
                 InsightRow(icon: "clock", text: "Average approval time improved to 4.2 hours", color: .cyan)
                 InsightRow(icon: "calendar", text: "Peak leave period: December holidays", color: .orange)
             }
             .padding()
-            .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+            .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
             .padding(.horizontal)
         }
     }
@@ -273,7 +267,7 @@ struct ReportCard: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.secondary)
             
             Text(value)
                 .font(.title)
@@ -282,11 +276,11 @@ struct ReportCard: View {
             
             Text(subtitle)
                 .font(.caption2)
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 
@@ -303,12 +297,12 @@ struct LeaveTypeBar: View {
             HStack {
                 Text(type)
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(.secondary)
                 Spacer()
                 Text("\(count)")
                     .font(.caption)
                     .fontWeight(.semibold)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
             }
             
             GeometryReader { geo in
@@ -341,7 +335,7 @@ struct InsightRow: View {
             
             Text(text)
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.8))
+                .foregroundStyle(.secondary)
         }
         .padding(.vertical, 4)
     }
@@ -349,7 +343,7 @@ struct InsightRow: View {
 
 #Preview {
     ZStack {
-        FluidBackground()
+        Color(.systemBackground).ignoresSafeArea()
         ReportsView()
     }
 }

@@ -15,7 +15,7 @@ struct EncashmentListView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 VStack(spacing: 0) {
                     // Header
@@ -63,15 +63,15 @@ struct EncashmentListView: View {
         HStack {
             Text("Encashment")
                 .font(.largeTitle.bold())
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
             
             Spacer()
             
             Button(action: { showRequestSheet = true }) {
                 Image(systemName: "plus")
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .padding(10)
-                    .glassEffect(in: Circle())
+                    .surfaceBackground(in: Circle())
             }
         }
         .padding(.horizontal)
@@ -87,7 +87,7 @@ struct EncashmentListView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Eligible Balance")
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(.secondary)
                     
                     Text("\(Int(eligibility.eligibleDays)) days")
                         .font(.title2)
@@ -100,12 +100,12 @@ struct EncashmentListView: View {
                 VStack(alignment: .trailing, spacing: 4) {
                     Text("Max Encashable")
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(.secondary)
                     
                     Text("\(Int(eligibility.maxEncashable)) days")
                         .font(.title2)
                         .fontWeight(.bold)
-                        .foregroundStyle(.cyan)
+                        .foregroundStyle(Color.accentColor)
                 }
             }
             
@@ -116,7 +116,7 @@ struct EncashmentListView: View {
                     
                     Text("Estimated Value")
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(.secondary)
                     
                     Spacer()
                     
@@ -130,7 +130,7 @@ struct EncashmentListView: View {
             }
         }
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
         .padding(.horizontal)
         .padding(.bottom, 16)
     }
@@ -178,7 +178,7 @@ struct EncashmentCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("\(encashment.days) Days")
                     .font(.headline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 Text(encashment.formattedAmount)
                     .font(.subheadline)
@@ -186,7 +186,7 @@ struct EncashmentCard: View {
                 
                 Text(encashment.formattedDate)
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(.secondary)
             }
             
             Spacer()
@@ -195,7 +195,7 @@ struct EncashmentCard: View {
             StatusBadge(encashment.status)
         }
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
     }
 }
 
@@ -212,7 +212,7 @@ struct RequestEncashmentView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FluidBackground()
+                Color(.systemBackground).ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 24) {
@@ -220,20 +220,20 @@ struct RequestEncashmentView: View {
                         VStack(spacing: 16) {
                             Text("\(Int(days)) Days")
                                 .font(.system(size: 48, weight: .bold))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(.primary)
                             
                             Slider(value: $days, in: 1...maxDays, step: 1)
-                                .tint(.cyan)
+                                .tint(.accentColor)
                                 .padding(.horizontal)
                         }
                         .padding()
-                        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 20))
+                        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
                         .padding(.horizontal)
                         
                         // Estimated Amount
                         HStack {
                             Text("Estimated Amount")
-                                .foregroundStyle(.white.opacity(0.7))
+                                .foregroundStyle(.secondary)
                             
                             Spacer()
                             
@@ -243,17 +243,17 @@ struct RequestEncashmentView: View {
                                 .foregroundStyle(.green)
                         }
                         .padding()
-                        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+                        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
                         .padding(.horizontal)
                         
                         // Info
                         HStack {
                             Image(systemName: "info.circle.fill")
-                                .foregroundStyle(.cyan)
+                                .foregroundStyle(Color.accentColor)
                             
                             Text("Encashment will be processed in the next payroll cycle.")
                                 .font(.caption)
-                                .foregroundStyle(.white.opacity(0.7))
+                                .foregroundStyle(.secondary)
                         }
                         .padding(.horizontal)
                         
@@ -270,7 +270,7 @@ struct RequestEncashmentView: View {
                             HStack {
                                 if isSubmitting {
                                     ProgressView()
-                                        .tint(.white)
+                                        .tint(.accentColor)
                                 } else {
                                     Image(systemName: "paperplane.fill")
                                     Text("Submit Request")
@@ -280,7 +280,7 @@ struct RequestEncashmentView: View {
                             .frame(maxWidth: .infinity)
                             .frame(height: 52)
                         }
-                        .buttonStyle(.glassProminent)
+                        .buttonStyle(.borderedProminent)
                         .tint(.green)
                         .disabled(isSubmitting)
                         .padding(.horizontal)
@@ -295,7 +295,7 @@ struct RequestEncashmentView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") { dismiss() }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 }
             }
         }

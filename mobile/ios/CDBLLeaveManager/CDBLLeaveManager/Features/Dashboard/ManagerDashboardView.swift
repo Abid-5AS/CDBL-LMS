@@ -6,9 +6,12 @@
 //
 
 import SwiftUI
+import Combine
 
 struct ManagerDashboardView: View {
     @StateObject private var viewModel = DashboardViewModel()
+    @State private var showApprovals = false
+    @State private var showTeam = false
     @EnvironmentObject private var appState: AppState
     
     var body: some View {
@@ -26,6 +29,12 @@ struct ManagerDashboardView: View {
         }
         .task {
             await viewModel.loadDashboard(for: .deptHead)
+        }
+        .sheet(isPresented: $showApprovals) {
+            ApprovalsListView()
+        }
+        .sheet(isPresented: $showTeam) {
+            TeamListView()
         }
     }
     
@@ -71,30 +80,24 @@ struct ManagerDashboardView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Pending Approvals")
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                     
                     Text("\(viewModel.pendingApprovalsCount) request(s) awaiting your review")
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(.secondary)
                 }
                 
                 Spacer()
                 
                 Image(systemName: "chevron.right")
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(.secondary)
             }
             .padding()
-            .background(
-                LinearGradient(
-                    colors: [Color.orange.opacity(0.2), Color.orange.opacity(0.1)],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-            )
+            .background(Color(.secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .strokeBorder(Color.orange.opacity(0.3), lineWidth: 1)
+                    .strokeBorder(Color(.separator), lineWidth: 1)
             )
         }
         .padding(.horizontal)
@@ -128,13 +131,13 @@ struct ManagerDashboardView: View {
             HStack {
                 Text("Recent Requests")
                     .font(.headline)
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundStyle(.secondary)
                 
                 Spacer()
                 
                 Button("View All") {}
                     .font(.caption)
-                    .foregroundStyle(.cyan)
+                    .foregroundStyle(Color.accentColor)
             }
             .padding(.horizontal)
             
@@ -143,11 +146,11 @@ struct ManagerDashboardView: View {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(.green)
                     Text("All caught up! No pending approvals.")
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(.secondary)
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
-                .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+                .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
                 .padding(.horizontal)
             } else {
                 VStack(spacing: 12) {
@@ -166,12 +169,16 @@ struct ManagerDashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Quick Actions")
                 .font(.headline)
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(.secondary)
                 .padding(.horizontal)
             
             HStack(spacing: 12) {
-                ActionButton(icon: "checkmark.circle.fill", title: "Approvals", color: .green)
-                ActionButton(icon: "person.3.fill", title: "Team", color: .blue)
+                ActionButton(icon: "checkmark.circle.fill", title: "Approvals", color: .green) {
+                    showApprovals = true
+                }
+                ActionButton(icon: "person.3.fill", title: "Team", color: .blue) {
+                    showTeam = true
+                }
             }
             .padding(.horizontal)
         }
@@ -187,18 +194,12 @@ struct ApprovalCard: View {
         HStack(spacing: 16) {
             // Avatar
             Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [.cyan.opacity(0.5), .purple.opacity(0.5)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(Color(.tertiarySystemBackground))
                 .frame(width: 44, height: 44)
                 .overlay(
                     Text(initials)
                         .font(.subheadline.bold())
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                 )
             
             // Details
@@ -206,7 +207,7 @@ struct ApprovalCard: View {
                 Text(approval.employeeName)
                     .font(.subheadline)
                     .fontWeight(.medium)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 
                 HStack(spacing: 8) {
                     Text(approval.leaveType.capitalized)
@@ -214,11 +215,11 @@ struct ApprovalCard: View {
                         .foregroundStyle(approval.typeColor)
                     
                     Text("•")
-                        .foregroundStyle(.white.opacity(0.4))
+                        .foregroundStyle(.secondary)
                     
                     Text(approval.formattedDateRange)
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(.secondary)
                 }
             }
             
@@ -229,11 +230,11 @@ struct ApprovalCard: View {
                 Text(approval.daysText)
                     .font(.caption)
                     .fontWeight(.semibold)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
             }
         }
         .padding()
-        .glassEffect(.frosted, in: RoundedRectangle(cornerRadius: 16))
+        .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 16))
     }
     
     private var initials: String {
@@ -247,7 +248,7 @@ struct ApprovalCard: View {
 
 #Preview {
     ZStack {
-        FluidBackground()
+        Color(.systemBackground).ignoresSafeArea()
         ManagerDashboardView()
             .environmentObject(AppState.shared)
     }
