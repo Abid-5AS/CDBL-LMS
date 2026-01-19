@@ -268,8 +268,8 @@ export type HRISSyncWhereInput = {
   recordsFailed?: Prisma.IntFilter<"HRISSync"> | number
   errors?: Prisma.JsonNullableFilter<"HRISSync">
   createdBy?: Prisma.IntFilter<"HRISSync"> | number
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   conflicts?: Prisma.HRISConflictListRelationFilter
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type HRISSyncOrderByWithRelationInput = {
@@ -283,8 +283,8 @@ export type HRISSyncOrderByWithRelationInput = {
   recordsFailed?: Prisma.SortOrder
   errors?: Prisma.SortOrderInput | Prisma.SortOrder
   createdBy?: Prisma.SortOrder
-  user?: Prisma.UserOrderByWithRelationInput
   conflicts?: Prisma.HRISConflictOrderByRelationAggregateInput
+  user?: Prisma.UserOrderByWithRelationInput
   _relevance?: Prisma.HRISSyncOrderByRelevanceInput
 }
 
@@ -302,8 +302,8 @@ export type HRISSyncWhereUniqueInput = Prisma.AtLeast<{
   recordsFailed?: Prisma.IntFilter<"HRISSync"> | number
   errors?: Prisma.JsonNullableFilter<"HRISSync">
   createdBy?: Prisma.IntFilter<"HRISSync"> | number
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   conflicts?: Prisma.HRISConflictListRelationFilter
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
 export type HRISSyncOrderByWithAggregationInput = {
@@ -349,8 +349,8 @@ export type HRISSyncCreateInput = {
   recordsSynced?: number
   recordsFailed?: number
   errors?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  user: Prisma.UserCreateNestedOneWithoutHrisSyncsInput
   conflicts?: Prisma.HRISConflictCreateNestedManyWithoutSyncInput
+  user: Prisma.UserCreateNestedOneWithoutHrisSyncsInput
 }
 
 export type HRISSyncUncheckedCreateInput = {
@@ -376,8 +376,8 @@ export type HRISSyncUpdateInput = {
   recordsSynced?: Prisma.IntFieldUpdateOperationsInput | number
   recordsFailed?: Prisma.IntFieldUpdateOperationsInput | number
   errors?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  user?: Prisma.UserUpdateOneRequiredWithoutHrisSyncsNestedInput
   conflicts?: Prisma.HRISConflictUpdateManyWithoutSyncNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutHrisSyncsNestedInput
 }
 
 export type HRISSyncUncheckedUpdateInput = {
@@ -785,8 +785,8 @@ export type HRISSyncSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   recordsFailed?: boolean
   errors?: boolean
   createdBy?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   conflicts?: boolean | Prisma.HRISSync$conflictsArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.HRISSyncCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["hRISSync"]>
 
@@ -807,16 +807,16 @@ export type HRISSyncSelectScalar = {
 
 export type HRISSyncOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "provider" | "status" | "startedAt" | "completedAt" | "recordsTotal" | "recordsSynced" | "recordsFailed" | "errors" | "createdBy", ExtArgs["result"]["hRISSync"]>
 export type HRISSyncInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   conflicts?: boolean | Prisma.HRISSync$conflictsArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.HRISSyncCountOutputTypeDefaultArgs<ExtArgs>
 }
 
 export type $HRISSyncPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "HRISSync"
   objects: {
-    user: Prisma.$UserPayload<ExtArgs>
     conflicts: Prisma.$HRISConflictPayload<ExtArgs>[]
+    user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1169,8 +1169,8 @@ readonly fields: HRISSyncFieldRefs;
  */
 export interface Prisma__HRISSyncClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   conflicts<T extends Prisma.HRISSync$conflictsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.HRISSync$conflictsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HRISConflictPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

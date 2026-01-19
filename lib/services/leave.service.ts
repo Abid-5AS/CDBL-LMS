@@ -27,6 +27,8 @@ export type CreateLeaveRequestDTO = {
   needsCertificate?: boolean;
   certificateFile?: File;
   incidentDate?: Date; // For Special Disability Leave - when the disabling incident occurred
+  isHalfDay?: boolean;
+  halfDayPeriod?: "AM" | "PM";
 };
 
 export type ServiceResult<T> = {
@@ -164,6 +166,8 @@ export class LeaveService {
             needsCertificate: dto.needsCertificate,
             incidentDate: dto.incidentDate,
             payCalculation: payCalculation,
+            isHalfDay: dto.isHalfDay ?? false,
+            halfDayPeriod: dto.halfDayPeriod,
           },
         });
 

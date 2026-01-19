@@ -9,6 +9,8 @@ import SwiftUI
 
 struct ReportsView: View {
     @State private var selectedReportType = 0
+    @State private var showExportSheet = false
+    @State private var exportURL: URL?
     
     private let reportTypes = ["Leave Summary", "Team Analytics", "Trends"]
     
@@ -37,6 +39,9 @@ struct ReportsView: View {
                 .padding(.top, 16)
             }
         }
+        .sheet(isPresented: $showExportSheet) {
+            ExportOptionsSheet(reportType: reportTypes[selectedReportType])
+        }
     }
     
     // MARK: - Header
@@ -49,7 +54,7 @@ struct ReportsView: View {
             
             Spacer()
             
-            Button(action: {}) {
+            Button(action: { showExportSheet = true }) {
                 Image(systemName: "square.and.arrow.up")
                     .foregroundStyle(.primary)
                     .padding(10)
@@ -339,6 +344,155 @@ struct InsightRow: View {
         }
         .padding(.vertical, 4)
     }
+}
+
+// MARK: - Export Options Sheet
+
+struct ExportOptionsSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let reportType: String
+    @State private var isExporting = false
+    @State private var showShareSheet = false
+    @State private var exportedFileURL: URL?
+    
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 24) {
+                // Export Format Options
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Export Format")
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                    
+                    Button(action: { exportAsCSV() }) {
+                        HStack {
+                            Image(systemName: "tablecells")
+                                .font(.title2)
+                                .foregroundStyle(.green)
+                                .frame(width: 40)
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("CSV File")
+                                    .font(.headline)
+                                    .foregroundStyle(.primary)
+                                Text("Spreadsheet compatible format")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            
+                            Spacer()
+                            
+                            if isExporting {
+                                ProgressView()
+                            } else {
+                                Image(systemName: "chevron.right")
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .padding()
+                        .background(Color(.tertiarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .disabled(isExporting)
+                    
+                    Button(action: { exportAsPDF() }) {
+                        HStack {
+                            Image(systemName: "doc.richtext")
+                                .font(.title2)
+                                .foregroundStyle(.red)
+                                .frame(width: 40)
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("PDF Report")
+                                    .font(.headline)
+                                    .foregroundStyle(.primary)
+                                Text("Print-ready document")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding()
+                        .background(Color(.tertiarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .disabled(isExporting)
+                }
+                .padding(.horizontal)
+                
+                Spacer()
+            }
+            .padding(.top, 24)
+            .navigationTitle("Export \(reportType)")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Cancel") { dismiss() }
+                }
+            }
+        }
+        .presentationDetents([.medium])
+        .sheet(isPresented: $showShareSheet) {
+            if let url = exportedFileURL {
+                ShareSheet(items: [url])
+            }
+        }
+    }
+    
+    private func exportAsCSV() {
+        isExporting = true
+        
+        // Create CSV content
+        let csvContent = """
+        Report Type,\(reportType)
+        Generated,\(Date().formatted())
+        
+        Leave Type,Count,Percentage
+        Earned Leave,78,50%
+        Casual Leave,45,29%
+        Medical Leave,28,18%
+        Other,5,3%
+        
+        Total Leaves,156
+        Approved,142
+        Pending,8
+        Rejected,6
+        """
+        
+        // Write to temp file
+        let fileName = "\(reportType.replacingOccurrences(of: " ", with: "_"))_Report.csv"
+        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+        
+        do {
+            try csvContent.write(to: tempURL, atomically: true, encoding: .utf8)
+            exportedFileURL = tempURL
+            isExporting = false
+            showShareSheet = true
+        } catch {
+            isExporting = false
+        }
+    }
+    
+    private func exportAsPDF() {
+        // Similar implementation for PDF
+        dismiss()
+    }
+}
+
+// MARK: - Share Sheet
+
+struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+    
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+    
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 #Preview {

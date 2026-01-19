@@ -25,7 +25,9 @@ data class ApplyLeaveRequest(
     val type: String,
     val startDate: String,
     val endDate: String,
-    val reason: String
+    val reason: String,
+    val isHalfDay: Boolean? = null,
+    val halfDayPeriod: String? = null  // "AM" or "PM"
 )
 
 data class CreateLeaveResponse(

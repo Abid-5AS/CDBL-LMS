@@ -292,18 +292,42 @@ fun LeaveHistoryCardNew(leave: com.cdbl.leavemanager.data.model.LeaveRequest, on
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Top
                 ) {
+                    // Map leave type to display name
+                    val displayType = when(leave.type.uppercase()) {
+                        "EARNED" -> "Earned Leave"
+                        "CASUAL" -> "Casual Leave"
+                        "MEDICAL" -> "Medical Leave"
+                        "MATERNITY" -> "Maternity Leave"
+                        "PATERNITY" -> "Paternity Leave"
+                        "EXTRAWITHPAY" -> "Extra Leave (Paid)"
+                        "EXTRAWITHOUTPAY" -> "Extra Leave (Unpaid)"
+                        "STUDY" -> "Study Leave"
+                        "SPECIAL" -> "Special Leave"
+                        "QUARANTINE" -> "Quarantine Leave"
+                        else -> leave.type
+                    }
                     Text(
-                        text = leave.type,
+                        text = displayType,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
+                    // Map status to display name (capitalized)
+                    val displayStatus = when(leave.status.uppercase()) {
+                        "PENDING" -> "Pending"
+                        "APPROVED" -> "Approved"
+                        "REJECTED" -> "Rejected"
+                        "RETURNED" -> "Returned"
+                        "CANCELLED" -> "Cancelled"
+                        "FORWARDED" -> "Forwarded"
+                        else -> leave.status.lowercase().replaceFirstChar { it.uppercase() }
+                    }
                     Surface(
                         color = statusBg,
                         shape = RoundedCornerShape(12.dp) // Pill shape
                     ) {
                         Text(
-                            text = leave.status,
+                            text = displayStatus,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,

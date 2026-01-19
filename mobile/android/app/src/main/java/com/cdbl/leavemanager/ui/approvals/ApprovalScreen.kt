@@ -299,6 +299,10 @@ fun ApprovalScreen(
                                 onReject = { 
                                     selectedAction = "reject" to item
                                     showDialog = true 
+                                },
+                                onForward = {
+                                    selectedAction = "forward" to item
+                                    showDialog = true
                                 }
                             )
                         }
@@ -415,7 +419,8 @@ private fun EmptyApprovalsView(filter: ApprovalFilter) {
 fun EnhancedApprovalCard(
     item: ApprovalItem,
     onApprove: () -> Unit,
-    onReject: () -> Unit
+    onReject: () -> Unit,
+    onForward: () -> Unit
 ) {
     val isUrgent = isUrgent(item)
     val leaveTypeColor = getLeaveTypeColor(item.type)
@@ -570,7 +575,7 @@ fun EnhancedApprovalCard(
             // Action Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedButton(
                     onClick = onReject,
@@ -579,9 +584,21 @@ fun EnhancedApprovalCard(
                     border = BorderStroke(1.dp, ErrorRed.copy(alpha = 0.5f)),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Icon(Icons.Rounded.Close, contentDescription = "Reject", modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Reject")
+                    Icon(Icons.Rounded.Close, contentDescription = "Reject", modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Reject", style = MaterialTheme.typography.labelMedium)
+                }
+                
+                OutlinedButton(
+                    onClick = onForward,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = WarningAmber),
+                    border = BorderStroke(1.dp, WarningAmber.copy(alpha = 0.5f)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(Icons.Rounded.Forward, contentDescription = "Forward", modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Forward", style = MaterialTheme.typography.labelMedium)
                 }
                 
                 Button(
@@ -590,9 +607,9 @@ fun EnhancedApprovalCard(
                     colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Icon(Icons.Rounded.Check, contentDescription = "Approve", modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Approve")
+                    Icon(Icons.Rounded.Check, contentDescription = "Approve", modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Approve", style = MaterialTheme.typography.labelMedium)
                 }
             }
         }

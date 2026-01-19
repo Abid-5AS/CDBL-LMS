@@ -29,6 +29,8 @@ const ApplySchema = z.object({
   workingDays: z.number().int().positive().optional(),
   needsCertificate: z.boolean().optional(),
   incidentDate: z.string().optional(), // For Special Disability Leave - when the disabling incident occurred
+  isHalfDay: z.boolean().optional(),
+  halfDayPeriod: z.enum(["AM", "PM"]).optional(), // Required when isHalfDay is true
 });
 
 /**
@@ -107,7 +109,7 @@ export async function GET(req: Request) {
     console.log("[GET /api/leaves] Getting current user...");
     const me = await getCurrentUser();
     console.log("[GET /api/leaves] User:", me?.id);
-    
+
     if (!me) return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
 
     const url = new URL(req.url);
@@ -133,11 +135,11 @@ export async function GET(req: Request) {
         cursor,
       });
     }
-    
+
     // Calculate nextCursor
     const nextCursor = items.length === limit ? items[items.length - 1].id : undefined;
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       items,
       nextCursor
     });
@@ -318,6 +320,8 @@ export async function POST(req: Request) {
       needsCertificate: parsedInput.needsCertificate,
       certificateFile,
       incidentDate: parsedInput.incidentDate ? new Date(parsedInput.incidentDate) : undefined,
+      isHalfDay: parsedInput.isHalfDay,
+      halfDayPeriod: parsedInput.halfDayPeriod,
     });
 
     if (!result.success) {

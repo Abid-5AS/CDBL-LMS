@@ -46,9 +46,9 @@ export type ApprovalDelegationMinAggregateOutputType = {
   endDate: Date | null
   isActive: boolean | null
   reason: string | null
-  isPermanent: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
+  isPermanent: boolean | null
 }
 
 export type ApprovalDelegationMaxAggregateOutputType = {
@@ -59,9 +59,9 @@ export type ApprovalDelegationMaxAggregateOutputType = {
   endDate: Date | null
   isActive: boolean | null
   reason: string | null
-  isPermanent: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
+  isPermanent: boolean | null
 }
 
 export type ApprovalDelegationCountAggregateOutputType = {
@@ -72,10 +72,10 @@ export type ApprovalDelegationCountAggregateOutputType = {
   endDate: number
   isActive: number
   reason: number
-  leaveTypes: number
-  isPermanent: number
   createdAt: number
   updatedAt: number
+  isPermanent: number
+  leaveTypes: number
   _all: number
 }
 
@@ -100,9 +100,9 @@ export type ApprovalDelegationMinAggregateInputType = {
   endDate?: true
   isActive?: true
   reason?: true
-  isPermanent?: true
   createdAt?: true
   updatedAt?: true
+  isPermanent?: true
 }
 
 export type ApprovalDelegationMaxAggregateInputType = {
@@ -113,9 +113,9 @@ export type ApprovalDelegationMaxAggregateInputType = {
   endDate?: true
   isActive?: true
   reason?: true
-  isPermanent?: true
   createdAt?: true
   updatedAt?: true
+  isPermanent?: true
 }
 
 export type ApprovalDelegationCountAggregateInputType = {
@@ -126,10 +126,10 @@ export type ApprovalDelegationCountAggregateInputType = {
   endDate?: true
   isActive?: true
   reason?: true
-  leaveTypes?: true
-  isPermanent?: true
   createdAt?: true
   updatedAt?: true
+  isPermanent?: true
+  leaveTypes?: true
   _all?: true
 }
 
@@ -227,10 +227,10 @@ export type ApprovalDelegationGroupByOutputType = {
   endDate: Date
   isActive: boolean
   reason: string | null
-  leaveTypes: runtime.JsonValue | null
-  isPermanent: boolean
   createdAt: Date
   updatedAt: Date
+  isPermanent: boolean
+  leaveTypes: runtime.JsonValue | null
   _count: ApprovalDelegationCountAggregateOutputType | null
   _avg: ApprovalDelegationAvgAggregateOutputType | null
   _sum: ApprovalDelegationSumAggregateOutputType | null
@@ -264,12 +264,12 @@ export type ApprovalDelegationWhereInput = {
   endDate?: Prisma.DateTimeFilter<"ApprovalDelegation"> | Date | string
   isActive?: Prisma.BoolFilter<"ApprovalDelegation"> | boolean
   reason?: Prisma.StringNullableFilter<"ApprovalDelegation"> | string | null
-  leaveTypes?: Prisma.JsonNullableFilter<"ApprovalDelegation">
-  isPermanent?: Prisma.BoolFilter<"ApprovalDelegation"> | boolean
   createdAt?: Prisma.DateTimeFilter<"ApprovalDelegation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ApprovalDelegation"> | Date | string
-  delegator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  isPermanent?: Prisma.BoolFilter<"ApprovalDelegation"> | boolean
+  leaveTypes?: Prisma.JsonNullableFilter<"ApprovalDelegation">
   delegate?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  delegator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type ApprovalDelegationOrderByWithRelationInput = {
@@ -280,12 +280,12 @@ export type ApprovalDelegationOrderByWithRelationInput = {
   endDate?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   reason?: Prisma.SortOrderInput | Prisma.SortOrder
-  leaveTypes?: Prisma.SortOrderInput | Prisma.SortOrder
-  isPermanent?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  delegator?: Prisma.UserOrderByWithRelationInput
+  isPermanent?: Prisma.SortOrder
+  leaveTypes?: Prisma.SortOrderInput | Prisma.SortOrder
   delegate?: Prisma.UserOrderByWithRelationInput
+  delegator?: Prisma.UserOrderByWithRelationInput
   _relevance?: Prisma.ApprovalDelegationOrderByRelevanceInput
 }
 
@@ -300,12 +300,12 @@ export type ApprovalDelegationWhereUniqueInput = Prisma.AtLeast<{
   endDate?: Prisma.DateTimeFilter<"ApprovalDelegation"> | Date | string
   isActive?: Prisma.BoolFilter<"ApprovalDelegation"> | boolean
   reason?: Prisma.StringNullableFilter<"ApprovalDelegation"> | string | null
-  leaveTypes?: Prisma.JsonNullableFilter<"ApprovalDelegation">
-  isPermanent?: Prisma.BoolFilter<"ApprovalDelegation"> | boolean
   createdAt?: Prisma.DateTimeFilter<"ApprovalDelegation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ApprovalDelegation"> | Date | string
-  delegator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  isPermanent?: Prisma.BoolFilter<"ApprovalDelegation"> | boolean
+  leaveTypes?: Prisma.JsonNullableFilter<"ApprovalDelegation">
   delegate?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  delegator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
 export type ApprovalDelegationOrderByWithAggregationInput = {
@@ -316,10 +316,10 @@ export type ApprovalDelegationOrderByWithAggregationInput = {
   endDate?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   reason?: Prisma.SortOrderInput | Prisma.SortOrder
-  leaveTypes?: Prisma.SortOrderInput | Prisma.SortOrder
-  isPermanent?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isPermanent?: Prisma.SortOrder
+  leaveTypes?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ApprovalDelegationCountOrderByAggregateInput
   _avg?: Prisma.ApprovalDelegationAvgOrderByAggregateInput
   _max?: Prisma.ApprovalDelegationMaxOrderByAggregateInput
@@ -338,10 +338,10 @@ export type ApprovalDelegationScalarWhereWithAggregatesInput = {
   endDate?: Prisma.DateTimeWithAggregatesFilter<"ApprovalDelegation"> | Date | string
   isActive?: Prisma.BoolWithAggregatesFilter<"ApprovalDelegation"> | boolean
   reason?: Prisma.StringNullableWithAggregatesFilter<"ApprovalDelegation"> | string | null
-  leaveTypes?: Prisma.JsonNullableWithAggregatesFilter<"ApprovalDelegation">
-  isPermanent?: Prisma.BoolWithAggregatesFilter<"ApprovalDelegation"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ApprovalDelegation"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ApprovalDelegation"> | Date | string
+  isPermanent?: Prisma.BoolWithAggregatesFilter<"ApprovalDelegation"> | boolean
+  leaveTypes?: Prisma.JsonNullableWithAggregatesFilter<"ApprovalDelegation">
 }
 
 export type ApprovalDelegationCreateInput = {
@@ -349,12 +349,12 @@ export type ApprovalDelegationCreateInput = {
   endDate: Date | string
   isActive?: boolean
   reason?: string | null
-  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  delegator: Prisma.UserCreateNestedOneWithoutDelegationsDelegatedInput
+  isPermanent?: boolean
+  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   delegate: Prisma.UserCreateNestedOneWithoutDelegationsReceivedInput
+  delegator: Prisma.UserCreateNestedOneWithoutDelegationsDelegatedInput
 }
 
 export type ApprovalDelegationUncheckedCreateInput = {
@@ -365,10 +365,10 @@ export type ApprovalDelegationUncheckedCreateInput = {
   endDate: Date | string
   isActive?: boolean
   reason?: string | null
-  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isPermanent?: boolean
+  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ApprovalDelegationUpdateInput = {
@@ -376,12 +376,12 @@ export type ApprovalDelegationUpdateInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  delegator?: Prisma.UserUpdateOneRequiredWithoutDelegationsDelegatedNestedInput
+  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   delegate?: Prisma.UserUpdateOneRequiredWithoutDelegationsReceivedNestedInput
+  delegator?: Prisma.UserUpdateOneRequiredWithoutDelegationsDelegatedNestedInput
 }
 
 export type ApprovalDelegationUncheckedUpdateInput = {
@@ -392,10 +392,10 @@ export type ApprovalDelegationUncheckedUpdateInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ApprovalDelegationCreateManyInput = {
@@ -406,10 +406,10 @@ export type ApprovalDelegationCreateManyInput = {
   endDate: Date | string
   isActive?: boolean
   reason?: string | null
-  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isPermanent?: boolean
+  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ApprovalDelegationUpdateManyMutationInput = {
@@ -417,10 +417,10 @@ export type ApprovalDelegationUpdateManyMutationInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ApprovalDelegationUncheckedUpdateManyInput = {
@@ -431,10 +431,10 @@ export type ApprovalDelegationUncheckedUpdateManyInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ApprovalDelegationListRelationFilter = {
@@ -461,10 +461,10 @@ export type ApprovalDelegationCountOrderByAggregateInput = {
   endDate?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   reason?: Prisma.SortOrder
-  leaveTypes?: Prisma.SortOrder
-  isPermanent?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isPermanent?: Prisma.SortOrder
+  leaveTypes?: Prisma.SortOrder
 }
 
 export type ApprovalDelegationAvgOrderByAggregateInput = {
@@ -481,9 +481,9 @@ export type ApprovalDelegationMaxOrderByAggregateInput = {
   endDate?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   reason?: Prisma.SortOrder
-  isPermanent?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isPermanent?: Prisma.SortOrder
 }
 
 export type ApprovalDelegationMinOrderByAggregateInput = {
@@ -494,22 +494,15 @@ export type ApprovalDelegationMinOrderByAggregateInput = {
   endDate?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   reason?: Prisma.SortOrder
-  isPermanent?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isPermanent?: Prisma.SortOrder
 }
 
 export type ApprovalDelegationSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   delegatorId?: Prisma.SortOrder
   delegateId?: Prisma.SortOrder
-}
-
-export type ApprovalDelegationCreateNestedManyWithoutDelegatorInput = {
-  create?: Prisma.XOR<Prisma.ApprovalDelegationCreateWithoutDelegatorInput, Prisma.ApprovalDelegationUncheckedCreateWithoutDelegatorInput> | Prisma.ApprovalDelegationCreateWithoutDelegatorInput[] | Prisma.ApprovalDelegationUncheckedCreateWithoutDelegatorInput[]
-  connectOrCreate?: Prisma.ApprovalDelegationCreateOrConnectWithoutDelegatorInput | Prisma.ApprovalDelegationCreateOrConnectWithoutDelegatorInput[]
-  createMany?: Prisma.ApprovalDelegationCreateManyDelegatorInputEnvelope
-  connect?: Prisma.ApprovalDelegationWhereUniqueInput | Prisma.ApprovalDelegationWhereUniqueInput[]
 }
 
 export type ApprovalDelegationCreateNestedManyWithoutDelegateInput = {
@@ -519,7 +512,7 @@ export type ApprovalDelegationCreateNestedManyWithoutDelegateInput = {
   connect?: Prisma.ApprovalDelegationWhereUniqueInput | Prisma.ApprovalDelegationWhereUniqueInput[]
 }
 
-export type ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput = {
+export type ApprovalDelegationCreateNestedManyWithoutDelegatorInput = {
   create?: Prisma.XOR<Prisma.ApprovalDelegationCreateWithoutDelegatorInput, Prisma.ApprovalDelegationUncheckedCreateWithoutDelegatorInput> | Prisma.ApprovalDelegationCreateWithoutDelegatorInput[] | Prisma.ApprovalDelegationUncheckedCreateWithoutDelegatorInput[]
   connectOrCreate?: Prisma.ApprovalDelegationCreateOrConnectWithoutDelegatorInput | Prisma.ApprovalDelegationCreateOrConnectWithoutDelegatorInput[]
   createMany?: Prisma.ApprovalDelegationCreateManyDelegatorInputEnvelope
@@ -533,18 +526,11 @@ export type ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput = {
   connect?: Prisma.ApprovalDelegationWhereUniqueInput | Prisma.ApprovalDelegationWhereUniqueInput[]
 }
 
-export type ApprovalDelegationUpdateManyWithoutDelegatorNestedInput = {
+export type ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput = {
   create?: Prisma.XOR<Prisma.ApprovalDelegationCreateWithoutDelegatorInput, Prisma.ApprovalDelegationUncheckedCreateWithoutDelegatorInput> | Prisma.ApprovalDelegationCreateWithoutDelegatorInput[] | Prisma.ApprovalDelegationUncheckedCreateWithoutDelegatorInput[]
   connectOrCreate?: Prisma.ApprovalDelegationCreateOrConnectWithoutDelegatorInput | Prisma.ApprovalDelegationCreateOrConnectWithoutDelegatorInput[]
-  upsert?: Prisma.ApprovalDelegationUpsertWithWhereUniqueWithoutDelegatorInput | Prisma.ApprovalDelegationUpsertWithWhereUniqueWithoutDelegatorInput[]
   createMany?: Prisma.ApprovalDelegationCreateManyDelegatorInputEnvelope
-  set?: Prisma.ApprovalDelegationWhereUniqueInput | Prisma.ApprovalDelegationWhereUniqueInput[]
-  disconnect?: Prisma.ApprovalDelegationWhereUniqueInput | Prisma.ApprovalDelegationWhereUniqueInput[]
-  delete?: Prisma.ApprovalDelegationWhereUniqueInput | Prisma.ApprovalDelegationWhereUniqueInput[]
   connect?: Prisma.ApprovalDelegationWhereUniqueInput | Prisma.ApprovalDelegationWhereUniqueInput[]
-  update?: Prisma.ApprovalDelegationUpdateWithWhereUniqueWithoutDelegatorInput | Prisma.ApprovalDelegationUpdateWithWhereUniqueWithoutDelegatorInput[]
-  updateMany?: Prisma.ApprovalDelegationUpdateManyWithWhereWithoutDelegatorInput | Prisma.ApprovalDelegationUpdateManyWithWhereWithoutDelegatorInput[]
-  deleteMany?: Prisma.ApprovalDelegationScalarWhereInput | Prisma.ApprovalDelegationScalarWhereInput[]
 }
 
 export type ApprovalDelegationUpdateManyWithoutDelegateNestedInput = {
@@ -561,7 +547,7 @@ export type ApprovalDelegationUpdateManyWithoutDelegateNestedInput = {
   deleteMany?: Prisma.ApprovalDelegationScalarWhereInput | Prisma.ApprovalDelegationScalarWhereInput[]
 }
 
-export type ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput = {
+export type ApprovalDelegationUpdateManyWithoutDelegatorNestedInput = {
   create?: Prisma.XOR<Prisma.ApprovalDelegationCreateWithoutDelegatorInput, Prisma.ApprovalDelegationUncheckedCreateWithoutDelegatorInput> | Prisma.ApprovalDelegationCreateWithoutDelegatorInput[] | Prisma.ApprovalDelegationUncheckedCreateWithoutDelegatorInput[]
   connectOrCreate?: Prisma.ApprovalDelegationCreateOrConnectWithoutDelegatorInput | Prisma.ApprovalDelegationCreateOrConnectWithoutDelegatorInput[]
   upsert?: Prisma.ApprovalDelegationUpsertWithWhereUniqueWithoutDelegatorInput | Prisma.ApprovalDelegationUpsertWithWhereUniqueWithoutDelegatorInput[]
@@ -589,39 +575,18 @@ export type ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput = {
   deleteMany?: Prisma.ApprovalDelegationScalarWhereInput | Prisma.ApprovalDelegationScalarWhereInput[]
 }
 
-export type ApprovalDelegationCreateWithoutDelegatorInput = {
-  startDate: Date | string
-  endDate: Date | string
-  isActive?: boolean
-  reason?: string | null
-  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  delegate: Prisma.UserCreateNestedOneWithoutDelegationsReceivedInput
-}
-
-export type ApprovalDelegationUncheckedCreateWithoutDelegatorInput = {
-  id?: number
-  delegateId: number
-  startDate: Date | string
-  endDate: Date | string
-  isActive?: boolean
-  reason?: string | null
-  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type ApprovalDelegationCreateOrConnectWithoutDelegatorInput = {
-  where: Prisma.ApprovalDelegationWhereUniqueInput
-  create: Prisma.XOR<Prisma.ApprovalDelegationCreateWithoutDelegatorInput, Prisma.ApprovalDelegationUncheckedCreateWithoutDelegatorInput>
-}
-
-export type ApprovalDelegationCreateManyDelegatorInputEnvelope = {
-  data: Prisma.ApprovalDelegationCreateManyDelegatorInput | Prisma.ApprovalDelegationCreateManyDelegatorInput[]
-  skipDuplicates?: boolean
+export type ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput = {
+  create?: Prisma.XOR<Prisma.ApprovalDelegationCreateWithoutDelegatorInput, Prisma.ApprovalDelegationUncheckedCreateWithoutDelegatorInput> | Prisma.ApprovalDelegationCreateWithoutDelegatorInput[] | Prisma.ApprovalDelegationUncheckedCreateWithoutDelegatorInput[]
+  connectOrCreate?: Prisma.ApprovalDelegationCreateOrConnectWithoutDelegatorInput | Prisma.ApprovalDelegationCreateOrConnectWithoutDelegatorInput[]
+  upsert?: Prisma.ApprovalDelegationUpsertWithWhereUniqueWithoutDelegatorInput | Prisma.ApprovalDelegationUpsertWithWhereUniqueWithoutDelegatorInput[]
+  createMany?: Prisma.ApprovalDelegationCreateManyDelegatorInputEnvelope
+  set?: Prisma.ApprovalDelegationWhereUniqueInput | Prisma.ApprovalDelegationWhereUniqueInput[]
+  disconnect?: Prisma.ApprovalDelegationWhereUniqueInput | Prisma.ApprovalDelegationWhereUniqueInput[]
+  delete?: Prisma.ApprovalDelegationWhereUniqueInput | Prisma.ApprovalDelegationWhereUniqueInput[]
+  connect?: Prisma.ApprovalDelegationWhereUniqueInput | Prisma.ApprovalDelegationWhereUniqueInput[]
+  update?: Prisma.ApprovalDelegationUpdateWithWhereUniqueWithoutDelegatorInput | Prisma.ApprovalDelegationUpdateWithWhereUniqueWithoutDelegatorInput[]
+  updateMany?: Prisma.ApprovalDelegationUpdateManyWithWhereWithoutDelegatorInput | Prisma.ApprovalDelegationUpdateManyWithWhereWithoutDelegatorInput[]
+  deleteMany?: Prisma.ApprovalDelegationScalarWhereInput | Prisma.ApprovalDelegationScalarWhereInput[]
 }
 
 export type ApprovalDelegationCreateWithoutDelegateInput = {
@@ -629,10 +594,10 @@ export type ApprovalDelegationCreateWithoutDelegateInput = {
   endDate: Date | string
   isActive?: boolean
   reason?: string | null
-  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isPermanent?: boolean
+  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   delegator: Prisma.UserCreateNestedOneWithoutDelegationsDelegatedInput
 }
 
@@ -643,10 +608,10 @@ export type ApprovalDelegationUncheckedCreateWithoutDelegateInput = {
   endDate: Date | string
   isActive?: boolean
   reason?: string | null
-  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isPermanent?: boolean
+  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ApprovalDelegationCreateOrConnectWithoutDelegateInput = {
@@ -659,37 +624,39 @@ export type ApprovalDelegationCreateManyDelegateInputEnvelope = {
   skipDuplicates?: boolean
 }
 
-export type ApprovalDelegationUpsertWithWhereUniqueWithoutDelegatorInput = {
+export type ApprovalDelegationCreateWithoutDelegatorInput = {
+  startDate: Date | string
+  endDate: Date | string
+  isActive?: boolean
+  reason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isPermanent?: boolean
+  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  delegate: Prisma.UserCreateNestedOneWithoutDelegationsReceivedInput
+}
+
+export type ApprovalDelegationUncheckedCreateWithoutDelegatorInput = {
+  id?: number
+  delegateId: number
+  startDate: Date | string
+  endDate: Date | string
+  isActive?: boolean
+  reason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isPermanent?: boolean
+  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+}
+
+export type ApprovalDelegationCreateOrConnectWithoutDelegatorInput = {
   where: Prisma.ApprovalDelegationWhereUniqueInput
-  update: Prisma.XOR<Prisma.ApprovalDelegationUpdateWithoutDelegatorInput, Prisma.ApprovalDelegationUncheckedUpdateWithoutDelegatorInput>
   create: Prisma.XOR<Prisma.ApprovalDelegationCreateWithoutDelegatorInput, Prisma.ApprovalDelegationUncheckedCreateWithoutDelegatorInput>
 }
 
-export type ApprovalDelegationUpdateWithWhereUniqueWithoutDelegatorInput = {
-  where: Prisma.ApprovalDelegationWhereUniqueInput
-  data: Prisma.XOR<Prisma.ApprovalDelegationUpdateWithoutDelegatorInput, Prisma.ApprovalDelegationUncheckedUpdateWithoutDelegatorInput>
-}
-
-export type ApprovalDelegationUpdateManyWithWhereWithoutDelegatorInput = {
-  where: Prisma.ApprovalDelegationScalarWhereInput
-  data: Prisma.XOR<Prisma.ApprovalDelegationUpdateManyMutationInput, Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorInput>
-}
-
-export type ApprovalDelegationScalarWhereInput = {
-  AND?: Prisma.ApprovalDelegationScalarWhereInput | Prisma.ApprovalDelegationScalarWhereInput[]
-  OR?: Prisma.ApprovalDelegationScalarWhereInput[]
-  NOT?: Prisma.ApprovalDelegationScalarWhereInput | Prisma.ApprovalDelegationScalarWhereInput[]
-  id?: Prisma.IntFilter<"ApprovalDelegation"> | number
-  delegatorId?: Prisma.IntFilter<"ApprovalDelegation"> | number
-  delegateId?: Prisma.IntFilter<"ApprovalDelegation"> | number
-  startDate?: Prisma.DateTimeFilter<"ApprovalDelegation"> | Date | string
-  endDate?: Prisma.DateTimeFilter<"ApprovalDelegation"> | Date | string
-  isActive?: Prisma.BoolFilter<"ApprovalDelegation"> | boolean
-  reason?: Prisma.StringNullableFilter<"ApprovalDelegation"> | string | null
-  leaveTypes?: Prisma.JsonNullableFilter<"ApprovalDelegation">
-  isPermanent?: Prisma.BoolFilter<"ApprovalDelegation"> | boolean
-  createdAt?: Prisma.DateTimeFilter<"ApprovalDelegation"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"ApprovalDelegation"> | Date | string
+export type ApprovalDelegationCreateManyDelegatorInputEnvelope = {
+  data: Prisma.ApprovalDelegationCreateManyDelegatorInput | Prisma.ApprovalDelegationCreateManyDelegatorInput[]
+  skipDuplicates?: boolean
 }
 
 export type ApprovalDelegationUpsertWithWhereUniqueWithoutDelegateInput = {
@@ -708,17 +675,37 @@ export type ApprovalDelegationUpdateManyWithWhereWithoutDelegateInput = {
   data: Prisma.XOR<Prisma.ApprovalDelegationUpdateManyMutationInput, Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateInput>
 }
 
-export type ApprovalDelegationCreateManyDelegatorInput = {
-  id?: number
-  delegateId: number
-  startDate: Date | string
-  endDate: Date | string
-  isActive?: boolean
-  reason?: string | null
-  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: boolean
-  createdAt?: Date | string
-  updatedAt?: Date | string
+export type ApprovalDelegationScalarWhereInput = {
+  AND?: Prisma.ApprovalDelegationScalarWhereInput | Prisma.ApprovalDelegationScalarWhereInput[]
+  OR?: Prisma.ApprovalDelegationScalarWhereInput[]
+  NOT?: Prisma.ApprovalDelegationScalarWhereInput | Prisma.ApprovalDelegationScalarWhereInput[]
+  id?: Prisma.IntFilter<"ApprovalDelegation"> | number
+  delegatorId?: Prisma.IntFilter<"ApprovalDelegation"> | number
+  delegateId?: Prisma.IntFilter<"ApprovalDelegation"> | number
+  startDate?: Prisma.DateTimeFilter<"ApprovalDelegation"> | Date | string
+  endDate?: Prisma.DateTimeFilter<"ApprovalDelegation"> | Date | string
+  isActive?: Prisma.BoolFilter<"ApprovalDelegation"> | boolean
+  reason?: Prisma.StringNullableFilter<"ApprovalDelegation"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"ApprovalDelegation"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ApprovalDelegation"> | Date | string
+  isPermanent?: Prisma.BoolFilter<"ApprovalDelegation"> | boolean
+  leaveTypes?: Prisma.JsonNullableFilter<"ApprovalDelegation">
+}
+
+export type ApprovalDelegationUpsertWithWhereUniqueWithoutDelegatorInput = {
+  where: Prisma.ApprovalDelegationWhereUniqueInput
+  update: Prisma.XOR<Prisma.ApprovalDelegationUpdateWithoutDelegatorInput, Prisma.ApprovalDelegationUncheckedUpdateWithoutDelegatorInput>
+  create: Prisma.XOR<Prisma.ApprovalDelegationCreateWithoutDelegatorInput, Prisma.ApprovalDelegationUncheckedCreateWithoutDelegatorInput>
+}
+
+export type ApprovalDelegationUpdateWithWhereUniqueWithoutDelegatorInput = {
+  where: Prisma.ApprovalDelegationWhereUniqueInput
+  data: Prisma.XOR<Prisma.ApprovalDelegationUpdateWithoutDelegatorInput, Prisma.ApprovalDelegationUncheckedUpdateWithoutDelegatorInput>
+}
+
+export type ApprovalDelegationUpdateManyWithWhereWithoutDelegatorInput = {
+  where: Prisma.ApprovalDelegationScalarWhereInput
+  data: Prisma.XOR<Prisma.ApprovalDelegationUpdateManyMutationInput, Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorInput>
 }
 
 export type ApprovalDelegationCreateManyDelegateInput = {
@@ -728,48 +715,23 @@ export type ApprovalDelegationCreateManyDelegateInput = {
   endDate: Date | string
   isActive?: boolean
   reason?: string | null
-  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isPermanent?: boolean
+  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
-export type ApprovalDelegationUpdateWithoutDelegatorInput = {
-  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+export type ApprovalDelegationCreateManyDelegatorInput = {
+  id?: number
+  delegateId: number
+  startDate: Date | string
+  endDate: Date | string
+  isActive?: boolean
+  reason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isPermanent?: boolean
   leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  delegate?: Prisma.UserUpdateOneRequiredWithoutDelegationsReceivedNestedInput
-}
-
-export type ApprovalDelegationUncheckedUpdateWithoutDelegatorInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  delegateId?: Prisma.IntFieldUpdateOperationsInput | number
-  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type ApprovalDelegationUncheckedUpdateManyWithoutDelegatorInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  delegateId?: Prisma.IntFieldUpdateOperationsInput | number
-  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ApprovalDelegationUpdateWithoutDelegateInput = {
@@ -777,10 +739,10 @@ export type ApprovalDelegationUpdateWithoutDelegateInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   delegator?: Prisma.UserUpdateOneRequiredWithoutDelegationsDelegatedNestedInput
 }
 
@@ -791,10 +753,10 @@ export type ApprovalDelegationUncheckedUpdateWithoutDelegateInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type ApprovalDelegationUncheckedUpdateManyWithoutDelegateInput = {
@@ -804,10 +766,48 @@ export type ApprovalDelegationUncheckedUpdateManyWithoutDelegateInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+}
+
+export type ApprovalDelegationUpdateWithoutDelegatorInput = {
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  delegate?: Prisma.UserUpdateOneRequiredWithoutDelegationsReceivedNestedInput
+}
+
+export type ApprovalDelegationUncheckedUpdateWithoutDelegatorInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  delegateId?: Prisma.IntFieldUpdateOperationsInput | number
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+}
+
+export type ApprovalDelegationUncheckedUpdateManyWithoutDelegatorInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  delegateId?: Prisma.IntFieldUpdateOperationsInput | number
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isPermanent?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  leaveTypes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 
@@ -820,12 +820,12 @@ export type ApprovalDelegationSelect<ExtArgs extends runtime.Types.Extensions.In
   endDate?: boolean
   isActive?: boolean
   reason?: boolean
-  leaveTypes?: boolean
-  isPermanent?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  delegator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  isPermanent?: boolean
+  leaveTypes?: boolean
   delegate?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  delegator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["approvalDelegation"]>
 
 
@@ -838,23 +838,23 @@ export type ApprovalDelegationSelectScalar = {
   endDate?: boolean
   isActive?: boolean
   reason?: boolean
-  leaveTypes?: boolean
-  isPermanent?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isPermanent?: boolean
+  leaveTypes?: boolean
 }
 
-export type ApprovalDelegationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "delegatorId" | "delegateId" | "startDate" | "endDate" | "isActive" | "reason" | "leaveTypes" | "isPermanent" | "createdAt" | "updatedAt", ExtArgs["result"]["approvalDelegation"]>
+export type ApprovalDelegationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "delegatorId" | "delegateId" | "startDate" | "endDate" | "isActive" | "reason" | "createdAt" | "updatedAt" | "isPermanent" | "leaveTypes", ExtArgs["result"]["approvalDelegation"]>
 export type ApprovalDelegationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  delegator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   delegate?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  delegator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $ApprovalDelegationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ApprovalDelegation"
   objects: {
-    delegator: Prisma.$UserPayload<ExtArgs>
     delegate: Prisma.$UserPayload<ExtArgs>
+    delegator: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -864,10 +864,10 @@ export type $ApprovalDelegationPayload<ExtArgs extends runtime.Types.Extensions.
     endDate: Date
     isActive: boolean
     reason: string | null
-    leaveTypes: runtime.JsonValue | null
-    isPermanent: boolean
     createdAt: Date
     updatedAt: Date
+    isPermanent: boolean
+    leaveTypes: runtime.JsonValue | null
   }, ExtArgs["result"]["approvalDelegation"]>
   composites: {}
 }
@@ -1208,8 +1208,8 @@ readonly fields: ApprovalDelegationFieldRefs;
  */
 export interface Prisma__ApprovalDelegationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  delegator<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   delegate<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  delegator<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1246,10 +1246,10 @@ export interface ApprovalDelegationFieldRefs {
   readonly endDate: Prisma.FieldRef<"ApprovalDelegation", 'DateTime'>
   readonly isActive: Prisma.FieldRef<"ApprovalDelegation", 'Boolean'>
   readonly reason: Prisma.FieldRef<"ApprovalDelegation", 'String'>
-  readonly leaveTypes: Prisma.FieldRef<"ApprovalDelegation", 'Json'>
-  readonly isPermanent: Prisma.FieldRef<"ApprovalDelegation", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"ApprovalDelegation", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ApprovalDelegation", 'DateTime'>
+  readonly isPermanent: Prisma.FieldRef<"ApprovalDelegation", 'Boolean'>
+  readonly leaveTypes: Prisma.FieldRef<"ApprovalDelegation", 'Json'>
 }
     
 

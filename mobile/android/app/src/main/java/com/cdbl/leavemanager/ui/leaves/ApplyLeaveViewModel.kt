@@ -156,10 +156,17 @@ class ApplyLeaveViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(leavePolicies = defaults)
     }
 
-    fun submitLeave(token: String, type: String, startDate: String, endDate: String, reason: String, attachmentUri: Uri? = null) {
+    fun submitLeave(token: String, type: String, startDate: String, endDate: String, reason: String, attachmentUri: Uri? = null, isHalfDay: Boolean = false, halfDayPeriod: String? = null) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
-            val request = ApplyLeaveRequest(type, startDate, endDate, reason)
+            val request = ApplyLeaveRequest(
+                type = type,
+                startDate = startDate,
+                endDate = endDate,
+                reason = reason,
+                isHalfDay = if (isHalfDay) true else null,
+                halfDayPeriod = if (isHalfDay) halfDayPeriod else null
+            )
             
             val file = attachmentUri?.let { uri ->
                 getFileFromUri(uri)

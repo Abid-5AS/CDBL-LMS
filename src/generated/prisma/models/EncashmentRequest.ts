@@ -58,14 +58,14 @@ export type EncashmentRequestMinAggregateOutputType = {
   approvedAt: Date | null
   rejectionReason: string | null
   paidAt: Date | null
-  paymentStatus: string | null
-  paymentMethod: string | null
-  paymentReference: string | null
-  paymentDate: Date | null
-  paymentReceiptUrl: string | null
-  processedBy: number | null
   createdAt: Date | null
   updatedAt: Date | null
+  paymentDate: Date | null
+  paymentMethod: string | null
+  paymentReceiptUrl: string | null
+  paymentReference: string | null
+  paymentStatus: string | null
+  processedBy: number | null
 }
 
 export type EncashmentRequestMaxAggregateOutputType = {
@@ -80,14 +80,14 @@ export type EncashmentRequestMaxAggregateOutputType = {
   approvedAt: Date | null
   rejectionReason: string | null
   paidAt: Date | null
-  paymentStatus: string | null
-  paymentMethod: string | null
-  paymentReference: string | null
-  paymentDate: Date | null
-  paymentReceiptUrl: string | null
-  processedBy: number | null
   createdAt: Date | null
   updatedAt: Date | null
+  paymentDate: Date | null
+  paymentMethod: string | null
+  paymentReceiptUrl: string | null
+  paymentReference: string | null
+  paymentStatus: string | null
+  processedBy: number | null
 }
 
 export type EncashmentRequestCountAggregateOutputType = {
@@ -102,14 +102,14 @@ export type EncashmentRequestCountAggregateOutputType = {
   approvedAt: number
   rejectionReason: number
   paidAt: number
-  paymentStatus: number
-  paymentMethod: number
-  paymentReference: number
-  paymentDate: number
-  paymentReceiptUrl: number
-  processedBy: number
   createdAt: number
   updatedAt: number
+  paymentDate: number
+  paymentMethod: number
+  paymentReceiptUrl: number
+  paymentReference: number
+  paymentStatus: number
+  processedBy: number
   _all: number
 }
 
@@ -146,14 +146,14 @@ export type EncashmentRequestMinAggregateInputType = {
   approvedAt?: true
   rejectionReason?: true
   paidAt?: true
-  paymentStatus?: true
-  paymentMethod?: true
-  paymentReference?: true
-  paymentDate?: true
-  paymentReceiptUrl?: true
-  processedBy?: true
   createdAt?: true
   updatedAt?: true
+  paymentDate?: true
+  paymentMethod?: true
+  paymentReceiptUrl?: true
+  paymentReference?: true
+  paymentStatus?: true
+  processedBy?: true
 }
 
 export type EncashmentRequestMaxAggregateInputType = {
@@ -168,14 +168,14 @@ export type EncashmentRequestMaxAggregateInputType = {
   approvedAt?: true
   rejectionReason?: true
   paidAt?: true
-  paymentStatus?: true
-  paymentMethod?: true
-  paymentReference?: true
-  paymentDate?: true
-  paymentReceiptUrl?: true
-  processedBy?: true
   createdAt?: true
   updatedAt?: true
+  paymentDate?: true
+  paymentMethod?: true
+  paymentReceiptUrl?: true
+  paymentReference?: true
+  paymentStatus?: true
+  processedBy?: true
 }
 
 export type EncashmentRequestCountAggregateInputType = {
@@ -190,14 +190,14 @@ export type EncashmentRequestCountAggregateInputType = {
   approvedAt?: true
   rejectionReason?: true
   paidAt?: true
-  paymentStatus?: true
-  paymentMethod?: true
-  paymentReference?: true
-  paymentDate?: true
-  paymentReceiptUrl?: true
-  processedBy?: true
   createdAt?: true
   updatedAt?: true
+  paymentDate?: true
+  paymentMethod?: true
+  paymentReceiptUrl?: true
+  paymentReference?: true
+  paymentStatus?: true
+  processedBy?: true
   _all?: true
 }
 
@@ -299,14 +299,14 @@ export type EncashmentRequestGroupByOutputType = {
   approvedAt: Date | null
   rejectionReason: string | null
   paidAt: Date | null
-  paymentStatus: string | null
-  paymentMethod: string | null
-  paymentReference: string | null
-  paymentDate: Date | null
-  paymentReceiptUrl: string | null
-  processedBy: number | null
   createdAt: Date
   updatedAt: Date
+  paymentDate: Date | null
+  paymentMethod: string | null
+  paymentReceiptUrl: string | null
+  paymentReference: string | null
+  paymentStatus: string | null
+  processedBy: number | null
   _count: EncashmentRequestCountAggregateOutputType | null
   _avg: EncashmentRequestAvgAggregateOutputType | null
   _sum: EncashmentRequestSumAggregateOutputType | null
@@ -344,17 +344,17 @@ export type EncashmentRequestWhereInput = {
   approvedAt?: Prisma.DateTimeNullableFilter<"EncashmentRequest"> | Date | string | null
   rejectionReason?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
   paidAt?: Prisma.DateTimeNullableFilter<"EncashmentRequest"> | Date | string | null
-  paymentStatus?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
-  paymentMethod?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
-  paymentReference?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
-  paymentDate?: Prisma.DateTimeNullableFilter<"EncashmentRequest"> | Date | string | null
-  paymentReceiptUrl?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
-  processedBy?: Prisma.IntNullableFilter<"EncashmentRequest"> | number | null
   createdAt?: Prisma.DateTimeFilter<"EncashmentRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"EncashmentRequest"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  paymentDate?: Prisma.DateTimeNullableFilter<"EncashmentRequest"> | Date | string | null
+  paymentMethod?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
+  paymentReceiptUrl?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
+  paymentReference?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
+  paymentStatus?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
+  processedBy?: Prisma.IntNullableFilter<"EncashmentRequest"> | number | null
   approver?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   processor?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type EncashmentRequestOrderByWithRelationInput = {
@@ -369,17 +369,17 @@ export type EncashmentRequestOrderByWithRelationInput = {
   approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   rejectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
   paidAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  paymentStatus?: Prisma.SortOrderInput | Prisma.SortOrder
-  paymentMethod?: Prisma.SortOrderInput | Prisma.SortOrder
-  paymentReference?: Prisma.SortOrderInput | Prisma.SortOrder
-  paymentDate?: Prisma.SortOrderInput | Prisma.SortOrder
-  paymentReceiptUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  processedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  user?: Prisma.UserOrderByWithRelationInput
+  paymentDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentMethod?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentReceiptUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentReference?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  processedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   approver?: Prisma.UserOrderByWithRelationInput
   processor?: Prisma.UserOrderByWithRelationInput
+  user?: Prisma.UserOrderByWithRelationInput
   _relevance?: Prisma.EncashmentRequestOrderByRelevanceInput
 }
 
@@ -398,17 +398,17 @@ export type EncashmentRequestWhereUniqueInput = Prisma.AtLeast<{
   approvedAt?: Prisma.DateTimeNullableFilter<"EncashmentRequest"> | Date | string | null
   rejectionReason?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
   paidAt?: Prisma.DateTimeNullableFilter<"EncashmentRequest"> | Date | string | null
-  paymentStatus?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
-  paymentMethod?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
-  paymentReference?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
-  paymentDate?: Prisma.DateTimeNullableFilter<"EncashmentRequest"> | Date | string | null
-  paymentReceiptUrl?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
-  processedBy?: Prisma.IntNullableFilter<"EncashmentRequest"> | number | null
   createdAt?: Prisma.DateTimeFilter<"EncashmentRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"EncashmentRequest"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  paymentDate?: Prisma.DateTimeNullableFilter<"EncashmentRequest"> | Date | string | null
+  paymentMethod?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
+  paymentReceiptUrl?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
+  paymentReference?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
+  paymentStatus?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
+  processedBy?: Prisma.IntNullableFilter<"EncashmentRequest"> | number | null
   approver?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   processor?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
 export type EncashmentRequestOrderByWithAggregationInput = {
@@ -423,14 +423,14 @@ export type EncashmentRequestOrderByWithAggregationInput = {
   approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   rejectionReason?: Prisma.SortOrderInput | Prisma.SortOrder
   paidAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  paymentStatus?: Prisma.SortOrderInput | Prisma.SortOrder
-  paymentMethod?: Prisma.SortOrderInput | Prisma.SortOrder
-  paymentReference?: Prisma.SortOrderInput | Prisma.SortOrder
-  paymentDate?: Prisma.SortOrderInput | Prisma.SortOrder
-  paymentReceiptUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  processedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  paymentDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentMethod?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentReceiptUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentReference?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  processedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.EncashmentRequestCountOrderByAggregateInput
   _avg?: Prisma.EncashmentRequestAvgOrderByAggregateInput
   _max?: Prisma.EncashmentRequestMaxOrderByAggregateInput
@@ -453,14 +453,14 @@ export type EncashmentRequestScalarWhereWithAggregatesInput = {
   approvedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"EncashmentRequest"> | Date | string | null
   rejectionReason?: Prisma.StringNullableWithAggregatesFilter<"EncashmentRequest"> | string | null
   paidAt?: Prisma.DateTimeNullableWithAggregatesFilter<"EncashmentRequest"> | Date | string | null
-  paymentStatus?: Prisma.StringNullableWithAggregatesFilter<"EncashmentRequest"> | string | null
-  paymentMethod?: Prisma.StringNullableWithAggregatesFilter<"EncashmentRequest"> | string | null
-  paymentReference?: Prisma.StringNullableWithAggregatesFilter<"EncashmentRequest"> | string | null
-  paymentDate?: Prisma.DateTimeNullableWithAggregatesFilter<"EncashmentRequest"> | Date | string | null
-  paymentReceiptUrl?: Prisma.StringNullableWithAggregatesFilter<"EncashmentRequest"> | string | null
-  processedBy?: Prisma.IntNullableWithAggregatesFilter<"EncashmentRequest"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"EncashmentRequest"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"EncashmentRequest"> | Date | string
+  paymentDate?: Prisma.DateTimeNullableWithAggregatesFilter<"EncashmentRequest"> | Date | string | null
+  paymentMethod?: Prisma.StringNullableWithAggregatesFilter<"EncashmentRequest"> | string | null
+  paymentReceiptUrl?: Prisma.StringNullableWithAggregatesFilter<"EncashmentRequest"> | string | null
+  paymentReference?: Prisma.StringNullableWithAggregatesFilter<"EncashmentRequest"> | string | null
+  paymentStatus?: Prisma.StringNullableWithAggregatesFilter<"EncashmentRequest"> | string | null
+  processedBy?: Prisma.IntNullableWithAggregatesFilter<"EncashmentRequest"> | number | null
 }
 
 export type EncashmentRequestCreateInput = {
@@ -472,16 +472,16 @@ export type EncashmentRequestCreateInput = {
   approvedAt?: Date | string | null
   rejectionReason?: string | null
   paidAt?: Date | string | null
-  paymentStatus?: string | null
-  paymentMethod?: string | null
-  paymentReference?: string | null
-  paymentDate?: Date | string | null
-  paymentReceiptUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutEncashmentRequestsInput
+  paymentDate?: Date | string | null
+  paymentMethod?: string | null
+  paymentReceiptUrl?: string | null
+  paymentReference?: string | null
+  paymentStatus?: string | null
   approver?: Prisma.UserCreateNestedOneWithoutEncashmentApprovalsInput
   processor?: Prisma.UserCreateNestedOneWithoutEncashmentProcessedInput
+  user: Prisma.UserCreateNestedOneWithoutEncashmentRequestsInput
 }
 
 export type EncashmentRequestUncheckedCreateInput = {
@@ -496,14 +496,14 @@ export type EncashmentRequestUncheckedCreateInput = {
   approvedAt?: Date | string | null
   rejectionReason?: string | null
   paidAt?: Date | string | null
-  paymentStatus?: string | null
-  paymentMethod?: string | null
-  paymentReference?: string | null
-  paymentDate?: Date | string | null
-  paymentReceiptUrl?: string | null
-  processedBy?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  paymentDate?: Date | string | null
+  paymentMethod?: string | null
+  paymentReceiptUrl?: string | null
+  paymentReference?: string | null
+  paymentStatus?: string | null
+  processedBy?: number | null
 }
 
 export type EncashmentRequestUpdateInput = {
@@ -515,16 +515,16 @@ export type EncashmentRequestUpdateInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutEncashmentRequestsNestedInput
+  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approver?: Prisma.UserUpdateOneWithoutEncashmentApprovalsNestedInput
   processor?: Prisma.UserUpdateOneWithoutEncashmentProcessedNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutEncashmentRequestsNestedInput
 }
 
 export type EncashmentRequestUncheckedUpdateInput = {
@@ -539,14 +539,14 @@ export type EncashmentRequestUncheckedUpdateInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  processedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  processedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type EncashmentRequestCreateManyInput = {
@@ -561,14 +561,14 @@ export type EncashmentRequestCreateManyInput = {
   approvedAt?: Date | string | null
   rejectionReason?: string | null
   paidAt?: Date | string | null
-  paymentStatus?: string | null
-  paymentMethod?: string | null
-  paymentReference?: string | null
-  paymentDate?: Date | string | null
-  paymentReceiptUrl?: string | null
-  processedBy?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  paymentDate?: Date | string | null
+  paymentMethod?: string | null
+  paymentReceiptUrl?: string | null
+  paymentReference?: string | null
+  paymentStatus?: string | null
+  processedBy?: number | null
 }
 
 export type EncashmentRequestUpdateManyMutationInput = {
@@ -580,13 +580,13 @@ export type EncashmentRequestUpdateManyMutationInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type EncashmentRequestUncheckedUpdateManyInput = {
@@ -601,14 +601,14 @@ export type EncashmentRequestUncheckedUpdateManyInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  processedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  processedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type EncashmentRequestListRelationFilter = {
@@ -639,14 +639,14 @@ export type EncashmentRequestCountOrderByAggregateInput = {
   approvedAt?: Prisma.SortOrder
   rejectionReason?: Prisma.SortOrder
   paidAt?: Prisma.SortOrder
-  paymentStatus?: Prisma.SortOrder
-  paymentMethod?: Prisma.SortOrder
-  paymentReference?: Prisma.SortOrder
-  paymentDate?: Prisma.SortOrder
-  paymentReceiptUrl?: Prisma.SortOrder
-  processedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  paymentDate?: Prisma.SortOrder
+  paymentMethod?: Prisma.SortOrder
+  paymentReceiptUrl?: Prisma.SortOrder
+  paymentReference?: Prisma.SortOrder
+  paymentStatus?: Prisma.SortOrder
+  processedBy?: Prisma.SortOrder
 }
 
 export type EncashmentRequestAvgOrderByAggregateInput = {
@@ -671,14 +671,14 @@ export type EncashmentRequestMaxOrderByAggregateInput = {
   approvedAt?: Prisma.SortOrder
   rejectionReason?: Prisma.SortOrder
   paidAt?: Prisma.SortOrder
-  paymentStatus?: Prisma.SortOrder
-  paymentMethod?: Prisma.SortOrder
-  paymentReference?: Prisma.SortOrder
-  paymentDate?: Prisma.SortOrder
-  paymentReceiptUrl?: Prisma.SortOrder
-  processedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  paymentDate?: Prisma.SortOrder
+  paymentMethod?: Prisma.SortOrder
+  paymentReceiptUrl?: Prisma.SortOrder
+  paymentReference?: Prisma.SortOrder
+  paymentStatus?: Prisma.SortOrder
+  processedBy?: Prisma.SortOrder
 }
 
 export type EncashmentRequestMinOrderByAggregateInput = {
@@ -693,14 +693,14 @@ export type EncashmentRequestMinOrderByAggregateInput = {
   approvedAt?: Prisma.SortOrder
   rejectionReason?: Prisma.SortOrder
   paidAt?: Prisma.SortOrder
-  paymentStatus?: Prisma.SortOrder
-  paymentMethod?: Prisma.SortOrder
-  paymentReference?: Prisma.SortOrder
-  paymentDate?: Prisma.SortOrder
-  paymentReceiptUrl?: Prisma.SortOrder
-  processedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  paymentDate?: Prisma.SortOrder
+  paymentMethod?: Prisma.SortOrder
+  paymentReceiptUrl?: Prisma.SortOrder
+  paymentReference?: Prisma.SortOrder
+  paymentStatus?: Prisma.SortOrder
+  processedBy?: Prisma.SortOrder
 }
 
 export type EncashmentRequestSumOrderByAggregateInput = {
@@ -711,13 +711,6 @@ export type EncashmentRequestSumOrderByAggregateInput = {
   balanceAtRequest?: Prisma.SortOrder
   approvedBy?: Prisma.SortOrder
   processedBy?: Prisma.SortOrder
-}
-
-export type EncashmentRequestCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.EncashmentRequestCreateWithoutUserInput, Prisma.EncashmentRequestUncheckedCreateWithoutUserInput> | Prisma.EncashmentRequestCreateWithoutUserInput[] | Prisma.EncashmentRequestUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.EncashmentRequestCreateOrConnectWithoutUserInput | Prisma.EncashmentRequestCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.EncashmentRequestCreateManyUserInputEnvelope
-  connect?: Prisma.EncashmentRequestWhereUniqueInput | Prisma.EncashmentRequestWhereUniqueInput[]
 }
 
 export type EncashmentRequestCreateNestedManyWithoutApproverInput = {
@@ -734,7 +727,7 @@ export type EncashmentRequestCreateNestedManyWithoutProcessorInput = {
   connect?: Prisma.EncashmentRequestWhereUniqueInput | Prisma.EncashmentRequestWhereUniqueInput[]
 }
 
-export type EncashmentRequestUncheckedCreateNestedManyWithoutUserInput = {
+export type EncashmentRequestCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.EncashmentRequestCreateWithoutUserInput, Prisma.EncashmentRequestUncheckedCreateWithoutUserInput> | Prisma.EncashmentRequestCreateWithoutUserInput[] | Prisma.EncashmentRequestUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.EncashmentRequestCreateOrConnectWithoutUserInput | Prisma.EncashmentRequestCreateOrConnectWithoutUserInput[]
   createMany?: Prisma.EncashmentRequestCreateManyUserInputEnvelope
@@ -755,18 +748,11 @@ export type EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput = {
   connect?: Prisma.EncashmentRequestWhereUniqueInput | Prisma.EncashmentRequestWhereUniqueInput[]
 }
 
-export type EncashmentRequestUpdateManyWithoutUserNestedInput = {
+export type EncashmentRequestUncheckedCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.EncashmentRequestCreateWithoutUserInput, Prisma.EncashmentRequestUncheckedCreateWithoutUserInput> | Prisma.EncashmentRequestCreateWithoutUserInput[] | Prisma.EncashmentRequestUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.EncashmentRequestCreateOrConnectWithoutUserInput | Prisma.EncashmentRequestCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.EncashmentRequestUpsertWithWhereUniqueWithoutUserInput | Prisma.EncashmentRequestUpsertWithWhereUniqueWithoutUserInput[]
   createMany?: Prisma.EncashmentRequestCreateManyUserInputEnvelope
-  set?: Prisma.EncashmentRequestWhereUniqueInput | Prisma.EncashmentRequestWhereUniqueInput[]
-  disconnect?: Prisma.EncashmentRequestWhereUniqueInput | Prisma.EncashmentRequestWhereUniqueInput[]
-  delete?: Prisma.EncashmentRequestWhereUniqueInput | Prisma.EncashmentRequestWhereUniqueInput[]
   connect?: Prisma.EncashmentRequestWhereUniqueInput | Prisma.EncashmentRequestWhereUniqueInput[]
-  update?: Prisma.EncashmentRequestUpdateWithWhereUniqueWithoutUserInput | Prisma.EncashmentRequestUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.EncashmentRequestUpdateManyWithWhereWithoutUserInput | Prisma.EncashmentRequestUpdateManyWithWhereWithoutUserInput[]
-  deleteMany?: Prisma.EncashmentRequestScalarWhereInput | Prisma.EncashmentRequestScalarWhereInput[]
 }
 
 export type EncashmentRequestUpdateManyWithoutApproverNestedInput = {
@@ -797,7 +783,7 @@ export type EncashmentRequestUpdateManyWithoutProcessorNestedInput = {
   deleteMany?: Prisma.EncashmentRequestScalarWhereInput | Prisma.EncashmentRequestScalarWhereInput[]
 }
 
-export type EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput = {
+export type EncashmentRequestUpdateManyWithoutUserNestedInput = {
   create?: Prisma.XOR<Prisma.EncashmentRequestCreateWithoutUserInput, Prisma.EncashmentRequestUncheckedCreateWithoutUserInput> | Prisma.EncashmentRequestCreateWithoutUserInput[] | Prisma.EncashmentRequestUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.EncashmentRequestCreateOrConnectWithoutUserInput | Prisma.EncashmentRequestCreateOrConnectWithoutUserInput[]
   upsert?: Prisma.EncashmentRequestUpsertWithWhereUniqueWithoutUserInput | Prisma.EncashmentRequestUpsertWithWhereUniqueWithoutUserInput[]
@@ -839,59 +825,22 @@ export type EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput = {
   deleteMany?: Prisma.EncashmentRequestScalarWhereInput | Prisma.EncashmentRequestScalarWhereInput[]
 }
 
+export type EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.EncashmentRequestCreateWithoutUserInput, Prisma.EncashmentRequestUncheckedCreateWithoutUserInput> | Prisma.EncashmentRequestCreateWithoutUserInput[] | Prisma.EncashmentRequestUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.EncashmentRequestCreateOrConnectWithoutUserInput | Prisma.EncashmentRequestCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.EncashmentRequestUpsertWithWhereUniqueWithoutUserInput | Prisma.EncashmentRequestUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.EncashmentRequestCreateManyUserInputEnvelope
+  set?: Prisma.EncashmentRequestWhereUniqueInput | Prisma.EncashmentRequestWhereUniqueInput[]
+  disconnect?: Prisma.EncashmentRequestWhereUniqueInput | Prisma.EncashmentRequestWhereUniqueInput[]
+  delete?: Prisma.EncashmentRequestWhereUniqueInput | Prisma.EncashmentRequestWhereUniqueInput[]
+  connect?: Prisma.EncashmentRequestWhereUniqueInput | Prisma.EncashmentRequestWhereUniqueInput[]
+  update?: Prisma.EncashmentRequestUpdateWithWhereUniqueWithoutUserInput | Prisma.EncashmentRequestUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.EncashmentRequestUpdateManyWithWhereWithoutUserInput | Prisma.EncashmentRequestUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.EncashmentRequestScalarWhereInput | Prisma.EncashmentRequestScalarWhereInput[]
+}
+
 export type EnumEncashmentStatusFieldUpdateOperationsInput = {
   set?: $Enums.EncashmentStatus
-}
-
-export type EncashmentRequestCreateWithoutUserInput = {
-  year: number
-  daysRequested: number
-  balanceAtRequest: number
-  reason?: string | null
-  status?: $Enums.EncashmentStatus
-  approvedAt?: Date | string | null
-  rejectionReason?: string | null
-  paidAt?: Date | string | null
-  paymentStatus?: string | null
-  paymentMethod?: string | null
-  paymentReference?: string | null
-  paymentDate?: Date | string | null
-  paymentReceiptUrl?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  approver?: Prisma.UserCreateNestedOneWithoutEncashmentApprovalsInput
-  processor?: Prisma.UserCreateNestedOneWithoutEncashmentProcessedInput
-}
-
-export type EncashmentRequestUncheckedCreateWithoutUserInput = {
-  id?: number
-  year: number
-  daysRequested: number
-  balanceAtRequest: number
-  reason?: string | null
-  status?: $Enums.EncashmentStatus
-  approvedBy?: number | null
-  approvedAt?: Date | string | null
-  rejectionReason?: string | null
-  paidAt?: Date | string | null
-  paymentStatus?: string | null
-  paymentMethod?: string | null
-  paymentReference?: string | null
-  paymentDate?: Date | string | null
-  paymentReceiptUrl?: string | null
-  processedBy?: number | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type EncashmentRequestCreateOrConnectWithoutUserInput = {
-  where: Prisma.EncashmentRequestWhereUniqueInput
-  create: Prisma.XOR<Prisma.EncashmentRequestCreateWithoutUserInput, Prisma.EncashmentRequestUncheckedCreateWithoutUserInput>
-}
-
-export type EncashmentRequestCreateManyUserInputEnvelope = {
-  data: Prisma.EncashmentRequestCreateManyUserInput | Prisma.EncashmentRequestCreateManyUserInput[]
-  skipDuplicates?: boolean
 }
 
 export type EncashmentRequestCreateWithoutApproverInput = {
@@ -903,15 +852,15 @@ export type EncashmentRequestCreateWithoutApproverInput = {
   approvedAt?: Date | string | null
   rejectionReason?: string | null
   paidAt?: Date | string | null
-  paymentStatus?: string | null
-  paymentMethod?: string | null
-  paymentReference?: string | null
-  paymentDate?: Date | string | null
-  paymentReceiptUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutEncashmentRequestsInput
+  paymentDate?: Date | string | null
+  paymentMethod?: string | null
+  paymentReceiptUrl?: string | null
+  paymentReference?: string | null
+  paymentStatus?: string | null
   processor?: Prisma.UserCreateNestedOneWithoutEncashmentProcessedInput
+  user: Prisma.UserCreateNestedOneWithoutEncashmentRequestsInput
 }
 
 export type EncashmentRequestUncheckedCreateWithoutApproverInput = {
@@ -925,14 +874,14 @@ export type EncashmentRequestUncheckedCreateWithoutApproverInput = {
   approvedAt?: Date | string | null
   rejectionReason?: string | null
   paidAt?: Date | string | null
-  paymentStatus?: string | null
-  paymentMethod?: string | null
-  paymentReference?: string | null
-  paymentDate?: Date | string | null
-  paymentReceiptUrl?: string | null
-  processedBy?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  paymentDate?: Date | string | null
+  paymentMethod?: string | null
+  paymentReceiptUrl?: string | null
+  paymentReference?: string | null
+  paymentStatus?: string | null
+  processedBy?: number | null
 }
 
 export type EncashmentRequestCreateOrConnectWithoutApproverInput = {
@@ -954,15 +903,15 @@ export type EncashmentRequestCreateWithoutProcessorInput = {
   approvedAt?: Date | string | null
   rejectionReason?: string | null
   paidAt?: Date | string | null
-  paymentStatus?: string | null
-  paymentMethod?: string | null
-  paymentReference?: string | null
-  paymentDate?: Date | string | null
-  paymentReceiptUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutEncashmentRequestsInput
+  paymentDate?: Date | string | null
+  paymentMethod?: string | null
+  paymentReceiptUrl?: string | null
+  paymentReference?: string | null
+  paymentStatus?: string | null
   approver?: Prisma.UserCreateNestedOneWithoutEncashmentApprovalsInput
+  user: Prisma.UserCreateNestedOneWithoutEncashmentRequestsInput
 }
 
 export type EncashmentRequestUncheckedCreateWithoutProcessorInput = {
@@ -977,13 +926,13 @@ export type EncashmentRequestUncheckedCreateWithoutProcessorInput = {
   approvedAt?: Date | string | null
   rejectionReason?: string | null
   paidAt?: Date | string | null
-  paymentStatus?: string | null
-  paymentMethod?: string | null
-  paymentReference?: string | null
-  paymentDate?: Date | string | null
-  paymentReceiptUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  paymentDate?: Date | string | null
+  paymentMethod?: string | null
+  paymentReceiptUrl?: string | null
+  paymentReference?: string | null
+  paymentStatus?: string | null
 }
 
 export type EncashmentRequestCreateOrConnectWithoutProcessorInput = {
@@ -996,45 +945,55 @@ export type EncashmentRequestCreateManyProcessorInputEnvelope = {
   skipDuplicates?: boolean
 }
 
-export type EncashmentRequestUpsertWithWhereUniqueWithoutUserInput = {
+export type EncashmentRequestCreateWithoutUserInput = {
+  year: number
+  daysRequested: number
+  balanceAtRequest: number
+  reason?: string | null
+  status?: $Enums.EncashmentStatus
+  approvedAt?: Date | string | null
+  rejectionReason?: string | null
+  paidAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  paymentDate?: Date | string | null
+  paymentMethod?: string | null
+  paymentReceiptUrl?: string | null
+  paymentReference?: string | null
+  paymentStatus?: string | null
+  approver?: Prisma.UserCreateNestedOneWithoutEncashmentApprovalsInput
+  processor?: Prisma.UserCreateNestedOneWithoutEncashmentProcessedInput
+}
+
+export type EncashmentRequestUncheckedCreateWithoutUserInput = {
+  id?: number
+  year: number
+  daysRequested: number
+  balanceAtRequest: number
+  reason?: string | null
+  status?: $Enums.EncashmentStatus
+  approvedBy?: number | null
+  approvedAt?: Date | string | null
+  rejectionReason?: string | null
+  paidAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  paymentDate?: Date | string | null
+  paymentMethod?: string | null
+  paymentReceiptUrl?: string | null
+  paymentReference?: string | null
+  paymentStatus?: string | null
+  processedBy?: number | null
+}
+
+export type EncashmentRequestCreateOrConnectWithoutUserInput = {
   where: Prisma.EncashmentRequestWhereUniqueInput
-  update: Prisma.XOR<Prisma.EncashmentRequestUpdateWithoutUserInput, Prisma.EncashmentRequestUncheckedUpdateWithoutUserInput>
   create: Prisma.XOR<Prisma.EncashmentRequestCreateWithoutUserInput, Prisma.EncashmentRequestUncheckedCreateWithoutUserInput>
 }
 
-export type EncashmentRequestUpdateWithWhereUniqueWithoutUserInput = {
-  where: Prisma.EncashmentRequestWhereUniqueInput
-  data: Prisma.XOR<Prisma.EncashmentRequestUpdateWithoutUserInput, Prisma.EncashmentRequestUncheckedUpdateWithoutUserInput>
-}
-
-export type EncashmentRequestUpdateManyWithWhereWithoutUserInput = {
-  where: Prisma.EncashmentRequestScalarWhereInput
-  data: Prisma.XOR<Prisma.EncashmentRequestUpdateManyMutationInput, Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserInput>
-}
-
-export type EncashmentRequestScalarWhereInput = {
-  AND?: Prisma.EncashmentRequestScalarWhereInput | Prisma.EncashmentRequestScalarWhereInput[]
-  OR?: Prisma.EncashmentRequestScalarWhereInput[]
-  NOT?: Prisma.EncashmentRequestScalarWhereInput | Prisma.EncashmentRequestScalarWhereInput[]
-  id?: Prisma.IntFilter<"EncashmentRequest"> | number
-  userId?: Prisma.IntFilter<"EncashmentRequest"> | number
-  year?: Prisma.IntFilter<"EncashmentRequest"> | number
-  daysRequested?: Prisma.IntFilter<"EncashmentRequest"> | number
-  balanceAtRequest?: Prisma.IntFilter<"EncashmentRequest"> | number
-  reason?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
-  status?: Prisma.EnumEncashmentStatusFilter<"EncashmentRequest"> | $Enums.EncashmentStatus
-  approvedBy?: Prisma.IntNullableFilter<"EncashmentRequest"> | number | null
-  approvedAt?: Prisma.DateTimeNullableFilter<"EncashmentRequest"> | Date | string | null
-  rejectionReason?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
-  paidAt?: Prisma.DateTimeNullableFilter<"EncashmentRequest"> | Date | string | null
-  paymentStatus?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
-  paymentMethod?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
-  paymentReference?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
-  paymentDate?: Prisma.DateTimeNullableFilter<"EncashmentRequest"> | Date | string | null
-  paymentReceiptUrl?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
-  processedBy?: Prisma.IntNullableFilter<"EncashmentRequest"> | number | null
-  createdAt?: Prisma.DateTimeFilter<"EncashmentRequest"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"EncashmentRequest"> | Date | string
+export type EncashmentRequestCreateManyUserInputEnvelope = {
+  data: Prisma.EncashmentRequestCreateManyUserInput | Prisma.EncashmentRequestCreateManyUserInput[]
+  skipDuplicates?: boolean
 }
 
 export type EncashmentRequestUpsertWithWhereUniqueWithoutApproverInput = {
@@ -1053,6 +1012,31 @@ export type EncashmentRequestUpdateManyWithWhereWithoutApproverInput = {
   data: Prisma.XOR<Prisma.EncashmentRequestUpdateManyMutationInput, Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverInput>
 }
 
+export type EncashmentRequestScalarWhereInput = {
+  AND?: Prisma.EncashmentRequestScalarWhereInput | Prisma.EncashmentRequestScalarWhereInput[]
+  OR?: Prisma.EncashmentRequestScalarWhereInput[]
+  NOT?: Prisma.EncashmentRequestScalarWhereInput | Prisma.EncashmentRequestScalarWhereInput[]
+  id?: Prisma.IntFilter<"EncashmentRequest"> | number
+  userId?: Prisma.IntFilter<"EncashmentRequest"> | number
+  year?: Prisma.IntFilter<"EncashmentRequest"> | number
+  daysRequested?: Prisma.IntFilter<"EncashmentRequest"> | number
+  balanceAtRequest?: Prisma.IntFilter<"EncashmentRequest"> | number
+  reason?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
+  status?: Prisma.EnumEncashmentStatusFilter<"EncashmentRequest"> | $Enums.EncashmentStatus
+  approvedBy?: Prisma.IntNullableFilter<"EncashmentRequest"> | number | null
+  approvedAt?: Prisma.DateTimeNullableFilter<"EncashmentRequest"> | Date | string | null
+  rejectionReason?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
+  paidAt?: Prisma.DateTimeNullableFilter<"EncashmentRequest"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"EncashmentRequest"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"EncashmentRequest"> | Date | string
+  paymentDate?: Prisma.DateTimeNullableFilter<"EncashmentRequest"> | Date | string | null
+  paymentMethod?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
+  paymentReceiptUrl?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
+  paymentReference?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
+  paymentStatus?: Prisma.StringNullableFilter<"EncashmentRequest"> | string | null
+  processedBy?: Prisma.IntNullableFilter<"EncashmentRequest"> | number | null
+}
+
 export type EncashmentRequestUpsertWithWhereUniqueWithoutProcessorInput = {
   where: Prisma.EncashmentRequestWhereUniqueInput
   update: Prisma.XOR<Prisma.EncashmentRequestUpdateWithoutProcessorInput, Prisma.EncashmentRequestUncheckedUpdateWithoutProcessorInput>
@@ -1069,25 +1053,20 @@ export type EncashmentRequestUpdateManyWithWhereWithoutProcessorInput = {
   data: Prisma.XOR<Prisma.EncashmentRequestUpdateManyMutationInput, Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorInput>
 }
 
-export type EncashmentRequestCreateManyUserInput = {
-  id?: number
-  year: number
-  daysRequested: number
-  balanceAtRequest: number
-  reason?: string | null
-  status?: $Enums.EncashmentStatus
-  approvedBy?: number | null
-  approvedAt?: Date | string | null
-  rejectionReason?: string | null
-  paidAt?: Date | string | null
-  paymentStatus?: string | null
-  paymentMethod?: string | null
-  paymentReference?: string | null
-  paymentDate?: Date | string | null
-  paymentReceiptUrl?: string | null
-  processedBy?: number | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
+export type EncashmentRequestUpsertWithWhereUniqueWithoutUserInput = {
+  where: Prisma.EncashmentRequestWhereUniqueInput
+  update: Prisma.XOR<Prisma.EncashmentRequestUpdateWithoutUserInput, Prisma.EncashmentRequestUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.EncashmentRequestCreateWithoutUserInput, Prisma.EncashmentRequestUncheckedCreateWithoutUserInput>
+}
+
+export type EncashmentRequestUpdateWithWhereUniqueWithoutUserInput = {
+  where: Prisma.EncashmentRequestWhereUniqueInput
+  data: Prisma.XOR<Prisma.EncashmentRequestUpdateWithoutUserInput, Prisma.EncashmentRequestUncheckedUpdateWithoutUserInput>
+}
+
+export type EncashmentRequestUpdateManyWithWhereWithoutUserInput = {
+  where: Prisma.EncashmentRequestScalarWhereInput
+  data: Prisma.XOR<Prisma.EncashmentRequestUpdateManyMutationInput, Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserInput>
 }
 
 export type EncashmentRequestCreateManyApproverInput = {
@@ -1101,14 +1080,14 @@ export type EncashmentRequestCreateManyApproverInput = {
   approvedAt?: Date | string | null
   rejectionReason?: string | null
   paidAt?: Date | string | null
-  paymentStatus?: string | null
-  paymentMethod?: string | null
-  paymentReference?: string | null
-  paymentDate?: Date | string | null
-  paymentReceiptUrl?: string | null
-  processedBy?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  paymentDate?: Date | string | null
+  paymentMethod?: string | null
+  paymentReceiptUrl?: string | null
+  paymentReference?: string | null
+  paymentStatus?: string | null
+  processedBy?: number | null
 }
 
 export type EncashmentRequestCreateManyProcessorInput = {
@@ -1123,13 +1102,158 @@ export type EncashmentRequestCreateManyProcessorInput = {
   approvedAt?: Date | string | null
   rejectionReason?: string | null
   paidAt?: Date | string | null
-  paymentStatus?: string | null
-  paymentMethod?: string | null
-  paymentReference?: string | null
-  paymentDate?: Date | string | null
-  paymentReceiptUrl?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  paymentDate?: Date | string | null
+  paymentMethod?: string | null
+  paymentReceiptUrl?: string | null
+  paymentReference?: string | null
+  paymentStatus?: string | null
+}
+
+export type EncashmentRequestCreateManyUserInput = {
+  id?: number
+  year: number
+  daysRequested: number
+  balanceAtRequest: number
+  reason?: string | null
+  status?: $Enums.EncashmentStatus
+  approvedBy?: number | null
+  approvedAt?: Date | string | null
+  rejectionReason?: string | null
+  paidAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  paymentDate?: Date | string | null
+  paymentMethod?: string | null
+  paymentReceiptUrl?: string | null
+  paymentReference?: string | null
+  paymentStatus?: string | null
+  processedBy?: number | null
+}
+
+export type EncashmentRequestUpdateWithoutApproverInput = {
+  year?: Prisma.IntFieldUpdateOperationsInput | number
+  daysRequested?: Prisma.IntFieldUpdateOperationsInput | number
+  balanceAtRequest?: Prisma.IntFieldUpdateOperationsInput | number
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumEncashmentStatusFieldUpdateOperationsInput | $Enums.EncashmentStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  processor?: Prisma.UserUpdateOneWithoutEncashmentProcessedNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutEncashmentRequestsNestedInput
+}
+
+export type EncashmentRequestUncheckedUpdateWithoutApproverInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
+  year?: Prisma.IntFieldUpdateOperationsInput | number
+  daysRequested?: Prisma.IntFieldUpdateOperationsInput | number
+  balanceAtRequest?: Prisma.IntFieldUpdateOperationsInput | number
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumEncashmentStatusFieldUpdateOperationsInput | $Enums.EncashmentStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  processedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+}
+
+export type EncashmentRequestUncheckedUpdateManyWithoutApproverInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
+  year?: Prisma.IntFieldUpdateOperationsInput | number
+  daysRequested?: Prisma.IntFieldUpdateOperationsInput | number
+  balanceAtRequest?: Prisma.IntFieldUpdateOperationsInput | number
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumEncashmentStatusFieldUpdateOperationsInput | $Enums.EncashmentStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  processedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+}
+
+export type EncashmentRequestUpdateWithoutProcessorInput = {
+  year?: Prisma.IntFieldUpdateOperationsInput | number
+  daysRequested?: Prisma.IntFieldUpdateOperationsInput | number
+  balanceAtRequest?: Prisma.IntFieldUpdateOperationsInput | number
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumEncashmentStatusFieldUpdateOperationsInput | $Enums.EncashmentStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approver?: Prisma.UserUpdateOneWithoutEncashmentApprovalsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutEncashmentRequestsNestedInput
+}
+
+export type EncashmentRequestUncheckedUpdateWithoutProcessorInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
+  year?: Prisma.IntFieldUpdateOperationsInput | number
+  daysRequested?: Prisma.IntFieldUpdateOperationsInput | number
+  balanceAtRequest?: Prisma.IntFieldUpdateOperationsInput | number
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumEncashmentStatusFieldUpdateOperationsInput | $Enums.EncashmentStatus
+  approvedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type EncashmentRequestUncheckedUpdateManyWithoutProcessorInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
+  year?: Prisma.IntFieldUpdateOperationsInput | number
+  daysRequested?: Prisma.IntFieldUpdateOperationsInput | number
+  balanceAtRequest?: Prisma.IntFieldUpdateOperationsInput | number
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumEncashmentStatusFieldUpdateOperationsInput | $Enums.EncashmentStatus
+  approvedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type EncashmentRequestUpdateWithoutUserInput = {
@@ -1141,13 +1265,13 @@ export type EncashmentRequestUpdateWithoutUserInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approver?: Prisma.UserUpdateOneWithoutEncashmentApprovalsNestedInput
   processor?: Prisma.UserUpdateOneWithoutEncashmentProcessedNestedInput
 }
@@ -1163,14 +1287,14 @@ export type EncashmentRequestUncheckedUpdateWithoutUserInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  processedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  processedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type EncashmentRequestUncheckedUpdateManyWithoutUserInput = {
@@ -1184,138 +1308,14 @@ export type EncashmentRequestUncheckedUpdateManyWithoutUserInput = {
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   processedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type EncashmentRequestUpdateWithoutApproverInput = {
-  year?: Prisma.IntFieldUpdateOperationsInput | number
-  daysRequested?: Prisma.IntFieldUpdateOperationsInput | number
-  balanceAtRequest?: Prisma.IntFieldUpdateOperationsInput | number
-  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumEncashmentStatusFieldUpdateOperationsInput | $Enums.EncashmentStatus
-  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutEncashmentRequestsNestedInput
-  processor?: Prisma.UserUpdateOneWithoutEncashmentProcessedNestedInput
-}
-
-export type EncashmentRequestUncheckedUpdateWithoutApproverInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  userId?: Prisma.IntFieldUpdateOperationsInput | number
-  year?: Prisma.IntFieldUpdateOperationsInput | number
-  daysRequested?: Prisma.IntFieldUpdateOperationsInput | number
-  balanceAtRequest?: Prisma.IntFieldUpdateOperationsInput | number
-  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumEncashmentStatusFieldUpdateOperationsInput | $Enums.EncashmentStatus
-  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  processedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type EncashmentRequestUncheckedUpdateManyWithoutApproverInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  userId?: Prisma.IntFieldUpdateOperationsInput | number
-  year?: Prisma.IntFieldUpdateOperationsInput | number
-  daysRequested?: Prisma.IntFieldUpdateOperationsInput | number
-  balanceAtRequest?: Prisma.IntFieldUpdateOperationsInput | number
-  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumEncashmentStatusFieldUpdateOperationsInput | $Enums.EncashmentStatus
-  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  processedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type EncashmentRequestUpdateWithoutProcessorInput = {
-  year?: Prisma.IntFieldUpdateOperationsInput | number
-  daysRequested?: Prisma.IntFieldUpdateOperationsInput | number
-  balanceAtRequest?: Prisma.IntFieldUpdateOperationsInput | number
-  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumEncashmentStatusFieldUpdateOperationsInput | $Enums.EncashmentStatus
-  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutEncashmentRequestsNestedInput
-  approver?: Prisma.UserUpdateOneWithoutEncashmentApprovalsNestedInput
-}
-
-export type EncashmentRequestUncheckedUpdateWithoutProcessorInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  userId?: Prisma.IntFieldUpdateOperationsInput | number
-  year?: Prisma.IntFieldUpdateOperationsInput | number
-  daysRequested?: Prisma.IntFieldUpdateOperationsInput | number
-  balanceAtRequest?: Prisma.IntFieldUpdateOperationsInput | number
-  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumEncashmentStatusFieldUpdateOperationsInput | $Enums.EncashmentStatus
-  approvedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type EncashmentRequestUncheckedUpdateManyWithoutProcessorInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  userId?: Prisma.IntFieldUpdateOperationsInput | number
-  year?: Prisma.IntFieldUpdateOperationsInput | number
-  daysRequested?: Prisma.IntFieldUpdateOperationsInput | number
-  balanceAtRequest?: Prisma.IntFieldUpdateOperationsInput | number
-  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumEncashmentStatusFieldUpdateOperationsInput | $Enums.EncashmentStatus
-  approvedBy?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  rejectionReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  paymentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  paymentReceiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -1332,17 +1332,17 @@ export type EncashmentRequestSelect<ExtArgs extends runtime.Types.Extensions.Int
   approvedAt?: boolean
   rejectionReason?: boolean
   paidAt?: boolean
-  paymentStatus?: boolean
-  paymentMethod?: boolean
-  paymentReference?: boolean
-  paymentDate?: boolean
-  paymentReceiptUrl?: boolean
-  processedBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  paymentDate?: boolean
+  paymentMethod?: boolean
+  paymentReceiptUrl?: boolean
+  paymentReference?: boolean
+  paymentStatus?: boolean
+  processedBy?: boolean
   approver?: boolean | Prisma.EncashmentRequest$approverArgs<ExtArgs>
   processor?: boolean | Prisma.EncashmentRequest$processorArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["encashmentRequest"]>
 
 
@@ -1359,29 +1359,29 @@ export type EncashmentRequestSelectScalar = {
   approvedAt?: boolean
   rejectionReason?: boolean
   paidAt?: boolean
-  paymentStatus?: boolean
-  paymentMethod?: boolean
-  paymentReference?: boolean
-  paymentDate?: boolean
-  paymentReceiptUrl?: boolean
-  processedBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  paymentDate?: boolean
+  paymentMethod?: boolean
+  paymentReceiptUrl?: boolean
+  paymentReference?: boolean
+  paymentStatus?: boolean
+  processedBy?: boolean
 }
 
-export type EncashmentRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "year" | "daysRequested" | "balanceAtRequest" | "reason" | "status" | "approvedBy" | "approvedAt" | "rejectionReason" | "paidAt" | "paymentStatus" | "paymentMethod" | "paymentReference" | "paymentDate" | "paymentReceiptUrl" | "processedBy" | "createdAt" | "updatedAt", ExtArgs["result"]["encashmentRequest"]>
+export type EncashmentRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "year" | "daysRequested" | "balanceAtRequest" | "reason" | "status" | "approvedBy" | "approvedAt" | "rejectionReason" | "paidAt" | "createdAt" | "updatedAt" | "paymentDate" | "paymentMethod" | "paymentReceiptUrl" | "paymentReference" | "paymentStatus" | "processedBy", ExtArgs["result"]["encashmentRequest"]>
 export type EncashmentRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   approver?: boolean | Prisma.EncashmentRequest$approverArgs<ExtArgs>
   processor?: boolean | Prisma.EncashmentRequest$processorArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $EncashmentRequestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "EncashmentRequest"
   objects: {
-    user: Prisma.$UserPayload<ExtArgs>
     approver: Prisma.$UserPayload<ExtArgs> | null
     processor: Prisma.$UserPayload<ExtArgs> | null
+    user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1395,14 +1395,14 @@ export type $EncashmentRequestPayload<ExtArgs extends runtime.Types.Extensions.I
     approvedAt: Date | null
     rejectionReason: string | null
     paidAt: Date | null
-    paymentStatus: string | null
-    paymentMethod: string | null
-    paymentReference: string | null
-    paymentDate: Date | null
-    paymentReceiptUrl: string | null
-    processedBy: number | null
     createdAt: Date
     updatedAt: Date
+    paymentDate: Date | null
+    paymentMethod: string | null
+    paymentReceiptUrl: string | null
+    paymentReference: string | null
+    paymentStatus: string | null
+    processedBy: number | null
   }, ExtArgs["result"]["encashmentRequest"]>
   composites: {}
 }
@@ -1743,9 +1743,9 @@ readonly fields: EncashmentRequestFieldRefs;
  */
 export interface Prisma__EncashmentRequestClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   approver<T extends Prisma.EncashmentRequest$approverArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EncashmentRequest$approverArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   processor<T extends Prisma.EncashmentRequest$processorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EncashmentRequest$processorArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1786,14 +1786,14 @@ export interface EncashmentRequestFieldRefs {
   readonly approvedAt: Prisma.FieldRef<"EncashmentRequest", 'DateTime'>
   readonly rejectionReason: Prisma.FieldRef<"EncashmentRequest", 'String'>
   readonly paidAt: Prisma.FieldRef<"EncashmentRequest", 'DateTime'>
-  readonly paymentStatus: Prisma.FieldRef<"EncashmentRequest", 'String'>
-  readonly paymentMethod: Prisma.FieldRef<"EncashmentRequest", 'String'>
-  readonly paymentReference: Prisma.FieldRef<"EncashmentRequest", 'String'>
-  readonly paymentDate: Prisma.FieldRef<"EncashmentRequest", 'DateTime'>
-  readonly paymentReceiptUrl: Prisma.FieldRef<"EncashmentRequest", 'String'>
-  readonly processedBy: Prisma.FieldRef<"EncashmentRequest", 'Int'>
   readonly createdAt: Prisma.FieldRef<"EncashmentRequest", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"EncashmentRequest", 'DateTime'>
+  readonly paymentDate: Prisma.FieldRef<"EncashmentRequest", 'DateTime'>
+  readonly paymentMethod: Prisma.FieldRef<"EncashmentRequest", 'String'>
+  readonly paymentReceiptUrl: Prisma.FieldRef<"EncashmentRequest", 'String'>
+  readonly paymentReference: Prisma.FieldRef<"EncashmentRequest", 'String'>
+  readonly paymentStatus: Prisma.FieldRef<"EncashmentRequest", 'String'>
+  readonly processedBy: Prisma.FieldRef<"EncashmentRequest", 'Int'>
 }
     
 

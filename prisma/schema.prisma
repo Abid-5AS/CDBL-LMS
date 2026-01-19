@@ -75,6 +75,8 @@ model LeaveRequest {
   originalEndDate       DateTime?
   payCalculation        Json?
   studyLeaveDocuments   Json?
+  isHalfDay             Boolean                @default(false)
+  halfDayPeriod         String?                // "AM" or "PM"
   approvals             Approval[]
   calendarMappings      LeaveCalendarMapping[]
   comments              LeaveComment[]

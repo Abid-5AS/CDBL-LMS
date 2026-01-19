@@ -260,9 +260,9 @@ export type HRISConflictWhereInput = {
   resolvedBy?: Prisma.IntNullableFilter<"HRISConflict"> | number | null
   resolvedAt?: Prisma.DateTimeNullableFilter<"HRISConflict"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"HRISConflict"> | Date | string
-  sync?: Prisma.XOR<Prisma.HRISSyncScalarRelationFilter, Prisma.HRISSyncWhereInput>
   employee?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   resolver?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  sync?: Prisma.XOR<Prisma.HRISSyncScalarRelationFilter, Prisma.HRISSyncWhereInput>
 }
 
 export type HRISConflictOrderByWithRelationInput = {
@@ -276,9 +276,9 @@ export type HRISConflictOrderByWithRelationInput = {
   resolvedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  sync?: Prisma.HRISSyncOrderByWithRelationInput
   employee?: Prisma.UserOrderByWithRelationInput
   resolver?: Prisma.UserOrderByWithRelationInput
+  sync?: Prisma.HRISSyncOrderByWithRelationInput
   _relevance?: Prisma.HRISConflictOrderByRelevanceInput
 }
 
@@ -296,9 +296,9 @@ export type HRISConflictWhereUniqueInput = Prisma.AtLeast<{
   resolvedBy?: Prisma.IntNullableFilter<"HRISConflict"> | number | null
   resolvedAt?: Prisma.DateTimeNullableFilter<"HRISConflict"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"HRISConflict"> | Date | string
-  sync?: Prisma.XOR<Prisma.HRISSyncScalarRelationFilter, Prisma.HRISSyncWhereInput>
   employee?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   resolver?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  sync?: Prisma.XOR<Prisma.HRISSyncScalarRelationFilter, Prisma.HRISSyncWhereInput>
 }, "id">
 
 export type HRISConflictOrderByWithAggregationInput = {
@@ -342,9 +342,9 @@ export type HRISConflictCreateInput = {
   resolution?: string | null
   resolvedAt?: Date | string | null
   createdAt?: Date | string
-  sync: Prisma.HRISSyncCreateNestedOneWithoutConflictsInput
   employee?: Prisma.UserCreateNestedOneWithoutHrisConflictsEmployeeInput
   resolver?: Prisma.UserCreateNestedOneWithoutHrisConflictsResolverInput
+  sync: Prisma.HRISSyncCreateNestedOneWithoutConflictsInput
 }
 
 export type HRISConflictUncheckedCreateInput = {
@@ -367,9 +367,9 @@ export type HRISConflictUpdateInput = {
   resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sync?: Prisma.HRISSyncUpdateOneRequiredWithoutConflictsNestedInput
   employee?: Prisma.UserUpdateOneWithoutHrisConflictsEmployeeNestedInput
   resolver?: Prisma.UserUpdateOneWithoutHrisConflictsResolverNestedInput
+  sync?: Prisma.HRISSyncUpdateOneRequiredWithoutConflictsNestedInput
 }
 
 export type HRISConflictUncheckedUpdateInput = {
@@ -618,8 +618,8 @@ export type HRISConflictCreateWithoutEmployeeInput = {
   resolution?: string | null
   resolvedAt?: Date | string | null
   createdAt?: Date | string
-  sync: Prisma.HRISSyncCreateNestedOneWithoutConflictsInput
   resolver?: Prisma.UserCreateNestedOneWithoutHrisConflictsResolverInput
+  sync: Prisma.HRISSyncCreateNestedOneWithoutConflictsInput
 }
 
 export type HRISConflictUncheckedCreateWithoutEmployeeInput = {
@@ -651,8 +651,8 @@ export type HRISConflictCreateWithoutResolverInput = {
   resolution?: string | null
   resolvedAt?: Date | string | null
   createdAt?: Date | string
-  sync: Prisma.HRISSyncCreateNestedOneWithoutConflictsInput
   employee?: Prisma.UserCreateNestedOneWithoutHrisConflictsEmployeeInput
+  sync: Prisma.HRISSyncCreateNestedOneWithoutConflictsInput
 }
 
 export type HRISConflictUncheckedCreateWithoutResolverInput = {
@@ -805,8 +805,8 @@ export type HRISConflictUpdateWithoutEmployeeInput = {
   resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sync?: Prisma.HRISSyncUpdateOneRequiredWithoutConflictsNestedInput
   resolver?: Prisma.UserUpdateOneWithoutHrisConflictsResolverNestedInput
+  sync?: Prisma.HRISSyncUpdateOneRequiredWithoutConflictsNestedInput
 }
 
 export type HRISConflictUncheckedUpdateWithoutEmployeeInput = {
@@ -840,8 +840,8 @@ export type HRISConflictUpdateWithoutResolverInput = {
   resolution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sync?: Prisma.HRISSyncUpdateOneRequiredWithoutConflictsNestedInput
   employee?: Prisma.UserUpdateOneWithoutHrisConflictsEmployeeNestedInput
+  sync?: Prisma.HRISSyncUpdateOneRequiredWithoutConflictsNestedInput
 }
 
 export type HRISConflictUncheckedUpdateWithoutResolverInput = {
@@ -928,9 +928,9 @@ export type HRISConflictSelect<ExtArgs extends runtime.Types.Extensions.Internal
   resolvedBy?: boolean
   resolvedAt?: boolean
   createdAt?: boolean
-  sync?: boolean | Prisma.HRISSyncDefaultArgs<ExtArgs>
   employee?: boolean | Prisma.HRISConflict$employeeArgs<ExtArgs>
   resolver?: boolean | Prisma.HRISConflict$resolverArgs<ExtArgs>
+  sync?: boolean | Prisma.HRISSyncDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["hRISConflict"]>
 
 
@@ -950,17 +950,17 @@ export type HRISConflictSelectScalar = {
 
 export type HRISConflictOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "syncId" | "employeeId" | "conflictType" | "hrisData" | "systemData" | "resolution" | "resolvedBy" | "resolvedAt" | "createdAt", ExtArgs["result"]["hRISConflict"]>
 export type HRISConflictInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  sync?: boolean | Prisma.HRISSyncDefaultArgs<ExtArgs>
   employee?: boolean | Prisma.HRISConflict$employeeArgs<ExtArgs>
   resolver?: boolean | Prisma.HRISConflict$resolverArgs<ExtArgs>
+  sync?: boolean | Prisma.HRISSyncDefaultArgs<ExtArgs>
 }
 
 export type $HRISConflictPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "HRISConflict"
   objects: {
-    sync: Prisma.$HRISSyncPayload<ExtArgs>
     employee: Prisma.$UserPayload<ExtArgs> | null
     resolver: Prisma.$UserPayload<ExtArgs> | null
+    sync: Prisma.$HRISSyncPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1313,9 +1313,9 @@ readonly fields: HRISConflictFieldRefs;
  */
 export interface Prisma__HRISConflictClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  sync<T extends Prisma.HRISSyncDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.HRISSyncDefaultArgs<ExtArgs>>): Prisma.Prisma__HRISSyncClient<runtime.Types.Result.GetResult<Prisma.$HRISSyncPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   employee<T extends Prisma.HRISConflict$employeeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.HRISConflict$employeeArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   resolver<T extends Prisma.HRISConflict$resolverArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.HRISConflict$resolverArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  sync<T extends Prisma.HRISSyncDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.HRISSyncDefaultArgs<ExtArgs>>): Prisma.Prisma__HRISSyncClient<runtime.Types.Result.GetResult<Prisma.$HRISSyncPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

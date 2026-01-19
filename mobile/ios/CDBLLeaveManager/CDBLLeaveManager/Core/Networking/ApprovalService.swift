@@ -54,6 +54,17 @@ actor ApprovalService {
         )
     }
     
+    // MARK: - Forward Leave
+    
+    func forwardLeave(id: Int, comments: String? = nil) async throws -> APIResponse<LeaveRequest> {
+        let request = ApprovalActionRequest(action: "FORWARD", comments: comments)
+        return try await client.request(
+            "approvals/\(id)/action",
+            method: .post,
+            body: request
+        )
+    }
+    
     // MARK: - Return Leave
     
     func returnLeave(id: Int, comments: String) async throws -> APIResponse<LeaveRequest> {

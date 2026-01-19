@@ -296,8 +296,8 @@ export type ScheduledReportWhereInput = {
   createdBy?: Prisma.IntFilter<"ScheduledReport"> | number
   createdAt?: Prisma.DateTimeFilter<"ScheduledReport"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ScheduledReport"> | Date | string
-  creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   executions?: Prisma.ReportExecutionListRelationFilter
+  creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type ScheduledReportOrderByWithRelationInput = {
@@ -316,8 +316,8 @@ export type ScheduledReportOrderByWithRelationInput = {
   createdBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  creator?: Prisma.UserOrderByWithRelationInput
   executions?: Prisma.ReportExecutionOrderByRelationAggregateInput
+  creator?: Prisma.UserOrderByWithRelationInput
   _relevance?: Prisma.ScheduledReportOrderByRelevanceInput
 }
 
@@ -340,8 +340,8 @@ export type ScheduledReportWhereUniqueInput = Prisma.AtLeast<{
   createdBy?: Prisma.IntFilter<"ScheduledReport"> | number
   createdAt?: Prisma.DateTimeFilter<"ScheduledReport"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ScheduledReport"> | Date | string
-  creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   executions?: Prisma.ReportExecutionListRelationFilter
+  creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
 export type ScheduledReportOrderByWithAggregationInput = {
@@ -402,8 +402,8 @@ export type ScheduledReportCreateInput = {
   nextRunAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  creator: Prisma.UserCreateNestedOneWithoutScheduledReportsInput
   executions?: Prisma.ReportExecutionCreateNestedManyWithoutReportInput
+  creator: Prisma.UserCreateNestedOneWithoutScheduledReportsInput
 }
 
 export type ScheduledReportUncheckedCreateInput = {
@@ -439,8 +439,8 @@ export type ScheduledReportUpdateInput = {
   nextRunAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  creator?: Prisma.UserUpdateOneRequiredWithoutScheduledReportsNestedInput
   executions?: Prisma.ReportExecutionUpdateManyWithoutReportNestedInput
+  creator?: Prisma.UserUpdateOneRequiredWithoutScheduledReportsNestedInput
 }
 
 export type ScheduledReportUncheckedUpdateInput = {
@@ -949,8 +949,8 @@ export type ScheduledReportSelect<ExtArgs extends runtime.Types.Extensions.Inter
   createdBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   executions?: boolean | Prisma.ScheduledReport$executionsArgs<ExtArgs>
+  creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.ScheduledReportCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["scheduledReport"]>
 
@@ -976,16 +976,16 @@ export type ScheduledReportSelectScalar = {
 
 export type ScheduledReportOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "reportType" | "format" | "frequency" | "recipients" | "filters" | "scheduleTime" | "scheduleDay" | "isActive" | "lastRunAt" | "nextRunAt" | "createdBy" | "createdAt" | "updatedAt", ExtArgs["result"]["scheduledReport"]>
 export type ScheduledReportInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   executions?: boolean | Prisma.ScheduledReport$executionsArgs<ExtArgs>
+  creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.ScheduledReportCountOutputTypeDefaultArgs<ExtArgs>
 }
 
 export type $ScheduledReportPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ScheduledReport"
   objects: {
-    creator: Prisma.$UserPayload<ExtArgs>
     executions: Prisma.$ReportExecutionPayload<ExtArgs>[]
+    creator: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1343,8 +1343,8 @@ readonly fields: ScheduledReportFieldRefs;
  */
 export interface Prisma__ScheduledReportClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  creator<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   executions<T extends Prisma.ScheduledReport$executionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ScheduledReport$executionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReportExecutionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  creator<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

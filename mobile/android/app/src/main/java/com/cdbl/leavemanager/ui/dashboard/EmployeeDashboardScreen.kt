@@ -73,7 +73,9 @@ fun EmployeeDashboardScreen(
     onNavigateToApprovals: () -> Unit = {},
     onNavigateToLeaveDetails: (Int) -> Unit = {},
     onNavigateToHolidays: () -> Unit = {},
-    onNavigateToBalance: () -> Unit = {}
+    onNavigateToBalance: () -> Unit = {},
+    onNavigateToNotifications: () -> Unit = {},
+    onNavigateToProfile: () -> Unit = {}
 ) {
     // Collect UI State
     val state by viewModel.uiState.collectAsState()
@@ -140,7 +142,7 @@ fun EmployeeDashboardScreen(
                                 }
                                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                     IconButton(
-                                        onClick = { /*TODO*/ },
+                                        onClick = onNavigateToNotifications,
                                         modifier = Modifier
                                             .background(MaterialTheme.colorScheme.surface, CircleShape)
                                             .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f), CircleShape)

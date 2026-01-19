@@ -256,8 +256,8 @@ export type LeaveCalendarMappingWhereInput = {
   errorMessage?: Prisma.StringNullableFilter<"LeaveCalendarMapping"> | string | null
   createdAt?: Prisma.DateTimeFilter<"LeaveCalendarMapping"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"LeaveCalendarMapping"> | Date | string
-  leave?: Prisma.XOR<Prisma.LeaveRequestScalarRelationFilter, Prisma.LeaveRequestWhereInput>
   calendarConfig?: Prisma.XOR<Prisma.CalendarConfigScalarRelationFilter, Prisma.CalendarConfigWhereInput>
+  leave?: Prisma.XOR<Prisma.LeaveRequestScalarRelationFilter, Prisma.LeaveRequestWhereInput>
 }
 
 export type LeaveCalendarMappingOrderByWithRelationInput = {
@@ -270,8 +270,8 @@ export type LeaveCalendarMappingOrderByWithRelationInput = {
   errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  leave?: Prisma.LeaveRequestOrderByWithRelationInput
   calendarConfig?: Prisma.CalendarConfigOrderByWithRelationInput
+  leave?: Prisma.LeaveRequestOrderByWithRelationInput
   _relevance?: Prisma.LeaveCalendarMappingOrderByRelevanceInput
 }
 
@@ -289,8 +289,8 @@ export type LeaveCalendarMappingWhereUniqueInput = Prisma.AtLeast<{
   errorMessage?: Prisma.StringNullableFilter<"LeaveCalendarMapping"> | string | null
   createdAt?: Prisma.DateTimeFilter<"LeaveCalendarMapping"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"LeaveCalendarMapping"> | Date | string
-  leave?: Prisma.XOR<Prisma.LeaveRequestScalarRelationFilter, Prisma.LeaveRequestWhereInput>
   calendarConfig?: Prisma.XOR<Prisma.CalendarConfigScalarRelationFilter, Prisma.CalendarConfigWhereInput>
+  leave?: Prisma.XOR<Prisma.LeaveRequestScalarRelationFilter, Prisma.LeaveRequestWhereInput>
 }, "id" | "leaveId_calendarConfigId">
 
 export type LeaveCalendarMappingOrderByWithAggregationInput = {
@@ -332,8 +332,8 @@ export type LeaveCalendarMappingCreateInput = {
   errorMessage?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leave: Prisma.LeaveRequestCreateNestedOneWithoutCalendarMappingsInput
   calendarConfig: Prisma.CalendarConfigCreateNestedOneWithoutMappingsInput
+  leave: Prisma.LeaveRequestCreateNestedOneWithoutCalendarMappingsInput
 }
 
 export type LeaveCalendarMappingUncheckedCreateInput = {
@@ -355,8 +355,8 @@ export type LeaveCalendarMappingUpdateInput = {
   errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leave?: Prisma.LeaveRequestUpdateOneRequiredWithoutCalendarMappingsNestedInput
   calendarConfig?: Prisma.CalendarConfigUpdateOneRequiredWithoutMappingsNestedInput
+  leave?: Prisma.LeaveRequestUpdateOneRequiredWithoutCalendarMappingsNestedInput
 }
 
 export type LeaveCalendarMappingUncheckedUpdateInput = {
@@ -764,8 +764,8 @@ export type LeaveCalendarMappingSelect<ExtArgs extends runtime.Types.Extensions.
   errorMessage?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  leave?: boolean | Prisma.LeaveRequestDefaultArgs<ExtArgs>
   calendarConfig?: boolean | Prisma.CalendarConfigDefaultArgs<ExtArgs>
+  leave?: boolean | Prisma.LeaveRequestDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["leaveCalendarMapping"]>
 
 
@@ -784,15 +784,15 @@ export type LeaveCalendarMappingSelectScalar = {
 
 export type LeaveCalendarMappingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "leaveId" | "calendarConfigId" | "externalEventId" | "lastSyncedAt" | "syncStatus" | "errorMessage" | "createdAt" | "updatedAt", ExtArgs["result"]["leaveCalendarMapping"]>
 export type LeaveCalendarMappingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  leave?: boolean | Prisma.LeaveRequestDefaultArgs<ExtArgs>
   calendarConfig?: boolean | Prisma.CalendarConfigDefaultArgs<ExtArgs>
+  leave?: boolean | Prisma.LeaveRequestDefaultArgs<ExtArgs>
 }
 
 export type $LeaveCalendarMappingPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "LeaveCalendarMapping"
   objects: {
-    leave: Prisma.$LeaveRequestPayload<ExtArgs>
     calendarConfig: Prisma.$CalendarConfigPayload<ExtArgs>
+    leave: Prisma.$LeaveRequestPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1144,8 +1144,8 @@ readonly fields: LeaveCalendarMappingFieldRefs;
  */
 export interface Prisma__LeaveCalendarMappingClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  leave<T extends Prisma.LeaveRequestDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LeaveRequestDefaultArgs<ExtArgs>>): Prisma.Prisma__LeaveRequestClient<runtime.Types.Result.GetResult<Prisma.$LeaveRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   calendarConfig<T extends Prisma.CalendarConfigDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CalendarConfigDefaultArgs<ExtArgs>>): Prisma.Prisma__CalendarConfigClient<runtime.Types.Result.GetResult<Prisma.$CalendarConfigPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  leave<T extends Prisma.LeaveRequestDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LeaveRequestDefaultArgs<ExtArgs>>): Prisma.Prisma__LeaveRequestClient<runtime.Types.Result.GetResult<Prisma.$LeaveRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

@@ -79,6 +79,8 @@ export function useApplyLeaveForm() {
   const [incidentDate, setIncidentDate] = useState<Date | undefined>(undefined); // For Special Disability Leave
   const [conflictData, setConflictData] = useState<ConflictDetectionResult | null>(null);
   const [checkingConflicts, setCheckingConflicts] = useState(false);
+  const [isHalfDay, setIsHalfDay] = useState(false);
+  const [halfDayPeriod, setHalfDayPeriod] = useState<"AM" | "PM">("AM");
 
   const {
     data: balances,
@@ -473,6 +475,13 @@ export function useApplyLeaveForm() {
         payload.incidentDate = incidentDate.toISOString();
       }
 
+      // Add half-day parameters
+      if (isHalfDay) {
+        payload.isHalfDay = true;
+        payload.halfDayPeriod = halfDayPeriod;
+        // For half-day, working days should be 0.5 (but we use 1 in DB, with flag)
+      }
+
       // Handle Offline Submission
       if (typeof navigator !== "undefined" && !navigator.onLine) {
         const { queueSyncAction } = await import("@/lib/offline/db");
@@ -620,5 +629,9 @@ export function useApplyLeaveForm() {
     handleConfirmSubmit,
     handleManualSave,
     initiateReview,
+    isHalfDay,
+    setIsHalfDay,
+    halfDayPeriod,
+    setHalfDayPeriod,
   };
 }

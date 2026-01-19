@@ -117,6 +117,9 @@ struct ApprovalsListView: View {
                         onReject: {
                             viewModel.selectedForAction = approval
                             viewModel.showRejectSheet = true
+                        },
+                        onForward: {
+                            Task { await viewModel.forward(approval) }
                         }
                     )
                 }
@@ -134,6 +137,7 @@ struct ApprovalDetailCard: View {
     let showActions: Bool
     let onApprove: () -> Void
     let onReject: () -> Void
+    let onForward: () -> Void
     
     var body: some View {
         VStack(spacing: 16) {
@@ -191,29 +195,42 @@ struct ApprovalDetailCard: View {
             
             // Actions
             if showActions {
-                HStack(spacing: 12) {
+                HStack(spacing: 8) {
                     Button(action: onReject) {
                         HStack {
                             Image(systemName: "xmark")
                             Text("Reject")
                         }
-                        .font(.subheadline)
+                        .font(.caption)
                         .fontWeight(.medium)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
+                        .padding(.vertical, 10)
                     }
                     .buttonStyle(.bordered)
                     .foregroundStyle(.red)
+                    
+                    Button(action: onForward) {
+                        HStack {
+                            Image(systemName: "arrow.right.circle")
+                            Text("Forward")
+                        }
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                    }
+                    .buttonStyle(.bordered)
+                    .foregroundStyle(.orange)
                     
                     Button(action: onApprove) {
                         HStack {
                             Image(systemName: "checkmark")
                             Text("Approve")
                         }
-                        .font(.subheadline)
+                        .font(.caption)
                         .fontWeight(.medium)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
+                        .padding(.vertical, 10)
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.green)
@@ -303,6 +320,15 @@ final class ApprovalsViewModel: ObservableObject {
     func approve(_ approval: PendingApproval) async {
         do {
             _ = try await approvalService.approveLeave(id: approval.id)
+            pendingApprovals.removeAll { $0.id == approval.id }
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+    
+    func forward(_ approval: PendingApproval) async {
+        do {
+            _ = try await approvalService.forwardLeave(id: approval.id)
             pendingApprovals.removeAll { $0.id == approval.id }
         } catch {
             self.error = error.localizedDescription

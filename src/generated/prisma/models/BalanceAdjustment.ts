@@ -280,8 +280,8 @@ export type BalanceAdjustmentWhereInput = {
   newBalance?: Prisma.IntFilter<"BalanceAdjustment"> | number
   adjustedBy?: Prisma.IntFilter<"BalanceAdjustment"> | number
   createdAt?: Prisma.DateTimeFilter<"BalanceAdjustment"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   adjustedByUser?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type BalanceAdjustmentOrderByWithRelationInput = {
@@ -295,8 +295,8 @@ export type BalanceAdjustmentOrderByWithRelationInput = {
   newBalance?: Prisma.SortOrder
   adjustedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  user?: Prisma.UserOrderByWithRelationInput
   adjustedByUser?: Prisma.UserOrderByWithRelationInput
+  user?: Prisma.UserOrderByWithRelationInput
   _relevance?: Prisma.BalanceAdjustmentOrderByRelevanceInput
 }
 
@@ -314,8 +314,8 @@ export type BalanceAdjustmentWhereUniqueInput = Prisma.AtLeast<{
   newBalance?: Prisma.IntFilter<"BalanceAdjustment"> | number
   adjustedBy?: Prisma.IntFilter<"BalanceAdjustment"> | number
   createdAt?: Prisma.DateTimeFilter<"BalanceAdjustment"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   adjustedByUser?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
 export type BalanceAdjustmentOrderByWithAggregationInput = {
@@ -360,8 +360,8 @@ export type BalanceAdjustmentCreateInput = {
   previousBalance: number
   newBalance: number
   createdAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutBalanceAdjustmentsInput
   adjustedByUser: Prisma.UserCreateNestedOneWithoutAdjustmentsMadeInput
+  user: Prisma.UserCreateNestedOneWithoutBalanceAdjustmentsInput
 }
 
 export type BalanceAdjustmentUncheckedCreateInput = {
@@ -385,8 +385,8 @@ export type BalanceAdjustmentUpdateInput = {
   previousBalance?: Prisma.IntFieldUpdateOperationsInput | number
   newBalance?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutBalanceAdjustmentsNestedInput
   adjustedByUser?: Prisma.UserUpdateOneRequiredWithoutAdjustmentsMadeNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutBalanceAdjustmentsNestedInput
 }
 
 export type BalanceAdjustmentUncheckedUpdateInput = {
@@ -513,13 +513,6 @@ export type BalanceAdjustmentSumOrderByAggregateInput = {
   adjustedBy?: Prisma.SortOrder
 }
 
-export type BalanceAdjustmentCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.BalanceAdjustmentCreateWithoutUserInput, Prisma.BalanceAdjustmentUncheckedCreateWithoutUserInput> | Prisma.BalanceAdjustmentCreateWithoutUserInput[] | Prisma.BalanceAdjustmentUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.BalanceAdjustmentCreateOrConnectWithoutUserInput | Prisma.BalanceAdjustmentCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.BalanceAdjustmentCreateManyUserInputEnvelope
-  connect?: Prisma.BalanceAdjustmentWhereUniqueInput | Prisma.BalanceAdjustmentWhereUniqueInput[]
-}
-
 export type BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput = {
   create?: Prisma.XOR<Prisma.BalanceAdjustmentCreateWithoutAdjustedByUserInput, Prisma.BalanceAdjustmentUncheckedCreateWithoutAdjustedByUserInput> | Prisma.BalanceAdjustmentCreateWithoutAdjustedByUserInput[] | Prisma.BalanceAdjustmentUncheckedCreateWithoutAdjustedByUserInput[]
   connectOrCreate?: Prisma.BalanceAdjustmentCreateOrConnectWithoutAdjustedByUserInput | Prisma.BalanceAdjustmentCreateOrConnectWithoutAdjustedByUserInput[]
@@ -527,7 +520,7 @@ export type BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput = {
   connect?: Prisma.BalanceAdjustmentWhereUniqueInput | Prisma.BalanceAdjustmentWhereUniqueInput[]
 }
 
-export type BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput = {
+export type BalanceAdjustmentCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.BalanceAdjustmentCreateWithoutUserInput, Prisma.BalanceAdjustmentUncheckedCreateWithoutUserInput> | Prisma.BalanceAdjustmentCreateWithoutUserInput[] | Prisma.BalanceAdjustmentUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.BalanceAdjustmentCreateOrConnectWithoutUserInput | Prisma.BalanceAdjustmentCreateOrConnectWithoutUserInput[]
   createMany?: Prisma.BalanceAdjustmentCreateManyUserInputEnvelope
@@ -541,18 +534,11 @@ export type BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
   connect?: Prisma.BalanceAdjustmentWhereUniqueInput | Prisma.BalanceAdjustmentWhereUniqueInput[]
 }
 
-export type BalanceAdjustmentUpdateManyWithoutUserNestedInput = {
+export type BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.BalanceAdjustmentCreateWithoutUserInput, Prisma.BalanceAdjustmentUncheckedCreateWithoutUserInput> | Prisma.BalanceAdjustmentCreateWithoutUserInput[] | Prisma.BalanceAdjustmentUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.BalanceAdjustmentCreateOrConnectWithoutUserInput | Prisma.BalanceAdjustmentCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.BalanceAdjustmentUpsertWithWhereUniqueWithoutUserInput | Prisma.BalanceAdjustmentUpsertWithWhereUniqueWithoutUserInput[]
   createMany?: Prisma.BalanceAdjustmentCreateManyUserInputEnvelope
-  set?: Prisma.BalanceAdjustmentWhereUniqueInput | Prisma.BalanceAdjustmentWhereUniqueInput[]
-  disconnect?: Prisma.BalanceAdjustmentWhereUniqueInput | Prisma.BalanceAdjustmentWhereUniqueInput[]
-  delete?: Prisma.BalanceAdjustmentWhereUniqueInput | Prisma.BalanceAdjustmentWhereUniqueInput[]
   connect?: Prisma.BalanceAdjustmentWhereUniqueInput | Prisma.BalanceAdjustmentWhereUniqueInput[]
-  update?: Prisma.BalanceAdjustmentUpdateWithWhereUniqueWithoutUserInput | Prisma.BalanceAdjustmentUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.BalanceAdjustmentUpdateManyWithWhereWithoutUserInput | Prisma.BalanceAdjustmentUpdateManyWithWhereWithoutUserInput[]
-  deleteMany?: Prisma.BalanceAdjustmentScalarWhereInput | Prisma.BalanceAdjustmentScalarWhereInput[]
 }
 
 export type BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput = {
@@ -569,7 +555,7 @@ export type BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput = {
   deleteMany?: Prisma.BalanceAdjustmentScalarWhereInput | Prisma.BalanceAdjustmentScalarWhereInput[]
 }
 
-export type BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput = {
+export type BalanceAdjustmentUpdateManyWithoutUserNestedInput = {
   create?: Prisma.XOR<Prisma.BalanceAdjustmentCreateWithoutUserInput, Prisma.BalanceAdjustmentUncheckedCreateWithoutUserInput> | Prisma.BalanceAdjustmentCreateWithoutUserInput[] | Prisma.BalanceAdjustmentUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.BalanceAdjustmentCreateOrConnectWithoutUserInput | Prisma.BalanceAdjustmentCreateOrConnectWithoutUserInput[]
   upsert?: Prisma.BalanceAdjustmentUpsertWithWhereUniqueWithoutUserInput | Prisma.BalanceAdjustmentUpsertWithWhereUniqueWithoutUserInput[]
@@ -597,37 +583,18 @@ export type BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
   deleteMany?: Prisma.BalanceAdjustmentScalarWhereInput | Prisma.BalanceAdjustmentScalarWhereInput[]
 }
 
-export type BalanceAdjustmentCreateWithoutUserInput = {
-  leaveType: $Enums.LeaveType
-  year: number
-  amount: number
-  reason: string
-  previousBalance: number
-  newBalance: number
-  createdAt?: Date | string
-  adjustedByUser: Prisma.UserCreateNestedOneWithoutAdjustmentsMadeInput
-}
-
-export type BalanceAdjustmentUncheckedCreateWithoutUserInput = {
-  id?: number
-  leaveType: $Enums.LeaveType
-  year: number
-  amount: number
-  reason: string
-  previousBalance: number
-  newBalance: number
-  adjustedBy: number
-  createdAt?: Date | string
-}
-
-export type BalanceAdjustmentCreateOrConnectWithoutUserInput = {
-  where: Prisma.BalanceAdjustmentWhereUniqueInput
-  create: Prisma.XOR<Prisma.BalanceAdjustmentCreateWithoutUserInput, Prisma.BalanceAdjustmentUncheckedCreateWithoutUserInput>
-}
-
-export type BalanceAdjustmentCreateManyUserInputEnvelope = {
-  data: Prisma.BalanceAdjustmentCreateManyUserInput | Prisma.BalanceAdjustmentCreateManyUserInput[]
-  skipDuplicates?: boolean
+export type BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.BalanceAdjustmentCreateWithoutUserInput, Prisma.BalanceAdjustmentUncheckedCreateWithoutUserInput> | Prisma.BalanceAdjustmentCreateWithoutUserInput[] | Prisma.BalanceAdjustmentUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.BalanceAdjustmentCreateOrConnectWithoutUserInput | Prisma.BalanceAdjustmentCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.BalanceAdjustmentUpsertWithWhereUniqueWithoutUserInput | Prisma.BalanceAdjustmentUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.BalanceAdjustmentCreateManyUserInputEnvelope
+  set?: Prisma.BalanceAdjustmentWhereUniqueInput | Prisma.BalanceAdjustmentWhereUniqueInput[]
+  disconnect?: Prisma.BalanceAdjustmentWhereUniqueInput | Prisma.BalanceAdjustmentWhereUniqueInput[]
+  delete?: Prisma.BalanceAdjustmentWhereUniqueInput | Prisma.BalanceAdjustmentWhereUniqueInput[]
+  connect?: Prisma.BalanceAdjustmentWhereUniqueInput | Prisma.BalanceAdjustmentWhereUniqueInput[]
+  update?: Prisma.BalanceAdjustmentUpdateWithWhereUniqueWithoutUserInput | Prisma.BalanceAdjustmentUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.BalanceAdjustmentUpdateManyWithWhereWithoutUserInput | Prisma.BalanceAdjustmentUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.BalanceAdjustmentScalarWhereInput | Prisma.BalanceAdjustmentScalarWhereInput[]
 }
 
 export type BalanceAdjustmentCreateWithoutAdjustedByUserInput = {
@@ -663,36 +630,37 @@ export type BalanceAdjustmentCreateManyAdjustedByUserInputEnvelope = {
   skipDuplicates?: boolean
 }
 
-export type BalanceAdjustmentUpsertWithWhereUniqueWithoutUserInput = {
+export type BalanceAdjustmentCreateWithoutUserInput = {
+  leaveType: $Enums.LeaveType
+  year: number
+  amount: number
+  reason: string
+  previousBalance: number
+  newBalance: number
+  createdAt?: Date | string
+  adjustedByUser: Prisma.UserCreateNestedOneWithoutAdjustmentsMadeInput
+}
+
+export type BalanceAdjustmentUncheckedCreateWithoutUserInput = {
+  id?: number
+  leaveType: $Enums.LeaveType
+  year: number
+  amount: number
+  reason: string
+  previousBalance: number
+  newBalance: number
+  adjustedBy: number
+  createdAt?: Date | string
+}
+
+export type BalanceAdjustmentCreateOrConnectWithoutUserInput = {
   where: Prisma.BalanceAdjustmentWhereUniqueInput
-  update: Prisma.XOR<Prisma.BalanceAdjustmentUpdateWithoutUserInput, Prisma.BalanceAdjustmentUncheckedUpdateWithoutUserInput>
   create: Prisma.XOR<Prisma.BalanceAdjustmentCreateWithoutUserInput, Prisma.BalanceAdjustmentUncheckedCreateWithoutUserInput>
 }
 
-export type BalanceAdjustmentUpdateWithWhereUniqueWithoutUserInput = {
-  where: Prisma.BalanceAdjustmentWhereUniqueInput
-  data: Prisma.XOR<Prisma.BalanceAdjustmentUpdateWithoutUserInput, Prisma.BalanceAdjustmentUncheckedUpdateWithoutUserInput>
-}
-
-export type BalanceAdjustmentUpdateManyWithWhereWithoutUserInput = {
-  where: Prisma.BalanceAdjustmentScalarWhereInput
-  data: Prisma.XOR<Prisma.BalanceAdjustmentUpdateManyMutationInput, Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserInput>
-}
-
-export type BalanceAdjustmentScalarWhereInput = {
-  AND?: Prisma.BalanceAdjustmentScalarWhereInput | Prisma.BalanceAdjustmentScalarWhereInput[]
-  OR?: Prisma.BalanceAdjustmentScalarWhereInput[]
-  NOT?: Prisma.BalanceAdjustmentScalarWhereInput | Prisma.BalanceAdjustmentScalarWhereInput[]
-  id?: Prisma.IntFilter<"BalanceAdjustment"> | number
-  userId?: Prisma.IntFilter<"BalanceAdjustment"> | number
-  leaveType?: Prisma.EnumLeaveTypeFilter<"BalanceAdjustment"> | $Enums.LeaveType
-  year?: Prisma.IntFilter<"BalanceAdjustment"> | number
-  amount?: Prisma.IntFilter<"BalanceAdjustment"> | number
-  reason?: Prisma.StringFilter<"BalanceAdjustment"> | string
-  previousBalance?: Prisma.IntFilter<"BalanceAdjustment"> | number
-  newBalance?: Prisma.IntFilter<"BalanceAdjustment"> | number
-  adjustedBy?: Prisma.IntFilter<"BalanceAdjustment"> | number
-  createdAt?: Prisma.DateTimeFilter<"BalanceAdjustment"> | Date | string
+export type BalanceAdjustmentCreateManyUserInputEnvelope = {
+  data: Prisma.BalanceAdjustmentCreateManyUserInput | Prisma.BalanceAdjustmentCreateManyUserInput[]
+  skipDuplicates?: boolean
 }
 
 export type BalanceAdjustmentUpsertWithWhereUniqueWithoutAdjustedByUserInput = {
@@ -711,16 +679,36 @@ export type BalanceAdjustmentUpdateManyWithWhereWithoutAdjustedByUserInput = {
   data: Prisma.XOR<Prisma.BalanceAdjustmentUpdateManyMutationInput, Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserInput>
 }
 
-export type BalanceAdjustmentCreateManyUserInput = {
-  id?: number
-  leaveType: $Enums.LeaveType
-  year: number
-  amount: number
-  reason: string
-  previousBalance: number
-  newBalance: number
-  adjustedBy: number
-  createdAt?: Date | string
+export type BalanceAdjustmentScalarWhereInput = {
+  AND?: Prisma.BalanceAdjustmentScalarWhereInput | Prisma.BalanceAdjustmentScalarWhereInput[]
+  OR?: Prisma.BalanceAdjustmentScalarWhereInput[]
+  NOT?: Prisma.BalanceAdjustmentScalarWhereInput | Prisma.BalanceAdjustmentScalarWhereInput[]
+  id?: Prisma.IntFilter<"BalanceAdjustment"> | number
+  userId?: Prisma.IntFilter<"BalanceAdjustment"> | number
+  leaveType?: Prisma.EnumLeaveTypeFilter<"BalanceAdjustment"> | $Enums.LeaveType
+  year?: Prisma.IntFilter<"BalanceAdjustment"> | number
+  amount?: Prisma.IntFilter<"BalanceAdjustment"> | number
+  reason?: Prisma.StringFilter<"BalanceAdjustment"> | string
+  previousBalance?: Prisma.IntFilter<"BalanceAdjustment"> | number
+  newBalance?: Prisma.IntFilter<"BalanceAdjustment"> | number
+  adjustedBy?: Prisma.IntFilter<"BalanceAdjustment"> | number
+  createdAt?: Prisma.DateTimeFilter<"BalanceAdjustment"> | Date | string
+}
+
+export type BalanceAdjustmentUpsertWithWhereUniqueWithoutUserInput = {
+  where: Prisma.BalanceAdjustmentWhereUniqueInput
+  update: Prisma.XOR<Prisma.BalanceAdjustmentUpdateWithoutUserInput, Prisma.BalanceAdjustmentUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.BalanceAdjustmentCreateWithoutUserInput, Prisma.BalanceAdjustmentUncheckedCreateWithoutUserInput>
+}
+
+export type BalanceAdjustmentUpdateWithWhereUniqueWithoutUserInput = {
+  where: Prisma.BalanceAdjustmentWhereUniqueInput
+  data: Prisma.XOR<Prisma.BalanceAdjustmentUpdateWithoutUserInput, Prisma.BalanceAdjustmentUncheckedUpdateWithoutUserInput>
+}
+
+export type BalanceAdjustmentUpdateManyWithWhereWithoutUserInput = {
+  where: Prisma.BalanceAdjustmentScalarWhereInput
+  data: Prisma.XOR<Prisma.BalanceAdjustmentUpdateManyMutationInput, Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserInput>
 }
 
 export type BalanceAdjustmentCreateManyAdjustedByUserInput = {
@@ -735,39 +723,16 @@ export type BalanceAdjustmentCreateManyAdjustedByUserInput = {
   createdAt?: Date | string
 }
 
-export type BalanceAdjustmentUpdateWithoutUserInput = {
-  leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
-  year?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.IntFieldUpdateOperationsInput | number
-  reason?: Prisma.StringFieldUpdateOperationsInput | string
-  previousBalance?: Prisma.IntFieldUpdateOperationsInput | number
-  newBalance?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  adjustedByUser?: Prisma.UserUpdateOneRequiredWithoutAdjustmentsMadeNestedInput
-}
-
-export type BalanceAdjustmentUncheckedUpdateWithoutUserInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
-  year?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.IntFieldUpdateOperationsInput | number
-  reason?: Prisma.StringFieldUpdateOperationsInput | string
-  previousBalance?: Prisma.IntFieldUpdateOperationsInput | number
-  newBalance?: Prisma.IntFieldUpdateOperationsInput | number
-  adjustedBy?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type BalanceAdjustmentUncheckedUpdateManyWithoutUserInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
-  year?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.IntFieldUpdateOperationsInput | number
-  reason?: Prisma.StringFieldUpdateOperationsInput | string
-  previousBalance?: Prisma.IntFieldUpdateOperationsInput | number
-  newBalance?: Prisma.IntFieldUpdateOperationsInput | number
-  adjustedBy?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+export type BalanceAdjustmentCreateManyUserInput = {
+  id?: number
+  leaveType: $Enums.LeaveType
+  year: number
+  amount: number
+  reason: string
+  previousBalance: number
+  newBalance: number
+  adjustedBy: number
+  createdAt?: Date | string
 }
 
 export type BalanceAdjustmentUpdateWithoutAdjustedByUserInput = {
@@ -805,6 +770,41 @@ export type BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type BalanceAdjustmentUpdateWithoutUserInput = {
+  leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
+  year?: Prisma.IntFieldUpdateOperationsInput | number
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  reason?: Prisma.StringFieldUpdateOperationsInput | string
+  previousBalance?: Prisma.IntFieldUpdateOperationsInput | number
+  newBalance?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  adjustedByUser?: Prisma.UserUpdateOneRequiredWithoutAdjustmentsMadeNestedInput
+}
+
+export type BalanceAdjustmentUncheckedUpdateWithoutUserInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
+  year?: Prisma.IntFieldUpdateOperationsInput | number
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  reason?: Prisma.StringFieldUpdateOperationsInput | string
+  previousBalance?: Prisma.IntFieldUpdateOperationsInput | number
+  newBalance?: Prisma.IntFieldUpdateOperationsInput | number
+  adjustedBy?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type BalanceAdjustmentUncheckedUpdateManyWithoutUserInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  leaveType?: Prisma.EnumLeaveTypeFieldUpdateOperationsInput | $Enums.LeaveType
+  year?: Prisma.IntFieldUpdateOperationsInput | number
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  reason?: Prisma.StringFieldUpdateOperationsInput | string
+  previousBalance?: Prisma.IntFieldUpdateOperationsInput | number
+  newBalance?: Prisma.IntFieldUpdateOperationsInput | number
+  adjustedBy?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 
 
 export type BalanceAdjustmentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -818,8 +818,8 @@ export type BalanceAdjustmentSelect<ExtArgs extends runtime.Types.Extensions.Int
   newBalance?: boolean
   adjustedBy?: boolean
   createdAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   adjustedByUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["balanceAdjustment"]>
 
 
@@ -839,15 +839,15 @@ export type BalanceAdjustmentSelectScalar = {
 
 export type BalanceAdjustmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "leaveType" | "year" | "amount" | "reason" | "previousBalance" | "newBalance" | "adjustedBy" | "createdAt", ExtArgs["result"]["balanceAdjustment"]>
 export type BalanceAdjustmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   adjustedByUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $BalanceAdjustmentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "BalanceAdjustment"
   objects: {
-    user: Prisma.$UserPayload<ExtArgs>
     adjustedByUser: Prisma.$UserPayload<ExtArgs>
+    user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1200,8 +1200,8 @@ readonly fields: BalanceAdjustmentFieldRefs;
  */
 export interface Prisma__BalanceAdjustmentClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   adjustedByUser<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

@@ -57,6 +57,10 @@ fun ApplyLeaveScreen(
     var selectedStartDate by remember { mutableStateOf<LocalDate?>(null) }
     var selectedEndDate by remember { mutableStateOf<LocalDate?>(null) }
     
+    // Half-day state
+    var isHalfDay by remember { mutableStateOf(false) }
+    var halfDayPeriod by remember { mutableStateOf("AM") }
+    
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -214,7 +218,7 @@ fun ApplyLeaveScreen(
                                 val formatter = DateTimeFormatter.ISO_LOCAL_DATE
                                 val start = selectedStartDate!!.format(formatter)
                                 val end = (selectedEndDate ?: selectedStartDate!!).format(formatter)
-                                viewModel.submitLeave(token, selectedTypeCode, start, end, reason, selectedFileUri) 
+                                viewModel.submitLeave(token, selectedTypeCode, start, end, reason, selectedFileUri, isHalfDay, if (isHalfDay) halfDayPeriod else null) 
                             }
                         },
                         enabled = !uiState.isLoading && selectedStartDate != null && reason.isNotBlank(),
@@ -365,6 +369,64 @@ fun ApplyLeaveScreen(
                     existingLeaves = existingLeavesMap,
                     weekendsBlocked = false
                 )
+            }
+
+            // Half-Day Toggle (only show for single day selection)
+            if (selectedStartDate != null && (selectedEndDate == null || selectedStartDate == selectedEndDate) && (selectedTypeCode == "CASUAL" || selectedTypeCode == "EARNED")) {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)),
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    "Half Day Leave",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Text(
+                                    "Apply for half a day only",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Switch(
+                                checked = isHalfDay,
+                                onCheckedChange = { isHalfDay = it }
+                            )
+                        }
+                        
+                        if (isHalfDay) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                FilterChip(
+                                    onClick = { halfDayPeriod = "AM" },
+                                    label = { Text("First Half (AM)") },
+                                    selected = halfDayPeriod == "AM",
+                                    leadingIcon = if (halfDayPeriod == "AM") {
+                                        { Icon(Icons.Rounded.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                                    } else null
+                                )
+                                FilterChip(
+                                    onClick = { halfDayPeriod = "PM" },
+                                    label = { Text("Second Half (PM)") },
+                                    selected = halfDayPeriod == "PM",
+                                    leadingIcon = if (halfDayPeriod == "PM") {
+                                        { Icon(Icons.Rounded.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                                    } else null
+                                )
+                            }
+                        }
+                    }
+                }
             }
 
             // Reason Input

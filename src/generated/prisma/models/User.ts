@@ -38,47 +38,47 @@ export type UserSumAggregateOutputType = {
 
 export type UserMinAggregateOutputType = {
   id: number | null
+  empCode: string | null
   name: string | null
   email: string | null
-  password: string | null
-  empCode: string | null
   role: $Enums.Role | null
   department: string | null
-  deptHeadId: number | null
-  joinDate: Date | null
-  retirementDate: Date | null
   createdAt: Date | null
   updatedAt: Date | null
+  joinDate: Date | null
+  retirementDate: Date | null
+  password: string | null
+  deptHeadId: number | null
 }
 
 export type UserMaxAggregateOutputType = {
   id: number | null
+  empCode: string | null
   name: string | null
   email: string | null
-  password: string | null
-  empCode: string | null
   role: $Enums.Role | null
   department: string | null
-  deptHeadId: number | null
-  joinDate: Date | null
-  retirementDate: Date | null
   createdAt: Date | null
   updatedAt: Date | null
+  joinDate: Date | null
+  retirementDate: Date | null
+  password: string | null
+  deptHeadId: number | null
 }
 
 export type UserCountAggregateOutputType = {
   id: number
+  empCode: number
   name: number
   email: number
-  password: number
-  empCode: number
   role: number
   department: number
-  deptHeadId: number
-  joinDate: number
-  retirementDate: number
   createdAt: number
   updatedAt: number
+  joinDate: number
+  retirementDate: number
+  password: number
+  deptHeadId: number
   _all: number
 }
 
@@ -95,47 +95,47 @@ export type UserSumAggregateInputType = {
 
 export type UserMinAggregateInputType = {
   id?: true
+  empCode?: true
   name?: true
   email?: true
-  password?: true
-  empCode?: true
   role?: true
   department?: true
-  deptHeadId?: true
-  joinDate?: true
-  retirementDate?: true
   createdAt?: true
   updatedAt?: true
+  joinDate?: true
+  retirementDate?: true
+  password?: true
+  deptHeadId?: true
 }
 
 export type UserMaxAggregateInputType = {
   id?: true
+  empCode?: true
   name?: true
   email?: true
-  password?: true
-  empCode?: true
   role?: true
   department?: true
-  deptHeadId?: true
-  joinDate?: true
-  retirementDate?: true
   createdAt?: true
   updatedAt?: true
+  joinDate?: true
+  retirementDate?: true
+  password?: true
+  deptHeadId?: true
 }
 
 export type UserCountAggregateInputType = {
   id?: true
+  empCode?: true
   name?: true
   email?: true
-  password?: true
-  empCode?: true
   role?: true
   department?: true
-  deptHeadId?: true
-  joinDate?: true
-  retirementDate?: true
   createdAt?: true
   updatedAt?: true
+  joinDate?: true
+  retirementDate?: true
+  password?: true
+  deptHeadId?: true
   _all?: true
 }
 
@@ -227,17 +227,17 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 
 export type UserGroupByOutputType = {
   id: number
+  empCode: string | null
   name: string
   email: string
-  password: string | null
-  empCode: string | null
   role: $Enums.Role
   department: string | null
-  deptHeadId: number | null
-  joinDate: Date | null
-  retirementDate: Date | null
   createdAt: Date
   updatedAt: Date
+  joinDate: Date | null
+  retirementDate: Date | null
+  password: string | null
+  deptHeadId: number | null
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
   _sum: UserSumAggregateOutputType | null
@@ -265,82 +265,82 @@ export type UserWhereInput = {
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   id?: Prisma.IntFilter<"User"> | number
+  empCode?: Prisma.StringNullableFilter<"User"> | string | null
   name?: Prisma.StringFilter<"User"> | string
   email?: Prisma.StringFilter<"User"> | string
-  password?: Prisma.StringNullableFilter<"User"> | string | null
-  empCode?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   department?: Prisma.StringNullableFilter<"User"> | string | null
-  deptHeadId?: Prisma.IntNullableFilter<"User"> | number | null
-  joinDate?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
-  retirementDate?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  leaves?: Prisma.LeaveRequestListRelationFilter
-  balances?: Prisma.BalanceListRelationFilter
+  joinDate?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  retirementDate?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  password?: Prisma.StringNullableFilter<"User"> | string | null
+  deptHeadId?: Prisma.IntNullableFilter<"User"> | number | null
   approvals?: Prisma.ApprovalListRelationFilter
-  deptHead?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
-  teamMembers?: Prisma.UserListRelationFilter
-  encashmentRequests?: Prisma.EncashmentRequestListRelationFilter
+  delegationsReceived?: Prisma.ApprovalDelegationListRelationFilter
+  delegationsDelegated?: Prisma.ApprovalDelegationListRelationFilter
+  balances?: Prisma.BalanceListRelationFilter
+  adjustmentsMade?: Prisma.BalanceAdjustmentListRelationFilter
+  balanceAdjustments?: Prisma.BalanceAdjustmentListRelationFilter
+  bankDetails?: Prisma.XOR<Prisma.BankDetailsNullableScalarRelationFilter, Prisma.BankDetailsWhereInput> | null
+  calendarConfigs?: Prisma.CalendarConfigListRelationFilter
+  emergencyContacts?: Prisma.EmergencyContactListRelationFilter
   encashmentApprovals?: Prisma.EncashmentRequestListRelationFilter
   encashmentProcessed?: Prisma.EncashmentRequestListRelationFilter
-  balanceAdjustments?: Prisma.BalanceAdjustmentListRelationFilter
-  adjustmentsMade?: Prisma.BalanceAdjustmentListRelationFilter
-  delegationsDelegated?: Prisma.ApprovalDelegationListRelationFilter
-  delegationsReceived?: Prisma.ApprovalDelegationListRelationFilter
-  preferences?: Prisma.XOR<Prisma.UserPreferencesNullableScalarRelationFilter, Prisma.UserPreferencesWhereInput> | null
-  leaveTemplates?: Prisma.LeaveTemplateListRelationFilter
-  policyVersions?: Prisma.PolicyVersionListRelationFilter
-  profile?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
-  emergencyContacts?: Prisma.EmergencyContactListRelationFilter
-  bankDetails?: Prisma.XOR<Prisma.BankDetailsNullableScalarRelationFilter, Prisma.BankDetailsWhereInput> | null
-  documents?: Prisma.UserDocumentListRelationFilter
-  hrisSyncs?: Prisma.HRISSyncListRelationFilter
+  encashmentRequests?: Prisma.EncashmentRequestListRelationFilter
   hrisConflictsEmployee?: Prisma.HRISConflictListRelationFilter
   hrisConflictsResolver?: Prisma.HRISConflictListRelationFilter
+  hrisSyncs?: Prisma.HRISSyncListRelationFilter
+  leaves?: Prisma.LeaveRequestListRelationFilter
+  leaveTemplates?: Prisma.LeaveTemplateListRelationFilter
+  policyVersions?: Prisma.PolicyVersionListRelationFilter
   scheduledReports?: Prisma.ScheduledReportListRelationFilter
-  calendarConfigs?: Prisma.CalendarConfigListRelationFilter
+  deptHead?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  teamMembers?: Prisma.UserListRelationFilter
+  documents?: Prisma.UserDocumentListRelationFilter
+  preferences?: Prisma.XOR<Prisma.UserPreferencesNullableScalarRelationFilter, Prisma.UserPreferencesWhereInput> | null
+  profile?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
   webhooks?: Prisma.WebhookListRelationFilter
   policyUpdates?: Prisma.WorkflowPolicyListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  empCode?: Prisma.SortOrderInput | Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  password?: Prisma.SortOrderInput | Prisma.SortOrder
-  empCode?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   department?: Prisma.SortOrderInput | Prisma.SortOrder
-  deptHeadId?: Prisma.SortOrderInput | Prisma.SortOrder
-  joinDate?: Prisma.SortOrderInput | Prisma.SortOrder
-  retirementDate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  leaves?: Prisma.LeaveRequestOrderByRelationAggregateInput
-  balances?: Prisma.BalanceOrderByRelationAggregateInput
+  joinDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  retirementDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  password?: Prisma.SortOrderInput | Prisma.SortOrder
+  deptHeadId?: Prisma.SortOrderInput | Prisma.SortOrder
   approvals?: Prisma.ApprovalOrderByRelationAggregateInput
-  deptHead?: Prisma.UserOrderByWithRelationInput
-  teamMembers?: Prisma.UserOrderByRelationAggregateInput
-  encashmentRequests?: Prisma.EncashmentRequestOrderByRelationAggregateInput
+  delegationsReceived?: Prisma.ApprovalDelegationOrderByRelationAggregateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationOrderByRelationAggregateInput
+  balances?: Prisma.BalanceOrderByRelationAggregateInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentOrderByRelationAggregateInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentOrderByRelationAggregateInput
+  bankDetails?: Prisma.BankDetailsOrderByWithRelationInput
+  calendarConfigs?: Prisma.CalendarConfigOrderByRelationAggregateInput
+  emergencyContacts?: Prisma.EmergencyContactOrderByRelationAggregateInput
   encashmentApprovals?: Prisma.EncashmentRequestOrderByRelationAggregateInput
   encashmentProcessed?: Prisma.EncashmentRequestOrderByRelationAggregateInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentOrderByRelationAggregateInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentOrderByRelationAggregateInput
-  delegationsDelegated?: Prisma.ApprovalDelegationOrderByRelationAggregateInput
-  delegationsReceived?: Prisma.ApprovalDelegationOrderByRelationAggregateInput
-  preferences?: Prisma.UserPreferencesOrderByWithRelationInput
-  leaveTemplates?: Prisma.LeaveTemplateOrderByRelationAggregateInput
-  policyVersions?: Prisma.PolicyVersionOrderByRelationAggregateInput
-  profile?: Prisma.UserProfileOrderByWithRelationInput
-  emergencyContacts?: Prisma.EmergencyContactOrderByRelationAggregateInput
-  bankDetails?: Prisma.BankDetailsOrderByWithRelationInput
-  documents?: Prisma.UserDocumentOrderByRelationAggregateInput
-  hrisSyncs?: Prisma.HRISSyncOrderByRelationAggregateInput
+  encashmentRequests?: Prisma.EncashmentRequestOrderByRelationAggregateInput
   hrisConflictsEmployee?: Prisma.HRISConflictOrderByRelationAggregateInput
   hrisConflictsResolver?: Prisma.HRISConflictOrderByRelationAggregateInput
+  hrisSyncs?: Prisma.HRISSyncOrderByRelationAggregateInput
+  leaves?: Prisma.LeaveRequestOrderByRelationAggregateInput
+  leaveTemplates?: Prisma.LeaveTemplateOrderByRelationAggregateInput
+  policyVersions?: Prisma.PolicyVersionOrderByRelationAggregateInput
   scheduledReports?: Prisma.ScheduledReportOrderByRelationAggregateInput
-  calendarConfigs?: Prisma.CalendarConfigOrderByRelationAggregateInput
+  deptHead?: Prisma.UserOrderByWithRelationInput
+  teamMembers?: Prisma.UserOrderByRelationAggregateInput
+  documents?: Prisma.UserDocumentOrderByRelationAggregateInput
+  preferences?: Prisma.UserPreferencesOrderByWithRelationInput
+  profile?: Prisma.UserProfileOrderByWithRelationInput
   webhooks?: Prisma.WebhookOrderByRelationAggregateInput
   policyUpdates?: Prisma.WorkflowPolicyOrderByRelationAggregateInput
   _relevance?: Prisma.UserOrderByRelevanceInput
@@ -348,61 +348,61 @@ export type UserOrderByWithRelationInput = {
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: number
-  email?: string
   empCode?: string
+  email?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   name?: Prisma.StringFilter<"User"> | string
-  password?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   department?: Prisma.StringNullableFilter<"User"> | string | null
-  deptHeadId?: Prisma.IntNullableFilter<"User"> | number | null
-  joinDate?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
-  retirementDate?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  leaves?: Prisma.LeaveRequestListRelationFilter
-  balances?: Prisma.BalanceListRelationFilter
+  joinDate?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  retirementDate?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  password?: Prisma.StringNullableFilter<"User"> | string | null
+  deptHeadId?: Prisma.IntNullableFilter<"User"> | number | null
   approvals?: Prisma.ApprovalListRelationFilter
-  deptHead?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
-  teamMembers?: Prisma.UserListRelationFilter
-  encashmentRequests?: Prisma.EncashmentRequestListRelationFilter
+  delegationsReceived?: Prisma.ApprovalDelegationListRelationFilter
+  delegationsDelegated?: Prisma.ApprovalDelegationListRelationFilter
+  balances?: Prisma.BalanceListRelationFilter
+  adjustmentsMade?: Prisma.BalanceAdjustmentListRelationFilter
+  balanceAdjustments?: Prisma.BalanceAdjustmentListRelationFilter
+  bankDetails?: Prisma.XOR<Prisma.BankDetailsNullableScalarRelationFilter, Prisma.BankDetailsWhereInput> | null
+  calendarConfigs?: Prisma.CalendarConfigListRelationFilter
+  emergencyContacts?: Prisma.EmergencyContactListRelationFilter
   encashmentApprovals?: Prisma.EncashmentRequestListRelationFilter
   encashmentProcessed?: Prisma.EncashmentRequestListRelationFilter
-  balanceAdjustments?: Prisma.BalanceAdjustmentListRelationFilter
-  adjustmentsMade?: Prisma.BalanceAdjustmentListRelationFilter
-  delegationsDelegated?: Prisma.ApprovalDelegationListRelationFilter
-  delegationsReceived?: Prisma.ApprovalDelegationListRelationFilter
-  preferences?: Prisma.XOR<Prisma.UserPreferencesNullableScalarRelationFilter, Prisma.UserPreferencesWhereInput> | null
-  leaveTemplates?: Prisma.LeaveTemplateListRelationFilter
-  policyVersions?: Prisma.PolicyVersionListRelationFilter
-  profile?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
-  emergencyContacts?: Prisma.EmergencyContactListRelationFilter
-  bankDetails?: Prisma.XOR<Prisma.BankDetailsNullableScalarRelationFilter, Prisma.BankDetailsWhereInput> | null
-  documents?: Prisma.UserDocumentListRelationFilter
-  hrisSyncs?: Prisma.HRISSyncListRelationFilter
+  encashmentRequests?: Prisma.EncashmentRequestListRelationFilter
   hrisConflictsEmployee?: Prisma.HRISConflictListRelationFilter
   hrisConflictsResolver?: Prisma.HRISConflictListRelationFilter
+  hrisSyncs?: Prisma.HRISSyncListRelationFilter
+  leaves?: Prisma.LeaveRequestListRelationFilter
+  leaveTemplates?: Prisma.LeaveTemplateListRelationFilter
+  policyVersions?: Prisma.PolicyVersionListRelationFilter
   scheduledReports?: Prisma.ScheduledReportListRelationFilter
-  calendarConfigs?: Prisma.CalendarConfigListRelationFilter
+  deptHead?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  teamMembers?: Prisma.UserListRelationFilter
+  documents?: Prisma.UserDocumentListRelationFilter
+  preferences?: Prisma.XOR<Prisma.UserPreferencesNullableScalarRelationFilter, Prisma.UserPreferencesWhereInput> | null
+  profile?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
   webhooks?: Prisma.WebhookListRelationFilter
   policyUpdates?: Prisma.WorkflowPolicyListRelationFilter
-}, "id" | "email" | "empCode">
+}, "id" | "empCode" | "email">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  empCode?: Prisma.SortOrderInput | Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  password?: Prisma.SortOrderInput | Prisma.SortOrder
-  empCode?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   department?: Prisma.SortOrderInput | Prisma.SortOrder
-  deptHeadId?: Prisma.SortOrderInput | Prisma.SortOrder
-  joinDate?: Prisma.SortOrderInput | Prisma.SortOrder
-  retirementDate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  joinDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  retirementDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  password?: Prisma.SortOrderInput | Prisma.SortOrder
+  deptHeadId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -415,218 +415,218 @@ export type UserScalarWhereWithAggregatesInput = {
   OR?: Prisma.UserScalarWhereWithAggregatesInput[]
   NOT?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"User"> | number
+  empCode?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   name?: Prisma.StringWithAggregatesFilter<"User"> | string
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
-  password?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
-  empCode?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   role?: Prisma.EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
   department?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
-  deptHeadId?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
-  joinDate?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
-  retirementDate?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
+  joinDate?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  retirementDate?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  password?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  deptHeadId?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
 }
 
 export type UserCreateInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUpdateInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateManyInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
 }
 
 export type UserUpdateManyMutationInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type UserNullableScalarRelationFilter = {
@@ -652,17 +652,17 @@ export type UserOrderByRelevanceInput = {
 
 export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  empCode?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  password?: Prisma.SortOrder
-  empCode?: Prisma.SortOrder
   role?: Prisma.SortOrder
   department?: Prisma.SortOrder
-  deptHeadId?: Prisma.SortOrder
-  joinDate?: Prisma.SortOrder
-  retirementDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  joinDate?: Prisma.SortOrder
+  retirementDate?: Prisma.SortOrder
+  password?: Prisma.SortOrder
+  deptHeadId?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
@@ -672,32 +672,32 @@ export type UserAvgOrderByAggregateInput = {
 
 export type UserMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  empCode?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  password?: Prisma.SortOrder
-  empCode?: Prisma.SortOrder
   role?: Prisma.SortOrder
   department?: Prisma.SortOrder
-  deptHeadId?: Prisma.SortOrder
-  joinDate?: Prisma.SortOrder
-  retirementDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  joinDate?: Prisma.SortOrder
+  retirementDate?: Prisma.SortOrder
+  password?: Prisma.SortOrder
+  deptHeadId?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  empCode?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  password?: Prisma.SortOrder
-  empCode?: Prisma.SortOrder
   role?: Prisma.SortOrder
   department?: Prisma.SortOrder
-  deptHeadId?: Prisma.SortOrder
-  joinDate?: Prisma.SortOrder
-  retirementDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  joinDate?: Prisma.SortOrder
+  retirementDate?: Prisma.SortOrder
+  password?: Prisma.SortOrder
+  deptHeadId?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
@@ -730,24 +730,24 @@ export type UserUncheckedCreateNestedManyWithoutDeptHeadInput = {
   connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
 }
 
-export type StringFieldUpdateOperationsInput = {
-  set?: string
-}
-
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type StringFieldUpdateOperationsInput = {
+  set?: string
 }
 
 export type EnumRoleFieldUpdateOperationsInput = {
   set?: $Enums.Role
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type UserUpdateOneWithoutTeamMembersNestedInput = {
@@ -846,12 +846,6 @@ export type UserUpdateOneRequiredWithoutBalancesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBalancesInput, Prisma.UserUpdateWithoutBalancesInput>, Prisma.UserUncheckedUpdateWithoutBalancesInput>
 }
 
-export type UserCreateNestedOneWithoutEncashmentRequestsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutEncashmentRequestsInput, Prisma.UserUncheckedCreateWithoutEncashmentRequestsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEncashmentRequestsInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
 export type UserCreateNestedOneWithoutEncashmentApprovalsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutEncashmentApprovalsInput, Prisma.UserUncheckedCreateWithoutEncashmentApprovalsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutEncashmentApprovalsInput
@@ -864,12 +858,10 @@ export type UserCreateNestedOneWithoutEncashmentProcessedInput = {
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutEncashmentRequestsNestedInput = {
+export type UserCreateNestedOneWithoutEncashmentRequestsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutEncashmentRequestsInput, Prisma.UserUncheckedCreateWithoutEncashmentRequestsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutEncashmentRequestsInput
-  upsert?: Prisma.UserUpsertWithoutEncashmentRequestsInput
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutEncashmentRequestsInput, Prisma.UserUpdateWithoutEncashmentRequestsInput>, Prisma.UserUncheckedUpdateWithoutEncashmentRequestsInput>
 }
 
 export type UserUpdateOneWithoutEncashmentApprovalsNestedInput = {
@@ -892,10 +884,12 @@ export type UserUpdateOneWithoutEncashmentProcessedNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutEncashmentProcessedInput, Prisma.UserUpdateWithoutEncashmentProcessedInput>, Prisma.UserUncheckedUpdateWithoutEncashmentProcessedInput>
 }
 
-export type UserCreateNestedOneWithoutBalanceAdjustmentsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutBalanceAdjustmentsInput, Prisma.UserUncheckedCreateWithoutBalanceAdjustmentsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBalanceAdjustmentsInput
+export type UserUpdateOneRequiredWithoutEncashmentRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutEncashmentRequestsInput, Prisma.UserUncheckedCreateWithoutEncashmentRequestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEncashmentRequestsInput
+  upsert?: Prisma.UserUpsertWithoutEncashmentRequestsInput
   connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutEncashmentRequestsInput, Prisma.UserUpdateWithoutEncashmentRequestsInput>, Prisma.UserUncheckedUpdateWithoutEncashmentRequestsInput>
 }
 
 export type UserCreateNestedOneWithoutAdjustmentsMadeInput = {
@@ -904,12 +898,10 @@ export type UserCreateNestedOneWithoutAdjustmentsMadeInput = {
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutBalanceAdjustmentsNestedInput = {
+export type UserCreateNestedOneWithoutBalanceAdjustmentsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutBalanceAdjustmentsInput, Prisma.UserUncheckedCreateWithoutBalanceAdjustmentsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutBalanceAdjustmentsInput
-  upsert?: Prisma.UserUpsertWithoutBalanceAdjustmentsInput
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBalanceAdjustmentsInput, Prisma.UserUpdateWithoutBalanceAdjustmentsInput>, Prisma.UserUncheckedUpdateWithoutBalanceAdjustmentsInput>
 }
 
 export type UserUpdateOneRequiredWithoutAdjustmentsMadeNestedInput = {
@@ -920,10 +912,12 @@ export type UserUpdateOneRequiredWithoutAdjustmentsMadeNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAdjustmentsMadeInput, Prisma.UserUpdateWithoutAdjustmentsMadeInput>, Prisma.UserUncheckedUpdateWithoutAdjustmentsMadeInput>
 }
 
-export type UserCreateNestedOneWithoutDelegationsDelegatedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutDelegationsDelegatedInput, Prisma.UserUncheckedCreateWithoutDelegationsDelegatedInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDelegationsDelegatedInput
+export type UserUpdateOneRequiredWithoutBalanceAdjustmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBalanceAdjustmentsInput, Prisma.UserUncheckedCreateWithoutBalanceAdjustmentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBalanceAdjustmentsInput
+  upsert?: Prisma.UserUpsertWithoutBalanceAdjustmentsInput
   connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBalanceAdjustmentsInput, Prisma.UserUpdateWithoutBalanceAdjustmentsInput>, Prisma.UserUncheckedUpdateWithoutBalanceAdjustmentsInput>
 }
 
 export type UserCreateNestedOneWithoutDelegationsReceivedInput = {
@@ -932,12 +926,10 @@ export type UserCreateNestedOneWithoutDelegationsReceivedInput = {
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutDelegationsDelegatedNestedInput = {
+export type UserCreateNestedOneWithoutDelegationsDelegatedInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutDelegationsDelegatedInput, Prisma.UserUncheckedCreateWithoutDelegationsDelegatedInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutDelegationsDelegatedInput
-  upsert?: Prisma.UserUpsertWithoutDelegationsDelegatedInput
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDelegationsDelegatedInput, Prisma.UserUpdateWithoutDelegationsDelegatedInput>, Prisma.UserUncheckedUpdateWithoutDelegationsDelegatedInput>
 }
 
 export type UserUpdateOneRequiredWithoutDelegationsReceivedNestedInput = {
@@ -946,6 +938,14 @@ export type UserUpdateOneRequiredWithoutDelegationsReceivedNestedInput = {
   upsert?: Prisma.UserUpsertWithoutDelegationsReceivedInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDelegationsReceivedInput, Prisma.UserUpdateWithoutDelegationsReceivedInput>, Prisma.UserUncheckedUpdateWithoutDelegationsReceivedInput>
+}
+
+export type UserUpdateOneRequiredWithoutDelegationsDelegatedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDelegationsDelegatedInput, Prisma.UserUncheckedCreateWithoutDelegationsDelegatedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDelegationsDelegatedInput
+  upsert?: Prisma.UserUpsertWithoutDelegationsDelegatedInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDelegationsDelegatedInput, Prisma.UserUpdateWithoutDelegationsDelegatedInput>, Prisma.UserUncheckedUpdateWithoutDelegationsDelegatedInput>
 }
 
 export type UserCreateNestedOneWithoutPreferencesInput = {
@@ -1151,78 +1151,78 @@ export type UserUpdateOneWithoutPolicyUpdatesNestedInput = {
 }
 
 export type UserCreateWithoutTeamMembersInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutTeamMembersInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -1233,78 +1233,78 @@ export type UserCreateOrConnectWithoutTeamMembersInput = {
 }
 
 export type UserCreateWithoutDeptHeadInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutDeptHeadInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -1331,78 +1331,78 @@ export type UserUpdateToOneWithWhereWithoutTeamMembersInput = {
 }
 
 export type UserUpdateWithoutTeamMembersInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeamMembersInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
@@ -1428,92 +1428,92 @@ export type UserScalarWhereInput = {
   OR?: Prisma.UserScalarWhereInput[]
   NOT?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
   id?: Prisma.IntFilter<"User"> | number
+  empCode?: Prisma.StringNullableFilter<"User"> | string | null
   name?: Prisma.StringFilter<"User"> | string
   email?: Prisma.StringFilter<"User"> | string
-  password?: Prisma.StringNullableFilter<"User"> | string | null
-  empCode?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   department?: Prisma.StringNullableFilter<"User"> | string | null
-  deptHeadId?: Prisma.IntNullableFilter<"User"> | number | null
-  joinDate?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
-  retirementDate?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  joinDate?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  retirementDate?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  password?: Prisma.StringNullableFilter<"User"> | string | null
+  deptHeadId?: Prisma.IntNullableFilter<"User"> | number | null
 }
 
 export type UserCreateWithoutLeavesInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutLeavesInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -1535,155 +1535,155 @@ export type UserUpdateToOneWithWhereWithoutLeavesInput = {
 }
 
 export type UserUpdateWithoutLeavesInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLeavesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutApprovalsInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutApprovalsInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -1705,155 +1705,155 @@ export type UserUpdateToOneWithWhereWithoutApprovalsInput = {
 }
 
 export type UserUpdateWithoutApprovalsInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutApprovalsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutBalancesInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutBalancesInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -1875,237 +1875,155 @@ export type UserUpdateToOneWithWhereWithoutBalancesInput = {
 }
 
 export type UserUpdateWithoutBalancesInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBalancesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
-export type UserCreateWithoutEncashmentRequestsInput = {
-  name: string
-  email: string
-  password?: string | null
-  empCode?: string | null
-  role?: $Enums.Role
-  department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
-  approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
-  encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
-  hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
-  hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
-  scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
-  webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
-}
-
-export type UserUncheckedCreateWithoutEncashmentRequestsInput = {
-  id?: number
-  name: string
-  email: string
-  password?: string | null
-  empCode?: string | null
-  role?: $Enums.Role
-  department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
-  approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
-  encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
-  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
-  hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
-  scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
-  webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
-}
-
-export type UserCreateOrConnectWithoutEncashmentRequestsInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutEncashmentRequestsInput, Prisma.UserUncheckedCreateWithoutEncashmentRequestsInput>
-}
-
 export type UserCreateWithoutEncashmentApprovalsInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
-  encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
   delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
   bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
+  encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutEncashmentApprovalsInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
-  encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
   delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
   bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
+  encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -2116,78 +2034,78 @@ export type UserCreateOrConnectWithoutEncashmentApprovalsInput = {
 }
 
 export type UserCreateWithoutEncashmentProcessedInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
-  encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
   delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
   bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
+  encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutEncashmentProcessedInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
-  encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
   delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
   bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
+  encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -2197,92 +2115,86 @@ export type UserCreateOrConnectWithoutEncashmentProcessedInput = {
   create: Prisma.XOR<Prisma.UserCreateWithoutEncashmentProcessedInput, Prisma.UserUncheckedCreateWithoutEncashmentProcessedInput>
 }
 
-export type UserUpsertWithoutEncashmentRequestsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutEncashmentRequestsInput, Prisma.UserUncheckedUpdateWithoutEncashmentRequestsInput>
+export type UserCreateWithoutEncashmentRequestsInput = {
+  empCode?: string | null
+  name: string
+  email: string
+  role?: $Enums.Role
+  department?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
+  encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
+  encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
+  hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
+  hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
+  scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
+  webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutEncashmentRequestsInput = {
+  id?: number
+  empCode?: string | null
+  name: string
+  email: string
+  role?: $Enums.Role
+  department?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
+  approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
+  encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
+  encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
+  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
+  hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
+  scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
+  webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutEncashmentRequestsInput = {
+  where: Prisma.UserWhereUniqueInput
   create: Prisma.XOR<Prisma.UserCreateWithoutEncashmentRequestsInput, Prisma.UserUncheckedCreateWithoutEncashmentRequestsInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutEncashmentRequestsInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutEncashmentRequestsInput, Prisma.UserUncheckedUpdateWithoutEncashmentRequestsInput>
-}
-
-export type UserUpdateWithoutEncashmentRequestsInput = {
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
-  approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
-  encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
-  hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
-  hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
-  scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
-  webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
-}
-
-export type UserUncheckedUpdateWithoutEncashmentRequestsInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
-  approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
-  encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
-  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
-  hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
-  scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
-  webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutEncashmentApprovalsInput = {
@@ -2297,78 +2209,78 @@ export type UserUpdateToOneWithWhereWithoutEncashmentApprovalsInput = {
 }
 
 export type UserUpdateWithoutEncashmentApprovalsInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
-  encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
   delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
   bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
+  encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEncashmentApprovalsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
-  encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
   delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
   bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
+  encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
@@ -2385,237 +2297,243 @@ export type UserUpdateToOneWithWhereWithoutEncashmentProcessedInput = {
 }
 
 export type UserUpdateWithoutEncashmentProcessedInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
-  encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
   delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
   bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
+  encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEncashmentProcessedInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
-  encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
   delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
   bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
+  encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
-export type UserCreateWithoutBalanceAdjustmentsInput = {
-  name: string
-  email: string
-  password?: string | null
-  empCode?: string | null
-  role?: $Enums.Role
-  department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
-  approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
-  encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
-  encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
-  hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
-  hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
-  scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
-  webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
+export type UserUpsertWithoutEncashmentRequestsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutEncashmentRequestsInput, Prisma.UserUncheckedUpdateWithoutEncashmentRequestsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutEncashmentRequestsInput, Prisma.UserUncheckedCreateWithoutEncashmentRequestsInput>
+  where?: Prisma.UserWhereInput
 }
 
-export type UserUncheckedCreateWithoutBalanceAdjustmentsInput = {
-  id?: number
-  name: string
-  email: string
-  password?: string | null
-  empCode?: string | null
-  role?: $Enums.Role
-  department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
-  approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
-  encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
-  encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
-  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
-  hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
-  scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
-  webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
+export type UserUpdateToOneWithWhereWithoutEncashmentRequestsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutEncashmentRequestsInput, Prisma.UserUncheckedUpdateWithoutEncashmentRequestsInput>
 }
 
-export type UserCreateOrConnectWithoutBalanceAdjustmentsInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutBalanceAdjustmentsInput, Prisma.UserUncheckedCreateWithoutBalanceAdjustmentsInput>
+export type UserUpdateWithoutEncashmentRequestsInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
+  encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
+  encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
+  hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
+  hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
+  scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
+  webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutEncashmentRequestsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
+  encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
+  encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
+  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
+  hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
+  scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
+  webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutAdjustmentsMadeInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutAdjustmentsMadeInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -2625,92 +2543,86 @@ export type UserCreateOrConnectWithoutAdjustmentsMadeInput = {
   create: Prisma.XOR<Prisma.UserCreateWithoutAdjustmentsMadeInput, Prisma.UserUncheckedCreateWithoutAdjustmentsMadeInput>
 }
 
-export type UserUpsertWithoutBalanceAdjustmentsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutBalanceAdjustmentsInput, Prisma.UserUncheckedUpdateWithoutBalanceAdjustmentsInput>
+export type UserCreateWithoutBalanceAdjustmentsInput = {
+  empCode?: string | null
+  name: string
+  email: string
+  role?: $Enums.Role
+  department?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
+  encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
+  encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
+  hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
+  scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
+  webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutBalanceAdjustmentsInput = {
+  id?: number
+  empCode?: string | null
+  name: string
+  email: string
+  role?: $Enums.Role
+  department?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
+  approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
+  encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
+  encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
+  hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
+  scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
+  webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutBalanceAdjustmentsInput = {
+  where: Prisma.UserWhereUniqueInput
   create: Prisma.XOR<Prisma.UserCreateWithoutBalanceAdjustmentsInput, Prisma.UserUncheckedCreateWithoutBalanceAdjustmentsInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutBalanceAdjustmentsInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutBalanceAdjustmentsInput, Prisma.UserUncheckedUpdateWithoutBalanceAdjustmentsInput>
-}
-
-export type UserUpdateWithoutBalanceAdjustmentsInput = {
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
-  approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
-  encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
-  encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
-  hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
-  hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
-  scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
-  webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
-}
-
-export type UserUncheckedUpdateWithoutBalanceAdjustmentsInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
-  approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
-  encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
-  encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
-  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
-  hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
-  scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
-  webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutAdjustmentsMadeInput = {
@@ -2725,237 +2637,243 @@ export type UserUpdateToOneWithWhereWithoutAdjustmentsMadeInput = {
 }
 
 export type UserUpdateWithoutAdjustmentsMadeInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdjustmentsMadeInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
-export type UserCreateWithoutDelegationsDelegatedInput = {
-  name: string
-  email: string
-  password?: string | null
-  empCode?: string | null
-  role?: $Enums.Role
-  department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
-  approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
-  encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
-  encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
-  hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
-  hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
-  scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
-  webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
-  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
+export type UserUpsertWithoutBalanceAdjustmentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutBalanceAdjustmentsInput, Prisma.UserUncheckedUpdateWithoutBalanceAdjustmentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutBalanceAdjustmentsInput, Prisma.UserUncheckedCreateWithoutBalanceAdjustmentsInput>
+  where?: Prisma.UserWhereInput
 }
 
-export type UserUncheckedCreateWithoutDelegationsDelegatedInput = {
-  id?: number
-  name: string
-  email: string
-  password?: string | null
-  empCode?: string | null
-  role?: $Enums.Role
-  department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
-  approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
-  encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
-  encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
-  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
-  hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
-  scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
-  webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
-  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
+export type UserUpdateToOneWithWhereWithoutBalanceAdjustmentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutBalanceAdjustmentsInput, Prisma.UserUncheckedUpdateWithoutBalanceAdjustmentsInput>
 }
 
-export type UserCreateOrConnectWithoutDelegationsDelegatedInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutDelegationsDelegatedInput, Prisma.UserUncheckedCreateWithoutDelegationsDelegatedInput>
+export type UserUpdateWithoutBalanceAdjustmentsInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
+  encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
+  encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
+  hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
+  scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
+  webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutBalanceAdjustmentsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
+  encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
+  encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
+  hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
+  scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
+  webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutDelegationsReceivedInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutDelegationsReceivedInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -2965,92 +2883,86 @@ export type UserCreateOrConnectWithoutDelegationsReceivedInput = {
   create: Prisma.XOR<Prisma.UserCreateWithoutDelegationsReceivedInput, Prisma.UserUncheckedCreateWithoutDelegationsReceivedInput>
 }
 
-export type UserUpsertWithoutDelegationsDelegatedInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutDelegationsDelegatedInput, Prisma.UserUncheckedUpdateWithoutDelegationsDelegatedInput>
+export type UserCreateWithoutDelegationsDelegatedInput = {
+  empCode?: string | null
+  name: string
+  email: string
+  role?: $Enums.Role
+  department?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
+  encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
+  encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
+  hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
+  scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
+  webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
+  policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutDelegationsDelegatedInput = {
+  id?: number
+  empCode?: string | null
+  name: string
+  email: string
+  role?: $Enums.Role
+  department?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
+  approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
+  encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
+  encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
+  hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
+  scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
+  webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutDelegationsDelegatedInput = {
+  where: Prisma.UserWhereUniqueInput
   create: Prisma.XOR<Prisma.UserCreateWithoutDelegationsDelegatedInput, Prisma.UserUncheckedCreateWithoutDelegationsDelegatedInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutDelegationsDelegatedInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutDelegationsDelegatedInput, Prisma.UserUncheckedUpdateWithoutDelegationsDelegatedInput>
-}
-
-export type UserUpdateWithoutDelegationsDelegatedInput = {
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
-  approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
-  encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
-  encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
-  hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
-  hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
-  scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
-  webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
-  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
-}
-
-export type UserUncheckedUpdateWithoutDelegationsDelegatedInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
-  approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
-  encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
-  encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
-  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
-  hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
-  scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
-  webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
-  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUpsertWithoutDelegationsReceivedInput = {
@@ -3065,155 +2977,243 @@ export type UserUpdateToOneWithWhereWithoutDelegationsReceivedInput = {
 }
 
 export type UserUpdateWithoutDelegationsReceivedInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDelegationsReceivedInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
+  webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUpsertWithoutDelegationsDelegatedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDelegationsDelegatedInput, Prisma.UserUncheckedUpdateWithoutDelegationsDelegatedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDelegationsDelegatedInput, Prisma.UserUncheckedCreateWithoutDelegationsDelegatedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDelegationsDelegatedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDelegationsDelegatedInput, Prisma.UserUncheckedUpdateWithoutDelegationsDelegatedInput>
+}
+
+export type UserUpdateWithoutDelegationsDelegatedInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
+  encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
+  encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
+  hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
+  scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
+  webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
+  policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDelegationsDelegatedInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
   calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
+  encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
+  encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
+  hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
+  scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutPreferencesInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutPreferencesInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -3235,155 +3235,155 @@ export type UserUpdateToOneWithWhereWithoutPreferencesInput = {
 }
 
 export type UserUpdateWithoutPreferencesInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPreferencesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutHrisSyncsInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutHrisSyncsInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -3405,155 +3405,155 @@ export type UserUpdateToOneWithWhereWithoutHrisSyncsInput = {
 }
 
 export type UserUpdateWithoutHrisSyncsInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHrisSyncsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutHrisConflictsEmployeeInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
   leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
   policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
-  hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutHrisConflictsEmployeeInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
   leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
   policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
-  hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -3564,78 +3564,78 @@ export type UserCreateOrConnectWithoutHrisConflictsEmployeeInput = {
 }
 
 export type UserCreateWithoutHrisConflictsResolverInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
   leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
   policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
-  hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutHrisConflictsResolverInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
   leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
   policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
-  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -3657,78 +3657,78 @@ export type UserUpdateToOneWithWhereWithoutHrisConflictsEmployeeInput = {
 }
 
 export type UserUpdateWithoutHrisConflictsEmployeeInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
   leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
   policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
-  hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHrisConflictsEmployeeInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
   leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
   policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
-  hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
@@ -3745,155 +3745,155 @@ export type UserUpdateToOneWithWhereWithoutHrisConflictsResolverInput = {
 }
 
 export type UserUpdateWithoutHrisConflictsResolverInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
   leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
   policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
-  hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHrisConflictsResolverInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
   leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
   policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
-  hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutLeaveTemplatesInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutLeaveTemplatesInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -3915,155 +3915,155 @@ export type UserUpdateToOneWithWhereWithoutLeaveTemplatesInput = {
 }
 
 export type UserUpdateWithoutLeaveTemplatesInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLeaveTemplatesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutPolicyVersionsInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutPolicyVersionsInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -4085,155 +4085,155 @@ export type UserUpdateToOneWithWhereWithoutPolicyVersionsInput = {
 }
 
 export type UserUpdateWithoutPolicyVersionsInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPolicyVersionsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutProfileInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutProfileInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -4255,155 +4255,155 @@ export type UserUpdateToOneWithWhereWithoutProfileInput = {
 }
 
 export type UserUpdateWithoutProfileInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProfileInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutEmergencyContactsInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutEmergencyContactsInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -4425,155 +4425,155 @@ export type UserUpdateToOneWithWhereWithoutEmergencyContactsInput = {
 }
 
 export type UserUpdateWithoutEmergencyContactsInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmergencyContactsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutBankDetailsInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutBankDetailsInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -4595,155 +4595,155 @@ export type UserUpdateToOneWithWhereWithoutBankDetailsInput = {
 }
 
 export type UserUpdateWithoutBankDetailsInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBankDetailsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutDocumentsInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutDocumentsInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -4765,155 +4765,155 @@ export type UserUpdateToOneWithWhereWithoutDocumentsInput = {
 }
 
 export type UserUpdateWithoutDocumentsInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDocumentsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutScheduledReportsInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutScheduledReportsInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -4935,155 +4935,155 @@ export type UserUpdateToOneWithWhereWithoutScheduledReportsInput = {
 }
 
 export type UserUpdateWithoutScheduledReportsInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutScheduledReportsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutCalendarConfigsInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutCalendarConfigsInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
@@ -5105,156 +5105,156 @@ export type UserUpdateToOneWithWhereWithoutCalendarConfigsInput = {
 }
 
 export type UserUpdateWithoutCalendarConfigsInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCalendarConfigsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutWebhooksInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   policyUpdates?: Prisma.WorkflowPolicyCreateNestedManyWithoutUpdatedByUserInput
 }
 
 export type UserUncheckedCreateWithoutWebhooksInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedCreateNestedManyWithoutUpdatedByUserInput
 }
 
@@ -5275,156 +5275,156 @@ export type UserUpdateToOneWithWhereWithoutWebhooksInput = {
 }
 
 export type UserUpdateWithoutWebhooksInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWebhooksInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserCreateWithoutPolicyUpdatesInput = {
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutApproverInput
-  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
-  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigCreateNestedManyWithoutUserInput
+  deptHead?: Prisma.UserCreateNestedOneWithoutTeamMembersInput
+  teamMembers?: Prisma.UserCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookCreateNestedManyWithoutCreatorInput
 }
 
 export type UserUncheckedCreateWithoutPolicyUpdatesInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  deptHeadId?: number | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
-  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
+  deptHeadId?: number | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutApproverInput
-  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
+  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutApproverInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutProcessorInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutUserInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedCreateNestedManyWithoutAdjustedByUserInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegatorInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedCreateNestedManyWithoutDelegateInput
-  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
-  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
-  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedCreateNestedManyWithoutUserInput
-  bankDetails?: Prisma.BankDetailsUncheckedCreateNestedOneWithoutUserInput
-  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedCreateNestedManyWithoutUserInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutEmployeeInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedCreateNestedManyWithoutResolverInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedCreateNestedManyWithoutUserInput
+  leaves?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutRequesterInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedCreateNestedManyWithoutUserInput
+  policyVersions?: Prisma.PolicyVersionUncheckedCreateNestedManyWithoutChangedByUserInput
   scheduledReports?: Prisma.ScheduledReportUncheckedCreateNestedManyWithoutCreatorInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedCreateNestedManyWithoutUserInput
+  teamMembers?: Prisma.UserUncheckedCreateNestedManyWithoutDeptHeadInput
+  documents?: Prisma.UserDocumentUncheckedCreateNestedManyWithoutUserInput
+  preferences?: Prisma.UserPreferencesUncheckedCreateNestedOneWithoutUserInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
   webhooks?: Prisma.WebhookUncheckedCreateNestedManyWithoutCreatorInput
 }
 
@@ -5445,185 +5445,185 @@ export type UserUpdateToOneWithWhereWithoutPolicyUpdatesInput = {
 }
 
 export type UserUpdateWithoutPolicyUpdatesInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  deptHead?: Prisma.UserUpdateOneWithoutTeamMembersNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPolicyUpdatesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deptHeadId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type UserCreateManyDeptHeadInput = {
   id?: number
+  empCode?: string | null
   name: string
   email: string
-  password?: string | null
-  empCode?: string | null
   role?: $Enums.Role
   department?: string | null
-  joinDate?: Date | string | null
-  retirementDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  joinDate?: Date | string | null
+  retirementDate?: Date | string | null
+  password?: string | null
 }
 
 export type UserUpdateWithoutDeptHeadInput = {
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDeptHeadInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
-  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutApproverNestedInput
-  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
-  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
+  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
+  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
+  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
+  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
+  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
   encashmentApprovals?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutApproverNestedInput
   encashmentProcessed?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutProcessorNestedInput
-  balanceAdjustments?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutUserNestedInput
-  adjustmentsMade?: Prisma.BalanceAdjustmentUncheckedUpdateManyWithoutAdjustedByUserNestedInput
-  delegationsDelegated?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegatorNestedInput
-  delegationsReceived?: Prisma.ApprovalDelegationUncheckedUpdateManyWithoutDelegateNestedInput
-  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
-  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
-  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
-  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
-  emergencyContacts?: Prisma.EmergencyContactUncheckedUpdateManyWithoutUserNestedInput
-  bankDetails?: Prisma.BankDetailsUncheckedUpdateOneWithoutUserNestedInput
-  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
-  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  encashmentRequests?: Prisma.EncashmentRequestUncheckedUpdateManyWithoutUserNestedInput
   hrisConflictsEmployee?: Prisma.HRISConflictUncheckedUpdateManyWithoutEmployeeNestedInput
   hrisConflictsResolver?: Prisma.HRISConflictUncheckedUpdateManyWithoutResolverNestedInput
+  hrisSyncs?: Prisma.HRISSyncUncheckedUpdateManyWithoutUserNestedInput
+  leaves?: Prisma.LeaveRequestUncheckedUpdateManyWithoutRequesterNestedInput
+  leaveTemplates?: Prisma.LeaveTemplateUncheckedUpdateManyWithoutUserNestedInput
+  policyVersions?: Prisma.PolicyVersionUncheckedUpdateManyWithoutChangedByUserNestedInput
   scheduledReports?: Prisma.ScheduledReportUncheckedUpdateManyWithoutCreatorNestedInput
-  calendarConfigs?: Prisma.CalendarConfigUncheckedUpdateManyWithoutUserNestedInput
+  teamMembers?: Prisma.UserUncheckedUpdateManyWithoutDeptHeadNestedInput
+  documents?: Prisma.UserDocumentUncheckedUpdateManyWithoutUserNestedInput
+  preferences?: Prisma.UserPreferencesUncheckedUpdateOneWithoutUserNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
   webhooks?: Prisma.WebhookUncheckedUpdateManyWithoutCreatorNestedInput
   policyUpdates?: Prisma.WorkflowPolicyUncheckedUpdateManyWithoutUpdatedByUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutDeptHeadInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  empCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  joinDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  retirementDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -5632,51 +5632,51 @@ export type UserUncheckedUpdateManyWithoutDeptHeadInput = {
  */
 
 export type UserCountOutputType = {
-  leaves: number
-  balances: number
   approvals: number
-  teamMembers: number
-  encashmentRequests: number
+  delegationsReceived: number
+  delegationsDelegated: number
+  balances: number
+  adjustmentsMade: number
+  balanceAdjustments: number
+  calendarConfigs: number
+  emergencyContacts: number
   encashmentApprovals: number
   encashmentProcessed: number
-  balanceAdjustments: number
-  adjustmentsMade: number
-  delegationsDelegated: number
-  delegationsReceived: number
-  leaveTemplates: number
-  policyVersions: number
-  emergencyContacts: number
-  documents: number
-  hrisSyncs: number
+  encashmentRequests: number
   hrisConflictsEmployee: number
   hrisConflictsResolver: number
+  hrisSyncs: number
+  leaves: number
+  leaveTemplates: number
+  policyVersions: number
   scheduledReports: number
-  calendarConfigs: number
+  teamMembers: number
+  documents: number
   webhooks: number
   policyUpdates: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  leaves?: boolean | UserCountOutputTypeCountLeavesArgs
-  balances?: boolean | UserCountOutputTypeCountBalancesArgs
   approvals?: boolean | UserCountOutputTypeCountApprovalsArgs
-  teamMembers?: boolean | UserCountOutputTypeCountTeamMembersArgs
-  encashmentRequests?: boolean | UserCountOutputTypeCountEncashmentRequestsArgs
+  delegationsReceived?: boolean | UserCountOutputTypeCountDelegationsReceivedArgs
+  delegationsDelegated?: boolean | UserCountOutputTypeCountDelegationsDelegatedArgs
+  balances?: boolean | UserCountOutputTypeCountBalancesArgs
+  adjustmentsMade?: boolean | UserCountOutputTypeCountAdjustmentsMadeArgs
+  balanceAdjustments?: boolean | UserCountOutputTypeCountBalanceAdjustmentsArgs
+  calendarConfigs?: boolean | UserCountOutputTypeCountCalendarConfigsArgs
+  emergencyContacts?: boolean | UserCountOutputTypeCountEmergencyContactsArgs
   encashmentApprovals?: boolean | UserCountOutputTypeCountEncashmentApprovalsArgs
   encashmentProcessed?: boolean | UserCountOutputTypeCountEncashmentProcessedArgs
-  balanceAdjustments?: boolean | UserCountOutputTypeCountBalanceAdjustmentsArgs
-  adjustmentsMade?: boolean | UserCountOutputTypeCountAdjustmentsMadeArgs
-  delegationsDelegated?: boolean | UserCountOutputTypeCountDelegationsDelegatedArgs
-  delegationsReceived?: boolean | UserCountOutputTypeCountDelegationsReceivedArgs
-  leaveTemplates?: boolean | UserCountOutputTypeCountLeaveTemplatesArgs
-  policyVersions?: boolean | UserCountOutputTypeCountPolicyVersionsArgs
-  emergencyContacts?: boolean | UserCountOutputTypeCountEmergencyContactsArgs
-  documents?: boolean | UserCountOutputTypeCountDocumentsArgs
-  hrisSyncs?: boolean | UserCountOutputTypeCountHrisSyncsArgs
+  encashmentRequests?: boolean | UserCountOutputTypeCountEncashmentRequestsArgs
   hrisConflictsEmployee?: boolean | UserCountOutputTypeCountHrisConflictsEmployeeArgs
   hrisConflictsResolver?: boolean | UserCountOutputTypeCountHrisConflictsResolverArgs
+  hrisSyncs?: boolean | UserCountOutputTypeCountHrisSyncsArgs
+  leaves?: boolean | UserCountOutputTypeCountLeavesArgs
+  leaveTemplates?: boolean | UserCountOutputTypeCountLeaveTemplatesArgs
+  policyVersions?: boolean | UserCountOutputTypeCountPolicyVersionsArgs
   scheduledReports?: boolean | UserCountOutputTypeCountScheduledReportsArgs
-  calendarConfigs?: boolean | UserCountOutputTypeCountCalendarConfigsArgs
+  teamMembers?: boolean | UserCountOutputTypeCountTeamMembersArgs
+  documents?: boolean | UserCountOutputTypeCountDocumentsArgs
   webhooks?: boolean | UserCountOutputTypeCountWebhooksArgs
   policyUpdates?: boolean | UserCountOutputTypeCountPolicyUpdatesArgs
 }
@@ -5694,8 +5694,22 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountLeavesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.LeaveRequestWhereInput
+export type UserCountOutputTypeCountApprovalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ApprovalWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDelegationsReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ApprovalDelegationWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDelegationsDelegatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ApprovalDelegationWhereInput
 }
 
 /**
@@ -5708,22 +5722,29 @@ export type UserCountOutputTypeCountBalancesArgs<ExtArgs extends runtime.Types.E
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountApprovalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ApprovalWhereInput
+export type UserCountOutputTypeCountAdjustmentsMadeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BalanceAdjustmentWhereInput
 }
 
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountTeamMembersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.UserWhereInput
+export type UserCountOutputTypeCountBalanceAdjustmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BalanceAdjustmentWhereInput
 }
 
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountEncashmentRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.EncashmentRequestWhereInput
+export type UserCountOutputTypeCountCalendarConfigsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CalendarConfigWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountEmergencyContactsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmergencyContactWhereInput
 }
 
 /**
@@ -5743,64 +5764,8 @@ export type UserCountOutputTypeCountEncashmentProcessedArgs<ExtArgs extends runt
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountBalanceAdjustmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.BalanceAdjustmentWhereInput
-}
-
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountAdjustmentsMadeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.BalanceAdjustmentWhereInput
-}
-
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountDelegationsDelegatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ApprovalDelegationWhereInput
-}
-
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountDelegationsReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ApprovalDelegationWhereInput
-}
-
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountLeaveTemplatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.LeaveTemplateWhereInput
-}
-
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountPolicyVersionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.PolicyVersionWhereInput
-}
-
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountEmergencyContactsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.EmergencyContactWhereInput
-}
-
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.UserDocumentWhereInput
-}
-
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountHrisSyncsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.HRISSyncWhereInput
+export type UserCountOutputTypeCountEncashmentRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EncashmentRequestWhereInput
 }
 
 /**
@@ -5820,6 +5785,34 @@ export type UserCountOutputTypeCountHrisConflictsResolverArgs<ExtArgs extends ru
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountHrisSyncsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.HRISSyncWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountLeavesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LeaveRequestWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountLeaveTemplatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LeaveTemplateWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPolicyVersionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PolicyVersionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountScheduledReportsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ScheduledReportWhereInput
 }
@@ -5827,8 +5820,15 @@ export type UserCountOutputTypeCountScheduledReportsArgs<ExtArgs extends runtime
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountCalendarConfigsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.CalendarConfigWhereInput
+export type UserCountOutputTypeCountTeamMembersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserDocumentWhereInput
 }
 
 /**
@@ -5848,41 +5848,41 @@ export type UserCountOutputTypeCountPolicyUpdatesArgs<ExtArgs extends runtime.Ty
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  empCode?: boolean
   name?: boolean
   email?: boolean
-  password?: boolean
-  empCode?: boolean
   role?: boolean
   department?: boolean
-  deptHeadId?: boolean
-  joinDate?: boolean
-  retirementDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  leaves?: boolean | Prisma.User$leavesArgs<ExtArgs>
-  balances?: boolean | Prisma.User$balancesArgs<ExtArgs>
+  joinDate?: boolean
+  retirementDate?: boolean
+  password?: boolean
+  deptHeadId?: boolean
   approvals?: boolean | Prisma.User$approvalsArgs<ExtArgs>
-  deptHead?: boolean | Prisma.User$deptHeadArgs<ExtArgs>
-  teamMembers?: boolean | Prisma.User$teamMembersArgs<ExtArgs>
-  encashmentRequests?: boolean | Prisma.User$encashmentRequestsArgs<ExtArgs>
+  delegationsReceived?: boolean | Prisma.User$delegationsReceivedArgs<ExtArgs>
+  delegationsDelegated?: boolean | Prisma.User$delegationsDelegatedArgs<ExtArgs>
+  balances?: boolean | Prisma.User$balancesArgs<ExtArgs>
+  adjustmentsMade?: boolean | Prisma.User$adjustmentsMadeArgs<ExtArgs>
+  balanceAdjustments?: boolean | Prisma.User$balanceAdjustmentsArgs<ExtArgs>
+  bankDetails?: boolean | Prisma.User$bankDetailsArgs<ExtArgs>
+  calendarConfigs?: boolean | Prisma.User$calendarConfigsArgs<ExtArgs>
+  emergencyContacts?: boolean | Prisma.User$emergencyContactsArgs<ExtArgs>
   encashmentApprovals?: boolean | Prisma.User$encashmentApprovalsArgs<ExtArgs>
   encashmentProcessed?: boolean | Prisma.User$encashmentProcessedArgs<ExtArgs>
-  balanceAdjustments?: boolean | Prisma.User$balanceAdjustmentsArgs<ExtArgs>
-  adjustmentsMade?: boolean | Prisma.User$adjustmentsMadeArgs<ExtArgs>
-  delegationsDelegated?: boolean | Prisma.User$delegationsDelegatedArgs<ExtArgs>
-  delegationsReceived?: boolean | Prisma.User$delegationsReceivedArgs<ExtArgs>
-  preferences?: boolean | Prisma.User$preferencesArgs<ExtArgs>
-  leaveTemplates?: boolean | Prisma.User$leaveTemplatesArgs<ExtArgs>
-  policyVersions?: boolean | Prisma.User$policyVersionsArgs<ExtArgs>
-  profile?: boolean | Prisma.User$profileArgs<ExtArgs>
-  emergencyContacts?: boolean | Prisma.User$emergencyContactsArgs<ExtArgs>
-  bankDetails?: boolean | Prisma.User$bankDetailsArgs<ExtArgs>
-  documents?: boolean | Prisma.User$documentsArgs<ExtArgs>
-  hrisSyncs?: boolean | Prisma.User$hrisSyncsArgs<ExtArgs>
+  encashmentRequests?: boolean | Prisma.User$encashmentRequestsArgs<ExtArgs>
   hrisConflictsEmployee?: boolean | Prisma.User$hrisConflictsEmployeeArgs<ExtArgs>
   hrisConflictsResolver?: boolean | Prisma.User$hrisConflictsResolverArgs<ExtArgs>
+  hrisSyncs?: boolean | Prisma.User$hrisSyncsArgs<ExtArgs>
+  leaves?: boolean | Prisma.User$leavesArgs<ExtArgs>
+  leaveTemplates?: boolean | Prisma.User$leaveTemplatesArgs<ExtArgs>
+  policyVersions?: boolean | Prisma.User$policyVersionsArgs<ExtArgs>
   scheduledReports?: boolean | Prisma.User$scheduledReportsArgs<ExtArgs>
-  calendarConfigs?: boolean | Prisma.User$calendarConfigsArgs<ExtArgs>
+  deptHead?: boolean | Prisma.User$deptHeadArgs<ExtArgs>
+  teamMembers?: boolean | Prisma.User$teamMembersArgs<ExtArgs>
+  documents?: boolean | Prisma.User$documentsArgs<ExtArgs>
+  preferences?: boolean | Prisma.User$preferencesArgs<ExtArgs>
+  profile?: boolean | Prisma.User$profileArgs<ExtArgs>
   webhooks?: boolean | Prisma.User$webhooksArgs<ExtArgs>
   policyUpdates?: boolean | Prisma.User$policyUpdatesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -5892,45 +5892,45 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 
 export type UserSelectScalar = {
   id?: boolean
+  empCode?: boolean
   name?: boolean
   email?: boolean
-  password?: boolean
-  empCode?: boolean
   role?: boolean
   department?: boolean
-  deptHeadId?: boolean
-  joinDate?: boolean
-  retirementDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  joinDate?: boolean
+  retirementDate?: boolean
+  password?: boolean
+  deptHeadId?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "empCode" | "role" | "department" | "deptHeadId" | "joinDate" | "retirementDate" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "empCode" | "name" | "email" | "role" | "department" | "createdAt" | "updatedAt" | "joinDate" | "retirementDate" | "password" | "deptHeadId", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  leaves?: boolean | Prisma.User$leavesArgs<ExtArgs>
-  balances?: boolean | Prisma.User$balancesArgs<ExtArgs>
   approvals?: boolean | Prisma.User$approvalsArgs<ExtArgs>
-  deptHead?: boolean | Prisma.User$deptHeadArgs<ExtArgs>
-  teamMembers?: boolean | Prisma.User$teamMembersArgs<ExtArgs>
-  encashmentRequests?: boolean | Prisma.User$encashmentRequestsArgs<ExtArgs>
+  delegationsReceived?: boolean | Prisma.User$delegationsReceivedArgs<ExtArgs>
+  delegationsDelegated?: boolean | Prisma.User$delegationsDelegatedArgs<ExtArgs>
+  balances?: boolean | Prisma.User$balancesArgs<ExtArgs>
+  adjustmentsMade?: boolean | Prisma.User$adjustmentsMadeArgs<ExtArgs>
+  balanceAdjustments?: boolean | Prisma.User$balanceAdjustmentsArgs<ExtArgs>
+  bankDetails?: boolean | Prisma.User$bankDetailsArgs<ExtArgs>
+  calendarConfigs?: boolean | Prisma.User$calendarConfigsArgs<ExtArgs>
+  emergencyContacts?: boolean | Prisma.User$emergencyContactsArgs<ExtArgs>
   encashmentApprovals?: boolean | Prisma.User$encashmentApprovalsArgs<ExtArgs>
   encashmentProcessed?: boolean | Prisma.User$encashmentProcessedArgs<ExtArgs>
-  balanceAdjustments?: boolean | Prisma.User$balanceAdjustmentsArgs<ExtArgs>
-  adjustmentsMade?: boolean | Prisma.User$adjustmentsMadeArgs<ExtArgs>
-  delegationsDelegated?: boolean | Prisma.User$delegationsDelegatedArgs<ExtArgs>
-  delegationsReceived?: boolean | Prisma.User$delegationsReceivedArgs<ExtArgs>
-  preferences?: boolean | Prisma.User$preferencesArgs<ExtArgs>
-  leaveTemplates?: boolean | Prisma.User$leaveTemplatesArgs<ExtArgs>
-  policyVersions?: boolean | Prisma.User$policyVersionsArgs<ExtArgs>
-  profile?: boolean | Prisma.User$profileArgs<ExtArgs>
-  emergencyContacts?: boolean | Prisma.User$emergencyContactsArgs<ExtArgs>
-  bankDetails?: boolean | Prisma.User$bankDetailsArgs<ExtArgs>
-  documents?: boolean | Prisma.User$documentsArgs<ExtArgs>
-  hrisSyncs?: boolean | Prisma.User$hrisSyncsArgs<ExtArgs>
+  encashmentRequests?: boolean | Prisma.User$encashmentRequestsArgs<ExtArgs>
   hrisConflictsEmployee?: boolean | Prisma.User$hrisConflictsEmployeeArgs<ExtArgs>
   hrisConflictsResolver?: boolean | Prisma.User$hrisConflictsResolverArgs<ExtArgs>
+  hrisSyncs?: boolean | Prisma.User$hrisSyncsArgs<ExtArgs>
+  leaves?: boolean | Prisma.User$leavesArgs<ExtArgs>
+  leaveTemplates?: boolean | Prisma.User$leaveTemplatesArgs<ExtArgs>
+  policyVersions?: boolean | Prisma.User$policyVersionsArgs<ExtArgs>
   scheduledReports?: boolean | Prisma.User$scheduledReportsArgs<ExtArgs>
-  calendarConfigs?: boolean | Prisma.User$calendarConfigsArgs<ExtArgs>
+  deptHead?: boolean | Prisma.User$deptHeadArgs<ExtArgs>
+  teamMembers?: boolean | Prisma.User$teamMembersArgs<ExtArgs>
+  documents?: boolean | Prisma.User$documentsArgs<ExtArgs>
+  preferences?: boolean | Prisma.User$preferencesArgs<ExtArgs>
+  profile?: boolean | Prisma.User$profileArgs<ExtArgs>
   webhooks?: boolean | Prisma.User$webhooksArgs<ExtArgs>
   policyUpdates?: boolean | Prisma.User$policyUpdatesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -5939,46 +5939,46 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
-    leaves: Prisma.$LeaveRequestPayload<ExtArgs>[]
-    balances: Prisma.$BalancePayload<ExtArgs>[]
     approvals: Prisma.$ApprovalPayload<ExtArgs>[]
-    deptHead: Prisma.$UserPayload<ExtArgs> | null
-    teamMembers: Prisma.$UserPayload<ExtArgs>[]
-    encashmentRequests: Prisma.$EncashmentRequestPayload<ExtArgs>[]
+    delegationsReceived: Prisma.$ApprovalDelegationPayload<ExtArgs>[]
+    delegationsDelegated: Prisma.$ApprovalDelegationPayload<ExtArgs>[]
+    balances: Prisma.$BalancePayload<ExtArgs>[]
+    adjustmentsMade: Prisma.$BalanceAdjustmentPayload<ExtArgs>[]
+    balanceAdjustments: Prisma.$BalanceAdjustmentPayload<ExtArgs>[]
+    bankDetails: Prisma.$BankDetailsPayload<ExtArgs> | null
+    calendarConfigs: Prisma.$CalendarConfigPayload<ExtArgs>[]
+    emergencyContacts: Prisma.$EmergencyContactPayload<ExtArgs>[]
     encashmentApprovals: Prisma.$EncashmentRequestPayload<ExtArgs>[]
     encashmentProcessed: Prisma.$EncashmentRequestPayload<ExtArgs>[]
-    balanceAdjustments: Prisma.$BalanceAdjustmentPayload<ExtArgs>[]
-    adjustmentsMade: Prisma.$BalanceAdjustmentPayload<ExtArgs>[]
-    delegationsDelegated: Prisma.$ApprovalDelegationPayload<ExtArgs>[]
-    delegationsReceived: Prisma.$ApprovalDelegationPayload<ExtArgs>[]
-    preferences: Prisma.$UserPreferencesPayload<ExtArgs> | null
-    leaveTemplates: Prisma.$LeaveTemplatePayload<ExtArgs>[]
-    policyVersions: Prisma.$PolicyVersionPayload<ExtArgs>[]
-    profile: Prisma.$UserProfilePayload<ExtArgs> | null
-    emergencyContacts: Prisma.$EmergencyContactPayload<ExtArgs>[]
-    bankDetails: Prisma.$BankDetailsPayload<ExtArgs> | null
-    documents: Prisma.$UserDocumentPayload<ExtArgs>[]
-    hrisSyncs: Prisma.$HRISSyncPayload<ExtArgs>[]
+    encashmentRequests: Prisma.$EncashmentRequestPayload<ExtArgs>[]
     hrisConflictsEmployee: Prisma.$HRISConflictPayload<ExtArgs>[]
     hrisConflictsResolver: Prisma.$HRISConflictPayload<ExtArgs>[]
+    hrisSyncs: Prisma.$HRISSyncPayload<ExtArgs>[]
+    leaves: Prisma.$LeaveRequestPayload<ExtArgs>[]
+    leaveTemplates: Prisma.$LeaveTemplatePayload<ExtArgs>[]
+    policyVersions: Prisma.$PolicyVersionPayload<ExtArgs>[]
     scheduledReports: Prisma.$ScheduledReportPayload<ExtArgs>[]
-    calendarConfigs: Prisma.$CalendarConfigPayload<ExtArgs>[]
+    deptHead: Prisma.$UserPayload<ExtArgs> | null
+    teamMembers: Prisma.$UserPayload<ExtArgs>[]
+    documents: Prisma.$UserDocumentPayload<ExtArgs>[]
+    preferences: Prisma.$UserPreferencesPayload<ExtArgs> | null
+    profile: Prisma.$UserProfilePayload<ExtArgs> | null
     webhooks: Prisma.$WebhookPayload<ExtArgs>[]
     policyUpdates: Prisma.$WorkflowPolicyPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
+    empCode: string | null
     name: string
     email: string
-    password: string | null
-    empCode: string | null
     role: $Enums.Role
     department: string | null
-    deptHeadId: number | null
-    joinDate: Date | null
-    retirementDate: Date | null
     createdAt: Date
     updatedAt: Date
+    joinDate: Date | null
+    retirementDate: Date | null
+    password: string | null
+    deptHeadId: number | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -6319,30 +6319,30 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  leaves<T extends Prisma.User$leavesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$leavesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LeaveRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  balances<T extends Prisma.User$balancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$balancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BalancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   approvals<T extends Prisma.User$approvalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$approvalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApprovalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  deptHead<T extends Prisma.User$deptHeadArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$deptHeadArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  teamMembers<T extends Prisma.User$teamMembersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$teamMembersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  encashmentRequests<T extends Prisma.User$encashmentRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$encashmentRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EncashmentRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  delegationsReceived<T extends Prisma.User$delegationsReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$delegationsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApprovalDelegationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  delegationsDelegated<T extends Prisma.User$delegationsDelegatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$delegationsDelegatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApprovalDelegationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  balances<T extends Prisma.User$balancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$balancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BalancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  adjustmentsMade<T extends Prisma.User$adjustmentsMadeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$adjustmentsMadeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BalanceAdjustmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  balanceAdjustments<T extends Prisma.User$balanceAdjustmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$balanceAdjustmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BalanceAdjustmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  bankDetails<T extends Prisma.User$bankDetailsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$bankDetailsArgs<ExtArgs>>): Prisma.Prisma__BankDetailsClient<runtime.Types.Result.GetResult<Prisma.$BankDetailsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  calendarConfigs<T extends Prisma.User$calendarConfigsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$calendarConfigsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CalendarConfigPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  emergencyContacts<T extends Prisma.User$emergencyContactsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$emergencyContactsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmergencyContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   encashmentApprovals<T extends Prisma.User$encashmentApprovalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$encashmentApprovalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EncashmentRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   encashmentProcessed<T extends Prisma.User$encashmentProcessedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$encashmentProcessedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EncashmentRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  balanceAdjustments<T extends Prisma.User$balanceAdjustmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$balanceAdjustmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BalanceAdjustmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  adjustmentsMade<T extends Prisma.User$adjustmentsMadeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$adjustmentsMadeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BalanceAdjustmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  delegationsDelegated<T extends Prisma.User$delegationsDelegatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$delegationsDelegatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApprovalDelegationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  delegationsReceived<T extends Prisma.User$delegationsReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$delegationsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApprovalDelegationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  preferences<T extends Prisma.User$preferencesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$preferencesArgs<ExtArgs>>): Prisma.Prisma__UserPreferencesClient<runtime.Types.Result.GetResult<Prisma.$UserPreferencesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  leaveTemplates<T extends Prisma.User$leaveTemplatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$leaveTemplatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LeaveTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  policyVersions<T extends Prisma.User$policyVersionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$policyVersionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PolicyVersionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  profile<T extends Prisma.User$profileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$profileArgs<ExtArgs>>): Prisma.Prisma__UserProfileClient<runtime.Types.Result.GetResult<Prisma.$UserProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  emergencyContacts<T extends Prisma.User$emergencyContactsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$emergencyContactsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmergencyContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  bankDetails<T extends Prisma.User$bankDetailsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$bankDetailsArgs<ExtArgs>>): Prisma.Prisma__BankDetailsClient<runtime.Types.Result.GetResult<Prisma.$BankDetailsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  documents<T extends Prisma.User$documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  hrisSyncs<T extends Prisma.User$hrisSyncsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$hrisSyncsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HRISSyncPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  encashmentRequests<T extends Prisma.User$encashmentRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$encashmentRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EncashmentRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   hrisConflictsEmployee<T extends Prisma.User$hrisConflictsEmployeeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$hrisConflictsEmployeeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HRISConflictPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   hrisConflictsResolver<T extends Prisma.User$hrisConflictsResolverArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$hrisConflictsResolverArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HRISConflictPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  hrisSyncs<T extends Prisma.User$hrisSyncsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$hrisSyncsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HRISSyncPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  leaves<T extends Prisma.User$leavesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$leavesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LeaveRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  leaveTemplates<T extends Prisma.User$leaveTemplatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$leaveTemplatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LeaveTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  policyVersions<T extends Prisma.User$policyVersionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$policyVersionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PolicyVersionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   scheduledReports<T extends Prisma.User$scheduledReportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$scheduledReportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScheduledReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  calendarConfigs<T extends Prisma.User$calendarConfigsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$calendarConfigsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CalendarConfigPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  deptHead<T extends Prisma.User$deptHeadArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$deptHeadArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  teamMembers<T extends Prisma.User$teamMembersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$teamMembersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  documents<T extends Prisma.User$documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  preferences<T extends Prisma.User$preferencesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$preferencesArgs<ExtArgs>>): Prisma.Prisma__UserPreferencesClient<runtime.Types.Result.GetResult<Prisma.$UserPreferencesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  profile<T extends Prisma.User$profileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$profileArgs<ExtArgs>>): Prisma.Prisma__UserProfileClient<runtime.Types.Result.GetResult<Prisma.$UserProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   webhooks<T extends Prisma.User$webhooksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$webhooksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WebhookPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   policyUpdates<T extends Prisma.User$policyUpdatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$policyUpdatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkflowPolicyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -6375,17 +6375,17 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
  */
 export interface UserFieldRefs {
   readonly id: Prisma.FieldRef<"User", 'Int'>
+  readonly empCode: Prisma.FieldRef<"User", 'String'>
   readonly name: Prisma.FieldRef<"User", 'String'>
   readonly email: Prisma.FieldRef<"User", 'String'>
-  readonly password: Prisma.FieldRef<"User", 'String'>
-  readonly empCode: Prisma.FieldRef<"User", 'String'>
   readonly role: Prisma.FieldRef<"User", 'Role'>
   readonly department: Prisma.FieldRef<"User", 'String'>
-  readonly deptHeadId: Prisma.FieldRef<"User", 'Int'>
-  readonly joinDate: Prisma.FieldRef<"User", 'DateTime'>
-  readonly retirementDate: Prisma.FieldRef<"User", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly joinDate: Prisma.FieldRef<"User", 'DateTime'>
+  readonly retirementDate: Prisma.FieldRef<"User", 'DateTime'>
+  readonly password: Prisma.FieldRef<"User", 'String'>
+  readonly deptHeadId: Prisma.FieldRef<"User", 'Int'>
 }
     
 
@@ -6729,27 +6729,75 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * User.leaves
+ * User.approvals
  */
-export type User$leavesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$approvalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the LeaveRequest
+   * Select specific fields to fetch from the Approval
    */
-  select?: Prisma.LeaveRequestSelect<ExtArgs> | null
+  select?: Prisma.ApprovalSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the LeaveRequest
+   * Omit specific fields from the Approval
    */
-  omit?: Prisma.LeaveRequestOmit<ExtArgs> | null
+  omit?: Prisma.ApprovalOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.LeaveRequestInclude<ExtArgs> | null
-  where?: Prisma.LeaveRequestWhereInput
-  orderBy?: Prisma.LeaveRequestOrderByWithRelationInput | Prisma.LeaveRequestOrderByWithRelationInput[]
-  cursor?: Prisma.LeaveRequestWhereUniqueInput
+  include?: Prisma.ApprovalInclude<ExtArgs> | null
+  where?: Prisma.ApprovalWhereInput
+  orderBy?: Prisma.ApprovalOrderByWithRelationInput | Prisma.ApprovalOrderByWithRelationInput[]
+  cursor?: Prisma.ApprovalWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.LeaveRequestScalarFieldEnum | Prisma.LeaveRequestScalarFieldEnum[]
+  distinct?: Prisma.ApprovalScalarFieldEnum | Prisma.ApprovalScalarFieldEnum[]
+}
+
+/**
+ * User.delegationsReceived
+ */
+export type User$delegationsReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ApprovalDelegation
+   */
+  select?: Prisma.ApprovalDelegationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ApprovalDelegation
+   */
+  omit?: Prisma.ApprovalDelegationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ApprovalDelegationInclude<ExtArgs> | null
+  where?: Prisma.ApprovalDelegationWhereInput
+  orderBy?: Prisma.ApprovalDelegationOrderByWithRelationInput | Prisma.ApprovalDelegationOrderByWithRelationInput[]
+  cursor?: Prisma.ApprovalDelegationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ApprovalDelegationScalarFieldEnum | Prisma.ApprovalDelegationScalarFieldEnum[]
+}
+
+/**
+ * User.delegationsDelegated
+ */
+export type User$delegationsDelegatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ApprovalDelegation
+   */
+  select?: Prisma.ApprovalDelegationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ApprovalDelegation
+   */
+  omit?: Prisma.ApprovalDelegationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ApprovalDelegationInclude<ExtArgs> | null
+  where?: Prisma.ApprovalDelegationWhereInput
+  orderBy?: Prisma.ApprovalDelegationOrderByWithRelationInput | Prisma.ApprovalDelegationOrderByWithRelationInput[]
+  cursor?: Prisma.ApprovalDelegationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ApprovalDelegationScalarFieldEnum | Prisma.ApprovalDelegationScalarFieldEnum[]
 }
 
 /**
@@ -6777,94 +6825,118 @@ export type User$balancesArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 }
 
 /**
- * User.approvals
+ * User.adjustmentsMade
  */
-export type User$approvalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$adjustmentsMadeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Approval
+   * Select specific fields to fetch from the BalanceAdjustment
    */
-  select?: Prisma.ApprovalSelect<ExtArgs> | null
+  select?: Prisma.BalanceAdjustmentSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Approval
+   * Omit specific fields from the BalanceAdjustment
    */
-  omit?: Prisma.ApprovalOmit<ExtArgs> | null
+  omit?: Prisma.BalanceAdjustmentOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.ApprovalInclude<ExtArgs> | null
-  where?: Prisma.ApprovalWhereInput
-  orderBy?: Prisma.ApprovalOrderByWithRelationInput | Prisma.ApprovalOrderByWithRelationInput[]
-  cursor?: Prisma.ApprovalWhereUniqueInput
+  include?: Prisma.BalanceAdjustmentInclude<ExtArgs> | null
+  where?: Prisma.BalanceAdjustmentWhereInput
+  orderBy?: Prisma.BalanceAdjustmentOrderByWithRelationInput | Prisma.BalanceAdjustmentOrderByWithRelationInput[]
+  cursor?: Prisma.BalanceAdjustmentWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.ApprovalScalarFieldEnum | Prisma.ApprovalScalarFieldEnum[]
+  distinct?: Prisma.BalanceAdjustmentScalarFieldEnum | Prisma.BalanceAdjustmentScalarFieldEnum[]
 }
 
 /**
- * User.deptHead
+ * User.balanceAdjustments
  */
-export type User$deptHeadArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$balanceAdjustmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the User
+   * Select specific fields to fetch from the BalanceAdjustment
    */
-  select?: Prisma.UserSelect<ExtArgs> | null
+  select?: Prisma.BalanceAdjustmentSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the User
+   * Omit specific fields from the BalanceAdjustment
    */
-  omit?: Prisma.UserOmit<ExtArgs> | null
+  omit?: Prisma.BalanceAdjustmentOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.UserInclude<ExtArgs> | null
-  where?: Prisma.UserWhereInput
+  include?: Prisma.BalanceAdjustmentInclude<ExtArgs> | null
+  where?: Prisma.BalanceAdjustmentWhereInput
+  orderBy?: Prisma.BalanceAdjustmentOrderByWithRelationInput | Prisma.BalanceAdjustmentOrderByWithRelationInput[]
+  cursor?: Prisma.BalanceAdjustmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BalanceAdjustmentScalarFieldEnum | Prisma.BalanceAdjustmentScalarFieldEnum[]
 }
 
 /**
- * User.teamMembers
+ * User.bankDetails
  */
-export type User$teamMembersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$bankDetailsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the User
+   * Select specific fields to fetch from the BankDetails
    */
-  select?: Prisma.UserSelect<ExtArgs> | null
+  select?: Prisma.BankDetailsSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the User
+   * Omit specific fields from the BankDetails
    */
-  omit?: Prisma.UserOmit<ExtArgs> | null
+  omit?: Prisma.BankDetailsOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.UserInclude<ExtArgs> | null
-  where?: Prisma.UserWhereInput
-  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[]
-  cursor?: Prisma.UserWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
+  include?: Prisma.BankDetailsInclude<ExtArgs> | null
+  where?: Prisma.BankDetailsWhereInput
 }
 
 /**
- * User.encashmentRequests
+ * User.calendarConfigs
  */
-export type User$encashmentRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$calendarConfigsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the EncashmentRequest
+   * Select specific fields to fetch from the CalendarConfig
    */
-  select?: Prisma.EncashmentRequestSelect<ExtArgs> | null
+  select?: Prisma.CalendarConfigSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the EncashmentRequest
+   * Omit specific fields from the CalendarConfig
    */
-  omit?: Prisma.EncashmentRequestOmit<ExtArgs> | null
+  omit?: Prisma.CalendarConfigOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.EncashmentRequestInclude<ExtArgs> | null
-  where?: Prisma.EncashmentRequestWhereInput
-  orderBy?: Prisma.EncashmentRequestOrderByWithRelationInput | Prisma.EncashmentRequestOrderByWithRelationInput[]
-  cursor?: Prisma.EncashmentRequestWhereUniqueInput
+  include?: Prisma.CalendarConfigInclude<ExtArgs> | null
+  where?: Prisma.CalendarConfigWhereInput
+  orderBy?: Prisma.CalendarConfigOrderByWithRelationInput | Prisma.CalendarConfigOrderByWithRelationInput[]
+  cursor?: Prisma.CalendarConfigWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.EncashmentRequestScalarFieldEnum | Prisma.EncashmentRequestScalarFieldEnum[]
+  distinct?: Prisma.CalendarConfigScalarFieldEnum | Prisma.CalendarConfigScalarFieldEnum[]
+}
+
+/**
+ * User.emergencyContacts
+ */
+export type User$emergencyContactsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmergencyContact
+   */
+  select?: Prisma.EmergencyContactSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmergencyContact
+   */
+  omit?: Prisma.EmergencyContactOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmergencyContactInclude<ExtArgs> | null
+  where?: Prisma.EmergencyContactWhereInput
+  orderBy?: Prisma.EmergencyContactOrderByWithRelationInput | Prisma.EmergencyContactOrderByWithRelationInput[]
+  cursor?: Prisma.EmergencyContactWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EmergencyContactScalarFieldEnum | Prisma.EmergencyContactScalarFieldEnum[]
 }
 
 /**
@@ -6916,276 +6988,27 @@ export type User$encashmentProcessedArgs<ExtArgs extends runtime.Types.Extension
 }
 
 /**
- * User.balanceAdjustments
+ * User.encashmentRequests
  */
-export type User$balanceAdjustmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$encashmentRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the BalanceAdjustment
+   * Select specific fields to fetch from the EncashmentRequest
    */
-  select?: Prisma.BalanceAdjustmentSelect<ExtArgs> | null
+  select?: Prisma.EncashmentRequestSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the BalanceAdjustment
+   * Omit specific fields from the EncashmentRequest
    */
-  omit?: Prisma.BalanceAdjustmentOmit<ExtArgs> | null
+  omit?: Prisma.EncashmentRequestOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.BalanceAdjustmentInclude<ExtArgs> | null
-  where?: Prisma.BalanceAdjustmentWhereInput
-  orderBy?: Prisma.BalanceAdjustmentOrderByWithRelationInput | Prisma.BalanceAdjustmentOrderByWithRelationInput[]
-  cursor?: Prisma.BalanceAdjustmentWhereUniqueInput
+  include?: Prisma.EncashmentRequestInclude<ExtArgs> | null
+  where?: Prisma.EncashmentRequestWhereInput
+  orderBy?: Prisma.EncashmentRequestOrderByWithRelationInput | Prisma.EncashmentRequestOrderByWithRelationInput[]
+  cursor?: Prisma.EncashmentRequestWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.BalanceAdjustmentScalarFieldEnum | Prisma.BalanceAdjustmentScalarFieldEnum[]
-}
-
-/**
- * User.adjustmentsMade
- */
-export type User$adjustmentsMadeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the BalanceAdjustment
-   */
-  select?: Prisma.BalanceAdjustmentSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the BalanceAdjustment
-   */
-  omit?: Prisma.BalanceAdjustmentOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.BalanceAdjustmentInclude<ExtArgs> | null
-  where?: Prisma.BalanceAdjustmentWhereInput
-  orderBy?: Prisma.BalanceAdjustmentOrderByWithRelationInput | Prisma.BalanceAdjustmentOrderByWithRelationInput[]
-  cursor?: Prisma.BalanceAdjustmentWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.BalanceAdjustmentScalarFieldEnum | Prisma.BalanceAdjustmentScalarFieldEnum[]
-}
-
-/**
- * User.delegationsDelegated
- */
-export type User$delegationsDelegatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the ApprovalDelegation
-   */
-  select?: Prisma.ApprovalDelegationSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the ApprovalDelegation
-   */
-  omit?: Prisma.ApprovalDelegationOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.ApprovalDelegationInclude<ExtArgs> | null
-  where?: Prisma.ApprovalDelegationWhereInput
-  orderBy?: Prisma.ApprovalDelegationOrderByWithRelationInput | Prisma.ApprovalDelegationOrderByWithRelationInput[]
-  cursor?: Prisma.ApprovalDelegationWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.ApprovalDelegationScalarFieldEnum | Prisma.ApprovalDelegationScalarFieldEnum[]
-}
-
-/**
- * User.delegationsReceived
- */
-export type User$delegationsReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the ApprovalDelegation
-   */
-  select?: Prisma.ApprovalDelegationSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the ApprovalDelegation
-   */
-  omit?: Prisma.ApprovalDelegationOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.ApprovalDelegationInclude<ExtArgs> | null
-  where?: Prisma.ApprovalDelegationWhereInput
-  orderBy?: Prisma.ApprovalDelegationOrderByWithRelationInput | Prisma.ApprovalDelegationOrderByWithRelationInput[]
-  cursor?: Prisma.ApprovalDelegationWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.ApprovalDelegationScalarFieldEnum | Prisma.ApprovalDelegationScalarFieldEnum[]
-}
-
-/**
- * User.preferences
- */
-export type User$preferencesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the UserPreferences
-   */
-  select?: Prisma.UserPreferencesSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the UserPreferences
-   */
-  omit?: Prisma.UserPreferencesOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserPreferencesInclude<ExtArgs> | null
-  where?: Prisma.UserPreferencesWhereInput
-}
-
-/**
- * User.leaveTemplates
- */
-export type User$leaveTemplatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the LeaveTemplate
-   */
-  select?: Prisma.LeaveTemplateSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the LeaveTemplate
-   */
-  omit?: Prisma.LeaveTemplateOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.LeaveTemplateInclude<ExtArgs> | null
-  where?: Prisma.LeaveTemplateWhereInput
-  orderBy?: Prisma.LeaveTemplateOrderByWithRelationInput | Prisma.LeaveTemplateOrderByWithRelationInput[]
-  cursor?: Prisma.LeaveTemplateWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.LeaveTemplateScalarFieldEnum | Prisma.LeaveTemplateScalarFieldEnum[]
-}
-
-/**
- * User.policyVersions
- */
-export type User$policyVersionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the PolicyVersion
-   */
-  select?: Prisma.PolicyVersionSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the PolicyVersion
-   */
-  omit?: Prisma.PolicyVersionOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.PolicyVersionInclude<ExtArgs> | null
-  where?: Prisma.PolicyVersionWhereInput
-  orderBy?: Prisma.PolicyVersionOrderByWithRelationInput | Prisma.PolicyVersionOrderByWithRelationInput[]
-  cursor?: Prisma.PolicyVersionWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.PolicyVersionScalarFieldEnum | Prisma.PolicyVersionScalarFieldEnum[]
-}
-
-/**
- * User.profile
- */
-export type User$profileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the UserProfile
-   */
-  select?: Prisma.UserProfileSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the UserProfile
-   */
-  omit?: Prisma.UserProfileOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserProfileInclude<ExtArgs> | null
-  where?: Prisma.UserProfileWhereInput
-}
-
-/**
- * User.emergencyContacts
- */
-export type User$emergencyContactsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the EmergencyContact
-   */
-  select?: Prisma.EmergencyContactSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the EmergencyContact
-   */
-  omit?: Prisma.EmergencyContactOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.EmergencyContactInclude<ExtArgs> | null
-  where?: Prisma.EmergencyContactWhereInput
-  orderBy?: Prisma.EmergencyContactOrderByWithRelationInput | Prisma.EmergencyContactOrderByWithRelationInput[]
-  cursor?: Prisma.EmergencyContactWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.EmergencyContactScalarFieldEnum | Prisma.EmergencyContactScalarFieldEnum[]
-}
-
-/**
- * User.bankDetails
- */
-export type User$bankDetailsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the BankDetails
-   */
-  select?: Prisma.BankDetailsSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the BankDetails
-   */
-  omit?: Prisma.BankDetailsOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.BankDetailsInclude<ExtArgs> | null
-  where?: Prisma.BankDetailsWhereInput
-}
-
-/**
- * User.documents
- */
-export type User$documentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the UserDocument
-   */
-  select?: Prisma.UserDocumentSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the UserDocument
-   */
-  omit?: Prisma.UserDocumentOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserDocumentInclude<ExtArgs> | null
-  where?: Prisma.UserDocumentWhereInput
-  orderBy?: Prisma.UserDocumentOrderByWithRelationInput | Prisma.UserDocumentOrderByWithRelationInput[]
-  cursor?: Prisma.UserDocumentWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.UserDocumentScalarFieldEnum | Prisma.UserDocumentScalarFieldEnum[]
-}
-
-/**
- * User.hrisSyncs
- */
-export type User$hrisSyncsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the HRISSync
-   */
-  select?: Prisma.HRISSyncSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the HRISSync
-   */
-  omit?: Prisma.HRISSyncOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.HRISSyncInclude<ExtArgs> | null
-  where?: Prisma.HRISSyncWhereInput
-  orderBy?: Prisma.HRISSyncOrderByWithRelationInput | Prisma.HRISSyncOrderByWithRelationInput[]
-  cursor?: Prisma.HRISSyncWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.HRISSyncScalarFieldEnum | Prisma.HRISSyncScalarFieldEnum[]
+  distinct?: Prisma.EncashmentRequestScalarFieldEnum | Prisma.EncashmentRequestScalarFieldEnum[]
 }
 
 /**
@@ -7237,6 +7060,102 @@ export type User$hrisConflictsResolverArgs<ExtArgs extends runtime.Types.Extensi
 }
 
 /**
+ * User.hrisSyncs
+ */
+export type User$hrisSyncsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the HRISSync
+   */
+  select?: Prisma.HRISSyncSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the HRISSync
+   */
+  omit?: Prisma.HRISSyncOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.HRISSyncInclude<ExtArgs> | null
+  where?: Prisma.HRISSyncWhereInput
+  orderBy?: Prisma.HRISSyncOrderByWithRelationInput | Prisma.HRISSyncOrderByWithRelationInput[]
+  cursor?: Prisma.HRISSyncWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.HRISSyncScalarFieldEnum | Prisma.HRISSyncScalarFieldEnum[]
+}
+
+/**
+ * User.leaves
+ */
+export type User$leavesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LeaveRequest
+   */
+  select?: Prisma.LeaveRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LeaveRequest
+   */
+  omit?: Prisma.LeaveRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LeaveRequestInclude<ExtArgs> | null
+  where?: Prisma.LeaveRequestWhereInput
+  orderBy?: Prisma.LeaveRequestOrderByWithRelationInput | Prisma.LeaveRequestOrderByWithRelationInput[]
+  cursor?: Prisma.LeaveRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LeaveRequestScalarFieldEnum | Prisma.LeaveRequestScalarFieldEnum[]
+}
+
+/**
+ * User.leaveTemplates
+ */
+export type User$leaveTemplatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LeaveTemplate
+   */
+  select?: Prisma.LeaveTemplateSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LeaveTemplate
+   */
+  omit?: Prisma.LeaveTemplateOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LeaveTemplateInclude<ExtArgs> | null
+  where?: Prisma.LeaveTemplateWhereInput
+  orderBy?: Prisma.LeaveTemplateOrderByWithRelationInput | Prisma.LeaveTemplateOrderByWithRelationInput[]
+  cursor?: Prisma.LeaveTemplateWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LeaveTemplateScalarFieldEnum | Prisma.LeaveTemplateScalarFieldEnum[]
+}
+
+/**
+ * User.policyVersions
+ */
+export type User$policyVersionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PolicyVersion
+   */
+  select?: Prisma.PolicyVersionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PolicyVersion
+   */
+  omit?: Prisma.PolicyVersionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PolicyVersionInclude<ExtArgs> | null
+  where?: Prisma.PolicyVersionWhereInput
+  orderBy?: Prisma.PolicyVersionOrderByWithRelationInput | Prisma.PolicyVersionOrderByWithRelationInput[]
+  cursor?: Prisma.PolicyVersionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PolicyVersionScalarFieldEnum | Prisma.PolicyVersionScalarFieldEnum[]
+}
+
+/**
  * User.scheduledReports
  */
 export type User$scheduledReportsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -7261,27 +7180,108 @@ export type User$scheduledReportsArgs<ExtArgs extends runtime.Types.Extensions.I
 }
 
 /**
- * User.calendarConfigs
+ * User.deptHead
  */
-export type User$calendarConfigsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$deptHeadArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the CalendarConfig
+   * Select specific fields to fetch from the User
    */
-  select?: Prisma.CalendarConfigSelect<ExtArgs> | null
+  select?: Prisma.UserSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the CalendarConfig
+   * Omit specific fields from the User
    */
-  omit?: Prisma.CalendarConfigOmit<ExtArgs> | null
+  omit?: Prisma.UserOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.CalendarConfigInclude<ExtArgs> | null
-  where?: Prisma.CalendarConfigWhereInput
-  orderBy?: Prisma.CalendarConfigOrderByWithRelationInput | Prisma.CalendarConfigOrderByWithRelationInput[]
-  cursor?: Prisma.CalendarConfigWhereUniqueInput
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
+}
+
+/**
+ * User.teamMembers
+ */
+export type User$teamMembersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
+  orderBy?: Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[]
+  cursor?: Prisma.UserWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.CalendarConfigScalarFieldEnum | Prisma.CalendarConfigScalarFieldEnum[]
+  distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
+}
+
+/**
+ * User.documents
+ */
+export type User$documentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserDocument
+   */
+  select?: Prisma.UserDocumentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserDocument
+   */
+  omit?: Prisma.UserDocumentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserDocumentInclude<ExtArgs> | null
+  where?: Prisma.UserDocumentWhereInput
+  orderBy?: Prisma.UserDocumentOrderByWithRelationInput | Prisma.UserDocumentOrderByWithRelationInput[]
+  cursor?: Prisma.UserDocumentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserDocumentScalarFieldEnum | Prisma.UserDocumentScalarFieldEnum[]
+}
+
+/**
+ * User.preferences
+ */
+export type User$preferencesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserPreferences
+   */
+  select?: Prisma.UserPreferencesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserPreferences
+   */
+  omit?: Prisma.UserPreferencesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserPreferencesInclude<ExtArgs> | null
+  where?: Prisma.UserPreferencesWhereInput
+}
+
+/**
+ * User.profile
+ */
+export type User$profileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserProfile
+   */
+  select?: Prisma.UserProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserProfile
+   */
+  omit?: Prisma.UserProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserProfileInclude<ExtArgs> | null
+  where?: Prisma.UserProfileWhereInput
 }
 
 /**

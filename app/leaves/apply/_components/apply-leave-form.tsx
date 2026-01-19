@@ -87,6 +87,10 @@ export function ApplyLeaveForm() {
     handleConfirmSubmit,
     handleManualSave,
     initiateReview,
+    isHalfDay,
+    setIsHalfDay,
+    halfDayPeriod,
+    setHalfDayPeriod,
   } = useApplyLeaveForm();
   const router = useRouter();
 
@@ -209,6 +213,54 @@ export function ApplyLeaveForm() {
                       errors={{ start: errors.start, end: errors.end }}
                       bookedDates={bookedDates}
                     />
+
+                    {/* Half-Day Leave Toggle */}
+                    {(type === "CASUAL" || type === "EARNED") && dateRange.start && dateRange.end && dateRange.start.getTime() === dateRange.end.getTime() && (
+                      <div className="mt-4 p-4 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30">
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            id="halfDay"
+                            checked={isHalfDay}
+                            onChange={(e) => setIsHalfDay(e.target.checked)}
+                            className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
+                            disabled={submitting}
+                          />
+                          <label htmlFor="halfDay" className="text-sm font-medium text-indigo-900 dark:text-indigo-100">
+                            Apply for Half Day Leave
+                          </label>
+                        </div>
+
+                        {isHalfDay && (
+                          <div className="mt-3 flex gap-4 ml-7">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name="halfDayPeriod"
+                                value="AM"
+                                checked={halfDayPeriod === "AM"}
+                                onChange={() => setHalfDayPeriod("AM")}
+                                className="w-4 h-4 text-indigo-600 focus:ring-indigo-500"
+                                disabled={submitting}
+                              />
+                              <span className="text-sm text-indigo-800 dark:text-indigo-200">First Half (AM)</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name="halfDayPeriod"
+                                value="PM"
+                                checked={halfDayPeriod === "PM"}
+                                onChange={() => setHalfDayPeriod("PM")}
+                                className="w-4 h-4 text-indigo-600 focus:ring-indigo-500"
+                                disabled={submitting}
+                              />
+                              <span className="text-sm text-indigo-800 dark:text-indigo-200">Second Half (PM)</span>
+                            </label>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </section>
 

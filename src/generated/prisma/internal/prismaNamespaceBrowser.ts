@@ -103,17 +103,17 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const UserScalarFieldEnum = {
   id: 'id',
+  empCode: 'empCode',
   name: 'name',
   email: 'email',
-  password: 'password',
-  empCode: 'empCode',
   role: 'role',
   department: 'department',
-  deptHeadId: 'deptHeadId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
   joinDate: 'joinDate',
   retirementDate: 'retirementDate',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  password: 'password',
+  deptHeadId: 'deptHeadId'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -134,16 +134,18 @@ export const LeaveRequestScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   fitnessCertificateUrl: 'fitnessCertificateUrl',
-  isModified: 'isModified',
-  incidentDate: 'incidentDate',
-  isExtension: 'isExtension',
   parentLeaveId: 'parentLeaveId',
-  payCalculation: 'payCalculation',
-  studyLeaveDocuments: 'studyLeaveDocuments',
+  isExtension: 'isExtension',
+  isModified: 'isModified',
   cancellationReason: 'cancellationReason',
+  incidentDate: 'incidentDate',
   isCancellationRequest: 'isCancellationRequest',
   isPartialCancellation: 'isPartialCancellation',
-  originalEndDate: 'originalEndDate'
+  originalEndDate: 'originalEndDate',
+  payCalculation: 'payCalculation',
+  studyLeaveDocuments: 'studyLeaveDocuments',
+  isHalfDay: 'isHalfDay',
+  halfDayPeriod: 'halfDayPeriod'
 } as const
 
 export type LeaveRequestScalarFieldEnum = (typeof LeaveRequestScalarFieldEnum)[keyof typeof LeaveRequestScalarFieldEnum]
@@ -250,14 +252,14 @@ export const EncashmentRequestScalarFieldEnum = {
   approvedAt: 'approvedAt',
   rejectionReason: 'rejectionReason',
   paidAt: 'paidAt',
-  paymentStatus: 'paymentStatus',
-  paymentMethod: 'paymentMethod',
-  paymentReference: 'paymentReference',
-  paymentDate: 'paymentDate',
-  paymentReceiptUrl: 'paymentReceiptUrl',
-  processedBy: 'processedBy',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  paymentDate: 'paymentDate',
+  paymentMethod: 'paymentMethod',
+  paymentReceiptUrl: 'paymentReceiptUrl',
+  paymentReference: 'paymentReference',
+  paymentStatus: 'paymentStatus',
+  processedBy: 'processedBy'
 } as const
 
 export type EncashmentRequestScalarFieldEnum = (typeof EncashmentRequestScalarFieldEnum)[keyof typeof EncashmentRequestScalarFieldEnum]
@@ -299,9 +301,9 @@ export const NotificationScalarFieldEnum = {
   link: 'link',
   leaveId: 'leaveId',
   read: 'read',
-  readAt: 'readAt',
   createdAt: 'createdAt',
-  expiresAt: 'expiresAt'
+  expiresAt: 'expiresAt',
+  readAt: 'readAt'
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
@@ -331,10 +333,10 @@ export const ApprovalDelegationScalarFieldEnum = {
   endDate: 'endDate',
   isActive: 'isActive',
   reason: 'reason',
-  leaveTypes: 'leaveTypes',
-  isPermanent: 'isPermanent',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  isPermanent: 'isPermanent',
+  leaveTypes: 'leaveTypes'
 } as const
 
 export type ApprovalDelegationScalarFieldEnum = (typeof ApprovalDelegationScalarFieldEnum)[keyof typeof ApprovalDelegationScalarFieldEnum]
@@ -645,11 +647,11 @@ export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
 export const UserOrderByRelevanceFieldEnum = {
+  empCode: 'empCode',
   name: 'name',
   email: 'email',
-  password: 'password',
-  empCode: 'empCode',
-  department: 'department'
+  department: 'department',
+  password: 'password'
 } as const
 
 export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
@@ -677,7 +679,8 @@ export const LeaveRequestOrderByRelevanceFieldEnum = {
   certificateUrl: 'certificateUrl',
   policyVersion: 'policyVersion',
   fitnessCertificateUrl: 'fitnessCertificateUrl',
-  cancellationReason: 'cancellationReason'
+  cancellationReason: 'cancellationReason',
+  halfDayPeriod: 'halfDayPeriod'
 } as const
 
 export type LeaveRequestOrderByRelevanceFieldEnum = (typeof LeaveRequestOrderByRelevanceFieldEnum)[keyof typeof LeaveRequestOrderByRelevanceFieldEnum]
@@ -725,10 +728,10 @@ export type LeaveVersionOrderByRelevanceFieldEnum = (typeof LeaveVersionOrderByR
 export const EncashmentRequestOrderByRelevanceFieldEnum = {
   reason: 'reason',
   rejectionReason: 'rejectionReason',
-  paymentStatus: 'paymentStatus',
   paymentMethod: 'paymentMethod',
+  paymentReceiptUrl: 'paymentReceiptUrl',
   paymentReference: 'paymentReference',
-  paymentReceiptUrl: 'paymentReceiptUrl'
+  paymentStatus: 'paymentStatus'
 } as const
 
 export type EncashmentRequestOrderByRelevanceFieldEnum = (typeof EncashmentRequestOrderByRelevanceFieldEnum)[keyof typeof EncashmentRequestOrderByRelevanceFieldEnum]

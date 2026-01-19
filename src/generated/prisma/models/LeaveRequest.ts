@@ -55,14 +55,16 @@ export type LeaveRequestMinAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   fitnessCertificateUrl: string | null
-  isModified: boolean | null
-  incidentDate: Date | null
-  isExtension: boolean | null
   parentLeaveId: number | null
+  isExtension: boolean | null
+  isModified: boolean | null
   cancellationReason: string | null
+  incidentDate: Date | null
   isCancellationRequest: boolean | null
   isPartialCancellation: boolean | null
   originalEndDate: Date | null
+  isHalfDay: boolean | null
+  halfDayPeriod: string | null
 }
 
 export type LeaveRequestMaxAggregateOutputType = {
@@ -80,14 +82,16 @@ export type LeaveRequestMaxAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   fitnessCertificateUrl: string | null
-  isModified: boolean | null
-  incidentDate: Date | null
-  isExtension: boolean | null
   parentLeaveId: number | null
+  isExtension: boolean | null
+  isModified: boolean | null
   cancellationReason: string | null
+  incidentDate: Date | null
   isCancellationRequest: boolean | null
   isPartialCancellation: boolean | null
   originalEndDate: Date | null
+  isHalfDay: boolean | null
+  halfDayPeriod: string | null
 }
 
 export type LeaveRequestCountAggregateOutputType = {
@@ -105,16 +109,18 @@ export type LeaveRequestCountAggregateOutputType = {
   createdAt: number
   updatedAt: number
   fitnessCertificateUrl: number
-  isModified: number
-  incidentDate: number
-  isExtension: number
   parentLeaveId: number
-  payCalculation: number
-  studyLeaveDocuments: number
+  isExtension: number
+  isModified: number
   cancellationReason: number
+  incidentDate: number
   isCancellationRequest: number
   isPartialCancellation: number
   originalEndDate: number
+  payCalculation: number
+  studyLeaveDocuments: number
+  isHalfDay: number
+  halfDayPeriod: number
   _all: number
 }
 
@@ -148,14 +154,16 @@ export type LeaveRequestMinAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   fitnessCertificateUrl?: true
-  isModified?: true
-  incidentDate?: true
-  isExtension?: true
   parentLeaveId?: true
+  isExtension?: true
+  isModified?: true
   cancellationReason?: true
+  incidentDate?: true
   isCancellationRequest?: true
   isPartialCancellation?: true
   originalEndDate?: true
+  isHalfDay?: true
+  halfDayPeriod?: true
 }
 
 export type LeaveRequestMaxAggregateInputType = {
@@ -173,14 +181,16 @@ export type LeaveRequestMaxAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   fitnessCertificateUrl?: true
-  isModified?: true
-  incidentDate?: true
-  isExtension?: true
   parentLeaveId?: true
+  isExtension?: true
+  isModified?: true
   cancellationReason?: true
+  incidentDate?: true
   isCancellationRequest?: true
   isPartialCancellation?: true
   originalEndDate?: true
+  isHalfDay?: true
+  halfDayPeriod?: true
 }
 
 export type LeaveRequestCountAggregateInputType = {
@@ -198,16 +208,18 @@ export type LeaveRequestCountAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   fitnessCertificateUrl?: true
-  isModified?: true
-  incidentDate?: true
-  isExtension?: true
   parentLeaveId?: true
-  payCalculation?: true
-  studyLeaveDocuments?: true
+  isExtension?: true
+  isModified?: true
   cancellationReason?: true
+  incidentDate?: true
   isCancellationRequest?: true
   isPartialCancellation?: true
   originalEndDate?: true
+  payCalculation?: true
+  studyLeaveDocuments?: true
+  isHalfDay?: true
+  halfDayPeriod?: true
   _all?: true
 }
 
@@ -312,16 +324,18 @@ export type LeaveRequestGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   fitnessCertificateUrl: string | null
-  isModified: boolean
-  incidentDate: Date | null
-  isExtension: boolean
   parentLeaveId: number | null
-  payCalculation: runtime.JsonValue | null
-  studyLeaveDocuments: runtime.JsonValue | null
+  isExtension: boolean
+  isModified: boolean
   cancellationReason: string | null
+  incidentDate: Date | null
   isCancellationRequest: boolean
   isPartialCancellation: boolean
   originalEndDate: Date | null
+  payCalculation: runtime.JsonValue | null
+  studyLeaveDocuments: runtime.JsonValue | null
+  isHalfDay: boolean
+  halfDayPeriod: string | null
   _count: LeaveRequestCountAggregateOutputType | null
   _avg: LeaveRequestAvgAggregateOutputType | null
   _sum: LeaveRequestSumAggregateOutputType | null
@@ -362,23 +376,25 @@ export type LeaveRequestWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"LeaveRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"LeaveRequest"> | Date | string
   fitnessCertificateUrl?: Prisma.StringNullableFilter<"LeaveRequest"> | string | null
-  isModified?: Prisma.BoolFilter<"LeaveRequest"> | boolean
-  incidentDate?: Prisma.DateTimeNullableFilter<"LeaveRequest"> | Date | string | null
-  isExtension?: Prisma.BoolFilter<"LeaveRequest"> | boolean
   parentLeaveId?: Prisma.IntNullableFilter<"LeaveRequest"> | number | null
-  payCalculation?: Prisma.JsonNullableFilter<"LeaveRequest">
-  studyLeaveDocuments?: Prisma.JsonNullableFilter<"LeaveRequest">
+  isExtension?: Prisma.BoolFilter<"LeaveRequest"> | boolean
+  isModified?: Prisma.BoolFilter<"LeaveRequest"> | boolean
   cancellationReason?: Prisma.StringNullableFilter<"LeaveRequest"> | string | null
+  incidentDate?: Prisma.DateTimeNullableFilter<"LeaveRequest"> | Date | string | null
   isCancellationRequest?: Prisma.BoolFilter<"LeaveRequest"> | boolean
   isPartialCancellation?: Prisma.BoolFilter<"LeaveRequest"> | boolean
   originalEndDate?: Prisma.DateTimeNullableFilter<"LeaveRequest"> | Date | string | null
+  payCalculation?: Prisma.JsonNullableFilter<"LeaveRequest">
+  studyLeaveDocuments?: Prisma.JsonNullableFilter<"LeaveRequest">
+  isHalfDay?: Prisma.BoolFilter<"LeaveRequest"> | boolean
+  halfDayPeriod?: Prisma.StringNullableFilter<"LeaveRequest"> | string | null
   approvals?: Prisma.ApprovalListRelationFilter
+  calendarMappings?: Prisma.LeaveCalendarMappingListRelationFilter
   comments?: Prisma.LeaveCommentListRelationFilter
   parentLeave?: Prisma.XOR<Prisma.LeaveRequestNullableScalarRelationFilter, Prisma.LeaveRequestWhereInput> | null
   extensions?: Prisma.LeaveRequestListRelationFilter
   requester?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   versions?: Prisma.LeaveVersionListRelationFilter
-  calendarMappings?: Prisma.LeaveCalendarMappingListRelationFilter
 }
 
 export type LeaveRequestOrderByWithRelationInput = {
@@ -396,23 +412,25 @@ export type LeaveRequestOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   fitnessCertificateUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  isModified?: Prisma.SortOrder
-  incidentDate?: Prisma.SortOrderInput | Prisma.SortOrder
-  isExtension?: Prisma.SortOrder
   parentLeaveId?: Prisma.SortOrderInput | Prisma.SortOrder
-  payCalculation?: Prisma.SortOrderInput | Prisma.SortOrder
-  studyLeaveDocuments?: Prisma.SortOrderInput | Prisma.SortOrder
+  isExtension?: Prisma.SortOrder
+  isModified?: Prisma.SortOrder
   cancellationReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  incidentDate?: Prisma.SortOrderInput | Prisma.SortOrder
   isCancellationRequest?: Prisma.SortOrder
   isPartialCancellation?: Prisma.SortOrder
   originalEndDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  payCalculation?: Prisma.SortOrderInput | Prisma.SortOrder
+  studyLeaveDocuments?: Prisma.SortOrderInput | Prisma.SortOrder
+  isHalfDay?: Prisma.SortOrder
+  halfDayPeriod?: Prisma.SortOrderInput | Prisma.SortOrder
   approvals?: Prisma.ApprovalOrderByRelationAggregateInput
+  calendarMappings?: Prisma.LeaveCalendarMappingOrderByRelationAggregateInput
   comments?: Prisma.LeaveCommentOrderByRelationAggregateInput
   parentLeave?: Prisma.LeaveRequestOrderByWithRelationInput
   extensions?: Prisma.LeaveRequestOrderByRelationAggregateInput
   requester?: Prisma.UserOrderByWithRelationInput
   versions?: Prisma.LeaveVersionOrderByRelationAggregateInput
-  calendarMappings?: Prisma.LeaveCalendarMappingOrderByRelationAggregateInput
   _relevance?: Prisma.LeaveRequestOrderByRelevanceInput
 }
 
@@ -434,23 +452,25 @@ export type LeaveRequestWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"LeaveRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"LeaveRequest"> | Date | string
   fitnessCertificateUrl?: Prisma.StringNullableFilter<"LeaveRequest"> | string | null
-  isModified?: Prisma.BoolFilter<"LeaveRequest"> | boolean
-  incidentDate?: Prisma.DateTimeNullableFilter<"LeaveRequest"> | Date | string | null
-  isExtension?: Prisma.BoolFilter<"LeaveRequest"> | boolean
   parentLeaveId?: Prisma.IntNullableFilter<"LeaveRequest"> | number | null
-  payCalculation?: Prisma.JsonNullableFilter<"LeaveRequest">
-  studyLeaveDocuments?: Prisma.JsonNullableFilter<"LeaveRequest">
+  isExtension?: Prisma.BoolFilter<"LeaveRequest"> | boolean
+  isModified?: Prisma.BoolFilter<"LeaveRequest"> | boolean
   cancellationReason?: Prisma.StringNullableFilter<"LeaveRequest"> | string | null
+  incidentDate?: Prisma.DateTimeNullableFilter<"LeaveRequest"> | Date | string | null
   isCancellationRequest?: Prisma.BoolFilter<"LeaveRequest"> | boolean
   isPartialCancellation?: Prisma.BoolFilter<"LeaveRequest"> | boolean
   originalEndDate?: Prisma.DateTimeNullableFilter<"LeaveRequest"> | Date | string | null
+  payCalculation?: Prisma.JsonNullableFilter<"LeaveRequest">
+  studyLeaveDocuments?: Prisma.JsonNullableFilter<"LeaveRequest">
+  isHalfDay?: Prisma.BoolFilter<"LeaveRequest"> | boolean
+  halfDayPeriod?: Prisma.StringNullableFilter<"LeaveRequest"> | string | null
   approvals?: Prisma.ApprovalListRelationFilter
+  calendarMappings?: Prisma.LeaveCalendarMappingListRelationFilter
   comments?: Prisma.LeaveCommentListRelationFilter
   parentLeave?: Prisma.XOR<Prisma.LeaveRequestNullableScalarRelationFilter, Prisma.LeaveRequestWhereInput> | null
   extensions?: Prisma.LeaveRequestListRelationFilter
   requester?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   versions?: Prisma.LeaveVersionListRelationFilter
-  calendarMappings?: Prisma.LeaveCalendarMappingListRelationFilter
 }, "id">
 
 export type LeaveRequestOrderByWithAggregationInput = {
@@ -468,16 +488,18 @@ export type LeaveRequestOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   fitnessCertificateUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  isModified?: Prisma.SortOrder
-  incidentDate?: Prisma.SortOrderInput | Prisma.SortOrder
-  isExtension?: Prisma.SortOrder
   parentLeaveId?: Prisma.SortOrderInput | Prisma.SortOrder
-  payCalculation?: Prisma.SortOrderInput | Prisma.SortOrder
-  studyLeaveDocuments?: Prisma.SortOrderInput | Prisma.SortOrder
+  isExtension?: Prisma.SortOrder
+  isModified?: Prisma.SortOrder
   cancellationReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  incidentDate?: Prisma.SortOrderInput | Prisma.SortOrder
   isCancellationRequest?: Prisma.SortOrder
   isPartialCancellation?: Prisma.SortOrder
   originalEndDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  payCalculation?: Prisma.SortOrderInput | Prisma.SortOrder
+  studyLeaveDocuments?: Prisma.SortOrderInput | Prisma.SortOrder
+  isHalfDay?: Prisma.SortOrder
+  halfDayPeriod?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.LeaveRequestCountOrderByAggregateInput
   _avg?: Prisma.LeaveRequestAvgOrderByAggregateInput
   _max?: Prisma.LeaveRequestMaxOrderByAggregateInput
@@ -503,16 +525,18 @@ export type LeaveRequestScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"LeaveRequest"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"LeaveRequest"> | Date | string
   fitnessCertificateUrl?: Prisma.StringNullableWithAggregatesFilter<"LeaveRequest"> | string | null
-  isModified?: Prisma.BoolWithAggregatesFilter<"LeaveRequest"> | boolean
-  incidentDate?: Prisma.DateTimeNullableWithAggregatesFilter<"LeaveRequest"> | Date | string | null
-  isExtension?: Prisma.BoolWithAggregatesFilter<"LeaveRequest"> | boolean
   parentLeaveId?: Prisma.IntNullableWithAggregatesFilter<"LeaveRequest"> | number | null
-  payCalculation?: Prisma.JsonNullableWithAggregatesFilter<"LeaveRequest">
-  studyLeaveDocuments?: Prisma.JsonNullableWithAggregatesFilter<"LeaveRequest">
+  isExtension?: Prisma.BoolWithAggregatesFilter<"LeaveRequest"> | boolean
+  isModified?: Prisma.BoolWithAggregatesFilter<"LeaveRequest"> | boolean
   cancellationReason?: Prisma.StringNullableWithAggregatesFilter<"LeaveRequest"> | string | null
+  incidentDate?: Prisma.DateTimeNullableWithAggregatesFilter<"LeaveRequest"> | Date | string | null
   isCancellationRequest?: Prisma.BoolWithAggregatesFilter<"LeaveRequest"> | boolean
   isPartialCancellation?: Prisma.BoolWithAggregatesFilter<"LeaveRequest"> | boolean
   originalEndDate?: Prisma.DateTimeNullableWithAggregatesFilter<"LeaveRequest"> | Date | string | null
+  payCalculation?: Prisma.JsonNullableWithAggregatesFilter<"LeaveRequest">
+  studyLeaveDocuments?: Prisma.JsonNullableWithAggregatesFilter<"LeaveRequest">
+  isHalfDay?: Prisma.BoolWithAggregatesFilter<"LeaveRequest"> | boolean
+  halfDayPeriod?: Prisma.StringNullableWithAggregatesFilter<"LeaveRequest"> | string | null
 }
 
 export type LeaveRequestCreateInput = {
@@ -528,22 +552,24 @@ export type LeaveRequestCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
   isExtension?: boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutLeaveInput
+  calendarMappings?: Prisma.LeaveCalendarMappingCreateNestedManyWithoutLeaveInput
   comments?: Prisma.LeaveCommentCreateNestedManyWithoutLeaveInput
   parentLeave?: Prisma.LeaveRequestCreateNestedOneWithoutExtensionsInput
   extensions?: Prisma.LeaveRequestCreateNestedManyWithoutParentLeaveInput
   requester: Prisma.UserCreateNestedOneWithoutLeavesInput
   versions?: Prisma.LeaveVersionCreateNestedManyWithoutLeaveInput
-  calendarMappings?: Prisma.LeaveCalendarMappingCreateNestedManyWithoutLeaveInput
 }
 
 export type LeaveRequestUncheckedCreateInput = {
@@ -561,21 +587,23 @@ export type LeaveRequestUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
-  isExtension?: boolean
   parentLeaveId?: number | null
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isExtension?: boolean
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutLeaveInput
+  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedCreateNestedManyWithoutLeaveInput
   comments?: Prisma.LeaveCommentUncheckedCreateNestedManyWithoutLeaveInput
   extensions?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutParentLeaveInput
   versions?: Prisma.LeaveVersionUncheckedCreateNestedManyWithoutLeaveInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedCreateNestedManyWithoutLeaveInput
 }
 
 export type LeaveRequestUpdateInput = {
@@ -591,22 +619,24 @@ export type LeaveRequestUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutLeaveNestedInput
+  calendarMappings?: Prisma.LeaveCalendarMappingUpdateManyWithoutLeaveNestedInput
   comments?: Prisma.LeaveCommentUpdateManyWithoutLeaveNestedInput
   parentLeave?: Prisma.LeaveRequestUpdateOneWithoutExtensionsNestedInput
   extensions?: Prisma.LeaveRequestUpdateManyWithoutParentLeaveNestedInput
   requester?: Prisma.UserUpdateOneRequiredWithoutLeavesNestedInput
   versions?: Prisma.LeaveVersionUpdateManyWithoutLeaveNestedInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUpdateManyWithoutLeaveNestedInput
 }
 
 export type LeaveRequestUncheckedUpdateInput = {
@@ -624,21 +654,23 @@ export type LeaveRequestUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
   parentLeaveId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutLeaveNestedInput
+  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedUpdateManyWithoutLeaveNestedInput
   comments?: Prisma.LeaveCommentUncheckedUpdateManyWithoutLeaveNestedInput
   extensions?: Prisma.LeaveRequestUncheckedUpdateManyWithoutParentLeaveNestedInput
   versions?: Prisma.LeaveVersionUncheckedUpdateManyWithoutLeaveNestedInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedUpdateManyWithoutLeaveNestedInput
 }
 
 export type LeaveRequestCreateManyInput = {
@@ -656,16 +688,18 @@ export type LeaveRequestCreateManyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
-  isExtension?: boolean
   parentLeaveId?: number | null
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isExtension?: boolean
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
 }
 
 export type LeaveRequestUpdateManyMutationInput = {
@@ -681,15 +715,17 @@ export type LeaveRequestUpdateManyMutationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type LeaveRequestUncheckedUpdateManyInput = {
@@ -707,16 +743,18 @@ export type LeaveRequestUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
   parentLeaveId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type LeaveRequestListRelationFilter = {
@@ -755,16 +793,18 @@ export type LeaveRequestCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   fitnessCertificateUrl?: Prisma.SortOrder
-  isModified?: Prisma.SortOrder
-  incidentDate?: Prisma.SortOrder
-  isExtension?: Prisma.SortOrder
   parentLeaveId?: Prisma.SortOrder
-  payCalculation?: Prisma.SortOrder
-  studyLeaveDocuments?: Prisma.SortOrder
+  isExtension?: Prisma.SortOrder
+  isModified?: Prisma.SortOrder
   cancellationReason?: Prisma.SortOrder
+  incidentDate?: Prisma.SortOrder
   isCancellationRequest?: Prisma.SortOrder
   isPartialCancellation?: Prisma.SortOrder
   originalEndDate?: Prisma.SortOrder
+  payCalculation?: Prisma.SortOrder
+  studyLeaveDocuments?: Prisma.SortOrder
+  isHalfDay?: Prisma.SortOrder
+  halfDayPeriod?: Prisma.SortOrder
 }
 
 export type LeaveRequestAvgOrderByAggregateInput = {
@@ -789,14 +829,16 @@ export type LeaveRequestMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   fitnessCertificateUrl?: Prisma.SortOrder
-  isModified?: Prisma.SortOrder
-  incidentDate?: Prisma.SortOrder
-  isExtension?: Prisma.SortOrder
   parentLeaveId?: Prisma.SortOrder
+  isExtension?: Prisma.SortOrder
+  isModified?: Prisma.SortOrder
   cancellationReason?: Prisma.SortOrder
+  incidentDate?: Prisma.SortOrder
   isCancellationRequest?: Prisma.SortOrder
   isPartialCancellation?: Prisma.SortOrder
   originalEndDate?: Prisma.SortOrder
+  isHalfDay?: Prisma.SortOrder
+  halfDayPeriod?: Prisma.SortOrder
 }
 
 export type LeaveRequestMinOrderByAggregateInput = {
@@ -814,14 +856,16 @@ export type LeaveRequestMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   fitnessCertificateUrl?: Prisma.SortOrder
-  isModified?: Prisma.SortOrder
-  incidentDate?: Prisma.SortOrder
-  isExtension?: Prisma.SortOrder
   parentLeaveId?: Prisma.SortOrder
+  isExtension?: Prisma.SortOrder
+  isModified?: Prisma.SortOrder
   cancellationReason?: Prisma.SortOrder
+  incidentDate?: Prisma.SortOrder
   isCancellationRequest?: Prisma.SortOrder
   isPartialCancellation?: Prisma.SortOrder
   originalEndDate?: Prisma.SortOrder
+  isHalfDay?: Prisma.SortOrder
+  halfDayPeriod?: Prisma.SortOrder
 }
 
 export type LeaveRequestSumOrderByAggregateInput = {
@@ -1017,21 +1061,23 @@ export type LeaveRequestCreateWithoutRequesterInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
   isExtension?: boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutLeaveInput
+  calendarMappings?: Prisma.LeaveCalendarMappingCreateNestedManyWithoutLeaveInput
   comments?: Prisma.LeaveCommentCreateNestedManyWithoutLeaveInput
   parentLeave?: Prisma.LeaveRequestCreateNestedOneWithoutExtensionsInput
   extensions?: Prisma.LeaveRequestCreateNestedManyWithoutParentLeaveInput
   versions?: Prisma.LeaveVersionCreateNestedManyWithoutLeaveInput
-  calendarMappings?: Prisma.LeaveCalendarMappingCreateNestedManyWithoutLeaveInput
 }
 
 export type LeaveRequestUncheckedCreateWithoutRequesterInput = {
@@ -1048,21 +1094,23 @@ export type LeaveRequestUncheckedCreateWithoutRequesterInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
-  isExtension?: boolean
   parentLeaveId?: number | null
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isExtension?: boolean
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutLeaveInput
+  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedCreateNestedManyWithoutLeaveInput
   comments?: Prisma.LeaveCommentUncheckedCreateNestedManyWithoutLeaveInput
   extensions?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutParentLeaveInput
   versions?: Prisma.LeaveVersionUncheckedCreateNestedManyWithoutLeaveInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedCreateNestedManyWithoutLeaveInput
 }
 
 export type LeaveRequestCreateOrConnectWithoutRequesterInput = {
@@ -1109,16 +1157,18 @@ export type LeaveRequestScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"LeaveRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"LeaveRequest"> | Date | string
   fitnessCertificateUrl?: Prisma.StringNullableFilter<"LeaveRequest"> | string | null
-  isModified?: Prisma.BoolFilter<"LeaveRequest"> | boolean
-  incidentDate?: Prisma.DateTimeNullableFilter<"LeaveRequest"> | Date | string | null
-  isExtension?: Prisma.BoolFilter<"LeaveRequest"> | boolean
   parentLeaveId?: Prisma.IntNullableFilter<"LeaveRequest"> | number | null
-  payCalculation?: Prisma.JsonNullableFilter<"LeaveRequest">
-  studyLeaveDocuments?: Prisma.JsonNullableFilter<"LeaveRequest">
+  isExtension?: Prisma.BoolFilter<"LeaveRequest"> | boolean
+  isModified?: Prisma.BoolFilter<"LeaveRequest"> | boolean
   cancellationReason?: Prisma.StringNullableFilter<"LeaveRequest"> | string | null
+  incidentDate?: Prisma.DateTimeNullableFilter<"LeaveRequest"> | Date | string | null
   isCancellationRequest?: Prisma.BoolFilter<"LeaveRequest"> | boolean
   isPartialCancellation?: Prisma.BoolFilter<"LeaveRequest"> | boolean
   originalEndDate?: Prisma.DateTimeNullableFilter<"LeaveRequest"> | Date | string | null
+  payCalculation?: Prisma.JsonNullableFilter<"LeaveRequest">
+  studyLeaveDocuments?: Prisma.JsonNullableFilter<"LeaveRequest">
+  isHalfDay?: Prisma.BoolFilter<"LeaveRequest"> | boolean
+  halfDayPeriod?: Prisma.StringNullableFilter<"LeaveRequest"> | string | null
 }
 
 export type LeaveRequestCreateWithoutExtensionsInput = {
@@ -1134,21 +1184,23 @@ export type LeaveRequestCreateWithoutExtensionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
   isExtension?: boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutLeaveInput
+  calendarMappings?: Prisma.LeaveCalendarMappingCreateNestedManyWithoutLeaveInput
   comments?: Prisma.LeaveCommentCreateNestedManyWithoutLeaveInput
   parentLeave?: Prisma.LeaveRequestCreateNestedOneWithoutExtensionsInput
   requester: Prisma.UserCreateNestedOneWithoutLeavesInput
   versions?: Prisma.LeaveVersionCreateNestedManyWithoutLeaveInput
-  calendarMappings?: Prisma.LeaveCalendarMappingCreateNestedManyWithoutLeaveInput
 }
 
 export type LeaveRequestUncheckedCreateWithoutExtensionsInput = {
@@ -1166,20 +1218,22 @@ export type LeaveRequestUncheckedCreateWithoutExtensionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
-  isExtension?: boolean
   parentLeaveId?: number | null
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isExtension?: boolean
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutLeaveInput
+  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedCreateNestedManyWithoutLeaveInput
   comments?: Prisma.LeaveCommentUncheckedCreateNestedManyWithoutLeaveInput
   versions?: Prisma.LeaveVersionUncheckedCreateNestedManyWithoutLeaveInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedCreateNestedManyWithoutLeaveInput
 }
 
 export type LeaveRequestCreateOrConnectWithoutExtensionsInput = {
@@ -1200,21 +1254,23 @@ export type LeaveRequestCreateWithoutParentLeaveInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
   isExtension?: boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutLeaveInput
+  calendarMappings?: Prisma.LeaveCalendarMappingCreateNestedManyWithoutLeaveInput
   comments?: Prisma.LeaveCommentCreateNestedManyWithoutLeaveInput
   extensions?: Prisma.LeaveRequestCreateNestedManyWithoutParentLeaveInput
   requester: Prisma.UserCreateNestedOneWithoutLeavesInput
   versions?: Prisma.LeaveVersionCreateNestedManyWithoutLeaveInput
-  calendarMappings?: Prisma.LeaveCalendarMappingCreateNestedManyWithoutLeaveInput
 }
 
 export type LeaveRequestUncheckedCreateWithoutParentLeaveInput = {
@@ -1232,20 +1288,22 @@ export type LeaveRequestUncheckedCreateWithoutParentLeaveInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
   isExtension?: boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutLeaveInput
+  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedCreateNestedManyWithoutLeaveInput
   comments?: Prisma.LeaveCommentUncheckedCreateNestedManyWithoutLeaveInput
   extensions?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutParentLeaveInput
   versions?: Prisma.LeaveVersionUncheckedCreateNestedManyWithoutLeaveInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedCreateNestedManyWithoutLeaveInput
 }
 
 export type LeaveRequestCreateOrConnectWithoutParentLeaveInput = {
@@ -1282,21 +1340,23 @@ export type LeaveRequestUpdateWithoutExtensionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutLeaveNestedInput
+  calendarMappings?: Prisma.LeaveCalendarMappingUpdateManyWithoutLeaveNestedInput
   comments?: Prisma.LeaveCommentUpdateManyWithoutLeaveNestedInput
   parentLeave?: Prisma.LeaveRequestUpdateOneWithoutExtensionsNestedInput
   requester?: Prisma.UserUpdateOneRequiredWithoutLeavesNestedInput
   versions?: Prisma.LeaveVersionUpdateManyWithoutLeaveNestedInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUpdateManyWithoutLeaveNestedInput
 }
 
 export type LeaveRequestUncheckedUpdateWithoutExtensionsInput = {
@@ -1314,20 +1374,22 @@ export type LeaveRequestUncheckedUpdateWithoutExtensionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
   parentLeaveId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutLeaveNestedInput
+  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedUpdateManyWithoutLeaveNestedInput
   comments?: Prisma.LeaveCommentUncheckedUpdateManyWithoutLeaveNestedInput
   versions?: Prisma.LeaveVersionUncheckedUpdateManyWithoutLeaveNestedInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedUpdateManyWithoutLeaveNestedInput
 }
 
 export type LeaveRequestUpsertWithWhereUniqueWithoutParentLeaveInput = {
@@ -1359,21 +1421,23 @@ export type LeaveRequestCreateWithoutApprovalsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
   isExtension?: boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
+  calendarMappings?: Prisma.LeaveCalendarMappingCreateNestedManyWithoutLeaveInput
   comments?: Prisma.LeaveCommentCreateNestedManyWithoutLeaveInput
   parentLeave?: Prisma.LeaveRequestCreateNestedOneWithoutExtensionsInput
   extensions?: Prisma.LeaveRequestCreateNestedManyWithoutParentLeaveInput
   requester: Prisma.UserCreateNestedOneWithoutLeavesInput
   versions?: Prisma.LeaveVersionCreateNestedManyWithoutLeaveInput
-  calendarMappings?: Prisma.LeaveCalendarMappingCreateNestedManyWithoutLeaveInput
 }
 
 export type LeaveRequestUncheckedCreateWithoutApprovalsInput = {
@@ -1391,20 +1455,22 @@ export type LeaveRequestUncheckedCreateWithoutApprovalsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
-  isExtension?: boolean
   parentLeaveId?: number | null
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isExtension?: boolean
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
+  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedCreateNestedManyWithoutLeaveInput
   comments?: Prisma.LeaveCommentUncheckedCreateNestedManyWithoutLeaveInput
   extensions?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutParentLeaveInput
   versions?: Prisma.LeaveVersionUncheckedCreateNestedManyWithoutLeaveInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedCreateNestedManyWithoutLeaveInput
 }
 
 export type LeaveRequestCreateOrConnectWithoutApprovalsInput = {
@@ -1436,21 +1502,23 @@ export type LeaveRequestUpdateWithoutApprovalsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  calendarMappings?: Prisma.LeaveCalendarMappingUpdateManyWithoutLeaveNestedInput
   comments?: Prisma.LeaveCommentUpdateManyWithoutLeaveNestedInput
   parentLeave?: Prisma.LeaveRequestUpdateOneWithoutExtensionsNestedInput
   extensions?: Prisma.LeaveRequestUpdateManyWithoutParentLeaveNestedInput
   requester?: Prisma.UserUpdateOneRequiredWithoutLeavesNestedInput
   versions?: Prisma.LeaveVersionUpdateManyWithoutLeaveNestedInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUpdateManyWithoutLeaveNestedInput
 }
 
 export type LeaveRequestUncheckedUpdateWithoutApprovalsInput = {
@@ -1468,20 +1536,22 @@ export type LeaveRequestUncheckedUpdateWithoutApprovalsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
   parentLeaveId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedUpdateManyWithoutLeaveNestedInput
   comments?: Prisma.LeaveCommentUncheckedUpdateManyWithoutLeaveNestedInput
   extensions?: Prisma.LeaveRequestUncheckedUpdateManyWithoutParentLeaveNestedInput
   versions?: Prisma.LeaveVersionUncheckedUpdateManyWithoutLeaveNestedInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedUpdateManyWithoutLeaveNestedInput
 }
 
 export type LeaveRequestCreateWithoutCommentsInput = {
@@ -1497,21 +1567,23 @@ export type LeaveRequestCreateWithoutCommentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
   isExtension?: boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutLeaveInput
+  calendarMappings?: Prisma.LeaveCalendarMappingCreateNestedManyWithoutLeaveInput
   parentLeave?: Prisma.LeaveRequestCreateNestedOneWithoutExtensionsInput
   extensions?: Prisma.LeaveRequestCreateNestedManyWithoutParentLeaveInput
   requester: Prisma.UserCreateNestedOneWithoutLeavesInput
   versions?: Prisma.LeaveVersionCreateNestedManyWithoutLeaveInput
-  calendarMappings?: Prisma.LeaveCalendarMappingCreateNestedManyWithoutLeaveInput
 }
 
 export type LeaveRequestUncheckedCreateWithoutCommentsInput = {
@@ -1529,20 +1601,22 @@ export type LeaveRequestUncheckedCreateWithoutCommentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
-  isExtension?: boolean
   parentLeaveId?: number | null
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isExtension?: boolean
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutLeaveInput
+  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedCreateNestedManyWithoutLeaveInput
   extensions?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutParentLeaveInput
   versions?: Prisma.LeaveVersionUncheckedCreateNestedManyWithoutLeaveInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedCreateNestedManyWithoutLeaveInput
 }
 
 export type LeaveRequestCreateOrConnectWithoutCommentsInput = {
@@ -1574,21 +1648,23 @@ export type LeaveRequestUpdateWithoutCommentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutLeaveNestedInput
+  calendarMappings?: Prisma.LeaveCalendarMappingUpdateManyWithoutLeaveNestedInput
   parentLeave?: Prisma.LeaveRequestUpdateOneWithoutExtensionsNestedInput
   extensions?: Prisma.LeaveRequestUpdateManyWithoutParentLeaveNestedInput
   requester?: Prisma.UserUpdateOneRequiredWithoutLeavesNestedInput
   versions?: Prisma.LeaveVersionUpdateManyWithoutLeaveNestedInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUpdateManyWithoutLeaveNestedInput
 }
 
 export type LeaveRequestUncheckedUpdateWithoutCommentsInput = {
@@ -1606,20 +1682,22 @@ export type LeaveRequestUncheckedUpdateWithoutCommentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
   parentLeaveId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutLeaveNestedInput
+  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedUpdateManyWithoutLeaveNestedInput
   extensions?: Prisma.LeaveRequestUncheckedUpdateManyWithoutParentLeaveNestedInput
   versions?: Prisma.LeaveVersionUncheckedUpdateManyWithoutLeaveNestedInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedUpdateManyWithoutLeaveNestedInput
 }
 
 export type LeaveRequestCreateWithoutVersionsInput = {
@@ -1635,21 +1713,23 @@ export type LeaveRequestCreateWithoutVersionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
   isExtension?: boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutLeaveInput
+  calendarMappings?: Prisma.LeaveCalendarMappingCreateNestedManyWithoutLeaveInput
   comments?: Prisma.LeaveCommentCreateNestedManyWithoutLeaveInput
   parentLeave?: Prisma.LeaveRequestCreateNestedOneWithoutExtensionsInput
   extensions?: Prisma.LeaveRequestCreateNestedManyWithoutParentLeaveInput
   requester: Prisma.UserCreateNestedOneWithoutLeavesInput
-  calendarMappings?: Prisma.LeaveCalendarMappingCreateNestedManyWithoutLeaveInput
 }
 
 export type LeaveRequestUncheckedCreateWithoutVersionsInput = {
@@ -1667,20 +1747,22 @@ export type LeaveRequestUncheckedCreateWithoutVersionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
-  isExtension?: boolean
   parentLeaveId?: number | null
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isExtension?: boolean
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutLeaveInput
+  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedCreateNestedManyWithoutLeaveInput
   comments?: Prisma.LeaveCommentUncheckedCreateNestedManyWithoutLeaveInput
   extensions?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutParentLeaveInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedCreateNestedManyWithoutLeaveInput
 }
 
 export type LeaveRequestCreateOrConnectWithoutVersionsInput = {
@@ -1712,21 +1794,23 @@ export type LeaveRequestUpdateWithoutVersionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutLeaveNestedInput
+  calendarMappings?: Prisma.LeaveCalendarMappingUpdateManyWithoutLeaveNestedInput
   comments?: Prisma.LeaveCommentUpdateManyWithoutLeaveNestedInput
   parentLeave?: Prisma.LeaveRequestUpdateOneWithoutExtensionsNestedInput
   extensions?: Prisma.LeaveRequestUpdateManyWithoutParentLeaveNestedInput
   requester?: Prisma.UserUpdateOneRequiredWithoutLeavesNestedInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUpdateManyWithoutLeaveNestedInput
 }
 
 export type LeaveRequestUncheckedUpdateWithoutVersionsInput = {
@@ -1744,20 +1828,22 @@ export type LeaveRequestUncheckedUpdateWithoutVersionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
   parentLeaveId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutLeaveNestedInput
+  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedUpdateManyWithoutLeaveNestedInput
   comments?: Prisma.LeaveCommentUncheckedUpdateManyWithoutLeaveNestedInput
   extensions?: Prisma.LeaveRequestUncheckedUpdateManyWithoutParentLeaveNestedInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedUpdateManyWithoutLeaveNestedInput
 }
 
 export type LeaveRequestCreateWithoutCalendarMappingsInput = {
@@ -1773,15 +1859,17 @@ export type LeaveRequestCreateWithoutCalendarMappingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
   isExtension?: boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
   approvals?: Prisma.ApprovalCreateNestedManyWithoutLeaveInput
   comments?: Prisma.LeaveCommentCreateNestedManyWithoutLeaveInput
   parentLeave?: Prisma.LeaveRequestCreateNestedOneWithoutExtensionsInput
@@ -1805,16 +1893,18 @@ export type LeaveRequestUncheckedCreateWithoutCalendarMappingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
-  isExtension?: boolean
   parentLeaveId?: number | null
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isExtension?: boolean
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
   approvals?: Prisma.ApprovalUncheckedCreateNestedManyWithoutLeaveInput
   comments?: Prisma.LeaveCommentUncheckedCreateNestedManyWithoutLeaveInput
   extensions?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutParentLeaveInput
@@ -1850,15 +1940,17 @@ export type LeaveRequestUpdateWithoutCalendarMappingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutLeaveNestedInput
   comments?: Prisma.LeaveCommentUpdateManyWithoutLeaveNestedInput
   parentLeave?: Prisma.LeaveRequestUpdateOneWithoutExtensionsNestedInput
@@ -1882,16 +1974,18 @@ export type LeaveRequestUncheckedUpdateWithoutCalendarMappingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
   parentLeaveId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutLeaveNestedInput
   comments?: Prisma.LeaveCommentUncheckedUpdateManyWithoutLeaveNestedInput
   extensions?: Prisma.LeaveRequestUncheckedUpdateManyWithoutParentLeaveNestedInput
@@ -1912,16 +2006,18 @@ export type LeaveRequestCreateManyRequesterInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
-  isExtension?: boolean
   parentLeaveId?: number | null
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isExtension?: boolean
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
 }
 
 export type LeaveRequestUpdateWithoutRequesterInput = {
@@ -1937,21 +2033,23 @@ export type LeaveRequestUpdateWithoutRequesterInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutLeaveNestedInput
+  calendarMappings?: Prisma.LeaveCalendarMappingUpdateManyWithoutLeaveNestedInput
   comments?: Prisma.LeaveCommentUpdateManyWithoutLeaveNestedInput
   parentLeave?: Prisma.LeaveRequestUpdateOneWithoutExtensionsNestedInput
   extensions?: Prisma.LeaveRequestUpdateManyWithoutParentLeaveNestedInput
   versions?: Prisma.LeaveVersionUpdateManyWithoutLeaveNestedInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUpdateManyWithoutLeaveNestedInput
 }
 
 export type LeaveRequestUncheckedUpdateWithoutRequesterInput = {
@@ -1968,21 +2066,23 @@ export type LeaveRequestUncheckedUpdateWithoutRequesterInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
   parentLeaveId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutLeaveNestedInput
+  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedUpdateManyWithoutLeaveNestedInput
   comments?: Prisma.LeaveCommentUncheckedUpdateManyWithoutLeaveNestedInput
   extensions?: Prisma.LeaveRequestUncheckedUpdateManyWithoutParentLeaveNestedInput
   versions?: Prisma.LeaveVersionUncheckedUpdateManyWithoutLeaveNestedInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedUpdateManyWithoutLeaveNestedInput
 }
 
 export type LeaveRequestUncheckedUpdateManyWithoutRequesterInput = {
@@ -1999,16 +2099,18 @@ export type LeaveRequestUncheckedUpdateManyWithoutRequesterInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
   parentLeaveId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type LeaveRequestCreateManyParentLeaveInput = {
@@ -2026,15 +2128,17 @@ export type LeaveRequestCreateManyParentLeaveInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   fitnessCertificateUrl?: string | null
-  isModified?: boolean
-  incidentDate?: Date | string | null
   isExtension?: boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: boolean
   cancellationReason?: string | null
+  incidentDate?: Date | string | null
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: boolean
+  halfDayPeriod?: string | null
 }
 
 export type LeaveRequestUpdateWithoutParentLeaveInput = {
@@ -2050,21 +2154,23 @@ export type LeaveRequestUpdateWithoutParentLeaveInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUpdateManyWithoutLeaveNestedInput
+  calendarMappings?: Prisma.LeaveCalendarMappingUpdateManyWithoutLeaveNestedInput
   comments?: Prisma.LeaveCommentUpdateManyWithoutLeaveNestedInput
   extensions?: Prisma.LeaveRequestUpdateManyWithoutParentLeaveNestedInput
   requester?: Prisma.UserUpdateOneRequiredWithoutLeavesNestedInput
   versions?: Prisma.LeaveVersionUpdateManyWithoutLeaveNestedInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUpdateManyWithoutLeaveNestedInput
 }
 
 export type LeaveRequestUncheckedUpdateWithoutParentLeaveInput = {
@@ -2082,20 +2188,22 @@ export type LeaveRequestUncheckedUpdateWithoutParentLeaveInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvals?: Prisma.ApprovalUncheckedUpdateManyWithoutLeaveNestedInput
+  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedUpdateManyWithoutLeaveNestedInput
   comments?: Prisma.LeaveCommentUncheckedUpdateManyWithoutLeaveNestedInput
   extensions?: Prisma.LeaveRequestUncheckedUpdateManyWithoutParentLeaveNestedInput
   versions?: Prisma.LeaveVersionUncheckedUpdateManyWithoutLeaveNestedInput
-  calendarMappings?: Prisma.LeaveCalendarMappingUncheckedUpdateManyWithoutLeaveNestedInput
 }
 
 export type LeaveRequestUncheckedUpdateManyWithoutParentLeaveInput = {
@@ -2113,15 +2221,17 @@ export type LeaveRequestUncheckedUpdateManyWithoutParentLeaveInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fitnessCertificateUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isExtension?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isModified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  incidentDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isCancellationRequest?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPartialCancellation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   originalEndDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payCalculation?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  studyLeaveDocuments?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  isHalfDay?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  halfDayPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -2131,18 +2241,18 @@ export type LeaveRequestUncheckedUpdateManyWithoutParentLeaveInput = {
 
 export type LeaveRequestCountOutputType = {
   approvals: number
+  calendarMappings: number
   comments: number
   extensions: number
   versions: number
-  calendarMappings: number
 }
 
 export type LeaveRequestCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   approvals?: boolean | LeaveRequestCountOutputTypeCountApprovalsArgs
+  calendarMappings?: boolean | LeaveRequestCountOutputTypeCountCalendarMappingsArgs
   comments?: boolean | LeaveRequestCountOutputTypeCountCommentsArgs
   extensions?: boolean | LeaveRequestCountOutputTypeCountExtensionsArgs
   versions?: boolean | LeaveRequestCountOutputTypeCountVersionsArgs
-  calendarMappings?: boolean | LeaveRequestCountOutputTypeCountCalendarMappingsArgs
 }
 
 /**
@@ -2160,6 +2270,13 @@ export type LeaveRequestCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types
  */
 export type LeaveRequestCountOutputTypeCountApprovalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ApprovalWhereInput
+}
+
+/**
+ * LeaveRequestCountOutputType without action
+ */
+export type LeaveRequestCountOutputTypeCountCalendarMappingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LeaveCalendarMappingWhereInput
 }
 
 /**
@@ -2183,13 +2300,6 @@ export type LeaveRequestCountOutputTypeCountVersionsArgs<ExtArgs extends runtime
   where?: Prisma.LeaveVersionWhereInput
 }
 
-/**
- * LeaveRequestCountOutputType without action
- */
-export type LeaveRequestCountOutputTypeCountCalendarMappingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.LeaveCalendarMappingWhereInput
-}
-
 
 export type LeaveRequestSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2206,23 +2316,25 @@ export type LeaveRequestSelect<ExtArgs extends runtime.Types.Extensions.Internal
   createdAt?: boolean
   updatedAt?: boolean
   fitnessCertificateUrl?: boolean
-  isModified?: boolean
-  incidentDate?: boolean
-  isExtension?: boolean
   parentLeaveId?: boolean
-  payCalculation?: boolean
-  studyLeaveDocuments?: boolean
+  isExtension?: boolean
+  isModified?: boolean
   cancellationReason?: boolean
+  incidentDate?: boolean
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: boolean
+  payCalculation?: boolean
+  studyLeaveDocuments?: boolean
+  isHalfDay?: boolean
+  halfDayPeriod?: boolean
   approvals?: boolean | Prisma.LeaveRequest$approvalsArgs<ExtArgs>
+  calendarMappings?: boolean | Prisma.LeaveRequest$calendarMappingsArgs<ExtArgs>
   comments?: boolean | Prisma.LeaveRequest$commentsArgs<ExtArgs>
   parentLeave?: boolean | Prisma.LeaveRequest$parentLeaveArgs<ExtArgs>
   extensions?: boolean | Prisma.LeaveRequest$extensionsArgs<ExtArgs>
   requester?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   versions?: boolean | Prisma.LeaveRequest$versionsArgs<ExtArgs>
-  calendarMappings?: boolean | Prisma.LeaveRequest$calendarMappingsArgs<ExtArgs>
   _count?: boolean | Prisma.LeaveRequestCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["leaveRequest"]>
 
@@ -2243,27 +2355,29 @@ export type LeaveRequestSelectScalar = {
   createdAt?: boolean
   updatedAt?: boolean
   fitnessCertificateUrl?: boolean
-  isModified?: boolean
-  incidentDate?: boolean
-  isExtension?: boolean
   parentLeaveId?: boolean
-  payCalculation?: boolean
-  studyLeaveDocuments?: boolean
+  isExtension?: boolean
+  isModified?: boolean
   cancellationReason?: boolean
+  incidentDate?: boolean
   isCancellationRequest?: boolean
   isPartialCancellation?: boolean
   originalEndDate?: boolean
+  payCalculation?: boolean
+  studyLeaveDocuments?: boolean
+  isHalfDay?: boolean
+  halfDayPeriod?: boolean
 }
 
-export type LeaveRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "requesterId" | "type" | "startDate" | "endDate" | "workingDays" | "reason" | "needsCertificate" | "certificateUrl" | "status" | "policyVersion" | "createdAt" | "updatedAt" | "fitnessCertificateUrl" | "isModified" | "incidentDate" | "isExtension" | "parentLeaveId" | "payCalculation" | "studyLeaveDocuments" | "cancellationReason" | "isCancellationRequest" | "isPartialCancellation" | "originalEndDate", ExtArgs["result"]["leaveRequest"]>
+export type LeaveRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "requesterId" | "type" | "startDate" | "endDate" | "workingDays" | "reason" | "needsCertificate" | "certificateUrl" | "status" | "policyVersion" | "createdAt" | "updatedAt" | "fitnessCertificateUrl" | "parentLeaveId" | "isExtension" | "isModified" | "cancellationReason" | "incidentDate" | "isCancellationRequest" | "isPartialCancellation" | "originalEndDate" | "payCalculation" | "studyLeaveDocuments" | "isHalfDay" | "halfDayPeriod", ExtArgs["result"]["leaveRequest"]>
 export type LeaveRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   approvals?: boolean | Prisma.LeaveRequest$approvalsArgs<ExtArgs>
+  calendarMappings?: boolean | Prisma.LeaveRequest$calendarMappingsArgs<ExtArgs>
   comments?: boolean | Prisma.LeaveRequest$commentsArgs<ExtArgs>
   parentLeave?: boolean | Prisma.LeaveRequest$parentLeaveArgs<ExtArgs>
   extensions?: boolean | Prisma.LeaveRequest$extensionsArgs<ExtArgs>
   requester?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   versions?: boolean | Prisma.LeaveRequest$versionsArgs<ExtArgs>
-  calendarMappings?: boolean | Prisma.LeaveRequest$calendarMappingsArgs<ExtArgs>
   _count?: boolean | Prisma.LeaveRequestCountOutputTypeDefaultArgs<ExtArgs>
 }
 
@@ -2271,12 +2385,12 @@ export type $LeaveRequestPayload<ExtArgs extends runtime.Types.Extensions.Intern
   name: "LeaveRequest"
   objects: {
     approvals: Prisma.$ApprovalPayload<ExtArgs>[]
+    calendarMappings: Prisma.$LeaveCalendarMappingPayload<ExtArgs>[]
     comments: Prisma.$LeaveCommentPayload<ExtArgs>[]
     parentLeave: Prisma.$LeaveRequestPayload<ExtArgs> | null
     extensions: Prisma.$LeaveRequestPayload<ExtArgs>[]
     requester: Prisma.$UserPayload<ExtArgs>
     versions: Prisma.$LeaveVersionPayload<ExtArgs>[]
-    calendarMappings: Prisma.$LeaveCalendarMappingPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -2293,16 +2407,18 @@ export type $LeaveRequestPayload<ExtArgs extends runtime.Types.Extensions.Intern
     createdAt: Date
     updatedAt: Date
     fitnessCertificateUrl: string | null
-    isModified: boolean
-    incidentDate: Date | null
-    isExtension: boolean
     parentLeaveId: number | null
-    payCalculation: runtime.JsonValue | null
-    studyLeaveDocuments: runtime.JsonValue | null
+    isExtension: boolean
+    isModified: boolean
     cancellationReason: string | null
+    incidentDate: Date | null
     isCancellationRequest: boolean
     isPartialCancellation: boolean
     originalEndDate: Date | null
+    payCalculation: runtime.JsonValue | null
+    studyLeaveDocuments: runtime.JsonValue | null
+    isHalfDay: boolean
+    halfDayPeriod: string | null
   }, ExtArgs["result"]["leaveRequest"]>
   composites: {}
 }
@@ -2644,12 +2760,12 @@ readonly fields: LeaveRequestFieldRefs;
 export interface Prisma__LeaveRequestClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   approvals<T extends Prisma.LeaveRequest$approvalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LeaveRequest$approvalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApprovalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  calendarMappings<T extends Prisma.LeaveRequest$calendarMappingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LeaveRequest$calendarMappingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LeaveCalendarMappingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   comments<T extends Prisma.LeaveRequest$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LeaveRequest$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LeaveCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   parentLeave<T extends Prisma.LeaveRequest$parentLeaveArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LeaveRequest$parentLeaveArgs<ExtArgs>>): Prisma.Prisma__LeaveRequestClient<runtime.Types.Result.GetResult<Prisma.$LeaveRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   extensions<T extends Prisma.LeaveRequest$extensionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LeaveRequest$extensionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LeaveRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   requester<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   versions<T extends Prisma.LeaveRequest$versionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LeaveRequest$versionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LeaveVersionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  calendarMappings<T extends Prisma.LeaveRequest$calendarMappingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LeaveRequest$calendarMappingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LeaveCalendarMappingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2693,16 +2809,18 @@ export interface LeaveRequestFieldRefs {
   readonly createdAt: Prisma.FieldRef<"LeaveRequest", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"LeaveRequest", 'DateTime'>
   readonly fitnessCertificateUrl: Prisma.FieldRef<"LeaveRequest", 'String'>
-  readonly isModified: Prisma.FieldRef<"LeaveRequest", 'Boolean'>
-  readonly incidentDate: Prisma.FieldRef<"LeaveRequest", 'DateTime'>
-  readonly isExtension: Prisma.FieldRef<"LeaveRequest", 'Boolean'>
   readonly parentLeaveId: Prisma.FieldRef<"LeaveRequest", 'Int'>
-  readonly payCalculation: Prisma.FieldRef<"LeaveRequest", 'Json'>
-  readonly studyLeaveDocuments: Prisma.FieldRef<"LeaveRequest", 'Json'>
+  readonly isExtension: Prisma.FieldRef<"LeaveRequest", 'Boolean'>
+  readonly isModified: Prisma.FieldRef<"LeaveRequest", 'Boolean'>
   readonly cancellationReason: Prisma.FieldRef<"LeaveRequest", 'String'>
+  readonly incidentDate: Prisma.FieldRef<"LeaveRequest", 'DateTime'>
   readonly isCancellationRequest: Prisma.FieldRef<"LeaveRequest", 'Boolean'>
   readonly isPartialCancellation: Prisma.FieldRef<"LeaveRequest", 'Boolean'>
   readonly originalEndDate: Prisma.FieldRef<"LeaveRequest", 'DateTime'>
+  readonly payCalculation: Prisma.FieldRef<"LeaveRequest", 'Json'>
+  readonly studyLeaveDocuments: Prisma.FieldRef<"LeaveRequest", 'Json'>
+  readonly isHalfDay: Prisma.FieldRef<"LeaveRequest", 'Boolean'>
+  readonly halfDayPeriod: Prisma.FieldRef<"LeaveRequest", 'String'>
 }
     
 
@@ -3070,6 +3188,30 @@ export type LeaveRequest$approvalsArgs<ExtArgs extends runtime.Types.Extensions.
 }
 
 /**
+ * LeaveRequest.calendarMappings
+ */
+export type LeaveRequest$calendarMappingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LeaveCalendarMapping
+   */
+  select?: Prisma.LeaveCalendarMappingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LeaveCalendarMapping
+   */
+  omit?: Prisma.LeaveCalendarMappingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LeaveCalendarMappingInclude<ExtArgs> | null
+  where?: Prisma.LeaveCalendarMappingWhereInput
+  orderBy?: Prisma.LeaveCalendarMappingOrderByWithRelationInput | Prisma.LeaveCalendarMappingOrderByWithRelationInput[]
+  cursor?: Prisma.LeaveCalendarMappingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LeaveCalendarMappingScalarFieldEnum | Prisma.LeaveCalendarMappingScalarFieldEnum[]
+}
+
+/**
  * LeaveRequest.comments
  */
 export type LeaveRequest$commentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3158,30 +3300,6 @@ export type LeaveRequest$versionsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.LeaveVersionScalarFieldEnum | Prisma.LeaveVersionScalarFieldEnum[]
-}
-
-/**
- * LeaveRequest.calendarMappings
- */
-export type LeaveRequest$calendarMappingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the LeaveCalendarMapping
-   */
-  select?: Prisma.LeaveCalendarMappingSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the LeaveCalendarMapping
-   */
-  omit?: Prisma.LeaveCalendarMappingOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.LeaveCalendarMappingInclude<ExtArgs> | null
-  where?: Prisma.LeaveCalendarMappingWhereInput
-  orderBy?: Prisma.LeaveCalendarMappingOrderByWithRelationInput | Prisma.LeaveCalendarMappingOrderByWithRelationInput[]
-  cursor?: Prisma.LeaveCalendarMappingWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.LeaveCalendarMappingScalarFieldEnum | Prisma.LeaveCalendarMappingScalarFieldEnum[]
 }
 
 /**

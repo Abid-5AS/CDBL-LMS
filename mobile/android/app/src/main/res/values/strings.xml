@@ -73,6 +73,43 @@
     <string name="returned_requests">You have %1$d returned request(s)</string>
     <string name="pending_requests">Pending Requests</string>
 
+    <!-- Balance Card Labels (Web Consistent) -->
+    <string name="available_earned_leave">Available Earned Leave</string>
+    <string name="available_casual_leave">Available Casual Leave</string>
+    <string name="available_medical_leave">Available Medical Leave</string>
+    <string name="earned_leave_subtext">Carry-forward allowed up to 60 days</string>
+    <string name="casual_leave_subtext">Max 3 consecutive days</string>
+    <string name="medical_leave_subtext">> 3 days requires medical certificate</string>
+    <string name="opening_balance">Opening</string>
+    <string name="accrued">Accrued</string>
+    <string name="used_approved">Used (Approved)</string>
+    <string name="pending_approval">Pending Approval</string>
+    <string name="projected_balance">Projected Balance</string>
+    <string name="total_available">Total Available</string>
+    <string name="under_review_label">Under Review</string>
+    <string name="accrued_ytd">Accrued YTD</string>
+    <string name="your_leave_snapshot">Your leave snapshot</string>
+    <string name="leave_balances">Leave Balances</string>
+    <string name="recent_requests">Recent Requests</string>
+
+    <!-- Leave Type Display Names -->
+    <string name="leave_type_earned">Earned Leave</string>
+    <string name="leave_type_casual">Casual Leave</string>
+    <string name="leave_type_medical">Medical Leave</string>
+    <string name="leave_type_maternity">Maternity Leave</string>
+    <string name="leave_type_paternity">Paternity Leave</string>
+    <string name="leave_type_extra_paid">Extra Leave (Paid)</string>
+    <string name="leave_type_extra_unpaid">Extra Leave (Unpaid)</string>
+    <string name="leave_type_study">Study Leave</string>
+    <string name="leave_type_special">Special Leave</string>
+    <string name="leave_type_quarantine">Quarantine Leave</string>
+
+    <!-- Half-Day Leave (Web Consistent) -->
+    <string name="half_day_leave">Half Day Leave</string>
+    <string name="half_day_subtext">Apply for half a day only</string>
+    <string name="first_half_am">First Half (AM)</string>
+    <string name="second_half_pm">Second Half (PM)</string>
+
     <!-- Leave Status -->
     <string name="status_pending">Pending</string>
     <string name="status_approved">Approved</string>
