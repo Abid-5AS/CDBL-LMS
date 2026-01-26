@@ -33,7 +33,8 @@ fun CDBLApp(
 
     CDBLLeaveManagerTheme(
         darkTheme = isDarkTheme,
-        androidTheme = userPreferences.useDynamicColor
+        androidTheme = false,
+        disableDynamicTheming = !userPreferences.useDynamicColor
     ) {
         val snackbarHostState = remember { SnackbarHostState() }
         val roleState = appState.userRole.collectAsState()
@@ -73,4 +74,3 @@ fun CDBLApp(
         }
     }
 }
-

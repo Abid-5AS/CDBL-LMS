@@ -16,14 +16,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 
 private val LightDefaultColorScheme = lightColorScheme(
-    primary = Purple40,
+    primary = Indigo600,
     onPrimary = Color.White,
-    primaryContainer = Purple90,
-    onPrimaryContainer = Purple10,
-    secondary = Orange40,
+    primaryContainer = Indigo100,
+    onPrimaryContainer = Indigo900,
+    secondary = Teal40,
     onSecondary = Color.White,
-    secondaryContainer = Orange90,
-    onSecondaryContainer = Orange10,
+    secondaryContainer = Teal90,
+    onSecondaryContainer = Teal10,
     tertiary = Blue40,
     onTertiary = Color.White,
     tertiaryContainer = Blue90,
@@ -32,43 +32,43 @@ private val LightDefaultColorScheme = lightColorScheme(
     onError = Color.White,
     errorContainer = Red90,
     onErrorContainer = Red10,
-    background = DarkPurpleGray99,
-    onBackground = DarkPurpleGray10,
-    surface = DarkPurpleGray99,
-    onSurface = DarkPurpleGray10,
-    surfaceVariant = PurpleGray90,
-    onSurfaceVariant = PurpleGray30,
-    inverseSurface = DarkPurpleGray20,
-    inverseOnSurface = DarkPurpleGray95,
-    outline = PurpleGray50,
+    background = BackgroundLight,
+    onBackground = Slate900,
+    surface = SurfaceLight,
+    onSurface = Slate900,
+    surfaceVariant = Slate100,
+    onSurfaceVariant = Slate600,
+    inverseSurface = Slate800,
+    inverseOnSurface = Slate50,
+    outline = Slate300,
 )
 
 private val DarkDefaultColorScheme = darkColorScheme(
-    primary = Purple80,
-    onPrimary = Purple20,
-    primaryContainer = Purple30,
-    onPrimaryContainer = Purple90,
-    secondary = Orange80,
-    onSecondary = Orange20,
-    secondaryContainer = Orange30,
-    onSecondaryContainer = Orange90,
-    tertiary = Blue80,
-    onTertiary = Blue20,
-    tertiaryContainer = Blue30,
-    onTertiaryContainer = Blue90,
+    primary = Indigo500,
+    onPrimary = Slate950,
+    primaryContainer = Indigo900,
+    onPrimaryContainer = Indigo100,
+    secondary = Teal80,
+    onSecondary = Teal20,
+    secondaryContainer = Teal30,
+    onSecondaryContainer = Teal90,
+    tertiary = Orange80,
+    onTertiary = Orange20,
+    tertiaryContainer = Orange30,
+    onTertiaryContainer = Orange90,
     error = Red80,
     onError = Red20,
     errorContainer = Red30,
     onErrorContainer = Red90,
-    background = DarkPurpleGray10,
-    onBackground = DarkPurpleGray90,
-    surface = DarkPurpleGray10,
-    onSurface = DarkPurpleGray90,
-    surfaceVariant = PurpleGray30,
-    onSurfaceVariant = PurpleGray80,
-    inverseSurface = DarkPurpleGray90,
-    inverseOnSurface = DarkPurpleGray10,
-    outline = PurpleGray60,
+    background = BackgroundDark,
+    onBackground = Slate100,
+    surface = SurfaceDark,
+    onSurface = Slate100,
+    surfaceVariant = Slate700,
+    onSurfaceVariant = Slate300,
+    inverseSurface = Slate100,
+    inverseOnSurface = Slate900,
+    outline = Slate600,
 )
 
 private val LightAndroidColorScheme = lightColorScheme(
@@ -144,7 +144,12 @@ fun CDBLLeaveManagerTheme(
         androidTheme -> if (darkTheme) DarkAndroidColorScheme else LightAndroidColorScheme
         !disableDynamicTheming && supportsDynamicTheming() -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            val dynamicScheme = if (darkTheme) {
+                dynamicDarkColorScheme(context)
+            } else {
+                dynamicLightColorScheme(context)
+            }
+            stabilizeDynamicScheme(dynamicScheme, darkTheme)
         }
         else -> if (darkTheme) DarkDefaultColorScheme else LightDefaultColorScheme
     }
@@ -157,7 +162,11 @@ fun CDBLLeaveManagerTheme(
     )
     val gradientColors = when {
         androidTheme -> if (darkTheme) DarkAndroidGradientColors else LightAndroidGradientColors
-        !disableDynamicTheming && supportsDynamicTheming() -> emptyGradientColors
+        !disableDynamicTheming && supportsDynamicTheming() -> GradientColors(
+            top = colorScheme.primary.copy(alpha = 0.08f),
+            bottom = colorScheme.secondary.copy(alpha = 0.06f),
+            container = colorScheme.surface,
+        )
         else -> defaultGradientColors
     }
     val defaultBackgroundTheme = BackgroundTheme(
@@ -189,3 +198,21 @@ fun CDBLLeaveManagerTheme(
 
 @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.S)
 fun supportsDynamicTheming() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+
+private fun stabilizeDynamicScheme(
+    colorScheme: androidx.compose.material3.ColorScheme,
+    darkTheme: Boolean
+): androidx.compose.material3.ColorScheme {
+    val neutralScheme = if (darkTheme) DarkDefaultColorScheme else LightDefaultColorScheme
+    return colorScheme.copy(
+        background = neutralScheme.background,
+        onBackground = neutralScheme.onBackground,
+        surface = neutralScheme.surface,
+        onSurface = neutralScheme.onSurface,
+        surfaceVariant = neutralScheme.surfaceVariant,
+        onSurfaceVariant = neutralScheme.onSurfaceVariant,
+        inverseSurface = neutralScheme.inverseSurface,
+        inverseOnSurface = neutralScheme.inverseOnSurface,
+        outline = neutralScheme.outline,
+    )
+}
