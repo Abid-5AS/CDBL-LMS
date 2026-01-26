@@ -155,7 +155,6 @@ fun BalanceScreen(
                         opening = balance.opening,
                         accrued = balance.accrued,
                         used = balance.used,
-                        closing = balance.closing,
                         closing = balance.closing
                     )
                 }

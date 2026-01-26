@@ -52,10 +52,6 @@ fun EncashmentScreen(
         viewModel.loadRequests(token) // Load mock or real data
     }
     
-    LaunchedEffect(Unit) {
-        viewModel.loadRequests(token) 
-    }
-    
     val displayRequests = uiState.requests
 
     Scaffold(
@@ -171,8 +167,9 @@ fun EncashmentScreen(
                                 tint = MaterialTheme.colorScheme.onErrorContainer,
                                 modifier = Modifier.size(32.dp)
                             )
+                            }
                         }
-                }
+                    }
             } else {
                  // Optional: Show "No Deductions" or hiding it is fine.
                  // Show "Salary Safe" card?

@@ -50,7 +50,6 @@ fun HolidaysScreen(
     }
 
     val today = LocalDate.now()
-    val today = LocalDate.now()
     var searchQuery by remember { mutableStateOf("") }
     var viewMode by remember { mutableStateOf("grid") }
     

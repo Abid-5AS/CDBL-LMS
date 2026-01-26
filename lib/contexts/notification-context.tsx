@@ -75,9 +75,32 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
   const reconnectAttempts = useRef(0);
   const maxReconnectAttempts = 10;
 
+  // Function to fetch recent notifications
+  const fetchInitialNotifications = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const response = await fetch("/api/notifications/latest?limit=20");
+      if (response.ok) {
+        const data = await response.json();
+        if (data.notifications) {
+          setNotifications(data.notifications);
+        }
+        if (typeof data.unreadCount === 'number') {
+          setUnreadCount(data.unreadCount);
+        }
+      }
+    } catch (error) {
+      console.error("[NotificationProvider] Failed to fetch initial notifications:", error);
+    }
+  }, [user]);
+
   // Function to connect to SSE
   const connect = useCallback(() => {
     if (!user) return;
+
+    // Fetch initial data first
+    fetchInitialNotifications();
 
     // Close existing connection
     if (eventSourceRef.current) {
@@ -134,8 +157,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
       if (reconnectAttempts.current < maxReconnectAttempts) {
         const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000);
         console.log(
-          `[NotificationProvider] Reconnecting in ${delay}ms (attempt ${
-            reconnectAttempts.current + 1
+          `[NotificationProvider] Reconnecting in ${delay}ms (attempt ${reconnectAttempts.current + 1
           }/${maxReconnectAttempts})...`
         );
 
@@ -180,11 +202,11 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
       duration: 5000,
       action: notification.link
         ? {
-            label: "View",
-            onClick: () => {
-              window.location.href = notification.link!;
-            },
-          }
+          label: "View",
+          onClick: () => {
+            window.location.href = notification.link!;
+          },
+        }
         : undefined,
     };
 

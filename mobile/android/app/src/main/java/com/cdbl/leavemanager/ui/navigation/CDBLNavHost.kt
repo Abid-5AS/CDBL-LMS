@@ -133,7 +133,6 @@ fun CDBLNavHost(
                 onNavigateToAuditLogs = { navController.navigate("audit_logs_route") },
                 onNavigateToWorkflowPolicies = { navController.navigate("workflow_policies_route") },
                 onNavigateToHris = { navController.navigate("hris_sync_route") },
-                onNavigateToHris = { navController.navigate("hris_sync_route") },
                 onNavigateToWebhooks = { navController.navigate("webhooks_route") },
                 onNavigateToSystemTools = { navController.navigate("admin_tools_route") }
             )
