@@ -29,7 +29,9 @@ import com.cdbl.leavemanager.ui.admin.AdminHomeScreen
 import com.cdbl.leavemanager.ui.admin.AuditLogsScreen
 import com.cdbl.leavemanager.ui.admin.HrisSyncScreen
 import com.cdbl.leavemanager.ui.admin.WebhooksScreen
+import com.cdbl.leavemanager.ui.admin.WebhooksScreen
 import com.cdbl.leavemanager.ui.admin.WorkflowPoliciesScreen
+import com.cdbl.leavemanager.ui.admin.AdminToolsScreen
 import com.cdbl.leavemanager.ui.legal.FeedbackScreen
 import com.cdbl.leavemanager.ui.legal.PrivacyScreen
 import com.cdbl.leavemanager.ui.legal.TermsScreen
@@ -131,9 +133,18 @@ fun CDBLNavHost(
                 onNavigateToAuditLogs = { navController.navigate("audit_logs_route") },
                 onNavigateToWorkflowPolicies = { navController.navigate("workflow_policies_route") },
                 onNavigateToHris = { navController.navigate("hris_sync_route") },
-                onNavigateToWebhooks = { navController.navigate("webhooks_route") }
+                onNavigateToHris = { navController.navigate("hris_sync_route") },
+                onNavigateToWebhooks = { navController.navigate("webhooks_route") },
+                onNavigateToSystemTools = { navController.navigate("admin_tools_route") }
             )
         }
+
+        composable("admin_tools_route") {
+            AdminToolsScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
 
         composable(TopLevelDestination.MORE.route) {
             MoreScreen(

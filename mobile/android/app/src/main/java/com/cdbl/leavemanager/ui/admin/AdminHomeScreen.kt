@@ -38,7 +38,8 @@ fun AdminHomeScreen(
     onNavigateToAuditLogs: () -> Unit,
     onNavigateToWorkflowPolicies: () -> Unit,
     onNavigateToHris: () -> Unit,
-    onNavigateToWebhooks: () -> Unit
+    onNavigateToWebhooks: () -> Unit,
+    onNavigateToSystemTools: () -> Unit
 ) {
     val menuItems = listOf(
         AdminMenuItem(
@@ -81,7 +82,7 @@ fun AdminHomeScreen(
             title = stringResource(R.string.system_admin_tools),
             subtitle = "System configuration",
             color = ErrorRed,
-            onClick = {}
+            onClick = onNavigateToSystemTools
         )
     )
 

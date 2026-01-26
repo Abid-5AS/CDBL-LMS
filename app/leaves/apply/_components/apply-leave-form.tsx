@@ -167,7 +167,7 @@ export function ApplyLeaveForm() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Main Form Area */}
         <div className="lg:col-span-8 space-y-6">
-          <Card className="rounded-[24px] border-none shadow-xl bg-white/80 dark:bg-card/90 backdrop-blur-xl overflow-hidden">
+          <Card className="rounded-[24px] border-none shadow-xl bg-card/50 dark:bg-card/90 backdrop-blur-xl overflow-hidden ring-1 ring-border/50">
 
             <form
               onSubmit={handleReviewSubmit}
@@ -181,7 +181,7 @@ export function ApplyLeaveForm() {
                 {/* Section 1: Leave Details */}
                 <section className="relative pb-10">
                   <div className="flex items-center gap-4 mb-6">
-                    <div className="relative z-10 flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 ring-4 ring-white dark:ring-card transition-transform group-hover:scale-110">
+                    <div className="relative z-10 flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 ring-4 ring-background dark:ring-card transition-transform group-hover:scale-110">
                       <span className="font-bold text-sm">1</span>
                     </div>
                     <h3 className="text-lg font-semibold tracking-tight text-foreground/90">Leave Details</h3>
@@ -269,7 +269,7 @@ export function ApplyLeaveForm() {
                 {/* Section 2: Reason */}
                 <section className="relative">
                   <div className="flex items-center gap-4 mb-6">
-                    <div className="relative z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-muted text-muted-foreground border-2 border-slate-100 dark:border-slate-700 shadow-sm ring-4 ring-white dark:ring-card group-hover:border-indigo-500 group-hover:text-indigo-500 transition-colors">
+                    <div className="relative z-10 flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground border-2 border-border/50 shadow-sm ring-4 ring-background dark:ring-card group-hover:border-indigo-500 group-hover:text-indigo-500 transition-colors">
                       <span className="font-bold text-sm">2</span>
                     </div>
                     <h3 className="text-lg font-semibold tracking-tight text-foreground/90">Reason & Support</h3>
@@ -317,7 +317,7 @@ export function ApplyLeaveForm() {
                           setIncidentDate(value ? new Date(value) : undefined);
                           setErrors((prev) => ({ ...prev, incidentDate: undefined }));
                         }}
-                        className="flex h-11 w-full rounded-xl border-0 bg-white dark:bg-card shadow-sm ring-1 ring-inset ring-amber-200 focus:ring-2 focus:ring-amber-500 px-3 py-2 text-sm outline-none transition-all"
+                        className="flex h-11 w-full rounded-xl border-0 bg-background shadow-sm ring-1 ring-inset ring-amber-200/50 focus:ring-2 focus:ring-amber-500 px-3 py-2 text-sm outline-none transition-all dark:ring-amber-900/50"
                       />
                     </div>
                   </div>

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Calendar,
   CheckCircle2,
   Clock,
   FileText,
@@ -15,6 +14,8 @@ import {
   Plane,
   Palmtree,
   Stethoscope,
+  Info,
+  Calendar as CalendarIcon
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
@@ -23,11 +24,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import EnhancedSmoothTab from "@/components/ui/enhanced-smooth-tab";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
 
 import { LeaveDetailsModal } from "@/components/shared/modals/LeaveDetailsModal";
 import { useLeaveData } from "@/components/providers";
 import { cn } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui/ui";
+import { leaveTypeLabel, leaveTypeColor } from "@/lib/ui/ui";
 
 function LeaveRequestCard({ request, onClick }: { request: any; onClick: () => void }) {
   const statusColors = {
@@ -59,7 +63,7 @@ function LeaveRequestCard({ request, onClick }: { request: any; onClick: () => v
   const StatusIcon = statusIcons[request.status as keyof typeof statusIcons] || Clock;
   const statusColor = statusColors[request.status as keyof typeof statusColors] || statusColors.PENDING;
 
-  const typeDetails = typeConfig[request.type] || { icon: Calendar, color: "text-primary" };
+  const typeDetails = typeConfig[request.type] || { icon: CalendarIcon, color: "text-primary" };
   const TypeIcon = typeDetails.icon;
 
   return (
@@ -103,7 +107,7 @@ function LeaveRequestCard({ request, onClick }: { request: any; onClick: () => v
               )}
             </div>
             <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="h-3.5 w-3.5" />
+              <CalendarIcon className="h-3.5 w-3.5" />
               <span>
                 {format(new Date(request.startDate), "MMM d, yyyy")} -{" "}
                 {format(new Date(request.endDate), "MMM d, yyyy")}
@@ -120,6 +124,95 @@ function LeaveRequestCard({ request, onClick }: { request: any; onClick: () => v
         </div>
       </div>
     </motion.div>
+  );
+}
+function CalendarView({ requests, onSelectRequest }: { requests: any[]; onSelectRequest: (request: any) => void }) {
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [selectedDateRequests, setSelectedDateRequests] = useState<any[]>([]);
+
+  // Map requests to dates for markers
+  const requestDates = requests.reduce((acc, request) => {
+    const start = new Date(request.startDate);
+    const end = new Date(request.endDate);
+    let current = start;
+
+    while (current <= end) {
+      const dateStr = format(current, "yyyy-MM-dd");
+      if (!acc[dateStr]) acc[dateStr] = [];
+      acc[dateStr].push(request);
+      current = new Date(current.getTime() + 24 * 60 * 60 * 1000);
+    }
+    return acc;
+  }, {} as Record<string, any[]>);
+
+  // Update selected requests when date changes
+  const handleDateSelect = (newDate: Date | undefined) => {
+    setDate(newDate);
+    if (newDate) {
+      const dateStr = format(newDate, "yyyy-MM-dd");
+      setSelectedDateRequests(requestDates[dateStr] || []);
+    } else {
+      setSelectedDateRequests([]);
+    }
+  };
+
+  // Modifier to identify days with leaves
+  const hasLeave = (date: Date) => {
+    return !!requestDates[format(date, "yyyy-MM-dd")];
+  };
+
+  return (
+    <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex-1 rounded-xl border border-border bg-card p-4">
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={handleDateSelect}
+          className="rounded-md border mx-auto"
+          modifiers={{ hasLeave }}
+          modifiersClassNames={{
+            hasLeave: "font-bold text-primary relative after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-primary after:rounded-full"
+          }}
+        />
+        <div className="mt-4 flex gap-4 justify-center text-sm text-muted-foreground p-4 bg-muted/20 rounded-lg">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+            <span>Has Leave Request</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span>Selected Date</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 space-y-4">
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <Clock className="w-5 h-5 text-muted-foreground" />
+          {date ? format(date, "MMMM d, yyyy") : "Select a date"}
+        </h3>
+
+        {selectedDateRequests.length > 0 ? (
+          <div className="grid gap-4">
+            {selectedDateRequests.map((request) => (
+              <LeaveRequestCard
+                key={request.id}
+                request={request}
+                onClick={() => onSelectRequest(request)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center p-8 text-center border rounded-xl bg-muted/10 h-[300px]">
+            <div className="bg-muted p-3 rounded-full mb-3">
+              <Info className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <p className="text-muted-foreground font-medium">No leaves on this date</p>
+            <p className="text-sm text-muted-foreground/60 mt-1">Select a date with a dot marker to view requests</p>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -279,9 +372,13 @@ function RequestsView() {
               transition={{ duration: 0.2 }}
             >
               {viewMode === "calendar" ? (
-                <div className="rounded-xl border border-border bg-card p-8 text-center text-muted-foreground">
-                  Calendar view coming soon
-                </div>
+                <CalendarView
+                  requests={filteredRequests}
+                  onSelectRequest={(request) => {
+                    setSelectedLeave(request);
+                    setIsModalOpen(true);
+                  }}
+                />
               ) : (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   <AnimatePresence mode="popLayout">
