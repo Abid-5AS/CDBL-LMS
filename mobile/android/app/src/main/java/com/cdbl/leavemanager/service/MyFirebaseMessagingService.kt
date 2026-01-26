@@ -13,12 +13,37 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import android.util.Log
 
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import com.cdbl.leavemanager.data.repository.AuthRepository
+import com.cdbl.leavemanager.data.local.TokenManager
+
+@AndroidEntryPoint
 class MyFirebaseMessagingService : FirebaseMessagingService() {
+
+    @Inject
+    lateinit var authRepository: AuthRepository
+
+    @Inject
+    lateinit var tokenManager: TokenManager
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         Log.d("FCM", "New Token: $token")
-        // TODO: Send token to backend
+        
+        // Save to local storage
+        tokenManager.saveFcmToken(token)
+        
+        // Sync with backend if logged in
+        CoroutineScope(Dispatchers.IO).launch {
+            val authToken = tokenManager.getToken()
+            if (authToken != null) {
+                authRepository.saveFcmToken(authToken, token)
+            }
+        }
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
@@ -41,7 +66,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         val channelId = "default_channel"
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.mipmap.ic_launcher) // Ensure this resource exists, fallback to system default if not? Default implies @mipmap/ic_launcher usually.
+            .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(title)
             .setContentText(message)
             .setAutoCancel(true)

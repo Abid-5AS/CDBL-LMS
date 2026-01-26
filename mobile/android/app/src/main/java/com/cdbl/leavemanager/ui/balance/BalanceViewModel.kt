@@ -56,43 +56,13 @@ class BalanceViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        balance = mockBalance(),
+                        balance = null, // No fallback
                         pendingDays = pendingDays,
                         error = error.message,
-                        useMock = true
+                        useMock = false
                     )
                 }
             }
         }
-    }
-
-    private fun mockBalance(): BalanceDetailResponse {
-        val year = LocalDate.now().year
-        return BalanceDetailResponse(
-            year = year,
-            balances = listOf(
-                BalanceDetail(
-                    type = "EARNED",
-                    opening = 28.0,
-                    accrued = 6.0,
-                    used = 10.0,
-                    closing = 24.0
-                ),
-                BalanceDetail(
-                    type = "CASUAL",
-                    opening = 10.0,
-                    accrued = 0.0,
-                    used = 4.0,
-                    closing = 6.0
-                ),
-                BalanceDetail(
-                    type = "MEDICAL",
-                    opening = 14.0,
-                    accrued = 0.0,
-                    used = 2.0,
-                    closing = 12.0
-                )
-            )
-        )
     }
 }

@@ -12,6 +12,9 @@ import {
   XCircle,
   AlertCircle,
   LayoutGrid,
+  Plane,
+  Palmtree,
+  Stethoscope,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
@@ -47,8 +50,17 @@ function LeaveRequestCard({ request, onClick }: { request: any; onClick: () => v
     CANCELLATION_REQUESTED: XCircle,
   };
 
+  const typeConfig: Record<string, any> = {
+    EARNED: { icon: Plane, color: "text-amber-500" },
+    CASUAL: { icon: Palmtree, color: "text-blue-500" },
+    MEDICAL: { icon: Stethoscope, color: "text-emerald-500" },
+  };
+
   const StatusIcon = statusIcons[request.status as keyof typeof statusIcons] || Clock;
   const statusColor = statusColors[request.status as keyof typeof statusColors] || statusColors.PENDING;
+
+  const typeDetails = typeConfig[request.type] || { icon: Calendar, color: "text-primary" };
+  const TypeIcon = typeDetails.icon;
 
   return (
     <motion.div
@@ -62,10 +74,11 @@ function LeaveRequestCard({ request, onClick }: { request: any; onClick: () => v
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4">
           <div className={cn(
-            "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border",
-            statusColor
+            "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-background/50",
+            typeDetails.color
+            // statusColor // Removed status color background to prioritize type icon
           )}>
-            <StatusIcon className="h-5 w-5" />
+            <TypeIcon className="h-5 w-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">

@@ -50,33 +50,11 @@ fun HolidaysScreen(
     }
 
     val today = LocalDate.now()
-    val showMock = uiState.holidays.isEmpty() && uiState.error == null
+    val today = LocalDate.now()
     var searchQuery by remember { mutableStateOf("") }
     var viewMode by remember { mutableStateOf("grid") }
-    val mockHolidays = listOf(
-        Holiday(
-            id = 101,
-            date = LocalDate.now().plusDays(3).toString(),
-            name = "Independence Day",
-            isOptional = false,
-            description = "National holiday"
-        ),
-        Holiday(
-            id = 102,
-            date = LocalDate.now().plusDays(12).toString(),
-            name = "Company Foundation Day",
-            isOptional = true,
-            description = "Optional observance"
-        ),
-        Holiday(
-            id = 103,
-            date = LocalDate.now().plusDays(25).toString(),
-            name = "Victory Day",
-            isOptional = false,
-            description = "Public holiday"
-        )
-    )
-    val displayHolidays = if (showMock) mockHolidays else uiState.holidays
+    
+    val displayHolidays = uiState.holidays
 
     val filterOptions = listOf("Upcoming", "All", "Optional")
     val selectedFilter = remember { mutableStateOf("Upcoming") }
@@ -126,12 +104,7 @@ fun HolidaysScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.padding(paddingValues).fillMaxSize()
             ) {
-                item {
-                    if (showMock) {
-                        CDBLMockTag()
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                }
+
                 item {
                     Card(
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),

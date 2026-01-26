@@ -17,6 +17,7 @@ class TokenManager @Inject constructor(
     companion object {
         private const val PREFS_NAME = "secure_prefs"
         private const val KEY_JWT_TOKEN = "jwt_token"
+        private const val KEY_FCM_TOKEN = "fcm_token"
     }
 
     private val masterKey = MasterKey.Builder(context)
@@ -46,5 +47,13 @@ class TokenManager @Inject constructor(
     fun clearToken() {
         sharedPreferences.edit().remove(KEY_JWT_TOKEN).apply()
         _tokenFlow.value = null
+    }
+
+    fun saveFcmToken(token: String) {
+        sharedPreferences.edit().putString(KEY_FCM_TOKEN, token).apply()
+    }
+
+    fun getFcmToken(): String? {
+        return sharedPreferences.getString(KEY_FCM_TOKEN, null)
     }
 }

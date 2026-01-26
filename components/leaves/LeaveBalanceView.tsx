@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Calendar, Clock, TrendingUp, AlertCircle, BookOpen, CalendarPlus, FileDown, History, ChevronRight, Info } from "lucide-react";
+import { Calendar, Clock, TrendingUp, AlertCircle, BookOpen, CalendarPlus, FileDown, History, ChevronRight, Info, Plane, Palmtree, Stethoscope } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -35,7 +35,7 @@ const LEAVE_TYPE_CONFIG = {
   EARNED: {
     label: "Earned Leave",
     description: "Leaves earned through service",
-    icon: TrendingUp,
+    icon: Plane,
     color: "text-amber-500",
     bgColor: "bg-amber-500/10",
     borderColor: "border-amber-500/20",
@@ -45,7 +45,7 @@ const LEAVE_TYPE_CONFIG = {
   CASUAL: {
     label: "Casual Leave",
     description: "Short-term personal leave",
-    icon: Clock,
+    icon: Palmtree,
     color: "text-blue-500",
     bgColor: "bg-blue-500/10",
     borderColor: "border-blue-500/20",
@@ -55,7 +55,7 @@ const LEAVE_TYPE_CONFIG = {
   MEDICAL: {
     label: "Medical Leave",
     description: "Health & wellness leave",
-    icon: Calendar,
+    icon: Stethoscope,
     color: "text-emerald-500",
     bgColor: "bg-emerald-500/10",
     borderColor: "border-emerald-500/20",

@@ -33,4 +33,10 @@ interface AuthService {
         @retrofit2.http.Header("Authorization") token: String,
         @retrofit2.http.Body request: com.cdbl.leavemanager.data.model.UpdateProfileRequest
     ): retrofit2.Response<Map<String, Any>>
+
+    @retrofit2.http.POST("notifications/device-token")
+    suspend fun registerDeviceToken(
+        @retrofit2.http.Header("Authorization") token: String,
+        @retrofit2.http.Body request: Map<String, String>
+    ): retrofit2.Response<Map<String, Any>>
 }

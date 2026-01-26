@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.cdbl.leavemanager.ui.designsystem.component.CDBLMockTag
+
 import com.cdbl.leavemanager.ui.theme.Indigo100
 import com.cdbl.leavemanager.ui.theme.Indigo600
 import kotlinx.coroutines.delay
@@ -135,7 +135,7 @@ fun RequestEncashmentScreen(
                             color = Indigo600
                         )
                     }
-                    CDBLMockTag(modifier = Modifier.align(Alignment.TopEnd))
+
                 }
             }
 

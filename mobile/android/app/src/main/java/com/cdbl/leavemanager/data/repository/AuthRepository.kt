@@ -149,4 +149,17 @@ class AuthRepository @Inject constructor(
     suspend fun clearUserCache() {
         userDao.clearUser()
     }
+
+    suspend fun saveFcmToken(token: String, fcmToken: String): Result<Boolean> {
+        return try {
+            val response = authService.registerDeviceToken("Bearer $token", mapOf("token" to fcmToken, "platform" to "android"))
+            if (response.isSuccessful) {
+                Result.success(true)
+            } else {
+                Result.failure(Exception("Failed to register token"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

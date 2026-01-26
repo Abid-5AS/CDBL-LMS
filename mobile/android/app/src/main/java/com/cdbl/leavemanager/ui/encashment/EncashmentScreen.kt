@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cdbl.leavemanager.data.model.EncashmentRequest
-import com.cdbl.leavemanager.ui.designsystem.component.CDBLMockTag
+
 import com.cdbl.leavemanager.ui.theme.Indigo100
 import com.cdbl.leavemanager.ui.theme.Indigo600
 import com.cdbl.leavemanager.ui.theme.SuccessGreen
@@ -52,39 +52,11 @@ fun EncashmentScreen(
         viewModel.loadRequests(token) // Load mock or real data
     }
     
-    // Mock Data if empty
-    val showMockRequests = uiState.requests.isEmpty()
-    val displayRequests = if (showMockRequests) {
-        listOf(
-            EncashmentRequest(
-                id = 1, 
-                userId = 99,
-                year = 2024,
-                daysRequested = 10,
-                balanceAtRequest = 30,
-                reason = "Family Emergency", 
-                status = "APPROVED", 
-                rejectionReason = null, 
-                paymentStatus = "PAID", 
-                createdAt = "2024-10-01T10:00:00Z"
-            ),
-            EncashmentRequest(
-                id = 2,
-                userId = 99,
-                year = 2024, 
-                daysRequested = 5,
-                balanceAtRequest = 25,
-                reason = "Personal", 
-                status = "PENDING", 
-                rejectionReason = null, 
-                paymentStatus = null, 
-                createdAt = "2024-10-20T10:00:00Z"
-            )
-        )
-    } else {
-        uiState.requests
+    LaunchedEffect(Unit) {
+        viewModel.loadRequests(token) 
     }
-    val showMockBalance = true
+    
+    val displayRequests = uiState.requests
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -158,16 +130,13 @@ fun EncashmentScreen(
                     }
                      Text("Updated today", style = MaterialTheme.typography.labelSmall, color = Indigo100, modifier = Modifier.align(Alignment.End))
                 }
-                if (showMockBalance) {
-                    CDBLMockTag(modifier = Modifier.align(Alignment.TopEnd))
-                }
+
 
             }
 
             // Payroll/Deduction Card
             Spacer(modifier = Modifier.height(16.dp))
-            val deductionAmount = uiState.lwpDays * 1666.0 // Mock daily rate
-            val showMockPayroll = true
+            val deductionAmount = uiState.lwpDays * 1666.0 // Estimated rate
             
             if (deductionAmount > 0) {
                 Box(modifier = Modifier.fillMaxWidth()) {
@@ -203,10 +172,6 @@ fun EncashmentScreen(
                                 modifier = Modifier.size(32.dp)
                             )
                         }
-                    }
-                    if (showMockPayroll) {
-                        CDBLMockTag(modifier = Modifier.align(Alignment.TopEnd).padding(8.dp))
-                    }
                 }
             } else {
                  // Optional: Show "No Deductions" or hiding it is fine.
@@ -239,9 +204,6 @@ fun EncashmentScreen(
                             )
                         }
                     }
-                    if (showMockPayroll) {
-                        CDBLMockTag(modifier = Modifier.align(Alignment.TopEnd).padding(8.dp))
-                    }
                   }
             }
 
@@ -255,7 +217,7 @@ fun EncashmentScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(displayRequests) { request ->
-                    EncashmentCard(request, showMockTag = showMockRequests)
+                    EncashmentCard(request)
                 }
             }
         }
@@ -263,7 +225,7 @@ fun EncashmentScreen(
 }
 
 @Composable
-fun EncashmentCard(request: EncashmentRequest, showMockTag: Boolean = false) {
+fun EncashmentCard(request: EncashmentRequest) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Card(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -314,9 +276,7 @@ fun EncashmentCard(request: EncashmentRequest, showMockTag: Boolean = false) {
                 }
             }
         }
-        if (showMockTag) {
-            CDBLMockTag(modifier = Modifier.align(Alignment.TopEnd).padding(8.dp))
-        }
+
     }
 }
 

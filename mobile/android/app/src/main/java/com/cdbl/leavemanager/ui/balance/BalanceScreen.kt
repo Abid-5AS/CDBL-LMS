@@ -42,7 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.cdbl.leavemanager.ui.designsystem.component.CDBLMockTag
+
 import com.cdbl.leavemanager.ui.components.KpiCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -111,9 +111,7 @@ fun BalanceScreen(
             ) {
                 item {
                     Spacer(modifier = Modifier.height(8.dp))
-                    if (uiState.useMock) {
-                        CDBLMockTag()
-                    }
+
                 }
 
                 item {
@@ -158,7 +156,7 @@ fun BalanceScreen(
                         accrued = balance.accrued,
                         used = balance.used,
                         closing = balance.closing,
-                        showMockTag = uiState.useMock
+                        closing = balance.closing
                     )
                 }
             }
@@ -172,8 +170,7 @@ private fun BalanceDetailCard(
     opening: Double,
     accrued: Double,
     used: Double,
-    closing: Double,
-    showMockTag: Boolean
+    closing: Double
 ) {
     val (label, icon, accent) = when (balanceType.uppercase()) {
         "EARNED" -> Triple("Earned Leave", Icons.Rounded.FlightTakeoff, MaterialTheme.colorScheme.primary)
@@ -210,9 +207,7 @@ private fun BalanceDetailCard(
                         Text("${closing.toInt()} days available", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
-                if (showMockTag) {
-                    CDBLMockTag()
-                }
+
             }
 
             Spacer(modifier = Modifier.height(12.dp))
