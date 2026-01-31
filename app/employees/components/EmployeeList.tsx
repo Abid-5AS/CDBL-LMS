@@ -8,15 +8,12 @@ import { Users } from "lucide-react";
 import {
   Card,
   CardContent,
-<<<<<<< HEAD
   Table,
   TableHeader,
   TableBody,
   TableHead,
   TableRow,
   TableCell,
-=======
->>>>>>> consolidated-work
   Button,
 } from "@/components/ui";
 
@@ -27,6 +24,21 @@ import { CompletePagination } from "@/components/shared/pagination/Pagination";
 // Lib utilities (barrel export)
 import { useUser } from "@/lib";
 import { EmployeeCard } from "./EmployeeCard";
+
+// Helper functions for badge styles
+function getRoleBadgeClasses(role: string) {
+  switch (role) {
+    case "CEO": return "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200 dark:border-purple-800";
+    case "HR_HEAD": return "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300 border-pink-200 dark:border-pink-800";
+    case "HR_ADMIN": return "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300 border-rose-200 dark:border-rose-800";
+    case "DEPT_HEAD": return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 border-amber-200 dark:border-amber-800";
+    default: return "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-800";
+  }
+}
+
+function getRoleLabel(role: string) {
+  return role.replace("_", " ");
+}
 
 export type EmployeeRecord = {
   id: number;
@@ -206,97 +218,10 @@ export function EmployeeList() {
           </CardContent>
         </Card>
       ) : (
-<<<<<<< HEAD
-        <div className="max-h-[70vh] overflow-y-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead className="hidden sm:table-cell">Email</TableHead>
-                <TableHead className="hidden md:table-cell">
-                  Employee Code
-                </TableHead>
-                <TableHead className="hidden lg:table-cell">
-                  Department
-                </TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-                {paginatedEmployees.map((employee) => (
-                  <TableRow
-                    key={employee.id}
-                    className="hover:bg-bg-secondary dark:hover:bg-bg-secondary/50"
-                  >
-                    <TableCell className="font-medium text-text-primary">
-                      {employee.name}
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell text-muted-foreground">
-                      {employee.email}
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell text-muted-foreground">
-                      {employee.empCode || "—"}
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell text-muted-foreground">
-                      {employee.department || "—"}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={getRoleBadgeClasses(employee.role)}
-                      >
-                        {getRoleLabel(employee.role)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Link href={`/employees/${employee.id}`}>
-                                <Button variant="ghost" size="sm">
-                                  View
-                                </Button>
-                              </Link>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              View employee profile
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                        {user &&
-                          canEditEmployee(
-                            user.role as AppRole,
-                            employee.role
-                          ) && (
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Link
-                                    href={`/employees/${employee.id}?edit=true`}
-                                  >
-                                    <Button variant="ghost" size="sm">
-                                      <Pencil className="h-4 w-4" />
-                                    </Button>
-                                  </Link>
-                                </TooltipTrigger>
-                                <TooltipContent>Update employee</TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-=======
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {paginatedEmployees.map((employee) => (
             <EmployeeCard key={employee.id} employee={employee} />
           ))}
->>>>>>> consolidated-work
         </div>
       )}
 

@@ -20,13 +20,8 @@ import {
   Table,
   TableHeader,
   TableBody,
-<<<<<<< HEAD
-  TableRow,
-  TableHead,
-=======
   TableHead,
   TableRow,
->>>>>>> consolidated-work
   TableCell,
   Checkbox,
   AlertDialog,
@@ -290,14 +285,16 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
           start: req.startDate,
           end: req.endDate,
           workingDays: req.workingDays,
+          requestedDays: req.workingDays, // Add requestedDays
           requestedByName: req.requester.name,
           requestedByEmail: req.requester.email,
           requestedById: String(req.requester.id),
+          requestedByRole: (req.requester as any).role as any, // Add requestedByRole
           requestedAt: '',
           approvals: [],
           currentStageIndex: 0,
-          isCancellationRequest: req.isCancellationRequest,
-          isModified: req.isModified,
+          isCancellationRequest: (req as any).isCancellationRequest || false, // Ensure defaults
+          isModified: (req as any).isModified || false, // Ensure defaults
         })) as HRApprovalItem[]
       };
     }
@@ -338,7 +335,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
-        (item) =>
+        (item: HRApprovalItem) =>
           item.requestedByName?.toLowerCase().includes(query) ||
           item.requestedByEmail?.toLowerCase().includes(query) ||
           item.type.toLowerCase().includes(query) ||
@@ -351,12 +348,12 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
     // Status filter
     if (statusFilterValue !== "all") {
-      filtered = filtered.filter((item) => item.status === statusFilterValue);
+      filtered = filtered.filter((item: HRApprovalItem) => item.status === statusFilterValue);
     }
 
     // Type filter
     if (typeFilter !== "all") {
-      filtered = filtered.filter((item) => item.type === typeFilter);
+      filtered = filtered.filter((item: HRApprovalItem) => item.type === typeFilter);
     }
 
     return filtered;
@@ -559,7 +556,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
     (checked: boolean) => {
       if (viewMode !== "queue") return;
       if (checked) {
-        setSelectedIds(new Set(items.map((item) => item.id)));
+        setSelectedIds(new Set(items.map((item: HRApprovalItem) => item.id)));
       } else {
         setSelectedIds(new Set());
       }
@@ -635,8 +632,8 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
 
         if (result.success) {
           toast.success(
-            `Successfully rejected ${result.rejected} leave request${result.rejected > 1 ? "s" : ""
-            }` + (result.failed > 0 ? `. ${result.failed} failed.` : "")
+            `Successfully rejected ${result.rejected ?? 0} leave request${(result.rejected ?? 0) > 1 ? "s" : ""
+            }` + ((result.failed ?? 0) > 0 ? `. ${result.failed ?? 0} failed.` : "")
           );
           await mutate();
         } else {
@@ -873,119 +870,6 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
           </CardContent>
         </Card>
       ) : (
-<<<<<<< HEAD
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {viewMode === "queue" && (
-                <TableHead className="w-12">
-                  <Checkbox
-                    checked={allSelected}
-                    onCheckedChange={(checked) =>
-                      handleSelectAll(checked === true)
-                    }
-                    aria-label="Select all rows"
-                    className={
-                      someSelected ? "data-[state=checked]:bg-card-action" : ""
-                    }
-                  />
-                </TableHead>
-              )}
-              <TableHead>Employee</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Dates</TableHead>
-              <TableHead>Days</TableHead>
-              <TableHead>Reason</TableHead>
-              {viewMode === "queue" ? (
-                <>
-                  <TableHead>Stage</TableHead>
-                  <TableHead className="text-right">
-                    Actions
-                  </TableHead>
-                </>
-              ) : (
-                <>
-                  <TableHead>Decision</TableHead>
-                  <TableHead>Processed On</TableHead>
-                </>
-              )}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {items.map((item) => {
-              const start = formatDate(item.start);
-              const end = formatDate(item.end);
-              const stage =
-                item.approvals?.[item.currentStageIndex]?.status ?? item.status;
-              const decisionMeta = item.approvals?.[0];
-              return (
-                <TableRow
-                  key={item.id}
-                  className={clsx(
-                    "cursor-pointer transition",
-                    statusStyle(item.status),
-                    selectedIds.has(item.id) &&
-                      "bg-card-action dark:bg-card-action/20"
-                  )}
-                  onClick={(e) => {
-                    // Don't trigger onSelect if clicking on checkbox
-                    if (
-                      !(e.target as HTMLElement).closest(
-                        'input[type="checkbox"]'
-                      )
-                    ) {
-                      onSelect?.(item);
-                    }
-                  }}
-                >
-                  {viewMode === "queue" && (
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedIds.has(item.id)}
-                        onCheckedChange={(checked) =>
-                          handleSelectRow(item.id, checked === true)
-                        }
-                        onClick={(e) => e.stopPropagation()}
-                        aria-label={`Select row ${item.id}`}
-                      />
-                    </TableCell>
-                  )}
-                  <TableCell>
-                    <div className="font-medium text-text-primary">
-                      {item.requestedByName}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {item.requestedByEmail ?? "—"}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-sm text-text-secondary">
-                    {leaveTypeLabel[item.type] ?? item.type}
-                  </TableCell>
-                  <TableCell className="text-sm text-text-secondary">
-                    <div>{start}</div>
-                    {start !== end && (
-                      <div className="text-xs text-muted-foreground">
-                        to {end}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-sm text-text-secondary">
-                    {item.requestedDays}
-                  </TableCell>
-                  <TableCell className="max-w-xs text-sm text-text-secondary">
-                    <p className="whitespace-pre-wrap wrap-break-word">
-                      {item.reason}
-                    </p>
-                  </TableCell>
-                  {viewMode === "queue" ? (
-                    <>
-                      <TableCell className="text-sm font-medium capitalize text-text-secondary">
-                        {stage.toLowerCase()}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div
-                          className="flex justify-end"
-=======
         <div className="rounded-md border">
           <Table>
             <TableHeader>
@@ -1025,7 +909,7 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {items.map((item) => {
+              {items.map((item: HRApprovalItem) => {
                 const start = formatDate(item.start);
                 const end = formatDate(item.end);
                 const stage =
@@ -1058,7 +942,6 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                           onCheckedChange={(checked) =>
                             handleSelectRow(item.id, checked === true)
                           }
->>>>>>> consolidated-work
                           onClick={(e) => e.stopPropagation()}
                           aria-label={`Select row ${item.id}`}
                         />
@@ -1093,27 +976,6 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
                         <div className="text-xs text-muted-foreground">
                           to {end}
                         </div>
-<<<<<<< HEAD
-                      </TableCell>
-                    </>
-                  ) : (
-                    <>
-                      <TableCell className="text-sm font-semibold capitalize text-text-secondary">
-                        {item.status.toLowerCase()}
-                      </TableCell>
-                      <TableCell className="text-sm text-text-secondary">
-                        {decisionMeta?.decidedAt
-                          ? formatDate(decisionMeta.decidedAt)
-                          : "—"}
-                      </TableCell>
-                    </>
-                  )}
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-=======
                       )}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground dark:text-muted-foreground/80">
@@ -1229,7 +1091,6 @@ export function ApprovalTable({ onSelect, onDataChange }: ApprovalTableProps) {
             </TableBody>
           </Table>
         </div>
->>>>>>> consolidated-work
       )}
       {items.length !== displayedItems.length && displayedItems.length > 0 && (
         <p className="text-sm text-muted-foreground text-center">

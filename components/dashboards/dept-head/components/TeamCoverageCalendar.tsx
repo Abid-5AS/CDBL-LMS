@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
@@ -50,18 +50,12 @@ export function TeamCoverageCalendar({
 
     for (let i = 1; i <= daysInMonth; i++) {
       const date = new Date(year, month, i);
-<<<<<<< HEAD
-      // Deterministic mock data to avoid hydration mismatch (replace with real API later)
-      const count = (i + currentDate.getDate()) % 5; // Mock count 0-4, deterministic
-=======
       // Format as YYYY-MM-DD for lookup
       const offset = date.getTimezoneOffset() * 60000;
       const dateKey = new Date(date.getTime() - offset).toISOString().split('T')[0];
 
       const dayData = coverageData?.days[dateKey];
       const count = dayData?.count || 0;
-
->>>>>>> consolidated-work
       let intensity: CoverageDay["intensity"] = "none";
       if (count > 0) intensity = "low";
       if (count > 2) intensity = "medium";
@@ -123,64 +117,6 @@ export function TeamCoverageCalendar({
           <div key={i} className="text-[10px] text-center text-muted-foreground font-medium uppercase tracking-wider">
             {d}
           </div>
-<<<<<<< HEAD
-        </div>
-      </GlassCardHeader>
-      <GlassCardContent>
-        <div className="grid grid-cols-7 gap-1 mb-1">
-          {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
-            <div key={i} className="text-[10px] text-center text-muted-foreground font-medium">
-              {d}
-            </div>
-          ))}
-        </div>
-        <div className="grid grid-cols-7 gap-1">
-          {/* Padding for start of month */}
-          {Array.from({ length: new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay() }).map((_, i) => (
-            <div key={`pad-${i}`} className="aspect-square" />
-          ))}
-          
-          {calendarDays.map((day) => {
-            // Use stable key based on date instead of array index
-            const dateKey = `${day.date.getFullYear()}-${day.date.getMonth()}-${day.date.getDate()}`;
-            return (
-              <Tooltip key={dateKey}>
-                <TooltipTrigger asChild>
-                  <div
-                    className={cn(
-                      "aspect-square rounded-sm flex items-center justify-center text-[10px] cursor-pointer transition-colors hover:opacity-80",
-                      getIntensityColor(day.intensity),
-                      day.count > 0 ? "text-white font-medium" : "text-muted-foreground"
-                    )}
-                  >
-                    {day.date.getDate()}
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  <div className="text-xs">
-                    <p className="font-semibold">
-                      {day.date.toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </p>
-                    <p>{day.count} on leave</p>
-                    {day.count > 3 && <p className="text-red-400 font-bold">High Absence!</p>}
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            );
-          })}
-        </div>
-        <div className="mt-4 flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
-          <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-400" /> Low</div>
-          <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-orange-400" /> Med</div>
-          <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-red-500" /> High</div>
-        </div>
-      </GlassCardContent>
-    </GlassCard>
-=======
         ))}
       </div>
 
@@ -234,6 +170,5 @@ export function TeamCoverageCalendar({
         <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-red-500 shadow-sm" /> High (5+)</div>
       </div>
     </div>
->>>>>>> consolidated-work
   );
 }

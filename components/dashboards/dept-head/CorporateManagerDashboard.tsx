@@ -51,18 +51,6 @@ const containerVariants = {
   },
 };
 
-<<<<<<< HEAD
-function CardSkeleton() {
-  return (
-    <div className="border border-border shadow-sm rounded-md p-4 bg-card">
-      <div className="space-y-4">
-        <div className="h-4 w-32 bg-muted animate-pulse rounded" />
-        <div className="h-20 bg-muted animate-pulse rounded" />
-      </div>
-    </div>
-  );
-}
-=======
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
@@ -71,7 +59,6 @@ const itemVariants = {
     transition: { duration: 0.4 },
   },
 };
->>>>>>> consolidated-work
 
 export function CorporateManagerDashboard() {
   const router = useRouter();
@@ -134,211 +121,6 @@ export function CorporateManagerDashboard() {
 
   return (
     <TooltipProvider>
-<<<<<<< HEAD
-      <div className="min-h-screen p-4">
-        {/* Corporate Header */}
-        <div className="mb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className={cn(typography.pageTitle, "mb-1")}>
-                Manager Dashboard
-              </h1>
-              <p className={cn(typography.label, "!normal-case")}>
-                Review and approve leave requests from your department
-              </p>
-            </div>
-
-            {/* Header Actions */}
-            <button
-              onClick={() => mutate()}
-              className="p-2 hover:bg-muted rounded-md transition-colors border border-border"
-              title="Refresh"
-            >
-              <RefreshCw className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className={densityClasses.section}>
-          {/* Section 1: Department Overview KPIs (4 Cards) */}
-          <section>
-            <div className="mb-3">
-              <h2 className={typography.sectionTitle}>Department Overview</h2>
-              <p className={cn(typography.label, "!normal-case mt-1")}>
-                Key metrics and approval status
-              </p>
-            </div>
-
-            {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                {[1, 2, 3, 4].map((i) => (
-                  <CardSkeleton key={i} />
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                {/* KPI 1: Pending Approvals (with click to scroll) */}
-                <MetricCard
-                  label={
-                    <div className="flex items-center gap-2">
-                      <span>{METRIC_LABELS.PENDING_APPROVALS}</span>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button
-                            aria-label="Information about pending requests"
-                            className="hover:opacity-70 transition-opacity"
-                          >
-                            <Info className="h-4 w-4 text-slate-400" />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom" className="max-w-xs">
-                          <p className="text-sm font-semibold mb-1">
-                            What this shows:
-                          </p>
-                          <p className="text-sm mb-2">
-                            Leave requests from your department awaiting YOUR approval.
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </div>
-                  }
-                  value={counts.pending}
-                  subtitle="Awaiting your review"
-                  icon={ClipboardList}
-                  density={density}
-                  onClick={() => {
-                    const element = document.getElementById("pending-table");
-                    element?.scrollIntoView({ behavior: "smooth" });
-                  }}
-                />
-
-                {/* KPI 2: Forwarded */}
-                <MetricCard
-                  label={
-                    <div className="flex items-center gap-2">
-                      <span>{METRIC_LABELS.FORWARDED}</span>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button
-                            aria-label="Information about forwarded requests"
-                            className="hover:opacity-70 transition-opacity"
-                          >
-                            <Info className="h-4 w-4 text-slate-400" />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom" className="max-w-xs">
-                          <p className="text-sm font-semibold mb-1">
-                            What this shows:
-                          </p>
-                          <p className="text-sm mb-2">
-                            Requests you've approved and forwarded to HR for final processing.
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </div>
-                  }
-                  value={counts.forwarded}
-                  subtitle="Sent to HR"
-                  icon={CheckCircle}
-                  density={density}
-                />
-
-                {/* KPI 3: Returned */}
-                <MetricCard
-                  label={
-                    <div className="flex items-center gap-2">
-                      <span>{METRIC_LABELS.SENT_BACK}</span>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button
-                            aria-label="Information about returned requests"
-                            className="hover:opacity-70 transition-opacity"
-                          >
-                            <Info className="h-4 w-4 text-slate-400" />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom" className="max-w-xs">
-                          <p className="text-sm font-semibold mb-1">
-                            What this shows:
-                          </p>
-                          <p className="text-sm mb-2">
-                            Requests you've sent back to employees for corrections. They need to resubmit these.
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </div>
-                  }
-                  value={counts.returned}
-                  subtitle="Require employee action"
-                  icon={RotateCcw}
-                  density={density}
-                />
-
-                {/* KPI 4: Cancelled */}
-                <MetricCard
-                  label={
-                    <div className="flex items-center gap-2">
-                      <span>{STATUS_LABELS.CANCELLED}</span>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button
-                            aria-label="Information about cancelled requests"
-                            className="hover:opacity-70 transition-opacity"
-                          >
-                            <Info className="h-4 w-4 text-slate-400" />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom" className="max-w-xs">
-                          <p className="text-sm font-semibold mb-1">
-                            What this shows:
-                          </p>
-                          <p className="text-sm mb-2">
-                            Requests withdrawn by employees or cancelled after approval.
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </div>
-                  }
-                  value={counts.cancelled}
-                  subtitle="Withdrawn by employee"
-                  icon={XCircle}
-                  density={density}
-                />
-              </div>
-            )}
-          </section>
-
-          {/* Section 2: Approval Queue (Wide table + Sidebar) */}
-          <section id="pending-table">
-            <div className="mb-3">
-              <h2 className={typography.sectionTitle}>Approval Queue</h2>
-              <p className={cn(typography.label, "!normal-case mt-1")}>
-                Review and process leave requests from your department
-              </p>
-            </div>
-
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(300px,1fr)]">
-              {/* Left: Approval Queue Table */}
-              <div className="border border-border shadow-sm rounded-md bg-card">
-                <div className="px-2 py-4">
-                  <Suspense fallback={<CardSkeleton />}>
-                    <DeptHeadPendingTable
-                      data={
-                        data
-                          ? {
-                              rows: data.rows,
-                              total: data.rows?.length ?? 0,
-                              counts: data.counts,
-                            }
-                          : undefined
-                      }
-                      isLoading={isLoading}
-                      error={error}
-                      onMutate={mutate}
-                    />
-                  </Suspense>
-=======
       <RoleBasedDashboard
         role={Role.DEPT_HEAD}
         animate={true}
@@ -384,7 +166,6 @@ export function CorporateManagerDashboard() {
                     Go to Approvals
                     <ArrowRight className="h-4 w-4" />
                   </Button>
->>>>>>> consolidated-work
                 </div>
               </div>
             </div>
@@ -485,52 +266,3 @@ export function CorporateManagerDashboard() {
     </TooltipProvider>
   );
 }
-<<<<<<< HEAD
-
-/**
- * Corporate Alerts Panel
- */
-function DeptHeadAlertsPanel({
-  alerts,
-  isLoading,
-  density = "compact",
-}: {
-  alerts: Array<{
-    title: string;
-    detail: string;
-    tone: "info" | "warning" | "critical";
-  }>;
-  isLoading?: boolean;
-  density?: "comfortable" | "compact";
-}) {
-  if (isLoading) {
-    return (
-      <div className="border border-border shadow-sm rounded-md bg-card p-4 space-y-3">
-        <div className="h-14 rounded-md bg-muted animate-pulse" />
-        <div className="h-14 rounded-md bg-muted animate-pulse" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-3">
-      {alerts.map((alert, idx) => (
-        <SmartAlert
-          key={`${alert.title}-${idx}`}
-          variant={
-            alert.tone === "critical"
-              ? "destructive"
-              : alert.tone === "warning"
-              ? "warning"
-              : "info"
-          }
-          title={alert.title}
-        >
-          {alert.detail}
-        </SmartAlert>
-      ))}
-    </div>
-  );
-}
-=======
->>>>>>> consolidated-work

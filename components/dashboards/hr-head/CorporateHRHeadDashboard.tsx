@@ -824,7 +824,6 @@ function InsightsPanel({
       <CardContent className="space-y-3">
         {isLoading
           ? Array.from({ length: 3 }).map((_, idx) => (
-<<<<<<< HEAD
               <div key={idx} className="h-14 rounded-md bg-muted animate-pulse" />
             ))
           : items.map((item) => (
@@ -834,17 +833,6 @@ function InsightsPanel({
                 <p className="text-xs text-slate-500">{item.helper}</p>
               </div>
             ))}
-=======
-            <div key={idx} className="h-14 rounded-md bg-slate-100 animate-pulse" />
-          ))
-          : items.map((item) => (
-            <div key={item.label} className="rounded-md border border-slate-200 px-3 py-2">
-              <p className="text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
-              <p className="text-lg font-semibold text-slate-900">{item.value}</p>
-              <p className="text-xs text-slate-500">{item.helper}</p>
-            </div>
-          ))}
->>>>>>> consolidated-work
       </CardContent>
     </Card>
   );
@@ -881,13 +869,8 @@ function AlertsPanel({
       <CardContent className="space-y-3">
         {isLoading
           ? Array.from({ length: 2 }).map((_, idx) => (
-<<<<<<< HEAD
               <div key={idx} className="h-16 rounded-md bg-muted animate-pulse" />
             ))
-=======
-            <div key={idx} className="h-16 rounded-md bg-slate-100 animate-pulse" />
-          ))
->>>>>>> consolidated-work
           : alerts.map((alert, idx) => (
             <div
               key={`${alert.title}-${idx}`}

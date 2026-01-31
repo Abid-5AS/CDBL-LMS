@@ -19,13 +19,9 @@ async function CEODashboardContent() {
 
   const username = user.name ?? "Executive";
 
-<<<<<<< HEAD
-  return <SuperAdminDashboard username={username} />;
-=======
   return (
     <SuperAdminDashboard username={username} />
   );
->>>>>>> consolidated-work
 }
 
 export default function CEODashboardPage() {

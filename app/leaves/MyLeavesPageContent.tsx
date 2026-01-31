@@ -33,15 +33,11 @@ import { useLeaveData } from "@/components/providers";
 import { cn } from "@/lib/utils";
 import { leaveTypeLabel, leaveTypeColor } from "@/lib/ui/ui";
 
-<<<<<<< HEAD
 function formatLeaveType(type: string) {
   return type.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase());
 }
 
-function LeaveRequestCard({ request }: { request: any }) {
-=======
 function LeaveRequestCard({ request, onClick }: { request: any; onClick: () => void }) {
->>>>>>> consolidated-work
   const statusColors = {
     PENDING: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800",
     SUBMITTED: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800",
@@ -95,11 +91,7 @@ function LeaveRequestCard({ request, onClick }: { request: any; onClick: () => v
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-foreground">
-<<<<<<< HEAD
-                {formatLeaveType(request.type)}
-=======
                 {leaveTypeLabel[request.type] || request.type}
->>>>>>> consolidated-work
               </h3>
               <span className={cn(
                 "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border",
@@ -281,10 +273,6 @@ function RequestsView() {
   ];
 
   const filteredRequests = data?.items?.filter((item: any) => {
-<<<<<<< HEAD
-    const matchesTab = activeTab === "all" || item.status.toLowerCase() === activeTab;
-    const matchesSearch = item.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-=======
     // Handle tab filtering
     let matchesTab = false;
     if (activeTab === "all") {
@@ -303,7 +291,6 @@ function RequestsView() {
 
     const typeLabel = leaveTypeLabel[item.type] || item.type || "";
     const matchesSearch = typeLabel.toLowerCase().includes(searchQuery.toLowerCase()) ||
->>>>>>> consolidated-work
       item.reason?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesTab && matchesSearch;
   }) || [];
@@ -433,13 +420,6 @@ export function MyLeavesPageContent() {
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">Leaves</h1>
         <p className="text-muted-foreground">
-<<<<<<< HEAD
-          Manage your leave requests and track their status.
-        </p>
-      </div>
-
-      <RequestsView />
-=======
           View and manage your leave requests.
         </p>
       </div>
@@ -447,7 +427,6 @@ export function MyLeavesPageContent() {
       <div className="space-y-6">
         <RequestsView />
       </div>
->>>>>>> consolidated-work
     </div>
   );
 }

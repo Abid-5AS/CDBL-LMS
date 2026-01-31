@@ -49,11 +49,7 @@ export function MetricCard({
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className={cn(typography.label, "text-muted-foreground")}>{label}</div>
-<<<<<<< HEAD
-          <p className={cn(typography.kpiNumber, "mt-2 text-foreground")}>{value}</p>
-=======
           <div className={cn(typography.kpiNumber, "mt-2 text-foreground")}>{value}</div>
->>>>>>> consolidated-work
           {subtitle && (
             <div className={cn(typography.body, "mt-1 text-muted-foreground")}>
               {subtitle}
