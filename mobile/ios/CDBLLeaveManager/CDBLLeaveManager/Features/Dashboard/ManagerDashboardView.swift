@@ -12,6 +12,8 @@ struct ManagerDashboardView: View {
     @StateObject private var viewModel = DashboardViewModel()
     @State private var showApprovals = false
     @State private var showTeam = false
+    @State private var showMyLeaves = false
+    @State private var showApplyLeave = false
     @EnvironmentObject private var appState: AppState
     
     var body: some View {
@@ -36,6 +38,12 @@ struct ManagerDashboardView: View {
         .sheet(isPresented: $showTeam) {
             TeamListView()
         }
+        .sheet(isPresented: $showMyLeaves) {
+            LeavesListView()
+        }
+        .sheet(isPresented: $showApplyLeave) {
+            ApplyLeaveView()
+        }
     }
     
     private var dashboardContent: some View {
@@ -57,6 +65,9 @@ struct ManagerDashboardView: View {
             // Quick Actions
             quickActionsSection
             
+            // My Leave Actions (for dept head's own leaves)
+            myLeaveActionsSection
+            
             Spacer().frame(height: 100)
         }
         .padding(.top, 20)
@@ -65,7 +76,7 @@ struct ManagerDashboardView: View {
     // MARK: - Pending Approvals Card
     
     private var pendingApprovalsCard: some View {
-        Button(action: {}) {
+        Button(action: { showApprovals = true }) {
             HStack(spacing: 16) {
                 ZStack {
                     Circle()
@@ -135,7 +146,7 @@ struct ManagerDashboardView: View {
                 
                 Spacer()
                 
-                Button("View All") {}
+                Button("View All") { showApprovals = true }
                     .font(.caption)
                     .foregroundStyle(Color.accentColor)
             }
@@ -167,7 +178,7 @@ struct ManagerDashboardView: View {
     
     private var quickActionsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Quick Actions")
+            Text("Team Actions")
                 .font(.headline)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal)
@@ -178,6 +189,27 @@ struct ManagerDashboardView: View {
                 }
                 ActionButton(icon: "person.3.fill", title: "Team", color: .blue) {
                     showTeam = true
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+    
+    // MARK: - My Leave Actions (for dept head's own leaves)
+    
+    private var myLeaveActionsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("My Leaves")
+                .font(.headline)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal)
+            
+            HStack(spacing: 12) {
+                ActionButton(icon: "calendar.badge.clock", title: "My Leaves", color: .indigo) {
+                    showMyLeaves = true
+                }
+                ActionButton(icon: "plus.circle.fill", title: "Apply Leave", color: .cyan) {
+                    showApplyLeave = true
                 }
             }
             .padding(.horizontal)

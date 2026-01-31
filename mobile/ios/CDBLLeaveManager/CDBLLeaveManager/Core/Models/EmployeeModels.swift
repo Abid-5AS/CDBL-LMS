@@ -24,6 +24,72 @@ struct Employee: Decodable, Identifiable {
     let managerId: Int?
     let managerName: String?
     
+    enum CodingKeys: String, CodingKey {
+        case id, email, name, employeeId, empCode, designation, department
+        case phone, joiningDate, role, isActive, managerId, managerName
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        // Handle id
+        if let intId = try? container.decode(Int.self, forKey: .id) {
+            id = intId
+        } else if let strId = try? container.decode(String.self, forKey: .id), let parsedId = Int(strId) {
+            id = parsedId
+        } else {
+            id = 0
+        }
+        
+        email = (try? container.decode(String.self, forKey: .email)) ?? ""
+        name = try? container.decode(String.self, forKey: .name)
+        
+        // Handle employeeId or empCode
+        if let empId = try? container.decode(String.self, forKey: .employeeId) {
+            employeeId = empId
+        } else {
+            employeeId = try? container.decode(String.self, forKey: .empCode)
+        }
+        
+        designation = try? container.decode(String.self, forKey: .designation)
+        department = try? container.decode(String.self, forKey: .department)
+        phone = try? container.decode(String.self, forKey: .phone)
+        joiningDate = try? container.decode(String.self, forKey: .joiningDate)
+        role = try? container.decode(String.self, forKey: .role)
+        isActive = try? container.decode(Bool.self, forKey: .isActive)
+        managerId = try? container.decode(Int.self, forKey: .managerId)
+        managerName = try? container.decode(String.self, forKey: .managerName)
+    }
+    
+    // Memberwise initializer (since custom init(from:) removes the automatic one)
+    init(
+        id: Int,
+        email: String,
+        name: String?,
+        employeeId: String?,
+        designation: String?,
+        department: String?,
+        phone: String?,
+        joiningDate: String?,
+        role: String?,
+        isActive: Bool?,
+        managerId: Int?,
+        managerName: String?
+    ) {
+        self.id = id
+        self.email = email
+        self.name = name
+        self.employeeId = employeeId
+        self.designation = designation
+        self.department = department
+        self.phone = phone
+        self.joiningDate = joiningDate
+        self.role = role
+        self.isActive = isActive
+        self.managerId = managerId
+        self.managerName = managerName
+    }
+    
     var displayName: String {
         name ?? email
     }
@@ -48,10 +114,23 @@ struct Employee: Decodable, Identifiable {
 struct EmployeeListResponse: Decodable {
     let employees: [Employee]?
     let items: [Employee]?
+    let users: [Employee]?
     let total: Int?
     
+    enum CodingKeys: String, CodingKey {
+        case employees, items, users, total
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        employees = try? container.decode([Employee].self, forKey: .employees)
+        items = try? container.decode([Employee].self, forKey: .items)
+        users = try? container.decode([Employee].self, forKey: .users)
+        total = try? container.decode(Int.self, forKey: .total)
+    }
+    
     var allEmployees: [Employee] {
-        employees ?? items ?? []
+        employees ?? items ?? users ?? []
     }
 }
 

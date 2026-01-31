@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 struct ApprovalDetailView: View {
     let approvalId: Int

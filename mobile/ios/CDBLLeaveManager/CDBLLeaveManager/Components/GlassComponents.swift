@@ -156,31 +156,51 @@ struct ErrorView: View {
         self.retryAction = retryAction
     }
     
+    private var displayMessage: String {
+        // Provide user-friendly messages for common errors
+        if message.isEmpty {
+            return "Something went wrong. Please try again."
+        }
+        if message.lowercased().contains("network") || message.lowercased().contains("internet") {
+            return "Please check your internet connection and try again."
+        }
+        if message.lowercased().contains("unauthorized") || message.lowercased().contains("session") {
+            return "Your session has expired. Please log in again."
+        }
+        if message.lowercased().contains("decode") || message.lowercased().contains("parsing") {
+            return "Unable to load data. Please try again later."
+        }
+        return message
+    }
+    
     var body: some View {
         VStack(spacing: 20) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 48))
                 .foregroundStyle(.orange)
             
-            Text("Oops!")
+            Text("Something went wrong")
                 .font(.title2.bold())
                 .foregroundStyle(.primary)
             
-            Text(message)
+            Text(displayMessage)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
             
             if let retryAction = retryAction {
                 Button(action: retryAction) {
-                    HStack {
+                    HStack(spacing: 8) {
                         Image(systemName: "arrow.clockwise")
                         Text("Try Again")
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
+                    .fontWeight(.semibold)
+                    .padding(.horizontal, 28)
+                    .padding(.vertical, 14)
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.borderedProminent)
+                .tint(.blue)
             }
         }
         .padding()

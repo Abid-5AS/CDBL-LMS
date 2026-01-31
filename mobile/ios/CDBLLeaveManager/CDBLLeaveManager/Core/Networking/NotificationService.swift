@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 actor NotificationService {
     static let shared = NotificationService()

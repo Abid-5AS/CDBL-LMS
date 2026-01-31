@@ -49,10 +49,22 @@ struct ApplyLeaveView: View {
                         
                         // Error
                         if let error = viewModel.error {
-                            Text(error)
-                                .font(.caption)
-                                .foregroundStyle(.red)
-                                .padding(.horizontal)
+                            HStack(spacing: 12) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundStyle(.red)
+                                Text(error)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.primary)
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.red.opacity(0.15))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .strokeBorder(Color.red.opacity(0.3), lineWidth: 1)
+                            )
+                            .padding(.horizontal)
                         }
                         
                         // Submit Button

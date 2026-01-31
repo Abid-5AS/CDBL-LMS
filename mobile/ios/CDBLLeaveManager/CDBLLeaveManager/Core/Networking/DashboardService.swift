@@ -21,7 +21,8 @@ actor DashboardService {
     }
     
     func getLeaveBalance() async throws -> DashboardLeaveBalance {
-        return try await client.request("leave/balance")
+        // Correct endpoint: /api/balance/mine
+        return try await client.request("balance/mine")
     }
     
     func getWhosOutToday() async throws -> [WhosOutMember] {
@@ -42,29 +43,33 @@ actor DashboardService {
     // MARK: - HR Admin Dashboard
     
     func getHRAdminStats() async throws -> HRAdminStats {
-        return try await client.request("dashboard/hr-admin")
+        // Correct endpoint: /api/dashboard/hr-admin/stats
+        return try await client.request("dashboard/hr-admin/stats")
     }
     
     // MARK: - HR Head Dashboard
     
     func getHRHeadStats() async throws -> HRHeadStats {
-        return try await client.request("dashboard/hr-head")
+        // Correct endpoint: /api/dashboard/hr-head/stats
+        return try await client.request("dashboard/hr-head/stats")
     }
     
     // MARK: - CEO Dashboard
     
     func getCEOStats() async throws -> CEOStats {
-        return try await client.request("dashboard/ceo")
+        // Correct endpoint: /api/dashboard/ceo/stats
+        return try await client.request("dashboard/ceo/stats")
     }
     
     // MARK: - System Admin Dashboard
     
     func getSystemStats() async throws -> SystemStatsResponse {
-        return try await client.request("dashboard/admin")
+        return try await client.request("admin/system-stats")
     }
     
     func getRecentAuditLogs(limit: Int = 10) async throws -> AuditLogsResponse {
-        return try await client.request("admin/audit-logs?limit=\(limit)")
+        // Correct endpoint: /api/admin/logs
+        return try await client.request("admin/logs?limit=\(limit)")
     }
     
     // MARK: - Holidays

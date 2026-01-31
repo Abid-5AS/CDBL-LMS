@@ -32,6 +32,38 @@ struct LeaveRequest: Decodable, Identifiable {
     let halfDayPeriod: String?
     let totalDays: Double?
     
+    enum CodingKeys: String, CodingKey {
+        case id, type, startDate, endDate, reason, status
+        case createdAt, updatedAt, userId, employeeName, department
+        case approverComments, attachmentUrl, needsCertificate
+        case certificateUrl, fitnessCertificateUrl
+        case isHalfDay, halfDayType, halfDayPeriod, totalDays
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = (try? container.decode(Int.self, forKey: .id)) ?? 0
+        type = (try? container.decode(String.self, forKey: .type)) ?? "CASUAL"
+        startDate = (try? container.decode(String.self, forKey: .startDate)) ?? ""
+        endDate = (try? container.decode(String.self, forKey: .endDate)) ?? ""
+        reason = try? container.decode(String.self, forKey: .reason)
+        status = (try? container.decode(String.self, forKey: .status)) ?? "PENDING"
+        createdAt = try? container.decode(String.self, forKey: .createdAt)
+        updatedAt = try? container.decode(String.self, forKey: .updatedAt)
+        userId = try? container.decode(Int.self, forKey: .userId)
+        employeeName = try? container.decode(String.self, forKey: .employeeName)
+        department = try? container.decode(String.self, forKey: .department)
+        approverComments = try? container.decode(String.self, forKey: .approverComments)
+        attachmentUrl = try? container.decode(String.self, forKey: .attachmentUrl)
+        needsCertificate = try? container.decode(Bool.self, forKey: .needsCertificate)
+        certificateUrl = try? container.decode(String.self, forKey: .certificateUrl)
+        fitnessCertificateUrl = try? container.decode(String.self, forKey: .fitnessCertificateUrl)
+        isHalfDay = try? container.decode(Bool.self, forKey: .isHalfDay)
+        halfDayType = try? container.decode(String.self, forKey: .halfDayType)
+        halfDayPeriod = try? container.decode(String.self, forKey: .halfDayPeriod)
+        totalDays = try? container.decode(Double.self, forKey: .totalDays)
+    }
+    
     var statusColor: Color {
         switch status.uppercased() {
         case "APPROVED":

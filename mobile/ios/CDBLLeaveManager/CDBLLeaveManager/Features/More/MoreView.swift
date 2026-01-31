@@ -20,6 +20,8 @@ struct MoreView: View {
     @State private var showFeedback = false
     @State private var showTerms = false
     @State private var showPrivacy = false
+    @State private var showMyLeaves = false
+    @State private var showApplyLeave = false
     
     var body: some View {
         NavigationStack {
@@ -88,6 +90,12 @@ struct MoreView: View {
             .sheet(isPresented: $showPrivacy) {
                 PrivacyView()
             }
+            .sheet(isPresented: $showMyLeaves) {
+                LeavesListView()
+            }
+            .sheet(isPresented: $showApplyLeave) {
+                ApplyLeaveView()
+            }
         }
     }
     
@@ -153,6 +161,27 @@ struct MoreView: View {
     
     private var mainMenuSection: some View {
         VStack(spacing: 0) {
+            // Show My Leaves for non-employee roles (they don't have leaves tab)
+            if appState.userRole != .employee {
+                MoreMenuItem(
+                    icon: "doc.text.fill",
+                    title: "My Leaves",
+                    color: .indigo,
+                    action: { showMyLeaves = true }
+                )
+                
+                Divider().padding(.leading, 56)
+                
+                MoreMenuItem(
+                    icon: "plus.circle.fill",
+                    title: "Apply Leave",
+                    color: .cyan,
+                    action: { showApplyLeave = true }
+                )
+                
+                Divider().padding(.leading, 56)
+            }
+            
             MoreMenuItem(
                 icon: "bell.fill",
                 title: "Notifications",

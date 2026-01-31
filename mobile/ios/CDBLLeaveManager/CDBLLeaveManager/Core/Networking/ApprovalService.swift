@@ -35,9 +35,10 @@ actor ApprovalService {
     // MARK: - Approve Leave
     
     func approveLeave(id: Int, comments: String? = nil) async throws -> APIResponse<LeaveRequest> {
-        let request = ApprovalActionRequest(action: "APPROVE", comments: comments)
+        // Backend uses /decision endpoint with lowercase action names
+        let request = ApprovalActionRequest(action: "approve", comments: comments)
         return try await client.request(
-            "approvals/\(id)/action",
+            "approvals/\(id)/decision",
             method: .post,
             body: request
         )
@@ -46,9 +47,10 @@ actor ApprovalService {
     // MARK: - Reject Leave
     
     func rejectLeave(id: Int, comments: String) async throws -> APIResponse<LeaveRequest> {
-        let request = ApprovalActionRequest(action: "REJECT", comments: comments)
+        // Backend uses /decision endpoint with lowercase action names
+        let request = ApprovalActionRequest(action: "reject", comments: comments)
         return try await client.request(
-            "approvals/\(id)/action",
+            "approvals/\(id)/decision",
             method: .post,
             body: request
         )
@@ -57,22 +59,28 @@ actor ApprovalService {
     // MARK: - Forward Leave
     
     func forwardLeave(id: Int, comments: String? = nil) async throws -> APIResponse<LeaveRequest> {
-        let request = ApprovalActionRequest(action: "FORWARD", comments: comments)
+        // Forward uses /leaves/[id]/forward endpoint
+        struct ForwardRequest: Encodable {
+            let comment: String?
+        }
         return try await client.request(
-            "approvals/\(id)/action",
+            "leaves/\(id)/forward",
             method: .post,
-            body: request
+            body: ForwardRequest(comment: comments)
         )
     }
     
     // MARK: - Return Leave
     
     func returnLeave(id: Int, comments: String) async throws -> APIResponse<LeaveRequest> {
-        let request = ApprovalActionRequest(action: "RETURN", comments: comments)
+        // Return uses /leaves/[id]/return endpoint
+        struct ReturnRequest: Encodable {
+            let comment: String
+        }
         return try await client.request(
-            "approvals/\(id)/action",
+            "leaves/\(id)/return",
             method: .post,
-            body: request
+            body: ReturnRequest(comment: comments)
         )
     }
     
@@ -88,7 +96,7 @@ actor ApprovalService {
         return try await client.request(
             "approvals/bulk-action",
             method: .post,
-            body: BulkRequest(ids: ids, action: "APPROVE", comments: comments)
+            body: BulkRequest(ids: ids, action: "approve", comments: comments)
         )
     }
     

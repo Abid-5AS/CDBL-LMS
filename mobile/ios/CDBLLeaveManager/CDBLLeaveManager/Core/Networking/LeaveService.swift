@@ -161,11 +161,12 @@ actor LeaveService {
     // MARK: - Balance
     
     func getBalance() async throws -> DashboardLeaveBalance {
-        return try await client.request("leave/balance")
+        // Use the correct backend endpoint: /api/balance/mine
+        return try await client.request("balance/mine")
     }
     
     func getDetailedBalance() async throws -> BalanceResponse {
-        return try await client.request("leave/balance/detailed")
+        return try await client.request("balance/mine?detailed=true")
     }
     
     // MARK: - Leave Types

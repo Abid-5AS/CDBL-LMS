@@ -17,7 +17,16 @@ actor EmployeeService {
     // MARK: - Team Members
     
     func getTeamMembers(page: Int = 1, pageSize: Int = 50) async throws -> EmployeeListResponse {
-        return try await client.request("employees/team?page=\(page)&pageSize=\(pageSize)")
+        // Try to get team members from admin/users endpoint
+        return try await client.request("admin/users?page=\(page)&pageSize=\(pageSize)")
+    }
+    
+    // MARK: - Team On Leave
+    
+    func getTeamOnLeave() async throws -> [WhosOutMember] {
+        // Correct endpoint: /api/team/on-leave?scope=team
+        let response: APIResponse<[WhosOutMember]> = try await client.request("team/on-leave?scope=team")
+        return response.data ?? []
     }
     
     // MARK: - All Employees (HR/Admin)

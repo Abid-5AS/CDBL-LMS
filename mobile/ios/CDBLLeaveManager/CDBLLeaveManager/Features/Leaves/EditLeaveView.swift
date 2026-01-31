@@ -1,5 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import Combine
 
 struct EditLeaveView: View {
     let leave: LeaveRequest
@@ -273,6 +274,9 @@ final class EditLeaveViewModel: ObservableObject {
     @Published var isHalfDay = false
     @Published var halfDayPeriod = "AM"
     @Published var incidentDate: Date?
+    private var initialStartDate = Date()
+    private var initialEndDate = Date()
+    private var initialReason = ""
     private var initialIncidentDate: Date?
     private var initialIsHalfDay = false
 

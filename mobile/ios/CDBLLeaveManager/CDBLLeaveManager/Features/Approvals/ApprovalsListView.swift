@@ -45,7 +45,7 @@ struct ApprovalsListView: View {
                 await viewModel.loadApprovals()
             }
             .sheet(item: $viewModel.actionSheetItem) { item in
-                actionSheet(
+                approvalActionSheet(
                     title: item.title,
                     buttonTitle: item.buttonTitle,
                     commentText: item.commentBinding,
@@ -237,58 +237,62 @@ struct ApprovalDetailCard: View {
             
             // Actions
             if showActions {
-                HStack(spacing: 8) {
-                    Button(action: onReject) {
-                        HStack {
-                            Image(systemName: "xmark")
-                            Text("Reject")
+                VStack(spacing: 8) {
+                    HStack(spacing: 8) {
+                        Button(action: onReject) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "xmark")
+                                Text("Reject")
+                            }
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
                         }
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                    }
-                    .buttonStyle(.bordered)
-                    .foregroundStyle(.red)
+                        .buttonStyle(.bordered)
+                        .foregroundStyle(.red)
 
-                    Button(action: onReturn) {
-                        HStack {
-                            Image(systemName: "arrow.uturn.backward")
-                            Text("Return")
+                        Button(action: onReturn) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "arrow.uturn.backward")
+                                Text("Return")
+                            }
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
                         }
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
+                        .buttonStyle(.bordered)
+                        .foregroundStyle(.orange)
                     }
-                    .buttonStyle(.bordered)
-                    .foregroundStyle(.orange)
-
-                    Button(action: onForward) {
-                        HStack {
-                            Image(systemName: "arrow.right.circle")
-                            Text("Forward")
-                        }
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                    }
-                    .buttonStyle(.bordered)
-                    .foregroundStyle(.orange)
                     
-                    Button(action: onApprove) {
-                        HStack {
-                            Image(systemName: "checkmark")
-                            Text("Approve")
+                    HStack(spacing: 8) {
+                        Button(action: onForward) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "arrow.right.circle")
+                                Text("Forward")
+                            }
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
                         }
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
+                        .buttonStyle(.bordered)
+                        .foregroundStyle(.blue)
+                        
+                        Button(action: onApprove) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "checkmark")
+                                Text("Approve")
+                            }
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.green)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.green)
                 }
             }
         }
@@ -312,7 +316,7 @@ struct ApprovalSelection: Identifiable {
     let id: Int
 }
 
-private func actionSheet(
+private func approvalActionSheet(
     title: String,
     buttonTitle: String,
     commentText: Binding<String>,
