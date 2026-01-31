@@ -38,6 +38,10 @@ interface LeaveService {
         @Part("startDate") startDate: RequestBody,
         @Part("endDate") endDate: RequestBody,
         @Part("reason") reason: RequestBody,
+        @Part("needsCertificate") needsCertificate: RequestBody?,
+        @Part("incidentDate") incidentDate: RequestBody?,
+        @Part("isHalfDay") isHalfDay: RequestBody?,
+        @Part("halfDayPeriod") halfDayPeriod: RequestBody?,
         @Part file: MultipartBody.Part?
     ): Response<com.cdbl.leavemanager.data.model.CreateLeaveResponse>
 
@@ -53,28 +57,47 @@ interface LeaveService {
         @Path("id") id: Int
     ): Response<com.cdbl.leavemanager.data.model.LeaveCommentListResponse>
 
-    @POST("leaves/{id}/cancel")
+    @Multipart
+    @POST("leaves/{id}/certificate")
+    suspend fun uploadCertificate(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Part("type") type: RequestBody,
+        @Part certificate: MultipartBody.Part
+    ): Response<com.cdbl.leavemanager.data.model.CreateLeaveResponse>
+
+    @Multipart
+    @POST("leaves/{id}/resubmit")
+    suspend fun resubmitLeaveMultipart(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Part("type") type: RequestBody,
+        @Part("startDate") startDate: RequestBody,
+        @Part("endDate") endDate: RequestBody,
+        @Part("reason") reason: RequestBody,
+        @Part("needsCertificate") needsCertificate: RequestBody?,
+        @Part certificate: MultipartBody.Part?
+    ): Response<com.cdbl.leavemanager.data.model.CreateLeaveResponse>
+
+    @POST("leaves/{id}/resubmit")
+    suspend fun resubmitLeave(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int,
+        @Body request: com.cdbl.leavemanager.data.model.ApplyLeaveRequest
+    ): Response<com.cdbl.leavemanager.data.model.CreateLeaveResponse>
+
+
+    // Cancel Leave - PATCH /leaves/{id} - for employee-initiated cancellation
+    // PENDING/SUBMITTED: immediate cancellation (CANCELLED)
+    // APPROVED: changes to CANCELLATION_REQUESTED (needs HR approval)
+    @retrofit2.http.PATCH("leaves/{id}")
     suspend fun cancelLeave(
         @Header("Authorization") token: String,
         @Path("id") id: Int,
         @Body reason: CancelLeaveRequest
     ): Response<CancelLeaveResponse>
 
-    // Full Cancel - DELETE /leaves/{id} - for employee-initiated cancellation
-    @HTTP(method = "DELETE", path = "leaves/{id}", hasBody = true)
-    suspend fun fullCancelLeave(
-        @Header("Authorization") token: String,
-        @Path("id") id: Int,
-        @Body reason: FullCancelRequest
-    ): Response<FullCancelResponse>
 
-    // Partial Cancel - POST /leaves/{id}/partial-cancel - for approved leaves that started
-    @POST("leaves/{id}/partial-cancel")
-    suspend fun partialCancelLeave(
-        @Header("Authorization") token: String,
-        @Path("id") id: Int,
-        @Body reason: PartialCancelRequest
-    ): Response<PartialCancelResponse>
 
     @GET("manager/pending")
     suspend fun getManagerPendingLeaves(
@@ -92,36 +115,6 @@ interface LeaveService {
     ): Response<ApprovalHistoryResponse>
 }
 
-// Full Cancel - DELETE /leaves/{id}
-data class FullCancelRequest(
-    val reason: String
-)
-
-data class FullCancelResponse(
-    val ok: Boolean,
-    val leaveId: Int? = null,
-    val status: String? = null,
-    val message: String? = null,
-    val error: String? = null
-)
-
-// Partial Cancel - POST /leaves/{id}/partial-cancel
-data class PartialCancelRequest(
-    val reason: String
-)
-
-data class PartialCancelResponse(
-    val ok: Boolean,
-    val leaveId: Int? = null,
-    val status: String? = null,
-    val originalEndDate: String? = null,
-    val requestedEndDate: String? = null,
-    val originalWorkingDays: Int? = null,
-    val requestedWorkingDays: Int? = null,
-    val daysToCancel: Int? = null,
-    val message: String? = null,
-    val error: String? = null
-)
 
 data class CancelLeaveRequest(
     val reason: String
@@ -129,6 +122,9 @@ data class CancelLeaveRequest(
 
 data class CancelLeaveResponse(
     val ok: Boolean,
+    val id: Int? = null,
+    val status: String? = null,
+    val balanceRestored: Boolean? = null,
     val message: String? = null,
     val error: String? = null
 )
@@ -150,4 +146,3 @@ data class ApprovalHistoryItem(
     val requestedByName: String,
     val requestedByEmail: String
 )
-

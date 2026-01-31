@@ -13,6 +13,9 @@ data class LeaveRequest(
     val endDate: String,
     val workingDays: Int?,
     val reason: String?,
+    val needsCertificate: Boolean? = null,
+    val certificateUrl: String? = null,
+    val fitnessCertificateUrl: String? = null,
     val status: String,
     val createdAt: String,
     val updatedAt: String,
@@ -26,6 +29,8 @@ data class ApplyLeaveRequest(
     val startDate: String,
     val endDate: String,
     val reason: String,
+    val needsCertificate: Boolean? = null,
+    val incidentDate: String? = null,
     val isHalfDay: Boolean? = null,
     val halfDayPeriod: String? = null  // "AM" or "PM"
 )

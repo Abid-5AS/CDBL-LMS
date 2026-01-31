@@ -34,4 +34,17 @@ class NotificationsRepository @Inject constructor(
             Result.failure(e)
         }
     }
+
+    suspend fun markAllRead(token: String): Result<Unit> {
+        return try {
+            val response = notificationService.markAllRead("Bearer $token")
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Failed to mark all notifications: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

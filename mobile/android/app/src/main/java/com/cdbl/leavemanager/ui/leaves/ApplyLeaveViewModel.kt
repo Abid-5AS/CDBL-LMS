@@ -156,7 +156,18 @@ class ApplyLeaveViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(leavePolicies = defaults)
     }
 
-    fun submitLeave(token: String, type: String, startDate: String, endDate: String, reason: String, attachmentUri: Uri? = null, isHalfDay: Boolean = false, halfDayPeriod: String? = null) {
+    fun submitLeave(
+        token: String,
+        type: String,
+        startDate: String,
+        endDate: String,
+        reason: String,
+        attachmentUri: Uri? = null,
+        isHalfDay: Boolean = false,
+        halfDayPeriod: String? = null,
+        needsCertificate: Boolean? = null,
+        incidentDate: String? = null
+    ) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             val request = ApplyLeaveRequest(
@@ -164,6 +175,8 @@ class ApplyLeaveViewModel @Inject constructor(
                 startDate = startDate,
                 endDate = endDate,
                 reason = reason,
+                needsCertificate = needsCertificate,
+                incidentDate = incidentDate,
                 isHalfDay = if (isHalfDay) true else null,
                 halfDayPeriod = if (isHalfDay) halfDayPeriod else null
             )
@@ -204,4 +217,3 @@ class ApplyLeaveViewModel @Inject constructor(
         _uiState.value = ApplyLeaveUiState()
     }
 }
-

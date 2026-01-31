@@ -59,6 +59,7 @@ import com.cdbl.leavemanager.ui.components.ErrorView
 import com.cdbl.leavemanager.ui.components.KpiCard
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.isSystemInDarkTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -82,6 +83,12 @@ fun EmployeeDashboardScreen(
     val formattedDate = remember {
         LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMM dd"))
     }
+    
+    val isDark = isSystemInDarkTheme()
+    val warningColor = if (isDark) Color(0xFFFCD34D) else WarningAmber
+    val successColor = if (isDark) Color(0xFF34D399) else SuccessGreen
+    val errorColor = MaterialTheme.colorScheme.error
+    val primaryColor = MaterialTheme.colorScheme.primary
 
     LaunchedEffect(Unit) {
         viewModel.loadDashboard(token)
@@ -153,26 +160,28 @@ fun EmployeeDashboardScreen(
                                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
-                                    // Profile Placeholder
-                                    Box(
+                                    // Profile Icon (Clickable)
+                                    IconButton(
+                                        onClick = onNavigateToProfile,
                                         modifier = Modifier
-                                            .size(40.dp)
-                                            .clip(CircleShape)
-                                            .background(MaterialTheme.colorScheme.primaryContainer)
-                                            .border(2.dp, MaterialTheme.colorScheme.surface, CircleShape),
-                                        contentAlignment = Alignment.Center
+                                            .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
+                                            .border(2.dp, MaterialTheme.colorScheme.surface, CircleShape)
                                     ) {
-                                        Icon(Icons.Outlined.Person, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer)
+                                        Icon(
+                                            Icons.Outlined.Person, 
+                                            contentDescription = "Profile", 
+                                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                        )
                                     }
                                 }
                             }
                         }
                         
-                        // Action Center (Conditional) - Moved to top for priority
+                                    // Action Center (Conditional) - Moved to top for priority
                          if (state.needsAttentionCount > 0) {
                             item {
                                 Card(
-                                    colors = CardDefaults.cardColors(containerColor = ErrorRed.copy(alpha = 0.1f)),
+                                    colors = CardDefaults.cardColors(containerColor = errorColor.copy(alpha = 0.1f)),
                                     shape = RoundedCornerShape(16.dp),
                                     modifier = Modifier.fillMaxWidth().clickable { onNavigateToApprovals() }
                                 ) {
@@ -180,10 +189,10 @@ fun EmployeeDashboardScreen(
                                         modifier = Modifier.padding(16.dp),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Icon(Icons.Rounded.Notifications, contentDescription = null, tint = ErrorRed)
+                                        Icon(Icons.Rounded.Notifications, contentDescription = null, tint = errorColor)
                                         Spacer(modifier = Modifier.width(16.dp))
                                         Column {
-                                            Text(stringResource(R.string.action_required), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = ErrorRed)
+                                            Text(stringResource(R.string.action_required), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = errorColor)
                                             Text(stringResource(R.string.returned_requests, state.needsAttentionCount), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
                                         }
                                     }
@@ -204,8 +213,8 @@ fun EmployeeDashboardScreen(
                                          value = state.needsAttentionCount.toString(),
                                          subtitle = "Returned/Rejected",
                                          modifier = Modifier.weight(1f).fillMaxHeight(),
-                                         bg = if (state.needsAttentionCount > 0) ErrorRed.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant,
-                                         contentColor = if (state.needsAttentionCount > 0) ErrorRed else MaterialTheme.colorScheme.onSurfaceVariant,
+                                         bg = if (state.needsAttentionCount > 0) errorColor.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant,
+                                         contentColor = if (state.needsAttentionCount > 0) errorColor else MaterialTheme.colorScheme.onSurfaceVariant,
                                          onClick = onNavigateToApprovals
                                      )
                                      // Under Review
@@ -214,8 +223,8 @@ fun EmployeeDashboardScreen(
                                          value = state.underReviewCount.toString(),
                                          subtitle = stringResource(R.string.pending_requests),
                                          modifier = Modifier.weight(1f).fillMaxHeight(),
-                                         bg = if (state.underReviewCount > 0) WarningAmber.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant,
-                                         contentColor = if (state.underReviewCount > 0) WarningAmber else MaterialTheme.colorScheme.onSurfaceVariant,
+                                         bg = if (state.underReviewCount > 0) warningColor.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant,
+                                         contentColor = if (state.underReviewCount > 0) warningColor else MaterialTheme.colorScheme.onSurfaceVariant,
                                          onClick = { /* Navigate to Leave History filtered by Pending - currently just leaves */
                                               onNavigateToLeaveDetails(-1) // Signal to go to list
                                          }
@@ -231,18 +240,25 @@ fun EmployeeDashboardScreen(
                                          value = "${state.balance?.EARNED?.toInt() ?: 0}",
                                          subtitle = "Earned Leave",
                                          modifier = Modifier.weight(1f).fillMaxHeight(),
-                                         bg = Indigo600.copy(alpha = 0.1f),
-                                         contentColor = Indigo600,
+                                         bg = primaryColor.copy(alpha = 0.1f),
+                                         contentColor = primaryColor,
                                          onClick = onNavigateToBalance
                                      )
                                      // Next Leave
                                      KpiCard(
                                          title = stringResource(R.string.next_leave),
-                                         value = state.nextApprovedLeave?.let { "${it.startDate.take(10)}" } ?: "-",
+                                         value = state.nextApprovedLeave?.let { 
+                                             try {
+                                                 val date = LocalDate.parse(it.startDate.take(10))
+                                                 date.format(DateTimeFormatter.ofPattern("MMM d"))
+                                             } catch (e: Exception) {
+                                                 it.startDate.take(10)
+                                             }
+                                         } ?: "-",
                                          subtitle = state.nextApprovedLeave?.type ?: "None booked",
                                          modifier = Modifier.weight(1f).fillMaxHeight(),
-                                         bg = SuccessGreen.copy(alpha = 0.1f),
-                                         contentColor = SuccessGreen,
+                                         bg = successColor.copy(alpha = 0.1f),
+                                         contentColor = successColor,
                                          onClick = {
                                               state.nextApprovedLeave?.let { onNavigateToLeaveDetails(it.id) }
                                          }
@@ -275,9 +291,9 @@ fun EmployeeDashboardScreen(
                             
                             if (state.balance != null) {
                                 val realBalances = listOf(
-                                    BalanceItem("Earned Leave", state.balance!!.EARNED.toInt(), 33, Indigo600, Icons.Rounded.FlightTakeoff),
-                                    BalanceItem("Casual Leave", state.balance!!.CASUAL.toInt(), 10, WarningAmber, Icons.Rounded.BeachAccess),
-                                    BalanceItem("Medical Leave", state.balance!!.MEDICAL.toInt(), 14, ErrorRed, Icons.Rounded.Medication)
+                                    BalanceItem("Earned Leave", state.balance!!.EARNED.toInt(), 33, primaryColor, Icons.Rounded.FlightTakeoff),
+                                    BalanceItem("Casual Leave", state.balance!!.CASUAL.toInt(), 10, warningColor, Icons.Rounded.BeachAccess),
+                                    BalanceItem("Medical Leave", state.balance!!.MEDICAL.toInt(), 14, errorColor, Icons.Rounded.Medication)
                                 )
                                 
                                 LazyRow(

@@ -150,12 +150,14 @@ fun BalanceScreen(
                 }
 
                 items(balances) { balance ->
+                    val pending = uiState.pendingByType[balance.type] ?: 0.0
                     BalanceDetailCard(
                         balanceType = balance.type,
                         opening = balance.opening,
                         accrued = balance.accrued,
                         used = balance.used,
-                        closing = balance.closing
+                        closing = balance.closing,
+                        pending = pending
                     )
                 }
             }
@@ -169,7 +171,8 @@ private fun BalanceDetailCard(
     opening: Double,
     accrued: Double,
     used: Double,
-    closing: Double
+    closing: Double,
+    pending: Double
 ) {
     val (label, icon, accent) = when (balanceType.uppercase()) {
         "EARNED" -> Triple("Earned Leave", Icons.Rounded.FlightTakeoff, MaterialTheme.colorScheme.primary)
@@ -178,7 +181,11 @@ private fun BalanceDetailCard(
         else -> Triple(balanceType, Icons.Rounded.CalendarMonth, MaterialTheme.colorScheme.primary)
     }
     val total = opening + accrued
-    val progress = if (total > 0) (used / total).toFloat() else 0f
+    // Reversed Progress: Show Remaining Ration
+    // If total is 0, progress 0.
+    val progress = if (total > 0) (closing / total).toFloat() else 0f
+    
+    val projected = closing - pending
 
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -206,26 +213,43 @@ private fun BalanceDetailCard(
                         Text("${closing.toInt()} days available", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
-
             }
 
             Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             LinearProgressIndicator(
-                progress = progress,
+                progress = { progress },
                 color = accent,
                 trackColor = accent.copy(alpha = 0.15f),
-                modifier = Modifier.fillMaxWidth().height(8.dp)
+                modifier = Modifier.fillMaxWidth().height(8.dp),
+                strokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                BalanceStat(label = "Opening", value = opening)
-                BalanceStat(label = "Accrued", value = accrued, prefix = "+")
-                BalanceStat(label = "Used", value = used, prefix = "-")
-                BalanceStat(label = "Closing", value = closing)
+                Text(
+                    text = "Used: ${used.toInt()}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                
+                if (pending > 0) {
+                     Text(
+                        text = "Projected: ${projected.toInt()}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                
+                Text(
+                    text = "Total: ${total.toInt()}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }

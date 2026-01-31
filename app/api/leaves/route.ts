@@ -300,6 +300,10 @@ export async function POST(req: Request) {
         incidentDate: (formData as any).get("incidentDate")
           ? String((formData as any).get("incidentDate"))
           : undefined,
+        isHalfDay: toBoolean((formData as any).get("isHalfDay")),
+        halfDayPeriod: (formData as any).get("halfDayPeriod")
+          ? String((formData as any).get("halfDayPeriod"))
+          : undefined,
       };
 
       const cert = (formData as any).get("certificate");

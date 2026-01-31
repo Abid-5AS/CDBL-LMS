@@ -29,6 +29,7 @@ import com.cdbl.leavemanager.ui.leaves.components.LeaveCalendar
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.cdbl.leavemanager.R
 import java.time.LocalDate
@@ -51,6 +52,7 @@ fun ApplyLeaveScreen(
     var selectedTypeName by remember { mutableStateOf("Casual Leave") }
     var reason by remember { mutableStateOf("") }
     var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
+    var incidentDate by remember { mutableStateOf<LocalDate?>(null) }
     
     // Calendar State
     var currentMonth by remember { mutableStateOf(YearMonth.now()) }
@@ -66,6 +68,8 @@ fun ApplyLeaveScreen(
     ) { uri: Uri? ->
         selectedFileUri = uri
     }
+
+    val context = LocalContext.current
     
     // Leave Types - map policy codes to backend enum values
     val leaveTypes = remember(uiState.leavePolicies) {
@@ -80,6 +84,8 @@ fun ApplyLeaveScreen(
                 "6.15", "MATERNITY" -> Triple(Icons.Rounded.ChildCare, Color(0xFFec4899), "MATERNITY")
                 "6.16", "PATERNITY" -> Triple(Icons.Rounded.ChildFriendly, Color(0xFF3b82f6), "PATERNITY")
                 "STUDY" -> Triple(Icons.Rounded.School, Color(0xFF8b5cf6), "STUDY")
+                "SPECIAL_DISABILITY" -> Triple(Icons.Rounded.Accessible, Color(0xFF5b21b6), "SPECIAL_DISABILITY")
+                "QUARANTINE" -> Triple(Icons.Rounded.Masks, Color(0xFF0ea5e9), "QUARANTINE")
                 "SPECIAL" -> Triple(Icons.Rounded.Star, Color(0xFFf59e0b), "SPECIAL")
                 else -> Triple(Icons.Rounded.Event, Color.Gray, normalizedCode)
             }
@@ -115,26 +121,64 @@ fun ApplyLeaveScreen(
         viewModel.loadExistingLeaves(token)
     }
 
+    // Helper for checking weekends/holidays
+    val isWeekendOrHoliday = remember(uiState.holidays) {
+        { checkDate: LocalDate ->
+            val isFriSat = checkDate.dayOfWeek.value == 5 || checkDate.dayOfWeek.value == 6
+            val isHoliday = uiState.holidays.any { h -> h == checkDate }
+            isFriSat || isHoliday
+        }
+    }
+
     // Handle date selection
     val onDateSelected: (LocalDate) -> Unit = { date ->
-        when {
-            selectedStartDate == null -> {
-                selectedStartDate = date
-                selectedEndDate = null
-            }
-            selectedEndDate == null -> {
-                if (date.isBefore(selectedStartDate)) {
-                    selectedEndDate = selectedStartDate
+        val today = LocalDate.now()
+        val minAllowedDate = if (selectedTypeCode in listOf("MEDICAL", "EARNED", "QUARANTINE")) {
+            today.minusDays(30)
+        } else {
+            today
+        }
+
+        if (date.isBefore(minAllowedDate)) {
+            // TODO: Show toast/error that past dates are not allowed for this type
+        } else {
+            when {
+                selectedStartDate == null -> {
                     selectedStartDate = date
-                } else {
-                    selectedEndDate = date
+                    selectedEndDate = null
+                }
+                selectedEndDate == null -> {
+                    if (date.isBefore(selectedStartDate)) {
+                        selectedEndDate = selectedStartDate
+                        selectedStartDate = date
+                    } else {
+                        selectedEndDate = date
+                    }
+                    if (selectedStartDate != null && selectedEndDate != null && selectedStartDate != selectedEndDate) {
+                        isHalfDay = false
+                    }
+                }
+                else -> {
+                    selectedStartDate = date
+                    selectedEndDate = null
+                    isHalfDay = false
                 }
             }
-            else -> {
-                selectedStartDate = date
-                selectedEndDate = null
+        }
+    }
+
+    fun workingDaysUntil(start: LocalDate): Int {
+        val today = LocalDate.now()
+        if (!start.isAfter(today)) return 0
+        var count = 0
+        var cursor = today
+        while (cursor.isBefore(start)) {
+            cursor = cursor.plusDays(1)
+            if (!isWeekendOrHoliday(cursor)) {
+                count++
             }
         }
+        return count
     }
 
     Scaffold(
@@ -214,14 +258,94 @@ fun ApplyLeaveScreen(
                     
                     Button(
                         onClick = { 
-                            if (!uiState.isLoading && selectedStartDate != null) {
+                            val isMedical = selectedTypeCode == "MEDICAL"
+                            val requiresDoc = isMedical && daysDiff > 3
+                            
+                            val isCasual = selectedTypeCode == "CASUAL"
+                            val isWeekendStart = selectedStartDate?.let { isWeekendOrHoliday(it) } == true
+                            val isWeekendEnd = selectedEndDate?.let { isWeekendOrHoliday(it) } == true || (selectedEndDate == null && isWeekendStart)
+                            
+                            val casualViolation = isCasual && (daysDiff > 3 || isWeekendStart || isWeekendEnd)
+                            
+                            val extraLeaveViolation = (selectedTypeCode == "EXTRAWITHPAY" || selectedTypeCode == "EXTRAWITHOUTPAY") &&
+                                run {
+                                    val balance = uiState.balance
+                                    val casual = balance?.CASUAL ?: 0.0
+                                    val earned = balance?.EARNED ?: 0.0
+                                    val medical = balance?.MEDICAL ?: 0.0
+                                    casual > 2 || earned > 0 || medical > 5
+                                }
+
+                            val earnedNoticeViolation = selectedTypeCode == "EARNED" &&
+                                selectedStartDate != null &&
+                                workingDaysUntil(selectedStartDate!!) in 0..4
+
+                            val incidentViolation = selectedTypeCode == "SPECIAL_DISABILITY" && run {
+                                val start = selectedStartDate
+                                val incident = incidentDate
+                                if (start == null || incident == null) {
+                                    true
+                                } else {
+                                    val threeMonthsAgo = start.minusDays(90)
+                                    incident.isAfter(start) || incident.isAfter(LocalDate.now()) || incident.isBefore(threeMonthsAgo)
+                                }
+                            }
+
+                            val reasonTooShort = reason.trim().length < 10
+
+                            if (casualViolation) {
+                                // Block submit
+                            } else if (reasonTooShort) {
+                                // Block submit for reason length
+                            } else if (earnedNoticeViolation) {
+                                // Block submit for notice period
+                            } else if (extraLeaveViolation) {
+                                // Block submit for extraordinary leave rules
+                            } else if (incidentViolation) {
+                                // Block submit for incident date rules
+                            } else if (requiresDoc && selectedFileUri == null) {
+                                // Block submit for doc check
+                            } else if (!uiState.isLoading && selectedStartDate != null) {
                                 val formatter = DateTimeFormatter.ISO_LOCAL_DATE
                                 val start = selectedStartDate!!.format(formatter)
                                 val end = (selectedEndDate ?: selectedStartDate!!).format(formatter)
-                                viewModel.submitLeave(token, selectedTypeCode, start, end, reason, selectedFileUri, isHalfDay, if (isHalfDay) halfDayPeriod else null) 
+                                val incident = incidentDate?.format(formatter)
+                                viewModel.submitLeave(
+                                    token,
+                                    selectedTypeCode,
+                                    start,
+                                    end,
+                                    reason,
+                                    selectedFileUri,
+                                    isHalfDay,
+                                    if (isHalfDay) halfDayPeriod else null,
+                                    if (requiresDoc) true else null,
+                                    incident
+                                ) 
                             }
                         },
-                        enabled = !uiState.isLoading && selectedStartDate != null && reason.isNotBlank(),
+                        enabled = !uiState.isLoading && selectedStartDate != null && reason.isNotBlank() && 
+                                reason.trim().length >= 10 &&
+                                !(selectedTypeCode == "MEDICAL" && daysDiff > 3 && selectedFileUri == null) &&
+                                !(selectedTypeCode == "CASUAL" && (daysDiff > 3 || (selectedStartDate?.let { isWeekendOrHoliday(it) } == true) || (selectedEndDate?.let { isWeekendOrHoliday(it) } == true))) &&
+                                !((selectedTypeCode == "EXTRAWITHPAY" || selectedTypeCode == "EXTRAWITHOUTPAY") && run {
+                                    val balance = uiState.balance
+                                    val casual = balance?.CASUAL ?: 0.0
+                                    val earned = balance?.EARNED ?: 0.0
+                                    val medical = balance?.MEDICAL ?: 0.0
+                                    casual > 2 || earned > 0 || medical > 5
+                                }) &&
+                                !(selectedTypeCode == "EARNED" && selectedStartDate != null && workingDaysUntil(selectedStartDate!!) in 0..4) &&
+                                !(selectedTypeCode == "SPECIAL_DISABILITY" && run {
+                                    val start = selectedStartDate
+                                    val incident = incidentDate
+                                    if (start == null || incident == null) {
+                                        true
+                                    } else {
+                                        val threeMonthsAgo = start.minusDays(90)
+                                        incident.isAfter(start) || incident.isAfter(LocalDate.now()) || incident.isBefore(threeMonthsAgo)
+                                    }
+                                }),
                         modifier = Modifier.fillMaxWidth().height(52.dp),
                         shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
@@ -329,6 +453,12 @@ fun ApplyLeaveScreen(
                                     .clickable { 
                                         selectedTypeCode = item.apiCode
                                         selectedTypeName = item.name 
+                                        selectedFileUri = null
+                                        isHalfDay = false
+                                        halfDayPeriod = "AM"
+                                        if (item.apiCode != "SPECIAL_DISABILITY") {
+                                            incidentDate = null
+                                        }
                                     }
                                     .padding(horizontal = 14.dp, vertical = 10.dp)
                             ) {
@@ -429,6 +559,48 @@ fun ApplyLeaveScreen(
                 }
             }
 
+            // Incident Date (Special Disability)
+            if (selectedTypeCode == "SPECIAL_DISABILITY") {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)),
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            "Incident Date",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
+                        val displayDate = incidentDate?.format(formatter) ?: "Select incident date"
+                        Button(onClick = {
+                            val today = LocalDate.now()
+                            val initial = incidentDate ?: today
+                            android.app.DatePickerDialog(
+                                context,
+                                { _, year, month, dayOfMonth ->
+                                    incidentDate = LocalDate.of(year, month + 1, dayOfMonth)
+                                },
+                                initial.year,
+                                initial.monthValue - 1,
+                                initial.dayOfMonth
+                            ).show()
+                        }) {
+                            Text(displayDate)
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            "Incident must be within 3 months before the leave start date.",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
             // Reason Input
             Column {
                 Text(
@@ -439,7 +611,7 @@ fun ApplyLeaveScreen(
                 )
                 OutlinedTextField(
                     value = reason,
-                    onValueChange = { if (it.length <= 200) reason = it },
+                    onValueChange = { if (it.length <= 500) reason = it },
                     placeholder = { Text(stringResource(R.string.reason_hint)) },
                     modifier = Modifier.fillMaxWidth().height(120.dp),
                     shape = RoundedCornerShape(16.dp),
@@ -455,7 +627,7 @@ fun ApplyLeaveScreen(
                     horizontalArrangement = Arrangement.End
                 ) {
                     Text(
-                        "${reason.length}/200",
+                        "${reason.length}/500",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -507,6 +679,88 @@ fun ApplyLeaveScreen(
                         }
                     }
                 }
+            }
+            if (selectedTypeCode == "MEDICAL" && daysDiff > 3 && selectedFileUri == null) {
+                 Text(
+                    text = "* Medical certificate required for sick leave > 3 days",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = ErrorRed,
+                    modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+                )
+            }
+            if (selectedTypeCode == "EARNED" && selectedStartDate != null && workingDaysUntil(selectedStartDate!!) in 0..4) {
+                Text(
+                    text = "* Earned Leave requires at least 5 working days advance notice",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = ErrorRed,
+                    modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+                )
+            }
+            if ((selectedTypeCode == "EXTRAWITHPAY" || selectedTypeCode == "EXTRAWITHOUTPAY") && run {
+                val balance = uiState.balance
+                val casual = balance?.CASUAL ?: 0.0
+                val earned = balance?.EARNED ?: 0.0
+                val medical = balance?.MEDICAL ?: 0.0
+                casual > 2 || earned > 0 || medical > 5
+            }) {
+                Text(
+                    text = "* Extraordinary Leave requires other leave balances to be exhausted (Policy 6.26)",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = ErrorRed,
+                    modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+                )
+            }
+            if (selectedTypeCode == "SPECIAL_DISABILITY") {
+                val start = selectedStartDate
+                val incident = incidentDate
+                val incidentInvalid = if (start == null || incident == null) {
+                    true
+                } else {
+                    val threeMonthsAgo = start.minusDays(90)
+                    incident.isAfter(start) || incident.isAfter(LocalDate.now()) || incident.isBefore(threeMonthsAgo)
+                }
+                if (incidentInvalid) {
+                    Text(
+                        text = "* Incident date is required and must be within 3 months before leave start",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = ErrorRed,
+                        modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+                    )
+                }
+            }
+            if (selectedTypeCode == "CASUAL") {
+                if (daysDiff > 3) {
+                     Text(
+                        text = "* Casual Leave cannot exceed 3 consecutive days",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = ErrorRed,
+                        modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+                    )
+                }
+                if (selectedStartDate != null && isWeekendOrHoliday(selectedStartDate!!)) {
+                     Text(
+                        text = "* Casual Leave cannot start on a holiday/weekend",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = ErrorRed,
+                        modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+                    )
+                }
+                 if (selectedEndDate != null && isWeekendOrHoliday(selectedEndDate!!)) {
+                     Text(
+                        text = "* Casual Leave cannot end on a holiday/weekend",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = ErrorRed,
+                        modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+                    )
+                 }
+            }
+            if (reason.isNotBlank() && reason.trim().length < 10) {
+                Text(
+                    text = "* Reason must be at least 10 characters",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = ErrorRed,
+                    modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+                )
             }
 
             // Error Message

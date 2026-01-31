@@ -54,9 +54,7 @@ class NotificationsViewModel @Inject constructor(
 
     fun markAllAsRead(token: String) {
         viewModelScope.launch {
-            _uiState.value.items.filter { !it.read }.forEach { item ->
-                notificationsRepository.markRead(token, item.id)
-            }
+            notificationsRepository.markAllRead(token)
             loadNotifications(token)
         }
     }

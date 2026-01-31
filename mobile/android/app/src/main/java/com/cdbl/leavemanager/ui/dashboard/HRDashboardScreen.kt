@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,6 +27,12 @@ fun HRDashboardScreen(
     val uiState by viewModel.uiState.collectAsState()
     var stats by remember { mutableStateOf<com.cdbl.leavemanager.data.model.HRAdminStats?>(null) }
     var isLoadingStats by remember { mutableStateOf(true) }
+    
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+    val pendingBg = if (isDark) MaterialTheme.colorScheme.primaryContainer else Color(0xFFE3F2FD)
+    val pendingText = if (isDark) MaterialTheme.colorScheme.onPrimaryContainer else Color(0xFF1565C0)
+    val avgTimeBg = if (isDark) MaterialTheme.colorScheme.secondaryContainer else Color(0xFFE8F5E9)
+    val avgTimeText = if (isDark) MaterialTheme.colorScheme.onSecondaryContainer else Color(0xFF2E7D32)
 
     LaunchedEffect(Unit) {
         viewModel.loadDashboard(token) // Loads balance, analytics, etc.
@@ -69,16 +76,16 @@ fun HRDashboardScreen(
                             stats?.pendingRequests?.toString() ?: "0",
                             "Awaiting review",
                             Modifier.weight(1f),
-                            Color(0xFFE3F2FD),
-                            Color(0xFF1565C0)
+                            pendingBg,
+                            pendingText
                         )
                          KpiCard(
                             "Avg. Time",
                             "${stats?.avgApprovalTime ?: 0}d",
                             "Processing speed",
                             Modifier.weight(1f),
-                            Color(0xFFE8F5E9),
-                            Color(0xFF2E7D32)
+                            avgTimeBg,
+                            avgTimeText
                         )
                     }
                 }

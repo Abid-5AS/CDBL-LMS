@@ -71,9 +71,16 @@ class DashboardViewModel @Inject constructor(
                 val needsAttention = recentLeaves.count { leave -> leave.status == "RETURNED" || leave.status == "REJECTED" } // Expanded definition
                 val underReview = recentLeaves.count { leave -> leave.status == "PENDING" || leave.status == "SUBMITTED" }
                 val nextApproved = recentLeaves
-                    .filter { leave -> leave.status == "APPROVED" } // Filter for future dates if possible, assuming list is sorted or we parse dates
-                    // For simplicity in MVP, we take the first approved leave. 
-                    // Ideally check startDate > today.
+                    .filter { leave -> leave.status == "APPROVED" }
+                    .filter { leave ->
+                        try {
+                            val startDate = java.time.LocalDate.parse(leave.startDate.take(10))
+                            !startDate.isBefore(java.time.LocalDate.now())
+                        } catch (e: Exception) {
+                            false
+                        }
+                    }
+                    .sortedBy { leave -> leave.startDate }
                     .firstOrNull()
 
                 state.copy(

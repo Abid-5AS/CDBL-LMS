@@ -20,6 +20,7 @@ data class BalanceUiState(
     val isLoading: Boolean = false,
     val balance: BalanceDetailResponse? = null,
     val pendingDays: Int = 0,
+    val pendingByType: Map<String, Double> = emptyMap(),
     val error: String? = null,
     val useMock: Boolean = false
 )
@@ -39,16 +40,20 @@ class BalanceViewModel @Inject constructor(
 
             val balanceResult = dashboardRepository.getMyBalanceDetailed(token)
             val leaves = leaveRepository.getMyLeavesFlow(token).first()
-            val pendingDays = leaves
+            val pendingByType = leaves
                 .filter { it.status == "PENDING" || it.status == "SUBMITTED" }
-                .sumOf { it.workingDays ?: 0 }
+                .groupBy { it.type }
+                .mapValues { Entry -> Entry.value.sumOf { (it.workingDays ?: 0).toDouble() } }
+
+            val totalPending = pendingByType.values.sumOf { it.toInt() }
 
             balanceResult.onSuccess { data ->
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         balance = data,
-                        pendingDays = pendingDays,
+                        pendingDays = totalPending,
+                        pendingByType = pendingByType,
                         useMock = false
                     )
                 }
@@ -57,7 +62,8 @@ class BalanceViewModel @Inject constructor(
                     it.copy(
                         isLoading = false,
                         balance = null, // No fallback
-                        pendingDays = pendingDays,
+                        pendingDays = totalPending,
+                        pendingByType = pendingByType,
                         error = error.message,
                         useMock = false
                     )

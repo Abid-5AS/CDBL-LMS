@@ -24,8 +24,12 @@ struct LeaveRequest: Decodable, Identifiable {
     let department: String?
     let approverComments: String?
     let attachmentUrl: String?
+    let needsCertificate: Bool?
+    let certificateUrl: String?
+    let fitnessCertificateUrl: String?
     let isHalfDay: Bool?
     let halfDayType: String?
+    let halfDayPeriod: String?
     let totalDays: Double?
     
     var statusColor: Color {
@@ -111,8 +115,10 @@ struct ApplyLeaveRequest: Encodable {
     let startDate: String
     let endDate: String
     let reason: String
+    let needsCertificate: Bool?
+    let incidentDate: String?
     let isHalfDay: Bool?
-    let halfDayType: String?
+    let halfDayPeriod: String?
 }
 
 // MARK: - Leave Type
@@ -124,6 +130,11 @@ enum LeaveType: String, CaseIterable {
     case compensatory = "COMPENSATORY"
     case maternity = "MATERNITY"
     case paternity = "PATERNITY"
+    case extraWithPay = "EXTRAWITHPAY"
+    case extraWithoutPay = "EXTRAWITHOUTPAY"
+    case study = "STUDY"
+    case specialDisability = "SPECIAL_DISABILITY"
+    case quarantine = "QUARANTINE"
     case special = "SPECIAL"
     
     var displayName: String {
@@ -134,6 +145,11 @@ enum LeaveType: String, CaseIterable {
         case .compensatory: return "Compensatory Leave"
         case .maternity: return "Maternity Leave"
         case .paternity: return "Paternity Leave"
+        case .extraWithPay: return "Extraordinary Leave (Paid)"
+        case .extraWithoutPay: return "Extraordinary Leave (Unpaid)"
+        case .study: return "Study Leave"
+        case .specialDisability: return "Special Disability Leave"
+        case .quarantine: return "Quarantine Leave"
         case .special: return "Special Leave"
         }
     }
@@ -146,6 +162,11 @@ enum LeaveType: String, CaseIterable {
         case .compensatory: return "clock.arrow.circlepath"
         case .maternity: return "figure.and.child.holdinghands"
         case .paternity: return "figure.and.child.holdinghands"
+        case .extraWithPay: return "creditcard.fill"
+        case .extraWithoutPay: return "creditcard"
+        case .study: return "book.fill"
+        case .specialDisability: return "figure.roll"
+        case .quarantine: return "shield.lefthalf.filled"
         case .special: return "star.fill"
         }
     }
@@ -158,6 +179,11 @@ enum LeaveType: String, CaseIterable {
         case .compensatory: return .green
         case .maternity: return .pink
         case .paternity: return .blue
+        case .extraWithPay: return .orange
+        case .extraWithoutPay: return .gray
+        case .study: return .purple
+        case .specialDisability: return .brown
+        case .quarantine: return .teal
         case .special: return .purple
         }
     }
@@ -215,4 +241,12 @@ struct BalanceResponse: Decodable {
     let EARNED: Double?
     let CASUAL: Double?
     let MEDICAL: Double?
+    let MATERNITY: Double?
+    let PATERNITY: Double?
+    let STUDY: Double?
+    let SPECIAL: Double?
+    let SPECIAL_DISABILITY: Double?
+    let QUARANTINE: Double?
+    let EXTRAWITHPAY: Double?
+    let EXTRAWITHOUTPAY: Double?
 }

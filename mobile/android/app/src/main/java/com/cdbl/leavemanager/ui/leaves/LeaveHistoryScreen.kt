@@ -302,6 +302,7 @@ fun LeaveHistoryCardNew(leave: com.cdbl.leavemanager.data.model.LeaveRequest, on
                         "EXTRAWITHPAY" -> "Extra Leave (Paid)"
                         "EXTRAWITHOUTPAY" -> "Extra Leave (Unpaid)"
                         "STUDY" -> "Study Leave"
+                        "SPECIAL_DISABILITY" -> "Special Disability Leave"
                         "SPECIAL" -> "Special Leave"
                         "QUARANTINE" -> "Quarantine Leave"
                         else -> leave.type

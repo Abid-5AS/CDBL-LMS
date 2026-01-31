@@ -9,7 +9,21 @@ struct LeavesListView: View {
     @State private var selectedLeave: LeaveRequest?
     
     private let statusOptions = ["", "PENDING", "APPROVED", "REJECTED", "RETURNED", "CANCELLED"]
-    private let typeOptions = ["", "EARNED", "CASUAL", "MEDICAL", "COMPENSATORY"]
+    private let typeOptions = [
+        "",
+        "EARNED",
+        "CASUAL",
+        "MEDICAL",
+        "COMPENSATORY",
+        "MATERNITY",
+        "PATERNITY",
+        "STUDY",
+        "EXTRAWITHPAY",
+        "EXTRAWITHOUTPAY",
+        "SPECIAL_DISABILITY",
+        "QUARANTINE",
+        "SPECIAL"
+    ]
     
     var body: some View {
         VStack(spacing: 0) {

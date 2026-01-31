@@ -15,24 +15,47 @@ struct AppNotification: Decodable, Identifiable {
     let title: String
     let message: String
     let type: String
-    let isRead: Bool
+    let read: Bool
+    let readAt: String?
     let createdAt: String
     let data: NotificationData?
+    let leaveId: Int?
+    let link: String?
+    
+    var isRead: Bool {
+        read
+    }
     
     var icon: String {
         switch type.uppercased() {
+        case "LEAVE_SUBMITTED":
+            return "paperplane.fill"
         case "LEAVE_APPROVED":
             return "checkmark.circle.fill"
         case "LEAVE_REJECTED":
             return "xmark.circle.fill"
         case "LEAVE_RETURNED":
             return "arrow.uturn.backward.circle.fill"
-        case "LEAVE_REQUEST":
-            return "doc.text.fill"
+        case "LEAVE_FORWARDED":
+            return "arrowshape.turn.up.right.fill"
+        case "LEAVE_CANCELLED":
+            return "minus.circle.fill"
+        case "LEAVE_CANCELLATION_REQUESTED":
+            return "exclamationmark.triangle.fill"
+        case "LEAVE_APPROACHING":
+            return "calendar.badge.clock"
+        case "LEAVE_TYPE_CHANGED":
+            return "arrow.triangle.2.circlepath"
         case "APPROVAL_REQUIRED":
             return "exclamationmark.circle.fill"
-        case "REMINDER":
-            return "bell.fill"
+        case "ENCASHMENT_APPROVED":
+            return "checkmark.seal.fill"
+        case "ENCASHMENT_REJECTED":
+            return "xmark.seal.fill"
+        case "SYSTEM_ANNOUNCEMENT":
+            return "megaphone.fill"
+        case "LEAVE_REQUEST":
+            return "doc.text.fill"
         default:
             return "bell.fill"
         }
@@ -40,18 +63,34 @@ struct AppNotification: Decodable, Identifiable {
     
     var iconColor: Color {
         switch type.uppercased() {
+        case "LEAVE_SUBMITTED":
+            return .blue
         case "LEAVE_APPROVED":
             return .green
         case "LEAVE_REJECTED":
             return .red
         case "LEAVE_RETURNED":
             return .orange
-        case "LEAVE_REQUEST":
-            return .blue
+        case "LEAVE_FORWARDED":
+            return .indigo
+        case "LEAVE_CANCELLED":
+            return .gray
+        case "LEAVE_CANCELLATION_REQUESTED":
+            return .orange
+        case "LEAVE_APPROACHING":
+            return .teal
+        case "LEAVE_TYPE_CHANGED":
+            return .purple
         case "APPROVAL_REQUIRED":
             return .purple
-        case "REMINDER":
+        case "ENCASHMENT_APPROVED":
+            return .green
+        case "ENCASHMENT_REJECTED":
+            return .red
+        case "SYSTEM_ANNOUNCEMENT":
             return .yellow
+        case "LEAVE_REQUEST":
+            return .blue
         default:
             return .gray
         }

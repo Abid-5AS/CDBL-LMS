@@ -16,6 +16,7 @@ import com.cdbl.leavemanager.ui.dashboard.HRDashboardScreen
 import com.cdbl.leavemanager.ui.dashboard.HRHeadDashboardScreen
 import com.cdbl.leavemanager.ui.dashboard.ManagerDashboardScreen
 import com.cdbl.leavemanager.ui.leaves.LeaveHistoryScreen
+import com.cdbl.leavemanager.ui.leaves.EditLeaveScreen
 import com.cdbl.leavemanager.ui.profile.ProfileScreen
 import com.cdbl.leavemanager.ui.approvals.ApprovalScreen
 import com.cdbl.leavemanager.ui.balance.BalanceScreen
@@ -109,7 +110,10 @@ fun CDBLNavHost(
         }
 
         composable(TopLevelDestination.APPROVALS.route) {
-            ApprovalScreen(token = token)
+            ApprovalScreen(
+                token = token,
+                onNavigateToDetail = { id -> navController.navigate("leaves/$id?manager=1") }
+            )
         }
 
         composable(TopLevelDestination.TEAM.route) {
@@ -286,17 +290,33 @@ fun CDBLNavHost(
         }
 
         composable(
-            route = "leaves/{leaveId}",
+            route = "leaves/{leaveId}?manager={manager}",
             arguments = listOf(
-                navArgument("leaveId") { type = NavType.IntType }
+                navArgument("leaveId") { type = NavType.IntType },
+                navArgument("manager") { type = NavType.IntType; defaultValue = 0 }
             )
         ) { backStackEntry ->
             val leaveId = backStackEntry.arguments?.getInt("leaveId") ?: 0
+            val isManager = (backStackEntry.arguments?.getInt("manager") ?: 0) == 1
             com.cdbl.leavemanager.ui.leaves.LeaveDetailScreen(
                 token = token,
                 leaveId = leaveId,
-                isManagerView = false,
-                onBackClick = { navController.popBackStack() }
+                isManagerView = isManager,
+                onBackClick = { navController.popBackStack() },
+                onEditClick = { id -> navController.navigate("leaves/$id/edit") }
+            )
+        }
+
+        composable(
+            route = "leaves/{leaveId}/edit",
+            arguments = listOf(navArgument("leaveId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val leaveId = backStackEntry.arguments?.getInt("leaveId") ?: 0
+            EditLeaveScreen(
+                token = token,
+                leaveId = leaveId,
+                onBackClick = { navController.popBackStack() },
+                onSuccess = { navController.popBackStack() }
             )
         }
 

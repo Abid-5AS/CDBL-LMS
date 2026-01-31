@@ -42,9 +42,96 @@ actor LeaveService {
     
     // MARK: - Apply Leave
     
-    func applyLeave(_ request: ApplyLeaveRequest) async throws -> APIResponse<LeaveRequest> {
+    func applyLeave(
+        _ request: ApplyLeaveRequest,
+        file: APIClient.MultipartFile? = nil
+    ) async throws -> APIResponse<LeaveRequest> {
+        if let file = file {
+            var fields: [String: String] = [
+                "type": request.type,
+                "startDate": request.startDate,
+                "endDate": request.endDate,
+                "reason": request.reason
+            ]
+            if let needsCertificate = request.needsCertificate {
+                fields["needsCertificate"] = String(needsCertificate)
+            }
+            if let incidentDate = request.incidentDate {
+                fields["incidentDate"] = incidentDate
+            }
+            if let isHalfDay = request.isHalfDay {
+                fields["isHalfDay"] = String(isHalfDay)
+            }
+            if let halfDayPeriod = request.halfDayPeriod {
+                fields["halfDayPeriod"] = halfDayPeriod
+            }
+
+            return try await client.requestMultipart(
+                "leaves",
+                method: .post,
+                fields: fields,
+                file: file
+            )
+        }
+
         return try await client.request(
             "leaves",
+            method: .post,
+            body: request
+        )
+    }
+
+    // MARK: - Upload Certificate
+
+    func uploadCertificate(
+        leaveId: Int,
+        type: String,
+        file: APIClient.MultipartFile
+    ) async throws -> APIResponse<LeaveRequest> {
+        return try await client.requestMultipart(
+            "leaves/\(leaveId)/certificate",
+            method: .post,
+            fields: ["type": type],
+            file: file
+        )
+    }
+
+    // MARK: - Resubmit Leave
+
+    func resubmitLeave(
+        leaveId: Int,
+        request: ApplyLeaveRequest,
+        file: APIClient.MultipartFile? = nil
+    ) async throws -> APIResponse<LeaveRequest> {
+        if let file = file {
+            var fields: [String: String] = [
+                "type": request.type,
+                "startDate": request.startDate,
+                "endDate": request.endDate,
+                "reason": request.reason
+            ]
+            if let needsCertificate = request.needsCertificate {
+                fields["needsCertificate"] = String(needsCertificate)
+            }
+            if let incidentDate = request.incidentDate {
+                 fields["incidentDate"] = incidentDate
+            }
+            if let isHalfDay = request.isHalfDay {
+                 fields["isHalfDay"] = String(isHalfDay)
+            }
+            if let halfDayPeriod = request.halfDayPeriod {
+                 fields["halfDayPeriod"] = halfDayPeriod
+            }
+            return try await client.requestMultipart(
+                "leaves/\(leaveId)/resubmit",
+                method: .post,
+                fields: fields,
+                file: file
+            )
+        }
+
+        return try await client.request(
+            "leaves/\(leaveId)/resubmit",
             method: .post,
             body: request
         )
@@ -54,17 +141,20 @@ actor LeaveService {
     
     func cancelLeave(id: Int) async throws -> APIResponse<LeaveRequest> {
         return try await client.request(
-            "leaves/\(id)/cancel",
-            method: .post
+            "leaves/\(id)",
+            method: .patch,
+            body: ["reason": "Cancelled by user"]
         )
     }
     
     // MARK: - Withdraw Leave
     
     func withdrawLeave(id: Int) async throws -> APIResponse<LeaveRequest> {
+        // Withdraw usually implies same as cancel in this system context if early
         return try await client.request(
-            "leaves/\(id)/withdraw",
-            method: .post
+            "leaves/\(id)",
+            method: .patch,
+            body: ["reason": "Withdrawn by user"]
         )
     }
     

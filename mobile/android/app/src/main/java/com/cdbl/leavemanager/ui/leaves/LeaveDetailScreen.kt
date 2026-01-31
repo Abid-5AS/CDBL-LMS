@@ -31,9 +31,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.res.stringResource
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import android.net.Uri
 import com.cdbl.leavemanager.R
 import com.cdbl.leavemanager.ui.theme.*
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +46,7 @@ fun LeaveDetailScreen(
     leaveId: Int,
     isManagerView: Boolean = false,
     onBackClick: () -> Unit,
+    onEditClick: (Int) -> Unit = {},
     viewModel: LeaveDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -49,6 +54,17 @@ fun LeaveDetailScreen(
     // Action Dialog State
     var actionDialogType by remember { mutableStateOf<ActionType?>(null) }
     var actionComment by remember { mutableStateOf("") }
+    var pendingUploadType by remember { mutableStateOf<String?>(null) }
+
+    val fileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        val type = pendingUploadType
+        if (uri != null && type != null) {
+            viewModel.uploadCertificate(token, leaveId, type, uri)
+        }
+        pendingUploadType = null
+    }
     
     LaunchedEffect(leaveId) {
         viewModel.loadDetails(token, leaveId)
@@ -95,15 +111,24 @@ fun LeaveDetailScreen(
             
             // Show Approve/Reject buttons if Manager View and Pending Status
             val canApprove = isManagerView && leave?.status == "PENDING"
+            val canEdit = !isManagerView && leave?.status == "RETURNED"
             
-            if (canCancel || canApprove) {
+            if (canCancel || canApprove || canEdit) {
                 Column(
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.surface)
                         .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
                         .padding(16.dp)
                 ) {
-                    if (canApprove) {
+                    if (canEdit) {
+                        Button(
+                            onClick = { onEditClick(leaveId) },
+                            modifier = Modifier.fillMaxWidth().height(48.dp),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text("Edit & Resubmit", fontWeight = FontWeight.Bold)
+                        }
+                    } else if (canApprove) {
                         // Primary Actions: Reject / Approve
                         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             Button(
@@ -281,9 +306,42 @@ fun LeaveDetailScreen(
                     InfoCard(
                         title = stringResource(R.string.duration_label),
                         value = stringResource(R.string.days_count, (leave.workingDays ?: 0).toString()),
+                        icon = Icons.Rounded.Timer,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Date Range and Approver
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    // Formatted Date Range
+                    val dateRange = try {
+                        val start = LocalDate.parse(leave.startDate.take(10)).format(java.time.format.DateTimeFormatter.ofPattern("MMM dd"))
+                        val end = LocalDate.parse(leave.endDate.take(10)).format(java.time.format.DateTimeFormatter.ofPattern("MMM dd"))
+                        if (start == end) start else "$start - $end"
+                    } catch (e: Exception) {
+                        leave.startDate.take(10)
+                    }
+                    
+                    InfoCard(
+                        title = "Date Range",
+                        value = dateRange,
                         icon = Icons.Rounded.DateRange,
                         modifier = Modifier.weight(1f)
                     )
+                    
+                    if (leave.managerName != null) {
+                        InfoCard(
+                            title = "Approver",
+                            value = leave.managerName,
+                            icon = Icons.Rounded.CheckCircle, // Or person icon
+                            modifier = Modifier.weight(1f)
+                        )
+                    } else {
+                         // Spacer to keep grid alignment if needed, or just standard flow
+                         Spacer(modifier = Modifier.weight(1f))
+                    }
                 }
     
                 Spacer(modifier = Modifier.height(24.dp))
@@ -308,7 +366,47 @@ fun LeaveDetailScreen(
                 }
     
                 Spacer(modifier = Modifier.height(32.dp))
-    
+
+                // Certificates
+                val days = leave.workingDays?.takeIf { it > 0 } ?: run {
+                    try {
+                        val start = LocalDate.parse(leave.startDate.take(10))
+                        val end = LocalDate.parse(leave.endDate.take(10))
+                        (ChronoUnit.DAYS.between(start, end) + 1).toInt()
+                    } catch (e: Exception) {
+                        1
+                    }
+                }
+                val isMedical = leave.type.equals("MEDICAL", ignoreCase = true)
+                val needsMedicalCert = isMedical && days > 3
+                val needsFitnessCert = isMedical && days > 7
+                if (needsMedicalCert || needsFitnessCert) {
+                    Text("Certificates", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    if (needsMedicalCert) {
+                        CertificateCard(
+                            title = "Medical Certificate",
+                            isUploaded = !leave.certificateUrl.isNullOrBlank(),
+                            onUploadClick = {
+                                pendingUploadType = "medical"
+                                fileLauncher.launch("*/*")
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                    if (needsFitnessCert) {
+                        CertificateCard(
+                            title = "Fitness Certificate",
+                            isUploaded = !leave.fitnessCertificateUrl.isNullOrBlank(),
+                            onUploadClick = {
+                                pendingUploadType = "fitness"
+                                fileLauncher.launch("*/*")
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                }
+
                 // Timeline
                 Text(stringResource(R.string.timeline), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(16.dp))
@@ -463,6 +561,40 @@ fun TimelineItem(event: TimelineEvent) {
             Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(modifier = Modifier.height(4.dp))
             Text(event.time, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+        }
+    }
+}
+
+@Composable
+fun CertificateCard(
+    title: String,
+    isUploaded: Boolean,
+    onUploadClick: () -> Unit
+) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                if (isUploaded) "Uploaded" else "Missing",
+                style = MaterialTheme.typography.bodySmall,
+                color = if (isUploaded) SuccessGreen else ErrorRed
+            )
+            if (!isUploaded) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Button(
+                    onClick = onUploadClick,
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Upload")
+                }
+            }
         }
     }
 }

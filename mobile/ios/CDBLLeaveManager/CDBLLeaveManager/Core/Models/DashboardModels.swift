@@ -27,9 +27,14 @@ struct DashboardLeaveBalance: Decodable {
     let MATERNITY: Double?
     let PATERNITY: Double?
     let SPECIAL: Double?
+    let STUDY: Double?
+    let SPECIAL_DISABILITY: Double?
+    let QUARANTINE: Double?
+    let EXTRAWITHPAY: Double?
+    let EXTRAWITHOUTPAY: Double?
     
     enum CodingKeys: String, CodingKey {
-        case EARNED, CASUAL, MEDICAL, COMPENSATORY, MATERNITY, PATERNITY, SPECIAL
+        case EARNED, CASUAL, MEDICAL, COMPENSATORY, MATERNITY, PATERNITY, SPECIAL, STUDY, SPECIAL_DISABILITY, QUARANTINE, EXTRAWITHPAY, EXTRAWITHOUTPAY
     }
     
     init(from decoder: Decoder) throws {
@@ -41,6 +46,11 @@ struct DashboardLeaveBalance: Decodable {
         MATERNITY = try? container.decode(Double.self, forKey: .MATERNITY)
         PATERNITY = try? container.decode(Double.self, forKey: .PATERNITY)
         SPECIAL = try? container.decode(Double.self, forKey: .SPECIAL)
+        STUDY = try? container.decode(Double.self, forKey: .STUDY)
+        SPECIAL_DISABILITY = try? container.decode(Double.self, forKey: .SPECIAL_DISABILITY)
+        QUARANTINE = try? container.decode(Double.self, forKey: .QUARANTINE)
+        EXTRAWITHPAY = try? container.decode(Double.self, forKey: .EXTRAWITHPAY)
+        EXTRAWITHOUTPAY = try? container.decode(Double.self, forKey: .EXTRAWITHOUTPAY)
     }
 }
 

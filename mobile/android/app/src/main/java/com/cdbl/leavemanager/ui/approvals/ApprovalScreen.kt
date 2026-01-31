@@ -3,6 +3,7 @@ package com.cdbl.leavemanager.ui.approvals
 import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -47,6 +48,7 @@ enum class ApprovalFilter(val label: String) {
 fun ApprovalScreen(
     token: String,
     onBackClick: (() -> Unit)? = null,
+    onNavigateToDetail: (Int) -> Unit = {},
     viewModel: ApprovalViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -88,22 +90,47 @@ fun ApprovalScreen(
         if (currentAction != null) {
             val (action, item) = currentAction
             val isApprove = action == "approve"
+            val isReturn = action == "return"
             
             AlertDialog(
                 onDismissRequest = { showDialog = false },
                 icon = {
                     Icon(
-                        if (isApprove) Icons.Rounded.CheckCircle else Icons.Rounded.Cancel,
+                        when {
+                            isApprove -> Icons.Rounded.CheckCircle
+                            isReturn -> Icons.Rounded.Undo
+                            else -> Icons.Rounded.Cancel
+                        },
                         contentDescription = null,
-                        tint = if (isApprove) SuccessGreen else ErrorRed,
+                        tint = when {
+                            isApprove -> SuccessGreen
+                            isReturn -> WarningAmber
+                            else -> ErrorRed
+                        },
                         modifier = Modifier.size(48.dp)
                     )
                 },
-                title = { Text(if (isApprove) "Approve Request" else "Reject Request") },
+                title = { 
+                    Text(
+                        when (action) {
+                            "approve" -> "Approve Request"
+                            "reject" -> "Reject Request"
+                            "forward" -> "Forward Request"
+                            "return" -> "Return Request"
+                            else -> "Action"
+                        }
+                    ) 
+                },
                 text = {
                     Column {
                         Text(
-                            "You are about to ${if (isApprove) "approve" else "reject"} leave request from ${item.requestedByName}.",
+                            when (action) {
+                                "approve" -> "You are about to approve leave request from ${item.requestedByName}."
+                                "reject" -> "You are about to reject leave request from ${item.requestedByName}."
+                                "forward" -> "Forward ${item.requestedByName}'s leave request to the next approver."
+                                "return" -> "Return ${item.requestedByName}'s leave request for modification."
+                                else -> "Proceed with action."
+                            },
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Spacer(modifier = Modifier.height(16.dp))
@@ -111,7 +138,15 @@ fun ApprovalScreen(
                             value = comment,
                             onValueChange = { comment = it },
                             modifier = Modifier.fillMaxWidth(),
-                            label = { Text(if (isApprove) "Comment (optional)" else "Reason (required)") },
+                            label = { 
+                                Text(
+                                    when (action) {
+                                        "approve", "forward" -> "Comment (optional)"
+                                        "reject", "return" -> "Reason (required)"
+                                        else -> "Comment"
+                                    }
+                                ) 
+                            },
                             placeholder = { Text("Enter your comment...") },
                             minLines = 3,
                             shape = RoundedCornerShape(12.dp)
@@ -126,11 +161,24 @@ fun ApprovalScreen(
                             comment = ""
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isApprove) SuccessGreen else ErrorRed
+                            containerColor = when (action) {
+                                "approve" -> SuccessGreen
+                                "forward" -> MaterialTheme.colorScheme.primary
+                                "return" -> WarningAmber
+                                else -> ErrorRed
+                            }
                         ),
-                        enabled = isApprove || comment.isNotBlank()
+                        enabled = isApprove || action == "forward" || comment.isNotBlank()
                     ) {
-                        Text(if (isApprove) "Approve" else "Reject")
+                        Text(
+                            when (action) {
+                                "approve" -> "Approve"
+                                "reject" -> "Reject"
+                                "forward" -> "Forward"
+                                "return" -> "Return"
+                                else -> "Submit"
+                            }
+                        )
                     }
                 },
                 dismissButton = {
@@ -292,6 +340,7 @@ fun ApprovalScreen(
                         ) {
                             EnhancedApprovalCard(
                                 item = item,
+                                onView = { onNavigateToDetail(item.id.toInt()) },
                                 onApprove = { 
                                     selectedAction = "approve" to item
                                     showDialog = true 
@@ -302,6 +351,10 @@ fun ApprovalScreen(
                                 },
                                 onForward = {
                                     selectedAction = "forward" to item
+                                    showDialog = true
+                                },
+                                onReturn = {
+                                    selectedAction = "return" to item
                                     showDialog = true
                                 }
                             )
@@ -362,7 +415,10 @@ fun ApprovalScreen(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(uiState.historyItems, key = { it.id }) { item ->
-                                HistoryApprovalCard(item = item)
+                                HistoryApprovalCard(
+                                    item = item,
+                                    onView = { onNavigateToDetail(item.id.toInt()) }
+                                )
                             }
                         }
                     }
@@ -418,9 +474,11 @@ private fun EmptyApprovalsView(filter: ApprovalFilter) {
 @Composable
 fun EnhancedApprovalCard(
     item: ApprovalItem,
+    onView: () -> Unit,
     onApprove: () -> Unit,
     onReject: () -> Unit,
-    onForward: () -> Unit
+    onForward: () -> Unit,
+    onReturn: () -> Unit
 ) {
     val isUrgent = isUrgent(item)
     val leaveTypeColor = getLeaveTypeColor(item.type)
@@ -438,7 +496,7 @@ fun EnhancedApprovalCard(
             if (isUrgent) ErrorRed.copy(alpha = 0.3f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
         ),
         shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().clickable { onView() }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             // Header Row
@@ -573,43 +631,65 @@ fun EnhancedApprovalCard(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Action Buttons
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                OutlinedButton(
-                    onClick = onReject,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = ErrorRed),
-                    border = BorderStroke(1.dp, ErrorRed.copy(alpha = 0.5f)),
-                    shape = RoundedCornerShape(12.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Icon(Icons.Rounded.Close, contentDescription = "Reject", modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Reject", style = MaterialTheme.typography.labelMedium)
+                    OutlinedButton(
+                        onClick = onReject,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = ErrorRed),
+                        border = BorderStroke(1.dp, ErrorRed.copy(alpha = 0.5f)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Rounded.Close, contentDescription = "Reject", modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Reject", style = MaterialTheme.typography.labelMedium)
+                    }
+
+                    OutlinedButton(
+                        onClick = onReturn,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = WarningAmber),
+                        border = BorderStroke(1.dp, WarningAmber.copy(alpha = 0.5f)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Rounded.Undo, contentDescription = "Return", modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Return", style = MaterialTheme.typography.labelMedium)
+                    }
                 }
-                
-                OutlinedButton(
-                    onClick = onForward,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = WarningAmber),
-                    border = BorderStroke(1.dp, WarningAmber.copy(alpha = 0.5f)),
-                    shape = RoundedCornerShape(12.dp)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Icon(Icons.Rounded.Forward, contentDescription = "Forward", modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Forward", style = MaterialTheme.typography.labelMedium)
-                }
-                
-                Button(
-                    onClick = onApprove,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(Icons.Rounded.Check, contentDescription = "Approve", modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Approve", style = MaterialTheme.typography.labelMedium)
+                    OutlinedButton(
+                        onClick = onForward,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Rounded.Forward, contentDescription = "Forward", modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Forward", style = MaterialTheme.typography.labelMedium)
+                    }
+
+                    Button(
+                        onClick = onApprove,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Rounded.Check, contentDescription = "Approve", modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Approve", style = MaterialTheme.typography.labelMedium)
+                    }
                 }
             }
         }
@@ -645,7 +725,7 @@ private fun formatDate(dateString: String): String {
 }
 
 @Composable
-fun HistoryApprovalCard(item: ApprovalHistoryItem) {
+fun HistoryApprovalCard(item: ApprovalHistoryItem, onView: () -> Unit) {
     val statusColor = when(item.status.uppercase()) {
         "APPROVED" -> SuccessGreen
         "REJECTED" -> ErrorRed
@@ -665,7 +745,7 @@ fun HistoryApprovalCard(item: ApprovalHistoryItem) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)),
         shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().clickable { onView() }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             // Header: Requester + Status

@@ -2,6 +2,7 @@ package com.cdbl.leavemanager.ui.dashboard
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -33,6 +34,12 @@ fun ManagerDashboardScreen(
 ) {
     var managerData by remember { mutableStateOf<ManagerLeaveResponse?>(null) }
     var isLoading by remember { mutableStateOf(true) }
+    
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+    val warningColor = if (isDark) Color(0xFFFCD34D) else WarningAmber
+    val successColor = if (isDark) Color(0xFF34D399) else SuccessGreen
+    val errorColor = MaterialTheme.colorScheme.error
+    val primaryColor = MaterialTheme.colorScheme.primary
 
     LaunchedEffect(Unit) {
         viewModel.fetchManagerPendingLeaves(token).onSuccess {
@@ -56,7 +63,7 @@ fun ManagerDashboardScreen(
                             title = "Pending", 
                             value = counts.pending.toString(), 
                             icon = Icons.Rounded.Assignment, 
-                            color = WarningAmber, 
+                            color = warningColor, 
                             modifier = Modifier.weight(1f), 
                             onClick = onNavigateToApprovals
                         )
@@ -64,7 +71,7 @@ fun ManagerDashboardScreen(
                             title = "Forwarded", 
                             value = counts.forwarded.toString(), 
                             icon = Icons.Rounded.CheckCircle, 
-                            color = SuccessGreen, 
+                            color = successColor, 
                             modifier = Modifier.weight(1f), 
                             onClick = {}
                         )
@@ -74,7 +81,7 @@ fun ManagerDashboardScreen(
                             title = "Returned", 
                             value = counts.returned.toString(), 
                             icon = Icons.Rounded.RotateLeft, 
-                            color = Indigo600, 
+                            color = primaryColor, 
                             modifier = Modifier.weight(1f), 
                             onClick = {}
                         )
@@ -82,7 +89,7 @@ fun ManagerDashboardScreen(
                             title = "Cancelled", 
                             value = counts.cancelled.toString(), 
                             icon = Icons.Rounded.Close, 
-                            color = ErrorRed, 
+                            color = errorColor, 
                             modifier = Modifier.weight(1f), 
                             onClick = {}
                         )

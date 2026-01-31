@@ -26,7 +26,8 @@ data class LeaveDetailUiState(
 @HiltViewModel
 class LeaveDetailViewModel @Inject constructor(
     private val leaveRepository: LeaveRepository,
-    private val approvalRepository: ApprovalRepository
+    private val approvalRepository: ApprovalRepository,
+    @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LeaveDetailUiState())
@@ -72,18 +73,11 @@ class LeaveDetailViewModel @Inject constructor(
         submitDecision(token, leaveId, "RETURN", comment)
     }
 
+
     fun cancelLeave(token: String, leaveId: Int, reason: String) {
-        // Use fullCancelLeave for backwards compatibility
-        fullCancelLeave(token, leaveId, reason)
-    }
-
-    // Full Cancel - for entire leave request 
-    // PENDING/SUBMITTED: immediate cancellation
-    // APPROVED: changes to CANCELLATION_REQUESTED (needs approval)
-    fun fullCancelLeave(token: String, leaveId: Int, reason: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmitting = true) }
-            val result = leaveRepository.fullCancelLeave(token, leaveId, reason)
+            val result = leaveRepository.cancelLeave(token, leaveId, reason)
             
             result.onSuccess { response ->
                 _uiState.update { it.copy(isSubmitting = false, actionSuccess = true) }
@@ -95,22 +89,10 @@ class LeaveDetailViewModel @Inject constructor(
         }
     }
 
-    // Partial Cancel - for APPROVED leaves that have started but not ended
-    // Cancels only future days
-    fun partialCancelLeave(token: String, leaveId: Int, reason: String) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isSubmitting = true) }
-            val result = leaveRepository.partialCancelLeave(token, leaveId, reason)
-            
-            result.onSuccess { response ->
-                _uiState.update { it.copy(isSubmitting = false, actionSuccess = true) }
-                // Reload details to show updated status
-                loadDetails(token, leaveId)
-            }.onFailure { e ->
-                _uiState.update { it.copy(isSubmitting = false, error = e.message) }
-            }
-        }
-    }
+    // Aliases for backward compatibility with UI
+    fun fullCancelLeave(token: String, leaveId: Int, reason: String) = cancelLeave(token, leaveId, reason)
+    fun partialCancelLeave(token: String, leaveId: Int, reason: String) = cancelLeave(token, leaveId, reason)
+
 
     private fun submitDecision(token: String, leaveId: Int, decision: String, comment: String?) {
         viewModelScope.launch {
@@ -124,6 +106,41 @@ class LeaveDetailViewModel @Inject constructor(
             }.onFailure { e ->
                 _uiState.update { it.copy(isSubmitting = false, error = e.message) }
             }
+        }
+    }
+
+    fun uploadCertificate(token: String, leaveId: Int, type: String, uri: android.net.Uri) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSubmitting = true) }
+            val file = getFileFromUri(uri)
+            if (file == null) {
+                _uiState.update { it.copy(isSubmitting = false, error = "Unable to read certificate file") }
+                return@launch
+            }
+            val result = leaveRepository.uploadCertificate(token, leaveId, type, file)
+            result.onSuccess {
+                _uiState.update { it.copy(isSubmitting = false) }
+                loadDetails(token, leaveId)
+            }.onFailure { e ->
+                _uiState.update { it.copy(isSubmitting = false, error = e.message) }
+            }
+        }
+    }
+
+    private fun getFileFromUri(uri: android.net.Uri): java.io.File? {
+        return try {
+            val contentResolver = context.contentResolver
+            val fileName = "leave_certificate_${System.currentTimeMillis()}"
+            val tempFile = java.io.File(context.cacheDir, fileName)
+            contentResolver.openInputStream(uri)?.use { inputStream ->
+                java.io.FileOutputStream(tempFile).use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            }
+            tempFile
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 }

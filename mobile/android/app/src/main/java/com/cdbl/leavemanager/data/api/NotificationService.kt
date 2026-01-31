@@ -21,4 +21,9 @@ interface NotificationService {
         @Header("Authorization") token: String,
         @Path("id") id: Int
     ): Response<Map<String, Any>>
+
+    @POST("notifications/read-all")
+    suspend fun markAllRead(
+        @Header("Authorization") token: String
+    ): Response<Map<String, Any>>
 }

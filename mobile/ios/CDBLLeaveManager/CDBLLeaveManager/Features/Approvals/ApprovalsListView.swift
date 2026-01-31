@@ -11,36 +11,51 @@ import Combine
 struct ApprovalsListView: View {
     @StateObject private var viewModel = ApprovalsViewModel()
     @State private var selectedSegment = 0
+    @State private var selectedApproval: ApprovalSelection?
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header
-            header
-            
-            // Segmented Control
-            segmentedControl
-            
-            // Content
-            if viewModel.isLoading && viewModel.pendingApprovals.isEmpty {
-                LoadingView()
-            } else if let error = viewModel.error, viewModel.pendingApprovals.isEmpty {
-                ErrorView(error) {
-                    Task { await viewModel.loadApprovals() }
-                }
-            } else if viewModel.currentApprovals.isEmpty {
+        NavigationStack {
+            VStack(spacing: 0) {
+                // Header
+                header
+                
+                // Segmented Control
+                segmentedControl
+                
+                // Content
+                if viewModel.isLoading && viewModel.pendingApprovals.isEmpty {
+                    LoadingView()
+                } else if let error = viewModel.error, viewModel.pendingApprovals.isEmpty {
+                    ErrorView(error) {
+                        Task { await viewModel.loadApprovals() }
+                    }
+            } else if (selectedSegment == 0 ? viewModel.pendingApprovals : viewModel.approvalHistory).isEmpty {
                 EmptyStateView(
                     icon: "checkmark.circle",
                     title: "All Caught Up!",
-                    message: selectedSegment == 0 ? 
+                    message: selectedSegment == 0 ?
                         "No pending approvals at the moment." :
                         "No approval history to show."
                 )
             } else {
                 approvalsList
             }
-        }
-        .task {
-            await viewModel.loadApprovals()
+            }
+            .task {
+                await viewModel.loadApprovals()
+            }
+            .sheet(item: $viewModel.actionSheetItem) { item in
+                actionSheet(
+                    title: item.title,
+                    buttonTitle: item.buttonTitle,
+                    commentText: item.commentBinding,
+                    onSubmit: item.onSubmit,
+                    onCancel: { viewModel.actionSheetItem = nil }
+                )
+            }
+            .sheet(item: $selectedApproval) { selection in
+                ApprovalDetailView(approvalId: selection.id)
+            }
         }
     }
     
@@ -107,19 +122,44 @@ struct ApprovalsListView: View {
     private var approvalsList: some View {
         ScrollView {
             LazyVStack(spacing: 12) {
-                ForEach(viewModel.currentApprovals) { approval in
+                ForEach(selectedSegment == 0 ? viewModel.pendingApprovals : viewModel.approvalHistory) { approval in
                     ApprovalDetailCard(
                         approval: approval,
                         showActions: selectedSegment == 0,
+                        onView: { selectedApproval = ApprovalSelection(id: approval.id) },
                         onApprove: {
                             Task { await viewModel.approve(approval) }
                         },
                         onReject: {
                             viewModel.selectedForAction = approval
-                            viewModel.showRejectSheet = true
+                            viewModel.actionSheetItem = ActionSheetItem(
+                                title: "Reject Leave",
+                                buttonTitle: "Reject",
+                                commentBinding: $viewModel.rejectComments,
+                                onSubmit: {
+                                    if let selected = viewModel.selectedForAction {
+                                        Task { await viewModel.reject(selected, comments: viewModel.rejectComments) }
+                                    }
+                                    viewModel.actionSheetItem = nil
+                                }
+                            )
                         },
                         onForward: {
                             Task { await viewModel.forward(approval) }
+                        },
+                        onReturn: {
+                            viewModel.selectedForAction = approval
+                            viewModel.actionSheetItem = ActionSheetItem(
+                                title: "Return for Modification",
+                                buttonTitle: "Return",
+                                commentBinding: $viewModel.returnComments,
+                                onSubmit: {
+                                    if let selected = viewModel.selectedForAction {
+                                        Task { await viewModel.returnLeave(selected, comments: viewModel.returnComments) }
+                                    }
+                                    viewModel.actionSheetItem = nil
+                                }
+                            )
                         }
                     )
                 }
@@ -135,9 +175,11 @@ struct ApprovalsListView: View {
 struct ApprovalDetailCard: View {
     let approval: PendingApproval
     let showActions: Bool
+    let onView: () -> Void
     let onApprove: () -> Void
     let onReject: () -> Void
     let onForward: () -> Void
+    let onReturn: () -> Void
     
     var body: some View {
         VStack(spacing: 16) {
@@ -208,7 +250,20 @@ struct ApprovalDetailCard: View {
                     }
                     .buttonStyle(.bordered)
                     .foregroundStyle(.red)
-                    
+
+                    Button(action: onReturn) {
+                        HStack {
+                            Image(systemName: "arrow.uturn.backward")
+                            Text("Return")
+                        }
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                    }
+                    .buttonStyle(.bordered)
+                    .foregroundStyle(.orange)
+
                     Button(action: onForward) {
                         HStack {
                             Image(systemName: "arrow.right.circle")
@@ -239,6 +294,9 @@ struct ApprovalDetailCard: View {
         }
         .padding()
         .surfaceBackground(.regular, in: RoundedRectangle(cornerRadius: 20))
+        .onTapGesture {
+            onView()
+        }
     }
     
     private var initials: String {
@@ -247,6 +305,41 @@ struct ApprovalDetailCard: View {
             return "\(parts[0].prefix(1))\(parts[1].prefix(1))".uppercased()
         }
         return approval.employeeName.prefix(2).uppercased()
+    }
+}
+
+struct ApprovalSelection: Identifiable {
+    let id: Int
+}
+
+private func actionSheet(
+    title: String,
+    buttonTitle: String,
+    commentText: Binding<String>,
+    onSubmit: @escaping () -> Void,
+    onCancel: @escaping () -> Void
+) -> some View {
+    NavigationStack {
+        Form {
+            Section("Comments") {
+                TextField("Add a comment", text: commentText)
+            }
+        }
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button("Cancel") {
+                    onCancel()
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(buttonTitle) {
+                    onSubmit()
+                }
+                .disabled(commentText.wrappedValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+        }
     }
 }
 
@@ -285,8 +378,9 @@ final class ApprovalsViewModel: ObservableObject {
     @Published var pendingApprovals: [PendingApproval] = []
     @Published var approvalHistory: [PendingApproval] = []
     @Published var selectedForAction: PendingApproval?
-    @Published var showRejectSheet = false
     @Published var rejectComments = ""
+    @Published var returnComments = ""
+    @Published var actionSheetItem: ActionSheetItem?
     
     private let approvalService = ApprovalService.shared
     
@@ -339,11 +433,35 @@ final class ApprovalsViewModel: ObservableObject {
         do {
             _ = try await approvalService.rejectLeave(id: approval.id, comments: comments)
             pendingApprovals.removeAll { $0.id == approval.id }
-            showRejectSheet = false
             rejectComments = ""
         } catch {
             self.error = error.localizedDescription
         }
+    }
+
+    func returnLeave(_ approval: PendingApproval, comments: String) async {
+        do {
+            _ = try await approvalService.returnLeave(id: approval.id, comments: comments)
+            pendingApprovals.removeAll { $0.id == approval.id }
+            returnComments = ""
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+}
+
+final class ActionSheetItem: Identifiable {
+    let id = UUID()
+    let title: String
+    let buttonTitle: String
+    let commentBinding: Binding<String>
+    let onSubmit: () -> Void
+
+    init(title: String, buttonTitle: String, commentBinding: Binding<String>, onSubmit: @escaping () -> Void) {
+        self.title = title
+        self.buttonTitle = buttonTitle
+        self.commentBinding = commentBinding
+        self.onSubmit = onSubmit
     }
 }
 

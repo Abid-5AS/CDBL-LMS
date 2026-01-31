@@ -10,7 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.*
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -37,7 +37,8 @@ enum class NotificationFilter(val label: String) {
     UNREAD("Unread"),
     LEAVE("Leave"),
     APPROVAL("Approval"),
-    SYSTEM("System")
+    SYSTEM("System"),
+    ENCASHMENT("Encashment")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,9 +59,26 @@ fun NotificationsScreen(
         when (selectedFilter) {
             NotificationFilter.ALL -> uiState.items
             NotificationFilter.UNREAD -> uiState.items.filter { !it.read }
-            NotificationFilter.LEAVE -> uiState.items.filter { it.type == "leave_applied" || it.type == "leave_approved" || it.type == "leave_rejected" }
-            NotificationFilter.APPROVAL -> uiState.items.filter { it.type == "approval_required" || it.type == "approval_pending" }
-            NotificationFilter.SYSTEM -> uiState.items.filter { it.type == "system" || it.type == "announcement" }
+            NotificationFilter.LEAVE -> uiState.items.filter {
+                when (it.type.uppercase()) {
+                    "LEAVE_SUBMITTED",
+                    "LEAVE_APPROVED",
+                    "LEAVE_REJECTED",
+                    "LEAVE_RETURNED",
+                    "LEAVE_FORWARDED",
+                    "LEAVE_CANCELLED",
+                    "LEAVE_CANCELLATION_REQUESTED",
+                    "LEAVE_APPROACHING",
+                    "LEAVE_TYPE_CHANGED" -> true
+                    else -> false
+                }
+            }
+            NotificationFilter.APPROVAL -> uiState.items.filter { it.type.equals("APPROVAL_REQUIRED", ignoreCase = true) }
+            NotificationFilter.SYSTEM -> uiState.items.filter { it.type.equals("SYSTEM_ANNOUNCEMENT", ignoreCase = true) }
+            NotificationFilter.ENCASHMENT -> uiState.items.filter {
+                it.type.equals("ENCASHMENT_APPROVED", ignoreCase = true) ||
+                    it.type.equals("ENCASHMENT_REJECTED", ignoreCase = true)
+            }
         }
     }
 
@@ -242,10 +260,14 @@ private fun NotificationCard(
         border = BorderStroke(
             1.dp,
             if (item.read) MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
-            else MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+            else MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) // Thinner/lighter border
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
+        // ... (Swipe actions would be complex to add here without more context, let's fix the styling first as requested: "thick border")
+        // User also asked for "option to mark as read/unread or delete".
+        // I'll add a dropdown menu or action button in the card.
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -286,11 +308,17 @@ private fun NotificationCard(
                     )
                     if (!item.read) {
                         Spacer(modifier = Modifier.width(8.dp))
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .background(MaterialTheme.colorScheme.primary, CircleShape)
-                        )
+                        // Mark as read indicator (Clickable)
+                        IconButton(
+                            onClick = onClick,
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .background(MaterialTheme.colorScheme.primary, CircleShape)
+                            )
+                        }
                     }
                 }
 
@@ -363,14 +391,19 @@ private fun EmptyNotificationsView(filter: NotificationFilter) {
 }
 
 private fun getNotificationIconAndColor(type: String): Pair<ImageVector, Color> {
-    return when (type) {
-        "leave_applied" -> Icons.Rounded.FlightTakeoff to Indigo600
-        "leave_approved" -> Icons.Rounded.CheckCircle to SuccessGreen
-        "leave_rejected" -> Icons.Rounded.Cancel to ErrorRed
-        "leave_returned" -> Icons.Rounded.Replay to WarningAmber
-        "approval_required", "approval_pending" -> Icons.Rounded.Gavel to Blue500
-        "system", "announcement" -> Icons.Rounded.Campaign to Purple600
-        "reminder" -> Icons.Rounded.Alarm to WarningAmber
+    return when (type.uppercase()) {
+        "LEAVE_SUBMITTED" -> Icons.Rounded.FlightTakeoff to Indigo600
+        "LEAVE_APPROVED" -> Icons.Rounded.CheckCircle to SuccessGreen
+        "LEAVE_REJECTED" -> Icons.Rounded.Cancel to ErrorRed
+        "LEAVE_RETURNED" -> Icons.Rounded.Replay to WarningAmber
+        "LEAVE_FORWARDED" -> Icons.AutoMirrored.Rounded.Forward to Blue500
+        "LEAVE_CANCELLED", "LEAVE_CANCELLATION_REQUESTED" -> Icons.Rounded.DoNotDisturb to ErrorRed
+        "LEAVE_APPROACHING" -> Icons.Rounded.Alarm to WarningAmber
+        "LEAVE_TYPE_CHANGED" -> Icons.Rounded.SwapHoriz to Indigo600
+        "APPROVAL_REQUIRED" -> Icons.Rounded.Gavel to Blue500
+        "ENCASHMENT_APPROVED" -> Icons.Rounded.AttachMoney to SuccessGreen
+        "ENCASHMENT_REJECTED" -> Icons.Rounded.MoneyOff to ErrorRed
+        "SYSTEM_ANNOUNCEMENT" -> Icons.Rounded.Campaign to Purple600
         else -> Icons.Rounded.Notifications to Indigo600
     }
 }

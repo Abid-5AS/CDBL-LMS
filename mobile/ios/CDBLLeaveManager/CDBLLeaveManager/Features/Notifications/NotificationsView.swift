@@ -146,20 +146,58 @@ final class NotificationsViewModel: ObservableObject {
         isLoading = true
         error = nil
         
-        // TODO: Implement notification API service
-        // For now, use mock data
-        await MainActor.run {
+        do {
+            let response = try await NotificationService.shared.getNotifications(limit: 50, unreadOnly: false)
+            notifications = response.allNotifications
             isLoading = false
-            // Mock notifications would go here
+        } catch {
+            self.error = error.localizedDescription
+            isLoading = false
         }
     }
     
     func markAsRead(_ notification: AppNotification) async {
-        // TODO: Implement mark as read API
+        do {
+            try await NotificationService.shared.markAsRead(id: notification.id)
+            if let index = notifications.firstIndex(where: { $0.id == notification.id }) {
+                notifications[index] = AppNotification(
+                    id: notifications[index].id,
+                    title: notifications[index].title,
+                    message: notifications[index].message,
+                    type: notifications[index].type,
+                    read: true,
+                    readAt: notifications[index].readAt,
+                    createdAt: notifications[index].createdAt,
+                    data: notifications[index].data,
+                    leaveId: notifications[index].leaveId,
+                    link: notifications[index].link
+                )
+            }
+        } catch {
+            self.error = error.localizedDescription
+        }
     }
     
     func markAllRead() async {
-        // TODO: Implement mark all as read API
+        do {
+            try await NotificationService.shared.markAllAsRead()
+            notifications = notifications.map { item in
+                AppNotification(
+                    id: item.id,
+                    title: item.title,
+                    message: item.message,
+                    type: item.type,
+                    read: true,
+                    readAt: item.readAt,
+                    createdAt: item.createdAt,
+                    data: item.data,
+                    leaveId: item.leaveId,
+                    link: item.link
+                )
+            }
+        } catch {
+            self.error = error.localizedDescription
+        }
     }
 }
 

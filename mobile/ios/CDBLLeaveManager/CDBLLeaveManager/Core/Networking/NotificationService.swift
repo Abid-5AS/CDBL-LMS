@@ -15,22 +15,11 @@ actor NotificationService {
     
     // MARK: - Get Notifications
     
-    func getNotifications(page: Int = 1, pageSize: Int = 20) async throws -> NotificationListResponse {
+    func getNotifications(limit: Int = 20, unreadOnly: Bool = false) async throws -> NotificationListResponse {
         return try await apiClient.request(
-            "notifications?page=\(page)&pageSize=\(pageSize)",
+            "notifications/latest?limit=\(limit)&unreadOnly=\(unreadOnly)",
             method: .get
         )
-    }
-    
-    func getUnreadCount() async throws -> Int {
-        struct Response: Decodable {
-            let count: Int
-        }
-        let response: Response = try await apiClient.request(
-            "notifications/unread-count",
-            method: .get
-        )
-        return response.count
     }
     
     // MARK: - Mark as Read
@@ -38,14 +27,14 @@ actor NotificationService {
     func markAsRead(id: Int) async throws {
         let _: EmptyResponse = try await apiClient.request(
             "notifications/\(id)/read",
-            method: .patch
+            method: .post
         )
     }
     
     func markAllAsRead() async throws {
         let _: EmptyResponse = try await apiClient.request(
             "notifications/read-all",
-            method: .patch
+            method: .post
         )
     }
     

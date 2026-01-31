@@ -127,11 +127,26 @@ class LeaveRepository @Inject constructor(
                 val startPart = request.startDate.toRequestBody("text/plain".toMediaTypeOrNull())
                 val endPart = request.endDate.toRequestBody("text/plain".toMediaTypeOrNull())
                 val reasonPart = request.reason.toRequestBody("text/plain".toMediaTypeOrNull())
+                val needsCertificatePart = request.needsCertificate?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
+                val incidentDatePart = request.incidentDate?.toRequestBody("text/plain".toMediaTypeOrNull())
+                val isHalfDayPart = request.isHalfDay?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
+                val halfDayPeriodPart = request.halfDayPeriod?.toRequestBody("text/plain".toMediaTypeOrNull())
 
                 val fileReq = file.asRequestBody("application/octet-stream".toMediaTypeOrNull())
-                val filePart = MultipartBody.Part.createFormData("file", file.name, fileReq)
+                val filePart = MultipartBody.Part.createFormData("certificate", file.name, fileReq)
 
-                leaveService.createLeaveMultipart("Bearer $token", typePart, startPart, endPart, reasonPart, filePart)
+                leaveService.createLeaveMultipart(
+                    "Bearer $token",
+                    typePart,
+                    startPart,
+                    endPart,
+                    reasonPart,
+                    needsCertificatePart,
+                    incidentDatePart,
+                    isHalfDayPart,
+                    halfDayPeriodPart,
+                    filePart
+                )
             } else {
                 leaveService.createLeave("Bearer $token", request)
             }
@@ -199,6 +214,68 @@ class LeaveRepository @Inject constructor(
         }
     }
 
+    suspend fun uploadCertificate(
+        token: String,
+        leaveId: Int,
+        certificateType: String,
+        file: File
+    ): Result<Unit> {
+        return try {
+            val typePart = certificateType.toRequestBody("text/plain".toMediaTypeOrNull())
+            val fileReq = file.asRequestBody("application/octet-stream".toMediaTypeOrNull())
+            val filePart = MultipartBody.Part.createFormData("certificate", file.name, fileReq)
+            val response = leaveService.uploadCertificate("Bearer $token", leaveId, typePart, filePart)
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception(response.errorBody()?.string() ?: "Failed to upload certificate"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun resubmitLeave(
+        token: String,
+        leaveId: Int,
+        request: com.cdbl.leavemanager.data.model.ApplyLeaveRequest,
+        file: File? = null
+    ): Result<Unit> {
+        return try {
+            val response = if (file != null) {
+                val typePart = request.type.toRequestBody("text/plain".toMediaTypeOrNull())
+                val startPart = request.startDate.toRequestBody("text/plain".toMediaTypeOrNull())
+                val endPart = request.endDate.toRequestBody("text/plain".toMediaTypeOrNull())
+                val reasonPart = request.reason.toRequestBody("text/plain".toMediaTypeOrNull())
+                val needsCertificatePart = request.needsCertificate?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
+                val fileReq = file.asRequestBody("application/octet-stream".toMediaTypeOrNull())
+                val filePart = MultipartBody.Part.createFormData("certificate", file.name, fileReq)
+
+                leaveService.resubmitLeaveMultipart(
+                    "Bearer $token",
+                    leaveId,
+                    typePart,
+                    startPart,
+                    endPart,
+                    reasonPart,
+                    needsCertificatePart,
+                    filePart
+                )
+            } else {
+                leaveService.resubmitLeave("Bearer $token", leaveId, request)
+            }
+
+            if (response.isSuccessful) {
+                syncLeaves(token)
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception(response.errorBody()?.string() ?: "Failed to resubmit leave"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun getManagerPendingLeaves(token: String): Result<com.cdbl.leavemanager.data.model.ManagerLeaveResponse> {
         return try {
             val response = leaveService.getManagerPendingLeaves("Bearer $token")
@@ -212,53 +289,19 @@ class LeaveRepository @Inject constructor(
         }
     }
 
-    suspend fun cancelLeave(token: String, leaveId: Int, reason: String): Result<String> {
+    // Cancel Leave - PATCH /leaves/{id}
+    // PENDING/SUBMITTED: immediate cancellation → CANCELLED
+    // APPROVED: request cancellation → CANCELLATION_REQUESTED (needs HR approval)
+    // Both full and partial cancel now use the same endpoint
+    suspend fun cancelLeave(token: String, leaveId: Int, reason: String): Result<com.cdbl.leavemanager.data.api.CancelLeaveResponse> {
         return try {
             val request = com.cdbl.leavemanager.data.api.CancelLeaveRequest(reason)
             val response = leaveService.cancelLeave("Bearer $token", leaveId, request)
             if (response.isSuccessful && response.body()?.ok == true) {
                 syncLeaves(token) // Refresh leaves after cancel
-                Result.success(response.body()?.message ?: "Leave cancelled successfully")
-            } else {
-                val errorMsg = response.body()?.error ?: "Failed to cancel leave"
-                Result.failure(Exception(errorMsg))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    // Full Cancel - DELETE /leaves/{id}
-    // For PENDING/SUBMITTED: immediate cancellation
-    // For APPROVED: changes to CANCELLATION_REQUESTED (needs approval)
-    suspend fun fullCancelLeave(token: String, leaveId: Int, reason: String): Result<com.cdbl.leavemanager.data.api.FullCancelResponse> {
-        return try {
-            val request = com.cdbl.leavemanager.data.api.FullCancelRequest(reason)
-            val response = leaveService.fullCancelLeave("Bearer $token", leaveId, request)
-            if (response.isSuccessful && response.body()?.ok == true) {
-                syncLeaves(token) // Refresh leaves after cancel
                 Result.success(response.body()!!)
             } else {
-                val errorMsg = response.body()?.message ?: response.body()?.error ?: "Failed to cancel leave"
-                Result.failure(Exception(errorMsg))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    // Partial Cancel - POST /leaves/{id}/partial-cancel
-    // Only for APPROVED leaves that have started but not ended
-    // Cancels future days only
-    suspend fun partialCancelLeave(token: String, leaveId: Int, reason: String): Result<com.cdbl.leavemanager.data.api.PartialCancelResponse> {
-        return try {
-            val request = com.cdbl.leavemanager.data.api.PartialCancelRequest(reason)
-            val response = leaveService.partialCancelLeave("Bearer $token", leaveId, request)
-            if (response.isSuccessful && response.body()?.ok == true) {
-                syncLeaves(token) // Refresh leaves after cancel
-                Result.success(response.body()!!)
-            } else {
-                val errorMsg = response.body()?.message ?: response.body()?.error ?: "Failed to request partial cancellation"
+                val errorMsg = response.body()?.error ?: response.body()?.message ?: "Failed to cancel leave"
                 Result.failure(Exception(errorMsg))
             }
         } catch (e: Exception) {

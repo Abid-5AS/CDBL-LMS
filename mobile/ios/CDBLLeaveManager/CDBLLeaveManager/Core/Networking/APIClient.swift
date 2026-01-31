@@ -194,6 +194,83 @@ final class APIClient: Sendable {
         
         return data
     }
+
+    struct MultipartFile: Sendable {
+        let fieldName: String
+        let fileName: String
+        let mimeType: String
+        let data: Data
+    }
+
+    func requestMultipart<T: Decodable>(
+        _ endpoint: String,
+        method: HTTPMethod = .post,
+        fields: [String: String],
+        file: MultipartFile? = nil,
+        headers: [String: String]? = nil,
+        requiresAuth: Bool = true
+    ) async throws -> T {
+        guard let url = URL(string: APIConfiguration.baseURL + endpoint) else {
+            throw APIError.invalidURL
+        }
+
+        let boundary = "Boundary-\(UUID().uuidString)"
+        var request = URLRequest(url: url)
+        request.httpMethod = method.rawValue
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        headers?.forEach { request.setValue($1, forHTTPHeaderField: $0) }
+
+        if requiresAuth, let token = TokenManager.shared.getToken() {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        var body = Data()
+        for (key, value) in fields {
+            body.append("--\(boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
+            body.append("\(value)\r\n".data(using: .utf8)!)
+        }
+
+        if let file = file {
+            body.append("--\(boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"\(file.fieldName)\"; filename=\"\(file.fileName)\"\r\n".data(using: .utf8)!)
+            body.append("Content-Type: \(file.mimeType)\r\n\r\n".data(using: .utf8)!)
+            body.append(file.data)
+            body.append("\r\n".data(using: .utf8)!)
+        }
+
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+        request.httpBody = body
+
+        let (data, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.unknown
+        }
+
+        switch httpResponse.statusCode {
+        case 200...299:
+            break
+        case 401:
+            TokenManager.shared.clearToken()
+            throw APIError.unauthorized
+        case 403:
+            throw APIError.forbidden
+        case 404:
+            throw APIError.notFound
+        default:
+            let errorMessage = try? decoder.decode(ErrorResponse.self, from: data).error
+            throw APIError.serverError(httpResponse.statusCode, errorMessage)
+        }
+
+        do {
+            return try decoder.decode(T.self, from: data)
+        } catch {
+            throw APIError.decodingError(error)
+        }
+    }
 }
 
 // MARK: - Error Response
