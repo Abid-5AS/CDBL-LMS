@@ -60,7 +60,7 @@ const itemVariants = {
   },
 };
 
-export function CorporateManagerDashboard() {
+export function ManagerDashboard() {
   const router = useRouter();
   const user = useUser();
   const username = user?.name || "Dept. Head";

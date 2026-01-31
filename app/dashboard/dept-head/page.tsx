@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { CorporateManagerDashboard } from "@/components/dashboards/dept-head/CorporateManagerDashboard";
+import { ManagerDashboard } from "@/components/dashboards/dept-head/ManagerDashboard";
 import { DashboardLoadingFallback } from "../shared/LoadingFallback";
 
 async function DeptHeadDashboardContent() {
@@ -16,7 +16,7 @@ async function DeptHeadDashboardContent() {
     redirect("/dashboard");
   }
 
-  return <CorporateManagerDashboard />;
+  return <ManagerDashboard />;
 }
 
 export default function DeptHeadDashboardPage() {

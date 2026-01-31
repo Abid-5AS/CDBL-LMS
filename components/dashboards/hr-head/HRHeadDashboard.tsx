@@ -134,7 +134,7 @@ interface HRHeadStats {
  * ✅ Solid white cards with slate borders
  * ✅ Compact density (p-4 cards, smaller text)
  */
-export function CorporateHRHeadDashboard() {
+export function HRHeadDashboard() {
   const { data: stats, isLoading, error } = useSWR<HRHeadStats>(
     "/api/dashboard/hr-head/stats",
     apiFetcher,

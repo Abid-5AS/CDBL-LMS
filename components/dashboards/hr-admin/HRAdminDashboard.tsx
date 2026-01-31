@@ -117,7 +117,7 @@ type CorporateHRAdminDashboardProps = {
  * ✅ Solid white cards with slate borders
  * ✅ Compact density (p-4 cards, smaller text)
  */
-export function CorporateHRAdminDashboard({
+export function HRAdminDashboard({
   initialStats,
   initialKpis,
   initialEncashmentRequests = [],

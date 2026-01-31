@@ -44,7 +44,7 @@ import { useMounted } from "@/hooks";
 import { useEmployeeDashboardData } from "./hooks/useEmployeeDashboardData";
 
 // Corporate Active Request Tracker (restyled)
-import { CorporateActiveRequestTracker } from "./components/CorporateActiveRequestTracker";
+import { ActiveRequestTracker } from "./components/ActiveRequestTracker";
 
 type CorporateEmployeeDashboardProps = {
   username: string;
@@ -77,7 +77,7 @@ type CorporateEmployeeDashboardProps = {
  * ✅ Corporate color palette (slate-900 primary)
  * ✅ Colored top borders for leave type identification
  */
-export function CorporateEmployeeDashboard({
+export function EmployeeDashboard({
   username,
 }: CorporateEmployeeDashboardProps) {
   const router = useRouter();
@@ -231,7 +231,7 @@ export function CorporateEmployeeDashboard({
         </section>
 
         {/* Active Request Tracker */}
-        <CorporateActiveRequestTracker
+        <ActiveRequestTracker
           leaves={leaves || []}
           isLoading={isLoadingLeaves}
           density={density}
