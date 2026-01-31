@@ -8,7 +8,7 @@ import { NotificationProvider } from "@/context/NotificationContext";
 import { ToastContainer } from "@/components/notifications";
 import { HydrationWarningSuppress } from "@/components/HydrationWarningSuppress";
 import { OfflineIndicator } from "@/components/offline/OfflineIndicator";
-import { InstallPrompt } from "@/components/offline/InstallPrompt";
+
 import { SWRProvider } from "@/components/providers/SWRProvider";
 
 export const metadata: Metadata = {
@@ -72,7 +72,7 @@ export default function RootLayout({
                 <SWRProvider>
                   <main id="main-content">{children}</main>
                   <OfflineIndicator />
-                  <InstallPrompt />
+
                 </SWRProvider>
               </LayoutProvider>
               {/* Toast notification container */}

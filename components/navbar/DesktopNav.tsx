@@ -80,8 +80,8 @@ export function DesktopNav({
                       className={cn(
                         "group/link relative flex flex-nowrap items-center gap-2 overflow-hidden whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 border border-transparent",
                         active
-                          ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md hover:shadow-lg dark:from-indigo-500 dark:to-violet-500"
-                          : "text-muted-foreground hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-950/30 dark:hover:text-indigo-400"
+                          ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       )}
                     >
                       <Icon
@@ -142,7 +142,7 @@ export function DesktopNav({
         {!["CEO", "SYSTEM_ADMIN"].includes(user.role) && (
           <Button
             size="sm"
-            className="gap-1.5 shadow-md bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+            className="gap-1.5 shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 border-0 transition-all duration-200 hover:shadow-md"
             leftIcon={<CalendarPlus className="h-4 w-4" />}
             onClick={() => router.push("/leaves/apply")}
             aria-label="Apply for leave"

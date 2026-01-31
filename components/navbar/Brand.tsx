@@ -18,7 +18,7 @@ export function Brand({ compact = false }: { compact?: boolean }) {
       <div className="relative flex items-center justify-center">
         <div className="absolute inset-0 bg-primary/20 blur-lg rounded-full" />
         <div className={cn(
-          "relative flex items-center justify-center rounded-xl bg-gradient-to-br from-primary to-indigo-600 text-white shadow-lg shadow-primary/25",
+          "relative flex items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md shadow-primary/20",
           compact ? "h-8 w-8" : "h-10 w-10"
         )}>
           <Hexagon className={cn("fill-white/10 stroke-[2.5px]", compact ? "h-5 w-5" : "h-6 w-6")} />
@@ -38,7 +38,7 @@ export function Brand({ compact = false }: { compact?: boolean }) {
             CDBL
           </span>
           <span className={cn(
-            "font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary to-indigo-500",
+            "font-semibold text-primary",
             compact ? "text-sm" : "text-base"
           )}>
             LMS
