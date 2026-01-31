@@ -484,69 +484,14 @@ export function CorporateCEODashboard() {
                   </Card>
                 )}
 
-                {/* Quick Financial Summary */}
+                {/* Quick Financial Summary (REMOVED - No Salary Data) */}
+                {/* 
                 {!isLoading && stats && (
                   <Card className="border-border shadow-sm rounded-md">
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <CardTitle className={cn(typography.cardTitle, "flex items-center gap-2")}>
-                          <DollarSign className="h-4 w-4" />
-                          Financial Summary
-                        </CardTitle>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button
-                              aria-label="Cost methodology information"
-                              className="hover:opacity-70 transition-opacity"
-                            >
-                              <Info className="h-4 w-4 text-slate-400" />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom" className="max-w-xs">
-                            <p className="text-sm font-semibold mb-1">Methodology:</p>
-                            <p className="text-sm mb-2">
-                              Leave cost is estimated using average employee daily rate multiplied by total approved leave days YTD.
-                            </p>
-                            <p className="text-sm font-semibold mb-1">Calculation:</p>
-                            <p className="text-sm mb-2">
-                              Cost = (Total Leave Days × Avg Daily Rate). Daily rate assumes standard salary distribution across workforce.
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              This is an estimate. Actual cost may vary based on employee salaries and benefits.
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div>
-                        <p className={typography.kpiNumber}>
-                          ${((stats.estimatedCost || 0) / 1000).toFixed(1)}K
-                        </p>
-                        <p className="text-xs text-muted-foreground">Estimated YTD cost</p>
-                      </div>
-                      <Separator />
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Leave Days</span>
-                          <span className="font-medium">{stats.totalLeaveDays || 0}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">YoY Growth</span>
-                          <span
-                            className={cn(
-                              "font-medium",
-                              stats.yoyGrowth > 10 && "text-amber-600"
-                            )}
-                          >
-                            {(stats.yoyGrowth ?? 0) > 0 ? "+" : ""}
-                            {stats.yoyGrowth ?? 0}%
-                          </span>
-                        </div>
-                      </div>
-                    </CardContent>
+                    ...
                   </Card>
                 )}
+                */}
               </div>
             </div>
           </section>

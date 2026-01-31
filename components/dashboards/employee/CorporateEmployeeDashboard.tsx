@@ -111,9 +111,9 @@ export function CorporateEmployeeDashboard({
     if (!balanceData || !balanceData.balances) {
         // Fallback or loading state
         return {
-            CASUAL: { total: 14, available: 0, used: 0 },
-            MEDICAL: { total: 14, available: 0, used: 0 },
-            EARNED: { total: 20, available: 0, used: 0 }
+            CASUAL: { total: 0, available: 0, used: 0 },
+            MEDICAL: { total: 0, available: 0, used: 0 },
+            EARNED: { total: 0, available: 0, used: 0 }
         };
     }
     

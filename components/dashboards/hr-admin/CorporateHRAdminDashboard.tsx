@@ -53,7 +53,7 @@ import { PendingLeaveRequestsTable } from "./sections/PendingApprovals";
 import { CancellationRequestsPanel } from "./sections/CancellationRequests";
 import { DashboardCardSkeleton } from "@/components/shared/skeletons";
 
-import { EncashmentRequests } from "./sections/EncashmentRequests";
+// import { EncashmentRequests } from "./sections/EncashmentRequests";
 
 export interface HRAdminStats {
   // Core KPIs
@@ -661,10 +661,10 @@ export function CorporateHRAdminDashboard({
             </div>
           </section>
 
-          {/* Section 5: Encashment Requests */}
-          <section>
+          {/* Section 5: Encashment Requests (REMOVED - No Backend) */}
+          {/* <section>
              <EncashmentRequests requests={initialEncashmentRequests} />
-          </section>
+          </section> */}
 
           {/* Section 6: Cancellation Requests */}
           <section>

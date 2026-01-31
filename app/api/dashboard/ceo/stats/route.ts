@@ -300,10 +300,10 @@ export async function GET(req: NextRequest) {
       complianceScore,
       criticalRequests,
 
-      // Financial metrics
-      totalLeaveDays,
-      estimatedCost,
-      avgCostPerDay: avgDailyCost,
+      // Financial metrics (REMOVED - No Salary Data)
+      // totalLeaveDays,
+      // estimatedCost, 
+      // avgCostPerDay: avgDailyCost,
 
       // Year-over-year comparison
       thisYear: {
@@ -340,23 +340,10 @@ export async function GET(req: NextRequest) {
         })),
 
       // AI insights
-      insights,
+      insights: insights.filter(i => i.type !== "cost"), // Filter out cost insights if any were present (though current insights didn't have cost)
 
-      // System health (mocked data)
-      systemHealth: {
-        apiStatus: "healthy",
-        dbStatus: "healthy",
-        uptime: 99.9,
-      },
-
-      meta: {
-        mocked: {
-          avgCostPerDay: true,
-          estimatedCost: true,
-          insights: true,
-          systemHealth: true,
-        },
-      },
+      // System health (REMOVED - Dummy Data)
+      // systemHealth: ...
     };
 
     return NextResponse.json(stats);
