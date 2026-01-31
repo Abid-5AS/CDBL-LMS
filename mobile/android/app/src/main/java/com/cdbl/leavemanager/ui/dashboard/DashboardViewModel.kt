@@ -1,0 +1,129 @@
+package com.cdbl.leavemanager.ui.dashboard
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.cdbl.leavemanager.data.model.* 
+import com.cdbl.leavemanager.data.repository.DashboardRepository
+import com.cdbl.leavemanager.data.repository.AnalyticsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+import com.cdbl.leavemanager.data.repository.LeaveRepository
+import com.cdbl.leavemanager.data.repository.ApprovalRepository
+
+data class DashboardUiState(
+    val isLoading: Boolean = false,
+    val balance: BalanceResponse? = null,
+    val analytics: AnalyticsTrendResponse? = null,
+    val recentLeaves: List<LeaveRequest> = emptyList(),
+    val whosOutToday: List<TeamMemberOnLeave> = emptyList(),
+    val pendingApprovalsCount: Int = 0,
+    val needsAttentionCount: Int = 0,
+    val underReviewCount: Int = 0,
+    val nextApprovedLeave: LeaveRequest? = null,
+    val error: String? = null
+)
+
+@HiltViewModel
+class DashboardViewModel @Inject constructor(
+    private val dashboardRepository: DashboardRepository,
+    private val analyticsRepository: AnalyticsRepository,
+    private val leaveRepository: LeaveRepository,
+    private val approvalRepository: ApprovalRepository
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(DashboardUiState())
+    val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
+
+    private val _hrHeadStats = MutableStateFlow<Result<com.cdbl.leavemanager.data.model.HRHeadStats>?>(null)
+    val hrHeadStats: StateFlow<Result<com.cdbl.leavemanager.data.model.HRHeadStats>?> = _hrHeadStats.asStateFlow()
+
+    private val _users = MutableStateFlow<Result<List<com.cdbl.leavemanager.data.model.AdminUser>>?>(null)
+    val users: StateFlow<Result<List<com.cdbl.leavemanager.data.model.AdminUser>>?> = _users.asStateFlow()
+
+    fun loadDashboard(token: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            
+            // Load Balance (all users)
+            val balanceResult = dashboardRepository.getMyBalance(token)
+            
+            // Load Recent Activity (assuming this fetches the user's leave history)
+            val recentLeavesResult = leaveRepository.getRecentLeaves(token)
+
+            // Load Pending Approvals (will return empty list if 403)
+            val approvalsResult = approvalRepository.getPendingApprovals(token)
+
+            // Load Analytics (will fail gracefully for non-admins due to RBAC, or we can check role before calling)
+            // For now, we attempt to load it. If 403, we just ignore it.
+            val analyticsResult = analyticsRepository.getLeaveTrends(token)
+
+            // Load Team On Leave (dashboard widget)
+            val teamResult = dashboardRepository.getTeamOnLeave(token)
+
+            _uiState.update { state ->
+                val recentLeaves = recentLeavesResult.getOrDefault(emptyList())
+                val needsAttention = recentLeaves.count { leave -> leave.status == "RETURNED" || leave.status == "REJECTED" } // Expanded definition
+                val underReview = recentLeaves.count { leave -> leave.status == "PENDING" || leave.status == "SUBMITTED" }
+                val nextApproved = recentLeaves
+                    .filter { leave -> leave.status == "APPROVED" }
+                    .filter { leave ->
+                        try {
+                            val startDate = java.time.LocalDate.parse(leave.startDate.take(10))
+                            !startDate.isBefore(java.time.LocalDate.now())
+                        } catch (e: Exception) {
+                            false
+                        }
+                    }
+                    .sortedBy { leave -> leave.startDate }
+                    .firstOrNull()
+
+                state.copy(
+                    isLoading = false,
+                    balance = balanceResult.getOrNull(),
+                    analytics = analyticsResult.getOrNull(),
+                    recentLeaves = recentLeaves,
+                    whosOutToday = teamResult.getOrNull()?.members ?: emptyList(),
+                    pendingApprovalsCount = approvalsResult.getOrDefault(emptyList()).size,
+                    
+                    // Computed KPIs
+                    needsAttentionCount = needsAttention,
+                    underReviewCount = underReview,
+                    nextApprovedLeave = nextApproved,
+                    
+                    error = balanceResult.exceptionOrNull()?.message
+                )
+            }
+        }
+    }
+
+
+    suspend fun fetchManagerPendingLeaves(token: String): Result<com.cdbl.leavemanager.data.model.ManagerLeaveResponse> {
+        return leaveRepository.getManagerPendingLeaves(token)
+    }
+
+    suspend fun fetchSystemStats(token: String): Result<com.cdbl.leavemanager.data.model.SystemStatsResponse> {
+        return dashboardRepository.getSystemStats(token)
+    }
+
+    suspend fun fetchHRStats(token: String): Result<com.cdbl.leavemanager.data.model.HRAdminStats> {
+        return dashboardRepository.getHRStats(token)
+    }
+
+    suspend fun fetchAuditLogs(token: String): Result<List<com.cdbl.leavemanager.data.model.AuditLog>> {
+        return dashboardRepository.getAuditLogs(token)
+    }
+
+    suspend fun fetchCEOStats(token: String): Result<com.cdbl.leavemanager.data.model.CEOStats> {
+        return dashboardRepository.getCEOStats(token)
+    }
+
+    suspend fun fetchHRHeadStats(token: String): Result<com.cdbl.leavemanager.data.model.HRHeadStats> {
+        return dashboardRepository.getHRHeadStats(token)
+    }
+}

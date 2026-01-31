@@ -51,19 +51,18 @@ export interface FocusTrapProps {
  * </FocusTrap>
  * ```
  */
-export const FocusTrap = React.forwardRef<HTMLDivElement, FocusTrapProps>(
-  (
-    {
-      children,
-      initialFocus,
-      restoreFocus,
-      onEscape,
-      clickOutsideDeactivates = false,
-      className = "",
-      active = true,
-    },
-    ref
-  ) => {
+export const FocusTrap = (
+  {
+    children,
+    initialFocus,
+    restoreFocus,
+    onEscape,
+    clickOutsideDeactivates = false,
+    className = "",
+    active = true,
+    ref,
+  }: FocusTrapProps & { ref?: React.Ref<HTMLDivElement> }
+) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const focusTrapRef = useRef<FocusTrapManager | null>(null);
 
@@ -103,7 +102,7 @@ export const FocusTrap = React.forwardRef<HTMLDivElement, FocusTrapProps>(
       </div>
     );
   }
-);
+
 
 FocusTrap.displayName = "FocusTrap";
 
@@ -123,10 +122,12 @@ export interface SkipToContentProps {
   className?: string;
 }
 
-export const SkipToContent = React.forwardRef<
-  HTMLAnchorElement,
-  SkipToContentProps
->(({ targetId = "main", text = "Skip to main content", className = "" }, ref) => {
+export const SkipToContent = ({
+  targetId = "main",
+  text = "Skip to main content",
+  className = "",
+  ref,
+}: SkipToContentProps & { ref?: React.Ref<HTMLAnchorElement> }) => {
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
       e.preventDefault();
@@ -168,6 +169,6 @@ export const SkipToContent = React.forwardRef<
       {text}
     </a>
   );
-});
+};
 
 SkipToContent.displayName = "SkipToContent";

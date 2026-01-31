@@ -28,6 +28,7 @@ import {
   ExtensionRequestModal,
   ShortenLeaveModal,
   PartialCancelModal,
+  CancelLeaveModal,
 } from "./LeaveActionModals";
 
 interface LeaveActionsMenuProps {
@@ -62,6 +63,7 @@ export function LeaveActionsMenu({
   const [extensionOpen, setExtensionOpen] = useState(false);
   const [shortenOpen, setShortenOpen] = useState(false);
   const [partialCancelOpen, setPartialCancelOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
 
   // Determine if leave is ongoing
   const today = new Date();
@@ -124,10 +126,7 @@ export function LeaveActionsMenu({
           {(status === "PENDING" || status === "SUBMITTED" || (status === "APPROVED" && !hasStarted)) && (
             <DropdownMenuItem
               className="text-destructive focus:text-destructive"
-              onClick={() => {
-                // This would trigger the full cancel modal/action
-                // Implement full cancellation separately
-              }}
+              onClick={() => setCancelOpen(true)}
             >
               <XCircle className="mr-2 h-4 w-4" />
               Cancel Leave Request
@@ -168,6 +167,12 @@ export function LeaveActionsMenu({
         leaveId={leaveId}
         open={partialCancelOpen}
         onOpenChange={setPartialCancelOpen}
+      />
+
+      <CancelLeaveModal
+        leaveId={leaveId}
+        open={cancelOpen}
+        onOpenChange={setCancelOpen}
       />
     </>
   );

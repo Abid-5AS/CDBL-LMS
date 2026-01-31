@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/src/generated/prisma/client";
 import { format, subMonths } from "date-fns";
 
 export const cache = "no-store";

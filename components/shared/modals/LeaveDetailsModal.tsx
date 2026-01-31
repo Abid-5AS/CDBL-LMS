@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui";
 import { formatDate } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import {
   Calendar,
@@ -31,6 +31,7 @@ import {
   getNextApproverRole,
   getLatestApprovalDate,
   formatHeaderDate,
+  getStagesFromApprovals,
 } from "@/components/shared/forms/approval-utils";
 import {
   Accordion,
@@ -41,6 +42,7 @@ import {
 import { Button } from "@/components/ui";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { CancellationModal } from "@/components/shared/modals/CancellationModal";
 
 type LeaveDetails = {
   id: number;
@@ -49,14 +51,14 @@ type LeaveDetails = {
   endDate: string;
   workingDays: number;
   status:
-    | "SUBMITTED"
-    | "PENDING"
-    | "APPROVED"
-    | "REJECTED"
-    | "CANCELLED"
-    | "RETURNED"
-    | "CANCELLATION_REQUESTED"
-    | "RECALLED";
+  | "SUBMITTED"
+  | "PENDING"
+  | "APPROVED"
+  | "REJECTED"
+  | "CANCELLED"
+  | "RETURNED"
+  | "CANCELLATION_REQUESTED"
+  | "RECALLED";
   reason?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -88,6 +90,7 @@ export function LeaveDetailsModal({
 }: LeaveDetailsModalProps) {
   const router = useRouter();
   const [isNudging, setIsNudging] = useState(false);
+  const [showCancellationModal, setShowCancellationModal] = useState(false);
 
   // Keyboard navigation
   useEffect(() => {
@@ -135,188 +138,225 @@ export function LeaveDetailsModal({
     leave.status,
     requesterRole
   );
-  const nextApprover = getNextApproverRole(currentIndex, requesterRole);
+  const nextApprover = getNextApproverRole(currentIndex, requesterRole, leave.approvals || []);
   const latestDate = getLatestApprovalDate(leave.approvals || []);
 
+  // Dynamic stage count: approvals.length + 1 (for "Submitted")
+  const totalStages = (leave.approvals?.length || 0) + 1;
   const canNudge =
-    currentIndex < 4 &&
+    currentIndex < totalStages - 1 &&
     leave.status !== "APPROVED" &&
     leave.status !== "REJECTED" &&
     leave.status !== "CANCELLED";
 
+  // Check if leave can be cancelled (APPROVED and not already cancelled/with pending cancellation)
+  const canRequestCancellation =
+    leave.status === "APPROVED" &&
+    !leave.status.includes("CANCELLATION");
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto [&>button]:hidden rounded-3xl bg-card border-border shadow-xl">
-        <DialogHeader className="pb-4 border-b border-border/50">
-          {/* Header Row 1: Title + Status + Close Button */}
-          <div className="flex items-start justify-between gap-4 mb-4">
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <FileText className="h-5 w-5 text-brand shrink-0" />
-              <div className="flex items-center gap-2 min-w-0">
-                <DialogTitle className="text-lg font-semibold text-foreground truncate">
-                  {leaveTypeLabel[leave.type] || leave.type}
-                </DialogTitle>
-                <StatusBadge status={leave.status} />
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto [&>button]:hidden rounded-3xl bg-card border-border shadow-xl">
+          <DialogHeader className="pb-4 border-b border-border/50">
+            {/* Header Row 1: Title + Status + Close Button */}
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <FileText className="h-5 w-5 text-brand shrink-0" />
+                <div className="flex items-center gap-2 min-w-0">
+                  <DialogTitle className="text-lg font-semibold text-foreground truncate">
+                    {leaveTypeLabel[leave.type] || leave.type}
+                  </DialogTitle>
+                  <StatusBadge status={leave.status} />
+                </div>
               </div>
+
+              {/* Single Close Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0 hover:bg-muted"
+                onClick={() => onOpenChange(false)}
+                aria-label="Close modal"
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </div>
 
-            {/* Single Close Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 shrink-0 hover:bg-muted"
-              onClick={() => onOpenChange(false)}
-              aria-label="Close modal"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+            {/* Header Row 2: Stepper */}
+            <div className="mb-4">
+              <ApprovalStepper
+                currentIndex={currentIndex}
+                requesterRole={requesterRole as any}
+                stages={getStagesFromApprovals(leave.approvals || [], requesterRole)}
+              />
+            </div>
 
-          {/* Header Row 2: Stepper */}
-          <div className="mb-4">
-            <ApprovalStepper
-              currentIndex={currentIndex}
-              requesterRole={requesterRole as any}
-            />
-          </div>
-
-          {/* Header Row 3: Status line */}
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>
-              {currentIndex < 4 ? (
-                <>
-                  Next:{" "}
-                  <span className="font-semibold text-foreground">
-                    {nextApprover}
+            {/* Header Row 3: Status line */}
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>
+                {currentIndex < totalStages - 1 ? (
+                  <>
+                    Next:{" "}
+                    <span className="font-semibold text-foreground">
+                      {nextApprover}
+                    </span>
+                  </>
+                ) : leave.status === "APPROVED" ? (
+                  <span className="text-green-600 dark:text-green-400 font-semibold">
+                    Approved
                   </span>
-                </>
-              ) : leave.status === "APPROVED" ? (
-                <span className="text-green-600 dark:text-green-400 font-semibold">
-                  Approved
-                </span>
-              ) : leave.status === "REJECTED" ? (
-                <span className="text-red-600 dark:text-red-400 font-semibold">
-                  Rejected
-                </span>
-              ) : (
-                <span className="font-semibold text-foreground">
-                  Completed
+                ) : leave.status === "REJECTED" ? (
+                  <span className="text-red-600 dark:text-red-400 font-semibold">
+                    Rejected
+                  </span>
+                ) : (
+                  <span className="font-semibold text-foreground">
+                    Completed
+                  </span>
+                )}
+              </span>
+              {latestDate && (
+                <span>
+                  Last update:{" "}
+                  <span className="font-medium text-foreground">
+                    {formatHeaderDate(latestDate)}
+                  </span>
                 </span>
               )}
-            </span>
-            {latestDate && (
-              <span>
-                Last update:{" "}
-                <span className="font-medium text-foreground">
-                  {formatHeaderDate(latestDate)}
-                </span>
-              </span>
+            </div>
+          </DialogHeader>
+
+          <div className="space-y-5 mt-4 px-1">
+            {/* Dates and Duration */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-muted/50 border border-border/50">
+                <Calendar className="h-4 w-4 text-brand mt-0.5 shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-muted-foreground mb-1">
+                    Start Date
+                  </p>
+                  <p className="text-sm font-semibold text-foreground">
+                    {formatDate(leave.startDate)}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-muted/50 border border-border/50">
+                <Calendar className="h-4 w-4 text-brand mt-0.5 shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-muted-foreground mb-1">
+                    End Date
+                  </p>
+                  <p className="text-sm font-semibold text-foreground">
+                    {formatDate(leave.endDate)}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-muted/50 border border-border/50">
+                <Clock className="h-4 w-4 text-brand mt-0.5 shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-muted-foreground mb-1">
+                    Duration
+                  </p>
+                  <p className="text-sm font-semibold text-foreground">
+                    {leave.workingDays} {leave.workingDays === 1 ? "day" : "days"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Reason */}
+            {leave.reason && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-2">
+                  Reason
+                </p>
+                <div className="bg-muted/50 rounded-2xl p-4 border border-border/50">
+                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                    {leave.reason}
+                  </p>
+                </div>
+              </div>
             )}
           </div>
-        </DialogHeader>
 
-        <div className="space-y-5 mt-4 px-1">
-          {/* Dates and Duration */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex items-start gap-3 p-3 rounded-2xl bg-muted/50 border border-border/50">
-              <Calendar className="h-4 w-4 text-brand mt-0.5 shrink-0" />
-              <div className="min-w-0">
-                <p className="text-xs font-medium text-muted-foreground mb-1">
-                  Start Date
-                </p>
-                <p className="text-sm font-semibold text-foreground">
-                  {formatDate(leave.startDate)}
-                </p>
-              </div>
+          {/* Footer with Actions */}
+          <DialogFooter className="flex justify-between items-center pt-4 border-t border-border/50 mt-6">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Close
+            </Button>
+            <div className="flex items-center gap-2">
+              {leave.status === "RETURNED" && (
+                <Button
+                  onClick={() => {
+                    router.push(`/leaves/${leave.id}/edit`);
+                    onOpenChange(false);
+                  }}
+                >
+                  Edit & Resubmit
+                </Button>
+              )}
+              {(leave.status === "PENDING" || leave.status === "SUBMITTED") && (
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    router.push(`/leaves?id=${leave.id}`);
+                    onOpenChange(false);
+                  }}
+                >
+                  Cancel Request
+                </Button>
+              )}
+              {canRequestCancellation && (
+                <Button
+                  variant="destructive"
+                  onClick={() => setShowCancellationModal(true)}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Request Cancellation
+                </Button>
+              )}
+              {canNudge && (
+                <Button
+                  variant="outline"
+                  onClick={handleNudge}
+                  disabled={isNudging}
+                >
+                  {isNudging ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Nudge
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
-            <div className="flex items-start gap-3 p-3 rounded-2xl bg-muted/50 border border-border/50">
-              <Calendar className="h-4 w-4 text-brand mt-0.5 shrink-0" />
-              <div className="min-w-0">
-                <p className="text-xs font-medium text-muted-foreground mb-1">
-                  End Date
-                </p>
-                <p className="text-sm font-semibold text-foreground">
-                  {formatDate(leave.endDate)}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 p-3 rounded-2xl bg-muted/50 border border-border/50">
-              <Clock className="h-4 w-4 text-brand mt-0.5 shrink-0" />
-              <div className="min-w-0">
-                <p className="text-xs font-medium text-muted-foreground mb-1">
-                  Duration
-                </p>
-                <p className="text-sm font-semibold text-foreground">
-                  {leave.workingDays} {leave.workingDays === 1 ? "day" : "days"}
-                </p>
-              </div>
-            </div>
-          </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-          {/* Reason */}
-          {leave.reason && (
-            <div>
-              <p className="text-xs font-medium text-muted-foreground mb-2">
-                Reason
-              </p>
-              <div className="bg-muted/50 rounded-2xl p-4 border border-border/50">
-                <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                  {leave.reason}
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Footer with Actions */}
-        <DialogFooter className="flex justify-between items-center pt-4 border-t border-border/50 mt-6">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Close
-          </Button>
-          <div className="flex items-center gap-2">
-            {leave.status === "RETURNED" && (
-              <Button
-                onClick={() => {
-                  router.push(`/leaves/${leave.id}/edit`);
-                  onOpenChange(false);
-                }}
-              >
-                Edit & Resubmit
-              </Button>
-            )}
-            {(leave.status === "PENDING" || leave.status === "SUBMITTED") && (
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  router.push(`/leaves?id=${leave.id}`);
-                  onOpenChange(false);
-                }}
-              >
-                Cancel Request
-              </Button>
-            )}
-            {canNudge && (
-              <Button
-                variant="outline"
-                onClick={handleNudge}
-                disabled={isNudging}
-              >
-                {isNudging ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Sending...
-                  </>
-                ) : (
-                  <>
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Nudge
-                  </>
-                )}
-              </Button>
-            )}
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      {/* Cancellation Modal */}
+      <CancellationModal
+        open={showCancellationModal}
+        onClose={() => {
+          setShowCancellationModal(false);
+          onOpenChange(false); // Close the details modal too
+        }}
+        leave={leave ? {
+          id: leave.id,
+          type: leave.type,
+          startDate: leave.startDate,
+          endDate: leave.endDate,
+          workingDays: leave.workingDays,
+          reason: leave.reason || "",
+          status: leave.status,
+        } : null}
+      />
+    </>
   );
 }

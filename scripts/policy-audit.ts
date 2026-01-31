@@ -10,7 +10,7 @@
  *   pnpm policy:audit --json
  */
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/src/generated/prisma/client";
 import { policy } from "../lib/policy";
 import { getBackdateSettings } from "../lib/org-settings";
 

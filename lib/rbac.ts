@@ -7,7 +7,7 @@ export type AppRole =
   | "SYSTEM_ADMIN";
 
 const VIEW_ALL_REQUESTS = new Set<AppRole>(["HR_ADMIN", "HR_HEAD", "CEO", "DEPT_HEAD", "SYSTEM_ADMIN"]);
-const APPROVER_ROLES = new Set<AppRole>(["HR_HEAD", "CEO", "DEPT_HEAD", "SYSTEM_ADMIN"]);
+const APPROVER_ROLES = new Set<AppRole>(["HR_HEAD", "CEO", "DEPT_HEAD", "SYSTEM_ADMIN", "HR_ADMIN"]);
 const RETURN_ROLES = new Set<AppRole>(["HR_ADMIN", "HR_HEAD", "CEO", "DEPT_HEAD", "SYSTEM_ADMIN"]);
 const ADMIN_CANCEL_ROLES = new Set<AppRole>(["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"]);
 const SYSTEM_ONLY = new Set<AppRole>(["SYSTEM_ADMIN"]);

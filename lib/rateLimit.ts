@@ -13,12 +13,23 @@ let redisClient: Redis | null = null;
 try {
   const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
   redisClient = new Redis(redisUrl, {
-    maxRetriesPerRequest: 1,
+    maxRetriesPerRequest: 0, // Fail fast
     lazyConnect: true,
     retryStrategy: () => null, // Don't retry if connection fails
   });
+
+  // Handle connection errors gracefully to prevent app crash
+  redisClient.on('error', (err) => {
+    // Only log if it's not a known connection refused error which we expect in dev without redis
+    if ((err as any).code !== 'ECONNREFUSED') {
+      console.warn("Redis client error:", err.message);
+    }
+    // Disable redis client on error so fallback is used
+    redisClient = null;
+  });
 } catch (error) {
   console.warn("Redis not available, falling back to in-memory rate limiting");
+  redisClient = null;
 }
 
 /**
@@ -32,19 +43,24 @@ export async function checkRateLimit(ip: string): Promise<boolean> {
     try {
       const key = `rate:${ip}`;
       const attempts = await redisClient.incr(key);
-      
+
       if (attempts === 1) {
         await redisClient.expire(key, WINDOW);
       }
-      
+
       if (attempts > MAX_ATTEMPTS) return false;
       return true;
-    } catch (error) {
+    } catch (error: any) {
       // If Redis fails, fall back to in-memory
-      console.warn("Redis rate limit failed, using fallback:", error);
+      // Suppress connection errors which are expected in local dev without Redis
+      if (error?.message === 'Connection is closed.' || error?.code === 'ECONNREFUSED') {
+         // silently fail back to memory
+      } else {
+         console.warn("Redis rate limit failed, using fallback:", error);
+      }
     }
   }
-  
+
   // In-memory fallback
   const now = Date.now();
   const record = attempts.get(ip);
@@ -86,7 +102,7 @@ export async function clearRateLimit(ip: string): Promise<void> {
       console.warn("Redis clear failed, using fallback:", error);
     }
   }
-  
+
   attempts.delete(ip);
 }
 

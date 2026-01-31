@@ -32,6 +32,12 @@
       ],
       "@dash/*": [
         "./components/dashboards/*"
+      ],
+      "@prisma/client": [
+        "./node_modules/.prisma/client/client"
+      ],
+      "@prisma/client/*": [
+        "./node_modules/@prisma/client/*"
       ]
     }
   },
@@ -47,6 +53,8 @@
     "scripts",
     "tests",
     "types",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
     ".next-dev/types/**/*.ts",
     ".next-dev/dev/types/**/*.ts",
     ".next/types/**/*.ts",

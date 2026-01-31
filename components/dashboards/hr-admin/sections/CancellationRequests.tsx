@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { AlertCircle, XCircle } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import Link from "next/link";
 import { StatusBadge } from "@/components/shared";
 import useSWR from "swr";
@@ -57,7 +57,7 @@ export function CancellationRequestsPanel() {
 
   if (error) {
     return (
-      <div className="p-12 text-center text-sm text-data-error flex flex-col items-center gap-2">
+      <div className="p-12 text-center text-sm text-danger dark:text-danger/90 flex flex-col items-center gap-2">
         <AlertCircle className="h-5 w-5" />
         <p>Failed to load cancellation requests</p>
         <p className="text-xs text-muted-foreground">{(error as any)?.info?.details || (error as any)?.message || String(error)}</p>

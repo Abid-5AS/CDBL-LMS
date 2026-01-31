@@ -1,18 +1,11 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, Calendar, User, Clock } from "lucide-react";
-import { LeaveStatus } from "@prisma/client";
+import { Search, X, User, Calendar, Clock } from "lucide-react";
+import { LeaveStatus } from "@/lib/enums";
 
 // UI Components
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
   Badge,
   Input,
   TooltipProvider,
@@ -23,10 +16,12 @@ import {
   StatusBadge,
   ReviewModal,
   ApprovalActionButtons,
-  SimplePagination,
   LoadingSpinner,
   ErrorState,
   AllClearState,
+  LeaveTable,
+  ColumnDef,
+  ActionDef,
 } from "@/components/shared";
 
 // Lib utilities
@@ -35,8 +30,9 @@ import { cn, formatDate, leaveTypeLabel } from "@/lib";
 // Extracted hooks and components
 import { usePendingRequests } from "@/components/dashboards/dept-head/hooks/usePendingRequests";
 import { useLeaveFiltering } from "../hooks/useLeaveFiltering";
-import { PendingLeaveCard } from "../components/PendingLeaveCard";
 import { STATUS_TABS, getLeaveTypeColor } from "../utils/leave-utils";
+
+
 
 type LeaveRequest = {
   id: number;
@@ -69,7 +65,8 @@ export function PendingLeaveRequestsTable({
   isLoading: externalIsLoading,
   error: externalError,
   onMutate,
-}: PendingLeaveRequestsTableProps = {}) {
+  hideHeader = false,
+}: PendingLeaveRequestsTableProps & { hideHeader?: boolean } = {}) {
   const {
     searchInput: hookSearchInput,
     setSearchInput: setHookSearchInput,
@@ -156,6 +153,191 @@ export function PendingLeaveRequestsTable({
     }
   };
 
+  // Columns Configuration
+  const columns: ColumnDef<LeaveRequest>[] = [
+    {
+      header: "Employee",
+      accessorKey: "requester",
+      cell: (leave: LeaveRequest) => (
+        <div className="flex items-center gap-3">
+          <div className="rounded-full bg-gradient-to-br from-card-action to-card-summary p-2">
+            <User className="h-4 w-4 text-white dark:text-white" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <p className="truncate font-medium text-sm">
+                {leave.requester.name}
+              </p>
+              <Badge
+                variant="outline"
+                className={cn(
+                  "sm:hidden font-medium text-xs whitespace-nowrap",
+                  getLeaveTypeColor(leave.type)
+                )}
+              >
+                {leaveTypeLabel[leave.type] ?? leave.type}
+              </Badge>
+            </div>
+            <p className="truncate text-xs text-muted-foreground">
+              {leave.requester.email}
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      header: "Type",
+      accessorKey: "type",
+      className: "hidden sm:table-cell",
+      cell: (leave: LeaveRequest) => (
+        <Badge
+          variant="outline"
+          className={cn(
+            "font-medium text-xs whitespace-nowrap",
+            getLeaveTypeColor(leave.type)
+          )}
+        >
+          {leaveTypeLabel[leave.type] ?? leave.type}
+        </Badge>
+      ),
+    },
+    {
+      header: "Dates",
+      accessorKey: "startDate",
+      cell: (leave: LeaveRequest) => (
+        <div className="flex items-center gap-2 text-sm">
+          <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-1">
+            <span className="text-xs text-muted-foreground">
+              {formatDate(leave.startDate)}
+            </span>
+            <span className="hidden sm:inline text-muted-foreground">→</span>
+            <span className="text-xs text-muted-foreground">
+              {formatDate(leave.endDate)}
+            </span>
+            <span className="sm:hidden text-xs font-medium text-foreground">
+              ({leave.workingDays}d)
+            </span>
+          </div>
+        </div>
+      ),
+    },
+    {
+      header: "Days",
+      accessorKey: "workingDays",
+      className: "hidden lg:table-cell",
+      cell: (leave: LeaveRequest) => (
+        <div className="flex items-center gap-2">
+          <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+          <span className="text-sm font-medium">
+            {leave.workingDays}
+          </span>
+        </div>
+      ),
+    },
+    {
+      header: "Status",
+      accessorKey: "status",
+      className: "hidden xl:table-cell",
+      cell: (leave: LeaveRequest) => <StatusBadge status={leave.status} />,
+    },
+  ];
+
+  // Actions Configuration
+  const actions: ActionDef<LeaveRequest>[] = [
+    {
+      label: "Forward",
+      onClick: (leave: LeaveRequest) => handleForward(leave),
+      variant: "default",
+      disabled: (leave: LeaveRequest) => processingId === leave.id,
+      loading: (leave: LeaveRequest) => processingId === leave.id,
+    },
+    {
+      label: "Return",
+      onClick: (leave: LeaveRequest) => handleQuickAction(leave, "return"),
+      variant: "outline",
+      disabled: (leave: LeaveRequest) => processingId === leave.id,
+    },
+    {
+      label: "Reject",
+      onClick: (leave: LeaveRequest) => handleQuickAction(leave, "reject"),
+      variant: "destructive",
+      disabled: (leave: LeaveRequest) => processingId === leave.id,
+    },
+  ];
+
+  // Mobile Card Renderer
+  const mobileCardRenderer = (
+    leave: LeaveRequest,
+    isSelected: boolean,
+    toggleSelection: () => void,
+    actionButtons: React.ReactNode
+  ) => (
+    <div
+      className="surface-card p-4 rounded-xl space-y-3 border border-border dark:border-border/30"
+      onClick={() => handleRowClick(leave)}
+    >
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-3">
+          <div className="rounded-full bg-gradient-to-br from-card-action to-card-summary p-2">
+            <User className="h-4 w-4 text-white dark:text-white" />
+          </div>
+          <div>
+            <p className="font-medium text-sm">{leave.requester.name}</p>
+            <p className="text-xs text-muted-foreground">{leave.requester.email}</p>
+          </div>
+        </div>
+        <StatusBadge status={leave.status} />
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 text-sm">
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Type</p>
+          <Badge
+            variant="outline"
+            className={cn(
+              "font-medium text-xs whitespace-nowrap",
+              getLeaveTypeColor(leave.type)
+            )}
+          >
+            {leaveTypeLabel[leave.type] ?? leave.type}
+          </Badge>
+        </div>
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Duration</p>
+          <div className="flex items-center gap-1">
+            <Clock className="h-3 w-3 text-muted-foreground" />
+            <span>{leave.workingDays} days</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-1">
+        <p className="text-xs text-muted-foreground">Dates</p>
+        <div className="flex items-center gap-2 text-sm bg-muted/50 dark:bg-muted/40 p-2 rounded-lg">
+          <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+          <span>
+            {formatDate(leave.startDate)} - {formatDate(leave.endDate)}
+          </span>
+        </div>
+      </div>
+
+      <div className="pt-2 flex justify-end gap-2">
+        <ApprovalActionButtons
+          size="sm"
+          onAction={(action) => {
+            if (action === "forward") handleForward(leave);
+            if (action === "return") handleQuickAction(leave, "return");
+            if (action === "reject") handleQuickAction(leave, "reject");
+          }}
+          disabled={processingId === leave.id}
+          loading={processingId === leave.id}
+          loadingAction={processingId === leave.id ? "forward" : null}
+        />
+      </div>
+    </div>
+  );
+
   // Loading state
   if (isLoading) {
     return (
@@ -194,9 +376,11 @@ export function PendingLeaveRequestsTable({
       <div className="surface-card rounded-2xl overflow-hidden">
         <div className="space-y-4 p-6">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Pending Leave Requests</h3>
-          </div>
+          {!hideHeader && (
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Pending Leave Requests</h3>
+            </div>
+          )}
 
           {/* Tab Chips */}
           <div className="flex gap-2 overflow-x-auto scrollbar-hide">
@@ -207,7 +391,7 @@ export function PendingLeaveRequestsTable({
                 className={cn(
                   "px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
                   statusTab === tab.value
-                    ? "bg-card-action text-text-inverted"
+                    ? "bg-card-action text-white dark:text-white"
                     : "bg-muted text-muted-foreground hover:bg-muted/80"
                 )}
               >
@@ -224,7 +408,7 @@ export function PendingLeaveRequestsTable({
               placeholder="Search by employee, type, or reason..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="pl-9 bg-bg-primary/50 border-bg-muted"
+              className="pl-9 bg-card dark:bg-card/90/50 border-border dark:border-border/30"
             />
             {searchInput && (
               <button
@@ -236,185 +420,25 @@ export function PendingLeaveRequestsTable({
             )}
           </div>
 
-          {/* Table/List */}
-          {filteredLeaves.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="surface-card rounded-xl p-12 text-center"
-            >
-              <p className="text-sm text-muted-foreground">
+          {/* Unified Leave Table */}
+          <LeaveTable
+            data={paginatedLeaves as LeaveRequest[]}
+            columns={columns}
+            actions={actions}
+            keyField="id"
+            onRowClick={handleRowClick}
+            pagination={{
+              currentPage,
+              totalPages,
+              onPageChange: setCurrentPage,
+            }}
+            mobileCardRenderer={mobileCardRenderer}
+            emptyState={
+              <div className="text-center p-12 text-muted-foreground">
                 No matching requests found
-              </p>
-            </motion.div>
-          ) : (
-            <>
-              {/* Desktop Table View */}
-              <div className="hidden md:block relative overflow-y-auto max-h-[600px] nice-scrollbars">
-                <Table aria-label="Pending leave requests table" className="w-full table-auto">
-                  <TableHeader className="sticky top-0 z-10 bg-bg-primary/80 backdrop-blur-sm border-b border-bg-muted">
-                    <TableRow className="hover:bg-transparent">
-                      <TableHead className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">
-                        Employee
-                      </TableHead>
-                      <TableHead className="hidden sm:table-cell font-semibold text-xs text-muted-foreground uppercase tracking-wider">
-                        Type
-                      </TableHead>
-                      <TableHead className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">
-                        Dates
-                      </TableHead>
-                      <TableHead className="hidden lg:table-cell font-semibold text-xs text-muted-foreground uppercase tracking-wider">
-                        Days
-                      </TableHead>
-                      <TableHead className="hidden xl:table-cell font-semibold text-xs text-muted-foreground uppercase tracking-wider">
-                        Status
-                      </TableHead>
-                      <TableHead className="w-[140px] text-right font-semibold text-xs text-muted-foreground uppercase tracking-wider">
-                        Actions
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <AnimatePresence mode="popLayout">
-                      {paginatedLeaves.map((leave, index) => {
-                        if (!leave.requester) return null;
-                        const isProcessingThis = processingId === leave.id;
-
-                        return (
-                          <motion.tr
-                            key={leave.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            transition={{ duration: 0.2, delay: index * 0.03 }}
-                            className="group border-b border-bg-muted hover:bg-bg-secondary cursor-pointer transition-colors"
-                            onClick={() => handleRowClick(leave as any)}
-                          >
-                            <TableCell className="py-4">
-                              <div className="flex items-center gap-3">
-                                <div className="rounded-full bg-gradient-to-br from-card-action to-card-summary p-2">
-                                  <User className="h-4 w-4 text-text-inverted" />
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <div className="flex items-center gap-2">
-                                    <p className="truncate font-medium text-sm">
-                                      {leave.requester.name}
-                                    </p>
-                                    <Badge
-                                      variant="outline"
-                                      className={cn(
-                                        "sm:hidden font-medium text-xs whitespace-nowrap",
-                                        getLeaveTypeColor(leave.type)
-                                      )}
-                                    >
-                                      {leaveTypeLabel[leave.type] ?? leave.type}
-                                    </Badge>
-                                  </div>
-                                  <p className="truncate text-xs text-muted-foreground">
-                                    {leave.requester.email}
-                                  </p>
-                                </div>
-                              </div>
-                            </TableCell>
-                            <TableCell className="hidden sm:table-cell py-4">
-                              <Badge
-                                variant="outline"
-                                className={cn(
-                                  "font-medium text-xs whitespace-nowrap",
-                                  getLeaveTypeColor(leave.type)
-                                )}
-                              >
-                                {leaveTypeLabel[leave.type] ?? leave.type}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="py-4">
-                              <div className="flex items-center gap-2 text-sm">
-                                <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-1">
-                                  <span className="text-xs text-muted-foreground">
-                                    {formatDate(leave.startDate)}
-                                  </span>
-                                  <span className="hidden sm:inline text-muted-foreground">→</span>
-                                  <span className="text-xs text-muted-foreground">
-                                    {formatDate(leave.endDate)}
-                                  </span>
-                                  <span className="sm:hidden text-xs font-medium text-foreground">
-                                    ({leave.workingDays}d)
-                                  </span>
-                                </div>
-                              </div>
-                            </TableCell>
-                            <TableCell className="hidden lg:table-cell py-4">
-                              <div className="flex items-center gap-2">
-                                <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                                <span className="text-sm font-medium">
-                                  {leave.workingDays}
-                                </span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="hidden xl:table-cell py-4">
-                              <StatusBadge status={leave.status} />
-                            </TableCell>
-                            <TableCell className="py-4">
-                              <div
-                                className="flex items-center justify-end"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {(leave.status === "PENDING" ||
-                                  leave.status === "SUBMITTED") && (
-                                  <ApprovalActionButtons
-                                    size="sm"
-                                    onForward={() => handleForward(leave as any)}
-                                    onReturn={() => handleQuickAction(leave as any, "return")}
-                                    onCancel={() => handleQuickAction(leave as any, "reject")}
-                                    disabled={isProcessingThis}
-                                    loading={isProcessingThis}
-                                    loadingAction={isProcessingThis ? "forward" : null}
-                                  />
-                                )}
-                              </div>
-                            </TableCell>
-                          </motion.tr>
-                        );
-                      })}
-                    </AnimatePresence>
-                  </TableBody>
-                </Table>
               </div>
-
-              {/* Mobile Card View */}
-              <div className="md:hidden space-y-3">
-                <AnimatePresence mode="popLayout">
-                  {paginatedLeaves.map((leave, index) => {
-                    if (!leave.requester) return null;
-                    const isProcessingThis = processingId === leave.id;
-
-                    return (
-                      <PendingLeaveCard
-                        key={leave.id}
-                        leave={leave as any}
-                        index={index}
-                        isProcessing={isProcessingThis}
-                        onRowClick={(l: any) => handleRowClick(l as any)}
-                        onForward={(l: any) => handleForward(l as any)}
-                        onReturn={(l: any) => handleQuickAction(l as any, "return")}
-                      />
-                    );
-                  })}
-                </AnimatePresence>
-              </div>
-
-              {/* Pagination */}
-              <section className="rounded-3xl border border-border bg-card p-6 shadow-sm">
-                <SimplePagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={setCurrentPage}
-                  showPageInfo={true}
-                />
-              </section>
-            </>
-          )}
+            }
+          />
         </div>
       </div>
 

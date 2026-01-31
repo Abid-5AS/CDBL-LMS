@@ -42,6 +42,7 @@ import {
 import { LeaveSummarySidebar } from "./leave-summary-sidebar";
 import { useApplyLeaveForm } from "./use-apply-leave-form";
 import { useRouter } from "next/navigation";
+import { ConflictWarningCard } from "@/components/leaves/ConflictWarningCard";
 
 export function ApplyLeaveForm() {
   const {
@@ -69,6 +70,9 @@ export function ApplyLeaveForm() {
     holidays,
     incidentDate,
     payCalculation,
+    conflictData,
+    checkingConflicts,
+    bookedDates,
     setDateRange,
     setReason,
     setFile,
@@ -83,6 +87,10 @@ export function ApplyLeaveForm() {
     handleConfirmSubmit,
     handleManualSave,
     initiateReview,
+    isHalfDay,
+    setIsHalfDay,
+    halfDayPeriod,
+    setHalfDayPeriod,
   } = useApplyLeaveForm();
   const router = useRouter();
 
@@ -115,314 +123,256 @@ export function ApplyLeaveForm() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="mx-auto max-w-[1400px] space-y-4">
-        {/* Compact Header */}
-        <div className="flex items-center justify-between gap-4">
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <div className="h-6 w-1 bg-primary rounded-full" />
+    <div className="space-y-6 max-w-[1600px] mx-auto pb-12">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1">
+        <div>
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600">
             Apply for Leave
           </h1>
-          {lastSavedTime && (
-            <Badge variant="secondary" className="bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800">
-              <CheckCircle2 className="w-3 h-3 mr-1" />
-              Saved {lastSavedTime}
-            </Badge>
-          )}
+          <p className="text-muted-foreground mt-1 text-sm">
+            Submit your leave request for approval.
+          </p>
         </div>
-        {/* Warning Banner */}
-        {warnings.length > 0 && (
-          <div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 p-3">
-            <div className="flex items-start gap-2">
-              <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-              <div className="flex-1 space-y-1">
-                <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">Please review</p>
+        {lastSavedTime && (
+          <Badge variant="outline" className="gap-1.5 py-1.5 px-3 bg-emerald-50/50 text-emerald-700 border-emerald-200">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            Draft saved {lastSavedTime}
+          </Badge>
+        )}
+      </div>
+
+      {/* Warning Banner - modernized */}
+      {warnings.length > 0 && (
+        <div className="rounded-2xl border border-amber-200/50 bg-amber-50/80 p-4 shadow-sm backdrop-blur-sm">
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-amber-100 rounded-full shrink-0">
+              <AlertCircle className="h-5 w-5 text-amber-600" />
+            </div>
+            <div className="space-y-1 pt-1">
+              <p className="text-sm font-semibold text-amber-900">Attention Required</p>
+              <ul className="space-y-1">
                 {warnings.map((warning, idx) => (
-                  <p key={idx} className="text-xs text-amber-700 dark:text-amber-300">• {warning}</p>
+                  <li key={idx} className="text-sm text-amber-700 flex items-start gap-2">
+                    <span className="mt-1.5 w-1 h-1 rounded-full bg-amber-500 shrink-0" />
+                    {warning}
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Two-column responsive layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
-          {/* LEFT: Form Section (8 columns) */}
-          <div className="lg:col-span-8">
-            <Card className="border shadow-sm">
-              <form
-                onSubmit={handleReviewSubmit}
-                noValidate
-                aria-label="Leave application form"
-              >
-                <CardContent className="p-4 sm:p-6 space-y-5">
-                  {/* Balance Overview - Compact, Inside Form */}
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="rounded-lg border bg-card p-3">
-                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1">Current</p>
-                      <p className="text-xl font-bold text-foreground flex items-baseline gap-1">
-                        {typeof balanceForType === "number" ? balanceForType : "—"}
-                        <span className="text-xs font-normal text-muted-foreground">days</span>
-                      </p>
-                      {type && balanceForType !== undefined && (
-                        <div className="w-full bg-muted/30 rounded-full h-1 mt-2">
-                          <div className="h-full bg-emerald-500 rounded-full" style={{ width: "100%" }} />
-                        </div>
-                      )}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Main Form Area */}
+        <div className="lg:col-span-8 space-y-6">
+          <Card className="rounded-[24px] border-none shadow-xl bg-card/50 dark:bg-card/90 backdrop-blur-xl overflow-hidden ring-1 ring-border/50">
+
+            <form
+              onSubmit={handleReviewSubmit}
+              noValidate
+              className="flex flex-col min-h-[600px]"
+            >
+              <div className="p-8 space-y-2 flex-1 relative">
+                {/* Connecting Line */}
+                <div className="absolute left-[2.25rem] top-12 bottom-12 w-px bg-gradient-to-b from-indigo-100 via-indigo-50 to-transparent dark:from-indigo-900/50 dark:via-indigo-900/30" />
+
+                {/* Section 1: Leave Details */}
+                <section className="relative pb-10">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="relative z-10 flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 ring-4 ring-background dark:ring-card transition-transform group-hover:scale-110">
+                      <span className="font-bold text-sm">1</span>
                     </div>
-                    <div className={cn("rounded-lg border p-3", requestedDays > 0 ? "bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800" : "bg-card")}>
-                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1">Requesting</p>
-                      <p className={cn("text-xl font-bold flex items-baseline gap-1", requestedDays > 0 ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground")}>
-                        {requestedDays > 0 ? requestedDays : "—"}
-                        <span className="text-xs font-normal text-muted-foreground">days</span>
-                      </p>
-                    </div>
-                    <div className={cn("rounded-lg border p-3", remainingBalance !== null && remainingBalance < 0 ? "bg-rose-50/50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800" : remainingBalance !== null && remainingBalance < 2 ? "bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800" : "bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800")}>
-                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1">After</p>
-                      <p className={cn("text-xl font-bold flex items-baseline gap-1", remainingBalance !== null ? getBalanceTextColor(remainingBalance) : "text-foreground")}>
-                        {remainingBalance !== null ? Math.max(remainingBalance, 0) : "—"}
-                        <span className="text-xs font-normal text-muted-foreground">days</span>
-                      </p>
-                      {remainingBalance !== null && balanceForType !== undefined && (
-                        <div className="w-full bg-muted/30 rounded-full h-1 mt-2">
-                          <div className={cn("h-full rounded-full transition-all", getBalanceColor(balancePercent))} style={{ width: `${Math.max(0, balancePercent)}%` }} />
-                        </div>
-                      )}
-                    </div>
+                    <h3 className="text-lg font-semibold tracking-tight text-foreground/90">Leave Details</h3>
                   </div>
-                  {/* Leave Type and Date Range */}
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+                  <div className="pl-16 space-y-6 max-w-xl">
+                    <div className="space-y-1">
                       <LeaveTypeField
                         type={type}
                         onTypeChange={handleTypeChange}
                         error={errors.type}
                         clearErrors={clearErrors}
                       />
-                      <DateRangeField
-                        dateRange={dateRange}
-                        setDateRange={(range) =>
-                          setDateRange({
-                            start: range.start ?? undefined,
-                            end: range.end ?? undefined,
-                          })
-                        }
-                        holidays={holidays.map((h) => new Date(h.date))}
-                        minSelectableDate={minSelectableDate}
+                    </div>
+
+                    <DateRangeField
+                      dateRange={dateRange}
+                      setDateRange={(range) =>
+                        setDateRange({
+                          start: range.start ?? undefined,
+                          end: range.end ?? undefined,
+                        })
+                      }
+                      holidays={holidays.map((h) => new Date(h.date))}
+                      minSelectableDate={minSelectableDate}
+                      submitting={submitting}
+                      requestedDays={requestedDays}
+                      rangeValidation={rangeValidation}
+                      errors={{ start: errors.start, end: errors.end }}
+                      bookedDates={bookedDates}
+                    />
+
+                    {/* Half-Day Leave Toggle */}
+                    {(type === "CASUAL" || type === "EARNED") && dateRange.start && dateRange.end && dateRange.start.getTime() === dateRange.end.getTime() && (
+                      <div className="mt-4 p-4 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30">
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            id="halfDay"
+                            checked={isHalfDay}
+                            onChange={(e) => setIsHalfDay(e.target.checked)}
+                            className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
+                            disabled={submitting}
+                          />
+                          <label htmlFor="halfDay" className="text-sm font-medium text-indigo-900 dark:text-indigo-100">
+                            Apply for Half Day Leave
+                          </label>
+                        </div>
+
+                        {isHalfDay && (
+                          <div className="mt-3 flex gap-4 ml-7">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name="halfDayPeriod"
+                                value="AM"
+                                checked={halfDayPeriod === "AM"}
+                                onChange={() => setHalfDayPeriod("AM")}
+                                className="w-4 h-4 text-indigo-600 focus:ring-indigo-500"
+                                disabled={submitting}
+                              />
+                              <span className="text-sm text-indigo-800 dark:text-indigo-200">First Half (AM)</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name="halfDayPeriod"
+                                value="PM"
+                                checked={halfDayPeriod === "PM"}
+                                onChange={() => setHalfDayPeriod("PM")}
+                                className="w-4 h-4 text-indigo-600 focus:ring-indigo-500"
+                                disabled={submitting}
+                              />
+                              <span className="text-sm text-indigo-800 dark:text-indigo-200">Second Half (PM)</span>
+                            </label>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </section>
+
+                <Separator className="bg-slate-100 dark:bg-slate-800" />
+
+                {/* Section 2: Reason */}
+                <section className="relative">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="relative z-10 flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground border-2 border-border/50 shadow-sm ring-4 ring-background dark:ring-card group-hover:border-indigo-500 group-hover:text-indigo-500 transition-colors">
+                      <span className="font-bold text-sm">2</span>
+                    </div>
+                    <h3 className="text-lg font-semibold tracking-tight text-foreground/90">Reason & Support</h3>
+                  </div>
+
+                  <div className="pl-16 space-y-8">
+                    <ReasonField
+                      reason={reason}
+                      setReason={setReason}
+                      error={errors.reason}
+                      submitting={submitting}
+                      minLength={10}
+                      clearReasonError={clearErrors}
+                    />
+
+                    <div className="bg-slate-50/50 dark:bg-muted/30 p-2 rounded-2xl border border-slate-100 dark:border-border/50">
+                      <FileUploadField
+                        file={file}
+                        setFile={setFile}
+                        error={errors.file}
+                        required={requiresCertificate}
                         submitting={submitting}
-                        requestedDays={requestedDays}
-                        rangeValidation={rangeValidation}
-                        errors={{ start: errors.start, end: errors.end }}
+                        showOptionalUpload={showOptionalUpload}
+                        setShowOptionalUpload={setShowOptionalUpload}
+                        requiresCertificate={requiresCertificate}
+                        handleFileError={handleFileError}
                       />
                     </div>
                   </div>
+                </section>
 
-                  {/* Special Disability Leave: Incident Date Field */}
-                  {type === "SPECIAL_DISABILITY" && (
-                    <>
-                      <div className="space-y-3">
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-muted-foreground" />
-                            Date of Disabling Incident
-                            <span className="text-destructive">*</span>
-                          </label>
-                          <p className="text-xs text-muted-foreground">
-                            When did the disabling incident occur? Must be
-                            within 3 months of leave start date.
-                          </p>
-                          <input
-                            type="date"
-                            value={
-                              incidentDate
-                                ? incidentDate.toISOString().split("T")[0]
-                                : ""
-                            }
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              setIncidentDate(
-                                value ? new Date(value) : undefined
-                              );
-                              setErrors((prev) => ({
-                                ...prev,
-                                incidentDate: undefined,
-                              }));
-                            }}
-                            max={
-                              dateRange.start
-                                ? dateRange.start.toISOString().split("T")[0]
-                                : new Date().toISOString().split("T")[0]
-                            }
-                            disabled={submitting}
-                            className={cn(
-                              "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-                              errors.incidentDate && "border-destructive"
-                            )}
-                          />
-                          {errors.incidentDate && (
-                            <p className="text-xs text-destructive flex items-center gap-1">
-                              <AlertCircle className="w-3 h-3" />
-                              {errors.incidentDate}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Pay Calculation Preview */}
-                      {payCalculation && (
-                        <div className="rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-950/30 dark:border-blue-800 p-4 space-y-3">
-                          <div className="flex items-center gap-2">
-                            <Info className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                            <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
-                              Pay Calculation Preview
-                            </p>
-                          </div>
-                          <div className="space-y-2 text-sm">
-                            <div className="flex justify-between items-center">
-                              <span className="text-blue-700 dark:text-blue-300">
-                                Full pay (0-90 days):
-                              </span>
-                              <span className="font-semibold text-blue-900 dark:text-blue-100">
-                                {payCalculation.fullPayDays} days
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-blue-700 dark:text-blue-300">
-                                Half pay (91-180 days):
-                              </span>
-                              <span className="font-semibold text-blue-900 dark:text-blue-100">
-                                {payCalculation.halfPayDays} days
-                              </span>
-                            </div>
-                            {payCalculation.unPaidDays > 0 && (
-                              <div className="flex justify-between items-center">
-                                <span className="text-blue-700 dark:text-blue-300">
-                                  Unpaid (180+ days):
-                                </span>
-                                <span className="font-semibold text-destructive">
-                                  {payCalculation.unPaidDays} days
-                                </span>
-                              </div>
-                            )}
-                            <Separator className="my-2" />
-                            <div className="flex justify-between items-center">
-                              <span className="font-medium text-blue-900 dark:text-blue-100">
-                                Total days:
-                              </span>
-                              <span className="font-bold text-blue-900 dark:text-blue-100">
-                                {payCalculation.totalDays} days
-                              </span>
-                            </div>
-                          </div>
-                          <p className="text-xs text-blue-600 dark:text-blue-400">
-                            Per Policy 6.22: First 3 months at full pay, next 3
-                            months at half pay
-                          </p>
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  {/* Separator */}
-                  <Separator className="my-4" />
-
-                  {/* Reason Textarea */}
-                  <ReasonField
-                    reason={reason}
-                    setReason={setReason}
-                    error={errors.reason}
-                    submitting={submitting}
-                    minLength={10}
-                    clearReasonError={clearErrors}
-                  />
-
-                  {/* Separator */}
-                  <Separator className="my-4" />
-
-                  {/* File Upload */}
-                  <FileUploadField
-                    file={file}
-                    setFile={setFile}
-                    error={errors.file}
-                    required={requiresCertificate}
-                    submitting={submitting}
-                    showOptionalUpload={showOptionalUpload}
-                    setShowOptionalUpload={setShowOptionalUpload}
-                    requiresCertificate={requiresCertificate}
-                    handleFileError={handleFileError}
-                  />
-
-                  {/* General errors */}
-                  {errors.general && (
-                    <div className="rounded-lg border border-destructive/50 bg-destructive/10 dark:bg-destructive/20 p-3 flex items-start gap-2">
-                      <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-destructive">
-                          Validation Error
-                        </p>
-                        <p className="text-sm text-destructive/90 dark:text-destructive/80 mt-0.5">
-                          {errors.general}
-                        </p>
-                      </div>
+                {/* Special Disability Leave Logic */}
+                {type === "SPECIAL_DISABILITY" && (
+                  <div className="pl-16 pt-8">
+                    <div className="space-y-3 p-5 rounded-2xl bg-amber-50/50 border border-amber-100 dark:bg-amber-950/10 dark:border-amber-900/30">
+                      <label className="text-sm font-medium text-amber-900 dark:text-amber-100 flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-amber-600" />
+                        Date of Disabling Incident
+                      </label>
+                      <input
+                        type="date"
+                        value={incidentDate ? incidentDate.toISOString().split("T")[0] : ""}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setIncidentDate(value ? new Date(value) : undefined);
+                          setErrors((prev) => ({ ...prev, incidentDate: undefined }));
+                        }}
+                        className="flex h-11 w-full rounded-xl border-0 bg-background shadow-sm ring-1 ring-inset ring-amber-200/50 focus:ring-2 focus:ring-amber-500 px-3 py-2 text-sm outline-none transition-all dark:ring-amber-900/50"
+                      />
                     </div>
-                  )}
-                </CardContent>
-
-                {/* Actions */}
-                <div className="flex items-center justify-between gap-3 pt-3 border-t bg-muted/20 px-4 sm:px-6 pb-4">
-                  <p className="text-xs text-muted-foreground">
-                    {submitting ? "Submitting..." : lastSavedTime ? `Saved ${lastSavedTime}` : "Auto-saves"}
-                  </p>
-                  <div className="flex gap-2">
-                    <Button type="button" variant="ghost" onClick={() => router.back()} disabled={submitting} size="sm">Cancel</Button>
-                    <Button type="button" variant="outline" onClick={handleManualSave} disabled={submitting} size="sm" className="gap-1.5"><Save className="h-3.5 w-3.5" />Save</Button>
-                    <Button type="submit" loading={submitting} className="gap-1.5" size="sm"><Send className="h-3.5 w-3.5" />Submit</Button>
                   </div>
-                </div>
-              </form>
-            </Card>
-          </div>
+                )}
+              </div>
 
-          {/* RIGHT: Sidebar (4 columns) */}
-          <aside className="lg:col-span-4 space-y-0">
-            <LeaveSummarySidebar
-              type={type}
-              dateRange={dateRange}
-              requestedDays={requestedDays}
-              remainingBalance={remainingBalance}
-              balancesLoading={balancesLoading}
-              balancesError={Boolean(balancesError)}
-              warnings={warnings}
-              projectedBalancePercent={projectedBalancePercent}
-              policyHint={policyHint}
-              allBalances={
-                balances
-                  ? {
-                      EARNED: balances.EARNED,
-                      CASUAL: balances.CASUAL,
-                      MEDICAL: balances.MEDICAL,
-                    }
-                  : undefined
-              }
-            />
-          </aside>
+              {/* Enhanced Footer Actions */}
+              <div className="p-6 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between mt-auto">
+                <Button type="button" variant="ghost" onClick={() => router.back()} disabled={submitting} className="text-muted-foreground hover:text-foreground">
+                  Cancel
+                </Button>
+                <div className="flex gap-3">
+                  <Button type="button" variant="outline" onClick={handleManualSave} disabled={submitting} className="bg-white shadow-sm border-slate-200">
+                    Save Draft
+                  </Button>
+                  <Button
+                    type="submit"
+                    loading={submitting}
+                    className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 rounded-xl px-8"
+                  >
+                    Submit Request
+                  </Button>
+                </div>
+              </div>
+            </form>
+          </Card>
+        </div>
+
+        {/* Sidebar */}
+        <div className="lg:col-span-4 space-y-6">
+          <LeaveSummarySidebar
+            type={type}
+            dateRange={dateRange}
+            requestedDays={requestedDays}
+            remainingBalance={remainingBalance}
+            balancesLoading={balancesLoading}
+            balancesError={Boolean(balancesError)}
+            warnings={warnings}
+            projectedBalancePercent={projectedBalancePercent}
+            policyHint={policyHint}
+            allBalances={balances ? { EARNED: balances.EARNED, CASUAL: balances.CASUAL, MEDICAL: balances.MEDICAL } : undefined}
+          />
         </div>
       </div>
 
-      {/* Sticky Submit Button (visible on scroll for mobile) */}
+      {/* Mobile Sticky Button */}
       {showStickyButton && (
         <div className="fixed bottom-6 right-6 z-50 lg:hidden">
           <Button
-            onClick={(e) => {
-              e.preventDefault();
-              initiateReview();
-            }}
+            onClick={(e) => { e.preventDefault(); initiateReview(); }}
             disabled={submitting}
             size="lg"
-            className="shadow-lg hover:shadow-xl transition-all gap-2"
+            className="shadow-xl rounded-full h-14 w-14 p-0 flex items-center justify-center bg-indigo-600 text-white"
           >
-            <Send className="size-4" aria-hidden="true" />
-            {submitting ? "Submitting..." : "Submit Request"}
+            <Send className="size-6 ml-0.5" />
           </Button>
         </div>
       )}

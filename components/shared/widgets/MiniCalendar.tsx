@@ -83,7 +83,7 @@ export function MiniCalendar() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="rounded-2xl border border-white/20 p-3 shadow-inner">
-            <Calendar className="h-5 w-5 text-data-info" />
+            <Calendar className="h-5 w-5 text-info dark:text-info/90" />
           </div>
           <div>
             <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
@@ -99,8 +99,8 @@ export function MiniCalendar() {
         </span>
       </div>
 
-      <div className="rounded-2xl border border-data-info/20 bg-[color-mix(in_srgb,var(--color-data-info)10%,transparent)] px-4 py-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-data-info">
+      <div className="rounded-2xl border border-info/20 bg-[color-mix(in_srgb,var(--color-data-info)10%,transparent)] px-4 py-3">
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-info dark:text-info/90">
           Today
         </p>
         <p className="text-lg font-semibold text-foreground">
@@ -127,13 +127,13 @@ export function MiniCalendar() {
                 key={index}
                 className={cn(
                   "aspect-square rounded-xl border border-white/5 p-1 text-center text-xs font-semibold",
-                  hasLeave && !isToday && "bg-data-success/15 text-data-success",
-                  isToday && "bg-data-info text-background",
+                  hasLeave && !isToday && "bg-success dark:bg-success/80/15 text-success dark:text-success/90",
+                  isToday && "bg-info dark:bg-info/80 text-background",
                   !hasLeave && !isToday && "bg-[color-mix(in_srgb,var(--color-card)95%,transparent)]"
                 )}
               >
                 {day}
-                {hasLeave && !isToday && <div className="mt-0.5 h-1 rounded-full bg-data-success" />}
+                {hasLeave && !isToday && <div className="mt-0.5 h-1 rounded-full bg-success dark:bg-success/80" />}
               </div>
             );
           })}
@@ -143,10 +143,10 @@ export function MiniCalendar() {
       {approvedLeaves.length > 0 && (
         <div className="flex items-center gap-4 border-t border-white/5 pt-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded bg-data-success" /> Approved
+            <span className="h-3 w-3 rounded bg-success dark:bg-success/80" /> Approved
           </div>
           <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded bg-data-info" /> Today
+            <span className="h-3 w-3 rounded bg-info dark:bg-info/80" /> Today
           </div>
         </div>
       )}

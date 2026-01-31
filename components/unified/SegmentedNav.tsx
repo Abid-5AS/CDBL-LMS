@@ -9,7 +9,7 @@ type NavLink = {
   label: string;
 };
 
-import { getNavItemsForRole, type UserRole } from "@/lib/navigation";
+import { getNavItemsForRole, type UserRole } from "@/lib/ui/navigation";
 
 export function SegmentedNav({ role }: { role: "EMPLOYEE" | "HR_ADMIN" }) {
   const pathname = usePathname();
@@ -21,7 +21,7 @@ export function SegmentedNav({ role }: { role: "EMPLOYEE" | "HR_ADMIN" }) {
 
   return (
     <nav
-      className="flex items-center gap-1 rounded-full bg-bg-secondary p-1"
+      className="flex items-center gap-1 rounded-full bg-muted dark:bg-muted/80 p-1"
       role="navigation"
       aria-label="Main navigation"
     >
@@ -41,10 +41,10 @@ export function SegmentedNav({ role }: { role: "EMPLOYEE" | "HR_ADMIN" }) {
             className={clsx(
               "relative px-4 py-2 text-sm font-medium transition-all duration-300 ease-out rounded-full",
               "focus:outline-none focus:ring-2 focus:ring-card-action focus:ring-offset-2",
-              "hover:bg-bg-primary/50",
+              "hover:bg-card dark:bg-card/90/50",
               isActive
-                ? "bg-card-action text-text-inverted shadow-sm"
-                : "text-text-secondary hover:text-text-secondary"
+                ? "bg-card-action text-white dark:text-white shadow-sm"
+                : "text-muted-foreground dark:text-muted-foreground/80 hover:text-muted-foreground dark:text-muted-foreground/80"
             )}
             aria-current={isActive ? "page" : undefined}
           >

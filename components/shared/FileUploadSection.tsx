@@ -69,10 +69,10 @@ export function FileUploadSection({
 
   return (
     <div className="space-y-2">
-      <Label className="text-sm font-medium text-text-secondary">
+      <Label className="text-sm font-medium text-muted-foreground dark:text-muted-foreground/80">
         {required ? (
           <>
-            Medical Certificate <span className="text-data-error">*</span>
+            Medical Certificate <span className="text-danger dark:text-danger/90">*</span>
           </>
         ) : (
           "Supporting Document"
@@ -98,15 +98,15 @@ export function FileUploadSection({
         <div
           className={cn(
             "flex items-center gap-3 rounded-xl border p-4",
-            "border-border-strong",
-            "bg-bg-secondary"
+            "border-border dark:border-border/50",
+            "bg-muted dark:bg-muted/80"
           )}
         >
-          <div className="rounded-lg bg-data-info/10 p-2 border border-data-info/20">
-            <FileText className="h-5 w-5 text-data-info" />
+          <div className="rounded-lg bg-info dark:bg-info/80/10 p-2 border border-info/20">
+            <FileText className="h-5 w-5 text-info dark:text-info/90" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-text-secondary truncate">
+            <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground/80 truncate">
               {value.name}
             </p>
             <p className="text-xs text-muted-foreground">
@@ -129,7 +129,7 @@ export function FileUploadSection({
 
       {displayError && (
         <p
-          className="text-sm text-data-error flex items-center gap-1"
+          className="text-sm text-danger dark:text-danger/90 flex items-center gap-1"
           role="alert"
         >
           <AlertCircle className="h-3 w-3" aria-hidden="true" />

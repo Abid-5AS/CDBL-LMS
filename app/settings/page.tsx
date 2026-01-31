@@ -4,13 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 
 export default async function SettingsPage() {
   return (
-    <div className="space-y-6">
-      <section className="rounded-xl border border-border-strong dark:border-border-strong bg-bg-primary dark:bg-bg-secondary p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold text-foreground">Settings</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Manage your account preferences and notification settings
-        </p>
-      </section>
+    <div className="h-full">
       <Suspense fallback={<SettingsFallback />}>
         <SettingsGate />
       </Suspense>
@@ -40,8 +34,8 @@ async function SettingsGate() {
 function SettingsFallback() {
   return (
     <div className="space-y-6">
-      <div className="h-64 bg-bg-secondary dark:bg-bg-secondary rounded-xl animate-pulse" />
-      <div className="h-48 bg-bg-secondary dark:bg-bg-secondary rounded-xl animate-pulse" />
+      <div className="h-64 bg-muted dark:bg-muted/80 dark:bg-muted dark:bg-muted/80 rounded-xl animate-pulse" />
+      <div className="h-48 bg-muted dark:bg-muted/80 dark:bg-muted dark:bg-muted/80 rounded-xl animate-pulse" />
     </div>
   );
 }

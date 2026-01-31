@@ -540,3 +540,110 @@ export function PartialCancelModal({
     </Dialog>
   );
 }
+
+export function CancelLeaveModal({
+  leaveId,
+  open,
+  onOpenChange,
+}: {
+  leaveId: number;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [timeoutId]);
+
+  const onConfirm = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Use PATCH method as per employee cancellation endpoint
+      const response = await fetch(`/api/leaves/${leaveId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to cancel leave request");
+      }
+
+      setSuccess(true);
+
+      const newTimeoutId = setTimeout(() => {
+        onOpenChange(false);
+        router.refresh();
+      }, 2000);
+
+      setTimeoutId(newTimeoutId);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>Cancel Leave Request</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to cancel this leave request? This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+
+        {success ? (
+          <Alert className="bg-green-50 border-green-200">
+            <CheckCircle2 className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-800">
+              Leave request cancelled successfully!
+            </AlertDescription>
+          </Alert>
+        ) : (
+          <div className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={loading}
+              >
+                Go Back
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={onConfirm}
+                disabled={loading}
+              >
+                {loading ? "Cancelling..." : "Yes, Cancel Request"}
+              </Button>
+            </DialogFooter>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}

@@ -11,8 +11,7 @@ import {
 import { useTheme } from "next-themes";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
-import { RechartsGlassTooltip } from "@/components/ui/recharts-glass-tooltip";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 
 export type Slice = {
   type?: "CASUAL" | "EARNED" | "MEDICAL";
@@ -45,10 +44,32 @@ const TYPE_COLORS_MAP: Record<string, string> = {
   MEDICAL: "hsl(var(--chart-3))",
 };
 
+// Custom glass-styled tooltip
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="glass-card rounded-lg p-3 border border-border/50 shadow-xl backdrop-blur-xl">
+        <p className="text-sm font-semibold text-foreground mb-2">{data.name}</p>
+        <div className="space-y-1">
+          <div className="flex items-center justify-between gap-3 text-xs">
+            <span className="text-muted-foreground">Count:</span>
+            <span className="font-semibold text-foreground">{data.value}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3 text-xs">
+            <span className="text-muted-foreground">Percentage:</span>
+            <span className="font-semibold text-foreground">{data.share.toFixed(1)}%</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
 
 // Custom label renderer with better styling
 const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
-  if (percent < 5) return null; // Hide labels for small slices (< 5%)
+  if (percent < 0.05) return null; // Hide labels for small slices (< 5%)
 
   const RADIAN = Math.PI / 180;
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -65,7 +86,7 @@ const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent
       className="text-xs font-semibold"
       style={{ textShadow: "0 0 4px rgba(0,0,0,0.8)" }}
     >
-      {`${percent.toFixed(1)}%`}
+      {`${(percent * 100).toFixed(1)}%`}
     </text>
   );
 };
@@ -98,7 +119,7 @@ export function TypePie({
       return {
         name: displayName,
         value: slice.value,
-        percent: (slice.value / total) * 100,
+        share: (slice.value / total) * 100, // Renamed from percent to share to avoid Recharts collision
         type: slice.type,
         originalIndex: index,
       };
@@ -120,7 +141,7 @@ export function TypePie({
   }
 
   return (
-    <div className={cn("w-full", className)} style={{ height: `${height}px`, minHeight: `${height}px` }}>
+    <div className={cn("w-full", className)} style={{ height: `${height}px` }}>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -155,7 +176,7 @@ export function TypePie({
               />
             ))}
           </Pie>
-          <RechartsTooltip content={<RechartsGlassTooltip />} />
+          <RechartsTooltip content={<CustomTooltip />} />
           {showLegend && (
             <Legend
               wrapperStyle={{
@@ -168,7 +189,7 @@ export function TypePie({
                 const data = entry.payload;
                 return (
                   <span className="text-xs text-muted-foreground">
-                    {value}: <span className="font-semibold text-foreground">{data.value}</span> ({data.percent.toFixed(1)}%)
+                    {value}: <span className="font-semibold text-foreground">{data.value}</span> ({data.share.toFixed(1)}%)
                   </span>
                 );
               }}

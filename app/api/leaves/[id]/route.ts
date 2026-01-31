@@ -1,11 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/src/generated/prisma/client";
 import { normalizeToDhakaMidnight } from "@/lib/date-utils";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
-import { canCancelMaternityLeave } from "@/lib/leave-validation";
+import { canCancelMaternityLeave } from "@/lib/leaves/leave-validation";
+
+import { LeaveRepository } from "@/lib/repositories/leave.repository";
+
+/**
+ * Get leave request details
+ */
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const traceId = getTraceId(request as any);
+  const me = await getCurrentUser();
+  if (!me) return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
+
+  const { id: paramId } = await params;
+  const id = Number(paramId);
+  if (Number.isNaN(id)) return NextResponse.json(error("invalid_id", undefined, traceId), { status: 400 });
+
+  const leave = await LeaveRepository.findById(id);
+
+  if (!leave) {
+    return NextResponse.json(error("not_found", undefined, traceId), { status: 404 });
+  }
+
+  // Access control:
+  // 1. Requester can see their own leave
+  // 2. HR/Admins can see all leaves
+  // 3. Approvers can see leaves assigned to them (or generally all if they have broad view, but let's stick to basics)
+  const isRequester = leave.requesterId === me.id;
+  const isAdmin = ["HR_ADMIN", "HR_HEAD", "SYSTEM_ADMIN", "CEO"].includes(me.role);
+  // Simple check for now, can be expanded for specific approvers if needed
+
+  if (!isRequester && !isAdmin) {
+    // Check if user is an approver for this leave?
+    // For now, mirroring PATCH logic which restricts to requester, but we can allow admins too for view
+    return NextResponse.json(error("not_found", undefined, traceId), { status: 404 });
+  }
+
+  return NextResponse.json(leave);
+}
 
 /**
  * Employee-initiated cancellation
@@ -13,6 +50,7 @@ import { canCancelMaternityLeave } from "@/lib/leave-validation";
  * - SUBMITTED/PENDING → CANCELLED (immediate cancellation)
  * - APPROVED → CANCELLATION_REQUESTED (requires HR review)
  * - MATERNITY after start → BLOCKED (cannot cancel)
+ * - RETURNED → CANCELLED
  */
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const traceId = getTraceId(request as any);

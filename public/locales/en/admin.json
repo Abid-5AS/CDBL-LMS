@@ -1,0 +1,25 @@
+{
+    "nav": {
+        "dashboard": "Dashboard",
+        "employees": "Employees",
+        "departments": "Departments",
+        "policies": "Policies",
+        "reports": "Reports",
+        "settings": "Settings",
+        "audit": "Audit Logs",
+        "payroll": "Payroll"
+    },
+    "users": {
+        "title": "User Management",
+        "addUser": "Add User",
+        "editUser": "Edit User",
+        "roles": "Roles",
+        "active": "Active",
+        "inactive": "Inactive"
+    },
+    "settings": {
+        "general": "General Settings",
+        "notifications": "Notification Settings",
+        "security": "Security Settings"
+    }
+}

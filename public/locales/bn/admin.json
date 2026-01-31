@@ -1,0 +1,25 @@
+{
+    "nav": {
+        "dashboard": "ড্যাশবোর্ড",
+        "employees": "কর্মচারী",
+        "departments": "বিভাগ",
+        "policies": "নীতিমালা",
+        "reports": "প্রতিবেদন",
+        "settings": "সেটিংস",
+        "audit": "অডিট লগ",
+        "payroll": "বেতন"
+    },
+    "users": {
+        "title": "ব্যবহারকারী ব্যবস্থাপনা",
+        "addUser": "ব্যবহারকারী যোগ করুন",
+        "editUser": "ব্যবহারকারী সম্পাদনা করুন",
+        "roles": "ভূমিকা",
+        "active": "সক্রিয়",
+        "inactive": "নিষ্ক্রিয়"
+    },
+    "settings": {
+        "general": "সাধারণ সেটিংস",
+        "notifications": "নোটিফিকেশন সেটিংস",
+        "security": "নিরাপত্তা সেটিংস"
+    }
+}

@@ -4,7 +4,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
-import { LeaveType, LeaveStatus, LeaveRequest, Prisma, ApprovalDecision } from "@prisma/client";
+import { LeaveType, LeaveStatus, LeaveRequest, Prisma, ApprovalDecision } from "@/src/generated/prisma/client";
 
 /**
  * Standard includes for leave requests
@@ -16,6 +16,7 @@ const DEFAULT_INCLUDES = {
       name: true,
       email: true,
       role: true,
+      department: true,
       joinDate: true,
       retirementDate: true,
     },
@@ -60,7 +61,7 @@ export class LeaveRepository {
   /**
    * Find all leaves for a user
    */
-  static async findByUserId(userId: number, status?: LeaveStatus, options?: { limit?: number }): Promise<LeaveRequestWithRelations[]> {
+  static async findByUserId(userId: number, status?: LeaveStatus, options?: { limit?: number; cursor?: number }): Promise<LeaveRequestWithRelations[]> {
     return prisma.leaveRequest.findMany({
       where: {
         requesterId: userId,
@@ -69,6 +70,10 @@ export class LeaveRepository {
       include: DEFAULT_INCLUDES,
       orderBy: { createdAt: "desc" },
       ...(options?.limit && { take: options.limit }),
+      ...(options?.cursor && {
+        cursor: { id: options.cursor },
+        skip: 1, // Skip the cursor itself
+      }),
     });
   }
 
@@ -119,13 +124,18 @@ export class LeaveRepository {
     type?: LeaveType;
     requesterId?: number;
     limit?: number;
+    cursor?: number;
   }): Promise<LeaveRequestWithRelations[]> {
-    const { limit, ...whereFilters } = filters || {};
+    const { limit, cursor, ...whereFilters } = filters || {};
     return prisma.leaveRequest.findMany({
       where: whereFilters,
       include: DEFAULT_INCLUDES,
       orderBy: { createdAt: "desc" },
       ...(limit && { take: limit }),
+      ...(cursor && {
+        cursor: { id: cursor },
+        skip: 1,
+      }),
     });
   }
 
@@ -329,7 +339,13 @@ export class LeaveRepository {
   /**
    * Get leave statistics for a user
    */
-  static async getUserLeaveStats(userId: number, year: number) {
+  static async getUserLeaveStats(userId: number, year: number): Promise<{
+    total: number;
+    approved: number;
+    pending: number;
+    rejected: number;
+    byType: Record<string, { count: number; days: number }>;
+  }> {
     const startOfYear = new Date(year, 0, 1);
     const endOfYear = new Date(year, 11, 31);
 

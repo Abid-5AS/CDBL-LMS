@@ -1,144 +1,119 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
-}
-
-enum Role {
-  EMPLOYEE
-  DEPT_HEAD
-  HR_ADMIN
-  HR_HEAD
-  CEO
-  SYSTEM_ADMIN
-}
-
-enum LeaveType {
-  EARNED
-  CASUAL
-  MEDICAL
-  EXTRAWITHPAY
-  EXTRAWITHOUTPAY
-  MATERNITY
-  PATERNITY
-  STUDY
-  SPECIAL_DISABILITY
-  QUARANTINE
-  SPECIAL // EL excess >60 days, usable for medical or rest outside Bangladesh (Policy 6.19.c)
-}
-
-enum LeaveStatus {
-  DRAFT
-  SUBMITTED
-  PENDING
-  APPROVED
-  REJECTED
-  CANCELLED
-  RETURNED
-  CANCELLATION_REQUESTED
-  RECALLED
 }
 
 model User {
-  id         Int       @id @default(autoincrement())
-  name       String
-  email      String    @unique
-  password   String?
-  empCode    String?   @unique
-  role       Role      @default(EMPLOYEE)
-  department String?
-  deptHeadId     Int?       // User ID of department head (self-relation)
-  joinDate       DateTime? // Service start date for eligibility calculations (Policy 6.18)
-  retirementDate DateTime? // Expected retirement date for study leave validation (Policy 6.25.a)
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-
-  leaves              LeaveRequest[]
-  balances            Balance[]
-  approvals           Approval[]           @relation("ApprovalApprover")
-  deptHead            User?                @relation("HeadToMembers", fields: [deptHeadId], references: [id])
-  teamMembers         User[]               @relation("HeadToMembers")
-  encashmentRequests  EncashmentRequest[]
-  encashmentApprovals EncashmentRequest[]  @relation("EncashmentApprover")
-  savedReports        SavedReport[]
+  id                    Int                  @id @default(autoincrement())
+  empCode               String?              @unique
+  name                  String
+  email                 String               @unique
+  role                  Role                 @default(EMPLOYEE)
+  department            String?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  joinDate              DateTime?
+  retirementDate        DateTime?
+  password              String?
+  deptHeadId            Int?
+  approvals             Approval[]           @relation("ApprovalApprover")
+  delegationsReceived   ApprovalDelegation[] @relation("DelegationsReceived")
+  delegationsDelegated  ApprovalDelegation[] @relation("DelegationsDelegated")
+  balances              Balance[]
+  adjustmentsMade       BalanceAdjustment[]  @relation("AdjustmentsMade")
+  balanceAdjustments    BalanceAdjustment[]  @relation("BalanceAdjustments")
+  bankDetails           BankDetails?
+  calendarConfigs       CalendarConfig[]
+  emergencyContacts     EmergencyContact[]
+  encashmentApprovals   EncashmentRequest[]  @relation("EncashmentApprover")
+  encashmentProcessed   EncashmentRequest[]  @relation("EncashmentProcessor")
+  encashmentRequests    EncashmentRequest[]
+  hrisConflictsEmployee HRISConflict[]       @relation("HRISConflictsEmployee")
+  hrisConflictsResolver HRISConflict[]       @relation("HRISConflictsResolver")
+  hrisSyncs             HRISSync[]           @relation("HRISSyncs")
+  leaves                LeaveRequest[]
+  leaveTemplates        LeaveTemplate[]
+  policyVersions        PolicyVersion[]
+  scheduledReports      ScheduledReport[]    @relation("ReportCreator")
+  deptHead              User?                @relation("HeadToMembers", fields: [deptHeadId], references: [id])
+  teamMembers           User[]               @relation("HeadToMembers")
+  documents             UserDocument[]
+  preferences           UserPreferences?
+  profile               UserProfile?
+  webhooks              Webhook[]
+  policyUpdates         WorkflowPolicy[]     @relation("PolicyUpdates")
 
   @@index([deptHeadId])
 }
 
 model LeaveRequest {
-  id                    Int         @id @default(autoincrement())
+  id                    Int                    @id @default(autoincrement())
   requesterId           Int
   type                  LeaveType
-  originalType          LeaveType?  // Tracks if type was changed during approval
   startDate             DateTime
   endDate               DateTime
   workingDays           Int
   reason                String
-  needsCertificate      Boolean     @default(false)
-  certificateUrl        String? // medical certificate upload
-  fitnessCertificateUrl String? // fitness certificate for ML > 7 days on return
-  status                LeaveStatus @default(DRAFT)
-  policyVersion         String // e.g. "v2.0"
-  isModified            Boolean     @default(false) // True if request was returned and resubmitted
-  parentLeaveId         Int? // For extension/linked requests - references original leave
-  isExtension           Boolean     @default(false) // True if this is an extension request
-  isCancellationRequest Boolean     @default(false) // True if this is a cancellation request (partial or full)
-  isPartialCancellation Boolean     @default(false) // True if this is a partial cancellation request
-  originalEndDate       DateTime? // For partial cancellation: stores the original end date before cancellation
-  cancellationReason    String? // Reason for cancellation request
-  incidentDate          DateTime? // For Special Disability Leave: Date of disabling incident (Policy 6.22)
-  payCalculation        Json? // For Special Disability Leave: Pay breakdown { fullPayDays, halfPayDays, unPaidDays }
-  studyLeaveDocuments   Json? // For Study Leave: { admissionLetterUrl, loanAgreementUrl, feeReceiptUrl, courseDetails: { name, institution, duration, completionDate } }
-  createdAt             DateTime    @default(now())
-  updatedAt             DateTime    @updatedAt
-
-  requester    User           @relation(fields: [requesterId], references: [id])
-  approvals    Approval[]
-  comments     LeaveComment[]
-  versions     LeaveVersion[]
-  parentLeave  LeaveRequest?  @relation("LeaveExtension", fields: [parentLeaveId], references: [id])
-  extensions   LeaveRequest[] @relation("LeaveExtension")
+  needsCertificate      Boolean                @default(false)
+  certificateUrl        String?
+  status                LeaveStatus            @default(DRAFT)
+  policyVersion         String
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  fitnessCertificateUrl String?
+  parentLeaveId         Int?
+  isExtension           Boolean                @default(false)
+  isModified            Boolean                @default(false)
+  cancellationReason    String?
+  incidentDate          DateTime?
+  isCancellationRequest Boolean                @default(false)
+  isPartialCancellation Boolean                @default(false)
+  originalEndDate       DateTime?
+  payCalculation        Json?
+  studyLeaveDocuments   Json?
+  isHalfDay             Boolean                @default(false)
+  halfDayPeriod         String?                // "AM" or "PM"
+  approvals             Approval[]
+  calendarMappings      LeaveCalendarMapping[]
+  comments              LeaveComment[]
+  parentLeave           LeaveRequest?          @relation("LeaveExtension", fields: [parentLeaveId], references: [id])
+  extensions            LeaveRequest[]         @relation("LeaveExtension")
+  requester             User                   @relation(fields: [requesterId], references: [id])
+  versions              LeaveVersion[]
 
   @@index([requesterId, status])
+  @@index([requesterId, status, createdAt])
   @@index([parentLeaveId])
-  @@index([status, startDate]) // Optimize dashboard stats queries
-  @@index([status, updatedAt]) // Optimize processed today queries
-  @@index([startDate, endDate, status]) // Optimize employees on leave queries
-  @@index([type, status, startDate]) // Optimize leave type breakdown queries
-  @@index([type, startDate]) // For type-based trend analysis
-  @@index([requesterId, createdAt]) // For employee history queries
-  @@index([status, createdAt]) // For recent activity tracking
-}
-
-enum ApprovalDecision {
-  APPROVED
-  REJECTED
-  FORWARDED
-  PENDING
-  RETURNED
+  @@index([status, startDate])
+  @@index([status, updatedAt])
+  @@index([status, createdAt])
+  @@index([startDate, endDate, status])
+  @@index([type, status, startDate])
+  @@index([type, status])
+  @@index([createdAt])
 }
 
 model Approval {
   id         Int              @id @default(autoincrement())
   leaveId    Int
-  step       Int // Step in approval chain: 1=HR_ADMIN, 2=DEPT_HEAD, 3=HR_HEAD, 4=CEO
+  step       Int
   approverId Int
   decision   ApprovalDecision @default(PENDING)
-  toRole     String? // Role forwarded to (if decision is FORWARDED)
   comment    String?
   decidedAt  DateTime?
-
-  leave    LeaveRequest @relation(fields: [leaveId], references: [id])
-  approver User         @relation("ApprovalApprover", fields: [approverId], references: [id])
+  toRole     String?
+  approver   User             @relation("ApprovalApprover", fields: [approverId], references: [id])
+  leave      LeaveRequest     @relation(fields: [leaveId], references: [id])
 
   @@index([leaveId])
-  @@index([approverId, decision]) // Optimize pending approvals query
-  @@index([approverId, decidedAt]) // Optimize approval history queries
-  @@index([step, decidedAt]) // For funnel analysis
-  @@index([leaveId, step]) // For approval chain traversal
+  @@index([leaveId, step])
+  @@index([approverId, decision])
+  @@index([approverId, decision, decidedAt])
+  @@index([approverId, decidedAt])
 }
 
 model Balance {
@@ -146,14 +121,14 @@ model Balance {
   userId  Int
   type    LeaveType
   year    Int
-  opening Int // carry-forward (for EL)
-  accrued Int // e.g., EL accrual 2 days / month
+  opening Int
+  accrued Int
   used    Int       @default(0)
   closing Int
-
-  user User @relation(fields: [userId], references: [id])
+  user    User      @relation(fields: [userId], references: [id])
 
   @@unique([userId, type, year])
+  @@index([userId, year])
 }
 
 model Holiday {
@@ -186,31 +161,477 @@ model AuditLog {
 }
 
 model LeaveComment {
-  id         Int      @id @default(autoincrement())
+  id         Int          @id @default(autoincrement())
   leaveId    Int
   authorId   Int
-  authorRole String // Role of the person who wrote the comment
+  authorRole String
   comment    String
-  createdAt  DateTime @default(now())
-
-  leave LeaveRequest @relation(fields: [leaveId], references: [id], onDelete: Cascade)
+  createdAt  DateTime     @default(now())
+  leave      LeaveRequest @relation(fields: [leaveId], references: [id], onDelete: Cascade)
 
   @@index([leaveId])
 }
 
 model LeaveVersion {
-  id          Int      @id @default(autoincrement())
-  leaveId     Int
-  version     Int // Version number (1, 2, 3, etc.)
-  data        Json // JSON snapshot of the leave request at this version
-  createdAt   DateTime @default(now())
-  createdById Int
-  createdByRole String // Role of person who created this version (usually EMPLOYEE on resubmit)
-
-  leave LeaveRequest @relation(fields: [leaveId], references: [id], onDelete: Cascade)
+  id            Int          @id @default(autoincrement())
+  leaveId       Int
+  version       Int
+  data          Json
+  createdAt     DateTime     @default(now())
+  createdById   Int
+  createdByRole String
+  leave         LeaveRequest @relation(fields: [leaveId], references: [id], onDelete: Cascade)
 
   @@index([leaveId])
   @@index([leaveId, version])
+}
+
+model EncashmentRequest {
+  id                Int              @id @default(autoincrement())
+  userId            Int
+  year              Int
+  daysRequested     Int
+  balanceAtRequest  Int
+  reason            String?
+  status            EncashmentStatus @default(PENDING)
+  approvedBy        Int?
+  approvedAt        DateTime?
+  rejectionReason   String?
+  paidAt            DateTime?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  paymentDate       DateTime?
+  paymentMethod     String?
+  paymentReceiptUrl String?
+  paymentReference  String?
+  paymentStatus     String?
+  processedBy       Int?
+  approver          User?            @relation("EncashmentApprover", fields: [approvedBy], references: [id])
+  processor         User?            @relation("EncashmentProcessor", fields: [processedBy], references: [id])
+  user              User             @relation(fields: [userId], references: [id])
+
+  @@index([userId, status])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([approvedBy], map: "EncashmentRequest_approvedBy_fkey")
+  @@index([processedBy], map: "EncashmentRequest_processedBy_fkey")
+}
+
+model OrgSettings {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique
+  value       Json
+  description String?
+  updatedAt   DateTime @updatedAt
+  updatedBy   Int?
+}
+
+model OtpCode {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  email     String
+  code      String
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  attempts  Int      @default(0)
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([email, verified])
+  @@index([expiresAt])
+  @@map("OtpCode")
+}
+
+model Notification {
+  id        Int              @id @default(autoincrement())
+  userId    Int
+  type      NotificationType
+  title     String
+  message   String
+  link      String?
+  leaveId   Int?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  expiresAt DateTime?
+  readAt    DateTime?
+
+  @@index([userId, read])
+  @@index([userId, read, createdAt])
+  @@index([userId, createdAt])
+  @@index([createdAt])
+}
+
+model BalanceAdjustment {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  leaveType       LeaveType
+  year            Int
+  amount          Int
+  reason          String
+  previousBalance Int
+  newBalance      Int
+  adjustedBy      Int
+  createdAt       DateTime  @default(now())
+  adjustedByUser  User      @relation("AdjustmentsMade", fields: [adjustedBy], references: [id])
+  user            User      @relation("BalanceAdjustments", fields: [userId], references: [id])
+
+  @@index([userId, leaveType, year])
+  @@index([adjustedBy])
+  @@index([createdAt])
+}
+
+model ApprovalDelegation {
+  id          Int      @id @default(autoincrement())
+  delegatorId Int
+  delegateId  Int
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(true)
+  reason      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isPermanent Boolean  @default(false)
+  leaveTypes  Json?
+  delegate    User     @relation("DelegationsReceived", fields: [delegateId], references: [id])
+  delegator   User     @relation("DelegationsDelegated", fields: [delegatorId], references: [id])
+
+  @@index([delegatorId, isActive])
+  @@index([delegateId, isActive])
+  @@index([startDate, endDate])
+}
+
+model EscalationRule {
+  id             Int      @id @default(autoincrement())
+  role           Role
+  timeoutHours   Int
+  escalateToRole Role
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([role, escalateToRole])
+}
+
+model UserPreferences {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @unique
+  dashboardLayout Json?
+  theme           String?  @default("system")
+  notifications   Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model HRISSync {
+  id            Int            @id @default(autoincrement())
+  provider      String
+  status        String
+  startedAt     DateTime       @default(now())
+  completedAt   DateTime?
+  recordsTotal  Int
+  recordsSynced Int            @default(0)
+  recordsFailed Int            @default(0)
+  errors        Json?
+  createdBy     Int
+  conflicts     HRISConflict[]
+  user          User           @relation("HRISSyncs", fields: [createdBy], references: [id])
+
+  @@index([status, startedAt])
+  @@index([createdBy])
+}
+
+model HRISConflict {
+  id           Int       @id @default(autoincrement())
+  syncId       Int
+  employeeId   Int?
+  conflictType String
+  hrisData     Json
+  systemData   Json
+  resolution   String?
+  resolvedBy   Int?
+  resolvedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  employee     User?     @relation("HRISConflictsEmployee", fields: [employeeId], references: [id])
+  resolver     User?     @relation("HRISConflictsResolver", fields: [resolvedBy], references: [id])
+  sync         HRISSync  @relation(fields: [syncId], references: [id], onDelete: Cascade)
+
+  @@index([syncId, resolution])
+  @@index([employeeId])
+  @@index([resolvedBy], map: "HRISConflict_resolvedBy_fkey")
+}
+
+model LeaveTemplate {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  name      String
+  leaveType LeaveType
+  duration  Int
+  reason    String
+  isShared  Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model PolicyVersion {
+  id            Int      @id @default(autoincrement())
+  version       String
+  changes       Json
+  changedBy     Int
+  effectiveFrom DateTime
+  createdAt     DateTime @default(now())
+  changedByUser User     @relation(fields: [changedBy], references: [id])
+
+  @@index([effectiveFrom])
+  @@index([changedBy], map: "PolicyVersion_changedBy_fkey")
+}
+
+model UserProfile {
+  id               Int       @id @default(autoincrement())
+  userId           Int       @unique
+  phone            String?
+  address          String?   @db.Text
+  permanentAddress String?   @db.Text
+  dob              DateTime?
+  gender           String?
+  bloodGroup       String?
+  maritalStatus    String?
+  nid              String?
+  tin              String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EmergencyContact {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  name      String
+  relation  String
+  phone     String
+  address   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model BankDetails {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  bankName      String
+  accountNumber String
+  branchName    String?
+  routingNumber String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserDocument {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  title      String
+  type       String
+  fileUrl    String
+  uploadedAt DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model ScheduledReport {
+  id           Int               @id @default(autoincrement())
+  name         String
+  reportType   ReportType
+  format       ReportFormat
+  frequency    ReportFrequency
+  recipients   Json
+  filters      Json?
+  scheduleTime String?
+  scheduleDay  Int?
+  isActive     Boolean           @default(true)
+  lastRunAt    DateTime?
+  nextRunAt    DateTime?
+  createdBy    Int
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  executions   ReportExecution[]
+  creator      User              @relation("ReportCreator", fields: [createdBy], references: [id])
+
+  @@index([createdBy])
+  @@index([isActive, nextRunAt])
+  @@index([reportType, isActive])
+}
+
+model ReportExecution {
+  id          Int             @id @default(autoincrement())
+  reportId    Int
+  status      ExecutionStatus @default(PENDING)
+  startedAt   DateTime        @default(now())
+  completedAt DateTime?
+  fileUrl     String?
+  fileSize    Int?
+  recordCount Int?
+  errorLog    String?         @db.Text
+  sentTo      Json?
+  report      ScheduledReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId, status])
+  @@index([startedAt])
+}
+
+model CalendarConfig {
+  id                Int                    @id @default(autoincrement())
+  userId            Int
+  provider          CalendarProvider
+  providerAccountId String
+  accessToken       String                 @db.Text
+  refreshToken      String                 @db.Text
+  tokenExpiry       DateTime
+  calendarId        String?
+  isActive          Boolean                @default(true)
+  lastSyncAt        DateTime?
+  syncErrors        Json?
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  user              User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mappings          LeaveCalendarMapping[]
+
+  @@unique([userId, provider])
+  @@index([userId, isActive])
+  @@index([provider])
+}
+
+model LeaveCalendarMapping {
+  id               Int            @id @default(autoincrement())
+  leaveId          Int
+  calendarConfigId Int
+  externalEventId  String
+  lastSyncedAt     DateTime       @default(now())
+  syncStatus       String         @default("synced")
+  errorMessage     String?        @db.Text
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  calendarConfig   CalendarConfig @relation(fields: [calendarConfigId], references: [id], onDelete: Cascade)
+  leave            LeaveRequest   @relation(fields: [leaveId], references: [id], onDelete: Cascade)
+
+  @@unique([leaveId, calendarConfigId])
+  @@index([leaveId])
+  @@index([calendarConfigId])
+  @@index([syncStatus])
+}
+
+model Webhook {
+  id              Int               @id @default(autoincrement())
+  name            String
+  url             String            @db.Text
+  events          Json
+  secret          String            @db.Text
+  enabled         Boolean           @default(true)
+  description     String?           @db.Text
+  headers         Json?
+  lastTriggeredAt DateTime?
+  failureCount    Int               @default(0)
+  lastFailureAt   DateTime?
+  createdBy       Int
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  creator         User              @relation(fields: [createdBy], references: [id])
+  deliveries      WebhookDelivery[]
+
+  @@index([enabled])
+  @@index([createdBy])
+  @@index([lastTriggeredAt])
+}
+
+model WebhookDelivery {
+  id              Int       @id @default(autoincrement())
+  webhookId       Int
+  event           String
+  payload         Json
+  requestUrl      String    @db.Text
+  requestHeaders  Json?
+  requestBody     Json
+  responseStatus  Int?
+  responseHeaders Json?
+  responseBody    String?   @db.Text
+  status          String
+  attempts        Int       @default(0)
+  maxAttempts     Int       @default(3)
+  errorMessage    String?   @db.Text
+  errorCode       String?
+  deliveredAt     DateTime?
+  nextRetryAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  webhook         Webhook   @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@index([webhookId])
+  @@index([event])
+  @@index([status])
+  @@index([createdAt])
+  @@index([nextRetryAt])
+}
+
+model WorkflowPolicy {
+  id            Int        @id @default(autoincrement())
+  requesterRole Role       @unique
+  leaveType     LeaveType?
+  chain         Json
+  isActive      Boolean    @default(true)
+  updatedAt     DateTime   @updatedAt
+  updatedBy     Int?
+  updatedByUser User?      @relation("PolicyUpdates", fields: [updatedBy], references: [id])
+
+  @@index([updatedBy], map: "WorkflowPolicy_updatedBy_fkey")
+}
+
+enum Role {
+  EMPLOYEE
+  DEPT_HEAD
+  HR_ADMIN
+  HR_HEAD
+  CEO
+  SYSTEM_ADMIN
+}
+
+enum LeaveType {
+  EARNED
+  CASUAL
+  MEDICAL
+  EXTRAWITHPAY
+  EXTRAWITHOUTPAY
+  MATERNITY
+  PATERNITY
+  STUDY
+  SPECIAL_DISABILITY
+  QUARANTINE
+  SPECIAL
+}
+
+enum LeaveStatus {
+  DRAFT
+  SUBMITTED
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+  RETURNED
+  CANCELLATION_REQUESTED
+  RECALLED
+}
+
+enum ApprovalDecision {
+  APPROVED
+  REJECTED
+  FORWARDED
+  PENDING
+  RETURNED
 }
 
 enum EncashmentStatus {
@@ -220,56 +641,6 @@ enum EncashmentStatus {
   PAID
 }
 
-// EL Encashment Request (Policy 6.19.f)
-// Employees can encash EL balance exceeding 10 days
-model EncashmentRequest {
-  id               Int               @id @default(autoincrement())
-  userId           Int
-  year             Int // Year of EL balance being encashed
-  daysRequested    Int // Days employee wants to encash
-  balanceAtRequest Int // EL balance at time of request (for audit)
-  reason           String? // Optional reason for encashment
-  status           EncashmentStatus  @default(PENDING)
-  approvedBy       Int? // User ID of approver (typically CEO)
-  approvedAt       DateTime?
-  rejectionReason  String?
-  paidAt           DateTime? // When payment was processed
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-
-  user     User  @relation(fields: [userId], references: [id])
-  approver User? @relation("EncashmentApprover", fields: [approvedBy], references: [id])
-
-  @@index([userId, status])
-  @@index([status])
-}
-
-model OrgSettings {
-  id          Int      @id @default(autoincrement())
-  key         String   @unique
-  value       Json
-  description String?
-  updatedAt   DateTime @updatedAt
-  updatedBy   Int? // User ID
-}
-
-// 2FA OTP (One-Time Password) Model
-model OtpCode {
-  id           Int      @id @default(autoincrement())
-  userId       Int
-  email        String
-  code         String // 6-digit code
-  expiresAt    DateTime
-  verified     Boolean  @default(false)
-  attempts     Int      @default(0) // Track verification attempts
-  ipAddress    String? // Track IP for security
-  createdAt    DateTime @default(now())
-
-  @@index([email, verified])
-  @@index([expiresAt])
-  @@map("OtpCode")
-}
-
 enum NotificationType {
   LEAVE_SUBMITTED
   LEAVE_APPROVED
@@ -277,55 +648,56 @@ enum NotificationType {
   LEAVE_RETURNED
   LEAVE_FORWARDED
   LEAVE_CANCELLED
-  LEAVE_TYPE_CHANGED
   LEAVE_CANCELLATION_REQUESTED
   LEAVE_APPROACHING
   APPROVAL_REQUIRED
   ENCASHMENT_APPROVED
   ENCASHMENT_REJECTED
   SYSTEM_ANNOUNCEMENT
+  LEAVE_TYPE_CHANGED
 }
 
-// Real-time notification system
-model Notification {
-  id         Int              @id @default(autoincrement())
-  userId     Int // Recipient user ID
-  type       NotificationType
-  title      String
-  message    String
-  link       String? // Optional link to related resource (e.g., /leaves/123)
-  leaveId    Int? // Related leave request ID
-  read       Boolean          @default(false)
-  createdAt  DateTime         @default(now())
-  expiresAt  DateTime? // Optional expiry for time-sensitive notifications
-
-  @@index([userId, read])
-  @@index([userId, createdAt])
-  @@index([createdAt])
+enum ReportType {
+  LEAVE_SUMMARY
+  LEAVE_BALANCE
+  LEAVE_UTILIZATION
+  ATTENDANCE_REPORT
+  APPROVAL_TIMES
+  DEPARTMENT_ANALYTICS
+  EMPLOYEE_HISTORY
+  BURNOUT_RISK
+  COST_ANALYSIS
+  PATTERN_DETECTION
+  FORECAST_REPORT
+  COMPLIANCE_AUDIT
 }
 
-model AnalyticsCache {
-  id        Int      @id @default(autoincrement())
-  key       String   @unique
-  data      Json
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([key, expiresAt])
+enum ReportFormat {
+  PDF
+  EXCEL
+  CSV
+  JSON
 }
 
-model SavedReport {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  config      Json     // Stores the ReportConfig object
-  schedule    String?  // Cron expression for scheduled reports
-  recipients  String?  // Comma-separated email addresses
-  creatorId   Int
-  creator     User     @relation(fields: [creatorId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+enum ReportFrequency {
+  DAILY
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+  CUSTOM
+}
 
-  @@index([creatorId])
+enum ExecutionStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum CalendarProvider {
+  GOOGLE
+  OUTLOOK
 }

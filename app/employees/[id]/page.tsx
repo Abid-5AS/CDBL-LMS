@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
-import { unstable_noStore as noStore } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { canViewAllRequests, canViewEmployee, canEditEmployee, type AppRole } from "@/lib/rbac";
 import { getEmployeeDashboardData } from "@/lib/employee";
@@ -10,6 +9,8 @@ import { prisma } from "@/lib/prisma";
 
 // Note: dynamic export removed - incompatible with Next.js 16 cacheComponents
 // Using unstable_noStore() inside component for dynamic behavior
+
+export const dynamic = "force-dynamic";
 
 type EmployeePageProps = {
   params: Promise<{ id: string }>;
@@ -25,7 +26,6 @@ export default function EmployeeDetailPage(props: EmployeePageProps) {
 }
 
 async function EmployeeDashboardSection({ params, searchParams }: EmployeePageProps) {
-  noStore();
   const user = await getCurrentUser();
   
   if (!user) {
@@ -98,12 +98,12 @@ async function EmployeeDashboardSection({ params, searchParams }: EmployeePagePr
 
 function EmployeeDashboardFallback() {
   return (
-    <div className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
-      <div className="h-4 w-32 rounded bg-bg-secondary" />
+    <div className="rounded-xl border border-border dark:border-border/50 bg-card dark:bg-card/90 p-6 shadow-sm">
+      <div className="h-4 w-32 rounded bg-muted dark:bg-muted/80" />
       <div className="mt-4 space-y-3">
-        <div className="h-28 rounded-lg bg-bg-secondary" />
-        <div className="h-28 rounded-lg bg-bg-secondary" />
-        <div className="h-48 rounded-lg bg-bg-secondary" />
+        <div className="h-28 rounded-lg bg-muted dark:bg-muted/80" />
+        <div className="h-28 rounded-lg bg-muted dark:bg-muted/80" />
+        <div className="h-48 rounded-lg bg-muted dark:bg-muted/80" />
       </div>
     </div>
   );

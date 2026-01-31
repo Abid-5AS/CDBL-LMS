@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import type { DensityMode } from "@/lib/ui/density-modes";
 import { statusBadgeClass } from "@/lib/ui/density-modes";
-import type { LeaveStatus } from "@prisma/client";
+import type { LeaveStatus } from "@/lib/enums";
 
 interface StatusBadgeProps {
   status: LeaveStatus;

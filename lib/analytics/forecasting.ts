@@ -1,87 +1,200 @@
-interface HistoricalData {
-    period: number; // e.g., timestamp or month index
-    value: number;
-}
+import { prisma } from '@/lib/prisma';
+import { LeaveStatus } from '@prisma/client';
+import { addMonths, startOfMonth, endOfMonth, differenceInMonths } from 'date-fns';
+import type { ForecastResult } from './types';
 
-interface ForecastResult {
-    period: number;
-    value: number;
-    confidenceLower: number;
-    confidenceUpper: number;
-}
+/**
+ * Leave Forecasting Engine
+ * Predicts future leave trends using historical data
+ */
+export class LeaveForecast {
+  /**
+   * Forecast leave volume for next N months
+   * Uses simple moving average with seasonal adjustment
+   */
+  static async forecastLeaveVolume(
+    monthsAhead: number = 3,
+    department?: string
+  ): Promise<ForecastResult[]> {
+    // Get historical data (last 12 months)
+    const now = new Date();
+    const startDate = addMonths(startOfMonth(now), -12);
+    const endDate = endOfMonth(now);
 
-// Simple Linear Regression
-export function linearRegressionForecast(
-    history: HistoricalData[],
-    periodsToForecast: number
-): ForecastResult[] {
-    const n = history.length;
-    if (n < 2) return [];
-
-    let sumX = 0;
-    let sumY = 0;
-    let sumXY = 0;
-    let sumXX = 0;
-
-    history.forEach((point) => {
-        sumX += point.period;
-        sumY += point.value;
-        sumXY += point.period * point.value;
-        sumXX += point.period * point.period;
+    const leaves = await prisma.leaveRequest.findMany({
+      where: {
+        status: LeaveStatus.APPROVED,
+        startDate: {
+          gte: startDate,
+          lte: endDate,
+        },
+        ...(department && {
+          requester: {
+            department,
+          },
+        }),
+      },
+      select: {
+        startDate: true,
+        workingDays: true,
+      },
     });
 
-    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
-    const intercept = (sumY - slope * sumX) / n;
+    // Group by month
+    const monthlyData = new Map<string, number>();
 
-    // Calculate standard error for confidence intervals
-    const residuals = history.map(p => p.value - (slope * p.period + intercept));
-    const stdError = Math.sqrt(residuals.reduce((a, b) => a + b * b, 0) / (n - 2));
-
-    const forecast: ForecastResult[] = [];
-    const lastPeriod = history[n - 1].period;
-
-    for (let i = 1; i <= periodsToForecast; i++) {
-        const nextPeriod = lastPeriod + i;
-        const predicted = slope * nextPeriod + intercept;
-
-        // 95% confidence interval (approx 1.96 * stdError)
-        // Widening as we go further out
-        const margin = 1.96 * stdError * Math.sqrt(1 + 1 / n + (Math.pow(nextPeriod - (sumX / n), 2) / sumXX));
-
-        forecast.push({
-            period: nextPeriod,
-            value: Math.max(0, Math.round(predicted)),
-            confidenceLower: Math.max(0, Math.round(predicted - margin)),
-            confidenceUpper: Math.round(predicted + margin),
-        });
+    for (const leave of leaves) {
+      const monthKey = `${leave.startDate.getFullYear()}-${String(leave.startDate.getMonth() + 1).padStart(2, '0')}`;
+      monthlyData.set(monthKey, (monthlyData.get(monthKey) || 0) + leave.workingDays);
     }
 
-    return forecast;
-}
+    // Calculate moving average
+    const values = Array.from(monthlyData.values());
+    const movingAverage = values.length > 0
+      ? values.reduce((sum, val) => sum + val, 0) / values.length
+      : 0;
 
-// Simple Moving Average
-export function movingAverageForecast(
-    history: HistoricalData[],
-    periodsToForecast: number,
-    windowSize: number = 3
-): ForecastResult[] {
-    const forecast: ForecastResult[] = [];
-    let currentHistory = [...history.map(h => h.value)];
-    const lastPeriod = history[history.length - 1].period;
+    // Calculate standard deviation for confidence interval
+    const variance =
+      values.length > 0
+        ? values.reduce((sum, val) => sum + Math.pow(val - movingAverage, 2), 0) / values.length
+        : 0;
+    const stdDev = Math.sqrt(variance);
 
-    for (let i = 1; i <= periodsToForecast; i++) {
-        const window = currentHistory.slice(-windowSize);
-        const avg = window.reduce((a, b) => a + b, 0) / window.length;
+    // Detect seasonal patterns
+    const seasonalFactors = this.calculateSeasonalFactors(monthlyData);
 
-        forecast.push({
-            period: lastPeriod + i,
-            value: Math.round(avg),
-            confidenceLower: Math.round(avg * 0.8), // Simple heuristic
-            confidenceUpper: Math.round(avg * 1.2)
-        });
+    // Generate forecasts
+    const forecasts: ForecastResult[] = [];
 
-        currentHistory.push(avg);
+    for (let i = 1; i <= monthsAhead; i++) {
+      const forecastMonth = addMonths(startOfMonth(now), i);
+      const monthKey = `${forecastMonth.getFullYear()}-${String(forecastMonth.getMonth() + 1).padStart(2, '0')}`;
+      const seasonalFactor = seasonalFactors.get(forecastMonth.getMonth()) || 1;
+
+      const forecastedValue = movingAverage * seasonalFactor;
+
+      // Determine trend
+      let trend: 'increasing' | 'stable' | 'decreasing' = 'stable';
+      if (values.length >= 3) {
+        const recentAvg = values.slice(-3).reduce((sum, val) => sum + val, 0) / 3;
+        const olderAvg = values.slice(0, 3).reduce((sum, val) => sum + val, 0) / 3;
+
+        if (recentAvg > olderAvg * 1.1) trend = 'increasing';
+        else if (recentAvg < olderAvg * 0.9) trend = 'decreasing';
+      }
+
+      forecasts.push({
+        period: monthKey,
+        forecastedLeaveDays: Math.round(forecastedValue),
+        confidenceInterval: {
+          lower: Math.max(0, Math.round(forecastedValue - stdDev * 1.96)),
+          upper: Math.round(forecastedValue + stdDev * 1.96),
+        },
+        seasonalFactor: Math.round(seasonalFactor * 100) / 100,
+        trend,
+      });
     }
 
-    return forecast;
+    return forecasts;
+  }
+
+  /**
+   * Calculate seasonal factors by month (0-11)
+   */
+  private static calculateSeasonalFactors(
+    monthlyData: Map<string, number>
+  ): Map<number, number> {
+    const monthAverages = new Map<number, number[]>();
+
+    // Group by month of year
+    monthlyData.forEach((days, monthKey) => {
+      const [year, month] = monthKey.split('-');
+      const monthNum = parseInt(month) - 1; // 0-based
+
+      if (!monthAverages.has(monthNum)) {
+        monthAverages.set(monthNum, []);
+      }
+      monthAverages.get(monthNum)!.push(days);
+    });
+
+    // Calculate average for each month
+    const seasonalFactors = new Map<number, number>();
+    const overallAvg =
+      Array.from(monthlyData.values()).reduce((sum, val) => sum + val, 0) /
+      monthlyData.size;
+
+    for (let month = 0; month < 12; month++) {
+      const values = monthAverages.get(month) || [];
+      if (values.length > 0) {
+        const monthAvg = values.reduce((sum, val) => sum + val, 0) / values.length;
+        seasonalFactors.set(month, monthAvg / overallAvg);
+      } else {
+        seasonalFactors.set(month, 1);
+      }
+    }
+
+    return seasonalFactors;
+  }
+
+  /**
+   * Identify peak leave periods in historical data
+   */
+  static async identifyPeakPeriods(
+    lookbackMonths: number = 12,
+    department?: string
+  ): Promise<
+    {
+      period: string;
+      leaveDays: number;
+      percentageAboveAverage: number;
+    }[]
+  > {
+    const now = new Date();
+    const startDate = addMonths(startOfMonth(now), -lookbackMonths);
+
+    const leaves = await prisma.leaveRequest.findMany({
+      where: {
+        status: LeaveStatus.APPROVED,
+        startDate: {
+          gte: startDate,
+        },
+        ...(department && {
+          requester: {
+            department,
+          },
+        }),
+      },
+      select: {
+        startDate: true,
+        workingDays: true,
+      },
+    });
+
+    // Group by month
+    const monthlyData = new Map<string, number>();
+
+    for (const leave of leaves) {
+      const monthKey = `${leave.startDate.getFullYear()}-${String(leave.startDate.getMonth() + 1).padStart(2, '0')}`;
+      monthlyData.set(monthKey, (monthlyData.get(monthKey) || 0) + leave.workingDays);
+    }
+
+    // Calculate average
+    const values = Array.from(monthlyData.values());
+    const average = values.length > 0
+      ? values.reduce((sum, val) => sum + val, 0) / values.length
+      : 0;
+
+    // Find peaks (months with >20% above average)
+    const peaks = Array.from(monthlyData.entries())
+      .filter(([_, days]) => days > average * 1.2)
+      .map(([period, days]) => ({
+        period,
+        leaveDays: days,
+        percentageAboveAverage: Math.round(((days - average) / average) * 100),
+      }))
+      .sort((a, b) => b.leaveDays - a.leaveDays);
+
+    return peaks;
+  }
 }

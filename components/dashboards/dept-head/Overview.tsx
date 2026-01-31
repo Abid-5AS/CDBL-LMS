@@ -4,8 +4,9 @@ import { Suspense, useMemo } from "react";
 import { DeptHeadPendingTable } from "./sections/PendingTable";
 import { TeamCoverageCalendar } from "./components/TeamCoverageCalendar";
 import { DeptHeadQuickActions } from "./sections/QuickActions";
+import { TeamCapacityCalendar } from "./sections/TeamCapacityCalendar";
 import { useApiQueryWithParams } from "@/lib/apiClient";
-import { useFilterFromUrl } from "@/lib/url-filters";
+import { useFilterFromUrl } from "@/lib/ui/url-filters";
 import {
   RoleKPICard,
   ResponsiveDashboardGrid,
@@ -110,12 +111,6 @@ export function DeptHeadDashboardWrapper() {
         title: "Large Approval Queue",
         detail: `${counts.pending} requests awaiting review.`,
         tone: "warning",
-      });
-    } else if (counts.pending > 0) {
-       items.push({
-        title: "Pending Approvals",
-        detail: `${counts.pending} requests awaiting review.`,
-        tone: "info",
       });
     }
 
@@ -234,7 +229,7 @@ export function DeptHeadDashboardWrapper() {
             <RoleKPICard
               title={
                 <div className="flex items-center gap-2">
-                  <span>{METRIC_LABELS.SENT_BACK}</span>
+                  <span>Returned</span>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
@@ -347,6 +342,16 @@ export function DeptHeadDashboardWrapper() {
               <DeptHeadQuickActions />
             </Suspense>
           </div>
+        </DashboardSection>
+
+        {/* Team Capacity Calendar */}
+        <DashboardSection
+          title="Team Capacity"
+          description="Monitor team availability and plan leave approvals"
+        >
+          <Suspense fallback={<CardSkeleton />}>
+            <TeamCapacityCalendar daysAhead={30} />
+          </Suspense>
         </DashboardSection>
       </div>
     </TooltipProvider>

@@ -110,27 +110,24 @@ export function ProfileMenu({ user, onLogout, isLoggingOut }: ProfileMenuProps) 
           <DropdownMenuTrigger asChild>
             <motion.button
               type="button"
-              whileHover={{ scale: 1.02, y: -1 }}
+              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="flex items-center gap-2.5 px-2.5 py-1 rounded-xl bg-background/80 dark:bg-muted/60 border border-border hover:border-border-strong hover:bg-background dark:hover:bg-muted hover:shadow-md transition-all duration-300 focus:outline-none focus-ring"
+              className="flex items-center gap-3 pl-1 pr-3 py-1 rounded-full bg-muted/50 hover:bg-white hover:shadow-md border border-transparent hover:border-border/40 transition-all duration-300 group"
             >
-              <div className="text-left hidden sm:block">
-                <div className="text-[11px] font-semibold text-foreground tracking-tight leading-tight">
-                  {user.name}
-                </div>
-                <div className="text-[10px] text-muted-foreground tracking-tight leading-tight">
-                  {user.department || user.role}
-                </div>
-              </div>
               <div className="relative">
                 <motion.div
-                  whileHover={{ rotate: 5 }}
-                  className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent p-0.5 shadow-md"
+                  className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-violet-500 p-[2px] shadow-sm group-hover:shadow-md transition-all"
                 >
-                  <div className="w-full h-full rounded-full flex items-center justify-center bg-background dark:bg-muted text-xs font-bold text-foreground">
+                  <div className="w-full h-full rounded-full flex items-center justify-center bg-white dark:bg-slate-950 text-xs font-bold text-indigo-600 dark:text-indigo-400">
                     {initials}
                   </div>
                 </motion.div>
+              </div>
+
+              <div className="text-left hidden xl:block">
+                <div className="text-xs font-semibold text-foreground group-hover:text-indigo-700 transition-colors">
+                  {user.name}
+                </div>
               </div>
             </motion.button>
           </DropdownMenuTrigger>

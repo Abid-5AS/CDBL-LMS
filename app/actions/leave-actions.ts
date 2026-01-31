@@ -11,7 +11,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { LeaveService } from "@/lib/services/leave.service";
 import { NotificationService } from "@/lib/services/notification.service";
-import type { LeaveType } from "@prisma/client";
+import type { LeaveType } from "@/src/generated/prisma/client";
 import { invalidateHRAdminStatsCache } from "@/lib/dashboard/hr-admin-data";
 
 // Helper to check if user has approver privileges

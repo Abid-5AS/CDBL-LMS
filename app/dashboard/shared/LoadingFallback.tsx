@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 export function DashboardLoadingFallback() {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      <div className="relative h-36 rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm overflow-hidden">
+      <div className="relative h-36 rounded-xl border border-border dark:border-border/50 bg-card dark:bg-card/90 p-6 shadow-sm overflow-hidden">
         <div className="absolute inset-0 shimmer-effect" />
         <Skeleton className="h-6 w-48 mb-3" />
         <Skeleton className="h-4 w-full max-w-md" />
@@ -20,7 +20,7 @@ export function DashboardLoadingFallback() {
         {Array.from({ length: 3 }).map((_, i) => (
           <div
             key={i}
-            className="relative h-32 rounded-xl border border-border-strong bg-bg-primary shadow-sm overflow-hidden"
+            className="relative h-32 rounded-xl border border-border dark:border-border/50 bg-card dark:bg-card/90 shadow-sm overflow-hidden"
             style={{ animationDelay: `${i * 100}ms` }}
           >
             <div className="absolute inset-0 shimmer-effect" />

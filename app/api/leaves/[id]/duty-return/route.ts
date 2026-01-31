@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/src/generated/prisma/client";
 import { canReturn } from "@/lib/rbac";
 import { z } from "zod";
 import type { AppRole } from "@/lib/rbac";

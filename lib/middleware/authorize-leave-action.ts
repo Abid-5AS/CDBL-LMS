@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { canPerformAction, isFinalApprover } from "@/lib/workflow";
 import type { AppRole } from "@/lib/rbac";
 import type { ApprovalAction } from "@/lib/workflow";
-import type { LeaveType } from "@prisma/client";
+import type { LeaveType } from "@/src/generated/prisma/client";
 
 /**
  * Authorization Middleware for Leave Actions

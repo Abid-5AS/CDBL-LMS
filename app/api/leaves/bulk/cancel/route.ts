@@ -4,8 +4,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
 import { canCancel } from "@/lib/rbac";
-import { canCancelMaternityLeave } from "@/lib/leave-validation";
-import { processELOverflow } from "@/lib/el-overflow";
+import { canCancelMaternityLeave } from "@/lib/leaves/leave-validation";
+import { processELOverflow } from "@/lib/leaves/el-overflow";
 
 export const cache = "no-store";
 

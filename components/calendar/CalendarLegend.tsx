@@ -2,8 +2,8 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
-import { LeaveType } from "@prisma/client";
-import { leaveTypeLabel } from "@/lib/ui";
+import { LeaveType } from "@/lib/enums";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 
 // Semantic colors for statuses
 export const STATUS_COLORS = {

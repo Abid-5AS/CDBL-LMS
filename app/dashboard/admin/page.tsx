@@ -7,7 +7,7 @@ import { DashboardLayout } from "../shared/DashboardLayout";
 
 async function AdminDashboardContent() {
   const user = await getCurrentUser();
-  
+
   if (!user) {
     redirect("/login");
   }
@@ -20,12 +20,7 @@ async function AdminDashboardContent() {
   const username = user.name ?? "System Admin";
 
   return (
-    <DashboardLayout
-      title="Admin Console"
-      description="System-level configuration and management"
-    >
-      <SystemAdminDashboard username={username} />
-    </DashboardLayout>
+    <SystemAdminDashboard username={username} />
   );
 }
 

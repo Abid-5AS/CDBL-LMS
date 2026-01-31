@@ -38,7 +38,7 @@ import { EmployeePageHero } from "@/components/employee/PageHero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { useUser } from "@/lib/user-context";
+import { useUser } from "@/components/providers/UserContext";
 
 // ============================================
 // Policy Data
@@ -311,130 +311,132 @@ function PolicyCard({ policy }: PolicyCardProps) {
   const Icon = policy.icon;
 
   return (
-    <div className="neo-card p-6">
-      <CardHeader>
-        <div className="flex items-start justify-between">
+    <div className="neo-card p-6 rounded-[20px] border border-border/60 bg-white dark:bg-card text-card-foreground shadow-md transition-all hover:shadow-lg">
+      <div className="flex flex-col gap-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className={cn("p-2 rounded-lg bg-muted", policy.color)}>
+            <div className={cn("p-2.5 rounded-xl bg-muted/50", policy.color)}>
               <Icon className="size-6" />
             </div>
             <div>
-              <CardTitle className="text-xl">{policy.title}</CardTitle>
-              <CardDescription>Policy {policy.code}</CardDescription>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xl font-semibold leading-none tracking-tight">{policy.title}</h3>
+                <Badge variant="outline" className="text-xs font-normal text-muted-foreground">
+                  {policy.code}
+                </Badge>
+              </div>
               {policy.summary && (
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-1.5 text-sm text-muted-foreground max-w-2xl">
                   {policy.summary}
                 </p>
               )}
             </div>
           </div>
-          <Badge variant="secondary" className="text-sm">
+          <Badge variant="secondary" className="text-sm px-3 py-1 h-auto self-start sm:self-auto shrink-0">
             {policy.availability}
           </Badge>
         </div>
-      </CardHeader>
 
-      <CardContent className="space-y-4">
-        {/* Rules */}
+        {/* Rules Grid */}
         <div className="space-y-3">
-          <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-            Policy Rules
-          </h4>
-          <Accordion type="multiple" className="space-y-2">
+          <div className="flex items-center gap-2">
+            <h4 className="font-semibold text-xs text-muted-foreground uppercase tracking-wider">
+              Policy Rules
+            </h4>
+            <div className="h-px bg-border flex-1" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {policy.rules.map((rule, index) => {
-              const severityClass =
+              const severityStyles =
                 rule.type === "critical"
-                  ? "border-red-500/40 bg-red-50/60 dark:bg-red-900/10"
+                  ? "border-l-4 border-l-red-500 bg-red-50/50 dark:bg-red-950/20"
                   : rule.type === "warning"
-                  ? "border-amber-500/40 bg-amber-50/50 dark:bg-amber-900/10"
-                  : "border-border/60 bg-muted/30 dark:bg-muted/20";
+                    ? "border-l-4 border-l-amber-500 bg-amber-50/50 dark:bg-amber-950/20"
+                    : "border-l-4 border-l-blue-500 bg-card hover:bg-muted/30";
+
+              const iconColor =
+                rule.type === "critical" ? "text-red-600 dark:text-red-400" :
+                  rule.type === "warning" ? "text-amber-600 dark:text-amber-400" :
+                    "text-blue-600 dark:text-blue-400";
+
               const LeadingIcon =
                 rule.type === "critical"
                   ? XCircle
                   : rule.type === "warning"
-                  ? AlertCircle
-                  : CheckCircle2;
+                    ? AlertCircle
+                    : CheckCircle2;
 
               return (
-                <AccordionItem
+                <div
                   key={`${policy.code}-${index}`}
-                  value={`${policy.code}-${index}`}
-                  className="border-none"
+                  className={cn(
+                    "relative flex flex-col gap-2 p-4 rounded-lg border shadow-sm transition-all hover:shadow-md",
+                    severityStyles
+                  )}
                 >
-                  <AccordionTrigger
-                    className={cn(
-                      "rounded-lg border px-3 py-2 text-left hover:no-underline focus:ring-0",
-                      severityClass
-                    )}
-                  >
-                    <div className="flex w-full items-center justify-between gap-3">
-                      <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                        <LeadingIcon className="size-4 shrink-0" />
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <LeadingIcon className={cn("size-4 shrink-0", iconColor)} />
+                      <span className="font-medium text-sm text-foreground">
                         {rule.title}
-                      </div>
-                      <Badge variant="outline" className="text-xs">
-                        {rule.policyRef}
-                      </Badge>
+                      </span>
                     </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="pt-2">
-                    <p className="text-sm text-muted-foreground">
-                      {rule.description}
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
+                    <span className="text-[10px] font-mono text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded">
+                      {rule.policyRef}
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground pl-6 leading-relaxed">
+                    {rule.description}
+                  </p>
+                </div>
               );
             })}
-          </Accordion>
+          </div>
         </div>
 
         {/* Examples */}
         {policy.examples && policy.examples.length > 0 && (
-          <div className="space-y-3">
+          <div className="space-y-3 pt-2">
             <button
               onClick={() => setExpanded(!expanded)}
-              className="flex items-center justify-between gap-2 font-semibold text-sm text-muted-foreground uppercase tracking-wide hover:text-foreground transition-colors w-full"
+              className="group flex items-center gap-2 w-full text-left"
             >
-              <span>
-                Examples ({policy.examples.length})
-              </span>
-              <span className="flex items-center gap-2 text-xs font-medium normal-case text-muted-foreground">
-                {!expanded && (
-                  <span className="line-clamp-1">
-                    {policy.examples[0]?.scenario}
-                  </span>
-                )}
+              <div className="flex items-center justify-center p-1 rounded-md bg-muted group-hover:bg-muted/80 transition-colors">
                 {expanded ? (
-                  <ChevronUp className="size-4" />
+                  <ChevronUp className="size-4 text-muted-foreground" />
                 ) : (
-                  <ChevronDown className="size-4" />
+                  <ChevronDown className="size-4 text-muted-foreground" />
                 )}
+              </div>
+              <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+                View Scenarios & Examples ({policy.examples.length})
               </span>
+              <div className="h-px bg-border flex-1" />
             </button>
 
             {expanded && (
-              <div className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 animate-in slide-in-from-top-2 duration-200">
                 {policy.examples.map((example, index) => (
                   <div
                     key={index}
-                    className="p-3 rounded-md border border-border bg-muted/30 dark:bg-muted/50"
+                    className="flex items-start gap-3 p-3 rounded-lg border bg-muted/20"
                   >
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5">
-                        {example.valid ? (
-                          <CheckCircle2 className="size-5 text-green-600" />
-                        ) : (
-                          <XCircle className="size-5 text-red-600" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-sm">
-                          {example.scenario}
-                        </p>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {example.result}
-                        </p>
-                      </div>
+                    <div className="mt-0.5 shrink-0">
+                      {example.valid ? (
+                        <CheckCircle2 className="size-5 text-emerald-600 dark:text-emerald-500" />
+                      ) : (
+                        <XCircle className="size-5 text-red-600 dark:text-red-500" />
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <p className="font-medium text-sm text-foreground">
+                        "{example.scenario}"
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        → {example.result}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -442,7 +444,7 @@ function PolicyCard({ policy }: PolicyCardProps) {
             )}
           </div>
         )}
-      </CardContent>
+      </div>
     </div>
   );
 }
@@ -494,7 +496,7 @@ export function PolicyPageContent() {
   const heroStats = [
     { label: "Policy Sections", value: policySections.length },
     { label: "Rules Documented", value: totalRules },
-    { label: "Critical Alerts", value: criticalRules, state: criticalRules ? "danger" : "default" },
+    { label: "Critical Alerts", value: criticalRules, state: (criticalRules ? "danger" : "default") as "danger" | "default" },
   ];
 
   return (
@@ -536,7 +538,7 @@ export function PolicyPageContent() {
       />
 
       {/* Quick Reference */}
-      <Alert className="surface-card border border-border/70">
+      <Alert className="surface-card border border-border/60 rounded-[20px] bg-white dark:bg-card shadow-md">
         <FileText className="size-4" />
         <AlertTitle>Quick Reference</AlertTitle>
         <AlertDescription>
@@ -547,7 +549,7 @@ export function PolicyPageContent() {
       </Alert>
 
       {/* Search */}
-      <div className="surface-card p-4 rounded-3xl space-y-2">
+      <div className="surface-card p-4 rounded-[20px] space-y-2 bg-white dark:bg-card border border-border/60 shadow-md">
         <label className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
           Search policies
         </label>
@@ -568,14 +570,14 @@ export function PolicyPageContent() {
       </div>
 
       {/* Tabs for Organization */}
-      <Tabs defaultValue="all" className="w-full surface-card p-4 rounded-3xl">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 bg-muted/50 rounded-2xl">
-          <TabsTrigger value="all">All Policies</TabsTrigger>
-          <TabsTrigger value="cl">CL</TabsTrigger>
-          <TabsTrigger value="el">EL</TabsTrigger>
-          <TabsTrigger value="ml">ML</TabsTrigger>
-          <TabsTrigger value="maternity">Maternity</TabsTrigger>
-          <TabsTrigger value="paternity">Paternity</TabsTrigger>
+      <Tabs defaultValue="all" className="w-full space-y-6">
+        <TabsList className="grid w-full h-auto grid-cols-2 lg:grid-cols-6 bg-slate-200/60 dark:bg-slate-800/80 p-1.5 rounded-2xl">
+          <TabsTrigger value="all" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md">All Policies</TabsTrigger>
+          <TabsTrigger value="cl" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md">CL</TabsTrigger>
+          <TabsTrigger value="el" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md">EL</TabsTrigger>
+          <TabsTrigger value="ml" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md">ML</TabsTrigger>
+          <TabsTrigger value="maternity" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md">Maternity</TabsTrigger>
+          <TabsTrigger value="paternity" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md">Paternity</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="space-y-6 mt-6">
@@ -587,7 +589,7 @@ export function PolicyPageContent() {
             <Alert variant="default">
               <AlertTitle>No matches</AlertTitle>
               <AlertDescription>
-                No policies match 
+                No policies match
                 <span className="font-semibold">“{policySearch}”</span>.
                 Try another keyword.
               </AlertDescription>
@@ -672,7 +674,7 @@ export function PolicyPageContent() {
       </Tabs>
 
       {/* Additional Resources */}
-      <Card className="surface-card">
+      <Card className="surface-card rounded-[20px] bg-white dark:bg-card border border-border/60 shadow-md">
         <CardHeader>
           <CardTitle>Additional Resources</CardTitle>
           <CardDescription>Need more information?</CardDescription>

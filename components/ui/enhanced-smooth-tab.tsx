@@ -82,7 +82,7 @@ export default function EnhancedSmoothTab({
     defaultTabId,
     value,
     className,
-    activeColor = "bg-[#1F9CFE]",
+    activeColor = "bg-primary",
     onChange,
     onDirectionChange,
     showCardContent = true,

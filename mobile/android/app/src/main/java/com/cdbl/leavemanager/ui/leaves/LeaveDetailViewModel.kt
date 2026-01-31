@@ -1,0 +1,146 @@
+package com.cdbl.leavemanager.ui.leaves
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.cdbl.leavemanager.data.model.LeaveComment
+import com.cdbl.leavemanager.data.model.LeaveRequest
+import com.cdbl.leavemanager.data.repository.LeaveRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import com.cdbl.leavemanager.data.repository.ApprovalRepository
+import javax.inject.Inject
+
+data class LeaveDetailUiState(
+    val isLoading: Boolean = false,
+    val isSubmitting: Boolean = false,
+    val leave: LeaveRequest? = null,
+    val comments: List<LeaveComment> = emptyList(),
+    val error: String? = null,
+    val actionSuccess: Boolean = false
+)
+
+@HiltViewModel
+class LeaveDetailViewModel @Inject constructor(
+    private val leaveRepository: LeaveRepository,
+    private val approvalRepository: ApprovalRepository,
+    @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(LeaveDetailUiState())
+    val uiState: StateFlow<LeaveDetailUiState> = _uiState.asStateFlow()
+
+    fun loadDetails(token: String, leaveId: Int) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null, actionSuccess = false) }
+            
+            val leaveResult = leaveRepository.getLeaveDetails(token, leaveId)
+            val commentsResult = leaveRepository.getComments(token, leaveId)
+
+            if (leaveResult.isSuccess) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        leave = leaveResult.getOrNull(),
+                        comments = commentsResult.getOrDefault(emptyList())
+                    )
+                }
+            } else {
+                _uiState.update {
+                    val errorMsg = leaveResult.exceptionOrNull()?.message
+                    it.copy(isLoading = false, error = errorMsg)
+                }
+            }
+        }
+    }
+
+    fun approveLeave(token: String, leaveId: Int, comment: String?) {
+        submitDecision(token, leaveId, "APPROVE", comment)
+    }
+
+    fun rejectLeave(token: String, leaveId: Int, comment: String?) {
+        submitDecision(token, leaveId, "REJECT", comment)
+    }
+
+    fun forwardLeave(token: String, leaveId: Int, comment: String?) {
+        submitDecision(token, leaveId, "FORWARD", comment)
+    }
+
+    fun returnLeave(token: String, leaveId: Int, comment: String?) {
+        submitDecision(token, leaveId, "RETURN", comment)
+    }
+
+
+    fun cancelLeave(token: String, leaveId: Int, reason: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSubmitting = true) }
+            val result = leaveRepository.cancelLeave(token, leaveId, reason)
+            
+            result.onSuccess { response ->
+                _uiState.update { it.copy(isSubmitting = false, actionSuccess = true) }
+                // Reload details to show updated status
+                loadDetails(token, leaveId)
+            }.onFailure { e ->
+                _uiState.update { it.copy(isSubmitting = false, error = e.message) }
+            }
+        }
+    }
+
+    // Aliases for backward compatibility with UI
+    fun fullCancelLeave(token: String, leaveId: Int, reason: String) = cancelLeave(token, leaveId, reason)
+    fun partialCancelLeave(token: String, leaveId: Int, reason: String) = cancelLeave(token, leaveId, reason)
+
+
+    private fun submitDecision(token: String, leaveId: Int, decision: String, comment: String?) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSubmitting = true) }
+            val result = approvalRepository.submitDecision(token, leaveId.toString(), decision, comment)
+            
+            result.onSuccess {
+                _uiState.update { it.copy(isSubmitting = false, actionSuccess = true) }
+                // Reload details to show updated status
+                loadDetails(token, leaveId)
+            }.onFailure { e ->
+                _uiState.update { it.copy(isSubmitting = false, error = e.message) }
+            }
+        }
+    }
+
+    fun uploadCertificate(token: String, leaveId: Int, type: String, uri: android.net.Uri) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSubmitting = true) }
+            val file = getFileFromUri(uri)
+            if (file == null) {
+                _uiState.update { it.copy(isSubmitting = false, error = "Unable to read certificate file") }
+                return@launch
+            }
+            val result = leaveRepository.uploadCertificate(token, leaveId, type, file)
+            result.onSuccess {
+                _uiState.update { it.copy(isSubmitting = false) }
+                loadDetails(token, leaveId)
+            }.onFailure { e ->
+                _uiState.update { it.copy(isSubmitting = false, error = e.message) }
+            }
+        }
+    }
+
+    private fun getFileFromUri(uri: android.net.Uri): java.io.File? {
+        return try {
+            val contentResolver = context.contentResolver
+            val fileName = "leave_certificate_${System.currentTimeMillis()}"
+            val tempFile = java.io.File(context.cacheDir, fileName)
+            contentResolver.openInputStream(uri)?.use { inputStream ->
+                java.io.FileOutputStream(tempFile).use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            }
+            tempFile
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+}

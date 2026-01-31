@@ -23,14 +23,18 @@ import { toast } from "sonner";
 
 interface TeamCalendarViewProps {
   currentUserRole: string;
+  initialEvents?: CalendarEvent[];
+  initialDate?: Date;
 }
 
-export function TeamCalendarView({ currentUserRole }: TeamCalendarViewProps) {
-  const [currentDate, setCurrentDate] = useState(new Date());
+export function TeamCalendarView({ currentUserRole, initialEvents, initialDate }: TeamCalendarViewProps) {
+  const [currentDate, setCurrentDate] = useState(initialDate || new Date());
   const [viewMode, setViewMode] = useState<CalendarViewMode>("timeline");
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [events, setEvents] = useState<CalendarEvent[]>(initialEvents || []);
+  const [loading, setLoading] = useState(!initialEvents);
   
+  const initializedRef = React.useRef(!!initialEvents);
+
   const [actionDialogOpen, setActionDialogOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [actionReason, setActionReason] = useState("");
@@ -41,6 +45,41 @@ export function TeamCalendarView({ currentUserRole }: TeamCalendarViewProps) {
   const [selectedDayEvents, setSelectedDayEvents] = useState<CalendarEvent[]>([]);
 
   useEffect(() => {
+    if (initializedRef.current) {
+      // If we have initialized with data, and the date hasn't changed from initial, skip fetch
+      if (initialDate && currentDate.getTime() === initialDate.getTime()) {
+        return;
+      }
+      // If date changed, we proceed to fetch, but first reset the ref so we don't block future fetches? 
+      // No, initializedRef just means "we used the props once". 
+      // But we only want to skip the FIRST fetch.
+      // Actually, simpler: 
+      // If initializedRef is true, we set it to false and return? 
+      // No, because we want to fetch when date changes.
+    }
+    fetchTeamData();
+  }, [currentDate]);
+
+  // Reset initializedRef when currentDate changes so we don't block fetching? 
+  // No, the logic is:
+  // On Mount:
+  //   If initialEvents provided -> set events, set loading false.
+  //   useEffect runs. We want to SKIP fetchTeamData().
+  // On Next Month Click:
+  //   setCurrentDate updates.
+  //   useEffect runs. We want to RUN fetchTeamData().
+  
+  // Correct Logic:
+  // Use a ref `shouldFetch` initialized to `!initialEvents`.
+  // In useEffect: if (!shouldFetch.current) { shouldFetch.current = true; return; } fetchTeamData();
+  
+  const shouldFetch = React.useRef(!initialEvents);
+
+  useEffect(() => {
+    if (!shouldFetch.current) {
+        shouldFetch.current = true;
+        return;
+    }
     fetchTeamData();
   }, [currentDate]);
 
@@ -134,7 +173,7 @@ export function TeamCalendarView({ currentUserRole }: TeamCalendarViewProps) {
   const pendingCount = events.filter(e => e.status === "PENDING").length;
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6">
+    <div className="w-full mx-auto space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h2 className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
           <Users className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />

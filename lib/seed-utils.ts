@@ -3,7 +3,7 @@
  * These functions ensure consistent, policy-aligned data generation
  */
 
-import { LeaveType, LeaveStatus } from "@prisma/client";
+import { LeaveType, LeaveStatus } from "@/src/generated/prisma/client";
 import { normalizeToDhakaMidnight } from "./date-utils";
 
 /**

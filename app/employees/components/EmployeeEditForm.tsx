@@ -1,10 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { toast } from "sonner";
 import type { EmployeeDashboardData } from "@/lib/employee";
 import {
@@ -14,14 +11,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
   Input,
+  Label,
   Select,
   SelectContent,
   SelectItem,
@@ -33,15 +24,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui";
+import { Loader2 } from "lucide-react";
 import { canAssignRole, type AppRole } from "@/lib/rbac";
-
-const employeeEditSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  department: z.string().min(1, "Department is required"),
-  role: z.enum(["EMPLOYEE", "DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"]),
-  empCode: z.string().optional(),
-});
+import { updateEmployeeFromForm } from "@/app/actions/employee-actions";
 
 type EmployeeEditFormProps = {
   employee: EmployeeDashboardData;
@@ -53,81 +38,60 @@ export function EmployeeEditForm({
   viewerRole,
 }: EmployeeEditFormProps) {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const [isDirty, setIsDirty] = useState(false);
 
-  const form = useForm({
-    resolver: zodResolver(employeeEditSchema),
-    defaultValues: {
-      name: employee.name,
-      email: employee.email,
-      department: employee.department || "",
-      role: employee.role as AppRole,
-      empCode: employee.id.toString(), // Using ID as empCode for now
+  const [state, formAction, isPending] = useActionState(
+    async (prevState: any, formData: FormData) => {
+      const name = formData.get("name") as string;
+      const email = formData.get("email") as string;
+      const department = formData.get("department") as string;
+      const role = formData.get("role") as string;
+      const empCode = formData.get("empCode") as string;
+
+      // Client-side validation
+      if (!name || name.length < 2) {
+        return { success: false, error: "Name must be at least 2 characters" };
+      }
+      if (!email || !email.includes("@")) {
+        return { success: false, error: "Invalid email address" };
+      }
+      if (!department || department.length < 1) {
+        return { success: false, error: "Department is required" };
+      }
+
+      // Check role assignment permissions
+      if (role !== employee.role) {
+        if (!canAssignRole(viewerRole, role as AppRole)) {
+          return { success: false, error: "You don't have permission to assign this role" };
+        }
+      }
+
+      const result = await updateEmployeeFromForm(employee.id, formData);
+      return result;
     },
-  });
+    { success: false, error: null }
+  );
 
-  const onSubmit = async (values: z.infer<typeof employeeEditSchema>) => {
-    // Check if role can be assigned
-    if (values.role !== employee.role) {
-      if (!canAssignRole(viewerRole, values.role)) {
-        toast.error("You don't have permission to assign this role");
-        return;
-      }
-    }
-
-    setIsSubmitting(true);
-
-    // Calculate changed fields for audit log
-    const changedFields: Record<string, { from: any; to: any }> = {};
-    if (values.name !== employee.name)
-      changedFields.name = { from: employee.name, to: values.name };
-    if (values.email !== employee.email)
-      changedFields.email = { from: employee.email, to: values.email };
-    if (values.department !== (employee.department || ""))
-      changedFields.department = {
-        from: employee.department,
-        to: values.department,
-      };
-    if (values.role !== employee.role)
-      changedFields.role = { from: employee.role, to: values.role };
-    if (values.empCode !== employee.id.toString())
-      changedFields.empCode = {
-        from: employee.id.toString(),
-        to: values.empCode,
-      };
-
-    try {
-      const response = await fetch(`/api/employees/${employee.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...values,
-          changedFields: Object.keys(changedFields),
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        toast.error(error.error || "Failed to update employee");
-        return;
-      }
-
+  useEffect(() => {
+    if (state.success) {
       toast.success("Employee updated successfully");
+      setIsDirty(false);
       router.push(`/employees/${employee.id}`);
       router.refresh();
-    } catch (error) {
-      console.error("Error updating employee:", error);
-      toast.error("An error occurred while updating the employee");
-    } finally {
-      setIsSubmitting(false);
+    } else if (state.error) {
+      toast.error(state.error);
     }
-  };
+  }, [state, employee.id, router]);
 
   const handleDiscard = () => {
-    form.reset();
+    formRef.current?.reset();
+    setIsDirty(false);
     toast.success("Changes discarded");
+  };
+
+  const handleInputChange = () => {
+    setIsDirty(true);
   };
 
   const roleOptions: { value: AppRole; label: string }[] = [
@@ -164,134 +128,110 @@ export function EmployeeEditForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid gap-6 md:grid-cols-2">
-                <FormField
-                  control={form.control}
+          <form ref={formRef} action={formAction} className="space-y-6" onChange={handleInputChange}>
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
                   name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Full Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="John Doe" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          placeholder="john@example.com"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="department"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Department</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Engineering" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="role"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Role</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a role" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {roleOptions.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>
-                        You can only assign roles within your permission level
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="empCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Employee Code</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="EMP001"
-                          {...field}
-                          value={field.value || ""}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  placeholder="John Doe"
+                  defaultValue={employee.name}
+                  required
+                  minLength={2}
+                  disabled={isPending}
                 />
               </div>
 
-              {/* Sticky footer - only show when dirty */}
-              {form.formState.isDirty && (
-                <div className="sticky bottom-0 z-10 border-t border-border-strong bg-bg-primary p-4 -mx-4 -mb-4 shadow-lg">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-text-secondary">
-                      You have unsaved changes
-                    </span>
-                    <div className="flex gap-3">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleDiscard}
-                        disabled={isSubmitting}
-                      >
-                        Discard
-                      </Button>
-                      <Button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="bg-card-action hover:bg-card-action"
-                      >
-                        {isSubmitting ? "Saving..." : "Save"}
-                      </Button>
-                    </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="john@example.com"
+                  defaultValue={employee.email}
+                  required
+                  disabled={isPending}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="department">Department</Label>
+                <Input
+                  id="department"
+                  name="department"
+                  placeholder="Engineering"
+                  defaultValue={employee.department || ""}
+                  required
+                  disabled={isPending}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="role">Role</Label>
+                <Select
+                  name="role"
+                  defaultValue={employee.role as AppRole}
+                  disabled={isPending}
+                >
+                  <SelectTrigger id="role">
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roleOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-muted-foreground">
+                  You can only assign roles within your permission level
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="empCode">Employee Code</Label>
+                <Input
+                  id="empCode"
+                  name="empCode"
+                  placeholder="EMP001"
+                  defaultValue={employee.empCode || employee.id.toString()}
+                  disabled={isPending}
+                />
+              </div>
+            </div>
+
+            {/* Sticky footer - only show when dirty */}
+            {isDirty && (
+              <div className="sticky bottom-0 z-10 border-t border-border dark:border-border/50 bg-card dark:bg-card/90 p-4 -mx-4 -mb-4 shadow-lg">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground dark:text-muted-foreground/80">
+                    You have unsaved changes
+                  </span>
+                  <div className="flex gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleDiscard}
+                      disabled={isPending}
+                    >
+                      Discard
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={isPending}
+                      className="bg-card-action hover:bg-card-action"
+                    >
+                      {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      {isPending ? "Saving..." : "Save"}
+                    </Button>
                   </div>
                 </div>
-              )}
-            </form>
-          </Form>
+              </div>
+            )}
+          </form>
         </CardContent>
       </Card>
     </div>

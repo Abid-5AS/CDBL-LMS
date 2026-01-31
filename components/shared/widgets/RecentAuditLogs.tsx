@@ -15,7 +15,7 @@ export async function RecentAuditLogs() {
       <div className="neo-card flex flex-col gap-4 px-6 py-6">
         <div className="flex items-center gap-3">
           <div className="rounded-2xl border border-white/20 p-3 shadow-inner">
-            <Activity className="h-5 w-5 text-data-info" />
+            <Activity className="h-5 w-5 text-info dark:text-info/90" />
           </div>
           <div>
             <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
@@ -73,7 +73,7 @@ export async function RecentAuditLogs() {
                   {formatDate(log.createdAt.toISOString())}
                 </span>
               </div>
-              <span className="inline-flex items-center rounded-full border border-data-info/40 bg-data-info/10 px-2.5 py-0.5 text-xs font-semibold text-data-info">
+              <span className="inline-flex items-center rounded-full border border-info/40 bg-info dark:bg-info/80/10 px-2.5 py-0.5 text-xs font-semibold text-info dark:text-info/90">
                 {log.action}
               </span>
             </div>

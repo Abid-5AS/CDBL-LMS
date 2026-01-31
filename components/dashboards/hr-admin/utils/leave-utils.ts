@@ -14,12 +14,12 @@ export const STATUS_TABS = [
 export function getLeaveTypeColor(type: string): string {
   switch (type) {
     case "CASUAL":
-      return "bg-data-info/10 text-data-info border-data-info/20";
+      return "bg-info dark:bg-info/80/10 text-info dark:text-info/90 border-info/20";
     case "EARNED":
-      return "bg-data-success/10 text-data-success border-data-success/20";
+      return "bg-success dark:bg-success/80/10 text-success dark:text-success/90 border-success/20";
     case "MEDICAL":
-      return "bg-data-error/10 text-data-error border-data-error/20";
+      return "bg-danger dark:bg-danger/80/10 text-danger dark:text-danger/90 border-danger/20";
     default:
-      return "bg-bg-secondary text-text-secondary border-bg-muted";
+      return "bg-muted dark:bg-muted/80 text-muted-foreground dark:text-muted-foreground/80 border-border dark:border-border/30";
   }
 }

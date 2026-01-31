@@ -157,10 +157,10 @@ function HRAdminDashboardClientImpl({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="border border-data-error/30 bg-data-error/5 p-6 text-center rounded-lg"
+        className="border border-danger/30 bg-danger dark:bg-danger/80/5 p-6 text-center rounded-lg"
       >
-        <AlertCircle className="h-12 w-12 mx-auto mb-3 text-data-error" />
-        <p className="text-sm text-data-error font-medium">
+        <AlertCircle className="h-12 w-12 mx-auto mb-3 text-danger dark:text-danger/90" />
+        <p className="text-sm text-danger dark:text-danger/90 font-medium">
           Failed to load dashboard statistics
         </p>
         <p className="text-xs text-muted-foreground mt-1">
@@ -466,7 +466,7 @@ function HRAdminDashboardClientImpl({
                           className="h-2 bg-muted"
                         />
                         {displayStats && displayStats.dailyProgress >= 100 && (
-                          <p className="text-xs text-data-success flex items-center gap-1 mt-2">
+                          <p className="text-xs text-success dark:text-success/90 flex items-center gap-1 mt-2">
                             <CheckCircle2 className="h-3 w-3" />
                             Target achieved!
                           </p>

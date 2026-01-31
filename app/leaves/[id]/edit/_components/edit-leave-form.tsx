@@ -23,11 +23,11 @@ import {
 } from "@/components/ui/tooltip";
 import { AlertCircle, Info, RotateCcw, Calendar } from "lucide-react";
 import { toast } from "sonner";
-import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/toast-messages";
+import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/ui/toast-messages";
 import { DateRangePicker, FileUploadSection } from "@/components/shared";
-import { LeaveRequest, LeaveComment } from "@prisma/client";
+import type { LeaveRequest, LeaveComment } from "@/src/generated/prisma/client";
 import { formatDate } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import Link from "next/link";
 
 type EditLeaveFormProps = {
@@ -62,9 +62,9 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
   // Fetch holidays for date picker
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const { data: holidaysData } = useSWR<{ items: Array<{ date: string; name: string }> }>("/api/holidays", fetcher);
-  const holidays = holidaysData?.items?.map((h) => ({ 
+  const holidays = holidaysData?.items?.map((h) => ({
     date: h.date.split('T')[0], // Convert ISO to YYYY-MM-DD format
-    name: h.name 
+    name: h.name
   })) || [];
 
   // Get return comment (most recent non-employee comment)
@@ -105,11 +105,11 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
     }
 
     // Validate certificate requirement for medical leave > 3 days
-    const requestedDays = dateRange.start && dateRange.end 
+    const requestedDays = dateRange.start && dateRange.end
       ? Math.ceil((dateRange.end.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24)) + 1
       : 0;
     const requiresCertificate = type === "MEDICAL" && requestedDays > 3;
-    
+
     if (requiresCertificate && !file && !leave.certificateUrl) {
       toast.error("Medical certificate is required for leaves longer than 3 days");
       return;
@@ -124,10 +124,10 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
       formData.append("startDate", dateRange.start.toISOString());
       formData.append("endDate", dateRange.end.toISOString());
       formData.append("reason", reason.trim());
-      const requiresCertificate = type === "MEDICAL" && 
-        (dateRange.start && dateRange.end && 
-         Math.ceil((dateRange.end.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24)) + 1 > 3);
-      
+      const requiresCertificate = type === "MEDICAL" &&
+        (dateRange.start && dateRange.end &&
+          Math.ceil((dateRange.end.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24)) + 1 > 3);
+
       formData.append("needsCertificate", String(requiresCertificate || false));
 
       // Handle file upload: new file takes precedence, otherwise keep existing URL
@@ -168,35 +168,35 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       {/* Breadcrumb */}
       <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/leaves">My Leaves</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Edit & Resubmit</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/leaves">My Leaves</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>Edit & Resubmit</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
 
       {/* Return Comment Alert */}
       {returnComment && (
-        <Card className="rounded-2xl border-data-warning bg-data-warning/30 dark:bg-data-warning/10 shadow-sm">
+        <Card className="rounded-2xl border-warning bg-warning dark:bg-warning/80/30 dark:bg-warning dark:bg-warning/80/10 shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-data-warning dark:text-data-warning">
-              <AlertCircle className="h-5 w-5 text-data-warning" />
+            <CardTitle className="flex items-center gap-2 text-warning dark:text-warning/90 dark:text-warning dark:text-warning/90">
+              <AlertCircle className="h-5 w-5 text-warning dark:text-warning/90" />
               Return Reason
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <p className="text-sm font-medium text-data-warning dark:text-data-warning">
+              <p className="text-sm font-medium text-warning dark:text-warning/90 dark:text-warning dark:text-warning/90">
                 Returned by {returnComment.authorName} ({returnComment.authorRole})
               </p>
-              <p className="text-sm text-data-warning dark:text-data-warning">{returnComment.comment}</p>
-              <p className="text-xs text-data-warning dark:text-data-warning">
+              <p className="text-sm text-warning dark:text-warning/90 dark:text-warning dark:text-warning/90">{returnComment.comment}</p>
+              <p className="text-xs text-warning dark:text-warning/90 dark:text-warning dark:text-warning/90">
                 {formatDate(returnComment.createdAt)}
               </p>
             </div>
@@ -240,7 +240,7 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
               {/* Reason */}
               <div className="space-y-2">
                 <Label htmlFor="reason">
-                  Reason <span className="text-data-error">*</span>
+                  Reason <span className="text-danger dark:text-danger/90">*</span>
                 </Label>
                 <Textarea
                   id="reason"
@@ -266,7 +266,7 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
                         href={leave.certificateUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-data-info hover:underline"
+                        className="text-sm text-info dark:text-info/90 hover:underline"
                       >
                         View current certificate
                       </a>
@@ -277,9 +277,9 @@ export function EditLeaveForm({ leave, comments }: EditLeaveFormProps) {
                     onChange={setFile}
                     onError={setFileError}
                     error={fileError}
-                    required={type === "MEDICAL" && 
-                      (dateRange.start && dateRange.end && 
-                       Math.ceil((dateRange.end.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24)) + 1 > 3)}
+                    required={type === "MEDICAL" &&
+                      (dateRange.start && dateRange.end &&
+                        Math.ceil((dateRange.end.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24)) + 1 > 3)}
                   />
                   {fileError && (
                     <p className="text-sm text-destructive">{fileError}</p>

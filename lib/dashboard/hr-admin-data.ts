@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { getDailyProcessingTarget } from "@/lib/config/system-settings";
-import type { User } from "@prisma/client";
+import type { User } from "@/src/generated/prisma/client";
 
 export type HRAdminDashboardStats = {
   employeesOnLeave: number;
@@ -22,6 +22,18 @@ export type HRAdminDashboardStats = {
   monthlyTrend: Array<{
     month: string;
     count: number;
+  }>;
+  whoIsOut: Array<{
+    id: number;
+    name: string;
+    image?: string | null;
+  }>;
+  recentActivity: Array<{
+    id: number;
+    user: string;
+    action: string;
+    target: string;
+    time: string; // ISO string 
   }>;
 };
 
@@ -199,15 +211,15 @@ export async function getHRAdminKPIData(user?: MinimalUser): Promise<HRAdminDash
     // Compliance score: proportion of processed requests with required documentation
     complianceScore: recentApprovals.length > 0
       ? Math.round((await prisma.leaveRequest.count({
-          where: {
-            id: { in: recentApprovals.map(r => r.id).filter(Boolean) }, // Filter from the recent batch
-            OR: [
-              { needsCertificate: true, certificateUrl: { not: null } },
-              { type: "MEDICAL", certificateUrl: { not: null } },
-              { type: "SPECIAL_DISABILITY", fitnessCertificateUrl: { not: null } },
-            ],
-          }
-        }) / recentApprovals.length) * 100)
+        where: {
+          id: { in: recentApprovals.map(r => r.id).filter(Boolean) }, // Filter from the recent batch
+          OR: [
+            { needsCertificate: true, certificateUrl: { not: null } },
+            { type: "MEDICAL", certificateUrl: { not: null } },
+            { type: "SPECIAL_DISABILITY", fitnessCertificateUrl: { not: null } },
+          ],
+        }
+      }) / recentApprovals.length) * 100)
       : 100,
     // Empty arrays in fast endpoint, populated in /stats
     leaveTypeBreakdown: [],
@@ -248,6 +260,7 @@ export async function getHRAdminStatsData(
     pendingRequests,
     totalLeavesThisYear,
     processedToday,
+    encashmentPending,
   ] = await Promise.all([
     prisma.leaveRequest.count({
       where: {
@@ -281,6 +294,11 @@ export async function getHRAdminStatsData(
           gte: today,
           lt: tomorrow,
         },
+      },
+    }),
+    prisma.encashmentRequest.count({
+      where: {
+        status: "PENDING",
       },
     }),
   ]);
@@ -412,7 +430,7 @@ export async function getHRAdminStatsData(
     employeesOnLeave,
     pendingRequests,
     avgApprovalTime: Number(avgApprovalTime.toFixed(1)),
-    encashmentPending: 0,
+    encashmentPending,
     totalLeavesThisYear,
     processedToday,
     dailyTarget,

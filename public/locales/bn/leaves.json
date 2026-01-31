@@ -1,0 +1,17 @@
+{
+    "status": {
+        "pending": "অপেক্ষমান",
+        "approved": "অনুমোদিত",
+        "rejected": "প্রত্যাখ্যাত",
+        "cancelled": "বাতিলকৃত",
+        "forwarded": "ফরোয়ার্ড করা হয়েছে"
+    },
+    "details": {
+        "appliedOn": "আবেদনের তারিখ",
+        "approvedBy": "অনুমোদনকারী",
+        "rejectedBy": "প্রত্যাখ্যানকারী",
+        "reason": "কারণ",
+        "comments": "মন্তব্য",
+        "history": "অনুমোদনের ইতিহাস"
+    }
+}

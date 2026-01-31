@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { checkRateLimit } from "@/lib/rateLimit";
 import { signJwt } from "@/lib/auth";
 import { createOtpCode } from "@/lib/otp";
 
@@ -15,17 +14,12 @@ export const cache = "no-store";
  */
 export async function POST(req: Request) {
   try {
-    // Rate limiting check
-    const ip = req.headers.get("x-forwarded-for") || "local";
-    if (!(await checkRateLimit(ip))) {
-      return NextResponse.json(
-        { error: "Too many login attempts. Please try again later." },
-        { status: 429 }
-      );
-    }
-
     const body = await req.json();
-    const { email, password, skipOtp = false } = body;
+    const { email, password, skipOtp } = body;
+
+    // Get client IP
+    const forwardedFor = req.headers.get("x-forwarded-for");
+    const ip = forwardedFor ? forwardedFor.split(",")[0] : "127.0.0.1";
 
     if (!email || !password) {
       return NextResponse.json(
@@ -74,7 +68,8 @@ export async function POST(req: Request) {
     }
 
     // Check if OTP should be skipped (for mobile direct login or testing)
-    if (skipOtp === true) {
+    // In production, you might want to restrict skipOtp to specific conditions
+    if (skipOtp === true || skipOtp === "true") {
       // Direct login without OTP - generate JWT token immediately
       const token = await signJwt({
         sub: String(user.id),
@@ -107,6 +102,9 @@ export async function POST(req: Request) {
 
       // For mobile, we return the flow information but NOT the code
       // (In production, OTP would be sent via email/SMS)
+      // DEBUG: In dev/test, maybe log the code or return it if needed for testing?
+      console.log(`[Mobile Login] OTP for ${user.email}: ${code}`);
+
       return NextResponse.json({
         success: true,
         data: {

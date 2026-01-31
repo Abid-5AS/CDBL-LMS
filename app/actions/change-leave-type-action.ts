@@ -9,7 +9,7 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import type { LeaveType } from "@prisma/client";
+import type { LeaveType } from "@/src/generated/prisma/client";
 import { invalidateHRAdminStatsCache } from "@/lib/dashboard/hr-admin-data";
 
 export async function changeLeaveType(
@@ -63,7 +63,7 @@ export async function changeLeaveType(
     }
 
     // Verify user has permission to approve (can change type)
-    const canApprove = await verifyApprovalPermission(leave, parseInt(user.id));
+    const canApprove = await verifyApprovalPermission(leave, user.id);
     if (!canApprove) {
       return {
         success: false,
@@ -74,7 +74,7 @@ export async function changeLeaveType(
     // Check employee balance for new type
     const employeeId = leave.requesterId;
     const year = new Date(leave.startDate).getFullYear();
-    
+
     const balance = await prisma.balance.findFirst({
       where: {
         userId: employeeId,
@@ -112,7 +112,7 @@ export async function changeLeaveType(
       await tx.approval.create({
         data: {
           leaveId: leaveId,
-          approverId: parseInt(user.id),
+          approverId: user.id,
           decision: "PENDING",
           comment: `Leave type changed from ${leave.type} to ${newType}. Reason: ${reason.trim()}`,
           decidedAt: new Date(),

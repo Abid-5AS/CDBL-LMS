@@ -1,0 +1,16 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Auto-sync database after branch checkout
+# $3 is 1 if checking out a branch, 0 if checking out a file
+if [ "$3" = "1" ]; then
+    echo "🔄 Checking for database schema changes after branch switch..."
+    
+    # Check if schema.prisma or migrations changed
+    if git diff --name-only $1 $2 | grep -qE 'prisma/schema.prisma|prisma/migrations/'; then
+        echo "📦 Database schema changes detected. Running sync..."
+        pnpm db:sync
+    else
+        echo "✅ No database schema changes detected."
+    fi
+fi

@@ -12,11 +12,13 @@
 
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
+import { FUNCTIONAL_COLORS } from "@/constants/colors/semantic";
 
 interface ActivityData {
     label: string;
     value: number;
     color: string;
+    gradientColor: string;
     size: number;
     current: number;
     target: number;
@@ -32,7 +34,8 @@ const activities: ActivityData[] = [
     {
         label: "MOVE",
         value: 85,
-        color: "#FF2D55",
+        color: FUNCTIONAL_COLORS.error.light,
+        gradientColor: FUNCTIONAL_COLORS.error.dark,
         size: 200,
         current: 479,
         target: 800,
@@ -41,7 +44,8 @@ const activities: ActivityData[] = [
     {
         label: "EXERCISE",
         value: 60,
-        color: "#A3F900",
+        color: FUNCTIONAL_COLORS.success.light,
+        gradientColor: FUNCTIONAL_COLORS.success.dark,
         size: 160,
         current: 24,
         target: 30,
@@ -50,7 +54,8 @@ const activities: ActivityData[] = [
     {
         label: "STAND",
         value: 30,
-        color: "#04C7DD",
+        color: FUNCTIONAL_COLORS.info.light,
+        gradientColor: FUNCTIONAL_COLORS.info.dark,
         size: 120,
         current: 6,
         target: 12,
@@ -102,12 +107,7 @@ const CircleProgress = ({ data, index }: CircleProgressProps) => {
                             <stop
                                 offset="100%"
                                 style={{
-                                    stopColor:
-                                        data.color === "#FF2D55"
-                                            ? "#FF6B8B"
-                                            : data.color === "#A3F900"
-                                            ? "#C5FF4D"
-                                            : "#4DDFED",
+                                    stopColor: data.gradientColor,
                                     stopOpacity: 1,
                                 }}
                             />

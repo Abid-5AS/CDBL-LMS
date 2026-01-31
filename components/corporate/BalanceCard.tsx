@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import type { DensityMode } from "@/lib/ui/density-modes";
 import { cardPadding, cardGap, getTypography } from "@/lib/ui/density-modes";
-import type { LeaveType } from "@prisma/client";
+import type { LeaveType } from "@/lib/enums";
 import { TrendingUp, Clock, Heart } from "lucide-react";
 
 interface BalanceCardProps {
@@ -167,7 +167,7 @@ export function BalanceCard({
   const typography = getTypography(density);
   const config = LEAVE_TYPE_CONFIG[type];
   const Icon = config.icon;
-  
+
   // Calculate progress percentage
   const usagePercentage = total > 0 ? (used / total) * 100 : 0;
 
@@ -194,44 +194,38 @@ export function BalanceCard({
               <p className="text-xs text-muted-foreground">{config.abbr}</p>
             </div>
           </div>
-      {/* Header with Icon and Type */}
-      <div className="flex items-center gap-3 mb-4">
-        <div className={cn("p-2 rounded-lg", config.colors.iconBg)}>
-          <config.icon className={cn("h-5 w-5", config.colors.icon)} />
         </div>
-        <h3 className={cn(typography.cardTitle, "!text-foreground")}>{config.label}</h3>
-      </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-3 gap-4 text-center">
-        <div>
-          <p className={cn(typography.kpiNumber, config.colors.icon)}>{available}</p>
-          <p className={cn(typography.label, "!text-muted-foreground")}>Available</p>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <p className={cn(typography.kpiNumber, config.colors.icon)}>{available}</p>
+            <p className={cn(typography.label, "!text-muted-foreground")}>Available</p>
+          </div>
+          <div>
+            <p className={cn(typography.kpiNumber, config.colors.icon)}>{used}</p>
+            <p className={cn(typography.label, "!text-muted-foreground")}>Used</p>
+          </div>
+          <div>
+            <p className={cn(typography.kpiNumber, config.colors.icon)}>{total}</p>
+            <p className={cn(typography.label, "!text-muted-foreground")}>Total</p>
+          </div>
         </div>
-        <div>
-          <p className={cn(typography.kpiNumber, config.colors.icon)}>{used}</p>
-          <p className={cn(typography.label, "!text-muted-foreground")}>Used</p>
-        </div>
-        <div>
-          <p className={cn(typography.kpiNumber, config.colors.icon)}>{total}</p>
-          <p className={cn(typography.label, "!text-muted-foreground")}>Total</p>
-        </div>
-      </div>
 
-      {/* Usage Progress Bar */}
-      <div className="mt-4">
-        <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-          <span>Usage</span>
-          <span>{usagePercent}%</span>
-        </div>
-        <div className="h-2 bg-muted rounded-full overflow-hidden">
-          <div
-            className={cn("h-full transition-all duration-300", config.colors.progress)}
-            style={{ width: `${usagePercent}%` }}
-          />
+        {/* Usage Progress Bar */}
+        <div className="mt-4">
+          <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+            <span>Usage</span>
+            <span>{usagePercentage.toFixed(0)}%</span>
+          </div>
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <div
+              className={cn("h-full transition-all duration-300", config.colors.progress)}
+              style={{ width: `${usagePercentage}%` }}
+            />
+          </div>
         </div>
       </div>
     </div>
   );
 }
-```

@@ -1,5 +1,5 @@
 import { prisma } from "./lib/prisma";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/src/generated/prisma/client";
 
 async function testHRAdminAPI() {
   console.log("=== SIMULATING /api/approvals FOR HR_ADMIN ===\n");

@@ -14,8 +14,9 @@ import {
   Building2,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
-import { Balance, LeaveType, LeaveStatus } from "@prisma/client";
+import { leaveTypeLabel } from "@/lib/ui/ui";
+import type { Balance } from "@/src/generated/prisma/client";
+import { LeaveType, LeaveStatus } from "@/lib/enums";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 
 type EmployeeStatsCardProps = {
@@ -64,9 +65,9 @@ export function EmployeeStatsCard({
     };
   };
 
-  const casualBalance = getBalance("CASUAL");
-  const earnedBalance = getBalance("EARNED");
-  const medicalBalance = getBalance("MEDICAL");
+  const casualBalance = getBalance(LeaveType.CASUAL);
+  const earnedBalance = getBalance(LeaveType.EARNED);
+  const medicalBalance = getBalance(LeaveType.MEDICAL);
 
   return (
     <Card className="rounded-2xl border-muted shadow-sm">
@@ -121,19 +122,18 @@ export function EmployeeStatsCard({
               <div
                 className="bg-blue-600 h-2 rounded-full transition-all"
                 style={{
-                  width: `${
-                    casualBalance.used
-                      ? Math.min(
-                          100,
-                          ((casualBalance.available + casualBalance.used) /
-                            (casualBalance.available + casualBalance.used)) *
-                            100 -
-                            (casualBalance.used /
-                              (casualBalance.available + casualBalance.used)) *
-                              100
-                        )
-                      : 100
-                  }%`,
+                  width: `${casualBalance.used
+                    ? Math.min(
+                      100,
+                      ((casualBalance.available + casualBalance.used) /
+                        (casualBalance.available + casualBalance.used)) *
+                      100 -
+                      (casualBalance.used /
+                        (casualBalance.available + casualBalance.used)) *
+                      100
+                    )
+                    : 100
+                    }%`,
                 }}
               />
             </div>
@@ -154,19 +154,18 @@ export function EmployeeStatsCard({
               <div
                 className="bg-green-600 h-2 rounded-full transition-all"
                 style={{
-                  width: `${
-                    earnedBalance.used
-                      ? Math.min(
-                          100,
-                          ((earnedBalance.available + earnedBalance.used) /
-                            (earnedBalance.available + earnedBalance.used)) *
-                            100 -
-                            (earnedBalance.used /
-                              (earnedBalance.available + earnedBalance.used)) *
-                              100
-                        )
-                      : 100
-                  }%`,
+                  width: `${earnedBalance.used
+                    ? Math.min(
+                      100,
+                      ((earnedBalance.available + earnedBalance.used) /
+                        (earnedBalance.available + earnedBalance.used)) *
+                      100 -
+                      (earnedBalance.used /
+                        (earnedBalance.available + earnedBalance.used)) *
+                      100
+                    )
+                    : 100
+                    }%`,
                 }}
               />
             </div>
@@ -187,19 +186,18 @@ export function EmployeeStatsCard({
               <div
                 className="bg-amber-600 h-2 rounded-full transition-all"
                 style={{
-                  width: `${
-                    medicalBalance.used
-                      ? Math.min(
-                          100,
-                          ((medicalBalance.available + medicalBalance.used) /
-                            (medicalBalance.available + medicalBalance.used)) *
-                            100 -
-                            (medicalBalance.used /
-                              (medicalBalance.available + medicalBalance.used)) *
-                              100
-                        )
-                      : 100
-                  }%`,
+                  width: `${medicalBalance.used
+                    ? Math.min(
+                      100,
+                      ((medicalBalance.available + medicalBalance.used) /
+                        (medicalBalance.available + medicalBalance.used)) *
+                      100 -
+                      (medicalBalance.used /
+                        (medicalBalance.available + medicalBalance.used)) *
+                      100
+                    )
+                    : 100
+                    }%`,
                 }}
               />
             </div>

@@ -21,6 +21,7 @@ interface DateRangeFieldProps {
   requestedDays: number;
   rangeValidation: any;
   errors: { start?: string; end?: string };
+  bookedDates?: Date[]; // Dates with existing leave requests
 }
 
 // Get backdate info based on minSelectableDate
@@ -30,9 +31,9 @@ function getBackdateInfo(minDate?: Date) {
   today.setHours(0, 0, 0, 0);
   const minDateMidnight = new Date(minDate);
   minDateMidnight.setHours(0, 0, 0, 0);
-  
+
   const daysDiff = Math.floor((today.getTime() - minDateMidnight.getTime()) / (1000 * 60 * 60 * 24));
-  
+
   if (daysDiff <= 0) {
     return { canBackdate: false, days: 0 };
   }
@@ -48,15 +49,16 @@ export function DateRangeField({
   requestedDays,
   rangeValidation,
   errors,
+  bookedDates = [],
 }: DateRangeFieldProps) {
   const backdateInfo = getBackdateInfo(minSelectableDate);
-  
+
   return (
     <div className="space-y-2">
       <Label htmlFor="leave-dates" className="text-sm font-medium">
         Leave Dates <span className="text-destructive">*</span>
       </Label>
-      
+
       {/* Backdate Policy Info */}
       {backdateInfo && (
         <div className="rounded-md border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20 px-3 py-2 flex items-start gap-2">
@@ -70,7 +72,7 @@ export function DateRangeField({
           </p>
         </div>
       )}
-      
+
       <DateRangePicker
         value={{ start: dateRange.start, end: dateRange.end }}
         onChange={(range) => setDateRange({ start: range.start, end: range.end })}
@@ -78,6 +80,7 @@ export function DateRangeField({
         disabled={submitting}
         minDate={minSelectableDate}
         showQuickSelect={false}
+        bookedDates={bookedDates}
       />
       {/* Duration feedback */}
       {dateRange.start && dateRange.end && (
@@ -108,8 +111,8 @@ export function DateRangeField({
         </p>
       )}
       {rangeValidation?.containsNonWorking && rangeValidation.valid && (
-        <div className="mt-2 rounded-lg border border-data-warning/40 bg-data-warning/10 dark:bg-data-warning/20 px-3 py-2">
-          <p className="text-xs text-data-warning font-medium flex items-center gap-1.5">
+        <div className="mt-2 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20 px-3 py-2">
+          <p className="text-xs text-amber-700 dark:text-amber-300 font-medium flex items-center gap-1.5">
             <Info className="h-3.5 w-3.5 flex-shrink-0" />
             {rangeValidation.message}
           </p>

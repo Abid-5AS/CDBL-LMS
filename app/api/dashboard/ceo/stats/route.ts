@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
       prisma.leaveRequest.count({
         where: {
           status: "APPROVED",
-          startDate: { lte: tomorrow },
+          startDate: { lte: today },
           endDate: { gte: today },
         },
       }),
@@ -347,6 +347,15 @@ export async function GET(req: NextRequest) {
         apiStatus: "healthy",
         dbStatus: "healthy",
         uptime: 99.9,
+      },
+
+      meta: {
+        mocked: {
+          avgCostPerDay: true,
+          estimatedCost: true,
+          insights: true,
+          systemHealth: true,
+        },
       },
     };
 

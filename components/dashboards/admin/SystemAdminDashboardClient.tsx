@@ -4,6 +4,7 @@ import { Suspense, ReactNode } from "react";
 import Link from "next/link";
 import { Activity, Settings, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { KPICard } from "@/components/cards/KPICard";
 import { QuickActions } from "@/components/shared/QuickActions";
 import { DashboardSection } from "@/app/dashboard/shared/DashboardLayout";
@@ -71,8 +72,8 @@ export function SystemOverviewCards() {
         value="Healthy"
         subtext="All systems operational"
         icon={Activity}
-        iconColor="text-data-success"
-        accentColor="bg-data-success"
+        iconColor="text-success dark:text-success/90"
+        accentColor="bg-success dark:bg-success/80"
       />
     </div>
   );
@@ -86,8 +87,8 @@ export function SystemQuickStats({ systemStats }: QuickStatsProps) {
         value={systemStats.totalUsers.toString()}
         subtext="All system users"
         icon={Users}
-        iconColor="text-data-info"
-        accentColor="bg-data-info"
+        iconColor="text-info dark:text-info/90"
+        accentColor="bg-info dark:bg-info/80"
       />
       <KPICard
         title="Active Admins"
@@ -104,13 +105,13 @@ export function SystemQuickStats({ systemStats }: QuickStatsProps) {
         icon={Activity}
         iconColor={
           systemStats.systemHealth === "healthy"
-            ? "text-data-success"
-            : "text-data-warning"
+            ? "text-success dark:text-success/90"
+            : "text-warning dark:text-warning/90"
         }
         accentColor={
           systemStats.systemHealth === "healthy"
-            ? "bg-data-success"
-            : "bg-data-warning"
+            ? "bg-success dark:bg-success/80"
+            : "bg-warning dark:bg-warning/80"
         }
         status={systemStats.systemHealth === "healthy" ? "healthy" : "low"}
       />
@@ -208,6 +209,11 @@ export function SystemAdminDashboardContent({
       actions={actions}
       animate
     >
+      <div className="fixed bottom-4 right-4 z-50">
+        <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+          Mock data
+        </Badge>
+      </div>
       <div className="space-y-6">
         <DashboardSection
           title="System Overview"

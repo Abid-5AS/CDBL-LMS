@@ -14,7 +14,7 @@ type SearchInputProps = {
 export function SearchInput({ value, onChange, placeholder = "Search...", className }: SearchInputProps) {
   return (
     <div className={cn("relative", className)}>
-      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary" />
+      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground dark:text-muted-foreground/80" />
       <Input
         type="text"
         placeholder={placeholder}

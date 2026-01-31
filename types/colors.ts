@@ -4,7 +4,7 @@
  * Shared types used across color utilities
  */
 
-import { Role } from "@prisma/client";
+import { Role } from "@/src/generated/prisma/client";
 
 /**
  * Color scheme variant

@@ -1,10 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  compress: true,
   distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
   cacheComponents: false, // Disable cache components in development to reduce memory usage
-  reactCompiler: false, // Disable React compiler in development to reduce memory usage
-  serverExternalPackages: ["@prisma/client", "prisma"],
+  reactCompiler: true, // Enable React compiler for automatic optimization
+  serverExternalPackages: ["@prisma/client", ".prisma/client", "prisma", "nodemailer"],
 
   // Development-specific optimizations for memory usage
   onDemandEntries: {
@@ -44,15 +45,6 @@ const nextConfig: NextConfig = {
       };
     }
 
-    // Server-side externals for Prisma
-    if (isServer) {
-      config.externals = [
-        ...(config.externals || []),
-        "@prisma/client",
-        "prisma",
-      ];
-    }
-
     return config;
   },
 
@@ -60,15 +52,22 @@ const nextConfig: NextConfig = {
   experimental: {
     // Reduce memory usage by limiting concurrent builds
     workerThreads: false, // Disable worker threads in development
-    maxWorkers: 1, // Limit to 1 worker in development
-    // Disable incremental cache in development to save memory
-    appDir: true,
-    turbo: {
-      // Turbopack configuration
-      resolveAlias: {
-        fs: { browser: "./empty.ts" },
+  },
+
+  // Empty turbopack config to silence migration warning
+  turbopack: {},
+
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "api.dicebear.com",
       },
-    },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      }
+    ],
   },
 
   async headers() {
@@ -101,4 +100,12 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const withPWA = require("@ducanh2912/next-pwa").default({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development",
+  register: true,
+  skipWaiting: true,
+});
+
+export default withPWA(nextConfig);
+// export default nextConfig;

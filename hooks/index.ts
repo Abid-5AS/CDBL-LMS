@@ -27,10 +27,22 @@ export { useAccessibilityAudit } from "./useAccessibilityAudit";
 export { useKeyboardNav } from "./useKeyboardNav";
 export { useScreenReaderAnnouncement } from "./useScreenReaderAnnouncement";
 
-// Note: These are already re-exported from @/lib:
-// - useDebounce (from @/lib/use-debounce)
-// - useUser (from @/lib/user-context)
-// - useFilterFromUrl (from @/lib/url-filters)
+// Utility hooks
+export { useDebounce } from "./useDebounce";
+export { useMutation } from "./useMutation";
+export { useFormAutoSave } from "./useFormAutosave";
+export { useGesture } from "./useGesture";
+export { useHasMounted } from "./useHasMounted";
+export { useModalManager } from "./useModalManager";
+export { useMounted } from "./useMounted";
+export { useRealTimeValidation } from "./useRealTimeValidation";
+export { useSearch } from "./useSearch";
+export { useTableState } from "./useTableState";
+export { useVirtualScroll } from "./useVirtualScroll";
+export { useNotificationStream } from "./useNotificationStream";
+
+// Note: useUser is exported from @/components/providers/UserContext
+// Note: useFilterFromUrl is exported from @/lib/url-filters
 
 // Note: useNotification is exported from @/context/NotificationContext
 // Import it with: import { useNotification } from "@/context/NotificationContext"

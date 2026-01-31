@@ -33,10 +33,10 @@ import {
   FileX,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/lib/enums";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { cn } from "@/lib/utils";
 
@@ -118,18 +118,18 @@ function ReturnedRequestRow({
   // Extract return information from approvals or comments already in the leave data
   const returnApproval = Array.isArray(leave.approvals)
     ? leave.approvals
-        .filter((a) => a.decision === "FORWARDED" && a.comment && a.decidedAt)
-        .sort((a, b) => {
-          const dateA = a.decidedAt ? new Date(a.decidedAt).getTime() : 0;
-          const dateB = b.decidedAt ? new Date(b.decidedAt).getTime() : 0;
-          return dateB - dateA;
-        })[0]
+      .filter((a) => a.decision === "FORWARDED" && a.comment && a.decidedAt)
+      .sort((a, b) => {
+        const dateA = a.decidedAt ? new Date(a.decidedAt).getTime() : 0;
+        const dateB = b.decidedAt ? new Date(b.decidedAt).getTime() : 0;
+        return dateB - dateA;
+      })[0]
     : null;
 
   const returnComment = returnApproval
     ? null
     : Array.isArray(leave.comments)
-    ? leave.comments
+      ? leave.comments
         .filter(
           (c) =>
             c.authorRole !== "EMPLOYEE" &&
@@ -139,7 +139,7 @@ function ReturnedRequestRow({
           (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         )[0]
-    : null;
+      : null;
 
   const { data: commentsData, isLoading: commentsLoading } = useSWR<{
     items?: LeaveComment[];
@@ -160,32 +160,32 @@ function ReturnedRequestRow({
     returnComment ||
     (fetchedComments.length > 0
       ? fetchedComments
-          .filter(
-            (c) =>
-              c.authorRole !== "EMPLOYEE" &&
-              ["DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"].includes(c.authorRole)
-          )
-          .sort(
-            (a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          )[0]
+        .filter(
+          (c) =>
+            c.authorRole !== "EMPLOYEE" &&
+            ["DEPT_HEAD", "HR_ADMIN", "HR_HEAD", "CEO"].includes(c.authorRole)
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )[0]
       : null);
 
   const returnInfo = returnApproval
     ? {
-        authorName: returnApproval.approver?.name || "Unknown",
-        authorRole: returnApproval.approver?.role || "Approver",
-        comment: returnApproval.comment || "",
-        createdAt: returnApproval.decidedAt || "",
-      }
+      authorName: returnApproval.approver?.name || "Unknown",
+      authorRole: returnApproval.approver?.role || "Approver",
+      comment: returnApproval.comment || "",
+      createdAt: returnApproval.decidedAt || "",
+    }
     : finalReturnComment
-    ? {
+      ? {
         authorName: finalReturnComment.authorName || "Unknown",
         authorRole: finalReturnComment.authorRole,
         comment: finalReturnComment.comment,
         createdAt: finalReturnComment.createdAt,
       }
-    : null;
+      : null;
 
   // Get initials for avatar
   const getInitials = (name: string) => {
@@ -202,17 +202,17 @@ function ReturnedRequestRow({
   return (
     <TableRow
       className={cn(
-        "hover:bg-muted/40 transition-colors",
-        index % 2 === 0 && "bg-bg-primary dark:bg-bg-secondary/50"
+        "hover:bg-muted/40 dark:hover:bg-muted/30 transition-colors duration-100",
+        index % 2 === 0 && "bg-card dark:bg-card/90"
       )}
     >
-      <TableCell className="font-medium text-sm text-text-primary">
+      <TableCell className="font-medium text-sm text-foreground dark:text-foreground/90">
         {leaveTypeLabel[leave.type] ?? leave.type}
       </TableCell>
-      <TableCell className="text-sm text-text-secondary">
+      <TableCell className="text-sm text-foreground dark:text-foreground/90">
         {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
       </TableCell>
-      <TableCell className="hidden md:table-cell text-sm text-text-secondary">
+      <TableCell className="hidden md:table-cell text-sm text-foreground dark:text-foreground/90">
         {leave.workingDays}
       </TableCell>
       <TableCell>
@@ -226,10 +226,10 @@ function ReturnedRequestRow({
               </AvatarFallback>
             </Avatar>
             <div className="text-sm">
-              <div className="font-medium text-text-primary">
+              <div className="font-medium text-foreground dark:text-foreground/90">
                 {returnInfo.authorName}
               </div>
-              <div className="text-xs text-text-muted">
+              <div className="text-xs text-muted-foreground">
                 {returnInfo.authorRole}
               </div>
             </div>
@@ -256,7 +256,7 @@ function ReturnedRequestRow({
           <span className="text-sm text-muted-foreground">—</span>
         )}
       </TableCell>
-      <TableCell className="hidden lg:table-cell text-sm text-text-secondary">
+      <TableCell className="hidden lg:table-cell text-sm text-foreground dark:text-foreground/90">
         {formatDate(leave.updatedAt)}
       </TableCell>
       <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
@@ -274,7 +274,7 @@ function ReturnedRequestRow({
             onClick={() => router.push(`/leaves/${leave.id}/edit`)}
             variant="default"
             size="sm"
-            className="bg-card-action hover:bg-card-action/90 text-text-inverted"
+            className="bg-card-action hover:bg-card-action/90 text-white dark:text-white"
           >
             <Send className="w-4 h-4 mr-1" />
             Resubmit
@@ -356,7 +356,7 @@ export function ActionCenterCard({ leaves, isLoading }: ActionCenterCardProps) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-data-warning dark:text-data-warning" />
+            <AlertCircle className="h-5 w-5 text-warning dark:text-warning/90" />
             <CardTitle className="text-lg font-semibold">
               Action Center
             </CardTitle>
@@ -417,27 +417,27 @@ export function ActionCenterCard({ leaves, isLoading }: ActionCenterCardProps) {
         ) : hasReturnedRequests ? (
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader className="sticky top-0 bg-background z-10 shadow-sm border-b border-border-strong/70 dark:border-border-strong/70">
-                <TableRow className="bg-muted/30 hover:bg-muted/30">
-                  <TableHead className="text-xs font-medium text-text-secondary dark:text-text-secondary">
+              <TableHeader className="sticky top-0 bg-background z-10 shadow-sm border-b border-border/70 dark:border-border/50">
+                <TableRow className="bg-secondary dark:bg-secondary/80 hover:bg-secondary dark:hover:bg-secondary/80">
+                  <TableHead className="text-xs font-medium text-foreground dark:text-foreground/90">
                     Type
                   </TableHead>
-                  <TableHead className="text-xs font-medium text-text-secondary dark:text-text-secondary">
+                  <TableHead className="text-xs font-medium text-foreground dark:text-foreground/90">
                     Dates
                   </TableHead>
-                  <TableHead className="hidden md:table-cell text-xs font-medium text-text-secondary dark:text-text-secondary">
+                  <TableHead className="hidden md:table-cell text-xs font-medium text-foreground dark:text-foreground/90">
                     Days
                   </TableHead>
-                  <TableHead className="text-xs font-medium text-text-secondary dark:text-text-secondary">
+                  <TableHead className="text-xs font-medium text-foreground dark:text-foreground/90">
                     Returned By
                   </TableHead>
-                  <TableHead className="text-xs font-medium text-text-secondary dark:text-text-secondary">
+                  <TableHead className="text-xs font-medium text-foreground dark:text-foreground/90">
                     Comment
                   </TableHead>
-                  <TableHead className="hidden lg:table-cell text-xs font-medium text-text-secondary dark:text-text-secondary">
+                  <TableHead className="hidden lg:table-cell text-xs font-medium text-foreground dark:text-foreground/90">
                     Updated
                   </TableHead>
-                  <TableHead className="text-right text-xs font-medium text-text-secondary dark:text-text-secondary">
+                  <TableHead className="text-right text-xs font-medium text-foreground dark:text-foreground/90">
                     Action
                   </TableHead>
                 </TableRow>
@@ -455,13 +455,13 @@ export function ActionCenterCard({ leaves, isLoading }: ActionCenterCardProps) {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <div className="rounded-full bg-data-success/10 p-3 mb-3">
-              <AlertCircle className="h-6 w-6 text-data-success" />
+            <div className="rounded-full bg-success dark:bg-success/80/10 p-3 mb-3">
+              <AlertCircle className="h-6 w-6 text-success dark:text-success/90" />
             </div>
-            <p className="text-sm font-medium text-text-primary">
+            <p className="text-sm font-medium text-foreground dark:text-foreground/90">
               No action required
             </p>
-            <p className="text-xs text-text-muted mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               All your leave requests are up to date
             </p>
           </div>

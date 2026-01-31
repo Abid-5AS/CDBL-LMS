@@ -34,6 +34,7 @@ import { METRIC_LABELS } from "@/constants/dashboard-labels";
 // Corporate components
 import { MetricCard } from "@/components/corporate/MetricCard";
 import { getDensityClasses, getTypography } from "@/lib/ui/density-modes";
+import { DemoIndicator } from "@/components/ui/demo-indicator";
 
 // Shared chart components (reusable with corporate styling)
 import {
@@ -464,6 +465,7 @@ export function CorporateCEODashboard() {
                       <CardTitle className={cn(typography.cardTitle, "flex items-center gap-2")}>
                         <AlertCircle className="h-4 w-4 text-blue-600" />
                         Strategic Alerts
+                        <DemoIndicator />
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">

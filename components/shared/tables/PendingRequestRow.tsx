@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckCircle2, RotateCcw, ArrowRight, XCircle } from "lucide-react";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/lib/enums";
 import Link from "next/link";
 
 // UI Components (barrel export)
@@ -88,7 +88,7 @@ export function PendingRequestRow({
       <TableCell>
         <Link
           href={`/leaves/${request.id}`}
-          className="font-medium text-data-info hover:underline"
+          className="font-medium text-info dark:text-info/90 hover:underline"
         >
           {request.requester.name}
         </Link>
@@ -145,7 +145,7 @@ export function PendingRequestRow({
                       size="sm"
                       variant="ghost"
                       onClick={() => onApprove(request.id)}
-                      className="h-8 w-8 p-0 text-data-success hover:bg-data-success/10 hover:text-data-success"
+                      className="h-8 w-8 p-0 text-success dark:text-success/90 hover:bg-success dark:bg-success/80/10 hover:text-success dark:text-success/90"
                     >
                       <CheckCircle2 className="h-4 w-4" />
                     </Button>
@@ -165,7 +165,7 @@ export function PendingRequestRow({
                       size="sm"
                       variant="ghost"
                       onClick={() => onReject(request.id)}
-                      className="h-8 w-8 p-0 text-data-error hover:bg-data-error/10 hover:text-data-error"
+                      className="h-8 w-8 p-0 text-danger dark:text-danger/90 hover:bg-danger dark:bg-danger/80/10 hover:text-danger dark:text-danger/90"
                     >
                       <XCircle className="h-4 w-4" />
                     </Button>
@@ -183,7 +183,7 @@ export function PendingRequestRow({
                       size="sm"
                       variant="ghost"
                       onClick={() => onReturn(request.id)}
-                      className="h-8 w-8 p-0 text-data-warning hover:bg-data-warning/10 hover:text-data-warning"
+                      className="h-8 w-8 p-0 text-warning dark:text-warning/90 hover:bg-warning dark:bg-warning/80/10 hover:text-warning dark:text-warning/90"
                     >
                       <RotateCcw className="h-4 w-4" />
                     </Button>
@@ -201,7 +201,7 @@ export function PendingRequestRow({
                       size="sm"
                       variant="ghost"
                       onClick={() => onForward(request.id)}
-                      className="h-8 w-8 p-0 text-data-info hover:bg-data-info/10 hover:text-data-info"
+                      className="h-8 w-8 p-0 text-info dark:text-info/90 hover:bg-info dark:bg-info/80/10 hover:text-info dark:text-info/90"
                     >
                       <ArrowRight className="h-4 w-4" />
                     </Button>

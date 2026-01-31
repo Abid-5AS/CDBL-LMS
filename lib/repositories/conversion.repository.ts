@@ -73,7 +73,7 @@ export async function getLeaveConversionDetails(leaveId: number): Promise<Conver
 
     // Parse each conversion line
     const lines = breakdownText.split("\n");
-    lines.forEach((line) => {
+    lines.forEach((line: string) => {
       if (line.match(/^\s*\d+\./)) {
         // Extract days and type
         const daysMatch = line.match(/(\d+) days/);
@@ -125,7 +125,7 @@ export async function getLeaveConversionDetails(leaveId: number): Promise<Conver
 
     // Parse each conversion line
     const lines = breakdownText.split("\n");
-    lines.forEach((line) => {
+    lines.forEach((line: string) => {
       if (line.match(/^\s*\d+\./)) {
         // Extract days and type
         const daysMatch = line.match(/(\d+) day\(s\)/);
@@ -217,7 +217,7 @@ export async function getUserConversionHistory(
       const originalDays = originalMatch ? parseInt(originalMatch[1]) : leave.workingDays;
 
       const lines = breakdownText.split("\n");
-      lines.forEach((line) => {
+      lines.forEach((line: string) => {
         if (line.match(/^\s*\d+\./)) {
           const daysMatch = line.match(/(\d+) days/);
           const days = daysMatch ? parseInt(daysMatch[1]) : 0;
@@ -257,7 +257,7 @@ export async function getUserConversionHistory(
       const originalDays = originalMatch ? parseInt(originalMatch[1]) : (clConversion.workingDays || leave.workingDays);
 
       const lines = breakdownText.split("\n");
-      lines.forEach((line) => {
+      lines.forEach((line: string) => {
         if (line.match(/^\s*\d+\./)) {
           const daysMatch = line.match(/(\d+) day\(s\)/);
           const days = daysMatch ? parseInt(daysMatch[1]) : 0;
@@ -344,7 +344,16 @@ export async function getUserConversionHistory(
 /**
  * Get conversion statistics for a user
  */
-export async function getUserConversionStats(userId: number, year: number) {
+export async function getUserConversionStats(userId: number, year: number): Promise<{
+  totalConversions: number;
+  totalDaysConverted: number;
+  byType: {
+    ML_SPLIT: number;
+    CL_SPLIT: number;
+    CL_TO_EL: number;
+    EL_OVERFLOW: number;
+  };
+}> {
   const conversions = await getUserConversionHistory(userId, year);
 
   const stats = {

@@ -1,0 +1,17 @@
+{
+    "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled",
+        "forwarded": "Forwarded"
+    },
+    "details": {
+        "appliedOn": "Applied on",
+        "approvedBy": "Approved by",
+        "rejectedBy": "Rejected by",
+        "reason": "Reason",
+        "comments": "Comments",
+        "history": "Approval History"
+    }
+}

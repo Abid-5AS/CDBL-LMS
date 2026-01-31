@@ -11,11 +11,12 @@ import {
   isWeekendOrHoliday,
   normalizeToDhakaMidnight,
 } from "@/lib/date-utils";
-import { SUCCESS_MESSAGES, INFO_MESSAGES, getToastMessage } from "@/lib/toast-messages";
-import { countWorkingDaysSync } from "@/lib/working-days";
+import { SUCCESS_MESSAGES, INFO_MESSAGES, getToastMessage } from "@/lib/ui/toast-messages";
+import { countWorkingDaysSync } from "@/lib/leaves/working-days-client";
 import { useDraftAutosave } from "./use-draft-autosave";
 import { useHolidays } from "./use-holidays";
 import type { LeaveType } from "./leave-constants";
+import type { ConflictDetectionResult } from "@/lib/services/conflict-detector.service";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -41,10 +42,10 @@ export type DateRangeValue = {
 
 type RangeValidationResult =
   | {
-      valid: boolean;
-      containsNonWorking?: boolean;
-      message: string | null;
-    }
+    valid: boolean;
+    containsNonWorking?: boolean;
+    message: string | null;
+  }
   | null;
 
 type FormErrors = {
@@ -76,6 +77,10 @@ export function useApplyLeaveForm() {
   const [draftLoaded, setDraftLoaded] = useState(false);
   const [showStickyButton, setShowStickyButton] = useState(false);
   const [incidentDate, setIncidentDate] = useState<Date | undefined>(undefined); // For Special Disability Leave
+  const [conflictData, setConflictData] = useState<ConflictDetectionResult | null>(null);
+  const [checkingConflicts, setCheckingConflicts] = useState(false);
+  const [isHalfDay, setIsHalfDay] = useState(false);
+  const [halfDayPeriod, setHalfDayPeriod] = useState<"AM" | "PM">("AM");
 
   const {
     data: balances,
@@ -85,6 +90,40 @@ export function useApplyLeaveForm() {
     revalidateOnFocus: true,
     revalidateOnReconnect: true,
   });
+
+  // Fetch user's existing leaves to highlight in calendar
+  const { data: existingLeaves } = useSWR<{
+    items: Array<{
+      id: number;
+      startDate: string;
+      endDate: string;
+      status: string;
+    }>
+  }>("/api/leaves?mine=1&limit=50", fetcher, {
+    revalidateOnFocus: false,
+  });
+
+  // Compute booked dates from existing pending/approved leaves
+  const bookedDates = useMemo(() => {
+    if (!existingLeaves?.items) return [];
+
+    const dates: Date[] = [];
+    const activeStatuses = ['PENDING', 'SUBMITTED', 'APPROVED', 'FORWARDED'];
+
+    for (const leave of existingLeaves.items) {
+      if (!activeStatuses.includes(leave.status)) continue;
+
+      const start = new Date(leave.startDate);
+      const end = new Date(leave.endDate);
+
+      // Add all dates in the range
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        dates.push(new Date(d));
+      }
+    }
+
+    return dates;
+  }, [existingLeaves]);
 
   const { holidays } = useHolidays();
 
@@ -127,6 +166,43 @@ export function useApplyLeaveForm() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Check for leave conflicts when date range changes
+  useEffect(() => {
+    const checkConflicts = async () => {
+      // Only check if we have both dates
+      if (!dateRange.start || !dateRange.end) {
+        setConflictData(null);
+        return;
+      }
+
+      setCheckingConflicts(true);
+      try {
+        const response = await fetch("/api/leaves/check-conflicts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            startDate: dateRange.start.toISOString(),
+            endDate: dateRange.end.toISOString(),
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setConflictData(data);
+        } else {
+          setConflictData(null);
+        }
+      } catch (error) {
+        console.error("Error checking conflicts:", error);
+        setConflictData(null);
+      } finally {
+        setCheckingConflicts(false);
+      }
+    };
+
+    checkConflicts();
+  }, [dateRange.start, dateRange.end]);
 
   const requestedDays = useMemo(() => {
     if (!dateRange.start || !dateRange.end) return 0;
@@ -399,6 +475,32 @@ export function useApplyLeaveForm() {
         payload.incidentDate = incidentDate.toISOString();
       }
 
+      // Add half-day parameters
+      if (isHalfDay) {
+        payload.isHalfDay = true;
+        payload.halfDayPeriod = halfDayPeriod;
+        // For half-day, working days should be 0.5 (but we use 1 in DB, with flag)
+      }
+
+      // Handle Offline Submission
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        const { queueSyncAction } = await import("@/lib/offline/db");
+
+        if (file) {
+          payload.file = file;
+        }
+
+        await queueSyncAction("CREATE_LEAVE", payload);
+
+        // Clear draft and show offline success
+        clearDraft();
+        toast.success("You are offline. Request saved and will sync when online.", {
+          duration: 5000,
+        });
+        router.push("/leaves");
+        return;
+      }
+
       let response: Response;
 
       if (file) {
@@ -510,6 +612,9 @@ export function useApplyLeaveForm() {
     holidays,
     incidentDate,
     payCalculation,
+    conflictData,
+    checkingConflicts,
+    bookedDates, // New: dates with existing leave requests
     setDateRange,
     setReason,
     setFile,
@@ -524,5 +629,9 @@ export function useApplyLeaveForm() {
     handleConfirmSubmit,
     handleManualSave,
     initiateReview,
+    isHalfDay,
+    setIsHalfDay,
+    halfDayPeriod,
+    setHalfDayPeriod,
   };
 }

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { LeaveService } from "@/lib/services/leave.service";
-import { LeaveType } from "@prisma/client";
+import { LeaveType } from "@/src/generated/prisma/client";
 import { z } from "zod";
 
 // Define the return state type

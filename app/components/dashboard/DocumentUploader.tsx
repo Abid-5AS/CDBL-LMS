@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import Image from "next/image";
 
 /**
  * Document Type
@@ -334,9 +335,12 @@ export function DocumentUploader({
                       {/* File Icon/Preview */}
                       <div className="flex-shrink-0">
                         {uploadedFile.preview ? (
-                          <img
+                          <Image
                             src={uploadedFile.preview}
                             alt="Preview"
+                            width={48}
+                            height={48}
+                            unoptimized
                             className="w-12 h-12 object-cover rounded"
                           />
                         ) : (

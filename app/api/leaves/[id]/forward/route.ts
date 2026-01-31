@@ -11,7 +11,7 @@ import {
 } from "@/lib/workflow";
 import { canPerformAction } from "@/lib/workflow";
 import type { AppRole } from "@/lib/rbac";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/src/generated/prisma/client";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
 

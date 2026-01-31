@@ -3,17 +3,20 @@
  * Orchestrates business logic for leave management
  */
 
-import { LeaveType, LeaveStatus, ApprovalDecision } from "@prisma/client";
+import { LeaveType, LeaveStatus, ApprovalDecision, Role } from "@/src/generated/prisma/client";
 import { LeaveRepository } from "@/lib/repositories/leave.repository";
 import { LeaveValidator } from "./leave-validator";
 import { NotificationService } from "./notification.service";
 import { prisma } from "@/lib/prisma";
+import { notifyLeaveSubmitted } from "@/lib/webhooks/events";
 import { daysInclusive } from "@/lib/policy";
 import { getStepForRole } from "@/lib/workflow";
 import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
 import { generateSignedUrl } from "@/lib/storage";
+import { ApprovalService } from "./approval.service";
+import { LeaveQueryService } from "./leave-query.service";
 
 export type CreateLeaveRequestDTO = {
   type: LeaveType;
@@ -24,6 +27,8 @@ export type CreateLeaveRequestDTO = {
   needsCertificate?: boolean;
   certificateFile?: File;
   incidentDate?: Date; // For Special Disability Leave - when the disabling incident occurred
+  isHalfDay?: boolean;
+  halfDayPeriod?: "AM" | "PM";
 };
 
 export type ServiceResult<T> = {
@@ -38,52 +43,60 @@ export type ServiceResult<T> = {
 
 export class LeaveService {
   /**
-   * Create a new leave request
+   * Create a new leave request.
+   * 
+   * Validates the request against policy rules, uploads any required certificates,
+   * creates the leave record, initiates the approval workflow, and sends notifications.
+   * 
+   * @param userId - The ID of the user requesting leave
+   * @param dto - Data transfer object containing leave details
+   * @returns ServiceResult containing the created leave request or error details
    */
   static async createLeaveRequest(
     userId: number,
     dto: CreateLeaveRequestDTO
   ): Promise<ServiceResult<any>> {
     try {
-      // 1. Check for duplicate submissions (idempotency check)
-      // Look for identical requests within the last 5 minutes
+      // 1. Parallelize initial checks and uploads
       const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-      const existingRequest = await prisma.leaveRequest.findFirst({
-        where: {
-          requesterId: userId,
-          type: dto.type,
-          startDate: dto.startDate,
-          endDate: dto.endDate,
-          reason: dto.reason,
-          createdAt: {
-            gte: fiveMinutesAgo,
+
+      const [existingRequest, user, certificateResult] = await Promise.all([
+        // Check duplicate
+        prisma.leaveRequest.findFirst({
+          where: {
+            requesterId: userId,
+            type: dto.type,
+            startDate: dto.startDate,
+            endDate: dto.endDate,
+            reason: dto.reason,
+            createdAt: { gte: fiveMinutesAgo },
           },
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      });
+          orderBy: { createdAt: "desc" },
+        }),
+        // Get user info
+        prisma.user.findUnique({
+          where: { id: userId },
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            joinDate: true,
+            retirementDate: true,
+            deptHeadId: true,
+          },
+        }),
+        // Upload certificate
+        dto.certificateFile
+          ? this.uploadCertificate(dto.certificateFile)
+          : Promise.resolve({ success: true, data: undefined } as ServiceResult<string>),
+      ]);
 
       if (existingRequest) {
-        // Return the existing request to prevent duplicate
         return {
           success: true,
           data: existingRequest,
         };
       }
-
-      // 2. Get user information
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: {
-          id: true,
-          email: true,
-          role: true,
-          joinDate: true,
-          retirementDate: true,
-          deptHeadId: true,
-        },
-      });
 
       if (!user || !user.joinDate) {
         return {
@@ -95,19 +108,17 @@ export class LeaveService {
         };
       }
 
+      if (!certificateResult.success) {
+        return {
+          success: false,
+          error: certificateResult.error,
+        };
+      }
+      const certificateUrl = certificateResult.data;
+
       // 3. Calculate working days if not provided
       const workingDays =
         dto.workingDays || daysInclusive(dto.startDate, dto.endDate);
-
-      // 4. Handle certificate file upload
-      let certificateUrl: string | undefined;
-      if (dto.certificateFile) {
-        const fileResult = await this.uploadCertificate(dto.certificateFile);
-        if (!fileResult.success) {
-          return fileResult;
-        }
-        certificateUrl = fileResult.data;
-      }
 
       // 5. Validate leave request
       const validation = await LeaveValidator.validateLeaveRequest({
@@ -138,44 +149,116 @@ export class LeaveService {
         payCalculation = validation.warning.details.payCalculation;
       }
 
-      // 7. Create leave request
-      const leaveRequest = await LeaveRepository.create({
-        requesterId: userId,
-        type: dto.type,
-        startDate: dto.startDate,
-        endDate: dto.endDate,
-        workingDays,
-        reason: dto.reason,
-        certificateUrl,
-        needsCertificate: dto.needsCertificate,
-        incidentDate: dto.incidentDate,
-        payCalculation: payCalculation,
-      });
-
-      // 8. Create initial approval record
-      // First approver is always HR_ADMIN (step 1)
-      const approverRole = "HR_ADMIN";
-      const approver = await this.findApprover(userId, approverRole);
-      if (approver) {
-        await prisma.approval.create({
+      // 7. Transactional Creation
+      const { leaveRequest, approverIds } = await prisma.$transaction(async (tx) => {
+        // 7.1 Create leave request
+        const leaveRequest = await tx.leaveRequest.create({
           data: {
-            leaveId: leaveRequest.id,
-            approverId: approver.id,
-            step: 1,
-            decision: ApprovalDecision.PENDING,
+            requesterId: userId,
+            type: dto.type,
+            status: LeaveStatus.PENDING, // Explicitly PENDING initially
+            policyVersion: "v2.0",       // Default policy version
+            startDate: dto.startDate,
+            endDate: dto.endDate,
+            workingDays,
+            reason: dto.reason,
+            certificateUrl,
+            needsCertificate: dto.needsCertificate,
+            incidentDate: dto.incidentDate,
+            payCalculation: payCalculation,
+            isHalfDay: dto.isHalfDay ?? false,
+            halfDayPeriod: dto.halfDayPeriod,
           },
         });
+
+        // 7.2 Create full approval chain (Snapshotting)
+        const { WorkflowService } = await import('@/lib/workflow-service');
+        const chain = await WorkflowService.getChainFor(user.role as any, dto.type);
+
+        const createdApproverIds: number[] = [];
+
+        if (chain.length > 0) {
+          for (let i = 0; i < chain.length; i++) {
+            const role = chain[i];
+            const step = i + 1;
+            const approver = await LeaveService.findApprover(userId, role);
+
+            if (approver) {
+              await tx.approval.create({
+                data: {
+                  leaveId: leaveRequest.id,
+                  approverId: approver.id,
+                  step: step,
+                  decision: ApprovalDecision.PENDING,
+                },
+              });
+              createdApproverIds.push(approver.id);
+            } else {
+              console.warn(`Snapshotting halted: No approver found for role ${role} (request ${leaveRequest.id})`);
+              // For now, we allow the chain to be incomplete
+            }
+          }
+        }
+
+        // 7.3 Log the creation
+        await tx.auditLog.create({
+          data: {
+            actorEmail: user.email,
+            action: "LEAVE_CREATED",
+            targetEmail: user.email,
+            details: { leaveId: leaveRequest.id }
+          }
+        });
+
+        return { leaveRequest, approverIds: createdApproverIds };
+      });
+
+      // 8. Send Notifications (Post-transaction)
+      try {
+        // Notify Requester
+        await NotificationService.notifyLeaveSubmitted(leaveRequest.id, userId); // Or similar helper
+
+        // Notify First Approver
+        // We need to find the first step (which is approverIds[0] if ordered, but safest to query or use list)
+        // Actually, we have approverIds collected in order of chain.
+        // Chain order is correct (step 1, step 2...)
+        if (approverIds.length > 0) {
+          await NotificationService.notifyLeaveForwarded(leaveRequest.id, approverIds[0], user.email);
+        }
+      } catch (e) {
+        console.error("Failed to send notifications", e);
       }
 
-      // 9. Log the creation
-      await this.logAction(
-        user.email,
-        "LEAVE_REQUEST_CREATED",
-        { leaveId: leaveRequest.id }
-      );
+      // 9. Trigger webhook notification (non-blocking)
+      try {
+        await notifyLeaveSubmitted({
+          leaveId: leaveRequest.id,
+          employeeId: userId,
+          employeeName: user.email.split('@')[0],
+          employeeEmail: user.email,
+          leaveType: dto.type,
+          startDate: dto.startDate,
+          endDate: dto.endDate,
+          workingDays: workingDays,
+          reason: dto.reason,
+          status: 'SUBMITTED',
+        });
 
-      // 10. Send notifications to approvers and requester
-      await NotificationService.notifyLeaveSubmitted(leaveRequest.id, userId);
+        // 10. Dispatch Webhook Event
+        const { WebhookService } = await import("./webhook.service");
+        await WebhookService.dispatch('leave.created', {
+          leaveId: leaveRequest.id,
+          userId: userId,
+          leaveType: dto.type,
+          startDate: dto.startDate,
+          endDate: dto.endDate,
+          status: 'SUBMITTED',
+          reason: dto.reason,
+        });
+      } catch (webhookError) {
+        console.error("Webhook dispatch failed (non-critical):", webhookError);
+        // Don't fail the request because of webhook failure
+      }
 
       return {
         success: true,
@@ -194,151 +277,75 @@ export class LeaveService {
   }
 
   /**
-   * Approve a leave request
+   * Approve a leave request.
+   * 
+   * Updates the approval status, checks if it's the final approval,
+   * and if so, updates the leave status and deducts balance.
+   * 
+   * @param leaveId - ID of the leave request
+   * @param approverId - ID of the user approving the request
+   * @param comment - Optional comment from the approver
+   * @returns ServiceResult indicating success or failure
    */
   static async approveLeave(
     leaveId: number,
     approverId: number,
-    comment?: string
+    comment?: string,
+    ignoreWarnings: boolean = false
   ): Promise<ServiceResult<any>> {
-    try {
+    // Check for capacity conflicts before approving
+    if (!ignoreWarnings) {
       const leave = await LeaveRepository.findById(leaveId);
-      if (!leave) {
-        return {
-          success: false,
-          error: {
-            code: "leave_not_found",
-            message: "Leave request not found",
-          },
-        };
-      }
-
-      // Update approval record
-      await prisma.approval.updateMany({
-        where: {
-          leaveId: leaveId,
-          approverId,
-          decision: ApprovalDecision.PENDING,
-        },
-        data: {
-          decision: ApprovalDecision.APPROVED,
-          comment,
-          decidedAt: new Date(),
-        },
-      });
-
-      // Check if this is final approval
-      const isFinalApproval = await this.isFinalApproval(leaveId);
-
-      if (isFinalApproval) {
-        await LeaveRepository.updateStatus(leaveId, "APPROVED");
-
-        // Deduct from balance
-        await this.deductFromBalance(
-          leave.requesterId,
-          leave.type,
-          leave.workingDays
+      if (leave && leave.requester.department) {
+        const { TeamCapacityService } = await import("./team-capacity.service");
+        const conflict = await TeamCapacityService.checkConflicts(
+          leave.requester.department,
+          leave.startDate,
+          leave.endDate
         );
-      }
 
-      // Log action
-      await this.logAction(
-        `approver_${approverId}`,
-        "LEAVE_APPROVED",
-        { leaveId, comment }
-      );
-
-      // Send approval notification (only on final approval)
-      if (isFinalApproval) {
-        const approver = await prisma.user.findUnique({
-          where: { id: approverId },
-          select: { name: true },
-        });
-        if (approver) {
-          await NotificationService.notifyLeaveApproved(leaveId, approver.name);
+        if (conflict.hasConflict) {
+          return {
+            success: false,
+            error: {
+              code: "capacity_conflict",
+              message: conflict.message || "Capacity conflict detected",
+              details: { conflictDays: conflict.conflictDays },
+            },
+          };
         }
       }
-
-      return {
-        success: true,
-        data: { approved: true, final: isFinalApproval },
-      };
-    } catch (error) {
-      console.error("LeaveService.approveLeave error:", error);
-      return {
-        success: false,
-        error: {
-          code: "internal_error",
-          message: "An unexpected error occurred while approving leave",
-        },
-      };
     }
+
+    return ApprovalService.approve(leaveId, approverId, comment);
   }
 
   /**
-   * Reject a leave request
+   * Reject a leave request.
+   * 
+   * Updates the approval status to REJECTED, updates the leave status to REJECTED,
+   * and notifies the requester.
+   * 
+   * @param leaveId - ID of the leave request
+   * @param approverId - ID of the user rejecting the request
+   * @param reason - Reason for rejection
+   * @returns ServiceResult indicating success or failure
    */
   static async rejectLeave(
     leaveId: number,
     approverId: number,
     reason: string
   ): Promise<ServiceResult<any>> {
-    try {
-      // Update approval record
-      await prisma.approval.updateMany({
-        where: {
-          leaveId: leaveId,
-          approverId,
-          decision: ApprovalDecision.PENDING,
-        },
-        data: {
-          decision: ApprovalDecision.REJECTED,
-          comment: reason,
-          decidedAt: new Date(),
-        },
-      });
-
-      // Update leave status
-      await LeaveRepository.updateStatus(leaveId, "REJECTED");
-
-      // Log action
-      await this.logAction(
-        `approver_${approverId}`,
-        "LEAVE_REJECTED",
-        { leaveId, reason }
-      );
-
-      // Send rejection notification
-      const approver = await prisma.user.findUnique({
-        where: { id: approverId },
-        select: { name: true },
-      });
-      if (approver) {
-        await NotificationService.notifyLeaveRejected(
-          leaveId,
-          approver.name,
-          reason
-        );
-      }
-
-      return {
-        success: true,
-        data: { rejected: true },
-      };
-    } catch (error) {
-      console.error("LeaveService.rejectLeave error:", error);
-      return {
-        success: false,
-        error: {
-          code: "internal_error",
-          message: "An unexpected error occurred while rejecting leave",
-        },
-      };
-    }
+    return ApprovalService.reject(leaveId, approverId, reason);
   }
 
   /**
-   * Forward leave to next approver
+   * Forward a leave request to the next approver in the chain.
+   * 
+   * @param leaveId - ID of the leave request
+   * @param currentApproverId - ID of the current approver forwarding the request
+   * @param comment - Optional comment
+   * @returns ServiceResult indicating success or failure
    */
   static async forwardLeave(
     leaveId: number,
@@ -357,142 +364,57 @@ export class LeaveService {
         };
       }
 
-      // Get next approver first to determine toRole
+      // Get next approver to determine toRole
       const nextApprover = await this.getNextApprover(leave);
 
-      // Update current approval
-      await prisma.approval.updateMany({
-        where: {
-          leaveId: leaveId,
-          approverId: currentApproverId,
-          decision: ApprovalDecision.PENDING,
-        },
-        data: {
-          decision: ApprovalDecision.FORWARDED,
-          toRole: nextApprover?.role || null,
-          comment,
-          decidedAt: new Date(),
-        },
-      });
-
-      // Create next approval
-      if (nextApprover) {
-        const currentStep = await this.getCurrentStep(leaveId);
-        await prisma.approval.create({
-          data: {
-            leaveId: leaveId,
-            approverId: nextApprover.id,
-            step: currentStep + 1,
-            decision: ApprovalDecision.PENDING,
-          },
-        });
-      }
-
-      // Update status - keep as PENDING since it's still being processed
-      await LeaveRepository.updateStatus(leaveId, "PENDING");
-
-      // Log action
-      await this.logAction(
-        `approver_${currentApproverId}`,
-        "LEAVE_FORWARDED",
-        { leaveId, comment }
-      );
-
-      // Send forward notification
-      if (nextApprover) {
-        const forwarder = await prisma.user.findUnique({
-          where: { id: currentApproverId },
-          select: { name: true },
-        });
-        if (forwarder) {
-          await NotificationService.notifyLeaveForwarded(
-            leaveId,
-            nextApprover.id,
-            forwarder.name
-          );
+      if (!nextApprover) {
+        return {
+          success: false,
+          error: {
+            code: "no_next_approver",
+            message: "Cannot forward: No next approver found in workflow"
+          }
         }
       }
 
-      return {
-        success: true,
-        data: { forwarded: true },
-      };
+      return ApprovalService.forward(leaveId, currentApproverId, nextApprover.role as any, comment);
     } catch (error) {
       console.error("LeaveService.forwardLeave error:", error);
       return {
         success: false,
         error: {
           code: "internal_error",
-          message: "An unexpected error occurred while forwarding leave",
-        },
-      };
+          message: "An unexpected error occurred while forwarding leave"
+        }
+      }
     }
   }
 
   /**
-   * Return leave for modification
+   * Return a leave request to the requester for modification.
+   * 
+   * @param leaveId - ID of the leave request
+   * @param approverId - ID of the user returning the request
+   * @param reason - Reason for returning
+   * @returns ServiceResult indicating success or failure
    */
   static async returnLeave(
     leaveId: number,
     approverId: number,
     reason: string
   ): Promise<ServiceResult<any>> {
-    try {
-      // Update existing pending approval to FORWARDED with toRole: null
-      // This indicates the leave is being sent back to employee for modification
-      await prisma.approval.updateMany({
-        where: {
-          leaveId: leaveId,
-          approverId,
-          decision: ApprovalDecision.PENDING,
-        },
-        data: {
-          decision: ApprovalDecision.FORWARDED,
-          toRole: null, // Returning to employee (no next role)
-          comment: reason,
-          decidedAt: new Date(),
-        },
-      });
-
-      await LeaveRepository.updateStatus(leaveId, "RETURNED");
-
-      await this.logAction(
-        `approver_${approverId}`,
-        "LEAVE_RETURNED",
-        { leaveId, reason }
-      );
-
-      // Send return notification
-      const approver = await prisma.user.findUnique({
-        where: { id: approverId },
-        select: { name: true },
-      });
-      if (approver) {
-        await NotificationService.notifyLeaveReturned(
-          leaveId,
-          approver.name,
-          reason
-        );
-      }
-
-      return {
-        success: true,
-        data: { returned: true },
-      };
-    } catch (error) {
-      console.error("LeaveService.returnLeave error:", error);
-      return {
-        success: false,
-        error: {
-          code: "internal_error",
-          message: "An unexpected error occurred while returning leave",
-        },
-      };
-    }
+    return ApprovalService.returnForModification(leaveId, approverId, reason);
   }
 
   /**
-   * Cancel a leave request
+   * Cancel a leave request.
+   * 
+   * Can only be performed by the requester. Updates status to CANCELLED.
+   * 
+   * @param leaveId - ID of the leave request
+   * @param userId - ID of the user cancelling the request
+   * @param reason - Optional reason for cancellation
+   * @returns ServiceResult indicating success or failure
    */
   static async cancelLeave(
     leaveId: number,
@@ -532,6 +454,10 @@ export class LeaveService {
 
       // Send cancellation notification to approvers
       await NotificationService.notifyLeaveCancelled(leaveId);
+
+      // Remove from Calendar
+      const { CalendarService } = await import("@/lib/integrations/calendar/calendar-service");
+      await CalendarService.deleteLeaveEvent(leaveId, userId);
 
       return {
         success: true,
@@ -606,7 +532,7 @@ export class LeaveService {
 
     // For all other roles (HR_ADMIN, HR_HEAD, CEO), find by role
     const approver = await prisma.user.findFirst({
-      where: { role },
+      where: { role: role as any },
       select: { id: true },
     });
 
@@ -614,39 +540,25 @@ export class LeaveService {
   }
 
   private static async isFinalApproval(leaveId: number): Promise<boolean> {
-    // Get the leave request with requester info
+    // Get the leave request with all approvals
     const leave = await prisma.leaveRequest.findUnique({
       where: { id: leaveId },
       include: {
-        requester: { select: { role: true } },
         approvals: {
-          include: {
-            approver: { select: { role: true } },
-          },
-          orderBy: { step: 'desc' },
+          orderBy: { step: 'desc' }, // Highest step first
         },
       },
     });
 
-    if (!leave) {
+    if (!leave || leave.approvals.length === 0) {
+      // If no approvals defined, treating as not final (or handle as auto-approve elsewhere) 
       return false;
     }
 
-    // Get the appropriate workflow chain based on requester role
-    const { getChainFor } = await import('@/lib/workflow');
-    const chain = getChainFor(leave.type, leave.requester.role as any);
+    // The last step in the chain is the one with the highest step number (index 0 due to desc sort)
+    const lastApproval = leave.approvals[0];
 
-    // Check if we have an approval from the final approver in the chain
-    const finalRole = chain[chain.length - 1];
-
-    // Find if there's an approved approval from the final approver
-    const finalApproval = leave.approvals.find(
-      (approval) =>
-        approval.approver.role === finalRole &&
-        approval.decision === 'APPROVED'
-    );
-
-    return !!finalApproval;
+    return lastApproval.decision === ApprovalDecision.APPROVED;
   }
 
   private static async getCurrentStep(leaveId: number): Promise<number> {
@@ -661,49 +573,30 @@ export class LeaveService {
 
   private static async getNextApprover(
     leave: any
-  ): Promise<{ id: number; role: string } | null> {
-    // Get requester to determine the workflow chain
-    const requester = await prisma.user.findUnique({
-      where: { id: leave.requesterId },
-      select: { role: true },
-    });
+  ): Promise<{ id: number; role: Role } | null> {
+    // Logic: The "next" approver is the one responsible for the FIRST pending step.
 
-    if (!requester) {
-      return null;
-    }
-
-    // Get current approval step
-    const currentApproval = await prisma.approval.findFirst({
-      where: {
-        leaveId: leave.id,
-        decision: ApprovalDecision.PENDING,
-      },
-      orderBy: { step: 'desc' },
+    const approvals = await prisma.approval.findMany({
+      where: { leaveId: leave.id },
+      orderBy: { step: 'asc' }, // Order 1, 2, 3...
       include: {
         approver: { select: { role: true } },
       },
     });
 
-    if (!currentApproval) {
+    if (approvals.length === 0) return null;
+
+    // Find the first approval that is still PENDING
+    const nextPending = approvals.find(a => a.decision === ApprovalDecision.PENDING);
+
+    if (!nextPending) {
       return null;
     }
 
-    // Import workflow functions
-    const { getNextRoleInChain } = await import('@/lib/workflow');
-
-    // Get next role in chain based on current approver's role and requester's role
-    const nextRole = getNextRoleInChain(
-      currentApproval.approver.role as any,
-      leave.type,
-      requester.role as any
-    );
-
-    if (!nextRole) {
-      return null;
-    }
-
-    const approver = await this.findApprover(leave.requesterId, nextRole);
-    return approver ? { id: approver.id, role: nextRole } : null;
+    return {
+      id: nextPending.approverId,
+      role: nextPending.approver.role
+    };
   }
 
   private static async deductFromBalance(
@@ -752,6 +645,9 @@ export class LeaveService {
   /**
    * Get team leave requests for department head with filters and pagination
    */
+  /**
+   * Get team leave requests for department head with filters and pagination
+   */
   static async getTeamLeaveRequests(
     deptHeadId: number,
     filters: {
@@ -773,294 +669,7 @@ export class LeaveService {
       };
     }>
   > {
-    try {
-      const {
-        search = "",
-        status = "PENDING",
-        type = "ALL",
-        page = 1,
-        pageSize = 10,
-      } = filters;
-
-      // Get team members
-      const teamMembers = await prisma.user.findMany({
-        where: { deptHeadId },
-        select: { id: true },
-      });
-      const teamMemberIds = teamMembers.map((m) => m.id);
-
-      // If no team members, return empty results
-      if (teamMemberIds.length === 0) {
-        return {
-          success: true,
-          data: {
-            rows: [],
-            total: 0,
-            counts: {
-              pending: 0,
-              forwarded: 0,
-              returned: 0,
-              cancelled: 0,
-            },
-          },
-        };
-      }
-
-      // Build where clause
-      const where = this.buildTeamLeaveWhere(
-        deptHeadId,
-        search,
-        status,
-        type,
-        teamMemberIds
-      );
-
-      // Fetch all rows matching the filter (for deduplication)
-      const rowsRaw = await prisma.leaveRequest.findMany({
-        where,
-        include: {
-          requester: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              deptHeadId: true,
-            },
-          },
-          approvals: {
-            include: {
-              approver: {
-                select: { name: true, role: true },
-              },
-            },
-            orderBy: { step: "asc" },
-          },
-        },
-        orderBy: [{ startDate: "asc" }, { id: "asc" }],
-      });
-
-      // Deduplicate (same requester + dates)
-      const key = (r: any) =>
-        `${
-          r.requesterId
-        }-${r.startDate.toISOString()}-${r.endDate.toISOString()}`;
-      const seen = new Set<string>();
-      const uniqueRows = rowsRaw.filter((r) =>
-        seen.has(key(r)) ? false : seen.add(key(r))
-      );
-
-      // Calculate total after deduplication
-      const total = uniqueRows.length;
-
-      // Apply pagination AFTER deduplication
-      const rows = uniqueRows.slice((page - 1) * pageSize, page * pageSize);
-
-      // Calculate status counts
-      const counts = await this.getTeamLeaveCounts(deptHeadId, teamMemberIds);
-
-      // Serialize rows
-      const serializedRows = rows.map((r) => ({
-        id: r.id,
-        type: r.type,
-        startDate: r.startDate.toISOString(),
-        endDate: r.endDate.toISOString(),
-        workingDays: r.workingDays,
-        reason: r.reason,
-        status: r.status,
-        isModified: (r as any).isModified ?? false,
-        requester: r.requester,
-        approvals: r.approvals.map((a) => ({
-          id: a.id,
-          decision: a.decision,
-          toRole: a.toRole,
-          approverId: a.approverId,
-          approver: a.approver,
-          decidedAt: a.decidedAt?.toISOString() || null,
-          comment: a.comment,
-        })),
-      }));
-
-      return {
-        success: true,
-        data: {
-          rows: serializedRows,
-          total,
-          counts,
-        },
-      };
-    } catch (error) {
-      console.error("LeaveService.getTeamLeaveRequests error:", error);
-      return {
-        success: false,
-        error: {
-          code: "fetch_error",
-          message: "Failed to fetch team leave requests",
-        },
-      };
-    }
-  }
-
-  /**
-   * Build where clause for team leave requests
-   */
-  private static buildTeamLeaveWhere(
-    deptHeadId: number,
-    search: string,
-    status: string,
-    type: string,
-    teamMemberIds: number[]
-  ): any {
-    const base: any = {
-      requesterId: { in: teamMemberIds },
-    };
-
-    // Type filter
-    if (type && type !== "ALL") {
-      base.type = type as LeaveType;
-    }
-
-    // Search filter
-    if (search) {
-      base.OR = [
-        { requester: { name: { contains: search, mode: "insensitive" } } },
-        { requester: { email: { contains: search, mode: "insensitive" } } },
-        { reason: { contains: search, mode: "insensitive" } },
-      ];
-    }
-
-    // Status scope for Dept Head
-    if (status === "PENDING") {
-      base.status = { in: [LeaveStatus.PENDING, LeaveStatus.SUBMITTED] };
-      base.AND = [
-        {
-          approvals: {
-            some: {
-              decision: "FORWARDED",
-              toRole: "DEPT_HEAD",
-            },
-          },
-        },
-        {
-          approvals: {
-            none: {
-              approverId: deptHeadId,
-              decision: {
-                in: ["FORWARDED", "APPROVED", "REJECTED"],
-              },
-            },
-          },
-        },
-      ];
-    } else if (status === "FORWARDED") {
-      base.status = LeaveStatus.PENDING;
-      base.approvals = {
-        some: {
-          decision: "FORWARDED",
-          approverId: deptHeadId,
-          toRole: { not: null },
-        },
-      };
-    } else if (status === "RETURNED") {
-      base.status = LeaveStatus.RETURNED;
-      base.approvals = {
-        some: {
-          approverId: deptHeadId,
-          decision: "FORWARDED",
-          toRole: null,
-        },
-      };
-    } else if (status === "CANCELLED") {
-      base.status = LeaveStatus.CANCELLED;
-    } else if (status === "ALL") {
-      base.status = {
-        in: [
-          LeaveStatus.PENDING,
-          LeaveStatus.SUBMITTED,
-          LeaveStatus.RETURNED,
-          LeaveStatus.CANCELLED,
-        ],
-      };
-    }
-
-    return base;
-  }
-
-  /**
-   * Get status counts for team leave requests
-   */
-  private static async getTeamLeaveCounts(
-    deptHeadId: number,
-    teamMemberIds: number[]
-  ): Promise<{
-    pending: number;
-    forwarded: number;
-    returned: number;
-    cancelled: number;
-  }> {
-    const baseDept = { requesterId: { in: teamMemberIds } };
-
-    const [pending, forwarded, returned, cancelled] = await Promise.all([
-      prisma.leaveRequest.count({
-        where: {
-          ...baseDept,
-          status: { in: [LeaveStatus.PENDING, LeaveStatus.SUBMITTED] },
-          AND: [
-            {
-              approvals: {
-                some: {
-                  decision: "FORWARDED",
-                  toRole: "DEPT_HEAD",
-                },
-              },
-            },
-            {
-              approvals: {
-                none: {
-                  approverId: deptHeadId,
-                  decision: {
-                    in: ["FORWARDED", "APPROVED", "REJECTED"],
-                  },
-                },
-              },
-            },
-          ],
-        },
-      }),
-      prisma.leaveRequest.count({
-        where: {
-          ...baseDept,
-          status: LeaveStatus.PENDING,
-          approvals: {
-            some: {
-              decision: "FORWARDED",
-              approverId: deptHeadId,
-              toRole: { not: null },
-            },
-          },
-        },
-      }),
-      prisma.leaveRequest.count({
-        where: {
-          ...baseDept,
-          status: LeaveStatus.RETURNED,
-          approvals: {
-            some: {
-              approverId: deptHeadId,
-              decision: "FORWARDED",
-              toRole: null,
-            },
-          },
-        },
-      }),
-      prisma.leaveRequest.count({
-        where: {
-          ...baseDept,
-          status: LeaveStatus.CANCELLED,
-        },
-      }),
-    ]);
-
-    return { pending, forwarded, returned, cancelled };
+    return LeaveQueryService.getTeamLeaveRequests(deptHeadId, filters);
   }
 
   private static async logAction(

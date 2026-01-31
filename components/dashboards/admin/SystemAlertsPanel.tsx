@@ -3,6 +3,7 @@
 import { GlassCard, GlassCardContent, GlassCardHeader, GlassCardTitle } from "@/components/ui/glass-card";
 import { AlertTriangle, Info, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 interface SystemAlert {
   id: string;
@@ -45,26 +46,29 @@ export function SystemAlertsPanel() {
   const getAlertStyle = (type: string) => {
     switch (type) {
       case "warning":
-        return "bg-data-warning/10 border-data-warning/30 text-data-warning";
+        return "bg-warning dark:bg-warning/80/10 border-warning/30 text-warning dark:text-warning/90";
       case "success":
-        return "bg-data-success/10 border-data-success/30 text-data-success";
+        return "bg-success dark:bg-success/80/10 border-success/30 text-success dark:text-success/90";
       default:
-        return "bg-data-info/10 border-data-info/30 text-data-info";
+        return "bg-info dark:bg-info/80/10 border-info/30 text-info dark:text-info/90";
     }
   };
 
   return (
     <GlassCard variant="hover" className="surface-card">
-      <GlassCardHeader>
+      <GlassCardHeader className="flex flex-row items-center justify-between gap-2">
         <GlassCardTitle className="text-base flex items-center gap-2">
           <AlertTriangle className="h-4 w-4" />
           System Alerts
         </GlassCardTitle>
+        <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+          Mock
+        </Badge>
       </GlassCardHeader>
       <GlassCardContent className="space-y-3">
         {alerts.length === 0 ? (
           <div className="text-center py-6 text-sm text-muted-foreground">
-            <CheckCircle className="h-8 w-8 mx-auto mb-2 text-data-success" />
+            <CheckCircle className="h-8 w-8 mx-auto mb-2 text-success dark:text-success/90" />
             <p>All systems operating normally</p>
           </div>
         ) : (

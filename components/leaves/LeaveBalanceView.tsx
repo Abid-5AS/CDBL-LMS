@@ -1,12 +1,13 @@
 "use client";
 
-import { Calendar, Clock, TrendingUp, AlertCircle, BookOpen, CalendarPlus, FileDown, History } from "lucide-react";
+import { useMemo } from "react";
+import { Calendar, Clock, TrendingUp, AlertCircle, BookOpen, CalendarPlus, FileDown, History, ChevronRight, Info, Plane, Palmtree, Stethoscope } from "lucide-react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
 import { ConversionHistory } from "@/components/leaves/ConversionHistory";
@@ -26,41 +27,60 @@ type BalanceResponse = {
   balances: BalanceDetail[];
 };
 
+type LeaveResponse = {
+  items?: any[];
+};
+
 const LEAVE_TYPE_CONFIG = {
   EARNED: {
     label: "Earned Leave",
-    description: "Accrued leave that can be carried forward",
-    icon: TrendingUp,
-    color: "text-data-warning",
+    description: "Leaves earned through service",
+    icon: Plane,
+    color: "text-amber-500",
+    bgColor: "bg-amber-500/10",
+    borderColor: "border-amber-500/20",
     maxCarryForward: 60,
     expiresYearEnd: false,
   },
   CASUAL: {
     label: "Casual Leave",
-    description: "Short-term leave for personal matters",
-    icon: Clock,
-    color: "text-data-info",
+    description: "Short-term personal leave",
+    icon: Palmtree,
+    color: "text-blue-500",
+    bgColor: "bg-blue-500/10",
+    borderColor: "border-blue-500/20",
     maxCarryForward: undefined,
     expiresYearEnd: true,
   },
   MEDICAL: {
     label: "Medical Leave",
-    description: "Medical certificate required for > 3 days",
-    icon: Calendar,
-    color: "text-data-success",
+    description: "Health & wellness leave",
+    icon: Stethoscope,
+    color: "text-emerald-500",
+    bgColor: "bg-emerald-500/10",
+    borderColor: "border-emerald-500/20",
     maxCarryForward: undefined,
     expiresYearEnd: true,
   },
 };
 
 export function LeaveBalanceView() {
-  const { data, error, isLoading } = useSWR<BalanceResponse>(
+  const router = useRouter();
+
+  // Fetch balances
+  const { data: balanceData, error: balanceError, isLoading: isBalanceLoading } = useSWR<BalanceResponse>(
     "/api/balance/mine?detailed=true",
     apiFetcher,
-    {
-      revalidateOnFocus: false,
-    }
+    { revalidateOnFocus: false }
   );
+
+  // Fetch user's leaves to calculate projections
+  const { data: leavesData, isLoading: isLeavesLoading } = useSWR<LeaveResponse>(
+    "/api/leaves?mine=1&limit=100",
+    apiFetcher,
+    { revalidateOnFocus: false }
+  );
+
   const { data: analyticsData } = useSWR<{
     monthlyUsage?: Array<{
       monthName: string;
@@ -72,301 +92,344 @@ export function LeaveBalanceView() {
   }>("/api/dashboard/analytics?window=rolling12", apiFetcher, {
     revalidateOnFocus: false,
   });
-  const router = useRouter();
+
+  // Calculate pending days per type
+  const pendingDaysMap = useMemo(() => {
+    const map: Record<string, number> = { EARNED: 0, CASUAL: 0, MEDICAL: 0 };
+    if (!leavesData?.items) return map;
+
+    leavesData.items.forEach((item) => {
+      const isPending = ["PENDING", "SUBMITTED"].includes(item.status);
+      if (isPending && map[item.type] !== undefined) {
+        map[item.type] += item.workingDays || 0;
+      }
+    });
+    return map;
+  }, [leavesData]);
 
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
   const isYearEnd = currentMonth >= 10; // November or December
-  const totalAvailable = data?.balances.reduce((sum, balance) => sum + (balance.closing ?? 0), 0) ?? 0;
-  const totalUsed = data?.balances.reduce((sum, balance) => sum + (balance.used ?? 0), 0) ?? 0;
-  const totalAccrued = data?.balances.reduce((sum, balance) => sum + (balance.accrued ?? 0), 0) ?? 0;
+
+  const totalAvailable = balanceData?.balances.reduce((sum, b) => sum + (b.closing ?? 0), 0) ?? 0;
+  const totalUsed = balanceData?.balances.reduce((sum, b) => sum + (b.used ?? 0), 0) ?? 0;
+  const totalAccrued = balanceData?.balances.reduce((sum, b) => sum + (b.accrued ?? 0), 0) ?? 0;
+  const totalPending = Object.values(pendingDaysMap).reduce((sum, val) => sum + val, 0);
 
   const utilizationBase = totalAvailable + totalUsed;
-  const utilizationPct =
-    utilizationBase > 0 ? Math.round((totalUsed / utilizationBase) * 100) : 0;
+  const utilizationPct = utilizationBase > 0 ? Math.round((totalUsed / utilizationBase) * 100) : 0;
 
-  const usageTrend = (analyticsData?.monthlyUsage || []).map((month) => ({
-    month: month.monthName,
-    leaves: month.total,
-    approved: month.earned,
-    pending: month.casual,
-    returned: month.medical,
+  const usageTrend = (analyticsData?.monthlyUsage || []).map((m) => ({
+    month: m.monthName,
+    leaves: m.total,
+    approved: m.earned,
+    pending: m.casual,
+    returned: m.medical,
   }));
 
   const heroStats = [
     {
       label: "Total Available",
-      value: isLoading ? "…" : `${totalAvailable} days`,
+      value: isBalanceLoading ? "…" : `${totalAvailable} d`,
       state: totalAvailable <= 0 ? "danger" : totalAvailable <= 5 ? "warning" : "success",
-      helper: `Year ${data?.year ?? currentYear}`,
     },
     {
-      label: "Used This Year",
-      value: isLoading ? "…" : `${totalUsed} days`,
-      state: undefined,
-      helper:
-        utilizationBase > 0
-          ? `${utilizationPct}% utilized · replaces dashboard summary`
-          : "Synced with dashboard summary",
+      label: "Under Review",
+      value: isLeavesLoading ? "…" : `${totalPending} d`,
+      state: totalPending > 0 ? "warning" : undefined,
     },
     {
-      label: "Accrued",
-      value: isLoading ? "…" : `+${totalAccrued} days`,
+      label: "Accrued YTD",
+      value: isBalanceLoading ? "…" : `+${totalAccrued} d`,
       state: undefined,
-      helper: "Automatic monthly accrual",
     },
   ] as const;
 
   return (
-    <div className="mx-auto max-w-5xl space-y-4 py-4">
-      {/* Compact Hero Section */}
-      <div className="bg-card border border-border rounded-lg p-4">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground mb-1">
-              BALANCES
-            </p>
-            <h1 className="text-2xl font-semibold text-foreground mb-1">Your Leave Overview</h1>
-            <p className="text-sm text-muted-foreground">
-              Track available days, usage, and policy reminders for {data?.year ?? currentYear}.
-            </p>
-          </div>
+    <div className="mx-auto max-w-7xl space-y-6 py-6 px-4">
+      {/* Refined Header Section */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
+        <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              leftIcon={<BookOpen className="size-4" aria-hidden="true" />}
-              onClick={() => router.push("/policies")}
-            >
-              Policies
-            </Button>
-            <Button
-              size="sm"
-              leftIcon={<CalendarPlus className="size-4" aria-hidden="true" />}
-              onClick={() => router.push("/leaves/apply")}
-            >
-              Apply Leave
-            </Button>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Leave Balances</h1>
+            <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">
+              {balanceData?.year ?? currentYear}
+            </span>
+          </div>
+          <p className="text-muted-foreground text-sm max-w-md">
+            Track your leave entitlements, upcoming accruals, and projected availability.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-full px-4"
+            leftIcon={<BookOpen className="size-4" aria-hidden="true" />}
+            onClick={() => router.push("/policies")}
+          >
+            Policies
+          </Button>
+          <Button
+            size="sm"
+            className="rounded-full px-4 shadow-sm"
+            leftIcon={<CalendarPlus className="size-4" aria-hidden="true" />}
+            onClick={() => router.push("/leaves/apply")}
+          >
+            Apply Leave
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Left Column: Balances Grid */}
+        <div className="lg:col-span-3 space-y-6">
+          {balanceError && (
+            <Alert variant="destructive" className="border-destructive/40 shadow-sm">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>Failed to load balance information. Please try again.</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {(["EARNED", "CASUAL", "MEDICAL"] as const).map((type) => {
+              const config = LEAVE_TYPE_CONFIG[type];
+              const balance = balanceData?.balances.find((b) => b.type === type);
+              const Icon = config.icon;
+
+              const total = balance ? balance.opening + balance.accrued : 0;
+              const used = balance?.used ?? 0;
+              const available = balance?.closing ?? 0;
+              const pending = pendingDaysMap[type] || 0;
+              const projected = Math.max(0, available - pending);
+
+              const progressPercentage = total > 0 ? (used / total) * 100 : 0;
+              const projectedProgressPct = total > 0 ? ((used + pending) / total) * 100 : 0;
+
+              const getStatusColor = (val: number) => {
+                if (isBalanceLoading) return "bg-muted";
+                if (val > 50) return "bg-emerald-500";
+                if (val > 20) return "bg-amber-500";
+                return "bg-rose-500";
+              };
+
+              const showExpiryWarning = config.expiresYearEnd && isYearEnd && available > 0;
+              const showCarryForwardWarning = type === "EARNED" && config.maxCarryForward && available > config.maxCarryForward;
+
+              return (
+                <Card key={type} className="group relative overflow-hidden border-border/60 bg-card shadow-sm transition-all hover:shadow-md hover:border-border/100">
+                  <div className={cn("absolute top-0 left-0 w-full h-1", config.bgColor.replace("/10", ""))} />
+
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className={cn("p-2 rounded-xl", config.bgColor)}>
+                        <Icon className={cn("h-5 w-5", config.color)} />
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/70">Available</p>
+                        <p className="text-2xl font-black tracking-tight text-foreground -mt-1">
+                          {isBalanceLoading ? "…" : available}
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <CardTitle className="text-base font-bold">{config.label}</CardTitle>
+                      <CardDescription className="text-[11px] leading-tight mt-0.5">{config.description}</CardDescription>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="space-y-5">
+                    {/* Progress with clear labels */}
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between items-end text-[10px] font-bold uppercase tracking-wide text-muted-foreground/60">
+                        <span>Projected Balance</span>
+                        <div className="flex items-center gap-1">
+                          <span className={cn(pending > 0 ? "text-amber-600 font-black" : "")}>
+                            {isBalanceLoading ? "…" : projected} d
+                          </span>
+                          <TooltipProvider>
+                            <Tooltip delayDuration={300}>
+                              <TooltipTrigger asChild>
+                                <Info className="h-3 w-3 cursor-help opacity-40 hover:opacity-100" />
+                              </TooltipTrigger>
+                              <TooltipContent className="text-xs p-2 max-w-[200px]">
+                                <p className="font-bold mb-1">Projection Logic</p>
+                                <p>Available ({available}) - Pending ({pending}) = {projected} days remaining if all current requests are approved.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                      </div>
+                      <div className="relative h-1.5 w-full bg-muted/40 rounded-full overflow-hidden">
+                        {/* Current Usage */}
+                        <div
+                          className={cn("absolute left-0 top-0 h-full transition-all duration-500 z-10", getStatusColor(available))}
+                          style={{ width: `${progressPercentage}%` }}
+                        />
+                        {/* Pending Projection */}
+                        {pending > 0 && (
+                          <div
+                            className="absolute top-0 h-full bg-amber-500/30 dark:bg-amber-500/20 transition-all duration-500 z-0 animate-pulse"
+                            style={{ left: `${progressPercentage}%`, width: `${projectedProgressPct - progressPercentage}%` }}
+                          />
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Streamlined Stats Grid */}
+                    <div className="grid grid-cols-2 gap-y-3 pb-2 border-b border-border/40">
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-tight">Opening</p>
+                        <p className="text-sm font-bold text-foreground">{balance?.opening ?? 0} d</p>
+                      </div>
+                      <div className="space-y-0.5 text-right">
+                        <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-tight">Accrued</p>
+                        <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">+{balance?.accrued ?? 0} d</p>
+                      </div>
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-tight">Used (Approved)</p>
+                        <p className="text-sm font-bold text-rose-600 dark:text-rose-400">-{balance?.used ?? 0} d</p>
+                      </div>
+                      <div className="space-y-0.5 text-right">
+                        <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-tight">Pending Approval</p>
+                        <p className={cn("text-sm font-bold", pending > 0 ? "text-amber-500" : "text-muted-foreground")}>
+                          {pending} d
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Contextual Actions/Warnings */}
+                    <div className="min-h-[48px] flex items-center">
+                      {showExpiryWarning ? (
+                        <div className="flex items-center gap-2 text-[11px] font-medium text-amber-600 bg-amber-50 dark:bg-amber-950/20 p-2 rounded-lg w-full">
+                          <AlertCircle className="h-3.5 w-3.5" />
+                          <span>{available} days expire on Dec 31</span>
+                        </div>
+                      ) : showCarryForwardWarning ? (
+                        <div className="flex items-center gap-2 text-[11px] font-medium text-blue-600 bg-blue-50 dark:bg-blue-950/20 p-2 rounded-lg w-full">
+                          <AlertCircle className="h-3.5 w-3.5" />
+                          <span>Max {config.maxCarryForward}d carry-forward</span>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-muted-foreground font-medium italic">
+                          Carry-forward eligible
+                        </p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          {/* Quick Stats Summary */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {heroStats.map((stat) => (
+              <div
+                key={stat.label}
+                className="flex flex-col gap-1 p-4 rounded-2xl border border-border/50 bg-muted/30"
+              >
+                <span className="text-[10px] uppercase font-black tracking-widest text-muted-foreground opacity-70">{stat.label}</span>
+                <span className={cn(
+                  "text-xl font-black tracking-tight",
+                  stat.state === "danger" ? "text-rose-600" :
+                    stat.state === "warning" ? "text-amber-600" :
+                      stat.state === "success" ? "text-emerald-600" :
+                        "text-foreground"
+                )}>
+                  {stat.value}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
-        
-        {/* Inline Stats */}
-        <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-border/50">
-          {heroStats.map((stat) => (
-            <div
-              key={stat.label}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg border border-border/70 bg-muted/20"
-            >
-              <div>
-                <p className="text-xs text-muted-foreground">{stat.label}</p>
-                <p
-                  className={cn(
-                    "text-base font-semibold",
-                    stat.state === "danger" ? "text-destructive" :
-                    stat.state === "warning" ? "text-data-warning" :
-                    stat.state === "success" ? "text-data-success" :
-                    "text-foreground"
-                  )}
+
+        {/* Right Column: Actions & Progress Summary */}
+        <div className="space-y-6">
+          <Card className="border-border/60 bg-card shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-bold uppercase tracking-tight">Annual Summary</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="space-y-2">
+                <div className="flex justify-between items-end">
+                  <span className="text-xs font-semibold text-muted-foreground">Budget Utilized</span>
+                  <span className="text-lg font-black text-foreground">{utilizationPct}%</span>
+                </div>
+                <Progress value={utilizationPct} className="h-2" />
+              </div>
+
+              <div className="space-y-3 pt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-between"
+                  onClick={() => router.push("/reports")}
                 >
-                  {stat.value}
+                  <span className="flex items-center gap-2">
+                    <FileDown className="size-4 text-primary" />
+                    Entitlement Statement
+                  </span>
+                  <ChevronRight className="size-4 opacity-50" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-between"
+                  onClick={() => router.push("/leaves")}
+                >
+                  <span className="flex items-center gap-2">
+                    <History className="size-4 text-primary" />
+                    Usage History
+                  </span>
+                  <ChevronRight className="size-4 opacity-50" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Accrual Info */}
+          <div className="p-4 rounded-2xl bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/10">
+            <div className="flex gap-3">
+              <div className="mt-1">
+                <Calendar className="h-5 w-5 text-primary" />
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-sm font-bold text-foreground">Next Accrual</h4>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Monthly accruals are processed on the 1st of each month. Next update expected Feb 1st.
                 </p>
               </div>
             </div>
-          ))}
+          </div>
         </div>
       </div>
 
-      {error && (
-        <Alert variant="destructive" className="bg-card border border-destructive/40">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>Failed to load balance information. Please try again.</AlertDescription>
-        </Alert>
-      )}
-
-      {/* Leave Balance Cards - PRIORITY CONTENT */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {(["EARNED", "CASUAL", "MEDICAL"] as const).map((type) => {
-          const config = LEAVE_TYPE_CONFIG[type];
-          const balance = data?.balances.find((b) => b.type === type);
-          const Icon = config.icon;
-
-          const total = balance ? balance.opening + balance.accrued : 0;
-          const used = balance?.used ?? 0;
-          const available = balance?.closing ?? 0;
-          const progressPercentage = total > 0 ? (used / total) * 100 : 0;
-
-          // Determine status color
-          const getStatusColor = () => {
-            if (isLoading) return "bg-muted";
-            const remainingPercentage = total > 0 ? (available / total) * 100 : 0;
-            if (remainingPercentage > 50) return "bg-data-success";
-            if (remainingPercentage > 20) return "bg-data-warning";
-            return "bg-data-error";
-          };
-
-          // Check for warnings
-          const showExpiryWarning =
-            config.expiresYearEnd && isYearEnd && available > 0;
-          const showCarryForwardWarning =
-            type === "EARNED" &&
-            config.maxCarryForward &&
-            available > config.maxCarryForward;
-
-          return (
-            <Card key={type} className="bg-card border-border h-full flex flex-col">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Icon className={`h-5 w-5 ${config.color}`} />
-                  <CardTitle className="text-base">{config.label}</CardTitle>
-                </div>
-                <CardDescription>{config.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
+      {/* Analytics Section */}
+      <div className="pt-4 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {usageTrend.length > 0 && (
+          <Card className="border-border/60 bg-card shadow-sm overflow-hidden">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
                 <div>
-                  <div className="flex items-baseline justify-between">
-                    <p className="text-2xl font-semibold text-foreground">
-                      {isLoading ? "..." : available}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {isLoading ? "" : `of ${total} days`}
-                    </p>
-                  </div>
-                  <Progress
-                    value={progressPercentage}
-                    className="mt-2 h-2"
-                    indicatorClassName={getStatusColor()}
-                  />
+                  <CardTitle className="text-base font-bold">Monthly Usage Trend</CardTitle>
+                  <CardDescription className="text-xs">Rolling 12 months average</CardDescription>
                 </div>
+                <TrendingUp className="h-5 w-5 text-primary opacity-20" />
+              </div>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <TrendChart data={usageTrend} dataKey="leaves" height={200} />
+            </CardContent>
+          </Card>
+        )}
 
-                {!isLoading && balance && (
-                  <div className="space-y-1 text-xs text-muted-foreground">
-                    <div className="flex justify-between">
-                      <span>Opening Balance:</span>
-                      <span className="font-medium">{balance.opening} days</span>
-                    </div>
-                    {balance.accrued > 0 && (
-                      <div className="flex justify-between">
-                        <span>Accrued:</span>
-                        <span className="font-medium text-data-success">
-                          +{balance.accrued} days
-                        </span>
-                      </div>
-                    )}
-                    {balance.used > 0 && (
-                      <div className="flex justify-between">
-                        <span>Used:</span>
-                        <span className="font-medium text-data-error">
-                          -{balance.used} days
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex justify-between border-t border-border pt-1">
-                      <span>Available:</span>
-                      <span className="font-semibold">{balance.closing} days</span>
-                    </div>
-                  </div>
-                )}
-
-                <div className="space-y-1.5 min-h-[60px]">
-                  {showExpiryWarning && (
-                    <Alert variant="default" className="py-1">
-                      <AlertCircle className="h-3 w-3" />
-                      <AlertDescription className="text-xs flex items-center gap-2">
-                        <span>{available} days will expire on Dec 31.</span>
-                        <Link
-                          href="/policies#casual"
-                          className="underline text-foreground text-[11px]"
-                        >
-                          Policy
-                        </Link>
-                      </AlertDescription>
-                    </Alert>
-                  )}
-
-                  {showCarryForwardWarning && (
-                    <Alert variant="default" className="py-1">
-                      <AlertCircle className="h-3 w-3" />
-                      <AlertDescription className="text-xs flex items-center gap-2">
-                        <span>Max {config.maxCarryForward} days can be carried forward.</span>
-                        <Link
-                          href="/policies#earned"
-                          className="underline text-foreground text-[11px]"
-                        >
-                          See rules
-                        </Link>
-                      </AlertDescription>
-                    </Alert>
-                  )}
-
-                  {!showExpiryWarning && !showCarryForwardWarning && (
-                    <p className="text-xs text-muted-foreground">
-                      No expiry or carry-forward action required this year.
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Accrual Checkpoint Section */}
-      <div className="bg-card border border-border rounded-lg overflow-hidden">
-        <div className="p-4 border-b border-border/50">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <Calendar className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground font-medium">Upcoming Checkpoint</p>
-              <p className="text-sm font-semibold text-foreground">
-                {isYearEnd ? "Year-end balance reconciliation" : "Monthly accrual closes in 5 days"}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="p-4 bg-muted/20">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 justify-center"
-              leftIcon={<FileDown className="size-4" aria-hidden="true" />}
-              onClick={() => router.push("/reports")}
-            >
-              Download Statement
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              className="flex-1 justify-center"
-              leftIcon={<History className="size-4" aria-hidden="true" />}
-              onClick={() => router.push("/leaves")}
-            >
-              View History
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground mt-3 text-center">
-            Export includes accrual statement • History shows detailed leave log
-          </p>
+        {/* Conversion History */}
+        <div className="rounded-xl border border-border/60 bg-card p-0 shadow-sm overflow-hidden">
+          <ConversionHistory year={balanceData?.year ?? currentYear} showHeader />
         </div>
       </div>
-
-      {/* Monthly Usage Trend - Collapsible */}
-      {usageTrend.length > 0 && (
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle>Monthly usage trend</CardTitle>
-            <CardDescription>Rolling 12 months of approved leave days by type.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <TrendChart data={usageTrend} dataKey="leaves" height={220} />
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Conversion History Section */}
-      <ConversionHistory year={data?.year ?? currentYear} showHeader />
     </div>
   );
 }

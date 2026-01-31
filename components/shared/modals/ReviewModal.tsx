@@ -5,14 +5,14 @@ import { toast } from "sonner";
 import { Button, Textarea } from "@/components/ui";
 import { ArrowRight, RotateCcw } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { useUser } from "@/lib/user-context";
+import { useUser } from "@/components/providers/UserContext";
 import type { AppRole } from "@/lib/rbac";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/lib/enums";
 import { UnifiedModal } from "./UnifiedModal";
 import { apiPost } from "@/lib/apiClient";
-import { SUCCESS_MESSAGES } from "@/lib/toast-messages";
+import { SUCCESS_MESSAGES } from "@/lib/ui/toast-messages";
 
 type LeaveRequest = {
   id: number;
@@ -241,8 +241,8 @@ export function ReviewModal({
         {submitting
           ? "Processing..."
           : action === "reject"
-          ? "Confirm Reject"
-          : "Confirm Return"}
+            ? "Confirm Reject"
+            : "Confirm Return"}
       </Button>
     </>
   );

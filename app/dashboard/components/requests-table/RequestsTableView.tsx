@@ -7,7 +7,7 @@ import { formatDate } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import clsx from "clsx";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -95,7 +95,7 @@ export function RequestsTableView({
             <tr>
               <td
                 colSpan={enableSelection ? 7 : 6}
-                className="text-center text-sm text-data-error py-12"
+                className="text-center text-sm text-danger dark:text-danger/90 py-12"
                 role="alert"
               >
                 Failed to load

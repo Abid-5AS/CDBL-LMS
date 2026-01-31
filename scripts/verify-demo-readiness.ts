@@ -44,18 +44,7 @@ async function verifyDemoReadiness() {
   const balanceCount = await prisma.balance.count();
   console.log(`✅ Balances: ${balanceCount} (Expected: 24 - 8 users × 3 types)`);
 
-  // Verify FloatingDock requirement: users should be able to see their nav items
-  const usersWithRoles = await prisma.user.findMany({
-    select: { id: true, email: true, role: true },
-  });
-  console.log(`\n✅ Role Distribution:`);
-  const roleCounts = usersWithRoles.reduce((acc, u) => {
-    acc[u.role] = (acc[u.role] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-  Object.entries(roleCounts).forEach(([role, count]) => {
-    console.log(`   - ${role}: ${count}`);
-  });
+
 
   // Verify policy compliance: check if EL advance notice is enforced
   const pendingElLeaves = await prisma.leaveRequest.findMany({

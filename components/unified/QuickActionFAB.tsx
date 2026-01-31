@@ -6,7 +6,7 @@ import Link from "next/link";
 import clsx from "clsx";
 import { Plus, Eye, TrendingUp, X } from "lucide-react";
 import { useLeaveData } from "@/components/providers";
-import { useUser } from "@/lib/user-context";
+import { useUser } from "@/components/providers/UserContext";
 
 type FABAction = {
   label: string;
@@ -113,9 +113,9 @@ export function QuickActionFAB() {
                 <div className="flex items-center justify-center w-10 h-10 rounded-full bg-card-action dark:bg-card-action/40">
                   <Icon className="h-5 w-5 text-card-action dark:text-card-action" />
                 </div>
-                <span className="text-sm font-medium text-text-secondary dark:text-[var(--text-primary)] whitespace-nowrap">{action.label}</span>
+                <span className="text-sm font-medium text-muted-foreground dark:text-muted-foreground/80 dark:text-[var(--text-primary)] whitespace-nowrap">{action.label}</span>
                 {action.badge && (
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-data-error text-text-inverted text-xs font-semibold">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-danger dark:bg-danger/80 text-white dark:text-white text-xs font-semibold">
                     {action.badge}
                   </span>
                 )}
@@ -129,7 +129,7 @@ export function QuickActionFAB() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={clsx(
-          "flex items-center justify-center h-14 w-14 rounded-full bg-card-action text-text-inverted shadow-lg",
+          "flex items-center justify-center h-14 w-14 rounded-full bg-card-action text-white dark:text-white shadow-lg",
           "hover:bg-card-action active:scale-95 transition-all duration-200",
           "focus:outline-none focus:ring-2 focus:ring-card-action focus:ring-offset-2",
           "z-50 relative"

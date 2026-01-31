@@ -34,6 +34,7 @@ import { cn } from "@/lib/utils";
 // Corporate components
 import { MetricCard } from "@/components/corporate/MetricCard";
 import { getDensityClasses, getTypography } from "@/lib/ui/density-modes";
+import { DemoIndicator } from "@/components/ui/demo-indicator";
 
 // Lazy load chart components
 const LazyTypePie = lazy(() =>
@@ -51,6 +52,8 @@ const LazyTrendChart = lazy(() =>
 import { PendingLeaveRequestsTable } from "./sections/PendingApprovals";
 import { CancellationRequestsPanel } from "./sections/CancellationRequests";
 import { DashboardCardSkeleton } from "@/components/shared/skeletons";
+
+import { EncashmentRequests } from "./sections/EncashmentRequests";
 
 export interface HRAdminStats {
   // Core KPIs
@@ -86,6 +89,7 @@ export interface HRAdminStats {
 type CorporateHRAdminDashboardProps = {
   initialStats?: HRAdminStats | null;
   initialKpis?: HRAdminStats | null;
+  initialEncashmentRequests?: any[]; // Using any[] for simplicity, or import type
 };
 
 /**
@@ -103,6 +107,7 @@ type CorporateHRAdminDashboardProps = {
  * ✅ Pending Leave Requests Table
  * ✅ Analytics Section (Quick Stats, Leave Type Pie, Request Trend)
  * ✅ Cancellation Requests Panel
+ * ✅ Encashment Requests Panel [NEW]
  *
  * What Changed:
  * ❌ No Framer Motion animations
@@ -115,6 +120,7 @@ type CorporateHRAdminDashboardProps = {
 export function CorporateHRAdminDashboard({
   initialStats,
   initialKpis,
+  initialEncashmentRequests = [],
 }: CorporateHRAdminDashboardProps) {
   const density = "compact"; // HR Admin uses compact density
   const densityClasses = getDensityClasses(density);
@@ -573,8 +579,9 @@ export function CorporateHRAdminDashboard({
                       <Separator />
                       <div className="flex justify-between items-center text-sm hover:bg-muted/50 p-2 rounded-md transition-colors">
                         <span className="text-slate-500">Encashment Queue</span>
-                        <span className="font-semibold text-slate-900">
+                        <span className="font-semibold text-slate-900 flex items-center gap-2">
                           {displayStats?.encashmentPending || 0}
+                          <DemoIndicator />
                         </span>
                       </div>
                     </>
@@ -654,7 +661,12 @@ export function CorporateHRAdminDashboard({
             </div>
           </section>
 
-          {/* Section 5: Cancellation Requests */}
+          {/* Section 5: Encashment Requests */}
+          <section>
+             <EncashmentRequests requests={initialEncashmentRequests} />
+          </section>
+
+          {/* Section 6: Cancellation Requests */}
           <section>
             <div className="mb-3">
               <h2 className={typography.sectionTitle}>Cancellation Requests</h2>

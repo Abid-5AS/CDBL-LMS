@@ -14,7 +14,7 @@ import {
   Textarea,
 } from "@/components/ui";
 import { submitApprovalDecision } from "@/lib/apiClient";
-import { useUser } from "@/lib/user-context";
+import { useUser } from "@/components/providers";
 import { ArrowRight, RotateCcw } from "lucide-react";
 import type { AppRole } from "@/lib/rbac";
 
@@ -122,10 +122,10 @@ export function ApprovalActions({
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border-strong bg-bg-primary/95 backdrop-blur supports-[backdrop-filter]:bg-bg-primary/80">
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border dark:border-border/50 bg-card/95 dark:bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/80">
         <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-4 px-4 py-3">
           <div className="flex flex-col text-xs text-muted-foreground">
-            <span className="font-semibold uppercase tracking-wide text-text-secondary">
+            <span className="font-semibold uppercase tracking-wide text-foreground dark:text-foreground/90">
               Status
             </span>
             <span>

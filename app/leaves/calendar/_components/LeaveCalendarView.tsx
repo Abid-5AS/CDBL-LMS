@@ -14,13 +14,21 @@ import { format, addMonths, subMonths, startOfMonth, addDays } from "date-fns";
 import { Loader2, CalendarDays, Clock, Wallet, LayoutGrid, Users, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 
 type LeaveCalendarViewProps = {
   currentUserRole: string;
+  initialView?: string;
+  initialDate?: Date;
+  initialEvents?: CalendarEvent[];
 };
 
-export function LeaveCalendarView({ currentUserRole }: LeaveCalendarViewProps) {
+export function LeaveCalendarView({ 
+  currentUserRole,
+  initialView,
+  initialDate,
+  initialEvents
+}: LeaveCalendarViewProps) {
   const isAdmin = ["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"].includes(currentUserRole);
   const isManager = ["DEPT_HEAD", "MANAGER"].includes(currentUserRole);
   const isEmployee = !isAdmin && !isManager;
@@ -31,12 +39,24 @@ export function LeaveCalendarView({ currentUserRole }: LeaveCalendarViewProps) {
     return "my";
   };
 
-  const [activeTab, setActiveTab] = useState(getDefaultTab());
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [activeTab, setActiveTab] = useState(initialView || getDefaultTab());
+  const [currentDate, setCurrentDate] = useState(initialDate || new Date());
   const [viewMode, setViewMode] = useState<CalendarViewMode>(isEmployee ? "2-week" : "timeline");
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [loading, setLoading] = useState(true);
   
+  // Initialize events for "my" view if applicable
+  const [events, setEvents] = useState<CalendarEvent[]>(
+    (activeTab === "my" && initialEvents) ? initialEvents : []
+  );
+  
+  // Check if we have initial data for the current view
+  const hasInitialData = (activeTab === "my" && initialEvents && initialEvents.length > 0) || 
+                         (activeTab === "my" && initialEvents && initialView === "my"); // optimization: if initialView matches, we trust the empty array too
+  
+  const [loading, setLoading] = useState(!hasInitialData);
+  
+  const shouldFetch = useState(!hasInitialData)[0]; // Use state as ref equivalent for simplicity in this context, or just use a ref
+  const fetchRef = useState({ shouldFetch: !hasInitialData })[0];
+
   // Modal State
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -44,6 +64,10 @@ export function LeaveCalendarView({ currentUserRole }: LeaveCalendarViewProps) {
 
   useEffect(() => {
     if (activeTab === "my") {
+      if (!fetchRef.shouldFetch) {
+        fetchRef.shouldFetch = true; // Enable future fetches
+        return;
+      }
       fetchCalendarData();
     }
   }, [currentDate, activeTab]);
@@ -284,7 +308,11 @@ export function LeaveCalendarView({ currentUserRole }: LeaveCalendarViewProps) {
         </TabsContent>
 
         <TabsContent value="team" className="mt-0">
-          <TeamCalendarView currentUserRole={currentUserRole} />
+          <TeamCalendarView 
+            currentUserRole={currentUserRole} 
+            initialEvents={activeTab === "team" ? initialEvents : undefined}
+            initialDate={initialDate}
+          />
         </TabsContent>
 
         <TabsContent value="heatmap" className="mt-0">

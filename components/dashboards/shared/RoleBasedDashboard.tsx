@@ -4,7 +4,7 @@ import { ReactNode, CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown, Minus, Info } from "lucide-react";
-import type { Role } from "@prisma/client";
+import type { Role } from "@/lib/enums";
 import {
   Tooltip,
   TooltipContent,
@@ -54,7 +54,7 @@ const roleConfigs = {
     accentSoft: "var(--role-employee-accent-soft, #eef2ff)",
     gradient:
       "from-indigo-50 via-blue-50/30 to-purple-50/50 dark:from-slate-900 dark:via-indigo-900/20 dark:to-slate-900",
-    maxWidth: "max-w-7xl",
+    maxWidth: "",
     padding: "px-4 sm:px-6 lg:px-8",
   },
   MANAGER: {
@@ -62,7 +62,7 @@ const roleConfigs = {
     accentSoft: "var(--role-manager-accent-soft, #ecfdf5)",
     gradient:
       "from-emerald-50 via-green-50/30 to-teal-50/50 dark:from-slate-900 dark:via-emerald-900/20 dark:to-slate-900",
-    maxWidth: "max-w-7xl",
+    maxWidth: "",
     padding: "px-4 sm:px-6 lg:px-8",
   },
   DEPT_HEAD: {
@@ -70,7 +70,7 @@ const roleConfigs = {
     accentSoft: "var(--role-dept-head-accent-soft, #fef2f2)",
     gradient:
       "from-red-50 via-orange-50/30 to-pink-50/50 dark:from-slate-900 dark:via-red-900/20 dark:to-slate-900",
-    maxWidth: "max-w-[1600px]", // Wider for data tables
+    maxWidth: "",
     padding: "px-3 sm:px-4 lg:px-6",
   },
   HR_ADMIN: {
@@ -78,7 +78,7 @@ const roleConfigs = {
     accentSoft: "var(--role-hr-admin-accent-soft, #f3f4f6)",
     gradient:
       "from-violet-50 via-purple-50/30 to-indigo-50/50 dark:from-slate-900 dark:via-violet-900/20 dark:to-slate-900",
-    maxWidth: "max-w-[1600px]", // Wider for HR data
+    maxWidth: "",
     padding: "px-3 sm:px-4 lg:px-6",
   },
   HR_HEAD: {
@@ -86,7 +86,7 @@ const roleConfigs = {
     accentSoft: "var(--role-hr-head-accent-soft, #fff7ed)",
     gradient:
       "from-orange-50 via-amber-50/30 to-yellow-50/50 dark:from-slate-900 dark:via-orange-900/20 dark:to-slate-900",
-    maxWidth: "max-w-[1600px]", // Wider for executive view
+    maxWidth: "",
     padding: "px-3 sm:px-4 lg:px-6",
   },
   CEO: {
@@ -94,7 +94,7 @@ const roleConfigs = {
     accentSoft: "var(--role-ceo-accent-soft, #f9fafb)",
     gradient:
       "from-slate-50 via-gray-50/30 to-zinc-50/50 dark:from-slate-900 dark:via-gray-900/20 dark:to-slate-900",
-    maxWidth: "max-w-[1800px]", // Widest for executive dashboard
+    maxWidth: "",
     padding: "px-3 sm:px-4 lg:px-6",
   },
   SYSTEM_ADMIN: {
@@ -102,7 +102,7 @@ const roleConfigs = {
     accentSoft: "var(--role-system-admin-accent-soft, #ecfeff)",
     gradient:
       "from-cyan-50 via-blue-50/30 to-indigo-50/50 dark:from-slate-900 dark:via-cyan-900/20 dark:to-slate-900",
-    maxWidth: "max-w-[1600px]", // Wide for system data
+    maxWidth: "",
     padding: "px-3 sm:px-4 lg:px-6",
   },
 };
@@ -171,8 +171,8 @@ export function RoleBasedDashboard({
     backgroundVariant === "solid"
       ? "bg-background"
       : backgroundVariant === "transparent"
-      ? ""
-      : cn("bg-gradient-to-br", config.gradient);
+        ? ""
+        : cn("bg-gradient-to-br", config.gradient);
 
   const containerClasses = cn("w-full", backgroundClass, className);
 
@@ -213,8 +213,8 @@ export function RoleBasedDashboard({
                 "flex flex-col gap-4",
                 actions && !title && !description && "justify-end",
                 actions &&
-                  (title || description) &&
-                  "sm:flex-row sm:items-start sm:justify-between"
+                (title || description) &&
+                "sm:flex-row sm:items-start sm:justify-between"
               )}
             >
               {(title || description) && (
@@ -335,6 +335,9 @@ export function RoleKPICard({
   onClick,
   clickLabel,
   tooltip,
+  color,
+  bgColor,
+  variant = "default",
 }: {
   title: string | ReactNode;
   value: string | number;
@@ -351,6 +354,12 @@ export function RoleKPICard({
   onClick?: () => void;
   clickLabel?: string;
   tooltip?: string;
+  /** Custom text/icon color override (e.g. "text-blue-600") */
+  color?: string;
+  /** Custom background color override for icon (e.g. "bg-blue-50") */
+  bgColor?: string;
+  /** Visual variant */
+  variant?: "default" | "highlight";
 }) {
   const config = role
     ? roleConfigs[role] || roleConfigs.EMPLOYEE
@@ -380,10 +389,14 @@ export function RoleKPICard({
   const content = (
     <div
       className={cn(
-        "neo-card group relative flex h-full min-h-[190px] flex-col overflow-hidden",
+        onClick ? "card-interactive" : "corporate-card",
+        "group relative flex h-full min-h-[160px] flex-col overflow-hidden",
         "px-5 py-5 sm:px-6 sm:py-6",
-        onClick &&
-          "cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]",
+        // Visual Refinement: Remove borders, add shadow, specific light/dark adjustments
+        "border-0 shadow-md hover:shadow-lg transition-all duration-300",
+        "bg-white dark:bg-card/95 rounded-[20px]", // Brighter white in light mode, slightly lighter card in dark mode
+        "dark:border dark:border-white/5", // Faint border only in dark mode
+        variant === "highlight" && "ring-2 ring-primary/20 bg-primary/5",
         className
       )}
       style={accentVars}
@@ -393,76 +406,85 @@ export function RoleKPICard({
       onKeyDown={
         onClick
           ? (e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onClick();
-              }
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onClick();
             }
+          }
           : undefined
       }
       title={onClick && clickLabel ? clickLabel : undefined}
       aria-label={onClick && clickLabel ? clickLabel : undefined}
     >
-      {/* Removed gradient effect for professional look */}
-      <div className="relative flex items-start justify-between gap-4">
-        <div className="flex-1 space-y-3">
-          <div className="flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.35em] text-[color:var(--color-foreground-subtle)]">
-            {title}
-            {tooltip && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      className="cursor-help rounded-full p-0.5 hover:bg-muted/20"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Info className="h-3 w-3 opacity-70" />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="max-w-xs text-xs">{tooltip}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
+      <div className="relative flex items-start justify-between gap-4 h-full">
+        <div className="flex-1 flex flex-col justify-between h-full">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.1em] text-muted-foreground">
+              {title}
+              {tooltip && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        className="cursor-help rounded-full p-0.5 hover:bg-muted/20"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Info className="h-3 w-3 opacity-70" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs text-xs">{tooltip}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
+
+            <div className={cn("flex items-end gap-2", color)}>
+              <p className={cn("text-4xl sm:text-5xl font-bold tracking-tight", !color && "text-slate-900 dark:text-foreground")}>
+                {value}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-3xl font-semibold text-foreground sm:text-4xl">
-              {value}
-            </p>
+
+          <div className="mt-4">
             {subtitle && (
-              <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400 line-clamp-2">
                 {subtitle}
               </p>
             )}
+            {trend && (
+              <div className="inline-flex items-center gap-2 mt-2 rounded-full bg-[var(--role-kpi-accent-soft)]/70 px-2.5 py-0.5 text-xs font-bold text-[color:var(--role-kpi-accent)] w-fit">
+                {trendGlyph}
+                <span>
+                  {trend.direction === "down"
+                    ? "-"
+                    : trend.direction === "up"
+                      ? "+"
+                      : ""}
+                  {Math.abs(trend.value)}%
+                </span>
+                <span className="text-[color:var(--color-foreground-subtle)]/80">
+                  {trend.label}
+                </span>
+              </div>
+            )}
           </div>
-          {trend && (
-            <div className="inline-flex items-center gap-2 rounded-full bg-[var(--role-kpi-accent-soft)]/70 px-3 py-1 text-xs font-semibold text-[color:var(--role-kpi-accent)]">
-              {trendGlyph}
-              <span>
-                {trend.direction === "down"
-                  ? "-"
-                  : trend.direction === "up"
-                  ? "+"
-                  : ""}
-                {Math.abs(trend.value)}%
-              </span>
-              <span className="text-[color:var(--color-foreground-subtle)]/80">
-                {trend.label}
-              </span>
-            </div>
-          )}
         </div>
         {Icon && (
           <div
-            className="rounded-xl border border-border/50 p-3 bg-accent/10"
+            className={cn(
+              "rounded-2xl p-3.5 transition-colors",
+              !bgColor && "bg-[var(--role-kpi-accent-soft)]/50 dark:bg-[var(--role-kpi-accent-soft)]/10",
+              bgColor
+            )}
             style={{
-              color: "var(--role-kpi-accent)",
+              color: color ? undefined : "var(--role-kpi-accent)",
             }}
           >
-            <Icon className="h-6 w-6" />
+            <Icon className={cn("h-6 w-6", color)} />
           </div>
         )}
       </div>
@@ -477,6 +499,7 @@ export function RoleKPICard({
         transition={{ duration: 0.2 }}
         onClick={onClick}
         style={{ cursor: onClick ? "pointer" : "default" }}
+        className="h-full"
       >
         {content}
       </motion.div>

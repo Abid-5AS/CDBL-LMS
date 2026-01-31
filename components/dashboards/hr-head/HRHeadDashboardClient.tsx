@@ -100,9 +100,9 @@ export function HRHeadDashboardClient() {
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-data-error/20 bg-data-error/5 p-6 text-center">
-        <AlertCircle className="h-12 w-12 mx-auto mb-3 text-data-error" />
-        <p className="text-sm text-data-error font-medium">
+      <div className="rounded-2xl border border-danger/20 bg-danger dark:bg-danger/80/5 p-6 text-center">
+        <AlertCircle className="h-12 w-12 mx-auto mb-3 text-danger dark:text-danger/90" />
+        <p className="text-sm text-danger dark:text-danger/90 font-medium">
           Failed to load dashboard statistics
         </p>
         <p className="text-xs text-muted-foreground mt-1">
@@ -591,7 +591,7 @@ export function HRHeadDashboardClient() {
                         <td className="p-3">
                           <a
                             href={`/leaves/${escalation.leaveId}`}
-                            className="text-data-info hover:underline font-medium"
+                            className="text-info dark:text-info/90 hover:underline font-medium"
                           >
                             {escalation.employeeName}
                           </a>

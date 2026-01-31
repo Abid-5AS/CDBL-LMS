@@ -102,17 +102,17 @@ export function AnalyticsSection() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-text-secondary dark:text-text-secondary">
+                  <p className="text-sm text-muted-foreground dark:text-muted-foreground/80 dark:text-muted-foreground dark:text-muted-foreground/80">
                     Days Used
                   </p>
-                  <p className="text-2xl font-bold text-text-secondary dark:text-text-secondary mt-1">
+                  <p className="text-2xl font-bold text-muted-foreground dark:text-muted-foreground/80 dark:text-muted-foreground dark:text-muted-foreground/80 mt-1">
                     {summary?.periodTotal ?? 0}
                   </p>
-                  <p className="text-xs text-text-secondary dark:text-text-secondary mt-1">
+                  <p className="text-xs text-muted-foreground dark:text-muted-foreground/80 dark:text-muted-foreground dark:text-muted-foreground/80 mt-1">
                     {summary?.periodLabel ?? "This Year"}
                   </p>
                 </div>
-                <BarChart3 className="size-8 text-data-info" />
+                <BarChart3 className="size-8 text-info dark:text-info/90" />
               </div>
             </CardContent>
           </Card>
@@ -126,7 +126,7 @@ export function AnalyticsSection() {
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-1.5">
-                    <p className="text-sm text-text-secondary dark:text-text-secondary">
+                    <p className="text-sm text-muted-foreground dark:text-muted-foreground/80 dark:text-muted-foreground dark:text-muted-foreground/80">
                       Total Used
                     </p>
                     <TooltipProvider>
@@ -136,7 +136,7 @@ export function AnalyticsSection() {
                             type="button"
                             className="inline-flex items-center"
                           >
-                            <Info className="h-3 w-3 text-text-secondary hover:text-text-secondary dark:hover:text-text-secondary transition-colors" />
+                            <Info className="h-3 w-3 text-muted-foreground dark:text-muted-foreground/80 hover:text-muted-foreground dark:text-muted-foreground/80 dark:hover:text-muted-foreground dark:text-muted-foreground/80 transition-colors" />
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="right" className="max-w-xs">
@@ -149,14 +149,14 @@ export function AnalyticsSection() {
                       </Tooltip>
                     </TooltipProvider>
                   </div>
-                  <p className="text-2xl font-bold text-text-secondary dark:text-text-secondary mt-1">
+                  <p className="text-2xl font-bold text-muted-foreground dark:text-muted-foreground/80 dark:text-muted-foreground dark:text-muted-foreground/80 mt-1">
                     {summary?.totalUsed ?? 0}
                   </p>
-                  <p className="text-xs text-text-secondary dark:text-text-secondary mt-1">
+                  <p className="text-xs text-muted-foreground dark:text-muted-foreground/80 dark:text-muted-foreground dark:text-muted-foreground/80 mt-1">
                     This Year
                   </p>
                 </div>
-                <TrendingUp className="size-8 text-data-success" />
+                <TrendingUp className="size-8 text-success dark:text-success/90" />
               </div>
             </CardContent>
           </Card>
@@ -168,17 +168,17 @@ export function AnalyticsSection() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-text-secondary dark:text-text-secondary">
+                  <p className="text-sm text-muted-foreground dark:text-muted-foreground/80 dark:text-muted-foreground dark:text-muted-foreground/80">
                     Remaining
                   </p>
-                  <p className="text-2xl font-bold text-text-secondary dark:text-text-secondary mt-1">
+                  <p className="text-2xl font-bold text-muted-foreground dark:text-muted-foreground/80 dark:text-muted-foreground dark:text-muted-foreground/80 mt-1">
                     {summary?.remaining ?? 0}
                   </p>
-                  <p className="text-xs text-text-secondary dark:text-text-secondary mt-1">
+                  <p className="text-xs text-muted-foreground dark:text-muted-foreground/80 dark:text-muted-foreground dark:text-muted-foreground/80 mt-1">
                     All Types
                   </p>
                 </div>
-                <Calendar className="size-8 text-data-warning" />
+                <Calendar className="size-8 text-warning dark:text-warning/90" />
               </div>
             </CardContent>
           </Card>
@@ -186,7 +186,7 @@ export function AnalyticsSection() {
 
         {/* Period Filter - Right Side */}
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-sm text-text-secondary dark:text-text-secondary whitespace-nowrap">
+          <span className="text-sm text-muted-foreground dark:text-muted-foreground/80 dark:text-muted-foreground dark:text-muted-foreground/80 whitespace-nowrap">
             View:
           </span>
           <div className="flex gap-1">

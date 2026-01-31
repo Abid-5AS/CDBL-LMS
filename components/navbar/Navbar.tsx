@@ -7,7 +7,7 @@ import { MobileBar } from "./MobileBar";
 import { MobileMenu } from "./MobileMenu";
 import { useNavbarState } from "./use-navbar-state";
 import { cn } from "@/lib/utils";
-import { useHasMounted } from "@/hooks/use-has-mounted";
+import { useHasMounted } from "@/hooks";
 
 export function Navbar() {
   const state = useNavbarState();
@@ -37,7 +37,7 @@ export function Navbar() {
         role="navigation"
         aria-label="Main navigation"
       >
-        <div className="relative mx-auto flex h-full w-full max-w-7xl min-w-0 flex-col justify-center">
+        <div className="relative mx-auto flex h-full w-full min-w-0 flex-col justify-center px-4 sm:px-6 lg:px-8">
           <DesktopNav {...state} />
           <MobileBar {...state} />
         </div>

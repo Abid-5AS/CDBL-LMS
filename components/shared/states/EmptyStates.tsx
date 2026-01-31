@@ -82,14 +82,14 @@ export function EmptyStateCard({
 }: EmptyStateCardProps) {
   const variantClasses = {
     default: "from-muted/30 to-muted/10 border-muted/60",
-    success: "from-data-success/10 to-data-success/5 border-data-success/20",
-    warning: "from-data-warning/10 to-data-warning/5 border-data-warning/20",
+    success: "from-data-success/10 to-data-success/5 border-success/20",
+    warning: "from-data-warning/10 to-data-warning/5 border-warning/20",
   };
 
   const iconClasses = {
     default: "text-muted-foreground",
-    success: "text-data-success",
-    warning: "text-data-warning",
+    success: "text-success dark:text-success/90",
+    warning: "text-warning dark:text-warning/90",
   };
 
   return (
@@ -259,7 +259,7 @@ export function ErrorState({
       </CardHeader>
       <CardContent className="py-12">
         <div className="text-center space-y-4">
-          <AlertCircle className="h-12 w-12 mx-auto text-data-error" />
+          <AlertCircle className="h-12 w-12 mx-auto text-danger dark:text-danger/90" />
           <p className="text-sm text-muted-foreground">{message}</p>
           {onRetry && (
             <Button variant="outline" size="sm" onClick={onRetry}>

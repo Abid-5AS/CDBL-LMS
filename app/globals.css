@@ -94,8 +94,10 @@
 
 :root {
   /* Light Mode - Zinc + Indigo Theme */
-  --background: #ffffff;
-  --foreground: #09090b; /* Zinc 950 */
+  --background: #f1f5f9;
+  /* Zinc 50 renamed to Slate 100 */
+  --foreground: #09090b;
+  /* Zinc 950 */
 
   --card: #ffffff;
   --card-foreground: #09090b;
@@ -103,33 +105,43 @@
   --popover: #ffffff;
   --popover-foreground: #09090b;
 
-  --primary: #4f46e5; /* Indigo 600 */
+  --primary: #4f46e5;
+  /* Indigo 600 */
   --primary-foreground: #ffffff;
 
-  --secondary: #f4f4f5; /* Zinc 100 */
-  --secondary-foreground: #18181b; /* Zinc 900 */
+  --secondary: #f4f4f5;
+  /* Zinc 100 */
+  --secondary-foreground: #18181b;
+  /* Zinc 900 */
 
   --muted: #f4f4f5;
-  --muted-foreground: #71717a; /* Zinc 500 */
+  --muted-foreground: #71717a;
+  /* Zinc 500 */
 
   --accent: #f4f4f5;
   --accent-foreground: #18181b;
 
-  --success: #10b981; /* Emerald 500 */
+  --success: #10b981;
+  /* Emerald 500 */
   --success-foreground: #ffffff;
-  --warning: #f59e0b; /* Amber 500 */
+  --warning: #f59e0b;
+  /* Amber 500 */
   --warning-foreground: #ffffff;
-  --danger: #ef4444; /* Rose 500 */
+  --danger: #ef4444;
+  /* Rose 500 */
   --danger-foreground: #ffffff;
-  --info: #3b82f6; /* Blue 500 */
+  --info: #3b82f6;
+  /* Blue 500 */
   --info-foreground: #ffffff;
 
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
 
-  --border: #e4e4e7; /* Zinc 200 */
+  --border: #e4e4e7;
+  /* Zinc 200 */
   --input: #e4e4e7;
-  --ring: #4f46e5; /* Indigo 600 */
+  --ring: #4f46e5;
+  /* Indigo 600 */
   --outline: #e4e4e7;
   --focus-ring: #4f46e5;
 
@@ -139,11 +151,16 @@
   --surface-2: #f8fafc;
   --surface-3: #f1f5f9;
 
-  --chart-1: 221 83% 53%; /* Indigo 600 */
-  --chart-2: 142 71% 45%; /* Emerald 500 */
-  --chart-3: 217 91% 60%; /* Blue 500 */
-  --chart-4: 45 93% 47%; /* Amber 500 */
-  --chart-5: 340 82% 52%; /* Rose 500 */
+  --chart-1: 221 83% 53%;
+  /* Indigo 600 */
+  --chart-2: 142 71% 45%;
+  /* Emerald 500 */
+  --chart-3: 217 91% 60%;
+  /* Blue 500 */
+  --chart-4: 45 93% 47%;
+  /* Amber 500 */
+  --chart-5: 340 82% 52%;
+  /* Rose 500 */
 
   --sidebar: #ffffff;
   --sidebar-foreground: #09090b;
@@ -156,63 +173,72 @@
 }
 
 .dark {
-  /* Dark Mode - Zinc + Indigo Theme */
-  --background: #09090b; /* Zinc 950 */
-  --foreground: #fafafa; /* Zinc 50 */
+  /* Dark Mode - Slate + Indigo Theme (Premium Deep) */
+  --background: #020617;
+  /* Slate 950 */
+  --foreground: #f8fafc;
+  /* Slate 50 */
 
-  --card: #18181b; /* Zinc 900 */
-  --card-foreground: #fafafa;
+  --card: #0f172a;
+  /* Slate 900 */
+  --card-foreground: #f8fafc;
 
-  --popover: #18181b;
-  --popover-foreground: #fafafa;
+  --popover: #0f172a;
+  /* Slate 900 */
+  --popover-foreground: #f8fafc;
 
-  --primary: #6366f1; /* Indigo 500 */
+  --primary: #3b82f6;
+  /* Android Indigo 500 */
   --primary-foreground: #ffffff;
 
-  --secondary: #27272a; /* Zinc 800 */
-  --secondary-foreground: #fafafa;
+  --secondary: #334155;
+  /* Slate 700 */
+  --secondary-foreground: #f8fafc;
 
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa; /* Zinc 400 */
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
+  /* Slate 400 */
 
-  --accent: #27272a;
-  --accent-foreground: #fafafa;
+  --accent: #334155;
+  --accent-foreground: #f8fafc;
 
-  --success: #34d399; /* Emerald 400 */
+  --success: #34d399;
   --success-foreground: #022c22;
-  --warning: #fbbf24; /* Amber 400 */
+  --warning: #fbbf24;
   --warning-foreground: #451a03;
-  --danger: #f87171; /* Rose 400 */
+  --danger: #f87171;
   --danger-foreground: #450a0a;
-  --info: #60a5fa; /* Blue 400 */
+  --info: #60a5fa;
   --info-foreground: #172554;
 
-  --destructive: #7f1d1d; /* Rose 900 */
-  --destructive-foreground: #fafafa;
+  --destructive: #7f1d1d;
+  --destructive-foreground: #f8fafc;
 
-  --border: #27272a; /* Zinc 800 */
-  --input: #27272a;
-  --ring: #6366f1; /* Indigo 500 */
-  --outline: #27272a;
+  --border: #1e293b;
+  /* Slate 800 */
+  --input: #1e293b;
+  --ring: #6366f1;
+
+  --outline: #1e293b;
   --focus-ring: #6366f1;
 
-  --surface-1: #09090b;
-  --surface-2: #18181b;
-  --surface-3: #27272a;
+  --surface-1: #020617;
+  --surface-2: #0f172a;
+  --surface-3: #1e293b;
 
-  --chart-1: 226 70% 50%;
-  --chart-2: 160 60% 45%;
-  --chart-3: 30 80% 55%;
-  --chart-4: 280 65% 60%;
-  --chart-5: 340 75% 55%;
+  --chart-1: 221 83% 53%;
+  --chart-2: 142 71% 45%;
+  --chart-3: 217 91% 60%;
+  --chart-4: 45 93% 47%;
+  --chart-5: 340 82% 52%;
 
-  --sidebar: #09090b; /* Zinc 950 */
-  --sidebar-foreground: #fafafa;
-  --sidebar-primary: #6366f1;
+  --sidebar: #020617;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #3b82f6;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #27272a;
-  --sidebar-accent-foreground: #fafafa;
-  --sidebar-border: #27272a;
+  --sidebar-accent: #1e293b;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border: #1e293b;
   --sidebar-ring: #6366f1;
 }
 
@@ -220,9 +246,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   /* Accessible focus rings share a single token */
   :focus-visible {
     outline: 2px solid var(--focus-ring);
@@ -232,21 +260,27 @@
   .heading-xl {
     @apply text-3xl font-semibold leading-9 tracking-tight text-foreground;
   }
+
   .heading-lg {
     @apply text-2xl font-semibold leading-8 tracking-tight text-foreground;
   }
+
   .heading-md {
     @apply text-xl font-semibold leading-7 text-foreground;
   }
+
   .heading-sm {
     @apply text-lg font-semibold leading-6 text-foreground;
   }
+
   .body-lg {
     @apply text-base text-foreground leading-7;
   }
+
   .body-md {
     @apply text-sm text-foreground leading-6;
   }
+
   .body-muted {
     @apply text-sm text-muted-foreground leading-6;
   }
@@ -254,9 +288,11 @@
   .icon-sm {
     @apply h-4 w-4;
   }
+
   .icon-md {
     @apply h-5 w-5;
   }
+
   .icon-lg {
     @apply h-6 w-6;
   }
@@ -304,16 +340,12 @@
 
 .shell-bg__layer--grid {
   background-image:
-    linear-gradient(
-      90deg,
+    linear-gradient(90deg,
       transparent calc(var(--shell-grid-size) - 1px),
-      var(--shell-grid-color)
-    ),
-    linear-gradient(
-      0deg,
+      var(--shell-grid-color)),
+    linear-gradient(0deg,
       transparent calc(var(--shell-grid-size) - 1px),
-      var(--shell-grid-color)
-    );
+      var(--shell-grid-color));
   background-size: var(--shell-grid-size) var(--shell-grid-size);
   mix-blend-mode: soft-light;
   opacity: 0.25;
@@ -341,9 +373,10 @@
 }
 
 .page-shell {
-  width: min(1200px, 100%);
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 0 clamp(1rem, 4vw, 1.75rem) 1.5rem;
+  padding: 0 clamp(1rem, 3vw, 2rem) 1.5rem;
   position: relative;
   z-index: 1;
   display: flex;
@@ -391,10 +424,76 @@
 
 /* Animations */
 @keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in-up {
   animation: fade-in-up 0.2s ease-out forwards;
+}
+
+/* Responsive Grid Layouts */
+.stats-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 640px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Surface Card - Clean, distinct containers */
+.surface-card {
+  @apply bg-card border border-border/60 rounded-xl shadow-sm transition-all duration-200;
+}
+
+.surface-card:hover {
+  @apply border-border shadow-md;
+}
+
+/* Calendar Date Modifiers */
+.weekend-day {
+  @apply opacity-50;
+}
+
+.holiday-day {
+  @apply bg-primary/10 text-primary border border-primary/20 rounded-md;
+}
+
+.booked-day {
+  @apply bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-200 relative;
+}
+
+.booked-day::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: currentColor;
 }

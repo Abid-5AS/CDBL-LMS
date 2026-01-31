@@ -1,10 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/src/generated/prisma/client";
+import { notificationEvents, NOTIFICATION_EVENT } from "@/lib/events";
 
 // Type for notification with all relations
-export type NotificationWithRelations = Prisma.NotificationGetPayload<{
-  include: {};
-}>;
+export type NotificationWithRelations = Prisma.NotificationGetPayload<{}>;
 
 // Type for creating notifications
 export type CreateNotificationData = {
@@ -86,11 +85,13 @@ export class NotificationRepository {
     });
   }
 
+
+
   /**
    * Create a new notification
    */
   static async create(data: CreateNotificationData): Promise<NotificationWithRelations> {
-    return prisma.notification.create({
+    const notification = await prisma.notification.create({
       data: {
         userId: data.userId,
         type: data.type as any,
@@ -101,25 +102,52 @@ export class NotificationRepository {
         expiresAt: data.expiresAt,
       },
     });
+
+    // Emit event
+    notificationEvents.emit(NOTIFICATION_EVENT, notification);
+
+    return notification;
   }
 
   /**
    * Create multiple notifications (bulk)
    */
   static async createMany(notifications: CreateNotificationData[]): Promise<number> {
-    const result = await prisma.notification.createMany({
-      data: notifications.map((n) => ({
-        userId: n.userId,
-        type: n.type as any,
-        title: n.title,
-        message: n.message,
-        link: n.link,
-        leaveId: n.leaveId,
-        expiresAt: n.expiresAt,
-      })),
+    // We can't easily get the created IDs with createMany in MySQL/Prisma
+    // So we'll iterate and create individually if we want to emit events for each
+    // OR we just emit events without IDs (client might need ID for key, but maybe okay)
+    // For real-time, it's better to have the full object.
+    // Given the scale (usually small batches), creating individually in a transaction is acceptable for now
+    // or we can just fire-and-forget the events based on input data (but missing ID)
+    
+    // Strategy: Create individually to get full objects and emit events
+    // This is slightly slower but ensures correctness for real-time
+    
+    const createdNotifications: NotificationWithRelations[] = [];
+    
+    await prisma.$transaction(async (tx) => {
+      for (const n of notifications) {
+        const notification = await tx.notification.create({
+          data: {
+            userId: n.userId,
+            type: n.type as any,
+            title: n.title,
+            message: n.message,
+            link: n.link,
+            leaveId: n.leaveId,
+            expiresAt: n.expiresAt,
+          },
+        });
+        createdNotifications.push(notification as any);
+      }
     });
 
-    return result.count;
+    // Emit events after transaction commits
+    createdNotifications.forEach(n => {
+      notificationEvents.emit(NOTIFICATION_EVENT, n);
+    });
+
+    return createdNotifications.length;
   }
 
   /**
@@ -222,5 +250,43 @@ export class NotificationRepository {
       unread,
       read: total - unread,
     };
+  }
+  /**
+   * Register a device token for push notifications
+   */
+  static async registerDeviceToken(userId: number, token: string, platform: string = "android"): Promise<void> {
+    await prisma.deviceToken.upsert({
+      where: { token },
+      update: {
+        userId,
+        platform,
+        updatedAt: new Date(),
+      },
+      create: {
+        userId,
+        token,
+        platform,
+      },
+    });
+  }
+
+  /**
+   * Get all device tokens for a user
+   */
+  static async getDeviceTokens(userId: number): Promise<string[]> {
+    const tokens = await prisma.deviceToken.findMany({
+      where: { userId },
+      select: { token: true },
+    });
+    return tokens.map((t) => t.token);
+  }
+
+  /**
+   * Remove a device token (e.g., on logout or invalid token)
+   */
+  static async removeDeviceToken(token: string): Promise<void> {
+    await prisma.deviceToken.deleteMany({
+      where: { token },
+    });
   }
 }

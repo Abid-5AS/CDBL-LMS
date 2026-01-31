@@ -102,7 +102,7 @@ export function HRDashboard({ username }: HRDashboardProps) {
             Pending Leave Requests
           </h3>
           <Link href="/approvals">
-            <Button variant="ghost" className="text-data-info">
+            <Button variant="ghost" className="text-info dark:text-info/90">
               View all
             </Button>
           </Link>

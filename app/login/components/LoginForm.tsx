@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { getHomePageForRole } from "@/lib/navigation";
+import { getHomePageForRole } from "@/lib/ui/navigation";
 import * as LabelPrimitive from "@radix-ui/react-label";
 import { cva, type VariantProps } from "class-variance-authority";
 import type { ComponentProps } from "react";
@@ -62,7 +62,7 @@ const inputVariants = cva(
 
 interface InputProps
   extends Omit<ComponentProps<"input">, "size">,
-    VariantProps<typeof inputVariants> {}
+  VariantProps<typeof inputVariants> { }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, hasIcon, ...props }, ref) => {
@@ -130,11 +130,11 @@ Button.displayName = "Button";
 function CDBLLogo({ className }: { className?: string }) {
   return (
     <div className={cn("flex items-center justify-center", className)}>
-        <div className="h-12 w-12 bg-zinc-900 rounded-xl flex items-center justify-center text-white">
-            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-        </div>
+      <div className="h-12 w-12 bg-zinc-900 rounded-xl flex items-center justify-center text-white">
+        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+      </div>
     </div>
   );
 }
@@ -154,8 +154,8 @@ function LoginIllustration() {
       }}
     >
       {/* Removed specific icons as they are not part of the new design */}
-      <div className="relative z-10 w-full h-auto text-text-secondary/90" />
-      <div className="absolute -bottom-16 -right-16 size-40 bg-data-info/10 rounded-full blur-3xl" />
+      <div className="relative z-10 w-full h-auto text-muted-foreground dark:text-muted-foreground/80/90" />
+      <div className="absolute -bottom-16 -right-16 size-40 bg-info dark:bg-info/80/10 rounded-full blur-3xl" />
       <div className="absolute top-0 -left-16 size-40 bg-card-action/10 rounded-full blur-3xl" />
     </motion.div>
   );
@@ -346,15 +346,15 @@ export function LoginForm() {
         {/* Header */}
         <div className="flex flex-col items-center text-center space-y-2">
           <div className="lg:hidden mb-4">
-             <CDBLLogo />
+            <CDBLLogo />
           </div>
           <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
             {showOtpStep ? "Verify your identity" : "Welcome back"}
           </h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            {showOtpStep 
-                ? `Enter the code sent to ${email}` 
-                : "Enter your credentials to access your account"}
+            {showOtpStep
+              ? `Enter the code sent to ${email}`
+              : "Enter your credentials to access your account"}
           </p>
         </div>
 
@@ -470,24 +470,24 @@ export function LoginForm() {
           // OTP Verification Step
           <form onSubmit={onVerifyOtp} className="space-y-6">
             <div className="flex justify-center py-4">
-                <InputOTP
-                    maxLength={6}
-                    value={otp}
-                    onChange={setOtp}
-                    ref={otpInputRef}
-                >
-                    <InputOTPGroup>
-                        <InputOTPSlot index={0} />
-                        <InputOTPSlot index={1} />
-                        <InputOTPSlot index={2} />
-                    </InputOTPGroup>
-                    <div className="w-4" />
-                    <InputOTPGroup>
-                        <InputOTPSlot index={3} />
-                        <InputOTPSlot index={4} />
-                        <InputOTPSlot index={5} />
-                    </InputOTPGroup>
-                </InputOTP>
+              <InputOTP
+                maxLength={6}
+                value={otp}
+                onChange={setOtp}
+                ref={otpInputRef}
+              >
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                </InputOTPGroup>
+                <div className="w-4" />
+                <InputOTPGroup>
+                  <InputOTPSlot index={3} />
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+                </InputOTPGroup>
+              </InputOTP>
             </div>
 
             <AnimatePresence>
@@ -505,127 +505,127 @@ export function LoginForm() {
             </AnimatePresence>
 
             <div className="space-y-3">
-                <Button
-                  type="submit"
-                  className="w-full"
-                  size="lg"
-                  disabled={loading || otp.length !== 6}
-                >
-                  {loading && <Loader2 className="mr-2 size-4 animate-spin" />}
-                  Verify & Sign in
-                </Button>
-                
-                <div className="text-center">
-                    <button
-                        type="button"
-                        onClick={onResendOtp}
-                        disabled={resendingOtp || otpExpiry > 0}
-                        className="text-sm text-zinc-500 hover:text-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                        {resendingOtp ? (
-                            "Sending code..."
-                        ) : otpExpiry > 0 ? (
-                            `Resend code in ${formatTime(otpExpiry)}`
-                        ) : (
-                            "Resend verification code"
-                        )}
-                    </button>
-                </div>
-            </div>
-            
-            <div className="text-center">
+              <Button
+                type="submit"
+                className="w-full"
+                size="lg"
+                disabled={loading || otp.length !== 6}
+              >
+                {loading && <Loader2 className="mr-2 size-4 animate-spin" />}
+                Verify & Sign in
+              </Button>
+
+              <div className="text-center">
                 <button
-                    type="button"
-                    onClick={() => setShowOtpStep(false)}
-                    className="text-sm text-zinc-400 hover:text-zinc-600"
+                  type="button"
+                  onClick={onResendOtp}
+                  disabled={resendingOtp || otpExpiry > 0}
+                  className="text-sm text-zinc-500 hover:text-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                    Back to login
+                  {resendingOtp ? (
+                    "Sending code..."
+                  ) : otpExpiry > 0 ? (
+                    `Resend code in ${formatTime(otpExpiry)}`
+                  ) : (
+                    "Resend verification code"
+                  )}
                 </button>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setShowOtpStep(false)}
+                className="text-sm text-zinc-400 hover:text-zinc-600"
+              >
+                Back to login
+              </button>
             </div>
           </form>
         )}
 
         {/* Quick Login for Testing (Dev Only) */}
         {!showOtpStep && (
-            <div className="pt-6 mt-6 border-t border-zinc-100 dark:border-zinc-800">
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-3 text-center">
-                    Quick Login (Dev Only)
-                </p>
-                <div className="grid grid-cols-3 gap-2">
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs border border-zinc-200 dark:border-zinc-800"
-                        onClick={() => {
-                            setEmail("sysadmin@cdbl.local");
-                            setPassword("demo123");
-                        }}
-                    >
-                        Admin
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs border border-zinc-200 dark:border-zinc-800"
-                        onClick={() => {
-                            setEmail("hradmin@demo.local");
-                            setPassword("demo123");
-                        }}
-                    >
-                        HR Admin
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs border border-zinc-200 dark:border-zinc-800"
-                        onClick={() => {
-                            setEmail("hrhead@demo.local");
-                            setPassword("demo123");
-                        }}
-                    >
-                        HR Head
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs border border-zinc-200 dark:border-zinc-800"
-                        onClick={() => {
-                            setEmail("manager@demo.local");
-                            setPassword("demo123");
-                        }}
-                    >
-                        Dept Head
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs border border-zinc-200 dark:border-zinc-800"
-                        onClick={() => {
-                            setEmail("ceo@demo.local");
-                            setPassword("demo123");
-                        }}
-                    >
-                        CEO
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs border border-zinc-200 dark:border-zinc-800"
-                        onClick={() => {
-                            setEmail("employee1@demo.local");
-                            setPassword("demo123");
-                        }}
-                    >
-                        Employee
-                    </Button>
-                </div>
+          <div className="pt-6 mt-6 border-t border-zinc-100 dark:border-zinc-800">
+            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-3 text-center">
+              Quick Login (Dev Only)
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-xs border border-zinc-200 dark:border-zinc-800"
+                onClick={() => {
+                  setEmail("admin1@test.local");
+                  setPassword("password123");
+                }}
+              >
+                Admin
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-xs border border-zinc-200 dark:border-zinc-800"
+                onClick={() => {
+                  setEmail("hradmin1@test.local");
+                  setPassword("password123");
+                }}
+              >
+                HR Admin
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-xs border border-zinc-200 dark:border-zinc-800"
+                onClick={() => {
+                  setEmail("hrhead1@test.local");
+                  setPassword("password123");
+                }}
+              >
+                HR Head
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-xs border border-zinc-200 dark:border-zinc-800"
+                onClick={() => {
+                  setEmail("manager1@test.local");
+                  setPassword("password123");
+                }}
+              >
+                Dept Head
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-xs border border-zinc-200 dark:border-zinc-800"
+                onClick={() => {
+                  setEmail("ceo1@test.local");
+                  setPassword("password123");
+                }}
+              >
+                CEO
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-xs border border-zinc-200 dark:border-zinc-800"
+                onClick={() => {
+                  setEmail("employee1@test.local");
+                  setPassword("password123");
+                }}
+              >
+                Employee
+              </Button>
             </div>
+          </div>
         )}
       </div>
     </div>

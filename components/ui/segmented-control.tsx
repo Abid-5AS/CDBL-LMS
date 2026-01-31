@@ -14,7 +14,7 @@ export function SegmentedControl({ options, value, onChange, className }: Segmen
   return (
     <div
       className={cn(
-        "inline-flex items-center rounded-lg bg-bg-secondary p-1 shadow-inner",
+        "inline-flex items-center rounded-lg bg-muted dark:bg-muted/80 p-1 shadow-inner",
         className
       )}
       role="tablist"
@@ -32,8 +32,8 @@ export function SegmentedControl({ options, value, onChange, className }: Segmen
               "relative px-4 py-2 text-sm font-medium transition-all duration-200 rounded-md",
               "focus:outline-none focus:ring-2 focus:ring-data-info focus:ring-offset-2 focus:z-10",
               isActive
-                ? "bg-bg-primary text-data-info shadow-sm"
-                : "text-text-secondary hover:text-text-secondary hover:bg-bg-secondary"
+                ? "bg-card dark:bg-card/90 text-info dark:text-info/90 shadow-sm"
+                : "text-muted-foreground dark:text-muted-foreground/80 hover:text-muted-foreground dark:text-muted-foreground/80 hover:bg-muted dark:bg-muted/80"
             )}
           >
             {option}

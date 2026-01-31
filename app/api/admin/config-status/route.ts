@@ -100,6 +100,11 @@ export async function GET() {
       holidays,
       policies,
       users,
+      meta: {
+        mocked: {
+          policies: true,
+        },
+      },
     });
   } catch (error) {
     console.error("Error fetching config status:", error);

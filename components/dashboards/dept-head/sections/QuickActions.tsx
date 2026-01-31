@@ -34,13 +34,6 @@ export function DeptHeadQuickActions() {
     toast.info("Team calendar view");
   };
 
-  const handleActingApprover = () => {
-    // This would typically open a modal
-    // For now, show a toast message
-    toast.info("Acting approver assignment coming soon", {
-      description: "This feature allows you to delegate approval authority temporarily",
-    });
-  };
 
   const handleExportReport = async () => {
     if (isExporting) return;
@@ -101,12 +94,6 @@ export function DeptHeadQuickActions() {
       icon: Calendar,
       onClick: handleTeamCalendar,
       tooltip: "View team leave calendar",
-    },
-    {
-      label: "Acting Approver",
-      icon: UserCheck,
-      onClick: handleActingApprover,
-      tooltip: "Assign temporary approval delegation",
     },
     {
       label: "Export Report",

@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -47,13 +49,15 @@ const buttonVariants = cva(
 
 interface ButtonProps
   extends React.ComponentProps<"button">,
-    VariantProps<typeof buttonVariants> {
+  VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   loading?: boolean;
   loadingText?: string;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
 }
+
+import { motion } from "framer-motion";
 
 function Button({
   className,
@@ -68,7 +72,7 @@ function Button({
   disabled,
   ...props
 }: ButtonProps) {
-  const Comp = asChild ? Slot : "button";
+  const Comp = asChild ? Slot : (motion.button as any);
   const isDisabled = disabled || loading;
   const buttonContent = (
     <>
@@ -117,6 +121,7 @@ function Button({
       className={cn(buttonVariants({ variant, size, loading }), className)}
       disabled={isDisabled}
       aria-disabled={isDisabled}
+      {...(!asChild && !isDisabled ? { whileTap: { scale: 0.97 } } : {})}
       {...props}
     >
       {asChild ? children : buttonContent}

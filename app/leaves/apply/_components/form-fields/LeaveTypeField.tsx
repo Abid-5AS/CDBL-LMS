@@ -57,7 +57,7 @@ export function LeaveTypeField({
       >
         <SelectTrigger
           id="leave-type"
-          className={cn("h-11", error && "border-destructive")}
+          className={cn("h-12 rounded-xl bg-white dark:bg-card border-slate-200 dark:border-border shadow-sm focus:ring-indigo-500 transition-all", error && "border-destructive")}
           aria-label="Leave type"
           aria-required="true"
           aria-invalid={!!error}

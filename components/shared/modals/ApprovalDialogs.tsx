@@ -36,7 +36,7 @@ import { Loader2 } from "lucide-react";
 type ApprovalDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: () => void | Promise<void>;
+  onConfirm: (ignoreWarnings?: boolean) => void | Promise<any>;
   leaveType: string;
   employeeName: string;
   isLoading?: boolean;
@@ -50,8 +50,75 @@ export function ApprovalDialog({
   employeeName,
   isLoading = false,
 }: ApprovalDialogProps) {
+  const [warning, setWarning] = useState<any>(null);
+
+  const handleConfirm = async (ignoreWarnings: boolean = false) => {
+    const result = await onConfirm(ignoreWarnings);
+    if (result?.warning) {
+      setWarning(result.warning);
+    } else {
+      setWarning(null);
+      onOpenChange(false);
+    }
+  };
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
+      setWarning(null);
+    }
+    onOpenChange(newOpen);
+  };
+
+  if (warning) {
+    return (
+      <AlertDialog open={open} onOpenChange={handleOpenChange}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-destructive">
+              Capacity Warning
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>{warning.message}</p>
+              <div className="text-sm bg-muted p-2 rounded">
+                <p className="font-semibold mb-1">Conflict Details:</p>
+                <ul className="list-disc pl-4 space-y-1">
+                  {warning.details?.conflictDays?.map((day: any, i: number) => (
+                    <li key={i}>
+                      {new Date(day.date).toLocaleDateString()}:{" "}
+                      {day.capacityPercentage}% capacity
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <p className="font-semibold mt-2">
+                Do you want to proceed with approval anyway?
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => handleConfirm(true)}
+              disabled={isLoading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Approving...
+                </>
+              ) : (
+                "Yes, Approve Anyway"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  }
+
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
+    <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Approve Leave Request</AlertDialogTitle>
@@ -62,7 +129,7 @@ export function ApprovalDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm} disabled={isLoading}>
+          <AlertDialogAction onClick={() => handleConfirm(false)} disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -3,12 +3,12 @@
 import { useState, useMemo, useEffect } from "react";
 import useSWR from "swr";
 import { toast } from "sonner";
-import { LeaveStatus, LeaveType } from "@prisma/client";
-import { useUser } from "@/lib/user-context";
+import { LeaveStatus, LeaveType } from "@/lib/enums";
+import { useUser } from "@/components/providers/UserContext";
 import { isFinalApprover, canPerformAction } from "@/lib/workflow";
-import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/toast-messages";
-import { useDebounce } from "@/lib/use-debounce";
-import { useFilterFromUrl } from "@/lib/url-filters";
+import { SUCCESS_MESSAGES, getToastMessage } from "@/lib/ui/toast-messages";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useFilterFromUrl } from "@/lib/ui/url-filters";
 import { DEFAULT_FILTER } from "@/types/filters";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -104,8 +104,8 @@ export function usePendingRequests(options: UsePendingRequestsOptions = {}) {
   const requests: LeaveRequest[] = Array.isArray(data?.requests)
     ? data.requests
     : Array.isArray(data?.items)
-    ? data.items
-    : [];
+      ? data.items
+      : [];
   const totalPages = data?.totalPages || 1;
   const totalRequests = data?.total ?? requests.length;
 
@@ -180,10 +180,10 @@ export function usePendingRequests(options: UsePendingRequestsOptions = {}) {
           action === "approve"
             ? "approved"
             : action === "reject"
-            ? "rejected"
-            : action === "return"
-            ? "returned"
-            : "forwarded";
+              ? "rejected"
+              : action === "return"
+                ? "returned"
+                : "forwarded";
         toast.success(`${succeeded} request(s) ${actionText} successfully`);
         mutate();
         clearSelection();
@@ -232,12 +232,12 @@ export function usePendingRequests(options: UsePendingRequestsOptions = {}) {
         action === "approve"
           ? SUCCESS_MESSAGES.leave_approved
           : action === "reject"
-          ? SUCCESS_MESSAGES.leave_rejected
-          : action === "return"
-          ? SUCCESS_MESSAGES.returned_for_modification
-          : action === "cancel"
-          ? "Leave request cancelled successfully"
-          : SUCCESS_MESSAGES.leave_forwarded
+            ? SUCCESS_MESSAGES.leave_rejected
+            : action === "return"
+              ? SUCCESS_MESSAGES.returned_for_modification
+              : action === "cancel"
+                ? "Leave request cancelled successfully"
+                : SUCCESS_MESSAGES.leave_forwarded
       );
 
       mutate();

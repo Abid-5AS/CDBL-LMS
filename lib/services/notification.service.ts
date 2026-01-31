@@ -3,7 +3,7 @@ import {
   CreateNotificationData,
   NotificationWithRelations,
 } from "@/lib/repositories/notification.repository";
-import { LeaveType, LeaveStatus, ApprovalDecision } from "@prisma/client";
+import { LeaveType, LeaveStatus, ApprovalDecision } from "@/src/generated/prisma/client";
 import { formatDate } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 import {
@@ -13,6 +13,7 @@ import {
   sendLeaveReturnedEmail,
   sendLeaveForwardedEmail,
 } from "@/lib/email";
+import { messaging } from "@/lib/firebase-admin";
 
 export type ServiceResult<T> = {
   success: boolean;
@@ -34,6 +35,49 @@ export type ServiceResult<T> = {
  * - Cleanup of old notifications
  */
 export class NotificationService {
+  /**
+   * Helper to send FCM push notification
+   * TODO: Enable only when google-services.json and proper env vars are set
+   */
+  private static async sendPushNotification(
+    userId: number,
+    title: string,
+    body: string,
+    data?: Record<string, string>
+  ) {
+    if (!messaging) return;
+
+    try {
+      const tokens = await NotificationRepository.getDeviceTokens(userId);
+      if (tokens.length === 0) return;
+
+      const message = {
+        notification: { title, body },
+        data: data || {},
+        tokens: tokens,
+      };
+
+      const response = await messaging.sendEachForMulticast(message);
+      
+      // Cleanup invalid tokens
+      if (response.failureCount > 0) {
+        response.responses.forEach(async (resp, idx) => {
+          if (!resp.success) {
+            const error = resp.error;
+            if (
+              error?.code === "messaging/invalid-registration-token" ||
+              error?.code === "messaging/registration-token-not-registered"
+            ) {
+              await NotificationRepository.removeDeviceToken(tokens[idx]);
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Failed to send push notification:", error);
+    }
+  }
+
   /**
    * Get notifications for a user
    */
@@ -299,6 +343,14 @@ export class NotificationService {
         // Don't fail the notification if email fails
       });
 
+      // Send push notifications
+      notifications.forEach((n) => {
+        this.sendPushNotification(n.userId, n.title, n.message, {
+          leaveId: String(leaveId),
+          type: n.type,
+        });
+      });
+
       return { success: true, data: count };
     } catch (error) {
       console.error("NotificationService.notifyLeaveSubmitted error:", error);
@@ -358,6 +410,12 @@ export class NotificationService {
       ).catch((err) => {
         console.error("Failed to send leave approved email:", err);
         // Don't fail the notification if email fails
+      });
+
+      // Send push notification
+      this.sendPushNotification(leave.requesterId, "Leave Request Approved", `Your ${leave.type} leave request has been approved by ${approverName}`, {
+        leaveId: String(leaveId),
+        type: "LEAVE_APPROVED",
       });
 
       return { success: true };
@@ -427,6 +485,12 @@ export class NotificationService {
         // Don't fail the notification if email fails
       });
 
+      // Send push notification
+      this.sendPushNotification(leave.requesterId, "Leave Request Rejected", message, {
+        leaveId: String(leaveId),
+        type: "LEAVE_REJECTED",
+      });
+
       return { success: true };
     } catch (error) {
       console.error("NotificationService.notifyLeaveRejected error:", error);
@@ -486,6 +550,12 @@ export class NotificationService {
       ).catch((err) => {
         console.error("Failed to send leave returned email:", err);
         // Don't fail the notification if email fails
+      });
+
+      // Send push notification
+      this.sendPushNotification(leave.requesterId, "Leave Request Returned", `Your ${leave.type} leave request has been returned by ${approverName}`, {
+        leaveId: String(leaveId),
+        type: "LEAVE_RETURNED",
       });
 
       return { success: true };
@@ -568,6 +638,17 @@ export class NotificationService {
         });
       }
 
+      // Send push notifications
+      this.sendPushNotification(newApproverId, "Leave Approval Forwarded", `${forwarderName} has forwarded ${leave.requester.name}'s ${leave.type} leave request for your approval`, {
+        leaveId: String(leaveId),
+        type: "APPROVAL_REQUIRED",
+      });
+      
+      this.sendPushNotification(leave.requesterId, "Leave Request Forwarded", `Your ${leave.type} leave request has been forwarded by ${forwarderName}`, {
+        leaveId: String(leaveId),
+        type: "LEAVE_FORWARDED",
+      });
+
       return { success: true };
     } catch (error) {
       console.error("NotificationService.notifyLeaveForwarded error:", error);
@@ -622,6 +703,25 @@ export class NotificationService {
       );
 
       await NotificationRepository.createMany(notifications);
+
+      // Send push notifications
+      notifications.forEach((n) => {
+        this.sendPushNotification(n.userId, n.title, n.message, {
+          leaveId: String(leaveId),
+          type: n.type,
+        });
+      });
+
+      await NotificationRepository.createMany(notifications);
+
+      // Send push notifications
+      notifications.forEach((n) => {
+        this.sendPushNotification(n.userId, n.title, n.message, {
+          leaveId: String(leaveId),
+          type: n.type,
+        });
+      });
+
       return { success: true };
     } catch (error) {
       console.error("NotificationService.notifyLeaveCancelled error:", error);
@@ -665,6 +765,12 @@ export class NotificationService {
         message: `Your medical leave has ended. Please upload your fitness certificate to return to duty.`,
         link: `/leaves/${leaveId}`,
         leaveId: leaveId,
+      });
+
+      // Send push notification
+      this.sendPushNotification(employeeId, "Fitness Certificate Required", `Your medical leave has ended. Please upload your fitness certificate to return to duty.`, {
+        leaveId: String(leaveId),
+        type: "FITNESS_CERTIFICATE_REQUIRED",
       });
 
       return { success: true };
@@ -722,6 +828,14 @@ export class NotificationService {
 
       await NotificationRepository.createMany(notifications);
 
+      // Send push notifications
+      notifications.forEach((n) => {
+        this.sendPushNotification(n.userId, n.title, n.message, {
+          leaveId: String(leaveId),
+          type: n.type,
+        });
+      });
+
       return { success: true };
     } catch (error) {
       console.error(
@@ -772,6 +886,13 @@ export class NotificationService {
           link: `/leaves/${leaveId}`,
           leaveId: leaveId,
         });
+
+        // Send push notification
+        this.sendPushNotification(leave.requesterId, "Fitness Certificate Approved", `Your fitness certificate has been approved. You may now return to duty.`, {
+          leaveId: String(leaveId),
+          type: "FITNESS_CERTIFICATE_APPROVED",
+        });
+
       } else {
         // Notify next approver in chain
         const approvalChain = ["HR_ADMIN", "HR_HEAD", "CEO"];
@@ -812,6 +933,107 @@ export class NotificationService {
           message: "Failed to send fitness certificate approved notification",
         },
       };
+    }
+  }
+
+  /**
+   * Create notification when encashment is requested
+   */
+  static async notifyEncashmentRequested(
+    requestId: number
+  ): Promise<ServiceResult<void>> {
+    try {
+      const request = await prisma.encashmentRequest.findUnique({
+        where: { id: requestId },
+        include: { user: { select: { name: true } } },
+      });
+
+      if (!request) {
+        return { success: false, error: { code: "not_found", message: "Request not found" } };
+      }
+
+      // Notify HR Admins
+      const hrAdmins = await prisma.user.findMany({
+        where: { role: "HR_ADMIN" },
+        select: { id: true },
+      });
+
+      const notifications: CreateNotificationData[] = hrAdmins.map((admin) => ({
+        userId: admin.id,
+        type: "APPROVAL_REQUIRED",
+        title: "Encashment Request",
+        message: `${request.user.name} has requested encashment of ${request.daysRequested} days`,
+        link: `/dashboard/hr-admin`, // Direct to dashboard where request is visible
+        leaveId: undefined, // Not a leave request
+      }));
+
+      await NotificationRepository.createMany(notifications);
+      return { success: true };
+    } catch (error) {
+      console.error("NotificationService.notifyEncashmentRequested error:", error);
+      return { success: false, error: { code: "notification_error", message: "Failed to send notification" } };
+    }
+  }
+
+  /**
+   * Create notification when encashment is approved
+   */
+  static async notifyEncashmentApproved(
+    requestId: number
+  ): Promise<ServiceResult<void>> {
+    try {
+      const request = await prisma.encashmentRequest.findUnique({
+        where: { id: requestId },
+      });
+
+      if (!request) {
+        return { success: false, error: { code: "not_found", message: "Request not found" } };
+      }
+
+      await NotificationRepository.create({
+        userId: request.userId,
+        type: "ENCASHMENT_APPROVED",
+        title: "Encashment Approved",
+        message: `Your encashment request for ${request.daysRequested} days has been approved.`,
+        link: `/encashment`,
+        leaveId: undefined,
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error("NotificationService.notifyEncashmentApproved error:", error);
+      return { success: false, error: { code: "notification_error", message: "Failed to send notification" } };
+    }
+  }
+
+  /**
+   * Create notification when encashment is rejected
+   */
+  static async notifyEncashmentRejected(
+    requestId: number
+  ): Promise<ServiceResult<void>> {
+    try {
+      const request = await prisma.encashmentRequest.findUnique({
+        where: { id: requestId },
+      });
+
+      if (!request) {
+        return { success: false, error: { code: "not_found", message: "Request not found" } };
+      }
+
+      await NotificationRepository.create({
+        userId: request.userId,
+        type: "ENCASHMENT_REJECTED",
+        title: "Encashment Rejected",
+        message: `Your encashment request for ${request.daysRequested} days has been rejected.${request.rejectionReason ? ` Reason: ${request.rejectionReason}` : ""}`,
+        link: `/encashment`,
+        leaveId: undefined,
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error("NotificationService.notifyEncashmentRejected error:", error);
+      return { success: false, error: { code: "notification_error", message: "Failed to send notification" } };
     }
   }
 

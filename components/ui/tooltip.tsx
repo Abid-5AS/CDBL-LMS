@@ -47,15 +47,17 @@ function TooltipContent({
         sideOffset={sideOffset}
         className={cn(
           // Base styles - Material 3 + Glass aesthetic
-          "z-50 w-fit rounded-xl px-4 py-3 text-sm font-medium text-balance",
+          "z-50 w-fit rounded-lg px-3 py-2 text-xs font-medium text-balance",
           // High contrast backgrounds for accessibility (≥4.5:1 contrast ratio)
-          "bg-card/80 text-foreground",
+          "bg-popover text-popover-foreground",
+          // White text for maximum readability
+          "text-white dark:text-white dark:text-[#fefefe]",
           // Subtle border with glass effect
-          "border border-border/50",
+          "border border-bg-primary/20 dark:border-bg-primary/10",
           // Backdrop blur for glassmorphism
-          "backdrop-blur-xl",
+          "shadow-md",
           // Material 3 elevation shadow
-          "shadow-lg shadow-black/10",
+          "shadow-[0_2px_8px_rgba(0,0,0,0.25)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)]",
           // Smooth fade-in animation (0.2s ease)
           "animate-in fade-in-0 duration-200 ease-out",
           // Smooth fade-out animation (0.15s ease)
@@ -71,10 +73,12 @@ function TooltipContent({
         {children}
         <TooltipPrimitive.Arrow
           className={cn(
-            "z-50 fill-card/80",
+            "z-50 size-2.5",
+            // Match tooltip background
+            "fill-[rgba(30,30,30,0.95)] dark:fill-[rgba(255,255,255,0.15)]",
             // Match border color
-            "stroke-border/50",
-            "size-2.5"
+            "text-white dark:text-white/20 dark:text-white dark:text-white/10",
+            "stroke-[0.5]"
           )}
         />
       </TooltipPrimitive.Content>

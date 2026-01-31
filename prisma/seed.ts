@@ -1,12 +1,14 @@
 import path from "path";
 import { promises as fs } from "fs";
 import { randomUUID } from "crypto";
+import "dotenv/config";
 import bcrypt from "bcryptjs";
-import { ApprovalDecision, LeaveStatus, LeaveType, Role } from "@prisma/client";
+import { PrismaClient } from "@/src/generated/prisma/client";
+import { LeaveType, LeaveStatus, ApprovalDecision, Role, EncashmentStatus } from "@/src/generated/prisma/client";
 
 import { prisma } from "../lib/prisma";
 import { initDefaultOrgSettings } from "../lib/org-settings";
-import { countWorkingDaysSync } from "../lib/working-days";
+import { countWorkingDaysSync } from "../lib/leaves/working-days-client";
 import { normalizeToDhakaMidnight } from "../lib/date-utils";
 import { getChainFor } from "../lib/workflow";
 import {

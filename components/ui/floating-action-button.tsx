@@ -6,7 +6,7 @@ import { Plus, Calendar, Clock, FileText, X } from "lucide-react";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
-import { useUser } from "@/lib/user-context";
+import { useUser } from "@/components/providers";
 
 interface FABAction {
   icon: React.ComponentType<{ className?: string }>;

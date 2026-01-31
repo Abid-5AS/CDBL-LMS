@@ -130,10 +130,10 @@ export function ResponsiveDashboardGrid({
       >
         {Array.isArray(children)
           ? children.map((child, index) => (
-              <motion.div key={index} variants={itemVariants}>
-                {child}
-              </motion.div>
-            ))
+            <motion.div key={index} variants={itemVariants} className="h-full">
+              {child}
+            </motion.div>
+          ))
           : children}
       </motion.div>
     );

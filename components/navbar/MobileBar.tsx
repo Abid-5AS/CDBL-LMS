@@ -56,8 +56,8 @@ export function MobileBar({
           <NotificationDropdown />
         </motion.div>
 
-        {/* Apply Leave button - All roles except CEO */}
-        {user.role !== "CEO" && (
+        {/* Apply Leave FAB - All roles except CEO and SYSTEM_ADMIN */}
+        {!["CEO", "SYSTEM_ADMIN"].includes(user.role) && (
           <motion.div
             initial={{ opacity: 0, x: 15 }}
             animate={{ opacity: 1, x: 0 }}

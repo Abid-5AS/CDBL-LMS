@@ -3,7 +3,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { format, isSameMonth, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isToday } from "date-fns";
-import { LeaveType } from "@prisma/client";
+import { LeaveType } from "@/lib/enums";
 import { STATUS_COLORS, LEAVE_TYPE_DOTS } from "./CalendarLegend";
 
 export interface CalendarEvent {
@@ -46,7 +46,7 @@ export function CalendarGrid({ currentDate, events, onDayClick, className }: Cal
       end.setHours(23, 59, 59, 999);
       const checkDay = new Date(day);
       checkDay.setHours(12, 0, 0, 0);
-      
+
       return checkDay >= start && checkDay <= end;
     });
   };
@@ -104,8 +104,8 @@ export function CalendarGrid({ currentDate, events, onDayClick, className }: Cal
                     key={`${event.id}-${day.toISOString()}`}
                     className={cn(
                       "text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0.5 rounded-sm truncate border flex items-center gap-1",
-                      event.isHoliday 
-                        ? STATUS_COLORS.HOLIDAY 
+                      event.isHoliday
+                        ? STATUS_COLORS.HOLIDAY
                         : STATUS_COLORS[event.status] || "bg-muted text-muted-foreground"
                     )}
                   >

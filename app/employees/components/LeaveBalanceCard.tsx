@@ -34,8 +34,8 @@ export function LeaveBalanceCard({ balances }: LeaveBalanceCardProps) {
   }));
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-      <h3 className="text-sm font-semibold uppercase tracking-wide text-text-secondary dark:text-text-secondary mb-4">
+    <div className="rounded-lg border border-border dark:border-border/50 bg-card dark:bg-card/90 p-4 shadow-sm hover:shadow-md transition-all duration-100">
+      <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground dark:text-foreground/90 mb-4">
         Leave Balances
       </h3>
       <LeaveBalancePanel

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
@@ -15,50 +15,55 @@ import {
   AlertCircle,
   ClipboardList,
   BookOpen,
-  Filter,
+  User,
 } from "lucide-react";
 
 import {
   Button,
-  GlassCard,
-  GlassCardContent,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   Skeleton,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
   TooltipProvider,
-  Tabs,
-  TabsList,
-  TabsTrigger,
+  Badge,
 } from "@/components/ui";
 import { useApiQuery } from "@/lib/apiClient";
 import { useLeaveRequests } from "@/hooks";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib";
 import { formatDate } from "@/lib/utils";
-import { RoleBasedDashboard } from "../shared/RoleBasedDashboard";
+import { RoleBasedDashboard, RoleKPICard } from "../shared/RoleBasedDashboard";
 import {
   ResponsiveDashboardGrid,
+  DashboardWithSidebar,
   DashboardSection,
 } from "../shared/ResponsiveDashboardGrid";
+import { TabbedContent } from "../shared/ProgressiveDisclosure";
 import useSWR from "swr";
 import { apiFetcher } from "@/lib/apiClient";
+import { Role } from "@/lib/enums";
 
 // Extracted components
+import { EmployeeActionCenter } from "./components/EmployeeActionCenter";
 import { EmployeeRecentActivity } from "./components/EmployeeRecentActivity";
+import { EmployeeLeaveBalance } from "./components/EmployeeLeaveBalance";
 import { FloatingQuickActions } from "./components/FloatingQuickActions";
-import { LeaveBalanceCard } from "./components/LeaveBalanceCard";
-import { TeamStatusSummary } from "./components/TeamStatusSummary";
-import { ActiveRequestTracker } from "./components/ActiveRequestTracker";
-import { UpcomingHolidaysPanel } from "./components/UpcomingHolidaysPanel";
+import { ConversionSummaryCard } from "@/components/leaves/ConversionHistory";
+import { BalanceProjectionWidget } from "./components/BalanceProjectionWidget";
 
 // Extracted hooks and utils
 import { KPIGridSkeleton } from "@/components/shared/skeletons";
-import { useMounted } from "@/hooks/use-mounted";
+import { useMounted } from "@/hooks/useMounted";
 import { useEmployeeDashboardData } from "./hooks/useEmployeeDashboardData";
-import { WhosOutToday } from "@/app/dashboard/shared/WhosOutToday";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { ResourcesTile } from "./components/ResourcesTile";
 
 type EmployeeDashboardContentProps = {
   username: string;
+  whosOutTodaySlot: React.ReactNode;
 };
 
 const containerVariants = {
@@ -83,25 +88,67 @@ const itemVariants = {
   },
 };
 
-// Hardcoded entitlements for Mock 2.1 layout (as per plan)
-const LEAVE_ENTITLEMENTS = {
-  CASUAL: 14,
-  SICK: 14,
-  EARNED: 20,
-};
-
 export function ModernEmployeeDashboard({
   username,
+  whosOutTodaySlot,
 }: EmployeeDashboardContentProps) {
   const router = useRouter();
-  const [activityFilter, setActivityFilter] = useState<"ALL" | "PENDING" | "PAST">("ALL");
+  const [activeLeaveTab, setActiveLeaveTab] = useState<string>("overview");
+  const [scrollTimeoutId, setScrollTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false);
   const mounted = useMounted();
 
+  // Cleanup timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (scrollTimeoutId) {
+        clearTimeout(scrollTimeoutId);
+      }
+    };
+  }, [scrollTimeoutId]);
+
+  const infoButtonClasses =
+    "inline-flex h-7 w-7 items-center justify-center rounded-full border border-border/60 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60";
+
+  // Scroll to specific section and optionally switch tabs
+  const scrollToSection = (sectionId: string, tabId?: string) => {
+    if (tabId) {
+      setActiveLeaveTab(tabId);
+    }
+    // Clear any existing timeout to prevent conflicts
+    if (scrollTimeoutId) {
+      clearTimeout(scrollTimeoutId);
+    }
+
+    const timer = setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        const offset = 100; // Account for fixed header
+        const elementPosition =
+          element.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({
+          top: elementPosition - offset,
+          behavior: "smooth",
+        });
+      }
+      // Clear the timeout ID after execution
+      setScrollTimeoutId(null);
+    }, 100);
+
+    // Store the timeout ID so we can clear it if needed
+    setScrollTimeoutId(timer);
+  };
   const { allRows: leaves, isLoading: isLoadingLeaves } = useLeaveRequests({
     enableSelection: false,
   });
   const { data: balanceData, isLoading: isLoadingBalance } =
     useApiQuery<Record<string, number>>("/api/balance/mine");
+
+  // Fetch team data - remove unused API call
+  // const { data: teamData, isLoading: isLoadingTeam } = useSWR(
+  //   "/api/team/status",
+  //   apiFetcher
+  // );
 
   // Fetch holidays data
   const { data: holidaysData, isLoading: isLoadingHolidays } = useSWR(
@@ -112,159 +159,395 @@ export function ModernEmployeeDashboard({
   // Process data using custom hook
   const dashboardData = useEmployeeDashboardData(leaves, balanceData);
 
-  // Filter leaves for the activity list
-  const filteredLeaves = React.useMemo(() => {
-    if (!leaves) return [];
-
-    let result = [];
-    switch (activityFilter) {
-      case "PENDING":
-        result = leaves.filter(l => ["PENDING", "SUBMITTED", "FORWARDED"].includes(l.status));
-        break;
-      case "PAST":
-        result = leaves.filter(l => ["APPROVED", "REJECTED", "CANCELLED"].includes(l.status));
-        break;
-      default:
-        result = leaves.slice(0, 10); // Show recent 10 for ALL
-    }
-
-    // Map to add formatting
-    return result.map(leave => ({
-      ...leave,
-      typeLabel: leaveTypeLabel[leave.type] || leave.type,
-      formattedDates: `${formatDate(leave.startDate)} - ${formatDate(leave.endDate)}`,
-    }));
-  }, [leaves, activityFilter]);
-
   const quickActions = [
     {
       label: "Review My Leaves",
       description: "Jump to status & history",
       icon: ClipboardList,
-      accent: "bg-blue-600 text-white",
+      accent: "bg-gradient-to-br from-cyan-500 to-blue-500 text-white",
       onClick: () => router.push("/leaves"),
     },
     {
       label: "Check Balance & Policies",
       description: "View balances and rules",
       icon: BookOpen,
-      accent: "bg-emerald-600 text-white",
+      accent: "bg-gradient-to-br from-emerald-500 to-teal-500 text-white",
       onClick: () => router.push("/balance"),
     },
   ];
 
-  const headerActions = (
-    <div className="flex items-center gap-2">
-      <Button variant="outline" size="sm" onClick={() => router.push("/leaves")}>
-        <ClipboardList className="mr-2 h-4 w-4" />
-        My History
-      </Button>
-      <Button onClick={() => router.push("/leaves/apply")} size="sm" className="shadow-sm">
-        <Plus className="mr-2 h-4 w-4" />
-        Apply for Leave
-      </Button>
-    </div>
-  );
-
   return (
     <TooltipProvider>
-      {/* Removed FloatingQuickActions as per feedback */}
       <RoleBasedDashboard
-        role="EMPLOYEE"
+        role={Role.EMPLOYEE}
         animate={true}
         backgroundVariant="transparent"
-        compactHeader={true}
-        title="Overview"
-        description={`Welcome back, ${username.split(" ")[0]}.`}
-        actions={headerActions}
       >
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="space-y-6"
+          className="space-y-6 lg:space-y-8"
         >
-          {/* Top Section: Balance Cards */}
           <motion.section variants={itemVariants}>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <LeaveBalanceCard
-                type="CASUAL"
-                available={dashboardData.balanceData?.CASUAL || 0}
-                total={LEAVE_ENTITLEMENTS.CASUAL}
-                colorClass="bg-blue-500"
-              />
-              <LeaveBalanceCard
-                type="SICK"
-                available={dashboardData.balanceData?.SICK || 0}
-                total={LEAVE_ENTITLEMENTS.SICK}
-                colorClass="bg-rose-500"
-              />
-              <LeaveBalanceCard
-                type="EARNED"
-                available={dashboardData.balanceData?.EARNED || 0}
-                total={LEAVE_ENTITLEMENTS.EARNED}
-                colorClass="bg-emerald-500"
-              />
+            <div className="surface-card p-4 sm:p-5 rounded-2xl border bg-card/50 backdrop-blur-sm">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                {/* Welcome & Date */}
+                <div className="space-y-1">
+                  <h1 className="text-xl font-semibold text-foreground tracking-tight">
+                    Welcome back, {username.split(' ')[0]}
+                  </h1>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span>
+                      {mounted
+                        ? new Date().toLocaleDateString("en-GB", {
+                          weekday: "short",
+                          day: "numeric",
+                          month: "short",
+                        })
+                        : "..."}
+                    </span>
+                    {/* Next Leave Inline */}
+                    {dashboardData.nextScheduledLeave && (
+                      <>
+                        <span className="h-1 w-1 rounded-full bg-border" />
+                        <div className="flex items-center gap-1.5 text-foreground/80 font-medium bg-muted/30 px-2 py-0.5 rounded-md">
+                          <Calendar className="h-3.5 w-3.5 text-primary" />
+                          <span className="text-xs">
+                            Next: {formatDate(dashboardData.nextScheduledLeave.startDate)}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-2 self-start lg:self-auto">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="hidden sm:flex"
+                    onClick={() => scrollToSection("action-center")}
+                  >
+                    Action Center
+                  </Button>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    leftIcon={<Plus className="h-4 w-4" aria-hidden="true" />}
+                    onClick={() => router.push("/leaves/apply")}
+                  >
+                    Apply Leave
+                  </Button>
+                </div>
+              </div>
             </div>
           </motion.section>
 
-          {/* Active Request Tracking */}
-          <ActiveRequestTracker leaves={leaves} isLoading={isLoadingLeaves} />
 
-          {/* Main Content: 2-Column Grid */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            {/* Left Column: Recent Activity (2/3 width) */}
-            <motion.div variants={itemVariants} className="lg:col-span-2 space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-muted-foreground" />
-                  My Requests
-                </h3>
-                <Tabs
-                  value={activityFilter}
-                  onValueChange={(v) => setActivityFilter(v as any)}
-                  className="w-auto"
-                >
-                  <TabsList className="h-8">
-                    <TabsTrigger value="ALL" className="text-xs px-3">All</TabsTrigger>
-                    <TabsTrigger value="PENDING" className="text-xs px-3">Pending</TabsTrigger>
-                    <TabsTrigger value="PAST" className="text-xs px-3">Past</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
 
-              <GlassCard variant="hover">
-                <GlassCardContent className="p-0">
-                  {/* Reusing EmployeeRecentActivity but passing filtered leaves */}
+          {/* Quick Stats Grid */}
+          <DashboardSection
+            title="Leave Metrics"
+            description="Your balance, pending requests, and upcoming time off"
+            isLoading={false}
+            loadingFallback={<KPIGridSkeleton />}
+            animate={true}
+          >
+            <ResponsiveDashboardGrid
+              columns="1:2:4:4"
+              gap="md"
+              animate={true}
+              staggerChildren={0.1}
+              delayChildren={0.2}
+            >
+              <RoleKPICard
+                title={
+                  <div className="flex items-center gap-2">
+                    <span>Needs Your Action</span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          aria-label="Learn about requests that need your input"
+                          className={infoButtonClasses}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <AlertCircle className="h-4 w-4" aria-hidden="true" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">
+                          What this shows:
+                        </p>
+                        <p className="text-sm mb-2">
+                          Requests returned to you that must be edited or
+                          confirmed before they can re-enter the approval
+                          chain.
+                        </p>
+                        <p className="text-sm font-semibold mb-1">
+                          Current stage:
+                        </p>
+                        <p className="text-sm mb-2">
+                          Tap to jump directly to the Action Center where you
+                          can edit, resubmit, or cancel these requests.
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Once all items are handled this number resets to 0.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                }
+                value={dashboardData.needsAttentionCount}
+                subtitle={
+                  dashboardData.needsAttentionCount > 0
+                    ? "Returned or cancelled items"
+                    : "No actions required"
+                }
+                icon={AlertCircle}
+                role={Role.EMPLOYEE}
+                animate={true}
+                onClick={() => scrollToSection("action-center")}
+                clickLabel="Jump to Action Center"
+              />
+
+              <RoleKPICard
+                title={
+                  <div className="flex items-center gap-2">
+                    <span>Under Review</span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          aria-label="Information about under review requests"
+                          className={infoButtonClasses}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Info className="h-4 w-4" aria-hidden="true" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">
+                          What this shows:
+                        </p>
+                        <p className="text-sm mb-2">
+                          Requests currently moving through approvers. Nothing
+                          is required from you unless someone returns it.
+                        </p>
+                        <p className="text-sm font-semibold mb-1">
+                          How it's calculated:
+                        </p>
+                        <p className="text-sm mb-2">
+                          Includes submitted, pending, recalled, and
+                          cancellation requests forwarded to managers/HR. The
+                          subtitle highlights who currently has the request
+                          plus the average wait.
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Explore approvals in My Leaves for a full audit
+                          trail.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                }
+                value={dashboardData.underReviewCount}
+                subtitle={
+                  dashboardData.pendingStageInfo
+                    ? `With ${dashboardData.pendingStageInfo.role} • ${dashboardData.pendingAverageWait}d avg wait`
+                    : "Awaiting approval"
+                }
+                icon={Clock}
+                role={Role.EMPLOYEE}
+                animate={true}
+                onClick={() => router.push("/leaves?status=pending")}
+                clickLabel="View requests awaiting approval"
+              />
+
+              <RoleKPICard
+                title={
+                  <div className="flex items-center gap-2">
+                    <span>Total Balance</span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          aria-label="Information about total leave balance"
+                          className={infoButtonClasses}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Info className="h-4 w-4" aria-hidden="true" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">
+                          What this shows:
+                        </p>
+                        <p className="text-sm mb-2">
+                          Total leave days available to you across Earned,
+                          Casual, and Medical leave.
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Tap to open the Leave Balance tab for breakdown and
+                          expiry notes.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                }
+                value={dashboardData.totalBalance}
+                subtitle="Days available"
+                icon={Calendar}
+                role={Role.EMPLOYEE}
+                animate={true}
+                onClick={() => setIsBalanceModalOpen(true)}
+                clickLabel="View detailed balance breakdown"
+              />
+
+              <RoleKPICard
+                title={
+                  <div className="flex items-center gap-2">
+                    <span>
+                      {dashboardData.nextScheduledLeave
+                        ? "Next Approved Leave"
+                        : "No Approved Leave"}
+                    </span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          aria-label="Information about next approved leave"
+                          className={infoButtonClasses}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <p className="text-sm font-semibold mb-1">
+                          What this shows:
+                        </p>
+                        <p className="text-sm mb-2">
+                          Your next scheduled leave that has been fully approved
+                          and is confirmed. Shows how many days until it starts.
+                        </p>
+                        <p className="text-sm font-semibold mb-1">
+                          Important distinction:
+                        </p>
+                        <p className="text-sm mb-2">
+                          This shows APPROVED leaves only - not pending
+                          requests. Pending requests appear in "Pending
+                          Requests" card above.
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          You can request cancellation of approved leaves from
+                          the Action Center.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                }
+                value={
+                  dashboardData.daysUntilNextLeave !== null
+                    ? dashboardData.daysUntilNextLeave === 0
+                      ? "Today"
+                      : dashboardData.daysUntilNextLeave === 1
+                        ? "Tomorrow"
+                        : `${dashboardData.daysUntilNextLeave} days`
+                    : "—"
+                }
+                subtitle={
+                  dashboardData.nextScheduledLeave
+                    ? `${leaveTypeLabel[dashboardData.nextScheduledLeave.type] ||
+                    dashboardData.nextScheduledLeave.type
+                    } (${dashboardData.nextScheduledLeave.workingDays || 0
+                    } days)`
+                    : "Plan your time off"
+                }
+                icon={TrendingUp}
+                role={Role.EMPLOYEE}
+                animate={true}
+                onClick={() => router.push("/leaves")}
+                clickLabel="View all your leave requests"
+              />
+            </ResponsiveDashboardGrid>
+          </DashboardSection>
+
+          {/* Main Grid Layout (70/30 Split) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+
+            {/* Left Column (Main Content) - Spans 8 cols */}
+            <div className="lg:col-span-8 space-y-6 lg:space-y-8">
+
+              {/* Action Center */}
+              <DashboardSection
+                title="Action Center"
+                description="Handle returned requests, certificate tasks, and expiring balances"
+                isLoading={isLoadingLeaves}
+                animate={true}
+              >
+                <div id="action-center">
+                  <motion.div variants={itemVariants}>
+                    <EmployeeActionCenter actionItems={dashboardData.actionItems} />
+                  </motion.div>
+                </div>
+              </DashboardSection>
+
+              {/* Recent Activity (Table) */}
+              <DashboardSection
+                title="Recent Activity"
+                description="Your latest leave requests and their status"
+                isLoading={isLoadingLeaves}
+                animate={true}
+              >
+                <motion.div variants={itemVariants}>
                   <EmployeeRecentActivity
-                    leaves={filteredLeaves}
+                    leaves={dashboardData.recentLeaves}
                     isLoading={isLoadingLeaves}
                   />
-                  <div className="border-t border-border/60 p-3 text-center">
-                    <Button variant="ghost" size="sm" onClick={() => router.push("/leaves")} className="text-xs text-muted-foreground hover:text-foreground">
-                      View Full History
-                    </Button>
-                  </div>
-                </GlassCardContent>
-              </GlassCard>
-            </motion.div>
+                </motion.div>
+              </DashboardSection>
 
-            {/* Right Column: Team Status (1/3 width) */}
-            <motion.div variants={itemVariants} className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-muted-foreground" />
-                  My Team
-                </h3>
-              </div>
+            </div>
 
-              {/* New Compact Team Status Summary with Modal */}
-              <TeamStatusSummary />
+            {/* Right Column (Sidebar) - Spans 4 cols */}
+            <div className="lg:col-span-4 space-y-6 lg:space-y-8 sticky top-4 self-start">
 
-              {/* Upcoming Holidays Panel */}
-              <UpcomingHolidaysPanel holidays={holidaysData as any} isLoading={isLoadingHolidays} />
-            </motion.div>
+              {/* Who's Out Today */}
+              <motion.div variants={itemVariants}>
+                {whosOutTodaySlot}
+              </motion.div>
+
+              {/* Quick Resources / Utility Tile */}
+              <motion.div variants={itemVariants}>
+                <ResourcesTile />
+              </motion.div>
+
+            </div>
           </div>
+
+          {/* Balance Details Modal */}
+          <Dialog open={isBalanceModalOpen} onOpenChange={setIsBalanceModalOpen}>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Leave Balance Details</DialogTitle>
+                <DialogDescription>
+                  Breakdown of your available leave credits and history
+                </DialogDescription>
+              </DialogHeader>
+              <div className="mt-4">
+                <EmployeeLeaveBalance
+                  balanceData={dashboardData.balanceData}
+                  isLoading={isLoadingBalance}
+                />
+                <div className="mt-8">
+                  <BalanceProjectionWidget />
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </motion.div>
       </RoleBasedDashboard>
     </TooltipProvider>

@@ -3,13 +3,13 @@
 import { usePathname } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
-import { useUser } from "@/lib/user-context";
-import { SelectionProvider } from "@/lib/selection-context";
+import { useUser } from "@/components/providers/UserContext";
+import { SelectionProvider } from "@/components/providers/SelectionContext";
 import { cn } from "@/lib/utils";
 import { SlideDrawer } from "@/components/unified";
 import { LeaveDataProvider } from "@/components/providers";
 import { FloatingActionButton } from "@/components/ui/floating-action-button";
-import { SearchProvider } from "@/hooks/use-search";
+import { SearchProvider } from "@/hooks/useSearch";
 
 type LayoutWrapperProps = {
   children: React.ReactNode;

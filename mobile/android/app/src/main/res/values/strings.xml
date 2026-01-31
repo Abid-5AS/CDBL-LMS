@@ -1,0 +1,201 @@
+<resources>
+    <string name="app_name">CDBL Leave Manager</string>
+
+    <!-- Auth -->
+    <string name="login_title">Sign In</string>
+    <string name="login_subtitle">Enter your credentials to access your account</string>
+    <string name="otp_title">Verify OTP</string>
+    <string name="otp_subtitle">Enter the 6-digit code sent to %1$s</string>
+    <string name="otp_hint">Verification Code</string>
+    <string name="verify_button">Verify &amp; Sign In</string>
+    <string name="email">Email Address</string>
+    <string name="password">Password</string>
+    <string name="login_button">Sign In</string>
+    <string name="login_loading">Signing in...</string>
+
+    <!-- Navigation -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_leaves">Leaves</string>
+    <string name="nav_holidays">Holidays</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_approvals">Approvals</string>
+    <string name="nav_team">Team</string>
+    <string name="nav_reports">Reports</string>
+    <string name="nav_admin">Admin</string>
+    <string name="nav_more">More</string>
+    <string name="nav_employees">Employees</string>
+    <string name="nav_notifications">Notifications</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Leave Details -->
+    <string name="leave_details">Leave Details</string>
+    <string name="reject">Reject</string>
+    <string name="approve">Approve</string>
+    <string name="status_label">Status</string>
+    <string name="type_label">Type</string>
+    <string name="duration_label">Duration</string>
+    <string name="reason_label">Reason</string>
+    <string name="no_reason">No reason provided.</string>
+    <string name="timeline">Timeline</string>
+    <string name="approve_leave_confirm">Approve Leave</string>
+    <string name="reject_leave_confirm">Reject Leave</string>
+    <string name="comment_optional">Add an optional comment:</string>
+    <string name="final_status">Final Status</string>
+    <string name="applied_label">Applied</string>
+    <string name="applied_desc">Request submitted</string>
+    <string name="comment_label">%1$s Comment</string>
+    <string name="search_leaves">Search leaves...</string>
+    <string name="tab_all">All</string>
+    <string name="tab_pending">Pending</string>
+    <string name="tab_approved">Approved</string>
+    <string name="tab_rejected">Rejected</string>
+    <string name="tab_casual">Casual</string>
+    <string name="no_history">No leave history found</string>
+    <string name="days_count">%1$s Days</string>
+    <string name="good_morning">Good Morning!</string>
+    <string name="needs_action">Needs Your Action</string>
+    <string name="action_required">Action Required</string>
+    <string name="under_review">Under Review</string>
+    <string name="next_leave">Next Leave</string>
+    <string name="total_balance">Total Balance</string>
+    <string name="apply_leave">Apply Leave</string>
+    <string name="leave_history">Leave History</string>
+    <string name="recent_leaves">Recent Leaves</string>
+    <string name="view_all">View All</string>
+    <string name="no_recent_leaves">No recent leave requests found</string>
+    <string name="leave_balance">Leave Balance</string>
+    <string name="whos_out">Who\'s Out Today</string>
+    <string name="everyone_present">Everyone is present today!</string>
+    <string name="days_left">left</string>
+    <string name="used">Used</string>
+    <string name="total">Total</string>
+    <string name="returned_requests">You have %1$d returned request(s)</string>
+    <string name="pending_requests">Pending Requests</string>
+
+    <!-- Balance Card Labels (Web Consistent) -->
+    <string name="available_earned_leave">Available Earned Leave</string>
+    <string name="available_casual_leave">Available Casual Leave</string>
+    <string name="available_medical_leave">Available Medical Leave</string>
+    <string name="earned_leave_subtext">Carry-forward allowed up to 60 days</string>
+    <string name="casual_leave_subtext">Max 3 consecutive days</string>
+    <string name="medical_leave_subtext">> 3 days requires medical certificate</string>
+    <string name="opening_balance">Opening</string>
+    <string name="accrued">Accrued</string>
+    <string name="used_approved">Used (Approved)</string>
+    <string name="pending_approval">Pending Approval</string>
+    <string name="projected_balance">Projected Balance</string>
+    <string name="total_available">Total Available</string>
+    <string name="under_review_label">Under Review</string>
+    <string name="accrued_ytd">Accrued YTD</string>
+    <string name="your_leave_snapshot">Your leave snapshot</string>
+    <string name="leave_balances">Leave Balances</string>
+    <string name="recent_requests">Recent Requests</string>
+
+    <!-- Leave Type Display Names -->
+    <string name="leave_type_earned">Earned Leave</string>
+    <string name="leave_type_casual">Casual Leave</string>
+    <string name="leave_type_medical">Medical Leave</string>
+    <string name="leave_type_maternity">Maternity Leave</string>
+    <string name="leave_type_paternity">Paternity Leave</string>
+    <string name="leave_type_extra_paid">Extra Leave (Paid)</string>
+    <string name="leave_type_extra_unpaid">Extra Leave (Unpaid)</string>
+    <string name="leave_type_study">Study Leave</string>
+    <string name="leave_type_special">Special Leave</string>
+    <string name="leave_type_quarantine">Quarantine Leave</string>
+
+    <!-- Half-Day Leave (Web Consistent) -->
+    <string name="half_day_leave">Half Day Leave</string>
+    <string name="half_day_subtext">Apply for half a day only</string>
+    <string name="first_half_am">First Half (AM)</string>
+    <string name="second_half_pm">Second Half (PM)</string>
+
+    <!-- Leave Status -->
+    <string name="status_pending">Pending</string>
+    <string name="status_approved">Approved</string>
+    <string name="status_rejected">Rejected</string>
+    <string name="status_forwarded">Forwarded</string>
+
+    <!-- Apply Leave -->
+    <string name="apply_leave_title">Apply for Leave</string>
+    <string name="available_balance">Available Balance</string>
+    <string name="updated_today">Updated today</string>
+    <string name="select_leave_type">Select Leave Type</string>
+    <string name="select_dates">Select Dates</string>
+    <string name="days_selected">%1$d Days Selected</string>
+    <string name="total_days">Total Days</string>
+    <string name="reason_hint">I need to take some time off for personal matters...</string>
+    <string name="add_document">Add Supporting Document</string>
+    <string name="file_attached">File Attached</string>
+    <string name="tap_to_select">Tap to select file</string>
+    <string name="leave_type">Leave Type</string>
+    <string name="start_date">Start Date</string>
+    <string name="end_date">End Date</string>
+    <string name="reason">Reason for Leave</string>
+    <string name="upload_document">Upload Document</string>
+    <string name="submit_application">Submit Application</string>
+    <string name="submitting">Submitting...</string>
+    <string name="select_date">Select Date</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Profile</string>
+    <string name="error_load_profile">Error loading profile</string>
+    <string name="retry">Retry</string>
+    <string name="personal_info">Personal Information</string>
+    <string name="policies">Policies &amp; Guidelines</string>
+    <string name="holidays">Public Holidays</string>
+    <string name="notifications">Notifications</string>
+    <string name="reports">Reports</string>
+    <string name="employees">Employees</string>
+    <string name="settings">Settings</string>
+    <string name="delegation">Delegation</string>
+    <string name="calendar_integration">Calendar Integration</string>
+    <string name="admin_tools">Admin Tools</string>
+    <string name="audit_log_title">Audit Logs</string>
+    <string name="workflow_policies">Workflow Policies</string>
+    <string name="hris_sync">HRIS Sync</string>
+    <string name="webhooks">Webhooks</string>
+    <string name="reports_empty">No scheduled reports yet</string>
+    <string name="notifications_empty">No notifications available</string>
+    <string name="team_overview">Team Overview</string>
+    <string name="more_title">More</string>
+    <string name="employee_directory">Employee Directory</string>
+    <string name="upcoming_syncs">Recent Syncs</string>
+    <string name="admin_users">Admin Users</string>
+    <string name="system_admin_tools">System Admin Tools</string>
+    <string name="calendar_status">Calendar Status</string>
+    <string name="delegation_active">Active Delegations</string>
+    <string name="feedback_title">Send Feedback</string>
+    <string name="feedback_body">We value your feedback. A full feedback form will be available soon. For now, please email our team.</string>
+    <string name="feedback_email">feedback@cdbl.com.bd</string>
+    <string name="terms_title">Terms of Use</string>
+    <string name="terms_body">This section is under development. Full terms of use will be available soon.</string>
+    <string name="terms_contact">HR Department: hr@cdbl.com.bd</string>
+    <string name="privacy_title">Privacy Policy</string>
+    <string name="privacy_body">This section is under development. The privacy policy will be available soon.</string>
+    <string name="privacy_contact">HR Department: hr@cdbl.com.bd</string>
+    <string name="feedback">Feedback</string>
+    <string name="terms">Terms</string>
+    <string name="privacy">Privacy</string>
+    <string name="change_password">Change Password</string>
+    <string name="help_support">Help &amp; Support</string>
+    <string name="logout">Logout</string>
+    <string name="employee_id">Employee ID</string>
+    <string name="department">Department</string>
+    <string name="phone">Phone</string>
+    <string name="address">Address</string>
+
+    <!-- Admin -->
+    <string name="admin_console">Admin Console</string>
+    <string name="manage_users">Manage Users</string>
+    <string name="total_users">Total Users</string>
+    <string name="on_leave">On Leave</string>
+    <string name="audit_logs">Recent Audit Logs</string>
+
+    <!-- Common -->
+    <string name="error_generic">Something went wrong</string>
+    <string name="success_generic">Operation successful</string>
+    <string name="save">Save Changes</string>
+    <string name="cancel">Cancel</string>
+    <string name="back">Back</string>
+</resources>

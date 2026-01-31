@@ -3,61 +3,76 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Calendar,
   CheckCircle2,
   Clock,
   FileText,
-  Filter,
   Plus,
   Search,
   XCircle,
   AlertCircle,
   LayoutGrid,
+  Plane,
+  Palmtree,
+  Stethoscope,
+  Info,
+  Calendar as CalendarIcon
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import EnhancedSmoothTab from "@/components/ui/enhanced-smooth-tab";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-import { LeaveBalanceView } from "@/components/leaves/LeaveBalanceView";
-import { HolidayCalendarView } from "@/components/leaves/HolidayCalendarView";
+
+import { LeaveDetailsModal } from "@/components/shared/modals/LeaveDetailsModal";
 import { useLeaveData } from "@/components/providers";
 import { cn } from "@/lib/utils";
-import { Wallet, ClipboardList } from "lucide-react";
+import { leaveTypeLabel, leaveTypeColor } from "@/lib/ui/ui";
 
+<<<<<<< HEAD
 function formatLeaveType(type: string) {
   return type.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase());
 }
 
 function LeaveRequestCard({ request }: { request: any }) {
+=======
+function LeaveRequestCard({ request, onClick }: { request: any; onClick: () => void }) {
+>>>>>>> consolidated-work
   const statusColors = {
     PENDING: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800",
+    SUBMITTED: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800",
     APPROVED: "bg-green-500/10 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800",
     REJECTED: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800",
     CANCELLED: "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800",
     RETURNED: "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800",
+    CANCELLATION_REQUESTED: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800",
   };
 
   const statusIcons = {
     PENDING: Clock,
+    SUBMITTED: Clock,
     APPROVED: CheckCircle2,
     REJECTED: XCircle,
     CANCELLED: XCircle,
     RETURNED: AlertCircle,
+    CANCELLATION_REQUESTED: XCircle,
+  };
+
+  const typeConfig: Record<string, any> = {
+    EARNED: { icon: Plane, color: "text-amber-500" },
+    CASUAL: { icon: Palmtree, color: "text-blue-500" },
+    MEDICAL: { icon: Stethoscope, color: "text-emerald-500" },
   };
 
   const StatusIcon = statusIcons[request.status as keyof typeof statusIcons] || Clock;
   const statusColor = statusColors[request.status as keyof typeof statusColors] || statusColors.PENDING;
+
+  const typeDetails = typeConfig[request.type] || { icon: CalendarIcon, color: "text-primary" };
+  const TypeIcon = typeDetails.icon;
 
   return (
     <motion.div
@@ -65,36 +80,52 @@ function LeaveRequestCard({ request }: { request: any }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="group relative overflow-hidden rounded-xl border border-border bg-card p-4 transition-all hover:shadow-md dark:hover:border-primary/20"
+      onClick={onClick}
+      className="group relative overflow-hidden rounded-[20px] border border-border/60 bg-card p-4 transition-all shadow-md hover:shadow-lg dark:hover:border-primary/20 cursor-pointer"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4">
           <div className={cn(
-            "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border",
-            statusColor
+            "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-background/50",
+            typeDetails.color
+            // statusColor // Removed status color background to prioritize type icon
           )}>
-            <StatusIcon className="h-5 w-5" />
+            <TypeIcon className="h-5 w-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-foreground">
+<<<<<<< HEAD
                 {formatLeaveType(request.type)}
+=======
+                {leaveTypeLabel[request.type] || request.type}
+>>>>>>> consolidated-work
               </h3>
               <span className={cn(
                 "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border",
                 statusColor
               )}>
-                {request.status}
+                {request.status === "CANCELLATION_REQUESTED" ? "Cancellation Pending" : request.status}
               </span>
+              {request.isCancellationRequest && (
+                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300">
+                  Cancellation
+                </span>
+              )}
+              {request.isModified && !request.isCancellationRequest && (
+                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                  Resubmitted
+                </span>
+              )}
             </div>
             <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="h-3.5 w-3.5" />
+              <CalendarIcon className="h-3.5 w-3.5" />
               <span>
                 {format(new Date(request.startDate), "MMM d, yyyy")} -{" "}
                 {format(new Date(request.endDate), "MMM d, yyyy")}
               </span>
               <span className="text-xs">•</span>
-              <span>{request.days} days</span>
+              <span>{request.workingDays} days</span>
             </div>
             {request.reason && (
               <p className="mt-2 text-sm text-muted-foreground line-clamp-1">
@@ -107,6 +138,95 @@ function LeaveRequestCard({ request }: { request: any }) {
     </motion.div>
   );
 }
+function CalendarView({ requests, onSelectRequest }: { requests: any[]; onSelectRequest: (request: any) => void }) {
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [selectedDateRequests, setSelectedDateRequests] = useState<any[]>([]);
+
+  // Map requests to dates for markers
+  const requestDates = requests.reduce((acc, request) => {
+    const start = new Date(request.startDate);
+    const end = new Date(request.endDate);
+    let current = start;
+
+    while (current <= end) {
+      const dateStr = format(current, "yyyy-MM-dd");
+      if (!acc[dateStr]) acc[dateStr] = [];
+      acc[dateStr].push(request);
+      current = new Date(current.getTime() + 24 * 60 * 60 * 1000);
+    }
+    return acc;
+  }, {} as Record<string, any[]>);
+
+  // Update selected requests when date changes
+  const handleDateSelect = (newDate: Date | undefined) => {
+    setDate(newDate);
+    if (newDate) {
+      const dateStr = format(newDate, "yyyy-MM-dd");
+      setSelectedDateRequests(requestDates[dateStr] || []);
+    } else {
+      setSelectedDateRequests([]);
+    }
+  };
+
+  // Modifier to identify days with leaves
+  const hasLeave = (date: Date) => {
+    return !!requestDates[format(date, "yyyy-MM-dd")];
+  };
+
+  return (
+    <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex-1 rounded-xl border border-border bg-card p-4">
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={handleDateSelect}
+          className="rounded-md border mx-auto"
+          modifiers={{ hasLeave }}
+          modifiersClassNames={{
+            hasLeave: "font-bold text-primary relative after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-primary after:rounded-full"
+          }}
+        />
+        <div className="mt-4 flex gap-4 justify-center text-sm text-muted-foreground p-4 bg-muted/20 rounded-lg">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+            <span>Has Leave Request</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span>Selected Date</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 space-y-4">
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <Clock className="w-5 h-5 text-muted-foreground" />
+          {date ? format(date, "MMMM d, yyyy") : "Select a date"}
+        </h3>
+
+        {selectedDateRequests.length > 0 ? (
+          <div className="grid gap-4">
+            {selectedDateRequests.map((request) => (
+              <LeaveRequestCard
+                key={request.id}
+                request={request}
+                onClick={() => onSelectRequest(request)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center p-8 text-center border rounded-xl bg-muted/10 h-[300px]">
+            <div className="bg-muted p-3 rounded-full mb-3">
+              <Info className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <p className="text-muted-foreground font-medium">No leaves on this date</p>
+            <p className="text-sm text-muted-foreground/60 mt-1">Select a date with a dot marker to view requests</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function RequestsView() {
   const router = useRouter();
@@ -114,6 +234,8 @@ function RequestsView() {
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  const [selectedLeave, setSelectedLeave] = useState<any | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const tabs = [
     {
@@ -125,6 +247,21 @@ function RequestsView() {
       id: "pending",
       title: "Under Review",
       color: "bg-info/80 hover:bg-info dark:bg-info/70 dark:hover:bg-info/80",
+    },
+    {
+      id: "returned",
+      title: "Returned",
+      color: "bg-orange-500/80 hover:bg-orange-500 dark:bg-orange-600/70 dark:hover:bg-orange-500/80",
+    },
+    {
+      id: "cancellations",
+      title: "Cancellations",
+      color: "bg-rose-500/80 hover:bg-rose-500 dark:bg-rose-600/70 dark:hover:bg-rose-500/80",
+    },
+    {
+      id: "modified",
+      title: "Modified",
+      color: "bg-sky-500/80 hover:bg-sky-500 dark:bg-sky-600/70 dark:hover:bg-sky-500/80",
     },
     {
       id: "approved",
@@ -144,8 +281,29 @@ function RequestsView() {
   ];
 
   const filteredRequests = data?.items?.filter((item: any) => {
+<<<<<<< HEAD
     const matchesTab = activeTab === "all" || item.status.toLowerCase() === activeTab;
     const matchesSearch = item.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+=======
+    // Handle tab filtering
+    let matchesTab = false;
+    if (activeTab === "all") {
+      matchesTab = true;
+    } else if (activeTab === "pending") {
+      matchesTab = ["PENDING", "SUBMITTED"].includes(item.status);
+    } else if (activeTab === "returned") {
+      matchesTab = item.status === "RETURNED";
+    } else if (activeTab === "cancellations") {
+      matchesTab = item.isCancellationRequest || item.status === "CANCELLATION_REQUESTED";
+    } else if (activeTab === "modified") {
+      matchesTab = item.isModified && !item.isCancellationRequest;
+    } else {
+      matchesTab = item.status.toLowerCase() === activeTab;
+    }
+
+    const typeLabel = leaveTypeLabel[item.type] || item.type || "";
+    const matchesSearch = typeLabel.toLowerCase().includes(searchQuery.toLowerCase()) ||
+>>>>>>> consolidated-work
       item.reason?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesTab && matchesSearch;
   }) || [];
@@ -231,14 +389,25 @@ function RequestsView() {
               transition={{ duration: 0.2 }}
             >
               {viewMode === "calendar" ? (
-                <div className="rounded-xl border border-border bg-card p-8 text-center text-muted-foreground">
-                  Calendar view coming soon
-                </div>
+                <CalendarView
+                  requests={filteredRequests}
+                  onSelectRequest={(request) => {
+                    setSelectedLeave(request);
+                    setIsModalOpen(true);
+                  }}
+                />
               ) : (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   <AnimatePresence mode="popLayout">
                     {filteredRequests.map((request: any) => (
-                      <LeaveRequestCard key={request.id} request={request} />
+                      <LeaveRequestCard
+                        key={request.id}
+                        request={request}
+                        onClick={() => {
+                          setSelectedLeave(request);
+                          setIsModalOpen(true);
+                        }}
+                      />
                     ))}
                   </AnimatePresence>
                 </div>
@@ -247,6 +416,13 @@ function RequestsView() {
           </AnimatePresence>
         )}
       </div>
+
+      {/* Leave Details Modal */}
+      <LeaveDetailsModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        leave={selectedLeave}
+      />
     </div>
   );
 }
@@ -257,11 +433,21 @@ export function MyLeavesPageContent() {
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">Leaves</h1>
         <p className="text-muted-foreground">
+<<<<<<< HEAD
           Manage your leave requests and track their status.
         </p>
       </div>
 
       <RequestsView />
+=======
+          View and manage your leave requests.
+        </p>
+      </div>
+
+      <div className="space-y-6">
+        <RequestsView />
+      </div>
+>>>>>>> consolidated-work
     </div>
   );
 }

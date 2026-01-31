@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Role } from "@prisma/client";
+import { Role } from "@/lib/enums";
 
 /**
  * Approval Chain Step Interface
@@ -280,10 +280,10 @@ export function ApprovalList({
                                   step.status === "approved"
                                     ? "bg-green-100 border-green-500 dark:bg-green-950 dark:border-green-600"
                                     : step.status === "current"
-                                    ? "bg-blue-100 border-blue-500 dark:bg-blue-950 dark:border-blue-600"
-                                    : step.status === "rejected"
-                                    ? "bg-red-100 border-red-500 dark:bg-red-950 dark:border-red-600"
-                                    : "bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
+                                      ? "bg-blue-100 border-blue-500 dark:bg-blue-950 dark:border-blue-600"
+                                      : step.status === "rejected"
+                                        ? "bg-red-100 border-red-500 dark:bg-red-950 dark:border-red-600"
+                                        : "bg-gray-100 border-gray-300 dark:bg-gray-800 dark:border-gray-600"
                                 )}
                               >
                                 {step.status === "approved" ? (
@@ -359,11 +359,11 @@ export function ApprovalList({
                                       className={cn(
                                         "text-xs",
                                         step.status === "approved" &&
-                                          "border-green-300 dark:border-green-700 text-green-700 dark:text-green-300",
+                                        "border-green-300 dark:border-green-700 text-green-700 dark:text-green-300",
                                         step.status === "current" &&
-                                          "border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300",
+                                        "border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300",
                                         step.status === "pending" &&
-                                          "border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300"
+                                        "border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300"
                                       )}
                                     >
                                       {step.status}

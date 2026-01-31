@@ -9,15 +9,17 @@ import {
   type ApprovalAction,
 } from "@/lib/workflow";
 import type { AppRole } from "@/lib/rbac";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/src/generated/prisma/client";
 import { z } from "zod";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
-import { calculateMLConversion, formatConversionBreakdown } from "@/lib/medical-leave-conversion";
-import { calculateCLConversion, formatCLConversionBreakdown } from "@/lib/casual-leave-conversion";
-import { fetchHolidaysInRange } from "@/lib/leave-validation";
-import { countWorkingDays } from "@/lib/working-days";
-import { deductBalance, deductMultipleBalances } from "@/lib/balance-manager";
+import { calculateMLConversion, formatConversionBreakdown } from "@/lib/leaves/medical-leave-conversion";
+import { calculateCLConversion, formatCLConversionBreakdown } from "@/lib/leaves/casual-leave-conversion";
+import { fetchHolidaysInRange } from "@/lib/leaves/leave-validation";
+import { countWorkingDays } from "@/lib/leaves/working-days";
+import { deductBalance, deductMultipleBalances } from "@/lib/leaves/balance-manager";
+import { notifyLeaveApproved, notifyLeaveCancelled } from "@/lib/webhooks/events";
+import { calendarService } from "@/lib/integrations/calendar/service";
 
 export const cache = "no-store";
 
@@ -496,6 +498,50 @@ export async function POST(
       },
     },
   });
+
+    // Trigger webhook notification
+  if (isCancellationRequest) {
+    // Cancellation approved = Leave is now CANCELLED
+    await notifyLeaveCancelled({
+      leaveId: leave.id,
+      employeeId: leave.requesterId,
+      employeeName: leave.requester.email.split('@')[0],
+      leaveType: leave.type,
+      startDate: leave.startDate,
+      endDate: leave.endDate,
+      cancelledAt: new Date(),
+    });
+
+    // Remove from calendar
+    try {
+      await calendarService.removeLeaveFromCalendar(leave.id);
+    } catch (e) {
+      console.error("Failed to remove leave from calendar:", e);
+    }
+  } else {
+    // Regular leave approval
+    await notifyLeaveApproved({
+      leaveId: leave.id,
+      employeeId: leave.requesterId,
+      employeeName: leave.requester.email.split('@')[0],
+      employeeEmail: leave.requester.email,
+      leaveType: leave.type,
+      startDate: leave.startDate,
+      endDate: leave.endDate,
+      workingDays: leave.workingDays,
+      approvedBy: user.id,
+      approverName: user.name,
+      approverRole: userRole,
+      approvedAt: new Date(),
+    });
+
+    // Sync to calendar
+    try {
+      await calendarService.syncLeaveToCalendar(leave.id);
+    } catch (e) {
+      console.error("Failed to sync leave to calendar:", e);
+    }
+  }
 
   return NextResponse.json({
     ok: true,

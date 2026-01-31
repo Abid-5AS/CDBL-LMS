@@ -77,6 +77,15 @@ export {
   TableCell,
   TableCaption,
 } from "./table";
+export { ModernTable } from "./modern-table";
+export {
+  Table as EnhancedTable,
+  TableHeader as EnhancedTableHeader,
+  TableBody as EnhancedTableBody,
+  TableHead as EnhancedTableHead,
+  TableRow as EnhancedTableRow,
+  TableCell as EnhancedTableCell,
+} from "./table";
 
 export { Calendar } from "./calendar";
 export {
@@ -157,7 +166,7 @@ export {
 export { SegmentedControl } from "./segmented-control";
 export { Switch } from "./switch";
 
-export { default as LiquidGlassWrapper } from "./LiquidGlassWrapper";
+
 export { MultiStepWizard, useMultiStepWizard } from "./multi-step-wizard";
 export { EnhancedDatePicker } from "./enhanced-date-picker";
 export { DragDropUpload } from "./drag-drop-upload";
@@ -193,6 +202,6 @@ export { SmartInput, validationRules } from "./smart-input";
 
 export { default as SmoothTab } from "../kokonutui/smooth-tab";
 export { default as EnhancedSmoothTab } from "./enhanced-smooth-tab";
-export { EmptyState } from "./empty-state";
+
 export { StatusChip } from "./status-chip";
 export { RechartsGlassTooltip } from "./recharts-glass-tooltip";

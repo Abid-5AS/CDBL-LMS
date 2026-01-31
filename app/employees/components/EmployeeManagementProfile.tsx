@@ -69,13 +69,13 @@ const getRoleBadgeVariant = (role: AppRole) => {
     case "CEO":
       return "bg-card-summary/10 text-card-summary border-card-summary/20";
     case "HR_HEAD":
-      return "bg-data-info/10 text-data-info border-data-info/20";
+      return "bg-info dark:bg-info/80/10 text-info dark:text-info/90 border-info/20";
     case "HR_ADMIN":
-      return "bg-data-info/10 text-data-info border-data-info/20";
+      return "bg-info dark:bg-info/80/10 text-info dark:text-info/90 border-info/20";
     case "DEPT_HEAD":
-      return "bg-data-success/10 text-data-success border-data-success/20";
+      return "bg-success dark:bg-success/80/10 text-success dark:text-success/90 border-success/20";
     case "EMPLOYEE":
-      return "bg-bg-secondary text-text-secondary border-border-strong";
+      return "bg-muted dark:bg-muted/80 text-muted-foreground dark:text-muted-foreground/80 border-border dark:border-border/50";
   }
 };
 
@@ -148,10 +148,10 @@ export function EmployeeManagementProfile({
       historyFilter === "ALL"
         ? normalizedHistory
         : normalizedHistory.filter((entry) => {
-            const config = HISTORY_FILTERS.find((f) => f.value === historyFilter);
-            if (!config?.statuses) return true;
-            return config.statuses.includes(entry.status);
-          });
+          const config = HISTORY_FILTERS.find((f) => f.value === historyFilter);
+          if (!config?.statuses) return true;
+          return config.statuses.includes(entry.status);
+        });
     return SortedTimelineAdapter(subset);
   }, [historyFilter, normalizedHistory]);
 
@@ -218,9 +218,9 @@ export function EmployeeManagementProfile({
       label: "Next leave",
       value: nextLeave
         ? `${format(parseISO(nextLeave.startDate), "MMM d")} → ${format(
-            parseISO(nextLeave.endDate),
-            "MMM d"
-          )}`
+          parseISO(nextLeave.endDate),
+          "MMM d"
+        )}`
         : "No leave scheduled",
       helper: nextLeave ? `${nextLeave.type} • ${nextLeave.workingDays} days` : "Stay ready",
       icon: Calendar,
@@ -286,76 +286,97 @@ export function EmployeeManagementProfile({
       </BreadcrumbList>
 
       {/* Overview */}
-      <section className="surface-card p-6 space-y-6">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center">
-          <div className="flex flex-1 items-center gap-4">
-            <Avatar className="h-16 w-16 bg-muted">
-              <AvatarFallback className="text-lg font-semibold">
-                {employee.name
-                  .split(" ")
-                  .map((part) => part.charAt(0))
-                  .slice(0, 2)
-                  .join("")}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-2xl font-semibold text-foreground">
-                  {employee.name}
-                </h1>
-                <Badge className={getRoleBadgeVariant(employee.role as AppRole)}>
-                  {roleLabel(employee.role)}
-                </Badge>
-              </div>
-              <p className="text-sm text-muted-foreground">{employee.email}</p>
-              <div className="mt-3 flex items-center gap-3 text-sm text-muted-foreground">
-                <span className="inline-flex items-center gap-1">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                  {employee.employmentStatus ?? "Active"}
-                </span>
-                {employee.department && (
-                  <span className="inline-flex items-center gap-1">
-                    <Briefcase className="h-4 w-4" />
-                    {employee.department}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-          {canEdit && (
-            <div className="flex flex-wrap gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => router.push(`/employees/${employee.id}?edit=true`)}
-              >
-                <Pencil className="mr-2 h-4 w-4" />
-                Edit profile
-              </Button>
-              <Button variant="outline" size="sm" disabled>
-                <Ban className="mr-2 h-4 w-4" />
-                Deactivate
-              </Button>
-            </div>
-          )}
-        </div>
+      {/* Overview */}
+      <section className="relative overflow-hidden rounded-xl border border-border/50 bg-card shadow-sm transition-all hover:shadow-md">
+        <div className="absolute inset-0 h-32 bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-purple-600/10 dark:from-blue-900/20 dark:via-indigo-900/20 dark:to-purple-900/20" />
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          {quickMetrics.map((metric) => (
-            <div
-              key={metric.label}
-              className="rounded-xl border border-border/60 bg-background/60 p-4"
-            >
-              <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-                <metric.icon className="h-4 w-4" />
-                {metric.label}
+        <div className="relative px-6 pt-12 pb-6">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end">
+            <div className="flex flex-1 items-end gap-6">
+              <Avatar className="h-24 w-24 border-4 border-card shadow-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
+                <AvatarFallback className="text-3xl font-bold bg-transparent">
+                  {employee.name
+                    .split(" ")
+                    .map((part) => part.charAt(0))
+                    .slice(0, 2)
+                    .join("")}
+                </AvatarFallback>
+              </Avatar>
+
+              <div className="mb-1 space-y-1">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl font-bold text-foreground tracking-tight">
+                    {employee.name}
+                  </h1>
+                  <Badge className={cn("px-2.5 py-0.5 text-xs font-semibold shadow-none", getRoleBadgeVariant(employee.role as AppRole))}>
+                    {roleLabel(employee.role)}
+                  </Badge>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-primary/70" />
+                    <span>{employee.email}</span>
+                  </div>
+                  {employee.department && (
+                    <div className="flex items-center gap-2">
+                      <Briefcase className="h-4 w-4 text-primary/70" />
+                      <span>{employee.department}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <span className={cn("flex h-2.5 w-2.5 rounded-full ring-2 ring-card",
+                      employee.employmentStatus === "Terminated" ? "bg-red-500" : "bg-emerald-500"
+                    )} />
+                    <span className="font-medium text-foreground/80">{employee.employmentStatus ?? "Active"}</span>
+                  </div>
+                </div>
               </div>
-              <p className="mt-2 text-xl font-semibold text-foreground">
-                {metric.value}
-              </p>
-              <p className="text-sm text-muted-foreground">{metric.helper}</p>
             </div>
-          ))}
+            {canEdit && (
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.push(`/employees/${employee.id}?edit=true`)}
+                >
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edit profile
+                </Button>
+                <Button variant="outline" size="sm" disabled>
+                  <Ban className="mr-2 h-4 w-4" />
+                  Deactivate
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3 mt-8">
+            {quickMetrics.map((metric, i) => (
+              <div
+                key={metric.label}
+                className="group relative overflow-hidden rounded-lg border border-border/50 bg-background/50 p-4 hover:bg-background hover:shadow-sm transition-all"
+              >
+                <div className={cn("absolute right-0 top-0 p-3 opacity-10 transition-opacity group-hover:opacity-20",
+                  i === 0 ? "text-blue-500" : i === 1 ? "text-emerald-500" : "text-amber-500"
+                )}>
+                  <metric.icon className="h-12 w-12 rotate-[-15deg] transform" />
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    {metric.label}
+                  </p>
+                  <p className="text-2xl font-bold tracking-tight text-foreground">
+                    {metric.value}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground font-medium">
+                    {metric.helper}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

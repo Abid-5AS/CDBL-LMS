@@ -14,10 +14,10 @@ import {
 } from "@/components/ui/breadcrumb";
 import { AlertCircle, RotateCcw, Edit, Calendar, FileText, User, Clock, Upload, Bell, Plus, Minus } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import Link from "next/link";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { LeaveRequest, LeaveComment, Approval } from "@prisma/client";
+import type { LeaveRequest, LeaveComment, Approval } from "@/src/generated/prisma/client";
 import { FitnessCertificateModal } from "@/components/leaves/FitnessCertificateModal";
 import { DutyReturnFlow } from "@/components/leaves/DutyReturnFlow";
 import { ConversionDisplay, type ConversionDetails } from "@/components/leaves/ConversionDisplay";
@@ -127,36 +127,36 @@ export function LeaveDetailsContent({ leave, comments, currentUserId, currentUse
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {/* Breadcrumbs */}
         <BreadcrumbList className="mb-6">
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/leaves">My Leaves</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Leave Details</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/leaves">My Leaves</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Leave Details</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
 
         {/* Returned Banner */}
         {isReturned && returnComment && (
-          <Card className="mb-6 rounded-2xl border-data-warning bg-data-warning/30 dark:bg-data-warning/10 shadow-sm">
+          <Card className="mb-6 rounded-2xl border-warning bg-warning/30 dark:bg-warning/10 shadow-sm">
             <CardContent className="pt-6">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
-                  <div className="rounded-full bg-data-warning dark:bg-data-warning/30 p-3">
-                    <RotateCcw className="h-6 w-6 text-data-warning dark:text-data-warning" />
+                  <div className="rounded-full bg-warning dark:bg-warning/80 p-3">
+                    <RotateCcw className="h-6 w-6 text-white dark:text-white" />
                   </div>
                 </div>
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-data-warning dark:text-data-warning">
+                    <h3 className="text-lg font-semibold text-warning dark:text-warning/90">
                       Request Returned for Modification
                     </h3>
                     {isRequester && (
@@ -168,14 +168,14 @@ export function LeaveDetailsContent({ leave, comments, currentUserId, currentUse
                       </Button>
                     )}
                   </div>
-                  <div className="rounded-lg bg-bg-primary dark:bg-card border border-data-warning dark:border-data-warning p-4">
-                    <p className="text-sm font-medium text-data-warning dark:text-data-warning mb-2">
+                  <div className="rounded-lg bg-card dark:bg-card/90 border border-warning dark:border-warning/50 p-4">
+                    <p className="text-sm font-medium text-warning dark:text-warning/90 mb-2">
                       Returned by {returnComment.authorName} ({returnComment.authorRole})
                     </p>
-                    <p className="text-sm text-data-warning dark:text-data-warning mb-2">
+                    <p className="text-sm text-warning dark:text-warning/90 mb-2">
                       {returnComment.comment}
                     </p>
-                    <p className="text-xs text-data-warning dark:text-data-warning">
+                    <p className="text-xs text-warning dark:text-warning/90">
                       On {formatDate(returnComment.createdAt)}
                     </p>
                   </div>
@@ -322,12 +322,11 @@ export function LeaveDetailsContent({ leave, comments, currentUserId, currentUse
                     {leave.approvals.map((approval, index) => (
                       <div key={approval.id} className="flex items-start gap-4">
                         <div className="flex-shrink-0">
-                          <div className={`w-2 h-2 rounded-full mt-2 ${
-                            approval.decision === "APPROVED" ? "bg-data-success" :
-                            approval.decision === "REJECTED" ? "bg-data-error" :
-                            approval.decision === "FORWARDED" ? "bg-data-info" :
-                            "bg-bg-secondary"
-                          }`} />
+                          <div className={`w-2 h-2 rounded-full mt-2 ${approval.decision === "APPROVED" ? "bg-success dark:bg-success/80" :
+                              approval.decision === "REJECTED" ? "bg-danger dark:bg-danger/80" :
+                                approval.decision === "FORWARDED" ? "bg-info dark:bg-info/80" :
+                                  "bg-muted dark:bg-muted/80"
+                            }`} />
                           {index < leave.approvals.length - 1 && (
                             <div className="w-0.5 h-8 bg-muted ml-1" />
                           )}

@@ -1,6 +1,9 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
+/**
+ * @deprecated Use <Card variant="glass"> instead.
+ */
 const GlassCard = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & {

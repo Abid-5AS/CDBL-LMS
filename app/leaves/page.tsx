@@ -13,8 +13,9 @@ async function MyLeavesPageWrapper() {
   const role = await getUserRole();
   const userData = { name: user.name, email: user.email };
 
-  // Only employees use unified layout for this page
-  if (role !== "EMPLOYEE") {
+  // Allow all roles to view their leave history EXCEPT CEO and SYSTEM_ADMIN
+  const restrictedRoles = ["CEO", "SYSTEM_ADMIN"];
+  if (restrictedRoles.includes(role || "")) {
     redirect("/dashboard");
   }
 

@@ -4,7 +4,7 @@
 
 import * as React from "react";
 import { formatDate } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import {
   getCurrentApprovalStage,
   getDaysWaiting,

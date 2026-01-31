@@ -60,8 +60,8 @@ export function LogsPanel({ logs }: LogsPanelProps) {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-xl font-semibold text-text-secondary">Audit Log</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-xl font-semibold text-foreground dark:text-foreground/95">Audit Log</h2>
+        <p className="text-sm text-muted-foreground dark:text-muted-foreground/80">
           Recent administrative actions are captured for compliance.
         </p>
       </div>
@@ -107,26 +107,26 @@ export function LogsPanel({ logs }: LogsPanelProps) {
         <Card>
           <CardContent className="p-0">
             <div className="max-h-[460px] overflow-auto">
-              <ul className="divide-y divide-slate-100 text-sm">
+              <ul className="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
                 {filteredLogs.map((log) => (
                   <li
                     key={log.id}
-                    className="flex flex-col gap-1 px-4 py-3 hover:bg-bg-secondary transition-colors"
+                    className="flex flex-col gap-1 px-4 py-3 hover:bg-muted/50 dark:hover:bg-muted/30 transition-colors duration-100"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-text-secondary">
+                      <span className="font-medium text-foreground dark:text-foreground/90">
                         {log.action.replace(/_/g, " ")}
                       </span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-muted-foreground dark:text-muted-foreground/80">
                         {new Date(log.createdAt).toLocaleString()}
                       </span>
                     </div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-xs text-muted-foreground dark:text-muted-foreground/80">
                       Actor: {log.actorEmail}
                       {log.targetEmail ? ` • Target: ${log.targetEmail}` : null}
                     </div>
                     {log.details ? (
-                      <pre className="whitespace-pre-wrap rounded bg-bg-secondary p-2 text-xs text-text-secondary mt-1">
+                      <pre className="whitespace-pre-wrap rounded bg-secondary dark:bg-secondary/80 p-2 text-xs text-foreground dark:text-foreground/90 border border-border dark:border-border/30 mt-1">
                         {JSON.stringify(log.details, null, 2)}
                       </pre>
                     ) : null}

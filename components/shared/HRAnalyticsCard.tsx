@@ -110,8 +110,8 @@ const AnalyticsCircle = ({ data, index }: AnalyticsCircleProps) => {
           <span
             className={cn(
               "mt-1 text-xs font-semibold",
-              data.trend === "up" && "text-data-success",
-              data.trend === "down" && "text-data-error",
+              data.trend === "up" && "text-success dark:text-success/90",
+              data.trend === "down" && "text-danger dark:text-danger/90",
               data.trend === "stable" && "text-muted-foreground"
             )}
           >
@@ -228,10 +228,10 @@ export function HRAnalyticsCard({
             className={cn(
               "text-xs font-semibold px-3 py-1 rounded-full",
               overallEfficiency >= 80
-                ? "text-data-success"
+                ? "text-success dark:text-success/90"
                 : overallEfficiency >= 60
-                ? "text-data-warning"
-                : "text-data-error"
+                ? "text-warning dark:text-warning/90"
+                : "text-danger dark:text-danger/90"
             )}
           >
             {overallEfficiency >= 80

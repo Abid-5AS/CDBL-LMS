@@ -3,7 +3,7 @@
 import { motion, type Variants } from "framer-motion";
 import { Calendar, Star, Clock, ChevronRight, MoreVertical, Trash2 } from "lucide-react";
 import { useState } from "react";
-import type { Role } from "@prisma/client";
+import { Role } from "@/lib/enums";
 import { Badge } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import {
@@ -104,8 +104,8 @@ function HolidayListItem({
             isPast
               ? "bg-slate-500/10"
               : !holiday.isOptional
-              ? "bg-red-500/10"
-              : "bg-blue-500/10"
+                ? "bg-red-500/10"
+                : "bg-blue-500/10"
           )}>
             <Calendar
               className={cn(
@@ -113,8 +113,8 @@ function HolidayListItem({
                 isPast
                   ? "text-slate-600 dark:text-slate-400"
                   : !holiday.isOptional
-                  ? "text-red-600 dark:text-red-400"
-                  : "text-blue-600 dark:text-blue-400"
+                    ? "text-red-600 dark:text-red-400"
+                    : "text-blue-600 dark:text-blue-400"
               )}
               aria-hidden="true"
             />
@@ -155,7 +155,7 @@ function HolidayListItem({
               {!isPast && daysUntil > 0 && (
                 <>
                   <span>•</span>
-                  <span className="text-data-warning">
+                  <span className="text-warning dark:text-warning/90">
                     {daysUntil === 1 ? "Tomorrow" : `In ${daysUntil} days`}
                   </span>
                 </>
@@ -175,7 +175,7 @@ function HolidayListItem({
           {!isPast && !isToday && daysUntil <= 7 && daysUntil > 0 && (
             <Badge
               variant="default"
-              className="text-xs bg-data-warning/90 text-white"
+              className="text-xs bg-warning dark:bg-warning/80/90 text-white"
             >
               <Clock className="size-3 mr-1" aria-hidden="true" />
               {daysUntil}d

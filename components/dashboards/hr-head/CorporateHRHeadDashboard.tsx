@@ -35,6 +35,7 @@ import { formatDate } from "@/lib/utils";
 // Corporate components
 import { MetricCard } from "@/components/corporate/MetricCard";
 import { getDensityClasses, getTypography } from "@/lib/ui/density-modes";
+import { DemoIndicator } from "@/components/ui/demo-indicator";
 
 // Shared chart components (with corporate styling)
 import { AnalyticsBarChart } from "@/components/dashboards/shared/AnalyticsChart";
@@ -43,8 +44,8 @@ import { AnalyticsBarChart } from "@/components/dashboards/shared/AnalyticsChart
 import {
   PendingApprovals as PendingLeaveRequestsTable,
   CancellationRequests as CancellationRequestsPanel,
-  ReturnedRequests as ReturnedRequestsPanel,
-} from "@/components/dashboards";
+} from "@/components/dashboards/hr-admin/sections";
+import { ReturnedRequests as ReturnedRequestsPanel } from "@/components/dashboards/hr-head/sections";
 import { DashboardCardSkeleton } from "@/app/dashboard/shared/LoadingFallback";
 
 interface HRHeadStats {
@@ -303,9 +304,9 @@ export function CorporateHRHeadDashboard() {
                   trend={
                     stats && stats.pending > 10
                       ? {
-                          value: `+${stats.pending - 10}`,
-                          direction: "up",
-                        }
+                        value: `+${stats.pending - 10}`,
+                        direction: "up",
+                      }
                       : undefined
                   }
                   onClick={() =>
@@ -388,9 +389,9 @@ export function CorporateHRHeadDashboard() {
                   trend={
                     stats && stats.returned > 0
                       ? {
-                          value: `${stats.returned}`,
-                          direction: "neutral",
-                        }
+                        value: `${stats.returned}`,
+                        direction: "neutral",
+                      }
                       : undefined
                   }
                 />
@@ -426,11 +427,10 @@ export function CorporateHRHeadDashboard() {
                     </div>
                   }
                   value={stats?.upcoming || 0}
-                  subtitle={`Next 7 days (${
-                    stats?.totalEmployees
+                  subtitle={`Next 7 days (${stats?.totalEmployees
                       ? Math.round(((stats?.upcoming || 0) / stats.totalEmployees) * 100)
                       : 0
-                  }%)`}
+                    }%)`}
                   icon={Calendar}
                   density={density}
                   onClick={() => (window.location.href = "/calendar")}
@@ -573,9 +573,9 @@ export function CorporateHRHeadDashboard() {
                   trend={
                     stats && stats.newHires > 0
                       ? {
-                          value: `${stats.newHires}`,
-                          direction: "up",
-                        }
+                        value: `${stats.newHires}`,
+                        direction: "up",
+                      }
                       : undefined
                   }
                 />
@@ -610,22 +610,27 @@ export function CorporateHRHeadDashboard() {
                       </Tooltip>
                     </div>
                   }
-                  value={`${stats?.complianceScore || 0}%`}
+                  value={
+                    <div className="flex items-center gap-2">
+                      {`${stats?.complianceScore || 0}%`}
+                      <DemoIndicator />
+                    </div>
+                  }
                   subtitle="On-time processing rate"
                   icon={CheckCircle2}
                   density={density}
                   trend={
                     stats && stats.complianceScore >= 90
                       ? {
-                          value: `+${stats.complianceScore - 90}%`,
-                          direction: "up",
-                        }
+                        value: `+${stats.complianceScore - 90}%`,
+                        direction: "up",
+                      }
                       : stats && stats.complianceScore > 0
-                      ? {
+                        ? {
                           value: `-${90 - stats.complianceScore}%`,
                           direction: "down",
                         }
-                      : undefined
+                        : undefined
                   }
                 />
               </div>
@@ -657,7 +662,7 @@ export function CorporateHRHeadDashboard() {
                   </CardHeader>
                   <CardContent>
                     <Suspense fallback={<DashboardCardSkeleton />}>
-                      <PendingLeaveRequestsTable />
+                      <PendingLeaveRequestsTable hideHeader={true} />
                     </Suspense>
                   </CardContent>
                 </Card>
@@ -819,6 +824,7 @@ function InsightsPanel({
       <CardContent className="space-y-3">
         {isLoading
           ? Array.from({ length: 3 }).map((_, idx) => (
+<<<<<<< HEAD
               <div key={idx} className="h-14 rounded-md bg-muted animate-pulse" />
             ))
           : items.map((item) => (
@@ -828,6 +834,17 @@ function InsightsPanel({
                 <p className="text-xs text-slate-500">{item.helper}</p>
               </div>
             ))}
+=======
+            <div key={idx} className="h-14 rounded-md bg-slate-100 animate-pulse" />
+          ))
+          : items.map((item) => (
+            <div key={item.label} className="rounded-md border border-slate-200 px-3 py-2">
+              <p className="text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
+              <p className="text-lg font-semibold text-slate-900">{item.value}</p>
+              <p className="text-xs text-slate-500">{item.helper}</p>
+            </div>
+          ))}
+>>>>>>> consolidated-work
       </CardContent>
     </Card>
   );
@@ -864,17 +881,22 @@ function AlertsPanel({
       <CardContent className="space-y-3">
         {isLoading
           ? Array.from({ length: 2 }).map((_, idx) => (
+<<<<<<< HEAD
               <div key={idx} className="h-16 rounded-md bg-muted animate-pulse" />
             ))
+=======
+            <div key={idx} className="h-16 rounded-md bg-slate-100 animate-pulse" />
+          ))
+>>>>>>> consolidated-work
           : alerts.map((alert, idx) => (
-              <div
-                key={`${alert.title}-${idx}`}
-                className={`rounded-md border px-3 py-2 text-sm ${toneClasses[alert.tone]}`}
-              >
-                <p className="font-semibold">{alert.title}</p>
-                <p className="text-xs opacity-80">{alert.detail}</p>
-              </div>
-            ))}
+            <div
+              key={`${alert.title}-${idx}`}
+              className={`rounded-md border px-3 py-2 text-sm ${toneClasses[alert.tone]}`}
+            >
+              <p className="font-semibold">{alert.title}</p>
+              <p className="text-xs opacity-80">{alert.detail}</p>
+            </div>
+          ))}
       </CardContent>
     </Card>
   );

@@ -54,6 +54,9 @@ next-env.d.ts
 *.log
 **/logs/
 
+# test artifacts
+test-output*.txt
+
 # custom
 /lib/generated/prisma
 
@@ -94,3 +97,6 @@ $RECYCLE.BIN/
 .cursor/
 .serena/
 .todo/
+
+*storybook.log
+storybook-static

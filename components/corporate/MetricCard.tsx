@@ -6,7 +6,7 @@ import { metricCard, getTypography } from "@/lib/ui/density-modes";
 
 interface MetricCardProps {
   label: string | React.ReactNode;
-  value: string | number;
+  value: string | number | React.ReactNode;
   subtitle?: string;
   trend?: {
     value: string;
@@ -23,6 +23,7 @@ interface MetricCardProps {
  * Theme-aware component for KPIs and statistics
  *
  * Design: Clean card with bold numbers, theme-compatible colors
+ * @deprecated Use components/cards/KPICard instead
  */
 export function MetricCard({
   label,
@@ -48,19 +49,23 @@ export function MetricCard({
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className={cn(typography.label, "text-muted-foreground")}>{label}</div>
+<<<<<<< HEAD
           <p className={cn(typography.kpiNumber, "mt-2 text-foreground")}>{value}</p>
+=======
+          <div className={cn(typography.kpiNumber, "mt-2 text-foreground")}>{value}</div>
+>>>>>>> consolidated-work
           {subtitle && (
-            <p className={cn(typography.body, "mt-1 text-muted-foreground")}>
+            <div className={cn(typography.body, "mt-1 text-muted-foreground")}>
               {subtitle}
-            </p>
+            </div>
           )}
           {trend && (
             <div className="mt-2 flex items-center gap-1">
               <span
                 className={cn(
                   "text-xs font-medium",
-                  trend.direction === "up" && "text-data-success",
-                  trend.direction === "down" && "text-data-error",
+                  trend.direction === "up" && "text-success dark:text-success/90",
+                  trend.direction === "down" && "text-danger dark:text-danger/90",
                   trend.direction === "neutral" && "text-muted-foreground"
                 )}
               >

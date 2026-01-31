@@ -10,7 +10,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { RotateCcw, FileEdit } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import Link from "next/link";
 import { StatusBadge, EmptyState } from "@/components/shared";
 import useSWR from "swr";
@@ -58,7 +58,7 @@ export function ReturnedRequestsPanel() {
   if (error) {
     return (
       <GlassCard variant="hover">
-        <GlassCardContent className="py-12 text-center text-sm text-data-error">
+        <GlassCardContent className="py-12 text-center text-sm text-danger dark:text-danger/90">
           Failed to load returned requests
         </GlassCardContent>
       </GlassCard>
@@ -93,7 +93,7 @@ export function ReturnedRequestsPanel() {
     <GlassCard variant="hover">
       <GlassCardHeader>
         <GlassCardTitle className="flex items-center gap-2">
-          <RotateCcw className="h-5 w-5 text-data-info" />
+          <RotateCcw className="h-5 w-5 text-info dark:text-info/90" />
           Returned for Modification ({returnedRequests.length})
         </GlassCardTitle>
       </GlassCardHeader>
@@ -117,7 +117,7 @@ export function ReturnedRequestsPanel() {
                   <TableCell>
                     <Link
                       href={`/employees/${leave.requester.id}`}
-                      className="text-data-info hover:underline font-medium"
+                      className="text-info dark:text-info/90 hover:underline font-medium"
                     >
                       {leave.requester.name}
                     </Link>
@@ -128,10 +128,10 @@ export function ReturnedRequestsPanel() {
                   <TableCell className="font-medium">
                     {leaveTypeLabel[leave.type] ?? leave.type}
                   </TableCell>
-                  <TableCell className="hidden sm:table-cell text-text-secondary">
+                  <TableCell className="hidden sm:table-cell text-muted-foreground dark:text-muted-foreground/80">
                     {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell text-text-secondary">
+                  <TableCell className="hidden md:table-cell text-muted-foreground dark:text-muted-foreground/80">
                     {leave.workingDays}
                   </TableCell>
                   <TableCell>

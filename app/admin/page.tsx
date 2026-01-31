@@ -14,7 +14,7 @@ export default function AdminConsolePage() {
 
 async function AdminConsoleGate() {
   const user = await getCurrentUser();
-  const allowedRoles = ["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"];
+  const allowedRoles = ["SYSTEM_ADMIN"];
   if (!user || !allowedRoles.includes(user.role as string)) {
     redirect("/dashboard");
   }
@@ -68,13 +68,13 @@ async function AdminConsoleGate() {
 function AdminFallback() {
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-border-strong bg-bg-primary p-6 shadow-sm">
-        <div className="h-8 w-64 bg-bg-secondary rounded animate-pulse" />
-        <div className="mt-2 h-4 w-96 bg-bg-secondary rounded animate-pulse" />
+      <section className="rounded-xl border border-border dark:border-border/50 bg-card dark:bg-card/90 p-6 shadow-sm">
+        <div className="h-8 w-64 bg-muted dark:bg-muted/80 rounded animate-pulse" />
+        <div className="mt-2 h-4 w-96 bg-muted dark:bg-muted/80 rounded animate-pulse" />
       </section>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-32 rounded-xl border border-border-strong bg-bg-primary shadow-sm animate-pulse" />
+          <div key={i} className="h-32 rounded-xl border border-border dark:border-border/50 bg-card dark:bg-card/90 shadow-sm animate-pulse" />
         ))}
       </div>
     </div>

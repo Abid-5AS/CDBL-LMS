@@ -4,8 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import { useUser } from "@/lib/user-context";
-import { getNavItemsForRole, type UserRole } from "@/lib/navigation";
+import { useUser } from "@/components/providers";
+import { getNavItemsForRole, type UserRole } from "@/lib/ui/navigation";
 
 export type NavbarState = {
   user: ReturnType<typeof useUser>;
@@ -87,7 +87,11 @@ export function useNavbarState(): NavbarState {
       if (href === "/leaves") {
         return pathname === "/leaves" || pathname.startsWith("/leaves/");
       }
-      
+
+      if (href === "/webhooks") {
+        return pathname === "/webhooks" || pathname.startsWith("/webhooks/");
+      }
+
       return pathname === href || pathname.startsWith(`${href}/`);
     },
     [pathname],

@@ -22,9 +22,9 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { SharedTimeline } from "@/components/shared/SharedTimeline";
 import { SortedTimelineAdapter } from "@/components/shared/timeline-adapters";
 import { getChainFor } from "@/lib/workflow";
-import { type LeaveType } from "@prisma/client";
+import { type LeaveType } from "@/lib/enums";
 import { cn } from "@/lib/utils";
-import { useUIStore } from "@/lib/ui-state";
+import { useUIStore } from "@/lib/ui/ui-state";
 
 type LeaveStatus =
   | "SUBMITTED"
@@ -172,7 +172,7 @@ export function SortedTimeline({ leaves, isLoading }: SortedTimelineProps) {
           </div>
         </CardHeader>
         <CardContent className="p-6">
-          <div className="text-center text-text-secondary dark:text-text-secondary">
+          <div className="text-center text-foreground dark:text-foreground/90">
             No leaves match your filters
           </div>
         </CardContent>
@@ -191,7 +191,7 @@ export function SortedTimeline({ leaves, isLoading }: SortedTimelineProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="text-data-info font-semibold hover:bg-data-info dark:hover:bg-data-info/30 h-7 px-2 text-xs"
+            className="text-info dark:text-info/90 font-semibold hover:bg-info/10 dark:hover:bg-info/30 h-7 px-2 text-xs transition-colors duration-100"
             onClick={() => router.push("/leaves")}
           >
             View All
@@ -202,14 +202,14 @@ export function SortedTimeline({ leaves, isLoading }: SortedTimelineProps) {
         {/* Filters */}
         <div className="flex flex-wrap gap-2">
           {/* Time filter tabs */}
-          <div className="flex gap-1 rounded-lg border border-border-strong dark:border-border-strong p-1">
+          <div className="flex gap-1 rounded-lg border border-border dark:border-border/50 p-1">
             <button
               onClick={() => setTimeFilter("upcoming")}
               className={cn(
-                "px-3 py-1 text-xs rounded-md transition-colors",
+                "px-3 py-1 text-xs rounded-md transition-colors duration-100",
                 timeFilter === "upcoming"
-                  ? "bg-data-info text-text-inverted"
-                  : "text-text-secondary dark:text-text-secondary hover:bg-bg-secondary dark:hover:bg-bg-secondary"
+                  ? "bg-info dark:bg-info/80 text-white dark:text-white"
+                  : "text-foreground dark:text-foreground/90 hover:bg-muted/50 dark:hover:bg-muted/30"
               )}
             >
               Upcoming
@@ -217,10 +217,10 @@ export function SortedTimeline({ leaves, isLoading }: SortedTimelineProps) {
             <button
               onClick={() => setTimeFilter("past")}
               className={cn(
-                "px-3 py-1 text-xs rounded-md transition-colors",
+                "px-3 py-1 text-xs rounded-md transition-colors duration-100",
                 timeFilter === "past"
-                  ? "bg-data-info text-text-inverted"
-                  : "text-text-secondary dark:text-text-secondary hover:bg-bg-secondary dark:hover:bg-bg-secondary"
+                  ? "bg-info dark:bg-info/80 text-white dark:text-white"
+                  : "text-foreground dark:text-foreground/90 hover:bg-muted/50 dark:hover:bg-muted/30"
               )}
             >
               Past
@@ -272,11 +272,11 @@ export function SortedTimeline({ leaves, isLoading }: SortedTimelineProps) {
           />
         </div>
         {sortedLeaves.length > 5 && (
-          <div className="mt-3 pt-3 border-t border-border-strong dark:border-border-strong text-center">
+          <div className="mt-3 pt-3 border-t border-border dark:border-border/50 text-center">
             <Button
               variant="ghost"
               size="sm"
-              className="text-xs"
+              className="text-xs hover:bg-muted/50 dark:hover:bg-muted/30 transition-colors duration-100"
               onClick={() => router.push("/leaves")}
             >
               View {sortedLeaves.length - 5} more

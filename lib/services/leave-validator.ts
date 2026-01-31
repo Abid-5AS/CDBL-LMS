@@ -3,7 +3,7 @@
  * Centralizes all validation logic for leave requests
  */
 
-import { LeaveType } from "@prisma/client";
+import { LeaveType } from "@/src/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   policy,
@@ -18,19 +18,19 @@ import {
   validateSpecialDisabilityIncidentDate,
   calculateSpecialDisabilityPay,
 } from "@/lib/policy";
-import { countWorkingDays } from "@/lib/working-days";
+import { countWorkingDays } from "@/lib/leaves/working-days";
 import { normalizeToDhakaMidnight } from "@/lib/date-utils";
 import {
   violatesCasualLeaveCombination,
   violatesCasualLeaveSideTouch,
   validatePaternityLeaveEligibility,
   validateExtraordinaryLeavePrerequisite,
-} from "@/lib/leave-validation";
+} from "@/lib/leaves/leave-validation";
 import {
   calculateCLConversion,
   getCLConversionWarning,
   formatCLConversionBreakdown,
-} from "@/lib/casual-leave-conversion";
+} from "@/lib/leaves/casual-leave-conversion";
 
 export type ValidationResult = {
   valid: boolean;

@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { GlassCard, GlassCardContent } from "@/components/ui/glass-card";
 import { Badge } from "@/components/ui/badge";
 import { User, Calendar, ChevronRight, X } from "lucide-react";
-import { leaveTypeLabel } from "@/lib/ui";
-import { LeaveType } from "@prisma/client";
+import { leaveTypeLabel } from "@/lib/ui/ui";
+import { LeaveType } from "@/lib/enums";
 import { cn } from "@/lib/utils";
 import {
   Dialog,
@@ -73,7 +73,7 @@ export function TeamStatusSummary() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <div 
+        <div
           className="group cursor-pointer rounded-xl border border-border bg-card p-4 transition-all hover:border-primary/50 hover:shadow-md"
           role="button"
           tabIndex={0}

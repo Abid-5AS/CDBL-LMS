@@ -262,9 +262,9 @@ export function NotificationProvider({
   };
 
   return (
-    <NotificationContext.Provider value={value}>
+    <NotificationContext value={value}>
       {children}
-    </NotificationContext.Provider>
+    </NotificationContext>
   );
 }
 

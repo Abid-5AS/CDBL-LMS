@@ -8,7 +8,7 @@ import { canEditEmployee } from "@/lib/rbac";
 import { Button, Badge } from "@/components/ui";
 import { EmployeeProfileCard } from "./EmployeeProfileCard";
 import { LeaveHistoryTable } from "./LeaveHistoryTable";
-import { ModernHRStatCards } from "@/components/ModernHRStatCards";
+import { ModernHRStatCards } from "@/components/dashboards/shared/ModernHRStatCards";
 import { Pencil } from "lucide-react";
 
 type EmployeeDetailViewProps = {

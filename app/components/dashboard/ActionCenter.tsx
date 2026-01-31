@@ -145,7 +145,7 @@ export function ActionCenter({
           </div>
         ) : actions.length === 0 ? (
           <div className="text-center py-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted/50 mb-3">>
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted/50 mb-3">
               <svg
                 className="w-8 h-8 text-green-600 dark:text-green-400"
                 fill="none"

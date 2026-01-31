@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { getRoleBadgeClasses, getRoleLabel, type AppRole } from "@/lib/ui-utils";
+import { getRoleBadgeClasses, getRoleLabel, type AppRole } from "@/lib/ui/ui-utils";
 import {
   BadgeCheck,
   Briefcase,

@@ -1,4 +1,4 @@
-import type { LeaveType } from "@prisma/client";
+import type { LeaveType } from "@/src/generated/prisma/client";
 
 export type Status = "ALL" | "PENDING" | "FORWARDED" | "RETURNED" | "CANCELLED";
 

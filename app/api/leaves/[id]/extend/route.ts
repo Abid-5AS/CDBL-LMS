@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { LeaveStatus } from "@prisma/client";
+import { LeaveStatus } from "@/src/generated/prisma/client";
 import { z } from "zod";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
 import { normalizeToDhakaMidnight } from "@/lib/date-utils";
-import { countWorkingDays } from "@/lib/working-days";
+import { countWorkingDays } from "@/lib/leaves/working-days";
 import { getChainFor } from "@/lib/workflow";
-import { fetchHolidaysInRange } from "@/lib/leave-validation";
+import { fetchHolidaysInRange } from "@/lib/leaves/leave-validation";
 
 export const cache = "no-store";
 

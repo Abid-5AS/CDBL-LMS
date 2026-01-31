@@ -3,7 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle, AlertTriangle, Shield } from "lucide-react";
-import { Balance, LeaveType } from "@prisma/client";
+import type { Balance } from "@/src/generated/prisma/client";
+import { LeaveType } from "@/lib/enums";
 import { policy } from "@/lib/policy";
 
 type PolicyComplianceCheckProps = {
@@ -46,9 +47,8 @@ export function PolicyComplianceCheck({
     checks.push({
       status: "warning",
       message: "Partial balance available",
-      details: `Only ${availableBalance} days available, ${workingDays} days requested (${
-        workingDays - availableBalance
-      } days short)`,
+      details: `Only ${availableBalance} days available, ${workingDays} days requested (${workingDays - availableBalance
+        } days short)`,
     });
   } else {
     checks.push({
@@ -71,9 +71,8 @@ export function PolicyComplianceCheck({
       checks.push({
         status: "fail",
         message: "Exceeds maximum duration",
-        details: `${workingDays} days requested, max ${maxDays} days allowed (${
-          workingDays - maxDays
-        } days over)`,
+        details: `${workingDays} days requested, max ${maxDays} days allowed (${workingDays - maxDays
+          } days over)`,
       });
     }
   }
@@ -101,7 +100,7 @@ export function PolicyComplianceCheck({
   // Check 5: Advance Notice (simplified check)
   const daysUntilStart = Math.ceil(
     (new Date(startDate).getTime() - new Date().getTime()) /
-      (1000 * 60 * 60 * 24)
+    (1000 * 60 * 60 * 24)
   );
 
   if (leaveType === "CASUAL") {
@@ -146,13 +145,12 @@ export function PolicyComplianceCheck({
 
   return (
     <Card
-      className={`rounded-2xl shadow-sm ${
-        overallStatus === "pass"
+      className={`rounded-2xl shadow-sm ${overallStatus === "pass"
           ? "border-green-500 bg-green-50 dark:bg-green-950/20"
           : overallStatus === "fail"
-          ? "border-red-500 bg-red-50 dark:bg-red-950/20"
-          : "border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20"
-      }`}
+            ? "border-red-500 bg-red-50 dark:bg-red-950/20"
+            : "border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20"
+        }`}
     >
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
@@ -165,15 +163,15 @@ export function PolicyComplianceCheck({
               overallStatus === "pass"
                 ? "default"
                 : overallStatus === "fail"
-                ? "destructive"
-                : "secondary"
+                  ? "destructive"
+                  : "secondary"
             }
             className={
               overallStatus === "pass"
                 ? "bg-green-600"
                 : overallStatus === "fail"
-                ? "bg-red-600"
-                : "bg-yellow-600"
+                  ? "bg-red-600"
+                  : "bg-yellow-600"
             }
           >
             {overallStatus === "pass" && "All Checks Passed"}
@@ -198,25 +196,23 @@ export function PolicyComplianceCheck({
             </div>
             <div className="flex-1">
               <p
-                className={`text-sm font-medium ${
-                  check.status === "pass"
+                className={`text-sm font-medium ${check.status === "pass"
                     ? "text-green-700 dark:text-green-300"
                     : check.status === "fail"
-                    ? "text-red-700 dark:text-red-300"
-                    : "text-yellow-700 dark:text-yellow-300"
-                }`}
+                      ? "text-red-700 dark:text-red-300"
+                      : "text-yellow-700 dark:text-yellow-300"
+                  }`}
               >
                 {check.message}
               </p>
               {check.details && (
                 <p
-                  className={`text-xs mt-1 ${
-                    check.status === "pass"
+                  className={`text-xs mt-1 ${check.status === "pass"
                       ? "text-green-600 dark:text-green-400"
                       : check.status === "fail"
-                      ? "text-red-600 dark:text-red-400"
-                      : "text-yellow-600 dark:text-yellow-400"
-                  }`}
+                        ? "text-red-600 dark:text-red-400"
+                        : "text-yellow-600 dark:text-yellow-400"
+                    }`}
                 >
                   {check.details}
                 </p>

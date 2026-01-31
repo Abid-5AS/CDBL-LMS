@@ -15,8 +15,8 @@ import {
   Building2,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { leaveTypeLabel } from "@/lib/ui";
-import { LeaveType } from "@prisma/client";
+import { leaveTypeLabel } from "@/lib/ui/ui";
+import { LeaveType } from "@/lib/enums";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 
 type TeamImpactCardProps = {
@@ -82,49 +82,51 @@ export function TeamImpactCard({ overlappingLeaves }: TeamImpactCardProps) {
           </div>
         </div>
 
-        {/* Overlapping Leave List */}
+        {/* Overlapping Leave List - Scrollable */}
         <div className="space-y-2">
           <p className="text-xs font-medium text-muted-foreground">
             Overlapping Leave Requests
           </p>
-          {overlappingLeaves.map((leave) => (
-            <div
-              key={leave.id}
-              className="p-3 rounded-lg border border-muted bg-card"
-            >
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">
-                    {leave.requester.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {leave.requester.email}
-                  </p>
+          <div className="max-h-[250px] overflow-y-auto pr-2 space-y-2 thin-scrollbar">
+            {overlappingLeaves.map((leave) => (
+              <div
+                key={leave.id}
+                className="p-3 rounded-lg border border-muted bg-card hover:bg-muted/30 transition-colors"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">
+                      {leave.requester.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {leave.requester.email}
+                    </p>
+                  </div>
+                  <StatusBadge status={leave.status as any} />
                 </div>
-                <StatusBadge status={leave.status} />
-              </div>
 
-              <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">
-                <Badge variant="outline" className="text-xs">
-                  {leaveTypeLabel[leave.type] ?? leave.type}
-                </Badge>
-                {leave.requester.department && (
+                <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">
+                  <Badge variant="outline" className="text-[10px] h-5 px-1.5">
+                    {leaveTypeLabel[leave.type] ?? leave.type}
+                  </Badge>
+                  {leave.requester.department && (
+                    <span className="flex items-center gap-1">
+                      <Building2 className="h-3 w-3" />
+                      {leave.requester.department}
+                    </span>
+                  )}
                   <span className="flex items-center gap-1">
-                    <Building2 className="h-3 w-3" />
-                    {leave.requester.department}
+                    <Calendar className="h-3 w-3" />
+                    {leave.workingDays} days
                   </span>
-                )}
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-3 w-3" />
-                  {leave.workingDays} days
-                </span>
-              </div>
+                </div>
 
-              <div className="mt-2 text-xs text-muted-foreground">
-                {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
+                <div className="mt-2 text-xs text-muted-foreground">
+                  {formatDate(leave.startDate)} → {formatDate(leave.endDate)}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* Impact Summary */}

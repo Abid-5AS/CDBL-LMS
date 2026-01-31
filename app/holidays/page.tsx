@@ -12,8 +12,9 @@ async function HolidaysPageWrapper() {
 
   const role = await getUserRole();
 
-  // Both Employee and HR Admin use unified layout
-  if (role !== "EMPLOYEE" && role !== "HR_ADMIN") {
+  // Allow access for all authenticated employees (including management roles)
+  const allowedRoles = ["EMPLOYEE", "HR_ADMIN", "DEPT_HEAD", "HR_HEAD", "CEO"];
+  if (!allowedRoles.includes(role)) {
     redirect("/dashboard");
   }
 

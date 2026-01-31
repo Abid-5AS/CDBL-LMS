@@ -3,7 +3,20 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Role } from "@/src/generated/prisma/client";
 import { canEditEmployee, canAssignRole, type AppRole } from "@/lib/rbac";
+
+export async function updateEmployeeFromForm(employeeId: number, formData: FormData) {
+  const updates = {
+    name: formData.get("name") as string,
+    email: formData.get("email") as string,
+    department: formData.get("department") as string,
+    role: formData.get("role") as string,
+    empCode: formData.get("empCode") as string,
+  };
+
+  return updateEmployee(employeeId, updates);
+}
 
 export async function updateEmployee(employeeId: number, updates: {
   name?: string;
@@ -57,22 +70,22 @@ export async function updateEmployee(employeeId: number, updates: {
         ...(updates.name && { name: updates.name }),
         ...(updates.email && { email: updates.email }),
         ...(updates.department !== undefined && { department: updates.department }),
-        ...(updates.role && { role: updates.role }),
+        ...(updates.role && { role: updates.role as Role }),
         ...(updates.empCode !== undefined && { empCode: updates.empCode }),
       },
     });
 
     // Calculate changed fields for audit
     const changedFieldsDetails: Record<string, { from: any; to: any }> = {};
-    if (updates.name && updates.name !== originalEmployee.name) 
+    if (updates.name && updates.name !== originalEmployee.name)
       changedFieldsDetails.name = { from: originalEmployee.name, to: updates.name };
-    if (updates.email && updates.email !== originalEmployee.email) 
+    if (updates.email && updates.email !== originalEmployee.email)
       changedFieldsDetails.email = { from: originalEmployee.email, to: updates.email };
-    if (updates.department !== undefined && updates.department !== originalEmployee.department) 
+    if (updates.department !== undefined && updates.department !== originalEmployee.department)
       changedFieldsDetails.department = { from: originalEmployee.department, to: updates.department };
-    if (updates.role && updates.role !== originalEmployee.role) 
+    if (updates.role && updates.role !== originalEmployee.role)
       changedFieldsDetails.role = { from: originalEmployee.role, to: updates.role };
-    if (updates.empCode !== undefined && updates.empCode !== originalEmployee.empCode) 
+    if (updates.empCode !== undefined && updates.empCode !== originalEmployee.empCode)
       changedFieldsDetails.empCode = { from: originalEmployee.empCode, to: updates.empCode };
 
     // Log audit trail with EMPLOYEE_EDIT action and changedFields

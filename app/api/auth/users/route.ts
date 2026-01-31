@@ -33,6 +33,9 @@ export async function GET() {
     where.department = user.department;
   }
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   const users = await prisma.user.findMany({
     where,
     orderBy: { name: "asc" },
@@ -43,6 +46,26 @@ export async function GET() {
       empCode: true,
       department: true,
       role: true,
+      // Fetch profile for phone/avatar info if we add it later
+      profile: {
+        select: {
+          phone: true,
+        }
+      },
+      // Fetch active leaves to determine status
+      leaves: {
+        where: {
+          status: "APPROVED",
+          startDate: { lte: today },
+          endDate: { gte: today },
+        },
+        select: {
+          id: true,
+          type: true,
+          endDate: true,
+        },
+        take: 1, // We only need to know if there IS one
+      },
     },
   });
 

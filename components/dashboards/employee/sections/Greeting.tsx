@@ -3,7 +3,7 @@
 export function DashboardGreeting() {
   return (
     <div className="mb-4">
-      <h1 className="text-xl font-semibold text-text-secondary dark:text-text-secondary">
+      <h1 className="text-xl font-semibold text-muted-foreground dark:text-muted-foreground/80 dark:text-muted-foreground dark:text-muted-foreground/80">
         Your Leave Dashboard
       </h1>
       <p className="text-sm text-muted-foreground mt-1">

@@ -2,37 +2,56 @@
 
 import * as React from "react";
 import { Suspense, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import {
   ClipboardList,
   CheckCircle,
   RotateCcw,
   XCircle,
+  UserCheck,
   RefreshCw,
   Info,
+  Users,
+  Calendar as CalendarIcon,
+  ArrowRight
 } from "lucide-react";
 import {
+  Button,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
   TooltipProvider,
-} from "@/components/ui/tooltip";
+} from "@/components/ui";
 import { cn } from "@/lib/utils";
-import { STATUS_LABELS, METRIC_LABELS } from "@/constants/dashboard-labels";
+import { Role } from "@/lib/enums";
+import { useUser } from "@/lib"; // Correct client-side hook
 
-// Corporate components
-import { MetricCard } from "@/components/corporate/MetricCard";
-import { getDensityClasses, getTypography } from "@/lib/ui/density-modes";
+// Shared UI
+import { RoleBasedDashboard, RoleKPICard } from "../shared/RoleBasedDashboard";
+import {
+  ResponsiveDashboardGrid,
+  DashboardSection,
+} from "../shared/ResponsiveDashboardGrid";
+import { KPIGridSkeleton } from "@/components/shared/skeletons";
 
-// Hooks and utilities
+// Feature Components
+import { DashboardPendingList } from "./components/DashboardPendingList";
+import { TeamAvailability } from "./TeamAvailability";
+
+
+// Hooks
 import { useApiQueryWithParams } from "@/lib/apiClient";
-import { useFilterFromUrl } from "@/lib/url-filters";
 
-// Existing feature components (preserved)
-import { DeptHeadPendingTable } from "./sections/PendingTable";
-import { TeamCoverageCalendar } from "./components/TeamCoverageCalendar";
-import { DeptHeadQuickActions } from "./sections/QuickActions";
-import { SmartAlert } from "@/components/dashboards/shared";
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05, delayChildren: 0.1 },
+  },
+};
 
+<<<<<<< HEAD
 function CardSkeleton() {
   return (
     <div className="border border-border shadow-sm rounded-md p-4 bg-card">
@@ -43,131 +62,79 @@ function CardSkeleton() {
     </div>
   );
 }
+=======
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4 },
+  },
+};
+>>>>>>> consolidated-work
 
-/**
- * Corporate Manager/Dept Head Dashboard
- *
- * Design Philosophy: "Compact" density mode
- * - Manager role needs data-heavy, efficient views
- * - Clean, professional design without animations
- * - Focus on approval queue and team management
- *
- * Features Preserved:
- * ✅ 4 KPI Cards (Pending, Forwarded, Returned, Cancelled) with tooltips
- * ✅ Click-to-scroll on Pending KPI
- * ✅ Approval Queue with ultra-feature-rich PendingTable:
- *    - Search with debounce
- *    - Filters (Status, Type)
- *    - Batch selection & bulk actions
- *    - Individual row actions (Approve/Reject/Forward/Return)
- *    - All action dialogs preserved
- *    - Loading/Error/Empty states
- * ✅ Smart Alerts Panel (dynamic alerts based on queue size)
- * ✅ Team Coverage Calendar
- * ✅ Quick Actions Panel (Team Calendar, Export Report, Delegate)
- * ✅ All tooltips preserved
- * ✅ Refresh functionality
- * ✅ All custom hooks preserved
- *
- * What Changed:
- * ❌ No animations
- * ❌ No gradients
- * ✅ Corporate MetricCard components
- * ✅ Solid white cards with slate borders
- * ✅ Compact density (p-4 cards, text-sm)
- * ✅ Ultra-dense table styling
- */
 export function CorporateManagerDashboard() {
-  const density = "compact"; // Manager uses compact density
-  const densityClasses = getDensityClasses(density);
-  const typography = getTypography(density);
+  const router = useRouter();
+  const user = useUser();
+  const username = user?.name || "Dept. Head";
 
-  const { state } = useFilterFromUrl();
+  // -- Data Fetching --
+  // 1. Pending Counts & List
   const {
-    data: rawData,
-    isLoading,
-    error,
-    mutate,
+    data: pendingData,
+    isLoading: isPendingLoading,
+    mutate: mutatePending,
   } = useApiQueryWithParams<{
-    items: unknown[];
+    rows: any[];
     counts: {
       pending: number;
       forwarded: number;
       returned: number;
       cancelled: number;
     };
-  }>(
-    "/api/manager/pending",
-    {
-      q: state.q,
-      status: state.status,
-      type: state.type === "ALL" ? null : state.type,
-      page: state.page,
-      size: state.pageSize,
-    },
-    {
-      revalidateOnFocus: false,
-    }
-  );
+  }>("/api/manager/pending", {
+    status: "PENDING",
+    page: 1,
+    size: 10 // Fetch top 10 for widgets
+  });
 
-  const counts = rawData?.counts || {
-    pending: 0,
-    forwarded: 0,
-    returned: 0,
-    cancelled: 0,
+  // 2. Team Coverage (Current Month)
+  const [calendarDate, setCalendarDate] = React.useState(new Date());
+  const { data: coverageData, isLoading: isCoverageLoading } = useApiQueryWithParams<{
+    days: Record<string, { count: number }>;
+  }>("/api/team/on-leave", {
+    scope: "department",
+    startDate: new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1).toLocaleDateString("en-CA"),
+    endDate: new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0).toLocaleDateString("en-CA"),
+  });
+
+  // Derived Metrics
+  const counts = pendingData?.counts || { pending: 0, forwarded: 0, returned: 0, cancelled: 0 };
+
+  // Availability Logic (Simplified)
+  const availabilityMetric = useMemo(() => {
+    if (!coverageData?.days) return { value: "--", subtitle: "Calculating..." };
+    const days = Object.values(coverageData.days);
+    if (days.length === 0) return { value: "100%", subtitle: "No absences recorded" };
+    const totalAbsences = days.reduce((acc, day) => acc + day.count, 0);
+    const avgAbsence = (totalAbsences / days.length).toFixed(1);
+    return {
+      value: avgAbsence,
+      subtitle: "Avg. staff on leave/day",
+    };
+  }, [coverageData]);
+
+  const prevMonth = () => setCalendarDate(d => new Date(d.getFullYear(), d.getMonth() - 1, 1));
+  const nextMonth = () => setCalendarDate(d => new Date(d.getFullYear(), d.getMonth() + 1, 1));
+
+  const refreshAll = () => {
+    mutatePending();
+    // mutateCoverage(); // if accessible
   };
-
-  const data =
-    rawData && rawData.items
-      ? {
-          rows: rawData.items as any[],
-          total: rawData.items.length,
-          counts: rawData.counts,
-        }
-      : undefined;
-
-  const alerts = useMemo(() => {
-    const items: Array<{
-      title: string;
-      detail: string;
-      tone: "info" | "warning" | "critical";
-    }> = [];
-
-    if (counts.pending > 15) {
-      items.push({
-        title: "Large Approval Queue",
-        detail: `${counts.pending} requests awaiting review.`,
-        tone: "warning",
-      });
-    } else if (counts.pending > 0) {
-      items.push({
-        title: "Pending Approvals",
-        detail: `${counts.pending} requests awaiting review.`,
-        tone: "info",
-      });
-    }
-
-    if (counts.returned > 5) {
-      items.push({
-        title: "High Return Rate",
-        detail: `${counts.returned} requests sent back to employees.`,
-        tone: "info",
-      });
-    }
-
-    if (items.length === 0) {
-      items.push({
-        title: "All Clear",
-        detail: "No urgent actions required.",
-        tone: "info",
-      });
-    }
-
-    return items;
-  }, [counts]);
 
   return (
     <TooltipProvider>
+<<<<<<< HEAD
       <div className="min-h-screen p-4">
         {/* Corporate Header */}
         <div className="mb-4">
@@ -371,40 +338,154 @@ export function CorporateManagerDashboard() {
                       onMutate={mutate}
                     />
                   </Suspense>
+=======
+      <RoleBasedDashboard
+        role={Role.DEPT_HEAD}
+        animate={true}
+        backgroundVariant="transparent"
+      >
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-6 lg:space-y-8"
+        >
+          {/* -- Header Section -- */}
+          <motion.section variants={itemVariants}>
+            <div className="surface-card p-5 sm:p-6 rounded-3xl border border-border/60 bg-card/60 backdrop-blur-md shadow-sm">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <h1 className="text-2xl font-bold text-foreground tracking-tight">
+                    Overview
+                  </h1>
+                  <p className="text-muted-foreground flex items-center gap-2 text-sm">
+                    {new Date().toLocaleDateString("en-GB", { weekday: 'long', day: 'numeric', month: 'long' })}
+                    <span className="h-1 w-1 rounded-full bg-border" />
+                    Managing {user?.department || "Department"} Team
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={refreshAll}
+                    className="h-9 gap-2"
+                  >
+                    <RefreshCw className="h-3.5 w-3.5" />
+                    Refresh
+                  </Button>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => router.push("/approvals")}
+                    className="h-9 gap-2 bg-[var(--dashboard-accent)] hover:bg-[var(--dashboard-accent)]/90 text-white border-0"
+                  >
+                    Go to Approvals
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+>>>>>>> consolidated-work
                 </div>
               </div>
-
-              {/* Right: Alerts Panel */}
-              <div className="space-y-4">
-                <DeptHeadAlertsPanel alerts={alerts} isLoading={isLoading} density={density} />
-              </div>
             </div>
-          </section>
+          </motion.section>
 
-          {/* Section 3: Team & Actions (2-Column Grid) */}
-          <section>
-            <div className="mb-3">
-              <h2 className={typography.sectionTitle}>Team & Actions</h2>
-              <p className={cn(typography.label, "!normal-case mt-1")}>
-                Team overview and quick management actions
-              </p>
+          {/* -- KPI Grid -- */}
+          <DashboardSection
+            title="Department Pulse"
+            description="Real-time metrics for your team"
+            animate={true}
+            loadingFallback={<KPIGridSkeleton />}
+          >
+            <ResponsiveDashboardGrid
+              columns="1:2:4:4"
+              gap="md"
+              animate={true}
+              staggerChildren={0.1}
+            >
+              {/* 1. Pending (Actionable) */}
+              <RoleKPICard
+                title="Pending Review"
+                value={counts.pending}
+                subtitle="Requests awaiting action"
+                icon={ClipboardList}
+                role={Role.DEPT_HEAD}
+                onClick={() => router.push("/approvals")}
+                className={counts.pending > 0 ? "ring-2 ring-[var(--dashboard-accent)]/20" : ""}
+              />
+
+              {/* 2. Forwarded (Progress) */}
+              <RoleKPICard
+                title="Forwarded to HR"
+                value={counts.forwarded}
+                subtitle="Approved & Processing"
+                icon={CheckCircle}
+                role={Role.DEPT_HEAD}
+              />
+
+              {/* 3. Returned (Issues) */}
+              <RoleKPICard
+                title="Returned"
+                value={counts.returned}
+                subtitle="Sent back for updates"
+                icon={RotateCcw}
+                role={Role.DEPT_HEAD}
+              />
+
+              {/* 4. Team Health */}
+              <RoleKPICard
+                title="Absence Rate"
+                value={availabilityMetric.value}
+                subtitle={availabilityMetric.subtitle}
+                icon={UserCheck}
+                role={Role.DEPT_HEAD}
+                tooltip="Average number of staff members on leave per day this month."
+              />
+            </ResponsiveDashboardGrid>
+          </DashboardSection>
+
+          {/* -- Main Content Split -- */}
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8 items-start">
+
+            {/* Left: Priority Queue (8 cols) */}
+            <div className="xl:col-span-8 space-y-6">
+              <DashboardSection
+                title="Priority Queue"
+                description="Recent requests requiring your attention"
+                isLoading={isPendingLoading}
+              >
+                <motion.div variants={itemVariants} className="h-[500px]">
+                  <DashboardPendingList
+                    requests={pendingData?.rows || []}
+                    isLoading={isPendingLoading}
+                    totalPending={counts.pending}
+                  />
+                </motion.div>
+              </DashboardSection>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <Suspense fallback={<CardSkeleton />}>
-                <TeamCoverageCalendar />
-              </Suspense>
+            {/* Right: Team Context (4 cols) */}
+            <div className="xl:col-span-4 space-y-6 sticky top-6">
+              <DashboardSection
+                title="Team Coverage"
+                description="Member availability this month"
+              >
+                <motion.div variants={itemVariants}>
+                  <TeamAvailability />
+                </motion.div>
+              </DashboardSection>
 
-              <Suspense fallback={<CardSkeleton />}>
-                <DeptHeadQuickActions />
-              </Suspense>
+
             </div>
-          </section>
-        </div>
-      </div>
+
+          </div>
+
+        </motion.div>
+      </RoleBasedDashboard>
     </TooltipProvider>
   );
 }
+<<<<<<< HEAD
 
 /**
  * Corporate Alerts Panel
@@ -451,3 +532,5 @@ function DeptHeadAlertsPanel({
     </div>
   );
 }
+=======
+>>>>>>> consolidated-work

@@ -2,7 +2,7 @@ import type { Config } from "tailwindcss";
 import defaultTheme from "tailwindcss/defaultTheme";
 
 const config: Config = {
-  darkMode: ["class"],
+  darkMode: "class",
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -17,7 +17,8 @@ const config: Config = {
         "2xl": "3rem",
       },
       screens: {
-        "2xl": "1440px",
+        "2xl": "1536px",
+        "3xl": "1920px",
       },
     },
     extend: {

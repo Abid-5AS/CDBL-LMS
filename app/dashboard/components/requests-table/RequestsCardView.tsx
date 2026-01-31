@@ -16,7 +16,7 @@ import {
 } from "@/components/ui";
 import { ClipboardCheck } from "lucide-react";
 import { StatusBadge, EmptyState } from "@/components/shared";
-import { leaveTypeLabel } from "@/lib/ui";
+import { leaveTypeLabel } from "@/lib/ui/ui";
 import { formatDate } from "@/lib/utils";
 import clsx from "clsx";
 import {
@@ -62,7 +62,7 @@ export function RequestsCardView({
 
   if (error) {
     return (
-      <div className="text-center text-sm text-data-error py-12" role="alert">
+      <div className="text-center text-sm text-danger dark:text-danger/90 py-12" role="alert">
         Failed to load
       </div>
     );

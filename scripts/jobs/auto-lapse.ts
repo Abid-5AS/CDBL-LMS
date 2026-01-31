@@ -13,7 +13,7 @@
 import { prisma } from "../../lib/prisma";
 import { normalizeToDhakaMidnight } from "../../lib/date-utils";
 import { toZonedTime } from "date-fns-tz";
-import { LeaveType } from "@prisma/client";
+import { LeaveType } from "@/src/generated/prisma/client";
 
 const DHAKA_TZ = "Asia/Dhaka";
 

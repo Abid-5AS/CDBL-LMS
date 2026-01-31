@@ -36,33 +36,49 @@ import {
   Forward,
   Loader2,
 } from "lucide-react";
-import { LeaveType } from "@prisma/client";
+import { LeaveType } from "@/lib/enums";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   approveLeaveRequest,
   rejectLeaveRequest,
-  forwardLeaveRequest,
+
   returnLeaveForModification,
 } from "@/app/actions/leave-actions";
+import { isFinalApprover } from "@/lib/workflow";
+import { Role } from "@/src/generated/prisma/client";
 
 type ApprovalActionCardProps = {
   leaveId: number;
   leaveType: LeaveType;
   currentUserRole: string;
+  requesterRole: string;
 };
 
-type DialogType = "approve" | "reject" | "forward" | "return" | null;
+type DialogType = "approve" | "reject" | "return" | null;
 
 export function ApprovalActionCard({
   leaveId,
   leaveType,
   currentUserRole,
+  requesterRole,
 }: ApprovalActionCardProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [activeDialog, setActiveDialog] = useState<DialogType>(null);
   const [comment, setComment] = useState("");
+
+  // Determine if this is the final approval
+  const isFinal = isFinalApprover(
+    currentUserRole as Role,
+    leaveType as any, // casting as any to avoid complex type matching if enums mismatch slightly
+    requesterRole as any
+  );
+
+  const approveButtonText = isFinal ? "Final Approve" : "Approve & Forward";
+  const approveDialogDescription = isFinal
+    ? `Are you sure you want to provide final approval for this ${leaveType.toLowerCase()} leave request? The leave balance will be deducted.`
+    : `Are you sure? This will forward the request to the next approver in the chain.`;
 
   // Determine which actions are available based on role
   const isCEO = currentUserRole === "CEO";
@@ -97,18 +113,13 @@ export function ApprovalActionCard({
           event.preventDefault();
           setActiveDialog("return");
           break;
-        case "f":
-          if (canForward) {
-            event.preventDefault();
-            setActiveDialog("forward");
-          }
-          break;
+
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeDialog, canForward]);
+  }, [activeDialog]);
 
   const handleApprove = async () => {
     startTransition(async () => {
@@ -157,25 +168,7 @@ export function ApprovalActionCard({
     });
   };
 
-  const handleForward = async () => {
-    startTransition(async () => {
-      try {
-        const result = await forwardLeaveRequest(leaveId);
 
-        if (result.success) {
-          toast.success("Leave request forwarded to next approver");
-          router.push("/approvals");
-          router.refresh();
-        } else {
-          toast.error(result.error || "Failed to forward request");
-        }
-      } catch (error) {
-        toast.error("An error occurred while forwarding");
-      } finally {
-        setActiveDialog(null);
-      }
-    });
-  };
 
   const handleReturn = async () => {
     if (!comment || comment.length < 5) {
@@ -223,7 +216,7 @@ export function ApprovalActionCard({
             size="lg"
             leftIcon={<CheckCircle2 className="h-4 w-4" aria-hidden="true" />}
           >
-            <span>Approve Request</span>
+            <span>{approveButtonText}</span>
             <kbd className="hidden sm:inline-flex h-5 min-w-5 items-center justify-center rounded border border-white/30 bg-white/20 px-1.5 text-[11px] font-medium text-white">
               A
             </kbd>
@@ -244,22 +237,6 @@ export function ApprovalActionCard({
             </kbd>
           </Button>
 
-          {/* Forward Button (if not CEO) */}
-          {canForward && (
-            <Button
-              onClick={() => setActiveDialog("forward")}
-              disabled={isPending}
-              className="w-full h-12 text-base justify-between"
-              size="lg"
-              variant="secondary"
-              leftIcon={<Forward className="h-4 w-4" aria-hidden="true" />}
-            >
-              <span>Forward to Next Approver</span>
-              <kbd className="hidden sm:inline-flex h-5 min-w-5 items-center justify-center rounded border border-border bg-muted px-1.5 text-[11px] font-medium">
-                F
-              </kbd>
-            </Button>
-          )}
 
           {/* Return Button */}
           <Button
@@ -289,9 +266,9 @@ export function ApprovalActionCard({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Approve Leave Request</AlertDialogTitle>
+            <AlertDialogTitle>{approveButtonText}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to approve this {leaveType.toLowerCase()} leave request? The employee will be notified via email.
+              {approveDialogDescription}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-4">
@@ -382,37 +359,7 @@ export function ApprovalActionCard({
         </DialogContent>
       </Dialog>
 
-      {/* Forward Dialog */}
-      <AlertDialog
-        open={activeDialog === "forward"}
-        onOpenChange={(open) => !open && setActiveDialog(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Forward to Next Approver</AlertDialogTitle>
-            <AlertDialogDescription>
-              This request will be forwarded to the next approver in the chain. They will be notified via email.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleForward}
-              disabled={isPending}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              {isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Forwarding...
-                </>
-              ) : (
-                "Forward"
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+
 
       {/* Return Dialog */}
       <Dialog

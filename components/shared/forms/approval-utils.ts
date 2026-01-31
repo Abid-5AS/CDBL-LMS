@@ -12,12 +12,60 @@ type ApprovalRecord = {
 /**
  * Get workflow stages based on requester role
  */
-function getWorkflowStages(requesterRole?: string): string[] {
-  if (requesterRole === "DEPT_HEAD") {
-    return ["Submitted", "HR Admin", "HR Head", "CEO"];
+// Helper to get role label
+function getRoleLabel(role?: string) {
+  if (!role) return "Approver";
+  const map: Record<string, string> = {
+    EMPLOYEE: "Employee",
+    DEPT_HEAD: "Dept Head",
+    HR_ADMIN: "HR Admin",
+    HR_HEAD: "HR Head",
+    CEO: "CEO",
+    SYSTEM_ADMIN: "System Admin"
+  };
+  return map[role] || role.replace(/_/g, " ");
+}
+
+export function getStagesFromApprovals(approvals: ApprovalRecord[], requesterRole?: string): string[] {
+  // Always start with "Submitted"
+  const stages: string[] = ["Submitted"];
+
+  // If no approvals, just show Submitted (waiting for first step)
+  if (!approvals || approvals.length === 0) {
+    return stages;
   }
-  // Default for regular employees
-  return ["Submitted", "HR Admin", "HR Head", "Dept Head"];
+
+  // Sort by step
+  const sorted = [...approvals].sort((a, b) => (a.step || 0) - (b.step || 0));
+
+  // Build stages from actual approvals
+  for (const approval of sorted) {
+    let roleLabel = "Approver";
+
+    // Try to get role from approver object
+    if (typeof approval.approver === "object" && approval.approver?.role) {
+      roleLabel = getRoleLabel(approval.approver.role);
+    } else if (typeof approval.approver === "string") {
+      // If approver is a string (name), we can't infer role, use generic
+      roleLabel = approval.approver;
+    }
+
+    stages.push(roleLabel);
+  }
+
+  return stages;
+}
+
+/**
+ * @deprecated This function is deprecated and should not be used.
+ * Workflow stages are now dynamically derived from actual approval records.
+ * Use getStagesFromApprovals instead.
+ */
+export function getWorkflowStages(requesterRole?: string): string[] {
+  // Return minimal fallback - only "Submitted"
+  // The real stages should come from getStagesFromApprovals
+  console.warn("getWorkflowStages is deprecated. Use getStagesFromApprovals with actual approval data.");
+  return ["Submitted"];
 }
 
 /**
@@ -30,7 +78,7 @@ export function calculateCurrentStageIndex(
   status?: string,
   requesterRole?: string
 ): number {
-  const stages = getWorkflowStages(requesterRole);
+  const stages = getStagesFromApprovals(approvals, requesterRole);
   const maxIndex = stages.length - 1;
 
   // If final status, we're at the last stage
@@ -66,8 +114,8 @@ export function calculateCurrentStageIndex(
 /**
  * Get the next approver role based on current stage
  */
-export function getNextApproverRole(currentIndex: number, requesterRole?: string): string | null {
-  const stages = getWorkflowStages(requesterRole);
+export function getNextApproverRole(currentIndex: number, requesterRole?: string, approvals?: ApprovalRecord[]): string | null {
+  const stages = getStagesFromApprovals(approvals || [], requesterRole);
   if (currentIndex >= stages.length - 1) return null; // At last stage
 
   // Skip "Submitted" at index 0, roles start at index 1
@@ -83,7 +131,7 @@ export function getLatestApprovalDate(approvals: ApprovalRecord[]): string | nul
     .filter((a) => a.decidedAt)
     .map((a) => a.decidedAt!)
     .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
-  
+
   return dates.length > 0 ? dates[0] : null;
 }
 
