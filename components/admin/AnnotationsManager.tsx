@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, Button, Badge, Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui";
 import { Switch } from "@/components/ui/switch";
-import { RotateCcw, Save, CheckCircle } from "lucide-react";
+import { RotateCcw, Save, CheckCircle, Zap, Lock, Cloud, FileText, Accessibility } from "lucide-react";
 import { useAnnotations, useAnnotationEnabled } from "@/hooks/useAnnotations";
 import { AnnotationType } from "@/lib/annotations/config";
 import { cn } from "@/lib/utils";
@@ -47,12 +47,12 @@ export function AnnotationsManager() {
     return annotation.category === category;
   });
 
-  const categoryIcons: Record<string, string> = {
-    accessibility: "♿",
-    performance: "⚡",
-    security: "🔒",
-    deployment: "☁️",
-    quality: "✅",
+  const categoryIcons: Record<string, React.ReactNode> = {
+    accessibility: <Accessibility className="w-6 h-6" />,
+    performance: <Zap className="w-6 h-6" />,
+    security: <Lock className="w-6 h-6" />,
+    deployment: <Cloud className="w-6 h-6 text-blue-500" />,
+    quality: <CheckCircle className="w-6 h-6 text-green-500" />,
   };
 
   return (
@@ -205,7 +205,7 @@ function AnnotationItem({ type, annotation, onToggle }: AnnotationItemProps) {
         <p className="text-sm text-muted-foreground">{annotation.description}</p>
         {annotation.documentPath && (
           <p className="text-xs text-blue-600 dark:text-blue-400 font-mono">
-            📄 {annotation.documentPath}
+            <FileText className="inline w-3 h-3 mr-1" /> {annotation.documentPath}
           </p>
         )}
       </div>

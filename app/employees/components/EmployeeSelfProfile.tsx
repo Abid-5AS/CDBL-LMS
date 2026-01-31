@@ -11,6 +11,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui";
+import { Hand } from "lucide-react";
 import { EmployeeProfileCard, LeaveHistoryTable } from "@/components/shared";
 import { LeaveBalanceCard } from "./LeaveBalanceCard";
 import ChartsSection from "./ChartsSection";
@@ -41,7 +42,7 @@ export function EmployeeSelfProfile({ employee }: EmployeeSelfProfileProps) {
               Your Profile
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Welcome back, {employee.name}! 👋
+              Welcome back, {employee.name}! <Hand className="inline-block w-4 h-4 ml-1 text-amber-400" />
             </p>
           </div>
           <div className="flex gap-3">

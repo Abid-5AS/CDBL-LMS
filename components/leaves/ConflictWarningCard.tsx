@@ -220,7 +220,7 @@ export function ConflictWarningCard({
             {data.blockSubmission && (
               <div className="mt-3 pt-3 border-t border-border">
                 <p className="text-sm font-medium text-red-600 dark:text-red-400">
-                  ⚠️ This leave request cannot be submitted due to insufficient
+                  <AlertTriangle className="inline-block h-4 w-4 mr-1 mb-0.5" /> This leave request cannot be submitted due to insufficient
                   team capacity. Please select an alternative date or contact HR.
                 </p>
               </div>

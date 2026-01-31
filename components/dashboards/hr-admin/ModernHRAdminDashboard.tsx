@@ -4,7 +4,7 @@ import { Suspense, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr"; // Assuming useSWR is used elsewhere, or just useEffect fetch
 import { apiFetcher } from "@/lib/apiClient";
-import { User, Bell, Search, Filter, Calendar as CalendarIcon, Clock, CheckCircle2, AlertCircle, Users, FileText, ArrowUpRight, TrendingUp } from "lucide-react"; // Icons
+import { User, Bell, Search, Filter, Calendar as CalendarIcon, Clock, CheckCircle2, AlertCircle, Users, FileText, ArrowUpRight, TrendingUp, Hand } from "lucide-react"; // Icons
 import {
     Card,
     CardContent,
@@ -77,7 +77,7 @@ export function ModernHRAdminDashboard({
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-                        Good Morning, {userName} <span className="text-2xl">👋</span>
+                        Good Morning, {userName} <Hand className="inline-block w-8 h-8 ml-1 text-amber-400 animate-pulse" />
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">
                         Here's what's happening in your organization today.
