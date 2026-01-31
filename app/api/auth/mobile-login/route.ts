@@ -102,8 +102,7 @@ export async function POST(req: Request) {
 
       // For mobile, we return the flow information but NOT the code
       // (In production, OTP would be sent via email/SMS)
-      // DEBUG: In dev/test, maybe log the code or return it if needed for testing?
-      console.log(`[Mobile Login] OTP for ${user.email}: ${code}`);
+      // In production, send via SMS/Email provider
 
       return NextResponse.json({
         success: true,

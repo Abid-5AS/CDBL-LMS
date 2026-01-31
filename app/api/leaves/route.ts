@@ -97,18 +97,15 @@ const ApplySchema = z.object({
  *         description: Internal server error
  */
 export async function GET(req: Request) {
-  console.log("[GET /api/leaves] Request received");
   let traceId = "unknown";
   try {
     traceId = getTraceId(req as any);
   } catch (e) {
-    console.error("[GET /api/leaves] Failed to get traceId:", e);
+    // Intentionally left blank, traceId remains "unknown"
   }
 
   try {
-    console.log("[GET /api/leaves] Getting current user...");
     const me = await getCurrentUser();
-    console.log("[GET /api/leaves] User:", me?.id);
 
     if (!me) return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
 
@@ -121,14 +118,12 @@ export async function GET(req: Request) {
     let items;
 
     if (mine) {
-      console.log("[GET /api/leaves] Fetching for user:", me.id, "cursor:", cursor);
       if (statusFilter && statusFilter !== "all") {
         items = await LeaveRepository.findByUserId(me.id, statusFilter as any, { limit, cursor });
       } else {
         items = await LeaveRepository.findByUserId(me.id, undefined, { limit, cursor });
       }
     } else {
-      console.log("[GET /api/leaves] Fetching all leaves", "cursor:", cursor);
       items = await LeaveRepository.findAll({
         status: statusFilter && statusFilter !== "all" ? statusFilter as any : undefined,
         limit,
