@@ -1,3 +1,21 @@
+/**
+ * CDBL Leave Manager - Android Application
+ *
+ * Main entry point for the Android app. This activity serves as the single-activity
+ * host for all Jetpack Compose screens.
+ *
+ * ## Architecture
+ * - Uses Hilt for dependency injection
+ * - Edge-to-edge display enabled
+ * - Compose-based UI with [CDBLApp] as root composable
+ *
+ * ## Injected Dependencies
+ * - [NetworkMonitor]: Observes network connectivity changes
+ * - [TokenManager]: Manages JWT token storage
+ *
+ * @see CDBLApp Main composable that handles navigation and theming
+ * @see CDBLAppState State holder for app-wide state
+ */
 package com.cdbl.leavemanager
 
 import android.os.Bundle

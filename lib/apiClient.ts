@@ -1,6 +1,33 @@
 /**
- * Unified API Client for CDBL Leave Management System
- * Consolidates lib/api.ts and lib/fetcher.ts into a single, consistent client
+ * @fileoverview Unified API Client for CDBL Leave Management System
+ * 
+ * Consolidates lib/api.ts and lib/fetcher.ts into a single, consistent client.
+ * 
+ * ## Features
+ * - Core fetch functions with timeout and error handling (`apiFetch`)
+ * - HTTP method helpers (`apiGet`, `apiPost`, `apiPut`, `apiDelete`)
+ * - SWR integration for React data fetching (`useApiQuery`, `useApiQueryWithParams`)
+ * - Mutation hook with loading/error states (`useApiMutation`)
+ * 
+ * ## Usage Examples
+ * ```typescript
+ * // Simple GET request
+ * const data = await apiGet<UserData>('/api/user');
+ * 
+ * // POST with data
+ * const result = await apiPost<Response>('/api/leave', { type: 'EARNED', days: 5 });
+ * 
+ * // React hook for data fetching
+ * const { data, error, isLoading } = useApiQuery<LeaveBalance>('/api/balances');
+ * ```
+ * 
+ * ## Error Handling
+ * - Network errors are wrapped with status code 0
+ * - Timeout errors return status code 408
+ * - API errors include the response data and status code
+ * 
+ * @module lib/apiClient
+ * @see /app/api/ - Backend API routes this client calls
  */
 
 import { useState, useCallback } from "react";

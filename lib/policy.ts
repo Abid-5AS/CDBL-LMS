@@ -1,3 +1,30 @@
+/**
+ * @fileoverview CDBL Leave Policy v2.0 Implementation
+ * 
+ * This module enforces all CDBL HR Leave Policy rules (based on Policy Chapter 6).
+ * 
+ * ## Leave Types Supported
+ * - **EARNED (EL)**: 24 days/year, 2 days/month accrual, 60-day carry-forward
+ * - **CASUAL (CL)**: 10 days/year, max 3 consecutive days, no carry-forward
+ * - **MEDICAL (ML)**: 14 days/year, certificate required for >3 days
+ * - **MATERNITY**: 56 days (8 weeks), requires 6 months service
+ * - **PATERNITY**: 7 working days
+ * - **QUARANTINE**: Up to 21 days (30 with CEO approval)
+ * - **SPECIAL_DISABILITY**: Up to 180 days (6 months)
+ * - **STUDY**: Up to 1 year (2 years with Board approval)
+ * - **EXTRAORDINARY**: 6-12 months based on service years
+ * 
+ * ## Key Policy Rules
+ * - EL requires 5 working days advance notice (Policy 6.11)
+ * - CL is EXEMPT from notice requirements (Policy 6.11.a)
+ * - Medical certificate required for ML > 3 days
+ * - EL encashment requires 10 days minimum balance (Policy 6.19.f)
+ * 
+ * @module lib/policy
+ * @see /docs/policies/CDBL_LEAVE_POLICY_CHAPTER_06.md - Original policy text
+ * @see /lib/workflow.ts - Approval workflow using policy
+ */
+
 import { normalizeToDhakaMidnight } from "./date-utils";
 import { formatDate } from "./utils";
 

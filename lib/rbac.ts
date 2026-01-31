@@ -1,3 +1,26 @@
+/**
+ * @fileoverview Role-Based Access Control (RBAC) Module
+ * 
+ * Implements the CDBL Leave Management System permission hierarchy.
+ * 
+ * ## Role Hierarchy (Highest to Lowest)
+ * 1. **SYSTEM_ADMIN** - Full system access, manages structure & policies
+ * 2. **CEO** - Executive oversight, final approval authority
+ * 3. **HR_HEAD** - HR department head, policy compliance
+ * 4. **HR_ADMIN** - Leave management, user administration
+ * 5. **DEPT_HEAD** - Team oversight, first-level approval
+ * 6. **EMPLOYEE** - Base role, apply for leave, view own data
+ * 
+ * ## Permission Matrices
+ * - `PROFILE_VIEW_MATRIX` - Who can view whose profile
+ * - `PROFILE_EDIT_MATRIX` - Who can edit whose profile
+ * - `ASSIGNABLE_ROLES` - Who can assign which roles
+ * 
+ * @module lib/rbac
+ * @see /lib/workflow.ts - Approval workflow using RBAC
+ * @see /lib/auth.ts - Authentication providing role info
+ */
+
 export type AppRole =
   | "EMPLOYEE"
   | "DEPT_HEAD"

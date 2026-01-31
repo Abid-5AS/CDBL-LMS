@@ -1,3 +1,15 @@
+/**
+ * Hilt Dependency Injection Module for CDBL Leave Manager
+ *
+ * Provides application-scoped singletons for:
+ * - [AppDatabase]: Room database instance
+ * - DAOs for data access (LeaveDao, UserDao, PolicyDao)
+ *
+ * ## Database
+ * Uses Room with destructive migration fallback. Database file: `cdbl_leave_manager.db`
+ *
+ * @see AppDatabase Room database class
+ */
 package com.cdbl.leavemanager.di
 
 import android.content.Context

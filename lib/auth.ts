@@ -1,3 +1,32 @@
+/**
+ * @fileoverview Authentication Module for CDBL Leave Management System
+ * 
+ * This module handles all JWT-based authentication for the application.
+ * 
+ * ## Architecture
+ * - Uses HS256 algorithm for JWT signing/verification
+ * - Tokens are stored in HTTP-only cookies (`session_token`)
+ * - Also supports Bearer token via Authorization header (for mobile apps)
+ * - Token rotation is supported for session extension
+ * 
+ * ## Security Requirements
+ * - JWT_SECRET must be 32+ characters in production
+ * - Tokens expire after 8 hours by default
+ * 
+ * ## Usage
+ * ```typescript
+ * // Server-side: Get current authenticated user
+ * const user = await getCurrentUser();
+ * 
+ * // Sign a new token
+ * const token = await signJwt({ sub: user.id, email: user.email, role: user.role });
+ * ```
+ * 
+ * @module lib/auth
+ * @see /app/api/login/route.ts - Login endpoint that uses this module
+ * @see /lib/rbac.ts - Role-based access control using auth info
+ */
+
 import { cookies, headers } from "next/headers";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";

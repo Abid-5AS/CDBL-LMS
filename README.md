@@ -2,6 +2,8 @@
 
 A comprehensive web-based leave management system for Central Depository Bangladesh Limited (CDBL), built with Next.js 16, React 19, and Prisma ORM.
 
+> 📋 **[Project Handover Documentation](./HANDOVER.md)** - Complete reference for developers taking over this project, including feature status, known issues, and deployment guides.
+
 ---
 
 ## Overview
@@ -252,6 +254,86 @@ See [Policy Logic Reference](./docs/Policy%20Logic/README.md) for complete polic
 
 ---
 
+## Handover Information
+
+This section provides essential information for ongoing maintenance and development.
+
+### Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         Client Layer                            │
+├──────────────┬───────────────────┬──────────────────────────────┤
+│   Web App    │     iOS App       │        Android App           │
+│  (Next.js)   │    (SwiftUI)      │    (Kotlin/Compose)          │
+└──────┬───────┴─────────┬─────────┴──────────────┬───────────────┘
+       │                 │                        │
+       └─────────────────┼────────────────────────┘
+                         ▼
+              ┌──────────────────────┐
+              │     REST API         │
+              │  (Next.js API Routes)│
+              └──────────┬───────────┘
+                         │
+       ┌─────────────────┼─────────────────┐
+       ▼                 ▼                 ▼
+┌─────────────┐  ┌─────────────────┐  ┌──────────────┐
+│   MySQL DB  │  │ Email Service   │  │ Push Notify  │
+│   (Prisma)  │  │  (Nodemailer)   │  │  (Firebase)  │
+└─────────────┘  └─────────────────┘  └──────────────┘
+```
+
+### Core Module Reference
+
+| Module | Location | Purpose |
+|--------|----------|---------|
+| Authentication | `lib/auth.ts` | JWT signing, verification, session management |
+| RBAC | `lib/rbac.ts` | Role-based permission checks |
+| Policy | `lib/policy.ts` | Leave policy rules & validation |
+| Workflow | `lib/workflow.ts` | Approval chain management |
+| API Client | `lib/apiClient.ts` | Unified fetch utilities |
+
+### Key Business Logic Files
+
+- **Leave Validation**: `lib/policy.ts` - All policy rules
+- **Balance Calculation**: `lib/services/balance-service.ts`
+- **Workflow Engine**: `lib/state-machine.ts` + `lib/workflow.ts`
+- **Email Templates**: `lib/email.ts`
+
+---
+
+## Maintenance Guide
+
+### Daily Operations
+
+```bash
+# Health check
+pnpm dev   # Start development server
+
+# Database
+pnpm prisma:seed     # Re-seed demo data
+pnpm db:status       # Check migration status
+```
+
+### Scheduled Jobs
+
+The following jobs run automatically in production:
+
+| Job | Schedule | Purpose |
+|-----|----------|---------|
+| EL Accrual | Monthly (1st) | Credit 2 EL days per employee |
+| CL Lapse | Yearly (Jan 1) | Reset CL balances |
+
+Run manually: `pnpm jobs:el-accrual` or `pnpm jobs:cl-lapse`
+
+### Common Issues
+
+1. **Database Connection Timeout**: Increase `connection_limit` in DATABASE_URL
+2. **JWT Errors**: Verify JWT_SECRET matches across environments
+3. **Email Not Sending**: Check SMTP credentials in .env
+
+---
+
 ## License
 
 Internal use only - CDBL Leave Management System
@@ -260,10 +342,10 @@ Internal use only - CDBL Leave Management System
 
 ## Version
 
-**Current Version**: 0.1.0
-**Policy Version**: v1.1
-**Next.js Version**: 16.0.0
-**Last Updated**: Current
+**Current Version**: 0.1.0  
+**Policy Version**: v2.0  
+**Next.js Version**: 16.0.0  
+**Last Updated**: January 2026
 
 ---
 
