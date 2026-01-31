@@ -12,9 +12,9 @@ import Combine
 
 enum APIConfiguration {
     #if DEBUG
-    static let baseURL = "https://choosing-jamie-real-operators.trycloudflare.com/api/"
+    static let baseURL = "https://liked-minimal-divorce-mac.trycloudflare.com/api/"
     #else
-    static let baseURL = "https://choosing-jamie-real-operators.trycloudflare.com/api/"
+    static let baseURL = "https://liked-minimal-divorce-mac.trycloudflare.com/api/"
     #endif
     
     static let timeoutInterval: TimeInterval = 30
