@@ -183,80 +183,6 @@ export function AdminHolidaysManagement() {
     }
   };
 
-  const parseCSV = (text: string): { name: string; date: string; isOptional: boolean }[] => {
-    const lines = text.trim().split('\n');
-    const headers = lines[0].toLowerCase().split(',').map(h => h.trim());
-    
-    const nameIndex = headers.findIndex(h => h.includes('name') || h.includes('holiday'));
-    const dateIndex = headers.findIndex(h => h.includes('date'));
-    const optionalIndex = headers.findIndex(h => h.includes('optional') || h.includes('type'));
-    
-    if (nameIndex === -1 || dateIndex === -1) {
-      throw new Error('CSV must contain "name" and "date" columns');
-    }
-    
-    return lines.slice(1).map(line => {
-      const values = line.split(',').map(v => v.trim());
-      return {
-        name: values[nameIndex] || '',
-        date: values[dateIndex] || '',
-        isOptional: optionalIndex >= 0 ? 
-          (values[optionalIndex]?.toLowerCase().includes('optional') || values[optionalIndex]?.toLowerCase() === 'yes' || values[optionalIndex]?.toLowerCase() === 'true') : 
-          false
-      };
-    }).filter(row => row.name && row.date);
-  };
-
-  const validateCSVData = (data: { name: string; date: string; isOptional: boolean }[]): ValidationError[] => {
-    const errors: ValidationError[] = [];
-    const existingDates = new Set(holidays.map(h => h.date.split('T')[0]));
-    
-    data.forEach((row, index) => {
-      const rowNumber = index + 2; // +2 because of header and 0-based index
-      
-      if (!row.name.trim()) {
-        errors.push({ row: rowNumber, field: 'name', message: 'Holiday name is required' });
-      } else if (row.name.trim().length < 3) {
-        errors.push({ row: rowNumber, field: 'name', message: 'Holiday name must be at least 3 characters' });
-      }
-      
-      if (!row.date) {
-        errors.push({ row: rowNumber, field: 'date', message: 'Date is required' });
-      } else {
-        // Try to parse the date
-        const dateFormats = [
-          /^\d{4}-\d{2}-\d{2}$/, // YYYY-MM-DD
-          /^\d{2}\/\d{2}\/\d{4}$/, // DD/MM/YYYY or MM/DD/YYYY
-          /^\d{2}-\d{2}-\d{4}$/, // DD-MM-YYYY
-        ];
-        
-        const isValidFormat = dateFormats.some(format => format.test(row.date));
-        if (!isValidFormat) {
-          errors.push({ row: rowNumber, field: 'date', message: 'Invalid date format. Use YYYY-MM-DD, DD/MM/YYYY, or DD-MM-YYYY' });
-        } else {
-          // Convert to YYYY-MM-DD format
-          let normalizedDate = row.date;
-          if (/^\d{2}\/\d{2}\/\d{4}$/.test(row.date)) {
-            const [d, m, y] = row.date.split('/');
-            normalizedDate = `${y}-${m}-${d}`;
-          } else if (/^\d{2}-\d{2}-\d{4}$/.test(row.date)) {
-            const [d, m, y] = row.date.split('-');
-            normalizedDate = `${y}-${m}-${d}`;
-          }
-          
-          if (existingDates.has(normalizedDate)) {
-            errors.push({ row: rowNumber, field: 'date', message: 'A holiday already exists on this date' });
-          }
-          
-          // Update the date in the data for import
-          row.date = normalizedDate;
-        }
-      }
-    });
-    
-    return errors;
-  };
-
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -271,103 +197,93 @@ export function AdminHolidaysManagement() {
 
   const handleImportCSV = async () => {
     if (!csvFile) {
-      toast.error('Please select a CSV file');
+      toast.error("Please select a CSV file");
       return;
     }
 
     setImporting(true);
+    setCsvErrors([]);
     try {
-      const text = await csvFile.text();
-      const data = parseCSV(text);
-      
-      if (data.length === 0) {
-        toast.error('No valid data found in CSV file');
+      const formData = new FormData();
+      formData.append("file", csvFile);
+
+      const res = await fetch("/api/admin/holidays/import", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        toast.error(data.error || "Failed to import holidays");
         setImporting(false);
         return;
       }
-      
-      const errors = validateCSVData(data);
-      
-      if (errors.length > 0) {
-        setCsvErrors(errors);
-        toast.error(`Found ${errors.length} validation error(s). Please review and fix.`);
-        setImporting(false);
-        return;
+
+      const { imported, failed, errors: apiErrors } = data;
+
+      if (apiErrors?.length > 0) {
+        setCsvErrors(
+          apiErrors.map((e: { row: number; error: string }) => ({
+            row: e.row,
+            field: "general",
+            message: e.error,
+          }))
+        );
       }
-      
-      // Import all holidays
-      let successCount = 0;
-      let failCount = 0;
-      
-      for (const holiday of data) {
-        try {
-          const res = await fetch('/api/holidays', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(holiday),
-          });
-          
-          if (res.ok) {
-            successCount++;
-          } else {
-            failCount++;
-          }
-        } catch {
-          failCount++;
-        }
-      }
-      
-      if (successCount > 0) {
-        toast.success(`Successfully imported ${successCount} holiday(s)${failCount > 0 ? `. ${failCount} failed.` : '!'}`);
+
+      if (imported > 0) {
+        toast.success(
+          `Successfully imported ${imported} holiday(s)${failed > 0 ? `. ${failed} failed.` : "!"}`
+        );
         setImportDialogOpen(false);
         setCsvFile(null);
         setCsvErrors([]);
         loadHolidays();
+      } else if (failed > 0) {
+        toast.error(`Import failed. ${failed} error(s). Please fix and try again.`);
       } else {
-        toast.error('Failed to import holidays');
+        toast.error("No holidays imported. Check CSV format.");
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to parse CSV file');
+    } catch (err: any) {
+      toast.error(err.message || "Failed to import holidays");
     } finally {
       setImporting(false);
     }
   };
 
-  const downloadTemplate = () => {
-    const template = 'Holiday Name,Date,Optional\nNew Year\'s Day,2025-01-01,no\nIndependence Day,2025-03-26,no\nOptional Holiday,2025-12-31,yes';
-    const blob = new Blob([template], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'holidays_template.csv';
-    a.click();
-    window.URL.revokeObjectURL(url);
-    toast.success('Template downloaded!');
+  const downloadTemplate = async () => {
+    try {
+      const res = await fetch("/api/admin/holidays/template");
+      if (!res.ok) throw new Error("Failed to download template");
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "holidays_import_template.csv";
+      a.click();
+      window.URL.revokeObjectURL(url);
+      toast.success("Template downloaded!");
+    } catch {
+      toast.error("Failed to download template");
+    }
   };
 
-  const exportHolidays = () => {
-    if (holidays.length === 0) {
-      toast.error('No holidays to export');
-      return;
+  const exportHolidays = async () => {
+    try {
+      const res = await fetch("/api/admin/holidays/export");
+      if (!res.ok) throw new Error("Failed to export");
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `holidays_${new Date().getFullYear()}.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      toast.success("Holidays exported!");
+    } catch {
+      toast.error("Failed to export holidays");
     }
-    
-    const csv = [
-      'Holiday Name,Date,Day,Optional',
-      ...holidays.map(h => {
-        const date = new Date(h.date);
-        const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
-        return `"${h.name}",${h.date.split('T')[0]},${dayName},${h.isOptional ? 'yes' : 'no'}`;
-      })
-    ].join('\n');
-    
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `holidays_${new Date().getFullYear()}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-    toast.success('Holidays exported!');
   };
 
   if (loading) {
@@ -436,10 +352,10 @@ export function AdminHolidaysManagement() {
                   <div className="rounded-lg bg-info dark:bg-info/80 border border-info p-4">
                     <h4 className="text-sm font-medium text-info dark:text-info/90 mb-2">CSV Format Requirements:</h4>
                     <ul className="text-sm text-info dark:text-info/90 space-y-1 list-disc list-inside">
-                      <li>Must include columns: <code className="bg-info dark:bg-info/80 px-1 rounded">Holiday Name</code>, <code className="bg-info dark:bg-info/80 px-1 rounded">Date</code></li>
-                      <li>Date format: YYYY-MM-DD, DD/MM/YYYY, or DD-MM-YYYY</li>
-                      <li>Optional column: <code className="bg-info dark:bg-info/80 px-1 rounded">Optional</code> (yes/no)</li>
-                      <li>First row must be headers</li>
+                      <li>Columns: <code className="bg-info dark:bg-info/80 px-1 rounded">date</code>, <code className="bg-info dark:bg-info/80 px-1 rounded">name</code>, <code className="bg-info dark:bg-info/80 px-1 rounded">isOptional</code></li>
+                      <li>Date format: YYYY-MM-DD</li>
+                      <li>isOptional: true/false</li>
+                      <li>Download the template for the exact format</li>
                     </ul>
                   </div>
 

@@ -10,7 +10,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Upload, CheckCircle2, AlertCircle, Clock, FileText } from "lucide-react";
 import {
@@ -102,7 +102,8 @@ export function FitnessCertificateUpload({
 
     try {
       const formData = new FormData();
-      formData.append("fitnessCertificate", selectedFile);
+      formData.append("certificate", selectedFile);
+      formData.append("type", "fitness");
 
       const response = await fetch(`/api/leaves/${leaveId}/certificate`, {
         method: "POST",

@@ -13,6 +13,9 @@ import {
   Mail,
   User,
   AlertCircle,
+  Upload,
+  Download,
+  FileText,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -99,6 +102,12 @@ export function UserManagement() {
     departmentId: null,
     isActive: true,
   });
+
+  const [importDialogOpen, setImportDialogOpen] = React.useState(false);
+  const [importFile, setImportFile] = React.useState<File | null>(null);
+  const [importing, setImporting] = React.useState(false);
+  const [importErrors, setImportErrors] = React.useState<{ row: number; error: string }[]>([]);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Fetch users and departments
   const fetchData = React.useCallback(async () => {
@@ -200,6 +209,103 @@ export function UserManagement() {
     });
   };
 
+  const downloadTemplate = async () => {
+    try {
+      const res = await fetch("/api/admin/users/template");
+      if (!res.ok) throw new Error("Failed to download template");
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "employees_import_template.csv";
+      a.click();
+      window.URL.revokeObjectURL(url);
+      toast.success("Template downloaded!");
+    } catch {
+      toast.error("Failed to download template");
+    }
+  };
+
+  const exportEmployees = async () => {
+    try {
+      const res = await fetch("/api/admin/users/export");
+      if (!res.ok) throw new Error("Failed to export");
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "employees_export.csv";
+      a.click();
+      window.URL.revokeObjectURL(url);
+      toast.success("Employees exported!");
+    } catch {
+      toast.error("Failed to export employees");
+    }
+  };
+
+  const handleImportFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.name.endsWith(".csv")) {
+        toast.error("Please select a CSV file");
+        return;
+      }
+      setImportFile(file);
+      setImportErrors([]);
+    }
+  };
+
+  const handleImportSubmit = async () => {
+    if (!importFile) {
+      toast.error("Please select a CSV file");
+      return;
+    }
+    setImporting(true);
+    setImportErrors([]);
+    try {
+      const formData = new FormData();
+      formData.append("file", importFile);
+
+      const res = await fetch("/api/admin/users/import", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        toast.error(data.error || "Failed to import employees");
+        setImporting(false);
+        return;
+      }
+
+      const { imported, failed, errors } = data;
+
+      if (errors?.length > 0) {
+        setImportErrors(errors);
+      }
+
+      if (imported > 0) {
+        toast.success(
+          `Successfully imported ${imported} employee(s)${failed > 0 ? `. ${failed} failed.` : "!"}`
+        );
+        setImportDialogOpen(false);
+        setImportFile(null);
+        setImportErrors([]);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        await fetchData();
+      } else if (failed > 0) {
+        toast.error(`Import failed. ${failed} error(s). Please fix and try again.`);
+      } else {
+        toast.error("No employees imported. Check CSV format.");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to import employees");
+    } finally {
+      setImporting(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -212,6 +318,20 @@ export function UserManagement() {
             <CardDescription>
               Manage user roles and department assignments
             </CardDescription>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={downloadTemplate}>
+              <Download className="size-4 mr-2" />
+              Template
+            </Button>
+            <Button variant="outline" size="sm" onClick={exportEmployees}>
+              <FileText className="size-4 mr-2" />
+              Export
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setImportDialogOpen(true)}>
+              <Upload className="size-4 mr-2" />
+              Import
+            </Button>
           </div>
         </div>
       </CardHeader>
@@ -448,6 +568,71 @@ export function UserManagement() {
             <Button onClick={handleSaveUser}>
               <Save className="size-4 mr-2" />
               Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Import Dialog */}
+      <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Import Employees from CSV</DialogTitle>
+            <DialogDescription>
+              Upload a CSV file to bulk import employees. Download the template for the required format.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>CSV File</Label>
+              <Input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv"
+                onChange={handleImportFileSelect}
+                className="cursor-pointer"
+              />
+              {importFile && (
+                <p className="text-sm text-muted-foreground">Selected: {importFile.name}</p>
+              )}
+            </div>
+            <div className="rounded-lg bg-muted/50 border p-4">
+              <h4 className="text-sm font-medium mb-2">CSV Format</h4>
+              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                <li>Columns: name, email, empCode, role, department, joinDate</li>
+                <li>Required: name, email</li>
+                <li>Default password: changeme123 (users should change on first login)</li>
+              </ul>
+            </div>
+            {importErrors.length > 0 && (
+              <div className="rounded-lg border border-destructive/50 p-4 max-h-48 overflow-y-auto">
+                <h4 className="text-sm font-medium text-destructive mb-2">
+                  Validation Errors ({importErrors.length})
+                </h4>
+                <div className="space-y-1">
+                  {importErrors.map((e, i) => (
+                    <div key={i} className="text-sm text-destructive">
+                      Row {e.row}: {e.error}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setImportDialogOpen(false);
+                setImportFile(null);
+                setImportErrors([]);
+                if (fileInputRef.current) fileInputRef.current.value = "";
+              }}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleImportSubmit} disabled={!importFile || importing}>
+              {importing ? "Importing..." : "Import Employees"}
             </Button>
           </DialogFooter>
         </DialogContent>

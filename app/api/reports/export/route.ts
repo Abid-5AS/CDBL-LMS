@@ -86,6 +86,17 @@ export async function GET(req: NextRequest) {
     },
   };
 
+  // Role-based visibility for leaves context (applied before query)
+  if (context === "leaves" && user.role === "EMPLOYEE") {
+    whereClause.requesterId = user.id;
+  } else if (context === "leaves" && user.role === "DEPT_HEAD") {
+    const teamMembers = await prisma.user.findMany({
+      where: { department: user.department },
+      select: { id: true },
+    });
+    whereClause.requesterId = { in: teamMembers.map((u: { id: number }) => u.id) };
+  }
+
   // Context-specific status filters
   if (context === "reports") {
     whereClause.status = {
@@ -262,19 +273,6 @@ export async function GET(req: NextRequest) {
     .map(([name, count]) => ({ name, count }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
-
-  // Role-based visibility for leaves context
-  if (context === "leaves" && user.role === "EMPLOYEE") {
-    whereClause.requesterId = user.id;
-  } else if (context === "leaves" && user.role === "DEPT_HEAD") {
-    // Dept Head sees their team members
-    const teamMembers = await prisma.user.findMany({
-      where: { department: user.department },
-      select: { id: true },
-    });
-    whereClause.requesterId = { in: teamMembers.map((u) => u.id) };
-  }
-  // HR_ADMIN, HR_HEAD, CEO see all (no additional filter)
 
   if (type === "csv") {
     // Generate CSV with context-specific headers

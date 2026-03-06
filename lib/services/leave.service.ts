@@ -9,7 +9,7 @@ import { LeaveValidator } from "./leave-validator";
 import { NotificationService } from "./notification.service";
 import { prisma } from "@/lib/prisma";
 import { notifyLeaveSubmitted } from "@/lib/webhooks/events";
-import { daysInclusive } from "@/lib/policy";
+import { countWorkingDays } from "@/lib/leaves/working-days";
 import { getStepForRole } from "@/lib/workflow";
 import { promises as fs } from "fs";
 import path from "path";
@@ -116,9 +116,14 @@ export class LeaveService {
       }
       const certificateUrl = certificateResult.data;
 
-      // 3. Calculate working days if not provided
-      const workingDays =
-        dto.workingDays || daysInclusive(dto.startDate, dto.endDate);
+      // 3. Calculate working days if not provided (exclude weekends and holidays per policy)
+      let workingDays: number;
+      if (dto.isHalfDay) {
+        workingDays = 1; // Half-day = 1 day in DB (Int); balance deduction uses this
+      } else {
+        workingDays =
+          dto.workingDays ?? (await countWorkingDays(dto.startDate, dto.endDate));
+      }
 
       // 5. Validate leave request
       const validation = await LeaveValidator.validateLeaveRequest({
@@ -264,13 +269,16 @@ export class LeaveService {
         success: true,
         data: leaveRequest,
       };
-    } catch (error) {
-      console.error("LeaveService.createLeaveRequest error:", error);
+    } catch (err) {
+      console.error("LeaveService.createLeaveRequest error:", err);
+      const message =
+        err instanceof Error ? err.message : "An unexpected error occurred while creating leave request";
       return {
         success: false,
         error: {
           code: "internal_error",
           message: "An unexpected error occurred while creating leave request",
+          details: { originalError: message },
         },
       };
     }

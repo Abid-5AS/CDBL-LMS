@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShieldCheck, Activity, Database, Clock } from "lucide-react";
+import { AuditExportButton } from "./components/AuditExportButton";
 
 export default function AuditViewerPage() {
   return (
@@ -100,8 +101,9 @@ async function AuditContent() {
 
       {/* Audit Table */}
       <Card className="overflow-hidden">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle>Recent Activity</CardTitle>
+          <AuditExportButton />
         </CardHeader>
         <div className="p-0">
           <Table>

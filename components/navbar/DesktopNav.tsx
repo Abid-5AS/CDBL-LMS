@@ -25,7 +25,9 @@ type DesktopNavProps = Pick<
   | "scrolled"
   | "logout"
   | "loggingOut"
->;
+> & {
+  hideNavLinks?: boolean;
+};
 
 export function DesktopNav({
   user,
@@ -35,6 +37,7 @@ export function DesktopNav({
   scrolled,
   logout,
   loggingOut,
+  hideNavLinks = false,
 }: DesktopNavProps) {
   const { openSearch } = useSearch();
   const navHeight = scrolled ? 64 : 72;
@@ -57,51 +60,53 @@ export function DesktopNav({
           <Brand compact />
         </motion.div>
 
-        {/* Navigation Links */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          className="relative hidden md:flex flex-1 min-w-0 max-w-full items-center overflow-x-auto scrollbar-hide"
-        >
-          <nav
-            role="navigation"
-            aria-label="Primary navigation"
-            className="w-full min-w-0"
+        {/* Navigation Links - hidden when sidebar is shown */}
+        {!hideNavLinks && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="relative hidden md:flex flex-1 min-w-0 max-w-full items-center overflow-x-auto scrollbar-hide"
           >
-            <ul className="flex w-full flex-nowrap items-center gap-1">
-              {navLinks.map((link, index) => {
-                const Icon = link.icon;
-                const active = isActive(link.href);
-                return (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className={cn(
-                        "group/link relative flex flex-nowrap items-center gap-2 overflow-hidden whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 border border-transparent",
-                        active
-                          ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                      )}
-                    >
-                      <Icon
+            <nav
+              role="navigation"
+              aria-label="Primary navigation"
+              className="w-full min-w-0"
+            >
+              <ul className="flex w-full flex-nowrap items-center gap-1">
+                {navLinks.map((link) => {
+                  const Icon = link.icon;
+                  const active = isActive(link.href);
+                  return (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
                         className={cn(
-                          "h-4 w-4 shrink-0 transition-all duration-300",
+                          "group/link relative flex flex-nowrap items-center gap-2 overflow-hidden whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 border border-transparent",
                           active
-                            ? "text-white"
-                            : "text-muted-foreground group-hover/link:text-indigo-600 dark:group-hover/link:text-indigo-400"
+                            ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
                         )}
-                      />
-                      <span className="relative hidden lg:inline whitespace-nowrap font-medium">
-                        {link.label}
-                      </span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-        </motion.div>
+                      >
+                        <Icon
+                          className={cn(
+                            "h-4 w-4 shrink-0 transition-all duration-300",
+                            active
+                              ? "text-white"
+                              : "text-muted-foreground group-hover/link:text-indigo-600 dark:group-hover/link:text-indigo-400"
+                          )}
+                        />
+                        <span className="relative hidden lg:inline whitespace-nowrap font-medium">
+                          {link.label}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          </motion.div>
+        )}
       </div>
 
       {/* Actions Section */}

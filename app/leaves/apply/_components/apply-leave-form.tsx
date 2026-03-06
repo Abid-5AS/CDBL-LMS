@@ -214,8 +214,8 @@ export function ApplyLeaveForm() {
                       bookedDates={bookedDates}
                     />
 
-                    {/* Half-Day Leave Toggle */}
-                    {(type === "CASUAL" || type === "EARNED") && dateRange.start && dateRange.end && dateRange.start.getTime() === dateRange.end.getTime() && (
+                    {/* Half-Day Leave Toggle - visible for EARNED/CASUAL, enabled when single day selected */}
+                    {(type === "CASUAL" || type === "EARNED") && (
                       <div className="mt-4 p-4 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30">
                         <div className="flex items-center gap-3">
                           <input
@@ -224,13 +224,23 @@ export function ApplyLeaveForm() {
                             checked={isHalfDay}
                             onChange={(e) => setIsHalfDay(e.target.checked)}
                             className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
-                            disabled={submitting}
+                            disabled={
+                              submitting ||
+                              !dateRange.start ||
+                              !dateRange.end ||
+                              dateRange.start.getTime() !== dateRange.end.getTime()
+                            }
+                            aria-describedby="halfDayHint"
                           />
                           <label htmlFor="halfDay" className="text-sm font-medium text-indigo-900 dark:text-indigo-100">
                             Apply for Half Day Leave
                           </label>
                         </div>
-
+                        {(!dateRange.start || !dateRange.end || dateRange.start.getTime() !== dateRange.end.getTime()) && (
+                          <p id="halfDayHint" className="mt-2 text-xs text-indigo-700/80 dark:text-indigo-300/80 ml-7">
+                            Select a single day (same start and end date) above to enable half-day leave.
+                          </p>
+                        )}
                         {isHalfDay && (
                           <div className="mt-3 flex gap-4 ml-7">
                             <label className="flex items-center gap-2 cursor-pointer">

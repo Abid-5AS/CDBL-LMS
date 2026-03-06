@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { LeaveType, Role } from "@/src/generated/prisma/client";
+import { LeaveType, LeaveStatus, Role } from "@/src/generated/prisma/client";
 import { parse } from "papaparse";
 import * as bcrypt from "bcryptjs";
 
@@ -32,6 +32,15 @@ export interface BalanceImportRow {
   opening: number;
   accrued?: number;
   used?: number;
+}
+
+export interface LeaveImportRow {
+  employeeEmail: string;
+  type: string;
+  startDate: string;
+  endDate: string;
+  reason: string;
+  workingDays?: string;
 }
 
 /**
@@ -152,7 +161,12 @@ export class ImportExportService {
     let imported = 0;
 
     for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
+      const raw = rows[i];
+      const row: HolidayImportRow = {
+        date: raw.date ?? (raw as any)["Date"] ?? "",
+        name: raw.name ?? (raw as any)["Holiday Name"] ?? (raw as any)["holiday name"] ?? "",
+        isOptional: raw.isOptional ?? (raw as any)["Optional"] ?? (raw as any)["optional"] ?? "",
+      };
       const rowNum = i + 2;
 
       try {
@@ -352,6 +366,25 @@ export class ImportExportService {
   }
 
   /**
+   * Export employees to CSV (import-ready format)
+   */
+  static exportEmployees(
+    users: { name: string; email: string; empCode?: string | null; role: string; department?: string | null; joinDate?: Date | null }[]
+  ): string {
+    const headers = ["name", "email", "empCode", "role", "department", "joinDate"];
+    const rows = users.map((u) => [
+      u.name,
+      u.email,
+      u.empCode ?? "",
+      u.role,
+      u.department ?? "",
+      u.joinDate ? new Date(u.joinDate).toISOString().split("T")[0] : "",
+    ]);
+    const escape = (v: string) => (v.includes(",") || v.includes('"') ? `"${String(v).replace(/"/g, '""')}"` : v);
+    return [headers.join(","), ...rows.map((r) => r.map(escape).join(","))].join("\n");
+  }
+
+  /**
    * Generate import template CSV
    */
   static generateEmployeeTemplate(): string {
@@ -379,8 +412,109 @@ export class ImportExportService {
       ["empCode", "leaveType", "year", "opening", "accrued", "used"],
       ["EMP001", "EARNED", "2025", "20", "0", "5"],
       ["EMP001", "CASUAL", "2025", "10", "0", "2"],
+      ["EMP001", "MEDICAL", "2025", "14", "0", "0"],
+      ["EMP001", "SPECIAL", "2025", "0", "0", "0"],
     ];
 
     return template.map((row) => row.join(",")).join("\n");
+  }
+
+  static generateLeaveTemplate(): string {
+    const template = [
+      ["employeeEmail", "type", "startDate", "endDate", "reason", "workingDays"],
+      ["john@example.com", "EARNED", "2025-03-10", "2025-03-12", "Personal leave", "3"],
+      ["jane@example.com", "CASUAL", "2025-03-15", "2025-03-15", "Family event", "1"],
+    ];
+
+    return template.map((row) => row.join(",")).join("\n");
+  }
+
+  static async importLeaves(
+    csvContent: string,
+    dryRun: boolean = false
+  ): Promise<ImportResult> {
+    const rows = this.parseCSV<LeaveImportRow>(csvContent);
+    const errors: { row: number; error: string }[] = [];
+    let imported = 0;
+
+    const validTypes = Object.values(LeaveType);
+
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const rowNum = i + 2;
+
+      try {
+        if (!row.employeeEmail || !row.type || !row.startDate || !row.endDate || !row.reason) {
+          errors.push({
+            row: rowNum,
+            error: "employeeEmail, type, startDate, endDate, reason are required",
+          });
+          continue;
+        }
+
+        const email = row.employeeEmail.trim().toLowerCase();
+        const type = row.type.toUpperCase();
+        if (!validTypes.includes(type as LeaveType)) {
+          errors.push({ row: rowNum, error: `Invalid leave type: ${row.type}` });
+          continue;
+        }
+
+        const startDate = new Date(row.startDate);
+        const endDate = new Date(row.endDate);
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+          errors.push({ row: rowNum, error: "Invalid date format" });
+          continue;
+        }
+
+        if (row.reason.trim().length < 3) {
+          errors.push({ row: rowNum, error: "Reason must be at least 3 characters" });
+          continue;
+        }
+
+        if (!dryRun) {
+          const employee = await prisma.user.findUnique({
+            where: { email },
+          });
+
+          if (!employee) {
+            errors.push({ row: rowNum, error: `Employee not found: ${email}` });
+            continue;
+          }
+
+          const workingDays = row.workingDays
+            ? parseInt(row.workingDays, 10)
+            : Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
+          await prisma.leaveRequest.create({
+            data: {
+              requesterId: employee.id,
+              type: type as LeaveType,
+              startDate,
+              endDate,
+              reason: row.reason.trim(),
+              workingDays: isNaN(workingDays) ? 1 : workingDays,
+              status: LeaveStatus.APPROVED,
+              policyVersion: "v2.0-bulk-import",
+            },
+          });
+
+          imported++;
+        } else {
+          imported++;
+        }
+      } catch (err) {
+        errors.push({
+          row: rowNum,
+          error: err instanceof Error ? err.message : "Unknown error",
+        });
+      }
+    }
+
+    return {
+      success: errors.length === 0,
+      imported,
+      failed: errors.length,
+      errors,
+    };
   }
 }

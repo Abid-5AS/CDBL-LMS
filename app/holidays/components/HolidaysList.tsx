@@ -1,11 +1,14 @@
 "use client";
 
 import { motion, type Variants } from "framer-motion";
-import { Calendar, Star, Clock, ChevronRight, MoreVertical, Trash2 } from "lucide-react";
+import { Calendar, Star, Clock, ChevronRight, MoreVertical, Trash2, Edit } from "lucide-react";
 import { useState } from "react";
 import { Role } from "@/lib/enums";
 import { Badge } from "@/components/ui";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +17,13 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -21,6 +31,7 @@ import {
   AlertDialogDescription,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 import { formatDate, cn } from "@/lib/utils";
 import type { Holiday } from "../hooks/useHolidaysData";
 
@@ -46,14 +57,23 @@ function HolidayListItem({
   index,
   isAdmin,
   onDelete,
+  onUpdated,
 }: {
   holiday: Holiday;
   index: number;
   isAdmin: boolean;
   onDelete?: () => void;
+  onUpdated?: () => void;
 }) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editName, setEditName] = useState(holiday.name);
+  const [editDate, setEditDate] = useState(
+    new Date(holiday.date).toISOString().split("T")[0]
+  );
+  const [editOptional, setEditOptional] = useState(holiday.isOptional);
+  const [isSaving, setIsSaving] = useState(false);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -83,6 +103,41 @@ function HolidayListItem({
       setIsDeleting(false);
       setDeleteDialogOpen(false);
     }
+  };
+
+  const handleEdit = async () => {
+    if (!editName.trim()) return;
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/holidays/${holiday.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editName,
+          date: editDate,
+          isOptional: editOptional,
+        }),
+      });
+      if (response.ok) {
+        toast.success("Holiday updated successfully");
+        setEditDialogOpen(false);
+        onUpdated?.();
+      } else {
+        const data = await response.json();
+        toast.error(data.error === "duplicate_date" ? "A holiday already exists on this date" : "Failed to update holiday");
+      }
+    } catch {
+      toast.error("Failed to update holiday");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const openEditDialog = () => {
+    setEditName(holiday.name);
+    setEditDate(new Date(holiday.date).toISOString().split("T")[0]);
+    setEditOptional(holiday.isOptional);
+    setEditDialogOpen(true);
   };
 
   return (
@@ -194,8 +249,9 @@ function HolidayListItem({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
-                <DropdownMenuItem disabled className="text-xs opacity-60">
-                  Edit (coming soon)
+                <DropdownMenuItem onClick={openEditDialog}>
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -220,7 +276,7 @@ function HolidayListItem({
         <AlertDialogContent>
           <AlertDialogTitle>Delete Holiday</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete "{holiday.name}"? This action cannot be undone.
+            Are you sure you want to delete &quot;{holiday.name}&quot;? This action cannot be undone.
           </AlertDialogDescription>
           <div className="flex justify-end gap-3">
             <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -234,12 +290,57 @@ function HolidayListItem({
           </div>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Holiday</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-name">Name</Label>
+              <Input
+                id="edit-name"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-date">Date</Label>
+              <Input
+                id="edit-date"
+                type="date"
+                value={editDate}
+                onChange={(e) => setEditDate(e.target.value)}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="edit-optional"
+                checked={editOptional}
+                onCheckedChange={(checked) =>
+                  setEditOptional(checked === true)
+                }
+              />
+              <Label htmlFor="edit-optional">Optional Holiday</Label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleEdit} disabled={isSaving || !editName.trim()}>
+              {isSaving ? "Saving..." : "Save Changes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
 
 export function HolidaysList({ holidays, role, onHolidayUpdated }: HolidaysListProps) {
-  const isAdmin = role === "HR_ADMIN" || role === "HR_HEAD" || role === "CEO";
+  const isAdmin = role === "HR_ADMIN" || role === "HR_HEAD" || role === "CEO" || role === "SYSTEM_ADMIN";
 
   if (holidays.length === 0) {
     return (
@@ -271,6 +372,7 @@ export function HolidaysList({ holidays, role, onHolidayUpdated }: HolidaysListP
           index={index}
           isAdmin={isAdmin}
           onDelete={onHolidayUpdated}
+          onUpdated={onHolidayUpdated}
         />
       ))}
     </div>

@@ -2,6 +2,14 @@ import { prisma } from "@/lib/prisma";
 import { LeaveType, LeaveStatus } from "@/src/generated/prisma/client";
 import { startOfMonth, endOfMonth, eachDayOfInterval, isWeekend } from "date-fns";
 
+const UNPAID_LEAVE_TYPES: Set<LeaveType> = new Set([
+    LeaveType.EXTRAWITHOUTPAY,
+]);
+
+function isLeaveTypePaid(type: LeaveType): boolean {
+    return !UNPAID_LEAVE_TYPES.has(type);
+}
+
 export interface PayrollSummary {
     employeeId: number;
     month: number;
@@ -27,29 +35,15 @@ export class PayrollCalculator {
         const startDate = startOfMonth(new Date(year, month));
         const endDate = endOfMonth(startDate);
 
-        // Get all approved leaves for the employee in this month
         const leaves = await prisma.leaveRequest.findMany({
             where: {
-                employeeId,
+                requesterId: employeeId,
                 status: LeaveStatus.APPROVED,
-                OR: [
-                    {
-                        startDate: {
-                            lte: endDate,
-                        },
-                        endDate: {
-                            gte: startDate,
-                        },
-                    },
-                ],
-            },
-            include: {
-                leaveType: true,
+                startDate: { lte: endDate },
+                endDate: { gte: startDate },
             },
         });
 
-        // Calculate working days in month (excluding weekends)
-        // TODO: Integrate with Holiday calendar for more accuracy
         const daysInMonth = eachDayOfInterval({ start: startDate, end: endDate });
         const totalWorkingDays = daysInMonth.filter((day) => !isWeekend(day)).length;
 
@@ -57,18 +51,16 @@ export class PayrollCalculator {
         let totalUnpaidLeaveDays = 0;
         const breakdown: Record<string, { days: number; isPaid: boolean }> = {};
 
-        // Process each leave
         for (const leave of leaves) {
-            // Calculate overlap with current month
             const leaveStart = leave.startDate < startDate ? startDate : leave.startDate;
             const leaveEnd = leave.endDate > endDate ? endDate : leave.endDate;
 
             const leaveDays = eachDayOfInterval({ start: leaveStart, end: leaveEnd })
-                .filter((day) => !isWeekend(day)).length; // Assuming leaves are only counted on working days
+                .filter((day) => !isWeekend(day)).length;
 
             if (leaveDays > 0) {
-                const typeName = leave.leaveType.name;
-                const isPaid = leave.leaveType.isPaid;
+                const typeName = leave.type;
+                const isPaid = isLeaveTypePaid(leave.type);
 
                 if (!breakdown[typeName]) {
                     breakdown[typeName] = { days: 0, isPaid };
@@ -83,14 +75,8 @@ export class PayrollCalculator {
             }
         }
 
-        // Calculate LWP (Leave Without Pay)
-        // Logic: Explicit unpaid leaves + any other logic defined by policy
         const lwpDeductionDays = totalUnpaidLeaveDays;
-
-        // Calculate Encashment (only relevant for specific months/types, usually year-end)
-        // For now, returning 0 as it's typically a separate process
         const encashmentDays = 0;
-
         const totalPresentDays = totalWorkingDays - (totalPaidLeaveDays + totalUnpaidLeaveDays);
 
         return {

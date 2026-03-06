@@ -6,7 +6,6 @@ import useSWR from "swr";
 import { toast } from "sonner";
 import { policy } from "@/lib/policy";
 import {
-  totalDaysInclusive,
   rangeContainsNonWorking,
   isWeekendOrHoliday,
   normalizeToDhakaMidnight,
@@ -206,8 +205,9 @@ export function useApplyLeaveForm() {
 
   const requestedDays = useMemo(() => {
     if (!dateRange.start || !dateRange.end) return 0;
-    return totalDaysInclusive(dateRange.start, dateRange.end);
-  }, [dateRange]);
+    if (isHalfDay) return 1;
+    return countWorkingDaysSync(dateRange.start, dateRange.end, holidays);
+  }, [dateRange, holidays, isHalfDay]);
 
   const requiresCertificate = type === "MEDICAL" && requestedDays > 3;
 
@@ -468,6 +468,7 @@ export function useApplyLeaveForm() {
         endDate: dateRange.end.toISOString(),
         reason: reason.trim(),
         needsCertificate: requiresCertificate,
+        workingDays: requestedDays,
       };
 
       // Add incident date for Special Disability Leave
@@ -521,10 +522,10 @@ export function useApplyLeaveForm() {
 
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        const errorMessage = getToastMessage(
-          data?.error || "Unable to submit request",
-          data?.message
-        );
+        const errorMessage =
+          data?.originalError ||
+          data?.message ||
+          getToastMessage(data?.error || "Unable to submit request");
         toast.error(errorMessage);
         setSubmitting(false);
         return;

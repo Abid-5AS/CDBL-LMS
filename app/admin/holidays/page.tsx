@@ -5,7 +5,7 @@ import { AdminHolidaysManagement } from "./components/AdminHolidaysManagement";
 
 async function AdminHolidaysContent() {
   const user = await getCurrentUser();
-  if (!user || !["HR_ADMIN", "HR_HEAD", "CEO"].includes(user.role as string)) {
+  if (!user || !["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"].includes(user.role as string)) {
     redirect("/dashboard");
   }
 

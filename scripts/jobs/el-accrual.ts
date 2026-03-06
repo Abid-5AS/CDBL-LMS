@@ -69,8 +69,8 @@ async function wasOnLeaveEntireMonth(
   }
 
   // Get total days in month
-  const zonedStart = utcToZonedTime(monthStart, DHAKA_TZ);
-  const zonedEnd = utcToZonedTime(monthEnd, DHAKA_TZ);
+  const zonedStart = toZonedTime(monthStart, DHAKA_TZ);
+  const zonedEnd = toZonedTime(monthEnd, DHAKA_TZ);
   const daysInMonth = zonedEnd.getDate(); // Last day of month = days in month
   
   // If leaveDays covers all days in month, employee was on leave entire month
@@ -85,7 +85,7 @@ async function wasOnLeaveEntireMonth(
 export async function processELAccrual(targetMonth?: Date): Promise<AccrualResult[]> {
   // Default to previous month if not specified
   const now = new Date();
-  const zonedNow = utcToZonedTime(now, DHAKA_TZ);
+  const zonedNow = toZonedTime(now, DHAKA_TZ);
   const monthToProcess = targetMonth || new Date(zonedNow.getFullYear(), zonedNow.getMonth() - 1, 1);
   
   const monthStart = normalizeToDhakaMidnight(startOfMonth(monthToProcess));
@@ -94,15 +94,34 @@ export async function processELAccrual(targetMonth?: Date): Promise<AccrualResul
 
   console.log(`[EL Accrual] Processing accrual for ${monthToProcess.toISOString().slice(0, 7)}`);
 
-  // Get all employees
+  // Get all employees (with joinDate for pro-rata)
   const employees = await prisma.user.findMany({
     where: { role: "EMPLOYEE" },
-    select: { id: true, email: true },
+    select: { id: true, email: true, joinDate: true },
   });
 
   const results: AccrualResult[] = [];
 
   for (const employee of employees) {
+    // Skip if employee joined after the processed month (no retroactive accrual)
+    if (employee.joinDate) {
+      const joinZoned = toZonedTime(new Date(employee.joinDate), DHAKA_TZ);
+      const joinedAfterMonth =
+        joinZoned.getFullYear() > monthToProcess.getFullYear() ||
+        (joinZoned.getFullYear() === monthToProcess.getFullYear() &&
+          joinZoned.getMonth() > monthToProcess.getMonth());
+      if (joinedAfterMonth) {
+        results.push({
+          userId: employee.id,
+          email: employee.email,
+          accrued: 0,
+          skipped: true,
+          reason: "Employee joined after this month",
+        });
+        continue;
+      }
+    }
+
     // Check if employee was on leave entire month
     const skipped = await wasOnLeaveEntireMonth(employee.id, monthStart, monthEnd);
     

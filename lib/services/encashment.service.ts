@@ -59,6 +59,31 @@ export class EncashmentService {
   }
 
   /**
+   * Get all encashment requests with optional status filter (for Admin/HR).
+   */
+  static async getAllRequests(status?: string | null) {
+    const where: any = {};
+    if (status) {
+      where.status = status;
+    }
+    return prisma.encashmentRequest.findMany({
+      where,
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            department: true,
+            empCode: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
+  /**
    * Request Earned Leave (EL) encashment.
    * 
    * Validates policy constraints (min balance, max request size) and creates a request.

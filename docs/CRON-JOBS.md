@@ -8,6 +8,7 @@ The system uses **Vercel Cron Jobs** to automate critical background tasks:
 
 1. **Monthly EL Accrual** - Adds 2 days of Earned Leave to all employees each month (Policy 6.19)
 2. **Annual Leave Lapse** - Resets Casual, Medical, and Quarantine leave balances at year-end (Policy 6.16, 6.21.a)
+3. **Year-End Rollover** - Carries EL (up to 60 days) to next year; excess to SPECIAL (Policy 6.19)
 
 ## Cron Jobs
 
@@ -60,6 +61,27 @@ For each employee:
   For each leave type in [CASUAL, MEDICAL, QUARANTINE]:
     - Set balance to 0 (opening, accrued, used, closing all = 0)
     - Log: "{LEAVE_TYPE}_LAPSED" with previous balance
+```
+
+### 3. Year-End EL Rollover
+
+**Endpoint:** `/api/cron/year-end-rollover`
+**Schedule:** `0 5 1 1 *` (5:00 AM on January 1)
+
+**What it does:**
+- For each employee's EARNED balance of the previous year:
+  - Carries closing balance up to 60 days to next year's `opening`
+  - Excess above 60 transfers to SPECIAL (up to 120 days total)
+- Also carries prior year SPECIAL closing to next year (capped at 120)
+- Runs after Auto-Lapse so CL/ML/Quarantine are reset first
+
+**Business Logic:**
+```typescript
+For each employee EARNED balance of year N:
+  closing = min(closing, 60) -> next year opening
+  excess = closing - 60 -> next year SPECIAL (capped 120)
+  prior SPECIAL closing -> next year SPECIAL opening
+  Log: "YEAR_END_ROLLOVER"
 ```
 
 ## Security

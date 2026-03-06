@@ -9,7 +9,11 @@ import { useNavbarState } from "./use-navbar-state";
 import { cn } from "@/lib/utils";
 import { useHasMounted } from "@/hooks";
 
-export function Navbar() {
+type NavbarProps = {
+  hideNavLinks?: boolean;
+};
+
+export function Navbar({ hideNavLinks = false }: NavbarProps) {
   const state = useNavbarState();
   const mounted = useHasMounted();
 
@@ -38,7 +42,7 @@ export function Navbar() {
         aria-label="Main navigation"
       >
         <div className="relative mx-auto flex h-full w-full min-w-0 flex-col justify-center px-4 sm:px-6 lg:px-8">
-          <DesktopNav {...state} />
+          <DesktopNav {...state} hideNavLinks={hideNavLinks} />
           <MobileBar {...state} />
         </div>
       </motion.nav>

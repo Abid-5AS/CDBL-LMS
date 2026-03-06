@@ -21,16 +21,19 @@ export async function GET(req: NextRequest) {
   const traceId = getTraceId(req as any);
   if (!me) return NextResponse.json(error("unauthorized", undefined, traceId), { status: 401 });
 
-  const statusFilter = req.nextUrl.searchParams.get("status"); // PENDING, APPROVED, REJECTED, PAID
+  const statusFilter = req.nextUrl.searchParams.get("status");
+  const adminRoles = ["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"];
 
   try {
-    const requests = await EncashmentService.getUserRequests(me.id);
+    const requests = adminRoles.includes(me.role)
+      ? await EncashmentService.getAllRequests(statusFilter)
+      : await EncashmentService.getUserRequests(me.id);
     return NextResponse.json({ requests });
   } catch (err) {
     return NextResponse.json(
       error(
         "encashment_list_failed",
-        err instanceof Error ? err.message : "Failed to load encashment requests",
+        "Failed to load encashment requests",
         traceId
       ),
       { status: 500 }

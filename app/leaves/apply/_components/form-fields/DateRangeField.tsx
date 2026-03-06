@@ -79,7 +79,7 @@ export function DateRangeField({
         holidays={holidays.map((d) => ({ date: d.toISOString().split('T')[0], name: 'Holiday' }))}
         disabled={submitting}
         minDate={minSelectableDate}
-        showQuickSelect={false}
+        showQuickSelect={true}
         bookedDates={bookedDates}
       />
       {/* Duration feedback */}

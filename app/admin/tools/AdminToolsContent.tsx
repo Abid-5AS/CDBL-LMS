@@ -20,9 +20,9 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { HolidayCalendarManager } from "@/components/admin/HolidayCalendarManager";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { BalanceAdjustment } from "@/components/admin/BalanceAdjustment";
+import { BulkLeaveImport } from "@/components/admin/BulkLeaveImport";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface AdminToolsContentProps {
@@ -44,6 +44,7 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
     "SYSTEM_ADMIN",
   ].includes(userRole);
   const canAdjustBalances = ["SYSTEM_ADMIN"].includes(userRole);
+  const canImportLeaves = ["HR_ADMIN", "HR_HEAD", "SYSTEM_ADMIN"].includes(userRole);
 
   return (
     <div className="space-y-6">
@@ -174,19 +175,78 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
             </div>
           </div>
         </Link>
+
+        {/* Balance Management */}
+        {canAdjustBalances && (
+          <Link
+            href="/admin/balance"
+            className="neo-card group block p-6 cursor-pointer"
+          >
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-lg bg-emerald-500/10">
+                <TrendingUp className="size-6 text-emerald-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold mb-1 text-foreground">
+                  Balance Management
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  View all employee balances, import/export, and adjust
+                </p>
+              </div>
+            </div>
+          </Link>
+        )}
+
+        {/* Holiday Calendar */}
+        {canManageHolidays && (
+          <Link
+            href="/admin/holidays"
+            className="neo-card group block p-6 cursor-pointer"
+          >
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-lg bg-teal-500/10">
+                <Calendar className="size-6 text-teal-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold mb-1 text-foreground">
+                  Holiday Calendar
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Manage holidays, CSV import/export, and calendar settings
+                </p>
+              </div>
+            </div>
+          </Link>
+        )}
       </div>
 
       {/* Management Tools */}
       <Tabs
-        defaultValue={canManageUsers ? "users" : canManageHolidays ? "holidays" : "balances"}
+        defaultValue={
+          canManageUsers ? "users" : canManageHolidays ? "holidays" : canImportLeaves ? "leaves" : "balances"
+        }
         className="w-full"
       >
-        <TabsList className={`grid w-full ${canManageUsers && canManageHolidays && canAdjustBalances ? 'grid-cols-3' : canManageUsers && canManageHolidays ? 'grid-cols-2' : 'grid-cols-1'}`}>
+        <TabsList
+          className={`grid w-full ${
+            [canManageUsers, canManageHolidays, canAdjustBalances, canImportLeaves].filter(Boolean).length === 4
+              ? "grid-cols-4"
+              : [canManageUsers, canManageHolidays, canAdjustBalances, canImportLeaves].filter(Boolean).length === 3
+                ? "grid-cols-3"
+                : [canManageUsers, canManageHolidays, canAdjustBalances, canImportLeaves].filter(Boolean).length === 2
+                  ? "grid-cols-2"
+                  : "grid-cols-1"
+          }`}
+        >
           {canManageUsers && (
             <TabsTrigger value="users">User Management</TabsTrigger>
           )}
           {canManageHolidays && (
             <TabsTrigger value="holidays">Holiday Calendar</TabsTrigger>
+          )}
+          {canImportLeaves && (
+            <TabsTrigger value="leaves">Bulk Leave Import</TabsTrigger>
           )}
           {canAdjustBalances && (
             <TabsTrigger value="balances">Balance Adjustment</TabsTrigger>
@@ -201,7 +261,30 @@ export function AdminToolsContent({ userRole }: AdminToolsContentProps) {
 
         {canManageHolidays && (
           <TabsContent value="holidays" className="mt-6">
-            <HolidayCalendarManager />
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="size-5" />
+                  Holiday Calendar Management
+                </CardTitle>
+                <CardDescription>
+                  Manage holidays, import from CSV, and configure the holiday calendar.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Link href="/admin/holidays">
+                  <button className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                    Open Holiday Management
+                  </button>
+                </Link>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
+
+        {canImportLeaves && (
+          <TabsContent value="leaves" className="mt-6">
+            <BulkLeaveImport />
           </TabsContent>
         )}
 

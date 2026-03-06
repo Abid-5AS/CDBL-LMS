@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { PayrollCalculator } from "@/lib/payroll/calculator";
 import { PayrollExportService } from "@/lib/payroll/export.service";
 import { prisma } from "@/lib/prisma";
-import { Role } from "@/src/generated/prisma/client";
+
 
 export async function GET(request: NextRequest) {
     try {
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
         const { searchParams } = new URL(request.url);
         const month = parseInt(searchParams.get("month") || "");
         const year = parseInt(searchParams.get("year") || "");
-        const departmentId = searchParams.get("departmentId");
+        const department = searchParams.get("department");
 
         if (isNaN(month) || isNaN(year)) {
             return NextResponse.json(
@@ -26,13 +26,10 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // Fetch employees
-        const whereClause: any = {
-            isActive: true, // Only active employees
-        };
+        const whereClause: any = {};
 
-        if (departmentId) {
-            whereClause.departmentId = parseInt(departmentId);
+        if (department) {
+            whereClause.department = department;
         }
 
         const employees = await prisma.user.findMany({
