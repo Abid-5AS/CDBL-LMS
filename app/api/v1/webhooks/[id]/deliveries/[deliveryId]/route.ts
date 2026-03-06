@@ -41,7 +41,7 @@ export async function GET(
     return NextResponse.json(error('unauthorized', undefined, traceId), { status: 401 });
   }
 
-  if (!['HR_ADMIN', 'HR_HEAD', 'SUPER_ADMIN'].includes(me.role)) {
+  if (!['HR_ADMIN', 'HR_HEAD', 'SYSTEM_ADMIN'].includes(me.role)) {
     return NextResponse.json(
       error('forbidden', 'Insufficient permissions', traceId),
       { status: 403 }
@@ -112,7 +112,7 @@ export async function POST(
     return NextResponse.json(error('unauthorized', undefined, traceId), { status: 401 });
   }
 
-  if (!['HR_ADMIN', 'HR_HEAD', 'SUPER_ADMIN'].includes(me.role)) {
+  if (!['HR_ADMIN', 'HR_HEAD', 'SYSTEM_ADMIN'].includes(me.role)) {
     return NextResponse.json(
       error('forbidden', 'Insufficient permissions', traceId),
       { status: 403 }
@@ -153,3 +153,5 @@ export async function POST(
     );
   }
 }
+
+export const dynamic = "force-dynamic";

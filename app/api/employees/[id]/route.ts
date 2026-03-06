@@ -117,3 +117,5 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     role: updated.role,
   });
 }
+
+export const dynamic = "force-dynamic";

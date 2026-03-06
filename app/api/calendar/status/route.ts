@@ -42,3 +42,5 @@ export async function GET(req: NextRequest) {
     outlook: configs.find(c => c.provider === 'OUTLOOK') || null
   });
 }
+
+export const dynamic = "force-dynamic";

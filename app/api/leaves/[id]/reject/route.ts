@@ -110,37 +110,10 @@ export async function POST(
     data: { status: newStatus as LeaveStatus },
   });
 
-  // Restore balance when leave is rejected
-  // This allows the employee to reapply with corrected information
-  const currentYear = new Date().getFullYear();
-  const balance = await prisma.balance.findUnique({
-    where: {
-      userId_type_year: {
-        userId: leave.requesterId,
-        type: leave.type,
-        year: currentYear,
-      },
-    },
-  });
-
-  if (balance) {
-    const newUsed = Math.max((balance.used || 0) - leave.workingDays, 0);
-    const newClosing = (balance.opening || 0) + (balance.accrued || 0) - newUsed;
-
-    await prisma.balance.update({
-      where: {
-        userId_type_year: {
-          userId: leave.requesterId,
-          type: leave.type,
-          year: currentYear,
-        },
-      },
-      data: {
-        used: newUsed,
-        closing: newClosing,
-      },
-    });
-  }
+  // No balance restoration needed for rejecting SUBMITTED/PENDING leaves
+  // because balance is only deducted on approval.
+  // For CANCELLATION_REQUESTED leaves (rejecting a cancellation request),
+  // the leave stays approved and balance remains deducted — which is correct.
 
   // Create audit log
   await prisma.auditLog.create({

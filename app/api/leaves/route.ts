@@ -117,7 +117,9 @@ export async function GET(req: Request) {
 
     let items;
 
-    if (mine) {
+    const isAdmin = ["HR_ADMIN", "HR_HEAD", "CEO", "SYSTEM_ADMIN"].includes(me.role);
+
+    if (mine || !isAdmin) {
       if (statusFilter && statusFilter !== "all") {
         items = await LeaveRepository.findByUserId(me.id, statusFilter as any, { limit, cursor });
       } else {
@@ -142,7 +144,7 @@ export async function GET(req: Request) {
     console.error("GET /api/leaves error:", err);
     console.error("Error stack:", err instanceof Error ? err.stack : "No stack trace");
     return NextResponse.json(
-      error("internal_error", "Failed to fetch leave requests: " + String(err), traceId),
+      error("internal_error", "Failed to fetch leave requests", traceId),
       { status: 500 }
     );
   }
@@ -349,3 +351,5 @@ export async function POST(req: Request) {
     );
   }
 }
+
+export const dynamic = "force-dynamic";

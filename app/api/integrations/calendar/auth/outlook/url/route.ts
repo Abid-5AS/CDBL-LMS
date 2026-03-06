@@ -9,3 +9,5 @@ export async function GET() {
         return NextResponse.json({ error: 'Failed to generate auth URL' }, { status: 500 });
     }
 }
+
+export const dynamic = "force-dynamic";

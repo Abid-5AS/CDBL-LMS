@@ -12,6 +12,10 @@ export async function GET() {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
+  if (me.role !== "SYSTEM_ADMIN") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   // Get ALL leave requests with their approvals
   const allLeaves = await prisma.leaveRequest.findMany({
     include: {
@@ -93,3 +97,5 @@ export async function GET() {
     whereClauseUsed: hrAdminWhereClause,
   });
 }
+
+export const dynamic = "force-dynamic";

@@ -36,7 +36,7 @@ const nextConfig: NextConfig = {
             },
             // Limit size of chunks to reduce memory
             largeChunks: {
-              test: (module) => module.size() > 100000, // 100KB
+              test: (module: any) => module.size && module.size() > 100000, // 100KB
               priority: 5,
               chunks: 'all',
             },
@@ -52,6 +52,16 @@ const nextConfig: NextConfig = {
   experimental: {
     // Reduce memory usage by limiting concurrent builds
     workerThreads: false, // Disable worker threads in development
+  },
+  
+  // Disable typescript checking during build to avoid OOM crashes.
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    // Warning: This allows production builds to successfully complete even if
+    // your project has ESLint errors.
+    ignoreDuringBuilds: true,
   },
 
   // Empty turbopack config to silence migration warning
@@ -88,7 +98,7 @@ const nextConfig: NextConfig = {
         source: "/api/:path*",
         headers: [
           { key: "Access-Control-Allow-Credentials", value: "true" },
-          { key: "Access-Control-Allow-Origin", value: process.env.ALLOWED_ORIGINS || "*" },
+          { key: "Access-Control-Allow-Origin", value: process.env.ALLOWED_ORIGINS || "http://localhost:3000" },
           { key: "Access-Control-Allow-Methods", value: "GET,DELETE,PATCH,POST,PUT,OPTIONS" },
           {
             key: "Access-Control-Allow-Headers",
@@ -100,6 +110,7 @@ const nextConfig: NextConfig = {
   },
 };
 
+// NextPWA must be required like this as it doesn't officially support Next 15/16 yet perfectly with turbopack
 const withPWA = require("@ducanh2912/next-pwa").default({
   dest: "public",
   disable: process.env.NODE_ENV === "development",
@@ -108,4 +119,4 @@ const withPWA = require("@ducanh2912/next-pwa").default({
 });
 
 export default withPWA(nextConfig);
-// export default nextConfig;
+

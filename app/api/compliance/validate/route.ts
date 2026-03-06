@@ -217,3 +217,5 @@ export async function GET() {
   return NextResponse.json(report);
 }
 
+
+export const dynamic = "force-dynamic";

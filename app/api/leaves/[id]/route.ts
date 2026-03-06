@@ -27,17 +27,28 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json(error("not_found", undefined, traceId), { status: 404 });
   }
 
-  // Access control:
-  // 1. Requester can see their own leave
-  // 2. HR/Admins can see all leaves
-  // 3. Approvers can see leaves assigned to them (or generally all if they have broad view, but let's stick to basics)
   const isRequester = leave.requesterId === me.id;
   const isAdmin = ["HR_ADMIN", "HR_HEAD", "SYSTEM_ADMIN", "CEO"].includes(me.role);
-  // Simple check for now, can be expanded for specific approvers if needed
 
+  let isApprover = false;
   if (!isRequester && !isAdmin) {
-    // Check if user is an approver for this leave?
-    // For now, mirroring PATCH logic which restricts to requester, but we can allow admins too for view
+    const pendingApproval = await prisma.approval.findFirst({
+      where: { leaveId: id, approverId: me.id },
+    });
+    if (pendingApproval) {
+      isApprover = true;
+    } else if (me.role === "DEPT_HEAD") {
+      const requester = await prisma.user.findUnique({
+        where: { id: leave.requesterId },
+        select: { deptHeadId: true },
+      });
+      if (requester?.deptHeadId === me.id) {
+        isApprover = true;
+      }
+    }
+  }
+
+  if (!isRequester && !isAdmin && !isApprover) {
     return NextResponse.json(error("not_found", undefined, traceId), { status: 404 });
   }
 
@@ -152,3 +163,5 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     balanceRestored,
   });
 }
+
+export const dynamic = "force-dynamic";

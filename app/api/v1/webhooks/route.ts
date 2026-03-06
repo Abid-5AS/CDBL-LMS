@@ -84,8 +84,8 @@ export async function GET(req: Request) {
     return NextResponse.json(error('unauthorized', undefined, traceId), { status: 401 });
   }
 
-  // Only HR_ADMIN, HR_HEAD, and SUPER_ADMIN can manage webhooks
-  if (!['HR_ADMIN', 'HR_HEAD', 'SUPER_ADMIN'].includes(me.role)) {
+  // Only HR_ADMIN, HR_HEAD, and SYSTEM_ADMIN can manage webhooks
+  if (!['HR_ADMIN', 'HR_HEAD', 'SYSTEM_ADMIN'].includes(me.role)) {
     return NextResponse.json(
       error('forbidden', 'Insufficient permissions to access webhooks', traceId),
       { status: 403 }
@@ -226,8 +226,8 @@ export async function POST(req: Request) {
     return NextResponse.json(error('unauthorized', undefined, traceId), { status: 401 });
   }
 
-  // Only HR_ADMIN, HR_HEAD, and SUPER_ADMIN can create webhooks
-  if (!['HR_ADMIN', 'HR_HEAD', 'SUPER_ADMIN'].includes(me.role)) {
+  // Only HR_ADMIN, HR_HEAD, and SYSTEM_ADMIN can create webhooks
+  if (!['HR_ADMIN', 'HR_HEAD', 'SYSTEM_ADMIN'].includes(me.role)) {
     return NextResponse.json(
       error('forbidden', 'Insufficient permissions to create webhooks', traceId),
       { status: 403 }
@@ -280,3 +280,5 @@ export async function POST(req: Request) {
     );
   }
 }
+
+export const dynamic = "force-dynamic";

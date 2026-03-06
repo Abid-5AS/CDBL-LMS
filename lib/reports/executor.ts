@@ -1,8 +1,16 @@
-import { PrismaClient } from "@prisma/client";
-import { ReportConfig } from "@/components/reports/builder/ConfigPanel";
 import { format } from "date-fns";
+import { prisma } from "@/lib/prisma";
 
-const prisma = new PrismaClient();
+export interface ReportConfig {
+    metric: string;
+    dimension: string;
+    filter?: {
+        field: string;
+        operator: string;
+        value: string;
+    };
+    chartType?: "bar" | "line" | "pie" | "table";
+}
 
 export async function executeReport(config: ReportConfig) {
     // 1. Determine Group By (Dimension)

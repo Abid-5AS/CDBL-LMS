@@ -102,3 +102,5 @@ export async function GET(req: Request) {
 
 // Cache invalidation is now handled by Redis invalidateCache() function
 // Call invalidateCache('approvals:*') after approval operations
+
+export const dynamic = "force-dynamic";

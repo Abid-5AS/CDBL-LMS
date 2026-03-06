@@ -222,7 +222,9 @@ function CalendarView({ requests, onSelectRequest }: { requests: any[]; onSelect
 
 function RequestsView() {
   const router = useRouter();
-  const { data, error, isLoading } = useLeaveData();
+  const { data, error, isLoading, mutate } = useLeaveData();
+  const apiError = error as (Error & { status?: number }) | undefined;
+  const isUnauthorized = apiError?.status === 401;
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
@@ -348,10 +350,25 @@ function RequestsView() {
           <Card className="border-destructive/50 bg-destructive/5">
             <CardContent className="flex flex-col items-center justify-center p-6 text-center">
               <AlertCircle className="h-10 w-10 text-destructive mb-2" />
-              <p className="text-destructive font-medium">Failed to load requests</p>
-              <Button variant="outline" onClick={() => window.location.reload()} className="mt-4">
-                Try Again
-              </Button>
+              <p className="text-destructive font-medium">
+                {isUnauthorized
+                  ? "Your session may have expired. Please log in again."
+                  : "Failed to load requests"}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2 justify-center">
+                {isUnauthorized ? (
+                  <Button variant="outline" onClick={() => router.push("/login")}>
+                    Log in
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    onClick={() => mutate()}
+                  >
+                    Try Again
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
         ) : filteredRequests.length === 0 ? (

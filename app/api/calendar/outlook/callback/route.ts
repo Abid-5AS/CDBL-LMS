@@ -20,3 +20,5 @@ export async function GET(req: Request) {
         return NextResponse.redirect(new URL('/calendar?error=auth_failed', req.url));
     }
 }
+
+export const dynamic = "force-dynamic";

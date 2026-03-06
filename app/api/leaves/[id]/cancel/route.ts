@@ -6,7 +6,6 @@ import { z } from "zod";
 import { error } from "@/lib/errors";
 import { getTraceId } from "@/lib/trace";
 import { canCancelMaternityLeave } from "@/lib/leaves/leave-validation";
-import { processELOverflow } from "@/lib/leaves/el-overflow";
 
 export const cache = "no-store";
 
@@ -122,50 +121,8 @@ export async function POST(
     data: { status: LeaveStatus.CANCELLED },
   });
 
-  // Restore balance if leave was pending/submitted (not yet approved)
-  // This allows the employee to reapply immediately
-  const currentYear = new Date().getFullYear();
-  const balance = await prisma.balance.findUnique({
-    where: {
-      userId_type_year: {
-        userId: leave.requesterId,
-        type: leave.type,
-        year: currentYear,
-      },
-    },
-  });
-
-  if (balance) {
-    // Since the leave was never approved, we don't need to restore "used" balance
-    // The balance was already available, this is just a cleanup/confirmation
-    // However, if the balance was temporarily reserved, we restore it here
-    const newUsed = Math.max((balance.used || 0) - leave.workingDays, 0);
-    const newClosing = (balance.opening || 0) + (balance.accrued || 0) - newUsed;
-
-    await prisma.balance.update({
-      where: {
-        userId_type_year: {
-          userId: leave.requesterId,
-          type: leave.type,
-          year: currentYear,
-        },
-      },
-      data: {
-        used: newUsed,
-        closing: newClosing,
-      },
-    });
-
-    // Check if EL overflow to SPECIAL is needed (Policy 6.19.c)
-    if (leave.type === "EARNED" && newClosing > 60) {
-      await processELOverflow(
-        leave.requesterId,
-        currentYear,
-        user.email,
-        "leave_cancelled"
-      );
-    }
-  }
+  // No balance restoration needed: this route only handles SUBMITTED/PENDING
+  // leaves where balance was never deducted on approval.
 
   // Create audit log
   await prisma.auditLog.create({

@@ -281,16 +281,45 @@ export async function POST(
   // Handle file upload if provided
   let certificateUrl = body.certificateUrl || leave.certificateUrl;
   if (body.certificateFile && body.certificateFile instanceof File) {
+    const allowedExtensions = [".pdf", ".jpg", ".jpeg", ".png"];
+    const maxSizeBytes = 5 * 1024 * 1024; // 5MB
+
+    const fileExt = path.extname(body.certificateFile.name).toLowerCase();
+    if (!allowedExtensions.includes(fileExt)) {
+      return NextResponse.json(
+        error("invalid_file_type", `Only ${allowedExtensions.join(", ")} files are allowed`, traceId),
+        { status: 400 }
+      );
+    }
+
+    if (body.certificateFile.size > maxSizeBytes) {
+      return NextResponse.json(
+        error("file_too_large", "File size must not exceed 5MB", traceId),
+        { status: 400 }
+      );
+    }
+
+    const bytes = await body.certificateFile.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    // MIME validation via magic bytes
+    const { fileTypeFromBuffer } = await import("file-type");
+    const detected = await fileTypeFromBuffer(buffer);
+    const allowedMimes = ["application/pdf", "image/jpeg", "image/png"];
+    if (detected && !allowedMimes.includes(detected.mime)) {
+      return NextResponse.json(
+        error("invalid_file_content", "File content does not match its extension", traceId),
+        { status: 400 }
+      );
+    }
+
     const uploadsDir = path.join(process.cwd(), "private", "uploads");
     await fs.mkdir(uploadsDir, { recursive: true });
-    
-    const fileExt = path.extname(body.certificateFile.name);
+
     const filename = `${randomUUID()}${fileExt}`;
     const filePath = path.join(uploadsDir, filename);
-    
-    const bytes = await body.certificateFile.arrayBuffer();
-    await fs.writeFile(filePath, Buffer.from(bytes));
-    
+    await fs.writeFile(filePath, buffer);
+
     certificateUrl = generateSignedUrl(filename);
   }
 

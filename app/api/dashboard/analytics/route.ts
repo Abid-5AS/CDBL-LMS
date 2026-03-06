@@ -197,3 +197,5 @@ export async function GET(req: Request) {
     ].filter((d) => d.days > 0),
   });
 }
+
+export const dynamic = "force-dynamic";

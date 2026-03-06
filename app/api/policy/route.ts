@@ -6,3 +6,5 @@ export const cache = "no-store";
 export async function GET() {
   return NextResponse.json({ policy });
 }
+
+export const dynamic = "force-dynamic";

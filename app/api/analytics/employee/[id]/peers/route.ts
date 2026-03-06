@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { getCachedAnalytics, CACHE_TTL } from "@/lib/analytics/cache";
 import { getCurrentUser } from "@/lib/auth";
-
-const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -96,3 +94,5 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         );
     }
 }
+
+export const dynamic = "force-dynamic";

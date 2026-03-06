@@ -143,3 +143,5 @@ export async function GET() {
   return NextResponse.json({ alerts });
 }
 
+
+export const dynamic = "force-dynamic";

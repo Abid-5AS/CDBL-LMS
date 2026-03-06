@@ -130,3 +130,5 @@ export async function GET(request: Request) {
     MEDICAL: remaining("MEDICAL"),
   });
 }
+
+export const dynamic = "force-dynamic";

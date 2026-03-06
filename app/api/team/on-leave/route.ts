@@ -177,3 +177,5 @@ export async function GET(req: Request) {
     days // Map of YYYY-MM-DD -> { count, members }
   });
 }
+
+export const dynamic = "force-dynamic";

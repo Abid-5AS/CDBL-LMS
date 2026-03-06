@@ -79,3 +79,5 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL('/profile/integrations?error=exchange_failed', req.url));
   }
 }
+
+export const dynamic = "force-dynamic";

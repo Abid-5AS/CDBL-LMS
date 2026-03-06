@@ -258,3 +258,5 @@ export async function GET() {
     data: policies,
   });
 }
+
+export const dynamic = "force-dynamic";

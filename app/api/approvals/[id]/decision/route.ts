@@ -16,11 +16,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { canApprove } = await import("@/lib/rbac");
-  if (!canApprove(user.role)) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
-
   const body = await request.json();
   const parsed = bodySchema.safeParse(body);
   if (!parsed.success) {
@@ -36,16 +31,17 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const result = await resolveLeave(numericId, decision, user.id, parsed.data.comment);
 
   if (!result.ok) {
-    if (result.error === "not_found") {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
-    }
-    if (result.error === "already_resolved") {
-      return NextResponse.json({ error: "Leave already resolved" }, { status: 400 });
-    }
-    if (result.error === "self_approval_disallowed") {
-      return NextResponse.json({ error: "Cannot approve your own leave request" }, { status: 403 });
-    }
-    return NextResponse.json({ error: "unexpected_error" }, { status: 500 });
+    const statusMap: Record<string, { msg: string; code: number }> = {
+      not_found: { msg: "Not found", code: 404 },
+      already_resolved: { msg: "Leave already resolved", code: 400 },
+      self_approval_disallowed: { msg: "Cannot approve your own leave request", code: 403 },
+      forbidden: { msg: "You do not have permission to perform this action", code: 403 },
+      not_final_approver: { msg: "Only the final approver can approve leave requests", code: 403 },
+      balance_deduction_failed: { msg: "Insufficient leave balance", code: 400 },
+    };
+
+    const mapped = statusMap[result.error] || { msg: "Unexpected error", code: 500 };
+    return NextResponse.json({ error: mapped.msg }, { status: mapped.code });
   }
 
   return NextResponse.json({

@@ -18,7 +18,8 @@ export async function getUserRole(): Promise<AppRole | null> {
     role === "HR_HEAD" ||
     role === "DEPT_HEAD" ||
     role === "CEO" ||
-    role === "EMPLOYEE"
+    role === "EMPLOYEE" ||
+    role === "SYSTEM_ADMIN"
   ) {
     return role as AppRole;
   }

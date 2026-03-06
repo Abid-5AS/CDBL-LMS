@@ -29,6 +29,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
+    const maxSizeBytes = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSizeBytes) {
+      return NextResponse.json({ error: 'File size must not exceed 10MB' }, { status: 400 });
+    }
+
     // Determine provider based on file type or explicit provider parameter
     let syncProvider;
 
@@ -60,7 +65,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'Failed to sync HRIS data',
-        details: String(error),
       },
       { status: 500 }
     );
@@ -122,3 +126,5 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export const dynamic = "force-dynamic";

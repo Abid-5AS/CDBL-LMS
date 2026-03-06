@@ -279,24 +279,66 @@ export async function deductMultipleBalances(
   leaveId: number,
   performedBy: { id: number; email: string; role: string }
 ): Promise<{ success: boolean; results: BalanceUpdateResult[]; error?: string }> {
-  const results: BalanceUpdateResult[] = [];
-
   try {
-    for (const { type, days } of deductions) {
-      if (days > 0) {
-        const result = await deductBalance(userId, type, days, year, leaveId, performedBy);
-        results.push(result);
+    return await prisma.$transaction(async (tx) => {
+      const results: BalanceUpdateResult[] = [];
 
-        if (!result.success) {
-          // Rollback will happen automatically due to transaction failure
-          return { success: false, results, error: result.error };
+      for (const { type, days } of deductions) {
+        if (days <= 0) continue;
+
+        const balance = await tx.balance.findUnique({
+          where: { userId_type_year: { userId, type, year } },
+        });
+
+        if (!balance) {
+          throw new Error(`Balance record not found for user ${userId}, type ${type}, year ${year}`);
         }
-      }
-    }
 
-    return { success: true, results };
+        const beforeUsed = balance.used || 0;
+        const beforeClosing = balance.closing || 0;
+        const available = (balance.opening || 0) + (balance.accrued || 0) - beforeUsed;
+
+        if (days > available) {
+          return {
+            success: false,
+            results,
+            error: `Insufficient ${type} balance. Available: ${available} days, Required: ${days} days`,
+          };
+        }
+
+        await tx.balance.update({
+          where: { userId_type_year: { userId, type, year } },
+          data: { used: { increment: days }, closing: { decrement: days } },
+        });
+
+        await tx.auditLog.create({
+          data: {
+            actorEmail: performedBy.email,
+            action: "BALANCE_DEDUCTED",
+            targetEmail: "",
+            details: {
+              balanceId: balance.id, leaveId, leaveType: type, year, days,
+              beforeUsed, afterUsed: beforeUsed + days,
+              beforeClosing, afterClosing: Math.max(beforeClosing - days, 0),
+              performedByRole: performedBy.role,
+            },
+          },
+        });
+
+        results.push({
+          success: true,
+          balanceId: balance.id,
+          beforeUsed,
+          afterUsed: beforeUsed + days,
+          beforeClosing,
+          afterClosing: Math.max(beforeClosing - days, 0),
+        });
+      }
+
+      return { success: true, results };
+    });
   } catch (error: any) {
-    return { success: false, results, error: error.message };
+    return { success: false, results: [], error: error.message };
   }
 }
 
@@ -311,22 +353,57 @@ export async function restoreMultipleBalances(
   performedBy: { id: number; email: string; role: string },
   reason: "REJECTION" | "CANCELLATION" | "MODIFICATION" | "CORRECTION"
 ): Promise<{ success: boolean; results: BalanceUpdateResult[]; error?: string }> {
-  const results: BalanceUpdateResult[] = [];
-
   try {
-    for (const { type, days } of restorations) {
-      if (days > 0) {
-        const result = await restoreBalance(userId, type, days, year, leaveId, performedBy, reason);
-        results.push(result);
+    return await prisma.$transaction(async (tx) => {
+      const results: BalanceUpdateResult[] = [];
 
-        if (!result.success) {
-          return { success: false, results, error: result.error };
+      for (const { type, days } of restorations) {
+        if (days <= 0) continue;
+
+        const balance = await tx.balance.findUnique({
+          where: { userId_type_year: { userId, type, year } },
+        });
+
+        if (!balance) {
+          throw new Error(`Balance record not found for user ${userId}, type ${type}, year ${year}`);
         }
-      }
-    }
 
-    return { success: true, results };
+        const beforeUsed = balance.used || 0;
+        const beforeClosing = balance.closing || 0;
+        const afterUsed = Math.max(beforeUsed - days, 0);
+        const afterClosing = beforeClosing + days;
+
+        await tx.balance.update({
+          where: { userId_type_year: { userId, type, year } },
+          data: { used: { decrement: days }, closing: { increment: days } },
+        });
+
+        await tx.auditLog.create({
+          data: {
+            actorEmail: performedBy.email,
+            action: "BALANCE_RESTORED",
+            targetEmail: "",
+            details: {
+              balanceId: balance.id, leaveId, leaveType: type, year, days,
+              beforeUsed, afterUsed, beforeClosing, afterClosing,
+              reason, performedByRole: performedBy.role,
+            },
+          },
+        });
+
+        results.push({
+          success: true,
+          balanceId: balance.id,
+          beforeUsed,
+          afterUsed,
+          beforeClosing,
+          afterClosing,
+        });
+      }
+
+      return { success: true, results };
+    });
   } catch (error: any) {
-    return { success: false, results, error: error.message };
+    return { success: false, results: [], error: error.message };
   }
 }

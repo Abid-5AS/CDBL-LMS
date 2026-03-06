@@ -59,8 +59,12 @@ export function verifySignedUrl(filename: string, expires: string, sig: string):
  * @returns Absolute path to the file
  */
 export function getFilePath(filename: string): string {
-  const uploadDir = path.join(process.cwd(), "private", "uploads");
-  return path.join(uploadDir, filename);
+  const uploadDir = path.resolve(process.cwd(), "private", "uploads");
+  const resolved = path.resolve(uploadDir, filename);
+  if (!resolved.startsWith(uploadDir + path.sep) && resolved !== uploadDir) {
+    throw new Error("Invalid filename");
+  }
+  return resolved;
 }
 
 /**

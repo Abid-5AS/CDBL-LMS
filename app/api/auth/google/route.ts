@@ -12,3 +12,5 @@ export async function GET(req: NextRequest) {
   
   return NextResponse.redirect(authUrl);
 }
+
+export const dynamic = "force-dynamic";

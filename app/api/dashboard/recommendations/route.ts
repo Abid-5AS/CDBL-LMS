@@ -199,3 +199,5 @@ export async function GET() {
   return NextResponse.json({ recommendations });
 }
 
+
+export const dynamic = "force-dynamic";

@@ -558,8 +558,8 @@ export function LoginForm() {
                 size="sm"
                 className="text-xs border border-zinc-200 dark:border-zinc-800"
                 onClick={() => {
-                  setEmail("admin1@test.local");
-                  setPassword("password123");
+                  setEmail("sysadmin@cdbl.local");
+                  setPassword("demo123");
                 }}
               >
                 Admin
@@ -570,8 +570,8 @@ export function LoginForm() {
                 size="sm"
                 className="text-xs border border-zinc-200 dark:border-zinc-800"
                 onClick={() => {
-                  setEmail("hradmin1@test.local");
-                  setPassword("password123");
+                  setEmail("hradmin@demo.local");
+                  setPassword("demo123");
                 }}
               >
                 HR Admin
@@ -582,8 +582,8 @@ export function LoginForm() {
                 size="sm"
                 className="text-xs border border-zinc-200 dark:border-zinc-800"
                 onClick={() => {
-                  setEmail("hrhead1@test.local");
-                  setPassword("password123");
+                  setEmail("hrhead@demo.local");
+                  setPassword("demo123");
                 }}
               >
                 HR Head
@@ -594,8 +594,8 @@ export function LoginForm() {
                 size="sm"
                 className="text-xs border border-zinc-200 dark:border-zinc-800"
                 onClick={() => {
-                  setEmail("manager1@test.local");
-                  setPassword("password123");
+                  setEmail("manager@demo.local");
+                  setPassword("demo123");
                 }}
               >
                 Dept Head
@@ -606,8 +606,8 @@ export function LoginForm() {
                 size="sm"
                 className="text-xs border border-zinc-200 dark:border-zinc-800"
                 onClick={() => {
-                  setEmail("ceo1@test.local");
-                  setPassword("password123");
+                  setEmail("ceo@demo.local");
+                  setPassword("demo123");
                 }}
               >
                 CEO
@@ -618,8 +618,8 @@ export function LoginForm() {
                 size="sm"
                 className="text-xs border border-zinc-200 dark:border-zinc-800"
                 onClick={() => {
-                  setEmail("employee1@test.local");
-                  setPassword("password123");
+                  setEmail("employee1@demo.local");
+                  setPassword("demo123");
                 }}
               >
                 Employee

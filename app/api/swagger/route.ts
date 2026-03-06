@@ -20,3 +20,5 @@ import swaggerSpec from '@/lib/swagger/config';
 export async function GET() {
   return NextResponse.json(swaggerSpec);
 }
+
+export const dynamic = "force-dynamic";

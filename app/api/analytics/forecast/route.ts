@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 import { getCachedAnalytics, CACHE_TTL } from "@/lib/analytics/cache";
 import { getCurrentUser } from "@/lib/auth";
-import { linearRegressionForecast } from "@/lib/analytics/forecasting";
-import { format, subMonths, addMonths } from "date-fns";
-
-const prisma = new PrismaClient();
+import { LeaveForecast } from "@/lib/analytics/forecasting";
 
 export async function GET(req: NextRequest) {
     try {
@@ -22,57 +18,22 @@ export async function GET(req: NextRequest) {
         const data = await getCachedAnalytics(
             cacheKey,
             async () => {
-                // Fetch last 12 months of data
-                const endDate = new Date();
-                const startDate = subMonths(endDate, 12);
-
-                const leaves = await prisma.leaveRequest.findMany({
-                    where: {
-                        startDate: { gte: startDate, lte: endDate },
-                        status: "APPROVED",
-                    },
-                    select: { startDate: true },
-                });
-
-                // Aggregate by month index (0-11 relative to start date)
-                const monthlyCounts: number[] = new Array(13).fill(0);
-
-                leaves.forEach(l => {
-                    const monthDiff = (l.startDate.getFullYear() - startDate.getFullYear()) * 12 + (l.startDate.getMonth() - startDate.getMonth());
-                    if (monthDiff >= 0 && monthDiff <= 12) {
-                        monthlyCounts[monthDiff]++;
-                    }
-                });
-
-                const history = monthlyCounts.map((val, idx) => ({
-                    period: idx,
-                    value: val
-                }));
-
-                // Generate forecast
-                const forecast = linearRegressionForecast(history, monthsParam);
+                // Generate forecast using LeaveForecast
+                const forecasts = await LeaveForecast.forecastLeaveVolume(monthsParam);
 
                 // Format for chart
-                const chartData = [];
-
-                // Add historical points
-                history.forEach(h => {
-                    const date = addMonths(startDate, h.period);
-                    chartData.push({
-                        period: format(date, "MMM yyyy"),
-                        actual: h.value,
-                    });
-                });
-
-                // Add forecast points
-                forecast.forEach(f => {
-                    const date = addMonths(startDate, f.period);
-                    chartData.push({
-                        period: format(date, "MMM yyyy"),
-                        forecast: f.value,
-                        confidenceLower: f.confidenceLower,
-                        confidenceUpper: f.confidenceUpper,
-                    });
+                const chartData = forecasts.map(f => {
+                    // f.period is "YYYY-MM"
+                    const [year, month] = f.period.split('-');
+                    const date = new Date(parseInt(year), parseInt(month) - 1);
+                    
+                    return {
+                        period: date.toLocaleString('default', { month: 'short', year: 'numeric' }),
+                        forecast: f.forecastedLeaveDays,
+                        confidenceLower: f.confidenceInterval.lower,
+                        confidenceUpper: f.confidenceInterval.upper,
+                        trend: f.trend
+                    };
                 });
 
                 return { chartData };
@@ -89,3 +50,5 @@ export async function GET(req: NextRequest) {
         );
     }
 }
+
+export const dynamic = "force-dynamic";

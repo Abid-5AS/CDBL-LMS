@@ -28,3 +28,5 @@ export async function GET(
   return serveSignedFile(filename, expires, sig);
 }
 
+
+export const dynamic = "force-dynamic";

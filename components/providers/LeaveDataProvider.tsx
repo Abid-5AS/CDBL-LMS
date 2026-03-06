@@ -20,6 +20,7 @@ const LeaveDataContext = createContext<LeaveDataContextValue | null>(null);
 export function LeaveDataProvider({ children }: { children: ReactNode }) {
   const swrState = useSWR<LeaveResponse>("/api/leaves?mine=1", apiFetcher, {
     revalidateOnFocus: false,
+    shouldRetryOnError: (err) => (err as { status?: number })?.status !== 401,
   });
 
   return <LeaveDataContext.Provider value={swrState}>{children}</LeaveDataContext.Provider>;
@@ -34,7 +35,10 @@ export function useLeaveData() {
   const fallback = useSWR<LeaveResponse>(
     context ? null : "/api/leaves?mine=1",
     apiFetcher,
-    { revalidateOnFocus: false },
+    {
+      revalidateOnFocus: false,
+      shouldRetryOnError: (err) => (err as { status?: number })?.status !== 401,
+    },
   );
   return context ?? fallback;
 }

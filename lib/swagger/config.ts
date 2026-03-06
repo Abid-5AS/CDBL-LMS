@@ -177,7 +177,7 @@ API errors follow a standardized format:
         },
         UserRole: {
           type: 'string',
-          enum: ['EMPLOYEE', 'HR_ADMIN', 'DEPT_HEAD', 'HR_HEAD', 'CEO', 'SUPER_ADMIN'],
+          enum: ['EMPLOYEE', 'HR_ADMIN', 'DEPT_HEAD', 'HR_HEAD', 'CEO', 'SYSTEM_ADMIN'],
           example: 'EMPLOYEE',
         },
         // Leave Request schema

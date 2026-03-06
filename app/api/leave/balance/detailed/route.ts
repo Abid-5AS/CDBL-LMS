@@ -36,3 +36,5 @@ export async function GET(request: Request) {
         balances: detailedBalances,
     });
 }
+
+export const dynamic = "force-dynamic";

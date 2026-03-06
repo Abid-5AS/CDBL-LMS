@@ -141,36 +141,6 @@ export async function POST(
     },
   });
 
-  if (existingApproval) {
-    await prisma.approval.update({
-      where: { id: existingApproval.id },
-      data: {
-        decision: "APPROVED",
-        decidedAt: new Date(),
-        comment: parsed.data.comment,
-      },
-    });
-  } else {
-    // Fallback: create new approval record
-    await prisma.approval.create({
-      data: {
-        leaveId,
-        step,
-        approverId: user.id,
-        decision: "APPROVED",
-        decidedAt: new Date(),
-        comment: parsed.data.comment,
-      },
-    });
-  }
-
-  // Update leave status
-  await prisma.leaveRequest.update({
-    where: { id: leaveId },
-    data: { status: newStatus as LeaveStatus },
-  });
-
-  // Handle balance updates
   const currentYear = new Date().getFullYear();
 
   // For cancellation requests: restore balance instead of deducting
@@ -223,6 +193,24 @@ export async function POST(
         },
       });
     }
+
+    // Atomically update approval + leave status for cancellation
+    await prisma.$transaction(async (tx) => {
+      if (existingApproval) {
+        await tx.approval.update({
+          where: { id: existingApproval.id },
+          data: { decision: "APPROVED", decidedAt: new Date(), comment: parsed.data.comment },
+        });
+      } else {
+        await tx.approval.create({
+          data: { leaveId, step, approverId: user.id, decision: "APPROVED", decidedAt: new Date(), comment: parsed.data.comment },
+        });
+      }
+      await tx.leaveRequest.update({
+        where: { id: leaveId },
+        data: { status: newStatus as LeaveStatus },
+      });
+    });
 
     // Create audit log for cancellation approval
     await prisma.auditLog.create({
@@ -360,68 +348,35 @@ export async function POST(
 
     mlConversionDetails = formatConversionBreakdown(conversion);
 
-    // Update ML balance (up to 14 days)
-    if (conversion.mlPortion > 0 && mlBalance) {
-      const newUsed = (mlBalance.used || 0) + conversion.mlPortion;
-      const newClosing = (mlBalance.opening || 0) + (mlBalance.accrued || 0) - newUsed;
+    // Atomically update all ML conversion balances in a single transaction
+    await prisma.$transaction(async (tx) => {
+      if (conversion.mlPortion > 0 && mlBalance) {
+        const newUsed = (mlBalance.used || 0) + conversion.mlPortion;
+        const newClosing = (mlBalance.opening || 0) + (mlBalance.accrued || 0) - newUsed;
+        await tx.balance.update({
+          where: { userId_type_year: { userId: leave.requesterId, type: "MEDICAL", year: currentYear } },
+          data: { used: newUsed, closing: Math.max(newClosing, 0) },
+        });
+      }
 
-      await prisma.balance.update({
-        where: {
-          userId_type_year: {
-            userId: leave.requesterId,
-            type: "MEDICAL",
-            year: currentYear,
-          },
-        },
-        data: {
-          used: newUsed,
-          closing: Math.max(newClosing, 0),
-        },
-      });
-    }
+      if (conversion.elPortion > 0 && elBalance) {
+        const newUsed = (elBalance.used || 0) + conversion.elPortion;
+        const newClosing = (elBalance.opening || 0) + (elBalance.accrued || 0) - newUsed;
+        await tx.balance.update({
+          where: { userId_type_year: { userId: leave.requesterId, type: "EARNED", year: currentYear } },
+          data: { used: newUsed, closing: Math.max(newClosing, 0) },
+        });
+      }
 
-    // Update EL balance (excess days)
-    if (conversion.elPortion > 0 && elBalance) {
-      const newUsed = (elBalance.used || 0) + conversion.elPortion;
-      const newClosing = (elBalance.opening || 0) + (elBalance.accrued || 0) - newUsed;
-
-      await prisma.balance.update({
-        where: {
-          userId_type_year: {
-            userId: leave.requesterId,
-            type: "EARNED",
-            year: currentYear,
-          },
-        },
-        data: {
-          used: newUsed,
-          closing: Math.max(newClosing, 0),
-        },
-      });
-    }
-
-    // Update Special EL balance (if EL insufficient)
-    if (conversion.specialElPortion > 0 && specialElBalance) {
-      const newUsed = (specialElBalance.used || 0) + conversion.specialElPortion;
-      const newClosing = (specialElBalance.opening || 0) + (specialElBalance.accrued || 0) - newUsed;
-
-      await prisma.balance.update({
-        where: {
-          userId_type_year: {
-            userId: leave.requesterId,
-            type: "SPECIAL",
-            year: currentYear,
-          },
-        },
-        data: {
-          used: newUsed,
-          closing: Math.max(newClosing, 0),
-        },
-      });
-    }
-
-    // Note: Extraordinary Leave has no balance to track (unpaid leave)
-    // It's just recorded in the conversion details for transparency
+      if (conversion.specialElPortion > 0 && specialElBalance) {
+        const newUsed = (specialElBalance.used || 0) + conversion.specialElPortion;
+        const newClosing = (specialElBalance.opening || 0) + (specialElBalance.accrued || 0) - newUsed;
+        await tx.balance.update({
+          where: { userId_type_year: { userId: leave.requesterId, type: "SPECIAL", year: currentYear } },
+          data: { used: newUsed, closing: Math.max(newClosing, 0) },
+        });
+      }
+    });
   } else {
     // Standard balance update for non-CL, non-ML, or CL ≤3 days / ML ≤14 days
     // SECURITY: Use atomic deduction to prevent race conditions
@@ -470,6 +425,36 @@ export async function POST(
       },
     });
   }
+
+  // All balance operations succeeded — now atomically update approval + leave status
+  await prisma.$transaction(async (tx) => {
+    if (existingApproval) {
+      await tx.approval.update({
+        where: { id: existingApproval.id },
+        data: {
+          decision: "APPROVED",
+          decidedAt: new Date(),
+          comment: parsed.data.comment,
+        },
+      });
+    } else {
+      await tx.approval.create({
+        data: {
+          leaveId,
+          step,
+          approverId: user.id,
+          decision: "APPROVED",
+          decidedAt: new Date(),
+          comment: parsed.data.comment,
+        },
+      });
+    }
+
+    await tx.leaveRequest.update({
+      where: { id: leaveId },
+      data: { status: newStatus as LeaveStatus },
+    });
+  });
 
   // Create audit log
   await prisma.auditLog.create({

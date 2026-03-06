@@ -27,3 +27,5 @@ export async function GET() {
         data: LEAVE_TYPES,
     });
 }
+
+export const dynamic = "force-dynamic";

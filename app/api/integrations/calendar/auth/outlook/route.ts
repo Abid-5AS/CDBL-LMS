@@ -64,3 +64,5 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(new URL('/settings/calendar?error=token_exchange_failed', request.url));
     }
 }
+
+export const dynamic = "force-dynamic";

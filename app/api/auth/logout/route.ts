@@ -49,8 +49,13 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // Delete the session token
+  // Delete all auth cookies to prevent stale state
   response.cookies.delete(getJwtCookieName());
+  response.cookies.delete("auth_user_email");
+  response.cookies.delete("auth_user_name");
+  response.cookies.delete("auth_user_role");
 
   return response;
 }
+
+export const dynamic = "force-dynamic";
